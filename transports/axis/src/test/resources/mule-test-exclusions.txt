@@ -11,3 +11,6 @@ org.mule.transport.soap.axis.AxisEndpointMule2164TestCase
 
 # This works, but it requires tools.jar on the classpath which not everyone has
 org.mule.transport.soap.axis.AxisServiceUsingCxfEndpointTestCase
+
+# MULE-4573
+org.mule.transport.soap.axis.AxisConnectorLifecycleTestCase

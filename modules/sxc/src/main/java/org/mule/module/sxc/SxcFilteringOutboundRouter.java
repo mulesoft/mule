@@ -139,7 +139,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         if (evaluator == null)
         {
             builder = new XPathBuilder();
-
+            builder.setNamespaceContext(namespaces);
             addEventHandlers(builder, getFilter());
 
             evaluator = builder.compile();

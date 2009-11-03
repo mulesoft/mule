@@ -509,5 +509,79 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             this.shutdownTimeout = shutdownTimeout;
         }
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (autoWrapMessageAwareTransform ? 1231 : 1237);
+        result = prime * result + (cacheMessageAsBytes ? 1231 : 1237);
+        result = prime * result + (cacheMessageOriginalPayload ? 1231 : 1237);
+        result = prime * result + (clientMode ? 1231 : 1237);
+        result = prime * result + ((clusterId == null) ? 0 : clusterId.hashCode());
+        result = prime * result + defaultQueueTimeout;
+        result = prime * result + defaultTransactionTimeout;
+        result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
+        result = prime * result + (enableStreaming ? 1231 : 1237);
+        result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + responseTimeout;
+        result = prime * result + shutdownTimeout;
+        result = prime * result + (synchronous ? 1231 : 1237);
+        result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
+        result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        DefaultMuleConfiguration other = (DefaultMuleConfiguration) obj;
+        if (autoWrapMessageAwareTransform != other.autoWrapMessageAwareTransform) return false;
+        if (cacheMessageAsBytes != other.cacheMessageAsBytes) return false;
+        if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload) return false;
+        if (clientMode != other.clientMode) return false;
+        if (clusterId == null)
+        {
+            if (other.clusterId != null) return false;
+        }
+        else if (!clusterId.equals(other.clusterId)) return false;
+        if (defaultQueueTimeout != other.defaultQueueTimeout) return false;
+        if (defaultTransactionTimeout != other.defaultTransactionTimeout) return false;
+        if (domainId == null)
+        {
+            if (other.domainId != null) return false;
+        }
+        else if (!domainId.equals(other.domainId)) return false;
+        if (enableStreaming != other.enableStreaming) return false;
+        if (encoding == null)
+        {
+            if (other.encoding != null) return false;
+        }
+        else if (!encoding.equals(other.encoding)) return false;
+        if (id == null)
+        {
+            if (other.id != null) return false;
+        }
+        else if (!id.equals(other.id)) return false;
+        if (responseTimeout != other.responseTimeout) return false;
+        if (shutdownTimeout != other.shutdownTimeout) return false;
+        if (synchronous != other.synchronous) return false;
+        if (systemModelType == null)
+        {
+            if (other.systemModelType != null) return false;
+        }
+        else if (!systemModelType.equals(other.systemModelType)) return false;
+        if (workingDirectory == null)
+        {
+            if (other.workingDirectory != null) return false;
+        }
+        else if (!workingDirectory.equals(other.workingDirectory)) return false;
+        return true;
+    }
     
 }

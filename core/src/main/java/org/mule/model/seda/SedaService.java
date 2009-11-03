@@ -420,9 +420,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Queue not created for service " + name), this);
         }
-        if (logger.isDebugEnabled())
+        if (logger.isTraceEnabled())
         {
-            logger.debug(MessageFormat.format("Service {0} polling queue {1}, timeout = {2}", name, queue.getName(), queueTimeout));
+            logger.trace(MessageFormat.format("Service {0} polling queue {1}, timeout = {2}", name, queue.getName(), queueTimeout));
         }
         if (getQueueTimeout() == null)
         {

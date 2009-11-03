@@ -114,7 +114,9 @@ public class MuleManagedConnection implements ManagedConnection
             creds = new MuleCredentials(user, password.toCharArray());
         }
 
-        MuleConnection connection = new DefaultMuleConnection(this, info.getMuleContext(), creds);
+        // TODO Get muleContext from ResourceAdaptor somehow 
+        // (MULE-2916 MuleContext should not be a static singleton instance)
+        MuleConnection connection = new DefaultMuleConnection(this, null, creds);
         addConnection(connection);
         return connection;
     }

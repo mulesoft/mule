@@ -10,13 +10,6 @@
 
 package org.mule.module.jca;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.util.StringUtils;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import javax.resource.spi.ConnectionRequestInfo;
@@ -24,55 +17,15 @@ import javax.resource.spi.ConnectionRequestInfo;
 /**
  * <code>MuleConnectionRequestInfo</code> TODO
  */
-public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable, MuleContextAware
+public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 910828075890304726L;
 
-
-    private String configurationBuilder = SpringXmlConfigurationBuilder.class.getName();
-    private String configurations;
     private String username;
     private String password;
-
-    private MuleContext muleContext;
-
-    public MuleConnectionRequestInfo()
-    {
-        super();
-    }
-
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
-    {
-        ois.defaultReadObject();
-    }
-
-    public String getConfigurationBuilder()
-    {
-        return configurationBuilder;
-    }
-
-    public void setConfigurationBuilder(String configurationBuilder)
-    {
-        this.configurationBuilder = configurationBuilder;
-    }
-
-    public String getConfigurations()
-    {
-        return configurations;
-    }
-
-    public String[] getConfigurationsAsArray()
-    {
-        return StringUtils.splitAndTrim(configurations, ",");
-    }
-
-    public void setConfigurations(String configurations)
-    {
-        this.configurations = configurations;
-    }
 
     public String getUserName()
     {
@@ -94,72 +47,34 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
         this.password = password;
     }
 
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-
-        if (obj == null)
-        {
-            return false;
-        }
-
-        if (this.getClass() != obj.getClass())
-        {
-            return false;
-        }
-
-        final MuleConnectionRequestInfo muleConnectionRequestInfo = (MuleConnectionRequestInfo)obj;
-
-        if (configurationBuilder != null
-                        ? !configurationBuilder.equals(muleConnectionRequestInfo.configurationBuilder)
-                        : muleConnectionRequestInfo.configurationBuilder != null)
-        {
-            return false;
-        }
-
-        if (configurations != null
-                        ? !configurations.equals(muleConnectionRequestInfo.configurations)
-                        : muleConnectionRequestInfo.configurations != null)
-        {
-            return false;
-        }
-
-        if (password != null
-                        ? !password.equals(muleConnectionRequestInfo.password)
-                        : muleConnectionRequestInfo.password != null)
-        {
-            return false;
-        }
-
-        if (username != null
-                        ? !username.equals(muleConnectionRequestInfo.username)
-                        : muleConnectionRequestInfo.username != null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
+    @Override
     public int hashCode()
     {
-        int result = (configurationBuilder != null ? configurationBuilder.hashCode() : 0);
-        result = 29 * result + (configurations != null ? configurations.hashCode() : 0);
-        result = 29 * result + (username != null ? username.hashCode() : 0);
-        return 29 * result + (password != null ? password.hashCode() : 0);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        MuleConnectionRequestInfo other = (MuleConnectionRequestInfo) obj;
+        if (password == null)
+        {
+            if (other.password != null) return false;
+        }
+        else if (!password.equals(other.password)) return false;
+        if (username == null)
+        {
+            if (other.username != null) return false;
+        }
+        else if (!username.equals(other.username)) return false;
+        return true;
     }
 
     protected Object clone() throws CloneNotSupportedException

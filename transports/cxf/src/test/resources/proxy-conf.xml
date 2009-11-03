@@ -203,6 +203,11 @@
                         <cxf-core:logging/>
                     </cxf:features>
                 </cxf:inbound-endpoint>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapActionAsync" proxy="true" synchronous="false">
+                    <cxf:features>
+                        <cxf-core:logging/>
+                    </cxf:features>
+                </cxf:inbound-endpoint>
             </inbound>
             <outbound>
                 <filtering-router>
@@ -224,7 +229,7 @@
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/oneway" 
                         proxy="true"
-                        synchronous="true"/>
+                        synchronous="true" responseTimeout="2000"/>
                     <message-property-filter pattern="SOAPAction=http://acme.com/oneway"/>
                 </filtering-router>
             </outbound>

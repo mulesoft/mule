@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -61,15 +62,15 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     protected transient MuleContext muleContext;
 
     protected transient BootstrapContext bootstrapContext;
-    protected MuleConnectionRequestInfo info = new MuleConnectionRequestInfo();
-    protected final Map endpoints = new HashMap();
+    protected final Map<MuleEndpointKey, Service> endpoints = new HashMap<MuleEndpointKey, Service>();
     protected String defaultJcaModelName;
 
-    public MuleResourceAdapter()
-    {
-        // TODO Make this work for OSGi
-        //muleContext.getOrCreateRegistry();
-    }
+    private String configurationBuilder = SpringXmlConfigurationBuilder.class.getName();
+    private String configurations;
+    private String username;
+    private String password;
+
+    private DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
     {
@@ -84,18 +85,18 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     {
         this.bootstrapContext = bootstrapContext;
 
-        if (info.getConfigurations() != null)
+        if (configurations != null)
         {
             ConfigurationBuilder configBuilder = null;
             try
             {
-                configBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
-                                                                                   info.getConfigurations());
+                configBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configurationBuilder,
+                    configurations);
             }
             catch (Exception e)
             {
-                throw new ResourceAdapterInternalException("Failed to instanciate configurationBuilder class: "
-                                                           + info.getConfigurationBuilder(), e);
+                throw new ResourceAdapterInternalException(
+                    "Failed to instanciate configurationBuilder class: " + configurationBuilder, e);
             }
 
             try
@@ -103,16 +104,15 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 logger.info("Initializing Mule...");
 
                 MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-                DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-                config.setSystemModelType(JcaModel.JCA_MODEL_TYPE);
-                contextBuilder.setMuleConfiguration(config);
+                muleConfiguration.setSystemModelType(JcaModel.JCA_MODEL_TYPE);
+                contextBuilder.setMuleConfiguration(muleConfiguration);
                 muleContext = new DefaultMuleContextFactory().createMuleContext(configBuilder, contextBuilder);
             }
             catch (MuleException e)
             {
                 logger.error(e);
                 throw new ResourceAdapterInternalException(
-                    "Failed to load configurations: " + info.getConfigurations(), e);
+                    "Failed to load configurations: " + configurations, e);
             }
             try
             {
@@ -186,7 +186,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         }
         else
         {
-            throw new NotSupportedException("That type of ActicationSpec not supported: " + activationSpec.getClass());
+            throw new NotSupportedException("That type of ActicationSpec not supported: "
+                                            + activationSpec.getClass());
         }
 
     }
@@ -272,8 +273,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     }
 
     protected Service createJcaService(MessageEndpointFactory endpointFactory,
-                                              JcaModel model,
-                                              InboundEndpoint endpoint) throws MuleException
+                                       JcaModel model,
+                                       InboundEndpoint endpoint) throws MuleException
     {
         String name = "JcaService#" + endpointFactory.hashCode();
         Service service = new JcaService();
@@ -304,8 +305,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     }
 
     /**
-     * We only connect to one resource manager per ResourceAdapter instance, so any ActivationSpec will return
-     * the same XAResource.
+     * We only connect to one resource manager per ResourceAdapter instance, so any
+     * ActivationSpec will return the same XAResource.
      * 
      * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
      */
@@ -314,77 +315,33 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return new XAResource[]{};
     }
 
-    public String getPassword()
-    {
-        return info.getPassword();
-    }
-
-    public String getConfigurations()
-    {
-        return info.getConfigurations();
-    }
-
-    public String getUserName()
-    {
-        return info.getUserName();
-    }
-
+    /**
+     * @param password
+     */
     public void setPassword(String password)
     {
-        info.setPassword(password);
+        this.password = password;
     }
 
+    /**
+     * @param configurations
+     */
     public void setConfigurations(String configurations)
     {
-        info.setConfigurations(configurations);
+        this.configurations = configurations;
     }
 
+    /**
+     * @param userid
+     */
     public void setUserName(String userid)
     {
-        info.setUserName(userid);
-    }
-
-    public String getConfigurationBuilder()
-    {
-        return info.getConfigurationBuilder();
+        this.username = userid;
     }
 
     public void setConfigurationBuilder(String configbuilder)
     {
-        info.setConfigurationBuilder(configbuilder);
-    }
-
-    public MuleConnectionRequestInfo getInfo()
-    {
-        return info;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof MuleResourceAdapter))
-        {
-            return false;
-        }
-
-        final MuleResourceAdapter muleResourceAdapter = (MuleResourceAdapter) o;
-
-        if (info != null ? !info.equals(muleResourceAdapter.info) : muleResourceAdapter.info != null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return (info != null ? info.hashCode() : 0);
+        this.configurationBuilder = configbuilder;
     }
 
     public String getModelName()
@@ -395,6 +352,155 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     public void setModelName(String modelName)
     {
         this.defaultJcaModelName = modelName;
+    }
+
+    public void setAutoWrapMessageAwareTransform(Boolean autoWrapMessageAwareTransform)
+    {
+        if (autoWrapMessageAwareTransform != null)
+        {
+            muleConfiguration.setAutoWrapMessageAwareTransform(autoWrapMessageAwareTransform);
+        }
+    }
+
+    public void setCacheMessageAsBytes(Boolean cacheMessageAsBytes)
+    {
+        if (cacheMessageAsBytes != null)
+        {
+            muleConfiguration.setCacheMessageAsBytes(cacheMessageAsBytes);
+        }
+    }
+
+    public void setCacheMessageOriginalPayload(Boolean cacheMessageOriginalPayload)
+    {
+        if (cacheMessageOriginalPayload != null)
+        {
+            muleConfiguration.setCacheMessageOriginalPayload(cacheMessageOriginalPayload);
+        }
+    }
+
+    public void setClusterId(String clusterId)
+    {
+        muleConfiguration.setClusterId(clusterId);
+    }
+
+    public void setDefaultEncoding(String encoding)
+    {
+        muleConfiguration.setDefaultEncoding(encoding);
+    }
+
+    public void setDefaultQueueTimeout(Integer defaultQueueTimeout)
+    {
+        if (defaultQueueTimeout != null)
+        {
+            muleConfiguration.setDefaultQueueTimeout(defaultQueueTimeout);
+        }
+    }
+
+    public void setDefaultResponseTimeout(Integer responseTimeout)
+    {
+        if (responseTimeout != null)
+        {
+            muleConfiguration.setDefaultResponseTimeout(responseTimeout);
+        }
+    }
+
+    public void setDefaultSynchronousEndpoints(Boolean synchronous)
+    {
+        if (synchronous != null)
+        {
+            muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
+        }
+    }
+
+    public void setDefaultTransactionTimeout(Integer defaultTransactionTimeout)
+    {
+        if (defaultTransactionTimeout != null)
+        {
+            muleConfiguration.setDefaultTransactionTimeout(defaultTransactionTimeout);
+        }
+    }
+
+    public void setDomainId(String domainId)
+    {
+        muleConfiguration.setDomainId(domainId);
+    }
+
+    public void setServerId(String serverId)
+    {
+        muleConfiguration.setId(serverId);
+    }
+
+    public void setShutdownTimeout(Integer shutdownTimeout)
+    {
+        if (shutdownTimeout != null)
+        {
+            muleConfiguration.setShutdownTimeout(shutdownTimeout);
+        }
+    }
+
+    public void setWorkingDirectory(String workingDirectory)
+    {
+        muleConfiguration.setWorkingDirectory(workingDirectory);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((configurationBuilder == null) ? 0 : configurationBuilder.hashCode());
+        result = prime * result + ((configurations == null) ? 0 : configurations.hashCode());
+        result = prime * result + ((defaultJcaModelName == null) ? 0 : defaultJcaModelName.hashCode());
+        result = prime * result + ((endpoints == null) ? 0 : endpoints.hashCode());
+        result = prime * result + ((muleConfiguration == null) ? 0 : muleConfiguration.hashCode());
+        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        MuleResourceAdapter other = (MuleResourceAdapter) obj;
+        if (configurationBuilder == null)
+        {
+            if (other.configurationBuilder != null) return false;
+        }
+        else if (!configurationBuilder.equals(other.configurationBuilder)) return false;
+        if (configurations == null)
+        {
+            if (other.configurations != null) return false;
+        }
+        else if (!configurations.equals(other.configurations)) return false;
+        if (defaultJcaModelName == null)
+        {
+            if (other.defaultJcaModelName != null) return false;
+        }
+        else if (!defaultJcaModelName.equals(other.defaultJcaModelName)) return false;
+        if (endpoints == null)
+        {
+            if (other.endpoints != null) return false;
+        }
+        else if (!endpoints.equals(other.endpoints)) return false;
+        if (muleConfiguration == null)
+        {
+            if (other.muleConfiguration != null) return false;
+        }
+        else if (!muleConfiguration.equals(other.muleConfiguration)) return false;
+        if (password == null)
+        {
+            if (other.password != null) return false;
+        }
+        else if (!password.equals(other.password)) return false;
+        if (username == null)
+        {
+            if (other.username != null) return false;
+        }
+        else if (!username.equals(other.username)) return false;
+        return true;
     }
 
 }
