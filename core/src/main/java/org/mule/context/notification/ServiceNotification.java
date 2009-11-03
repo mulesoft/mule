@@ -10,6 +10,7 @@
 
 package org.mule.context.notification;
 
+import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.service.Service;
 
@@ -18,7 +19,7 @@ import org.mule.api.service.Service;
  * starting occurs. The payload of this event will always be a reference to the
  * service.
  */
-public class ServiceNotification extends ServerNotification
+public class ServiceNotification extends ServerNotification implements BlockingServerEvent
 {
     /**
      * Serial version

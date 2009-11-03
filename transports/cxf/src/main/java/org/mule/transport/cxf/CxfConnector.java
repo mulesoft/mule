@@ -11,7 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
-import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -21,7 +21,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.SpringRegistry;
-import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.ServiceNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
@@ -31,11 +31,11 @@ import org.mule.transport.cxf.transport.MuleUniversalTransport;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -52,7 +52,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * Connects Mule to a CXF bus instance.
  */
-public class CxfConnector extends AbstractConnector implements MuleContextNotificationListener<MuleContextNotification>
+public class CxfConnector extends AbstractConnector implements ServiceNotificationListener<ServiceNotification>
 {
 
     public static final String CXF = "cxf";
@@ -65,7 +65,7 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
     private Bus bus;
     private String configurationLocation;
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
-    private List<SedaService> services = Collections.synchronizedList(new ArrayList<SedaService>());
+    private Map<String, Set<Service>> serviceToProtocolServices = Collections.synchronizedMap(new HashMap<String, Set<Service>>());
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
     private boolean initializeStaticBusInstance = true;
     
@@ -218,20 +218,20 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
         
         // TODO MULE-2228 Simplify this API
-        SedaService service = new SedaService();
-        service.setMuleContext(muleContext);
+        SedaService outerProtocolService = new SedaService();
+        outerProtocolService.setMuleContext(muleContext);
 
         String uniqueServiceName = createServiceName(server.getEndpoint());
-        service.setName(uniqueServiceName);
-
-        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        outerProtocolService.setName(uniqueServiceName);
+        
+        outerProtocolService.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
         svcComponent.setBus(bus);
 
         final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(svcComponent));
         component.setMuleContext(muleContext);
-        service.setComponent(component);
+        outerProtocolService.setComponent(component);
 
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new
@@ -329,9 +329,17 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
 
         receiver.setEndpoint(receiverEndpoint);
         
-        service.setInboundRouter(new DefaultInboundRouterCollection());
-        service.getInboundRouter().addEndpoint(protocolEndpoint);
-        services.add(service);
+        outerProtocolService.setInboundRouter(new DefaultInboundRouterCollection());
+        outerProtocolService.getInboundRouter().addEndpoint(protocolEndpoint);
+
+        // Add outer services to map so that we can easily look them on on user
+        // service lifecycle notifications
+        if (!serviceToProtocolServices.containsKey(receiver.getService()))
+        {
+            serviceToProtocolServices.put(receiver.getService().getName(), new HashSet());
+        }
+        serviceToProtocolServices.get(receiver.getService().getName()).add(outerProtocolService);
+
     }
     
     /**
@@ -371,29 +379,41 @@ public class CxfConnector extends AbstractConnector implements MuleContextNotifi
         }
     }
 
-    public void onNotification(MuleContextNotification event)
+    public void onNotification(ServiceNotification event)
     {
-        // We need to register the CXF service service once the model
-        // starts because
-        // when the model starts listeners on components are started, thus
-        // all listener
-        // need to be registered for this connector before the CXF service
-        // service is registered. The implication of this is that to add a
-        // new service and a
-        // different http port the model needs to be restarted before the
-        // listener is available
-        if (event.getAction() == MuleContextNotification.CONTEXT_STARTED)
+        // Only register/start the outer (CxfServiceComponent/protocol) services once
+        // the inner (user) service is started
+        if (event.getAction() == ServiceNotification.SERVICE_STARTED
+            && serviceToProtocolServices.get(event.getSource()) != null)
         {
-            for (Service service : services)
+            try
             {
-                try
+                for (Service outerService : serviceToProtocolServices.get(event.getSource()))
                 {
-                    muleContext.getRegistry().registerService(service);
+                    muleContext.getRegistry().registerService(outerService);
                 }
-                catch (MuleException e)
+            }
+            catch (MuleException e)
+            {
+                handleException(e);
+            }
+        }
+        // We need to stop the outer services first if they are not already stopped
+        // to avoid request failures.
+        else if (event.getAction() == ServiceNotification.SERVICE_STOPPING
+                 && serviceToProtocolServices.get(event.getSource()) != null)
+        {
+            try
+            {
+                for (Service outerService : serviceToProtocolServices.get(event.getSource()))
                 {
-                    handleException(e);
+                    muleContext.getRegistry().unregisterService(outerService.getName());
+                    serviceToProtocolServices.remove(event.getSource());
                 }
+            }
+            catch (MuleException e)
+            {
+                handleException(e);;
             }
         }
     }
