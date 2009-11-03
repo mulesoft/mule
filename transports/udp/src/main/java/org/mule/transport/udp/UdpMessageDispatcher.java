@@ -137,13 +137,13 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
             {
-                return new DefaultMuleMessage(NullPayload.getInstance());
+                return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
             }
             return new DefaultMuleMessage(connector.getMessageAdapter(result), event.getMessage(), connector.getMuleContext());
         }
         else
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
         }
     }
 

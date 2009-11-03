@@ -240,7 +240,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         // One way dispatches over an async transport result in this
         if (transportResponse == null) 
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
         }
         
         // Otherwise we may have a response!

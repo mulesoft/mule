@@ -68,7 +68,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance());
+                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
                     }
                     
                     if (result instanceof MuleMessage)
@@ -83,12 +83,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + event.getEndpoint().getEndpointURI());
-                    return new DefaultMuleMessage(NullPayload.getInstance());
+                    return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
                 }
             }
             else
             {
-                return new DefaultMuleMessage(NullPayload.getInstance());
+                return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
             }
         }
         finally

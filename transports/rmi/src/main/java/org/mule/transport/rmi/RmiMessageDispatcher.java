@@ -98,7 +98,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
         if (result == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
         }
         else
         {
