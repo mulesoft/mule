@@ -21,6 +21,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
@@ -29,6 +30,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.security.SecurityException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -336,13 +338,13 @@ public abstract class AbstractExceptionListener
             catch (Exception e)
             {
                 logFatal(message, e);
-                closeStream(message);
+                closeStream(message, t);
             }
         }
         else
         {
             handleTransaction(t);
-            closeStream(message);
+            closeStream(message, t);
         }
     }
 
@@ -421,7 +423,7 @@ public abstract class AbstractExceptionListener
         return router;
     }
 
-    protected void closeStream(MuleMessage message)
+    protected void closeStream(MuleMessage message, Throwable t)
     {
         if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed())
         {
@@ -430,6 +432,18 @@ public abstract class AbstractExceptionListener
         if (message != null
             && muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE) != null)
         {
+            // Workaround for MULE-4561
+            MuleEvent event = RequestContext.getEvent();
+            if (event != null && 
+                event.getEndpoint() != null && 
+                event.getEndpoint() instanceof InboundEndpoint && 
+                event.getEndpoint().isSynchronous() 
+                && t instanceof SecurityException)
+            {
+                // Don't close stream because it may be needed for response payload
+                return;
+            }
+            
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
         }

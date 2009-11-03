@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:https="http://www.mulesoft.org/schema/mule/https"
+       xmlns:acegi="http://www.mulesoft.org/schema/mule/acegi"
+       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.0/mule-https.xsd
+       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd       
+       http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd">
+
+    <https:connector name="httpConnector">
+        <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
+        <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
+        <https:tls-server path="trustStore" storePassword="mulepassword"/>
+    </https:connector>
+
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
+
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
+                ross=ross,ROLE_ADMIN
+                anon=anon,ROLE_ANONYMOUS
+            </spring:value>
+        </spring:property>
+    </spring:bean>
+
+    <acegi:security-manager>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </acegi:security-manager>
+
+    <model name="http secured test model">
+        <service name="SecureUMO">
+            <inbound>
+                <cxf:inbound-endpoint 
+                    address="http://localhost:60443/services/Echo"
+                    frontend="simple"
+                    applySecurityToProtocol="true">
+                    <acegi:http-security-filter realm="mule-realm"/>
+                </cxf:inbound-endpoint>
+                <cxf:inbound-endpoint 
+                    address="https://localhost:60444/services/Echo"
+                    frontend="simple"
+                    applySecurityToProtocol="true">
+                    <acegi:http-security-filter realm="mule-realm"/>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+
+</mule>

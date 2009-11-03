@@ -17,7 +17,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,12 +47,6 @@ public final class ExceptionHelper
      * underlying message
      */
     public static final String ERROR_CODE_PROPERTY = "error.code.property";
-
-    /**
-     * a comma-separated list of other protocols the mappings in a file can be
-     * applied to
-     */
-    public static final String APPLY_TO_PROPERTY = "apply.to";
 
     /**
      * logger used by this class
@@ -212,15 +205,6 @@ public final class ExceptionHelper
             }
             
             errorMappings.put(protocol, p);
-            String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
-            if (applyTo != null)
-            {
-                String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
-                for (int i = 0; i < protocols.length; i++)
-                {
-                    errorMappings.put(protocols[i], p);
-                }
-            }
             return p;
         }
     }
