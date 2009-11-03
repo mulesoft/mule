@@ -38,16 +38,19 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(
-                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-                                + "but there was no security context on the session. Authentication denied on endpoint "
-                                + "http://localhost:4567. Message payload is of type: String",
-                get.getResponseBodyAsString());
+            assertEquals(getNoContextErrorResponse(), get.getResponseBodyAsString());
         }
         finally
         {
             get.releaseConnection();
         }
+    }
+
+    protected String getNoContextErrorResponse()
+    {
+        return "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+               + "but there was no security context on the session. Authentication denied on endpoint "
+               + "http://localhost:4567. Message payload is of type: String";
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
@@ -77,8 +80,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
-        doRequest("mule-realm", "localhost", "ross", "ross", getUrl(), true, false,
-            200);
+        doRequest("mule-realm", "localhost", "ross", "ross", getUrl(), true, false, 200);
     }
 
     private void doRequest(String realm,

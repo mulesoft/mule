@@ -51,5 +51,12 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
 
         super.doTearDown();
     }
+    
+    protected String getNoContextErrorResponse()
+    {
+        return "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
+               + "but there was no security context on the session. Authentication denied on endpoint "
+               + "servlet://test. Message payload is of type: String";
+    }
 
 }
