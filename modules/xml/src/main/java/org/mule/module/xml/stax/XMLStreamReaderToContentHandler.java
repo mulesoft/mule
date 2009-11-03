@@ -80,12 +80,8 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
         this.filter = filter;
     }
 
-    /*
-     * @see StAXReaderToContentHandler#bridge()
-     */
     public void bridge() throws XMLStreamException
     {
-
         try
         {
             // remembers the nest level of elements to know when we are done.
@@ -422,15 +418,11 @@ public class XMLStreamReaderToContentHandler implements StAXReaderToContentHandl
 
     protected void handleComment() throws XMLStreamException
     {
-        int textLength = staxStreamReader.getTextLength();
-        int textStart = staxStreamReader.getTextStart();
-        char[] chars = new char[textLength];
-
-        staxStreamReader.getTextCharacters(textStart, chars, 0, textLength);
-
+        char[] chars = staxStreamReader.getText().toCharArray();
+        
         try
         {
-            filter.comment(chars, 0, textLength);
+            filter.comment(chars, 0, chars.length);
         }
         catch (SAXException e)
         {

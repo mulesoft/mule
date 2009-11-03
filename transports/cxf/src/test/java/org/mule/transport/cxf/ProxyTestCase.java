@@ -220,7 +220,7 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:63081/services/envelope-proxy", msgWithComment, null);
         String resString = result.getPayloadAsString();
-        assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
+        assertTrue(resString.contains(doGoogleSearch));
     }
     
     protected String prepareOneWayTestMessage()
@@ -238,7 +238,7 @@ public class ProxyTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
         props.put("SOAPAction", "http://acme.com/oneway");
         return props;
-    }   
+    }
     
     protected String getConfigResources()
     {
