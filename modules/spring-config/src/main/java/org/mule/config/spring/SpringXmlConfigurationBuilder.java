@@ -94,7 +94,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
         // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
-        muleContext.addRegistry(1, registry);
+        muleContext.addRegistry(registry);
         registry.initialise();
     }
     

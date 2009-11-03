@@ -145,7 +145,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             injector = Guice.createInjector(modules);
         }
         GuiceRegistry registry = new GuiceRegistry(injector);
-        muleContext.addRegistry(2, registry);
+        muleContext.addRegistry(registry);
 
         for (Iterator<Key<?>> iterator = injector.getBindings().keySet().iterator(); iterator.hasNext();)
         {
