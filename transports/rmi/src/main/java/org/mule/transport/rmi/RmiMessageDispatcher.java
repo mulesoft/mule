@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
 import java.rmi.RMISecurityManager;
@@ -97,7 +98,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
         if (result == null)
         {
-            return null;
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
         else
         {

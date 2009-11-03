@@ -260,7 +260,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     if (result == null)
                     {
                         logger.debug("No message was returned via replyTo destination");
-                        return null;
+                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
                     }
                     else
                     {
@@ -282,7 +282,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     if (result == null)
                     {
                         logger.debug("No message was returned via replyTo destination " + replyTo);
-                        return null;
+                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
                     }
                     else
                     {

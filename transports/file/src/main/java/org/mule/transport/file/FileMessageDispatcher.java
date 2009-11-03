@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
@@ -148,7 +149,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return null;
+        return new DefaultMuleMessage(NullPayload.getInstance());
     }
 
     protected void doDispose()

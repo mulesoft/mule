@@ -17,6 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryContext;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -136,13 +137,13 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
             {
-                return null;
+                return new DefaultMuleMessage(NullPayload.getInstance());
             }
             return new DefaultMuleMessage(connector.getMessageAdapter(result), event.getMessage(), connector.getMuleContext());
         }
         else
         {
-            return null;
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
     }
 

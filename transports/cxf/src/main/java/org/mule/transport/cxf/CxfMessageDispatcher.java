@@ -18,6 +18,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.transport.soap.SoapConstants;
 import org.mule.util.TemplateParser;
 
@@ -239,7 +240,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         // One way dispatches over an async transport result in this
         if (transportResponse == null) 
         {
-            return null;
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
         
         // Otherwise we may have a response!

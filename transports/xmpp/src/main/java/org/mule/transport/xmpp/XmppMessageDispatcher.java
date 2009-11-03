@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.GroupChat;
@@ -103,7 +104,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
                 return new DefaultMuleMessage(connector.getMessageAdapter(response), connector.getMuleContext());
             }
         }
-        return null;
+        return new DefaultMuleMessage(NullPayload.getInstance());
     }
 
     protected void sendMessage(MuleEvent event) throws Exception

@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
@@ -19,6 +20,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 
 import java.net.URLDecoder;
 import java.util.Calendar;
@@ -104,7 +106,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return null;
+        return new DefaultMuleMessage(NullPayload.getInstance());
     }
 
     protected void sendMailMessage(Message message) throws MessagingException

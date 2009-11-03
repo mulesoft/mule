@@ -10,11 +10,13 @@
 
 package org.mule.transport.quartz;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.transport.quartz.config.JobConfig;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 import org.mule.transport.quartz.jobs.CustomJob;
@@ -175,7 +177,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return null;
+        return new DefaultMuleMessage(NullPayload.getInstance());
     }
 
     @Override

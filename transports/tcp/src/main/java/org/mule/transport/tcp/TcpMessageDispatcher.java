@@ -18,6 +18,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -67,7 +68,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return null;
+                        return new DefaultMuleMessage(NullPayload.getInstance());
                     }
                     
                     if (result instanceof MuleMessage)
@@ -82,12 +83,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + event.getEndpoint().getEndpointURI());
-                    return null;
+                    return new DefaultMuleMessage(NullPayload.getInstance());
                 }
             }
             else
             {
-                return null;
+                return new DefaultMuleMessage(NullPayload.getInstance());
             }
         }
         finally
