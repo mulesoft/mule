@@ -334,7 +334,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
 
         // Add outer services to map so that we can easily look them on on user
         // service lifecycle notifications
-        if (!serviceToProtocolServices.containsKey(receiver.getService()))
+        if (!serviceToProtocolServices.containsKey(receiver.getService().getName()))
         {
             serviceToProtocolServices.put(receiver.getService().getName(), new HashSet());
         }
