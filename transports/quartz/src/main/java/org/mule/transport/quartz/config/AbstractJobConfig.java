@@ -24,7 +24,7 @@ public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
 
     private String jobGroupName = QuartzConnector.DEFAULT_GROUP_NAME;
 
-    private MuleContext muleContext;
+    private transient MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
     {

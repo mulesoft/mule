@@ -16,6 +16,8 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 
+import java.io.Serializable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
@@ -24,10 +26,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * Will dispatch the current message to a Mule endpoint at a leter time.
- * This job can be used to fire timebased events.
+ * Will dispatch the current message to a Mule endpoint at a later time.
+ * This job can be used to fire time based events.
  */
-public class ScheduledDispatchJob implements Job
+public class ScheduledDispatchJob implements Job, Serializable
 {
     /**
      * The logger used for this class

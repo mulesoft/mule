@@ -36,7 +36,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
 
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setEndpointRef("vm://quartz.in");
         props.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
@@ -68,5 +68,4 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         // report more messages than requested during shutdown of the test/Mule server
         component.setEventCallback(null);
     }
-
 }
