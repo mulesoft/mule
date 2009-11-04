@@ -12,12 +12,14 @@ package org.mule.test.integration.components;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 
 /**
  * @author David Dossot (david@dossot.net)
  */
 public class LifecycleTrackerComponent extends AbstractLifecycleTracker
-        implements Callable {
+        implements ServiceAware, Callable {
 
     public void springInitialize() {
         getTracker().add("springInitialize");
@@ -25,6 +27,11 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker
 
     public void springDestroy() {
         getTracker().add("springDestroy");
+    }
+
+     public void setService(final Service service)
+    {
+        getTracker().add("setService");
     }
 
     public Object onCall(final MuleEventContext eventContext) throws Exception {
