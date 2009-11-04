@@ -95,7 +95,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -350,7 +349,6 @@ public abstract class AbstractConnector
             ((DefaultExceptionStrategy)exceptionListener).initialise();
         }
 
-
         initialised.set(true);
     }
 
@@ -384,9 +382,16 @@ public abstract class AbstractConnector
             {
                 throw new LifecycleException(e, this);
             }
-            return;
+        }
+        else
+        {
+            startAfterConnect();
         }
 
+    }
+
+    protected synchronized void startAfterConnect() throws MuleException
+    {
         if (logger.isInfoEnabled())
         {
             logger.info("Starting: " + this);
@@ -460,7 +465,7 @@ public abstract class AbstractConnector
     {
         if (!this.isStarted())
         {
-            logger.warn("Attempting to stop a connector which is not started");
+            logger.warn("Attempting to stop a connector which is not started: " + getName());
             return;
         }
         
@@ -504,7 +509,8 @@ public abstract class AbstractConnector
         }
         
         // Workaround for MULE-4553
-        dispatchers.clear();
+        this.disposeDispatchers();
+        this.disposeRequesters();
 
         if (this.isConnected())
         {
@@ -613,8 +619,6 @@ public abstract class AbstractConnector
         }
 
         this.disposeReceivers();
-        this.disposeDispatchers();
-        this.disposeRequesters();
 
         this.doDispose();
         disposed.set(true);
@@ -719,7 +723,10 @@ public abstract class AbstractConnector
         if (dispatchers != null)
         {
             logger.debug("Disposing Dispatchers");
-            dispatchers.clear();
+            synchronized (dispatchers)
+            {
+                dispatchers.clear();
+            }
             logger.debug("Dispatchers Disposed");
         }
     }
@@ -1564,7 +1571,7 @@ public abstract class AbstractConnector
                     
                     if (startOnConnect)
                     {
-                        start();
+                        startAfterConnect();
                     }                
                 }
     
@@ -2215,22 +2222,7 @@ public abstract class AbstractConnector
                 logger.debug("Transport '" + getProtocol() + "' will not support requests: ");
             }
 
-
             sessionHandler = serviceDescriptor.createSessionHandler();
-
-            // TODO Do we still need to support this for 2.x?
-            // Set any manager default properties for the connector. These are set on
-            // the Manager with a protocol e.g. jms.specification=1.1
-            // This provides a really convenient way to set properties on an object
-            // from unit tests
-//            Map props = new HashMap();
-//            PropertiesUtils.getPropertiesWithPrefix(muleContext.getRegistry().lookupProperties(), getProtocol()
-//                .toLowerCase(), props);
-//            if (props.size() > 0)
-//            {
-//                props = PropertiesUtils.removeNamespaces(props);
-//                org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
-//            }
         }
         catch (Exception e)
         {
