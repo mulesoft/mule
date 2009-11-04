@@ -22,5 +22,6 @@ public class MuleContextInitialisePhase extends ContainerManagedLifecyclePhase
     public MuleContextInitialisePhase()
     {
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
+        registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
     }
 }

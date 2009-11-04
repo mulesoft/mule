@@ -197,32 +197,22 @@ public class GenericLifecycleManager implements LifecycleManager
 
     public void checkPhase(String name) throws IllegalStateException
     {
-        if (completedPhases.contains(name))
-        {
-            throw new IllegalStateException("Phase '" + name + "' has already been executed");
-        }
-
-        if (name.equalsIgnoreCase(executingPhase))
-        {
-            throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
-        }
-
         if (executingPhase != null)
         {
-            throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+            if (name.equalsIgnoreCase(executingPhase))
+            {
+                throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
+            }
+            else
+            {
+                throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+            }
         }
 
         Integer phaseIndex = index.get(name);
         if (phaseIndex == null)
         {
             throw new IllegalStateException("Phase does not exist: " + name);
-        }
-        if (NotInLifecyclePhase.PHASE_NAME.equals(currentPhase))
-        {
-            if (phaseIndex > 0)
-            {
-                throw new IllegalStateException("The first lifecycle phase has to be called before the '" + name + "' phase");
-            }
         }
         else
         {
