@@ -99,7 +99,7 @@
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <commonsNetVersion>2.0</commonsNetVersion>
-        <commonsPoolVersion>1.5.2</commonsPoolVersion>
+        <commonsPoolVersion>1.5.3</commonsPoolVersion>
         <!-- TODO There is a more modern version of cryptix available: 
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
