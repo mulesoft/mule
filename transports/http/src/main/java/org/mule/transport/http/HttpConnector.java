@@ -325,7 +325,7 @@ public class HttpConnector extends TcpConnector
         this.followRedirects = followRedirects;
     }
     
-    protected HttpClient doClientConnect() throws Exception
+    HttpClient doClientConnect() throws Exception
     {
         HttpState state = new HttpState();
 
@@ -343,7 +343,7 @@ public class HttpConnector extends TcpConnector
         return client;
     }
 
-    protected void setupClientAuthorization(MuleEvent event, HttpMethod httpMethod,
+    void setupClientAuthorization(MuleEvent event, HttpMethod httpMethod,
                                             HttpClient client, ImmutableEndpoint endpoint)
             throws UnsupportedEncodingException
     {

@@ -36,9 +36,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter implements Messag
      */
     private static final long serialVersionUID = -1544495479333000422L;
 
-    private boolean http11 = true;
+    protected boolean http11 = true;
 
-    private Object message;
+    protected Object message;
 
     public HttpMessageAdapter(Object message)
     {
