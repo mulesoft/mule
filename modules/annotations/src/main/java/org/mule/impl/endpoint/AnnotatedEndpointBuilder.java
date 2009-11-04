@@ -16,12 +16,12 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.expression.PropertyConverter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.config.annotations.endpoints.ChannelType;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.impl.registry.ConfigurableTransportFactory;
 import org.mule.impl.registry.RegistryMap;
+import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.util.TemplateParser;
 
@@ -101,27 +101,39 @@ public class AnnotatedEndpointBuilder
             endpointBuilder.setEncoding(getPropertyValue(epData.getEncoding()));
         }
 
+        AbstractConnector connector;
         if (epData.getConnectorName() != null)
         {
-            endpointBuilder.setConnector(muleContext.getRegistry().lookupConnector(getPropertyValue(epData.getConnectorName())));
+            connector = (AbstractConnector)muleContext.getRegistry().lookupConnector(getPropertyValue(epData.getConnectorName()));
         }
         else if (epData.getConnector() != null)
         {
-            endpointBuilder.setConnector(epData.getConnector());
+            connector = (AbstractConnector)epData.getConnector();
         }
         else
         {
             //We always create a new connecotr for annotations when one has not been configured
             MuleEndpointURI uri = new MuleEndpointURI(getPropertyValue(epData.getAddress()), muleContext);
 
-            Connector connector = transportFactory.createConnector(uri);
+            connector = (AbstractConnector)transportFactory.createConnector(uri);
             //The ibeans transport factory will not always create a new connector, check before registering
             if (muleContext.getRegistry().lookupConnector(connector.getName()) == null)
             {
                 muleContext.getRegistry().registerConnector(connector);
             }
-            endpointBuilder.setConnector(connector);
+        }
+        endpointBuilder.setConnector(connector);
 
+        //Set threading for this connector. Note we simplify by setting all profiles with a single value 'threads'
+        //that can be set by the user
+        String threadsString = (String)epData.getProperties().get("threads");
+        if(threadsString!=null)
+        {
+            int threads = Integer.valueOf(threadsString);
+            connector.setMaxDispatchersActive(threads);
+            connector.setMaxRequestersActive(threads);
+            connector.getReceiverThreadingProfile().setMaxThreadsActive(threads);
+            connector.getReceiverThreadingProfile().setMaxThreadsIdle(threads);
         }
 
         if (epData.getName() != null)

@@ -45,12 +45,12 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
         return new AnnotatedEndpointBuilder(muleContext);
     }
 
-    public OutboundEndpoint parseOutboundEndpoint(Annotation annotation) throws MuleException
+    public OutboundEndpoint parseOutboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException
     {
         return (OutboundEndpoint) getEndpointBuilder().processEndpoint(createEndpointData(annotation));
     }
 
-    public InboundEndpoint parseInboundEndpoint(Annotation annotation) throws MuleException
+    public InboundEndpoint parseInboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException
     {
         return (InboundEndpoint) getEndpointBuilder().processEndpoint(createEndpointData(annotation));
     }

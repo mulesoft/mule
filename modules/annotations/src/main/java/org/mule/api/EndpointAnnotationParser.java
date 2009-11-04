@@ -14,6 +14,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Map;
 
 /**
  * An SPI interface that will process an Endpoint annotation. Note that the Annotation must be annotated with the {@link @Endpoint }
@@ -25,19 +26,23 @@ public interface EndpointAnnotationParser
      * Creates an outbound endpoint from the annotation.
      *
      * @param annotation the annotation to process
+     * @param metaInfo   any additional info that can be used to construct the endpoint.  Typically a connector name might be
+     *                   in this map so that all endpoints for the current object can share the same connector
      * @return a new {@link org.mule.api.endpoint.OutboundEndpoint} object configured according to the annotation
      * @throws MuleException if the outbound endpoint cannot be created. A Mule-specific error will be thrown.
      */
-    public OutboundEndpoint parseOutboundEndpoint(Annotation annotation) throws MuleException;
+    public OutboundEndpoint parseOutboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException;
 
     /**
      * Creates an inbound endpoint from the annotation.
      *
      * @param annotation the annotation to process
+     * @param metaInfo any additional info that can be used to construct the endpoint.  Typically a connector name might be
+     *                   in this map so that all endpoints for the current object can share the same connector
      * @return a new {@link org.mule.api.endpoint.InboundEndpoint} object configured according to the annotation
      * @throws MuleException if the inbound endpoint cannot be created. A Mule-specific error will be thrown.
      */
-    public InboundEndpoint parseInboundEndpoint(Annotation annotation) throws MuleException;
+    public InboundEndpoint parseInboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException;
 
     /**
      * Determines whether this parser can process the current annotation.  The clazz and member params are passed in
