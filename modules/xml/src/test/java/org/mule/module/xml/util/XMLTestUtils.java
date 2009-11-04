@@ -26,11 +26,11 @@ import org.xml.sax.InputSource;
 
 public class XMLTestUtils
 {
-    public static List getXmlMessageVariants(String resource) throws Exception
+    public static List<?> getXmlMessageVariants(String resource) throws Exception
     {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         
-        List list = new ArrayList();
+        List<Object> list = new ArrayList<Object>();
         InputStream is;
 
         // java.io.InputStream
@@ -64,5 +64,3 @@ public class XMLTestUtils
         return list;
     }
 }
-
-

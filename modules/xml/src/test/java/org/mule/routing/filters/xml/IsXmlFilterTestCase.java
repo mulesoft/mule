@@ -17,14 +17,13 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 
 public class IsXmlFilterTestCase extends AbstractMuleTestCase
 {
-
     private IsXmlFilter filter;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         filter = new IsXmlFilter();
@@ -75,14 +74,10 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
 
     public void testFilterXmlMessageVariants() throws Exception
     {
-        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
-        Iterator it = list.iterator();
-        
-        Object msg;
-        while (it.hasNext())
+        List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        for (Object message : list)
         {
-            msg = it.next();
-            assertTrue(filter.accept(new DefaultMuleMessage(msg, muleContext)));
+            assertTrue(filter.accept(new DefaultMuleMessage(message, muleContext)));
         }
     }
 }
