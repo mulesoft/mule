@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" 
-    xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.2"
-    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-       http://www.mulesource.org/schema/mule/quartz/2.2 http://www.mulesource.org/schema/mule/quartz/2.2/mule-quartz.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
 
-    <vm:connector name="persistentVmConnector" queueEvents="true">
+    <vm:connector name="persistentVmConnector">
         <vm:queue-profile persistent="true"/>
     </vm:connector>
 
-    <!-- 
-        Messages are sent from the test case to the customJobQueue endpoint. This has to be used to 
-        ensure that a message has been serialized and deserialized before it hits the quartz 
+    <!--
+        Messages are sent from the test case to the customJobQueue endpoint. This has to be used to
+        ensure that a message has been serialized and deserialized before it hits the quartz
         endpoint in the CustomJobScheduler service.
-        
+
         Sending messages to the "customJobInput" endpoint only are routed sync, no matter what's
         specified on the endpoint.
     -->
@@ -33,7 +33,7 @@
                 </pass-through-router>
             </outbound>
         </service>
-        
+
         <service name="CustomJobScheduler">
             <inbound>
                 <vm:inbound-endpoint path="customJobInput"/>
