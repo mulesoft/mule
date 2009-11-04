@@ -10,11 +10,12 @@
 package org.mule.impl.annotations;
 
 /**
- * Service component scopes
+ * Object component scopes
  */
-public enum ServiceScope
+public enum ObjectScope
 {
-   PROTOTYPE,
+   REQUEST,
    SINGLETON,
+   SINGLETON_THREADSAFE,
    POOLED
 }

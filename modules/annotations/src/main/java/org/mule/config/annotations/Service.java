@@ -9,7 +9,7 @@
  */
 package org.mule.config.annotations;
 
-import org.mule.impl.annotations.ServiceScope;
+import org.mule.impl.annotations.ObjectScope;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -31,7 +31,7 @@ public @interface Service
      * The name of this service
      * @return the name of this service. This value is required
      */
-    String name();
+    String name() default "";
 
     /**
      * Determines if this service will be a singleton or prototype.
@@ -41,7 +41,7 @@ public @interface Service
      * services possible by default. Note that any operations on field variables will need to be thread-safe.
      * @return true if the service is a singleton
      */
-    ServiceScope scope() default ServiceScope.SINGLETON;
+    ObjectScope scope() default ObjectScope.SINGLETON;
 
     /**
      * The service builder is used to add configuration to this service.  A builder is used when the service has more
@@ -56,5 +56,12 @@ public @interface Service
      * service or an empty String if there is no {@link ServiceBuilder} for this service.
      */
     //TODO Implement
-    String builder() default "";
+    //String builder() default "";
+
+    /**
+     * If the channel that triggered a call on this object is not expecting a response, how many threads can process the inbound
+     * emessages simultaneously
+     * @return the number of concurrent threads to be used for async processing
+     */
+    int maxAsyncThreads() default 8;
 }

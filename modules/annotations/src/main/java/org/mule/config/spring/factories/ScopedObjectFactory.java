@@ -12,7 +12,7 @@ package org.mule.config.spring.factories;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.PoolingProfile;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.annotations.ServiceScope;
+import org.mule.impl.annotations.ObjectScope;
 import org.mule.object.AbstractObjectFactory;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
@@ -21,7 +21,7 @@ import org.mule.object.SingletonObjectFactory;
   */
 public class ScopedObjectFactory extends AbstractObjectFactory
 {
-    private ServiceScope scope = ServiceScope.SINGLETON;
+    private ObjectScope scope = ObjectScope.SINGLETON;
 
     private PoolingProfile poolingProfile;
 
@@ -29,12 +29,12 @@ public class ScopedObjectFactory extends AbstractObjectFactory
 
     private Object objectInstance;
 
-    public ServiceScope getScope()
+    public ObjectScope getScope()
     {
         return scope;
     }
 
-    public void setScope(ServiceScope scope)
+    public void setScope(ObjectScope scope)
     {
         this.scope = scope;
     }
@@ -84,15 +84,15 @@ public class ScopedObjectFactory extends AbstractObjectFactory
      */
     public void initialise() throws InitialisationException
     {
-        if(scope == ServiceScope.PROTOTYPE)
+        if(scope == ObjectScope.REQUEST)
         {
             delegate = new PrototypeObjectFactory();
         }
-        else if(scope == ServiceScope.SINGLETON)
+        else if(scope == ObjectScope.SINGLETON)
         {
             delegate = new SingletonObjectFactory();
         }
-        else if(scope == ServiceScope.POOLED)
+        else if(scope == ObjectScope.POOLED)
         {
             delegate = new PrototypeObjectFactory();
 //            delegate = new PooledObjectFactory();
@@ -126,7 +126,7 @@ public class ScopedObjectFactory extends AbstractObjectFactory
     @Override
     public boolean isSingleton()
     {
-        return scope == ServiceScope.SINGLETON;
+        return scope == ObjectScope.SINGLETON;
     }
 
     public Object getObjectInstance()
