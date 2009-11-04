@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.PreInitProcessor;
 import org.mule.impl.endpoint.AnnotatedEndpointBuilder;
 import org.mule.impl.registry.RegistryMap;
 import org.mule.util.TemplateParser;
@@ -21,7 +21,7 @@ import org.mule.util.TemplateParser;
 /**
  * TODO
  */
-public abstract class AbstractAnnotationProcessor implements ObjectProcessor, MuleContextAware
+public abstract class AbstractAnnotationProcessor implements PreInitProcessor, MuleContextAware
 {
     protected MuleContext context;
     protected AnnotatedEndpointBuilder builder;

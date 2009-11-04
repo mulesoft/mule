@@ -16,8 +16,10 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
+import org.mule.api.registry.InjectProcessor;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -191,11 +193,14 @@ public class TransientRegistry extends AbstractRegistry
     Object applyProcessors(Object object)
     {
         Object theObject = object;
-        // this may be an incorrect hack.  the problem is that if we try to lookup objects in spring before
-        // it is initialised, we end up triggering object creation.  that causes circular dependencies because
-        // this may have originally been called while creating objects in spring...  so we prevent that by
-        // only doing the full lookup once everything is stable.  ac.
-        Collection<ObjectProcessor> processors = lookupObjects(ObjectProcessor.class);
+        //Process injectors first
+        Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
+        for (InjectProcessor processor : injectProcessors)
+        {
+            theObject = processor.process(theObject);
+        }
+        //Then any other processors
+        Collection<ObjectProcessor> processors = lookupObjects(PreInitProcessor.class);
         for (ObjectProcessor processor : processors)
         {
             theObject = processor.process(theObject);

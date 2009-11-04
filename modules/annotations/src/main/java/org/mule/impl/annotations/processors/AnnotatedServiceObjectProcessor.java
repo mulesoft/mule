@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.model.Model;
-import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.PreInitProcessor;
 import org.mule.config.annotations.Service;
 import org.mule.impl.annotations.AnnotatedServiceBuilder;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
@@ -31,7 +31,7 @@ import java.util.Iterator;
  * If one is not found a default  SEDA Model will be created
  * Finally, the processor will register the service with the Registry and return null.
  */
-public class AnnotatedServiceObjectProcessor implements ObjectProcessor, MuleContextAware
+public class AnnotatedServiceObjectProcessor implements PreInitProcessor, MuleContextAware
 {
     protected MuleContext context;
 

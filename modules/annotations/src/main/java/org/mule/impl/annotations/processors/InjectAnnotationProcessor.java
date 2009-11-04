@@ -11,7 +11,7 @@ package org.mule.impl.annotations.processors;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.InjectProcessor;
 
 import java.lang.reflect.Field;
 
@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  * Processes the JSR-330 {@link javax.inject.Inject} annotation. This can be used for injecting objects in the registry into
  * user object/beans. THis annotation injects by type. To inject by key use the {@link javax.inject.Named} annotation.
  */
-public class InjectAnnotationProcessor implements ObjectProcessor, MuleContextAware
+public class InjectAnnotationProcessor implements InjectProcessor, MuleContextAware
 {
     /**
      * logger used by this class

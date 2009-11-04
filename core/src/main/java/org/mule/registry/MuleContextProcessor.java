@@ -11,13 +11,13 @@ package org.mule.registry;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.InjectProcessor;
 
 /**
  * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered
  * implements {@link org.mule.api.context.MuleContextAware}.
  */
-public class MuleContextProcessor implements ObjectProcessor
+public class MuleContextProcessor implements InjectProcessor
 {
     private MuleContext context;
 

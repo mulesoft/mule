@@ -53,6 +53,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class AnnotatedServiceBuilder
     protected ObjectFactory createObjectFactory(Object object)
     {
         Service serv = object.getClass().getAnnotation(Service.class);
-        if (serv.scope().equals(ServiceScope.SINGLETON))
+        if (serv.scope().equals(ObjectScope.SINGLETON))
         {
             return new SingletonObjectFactory(object);
         }
@@ -130,7 +131,7 @@ public class AnnotatedServiceBuilder
 
         serviceDescriptor.setName(getValue(service.name()));
         componentFactory.initialise();
-        if (service.scope().equals(ServiceScope.POOLED))
+        if (service.scope().equals(ObjectScope.POOLED))
         {
             serviceDescriptor.setComponent(new PooledJavaComponent(componentFactory));
         }
@@ -299,7 +300,7 @@ public class AnnotatedServiceBuilder
                 EndpointAnnotationParser parser = (EndpointAnnotationParser) iterator.next();
                 if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
                 {
-                    return parser.parseInboundEndpoint(metaData.getAnnotation());
+                    return parser.parseInboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
                 }
             }
             //TODO i18n
@@ -319,7 +320,7 @@ public class AnnotatedServiceBuilder
                 EndpointAnnotationParser parser = (EndpointAnnotationParser) iterator.next();
                 if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
                 {
-                    return parser.parseOutboundEndpoint(metaData.getAnnotation());
+                    return parser.parseOutboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
                 }
             }
         }
