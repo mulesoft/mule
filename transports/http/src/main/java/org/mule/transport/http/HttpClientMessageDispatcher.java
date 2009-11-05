@@ -230,7 +230,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             httpMethod = (HttpMethod) sendTransformer.transform(msg);
         }
 
-        httpMethod.setFollowRedirects(connector.isFollowRedirects());
+        httpMethod.setFollowRedirects("true".equalsIgnoreCase((String)endpoint.getProperty("followRedirects")));
         return httpMethod;
     }
 
@@ -329,7 +329,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected MuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
     {
-        if (!connector.isFollowRedirects())
+        String followRedirects = (String)endpoint.getProperty("followRedirects");
+        if (followRedirects==null || "false".equalsIgnoreCase(followRedirects))
         {
             if (logger.isInfoEnabled())
             {
@@ -337,7 +338,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             return getResponseFromMethod(method, null);
         }
-        Header locationHeader = method.getRequestHeader(HttpConstants.HEADER_LOCATION);
+        Header locationHeader = method.getResponseHeader(HttpConstants.HEADER_LOCATION);
         if (locationHeader == null)
         {
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());

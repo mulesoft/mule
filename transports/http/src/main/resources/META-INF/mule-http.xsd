@@ -258,6 +258,15 @@
             <xsd:extension base="mule:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
+                <xsd:attribute name="followRedirects" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
+                            redirects when perfroming a POST (a restriction according to RFC 2616).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -275,6 +284,15 @@
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
+                <xsd:attribute name="followRedirects" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If a request if made using GET that responds with a redirectLocation header, setting this to true will
+                            make the request on the redirect URL.  This only works when using GET since you cannot automatically follow
+                            redirects when perfroming a POST (a restriction according to RFC 2616).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
