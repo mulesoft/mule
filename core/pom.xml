@@ -12,6 +12,7 @@
     <packaging>bundle</packaging>
     <name>Mule Core</name>
     <description>Mule server and core classes</description>
+
     <build>
         <plugins>
             <plugin>
@@ -28,17 +29,15 @@
         </plugins>
     </build>
 
+    <!--
+        group/artifact id only, version and exclusions are specified
+        via dependency management
+    -->
     <dependencies>
-
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
-
-        <!--
-            OTHERS. group/artifact id only, version and exclusions are specified
-            via dependency management
-        -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
@@ -64,7 +63,6 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-            <!-- OSGi-ready -->
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
         </dependency>
@@ -80,7 +78,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
-
         <!--
             Bind log4j statically, but preserve the clogging API compatibility.
         -->
@@ -100,13 +97,11 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.1</version>
         </dependency>
-
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm-commons</artifactId>
