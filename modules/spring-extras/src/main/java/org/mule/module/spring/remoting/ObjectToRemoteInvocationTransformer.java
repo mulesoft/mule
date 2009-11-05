@@ -22,7 +22,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 /**
  * Transforms a byte[] into an ObjectInputStream and then into a Spring RemoteInvocation instance.
  */
-
 public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 {
 
@@ -76,12 +75,17 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
             logger.debug("request to execute " + ri.getMethodName());
             for (int i = 0; i < ri.getArguments().length; i++)
             {
-                Object a = ri.getArguments()[i];
-                logger.debug("with argument (" + a.toString() + ")");
+                Object currentArgument = ri.getArguments()[i];
+                
+                StringBuilder buf = new StringBuilder(64);
+                buf.append("with argument (");
+                buf.append(currentArgument == null ? "<null>" : currentArgument.toString());
+                buf.append(")");
+                
+                logger.debug(buf);
             }
         }
         return ri;
-
     }
 
 }
