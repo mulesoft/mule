@@ -63,10 +63,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * Serial version
      */
     private static final long serialVersionUID = 1L;
+
     /**
      * logger used by this class
      */
-    protected Log logger = LogFactory.getLog(getClass());
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     /**
      * The endpoint associated with the event
      */
@@ -614,6 +616,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, MuleException
     {
+        logger = LogFactory.getLog(getClass());
+
         in.defaultReadObject();
         serializedData = new HashMap<String, Object>();
         serializedData.put("endpointHashcode", in.readInt());
