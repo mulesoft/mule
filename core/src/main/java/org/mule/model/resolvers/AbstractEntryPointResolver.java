@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,6 +40,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     private boolean acceptVoidMethods = false;
 
+    private boolean synchronizeCall = false;
 
     // @GuardedBy(itself)
     protected final ConcurrentHashMap methodCache = new ConcurrentHashMap(4);
@@ -151,7 +151,20 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
             logger.debug("Invoking " + methodCall);
         }
 
-        Object result = method.invoke(component, arguments);
+        Object result;
+
+        if(isSynchronizeCall())
+        {
+            synchronized (component)
+            {
+                result = method.invoke(component, arguments);
+            }
+        }
+        else
+        {
+            result = method.invoke(component, arguments);
+        }
+
         if (method.getReturnType().equals(Void.TYPE))
         {
             result = VoidResult.getInstance();
@@ -165,6 +178,15 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
         return new InvocationResult(result, method);
     }
 
+    public boolean isSynchronizeCall()
+    {
+        return synchronizeCall;
+    }
+
+    public void setSynchronizeCall(boolean synchronizeCall)
+    {
+        this.synchronizeCall = synchronizeCall;
+    }
 
     public String toString()
     {
