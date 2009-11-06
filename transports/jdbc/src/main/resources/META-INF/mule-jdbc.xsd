@@ -38,7 +38,12 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-sqlStatementStrategyFactory" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="abstract-sqlStatementStrategyFactory" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>The factory that determines the
+                execution strategy based on the SQL provided.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>Defines a set of queries. Each query has a key
@@ -51,7 +56,7 @@
                     type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    The delay in milliseconds that will be used during two subsequent polls to the database. This is only applied to queries configured on inbound endpoints.
+                        The delay in milliseconds that will be used during two subsequent polls to the database. This is only applied to queries configured on inbound endpoints.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -59,21 +64,21 @@
                     use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    Reference to the JDBC DataSource object. This object is typically created using Spring. When using XA transactions, an XADataSource object must be provided.
+                        Reference to the JDBC DataSource object. This object is typically created using Spring. When using XA transactions, an XADataSource object must be provided.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="queryRunner-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    Reference to the QueryRunner object, which is the object that actually runs the Query. This object is typically created using Spring. Default is org.apache.commons.dbutils.QueryRunner.
+                        Reference to the QueryRunner object, which is the object that actually runs the Query. This object is typically created using Spring. Default is org.apache.commons.dbutils.QueryRunner.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="resultSetHandler-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>
-                                                    Reference to the ResultSetHandler object, which is the object that determines which java.sql.ResultSet gets handled. This object is typically created using Spring. Default is org.apache.commons.dbutils.handlers.MapListHandler, which steps through the ResultSet and stores records as Map objects on a List.
+                        Reference to the ResultSetHandler object, which is the object that determines which java.sql.ResultSet gets handled. This object is typically created using Spring. Default is org.apache.commons.dbutils.handlers.MapListHandler, which steps through the ResultSet and stores records as Map objects on a List.
                                                 </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -93,7 +98,7 @@
         substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                            Receives or fetches data from a database. You can reference SQL select statements or call stored procedures on inbound endpoints. Statements on the inbound endpoint get invoked periodically according to the pollingInterval. Statements that contain an insert, update, or delete are not allowed.
+                Receives or fetches data from a database. You can reference SQL select statements or call stored procedures on inbound endpoints. Statements on the inbound endpoint get invoked periodically according to the pollingInterval. Statements that contain an insert, update, or delete are not allowed.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -112,7 +117,7 @@
         substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                            You can reference any SQL statement or call a stored procedure on outbound endpoints. Statements on the outbound endpoint get invoked synchronously. SQL select statements or stored procedures may return output that is handled by the ResultSetHandler and then attached to the message as the payload.
+                You can reference any SQL statement or call a stored procedure on outbound endpoints. Statements on the outbound endpoint get invoked synchronously. SQL select statements or stored procedures may return output that is handled by the ResultSetHandler and then attached to the message as the payload.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -150,7 +155,8 @@
     
     <xsd:element name="query" type="queryType" substitutionGroup="abstract-query">
         <xsd:annotation>
-            <xsd:documentation>Assigns a name (key) to a query (value). Queries
+            <xsd:documentation>
+                Assigns a name (key) to a query (value). Queries
                 are then referenced by key, such as jdbc://myQuery for
                 <![CDATA[<jdbc:query key="myQuery" value="select * from table"/>]]>
                 </xsd:documentation>
@@ -163,8 +169,16 @@
     </xsd:complexType>
     
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="queryKey" type="xsd:string"/>
-        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+        <xsd:attribute name="queryKey" type="xsd:string">
+                <xsd:annotation>
+                        <xsd:documentation>The key of the query to use.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+                <xsd:annotation>
+                        <xsd:documentation>The delay in milliseconds that will be used during two subsequent polls to the database.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:element name="transaction" type="transactionType" substitutionGroup="mule:abstract-transaction">
@@ -189,7 +203,8 @@
 
     <xsd:element name="sqlStatementStrategyFactory" type="sqlStatementStrategyFactoryType" substitutionGroup="abstract-sqlStatementStrategyFactory">
         <xsd:annotation>
-            <xsd:documentation>Override the default SqlStatementStrategyFactory. Determines the
+            <xsd:documentation>
+                Override the default SqlStatementStrategyFactory. Determines the
                 execution strategy based on the SQL provided.</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
