@@ -81,6 +81,11 @@ public abstract class AbstractExceptionListener
 
     protected boolean enableNotifications = true;
 
+    /**
+     * A message to be returned to the caller as a result of this exception handling.
+     */
+    private MuleMessage returnMessage = null;
+    
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -598,4 +603,24 @@ public abstract class AbstractExceptionListener
      */
     public abstract void handleStandardException(Throwable e);
 
+    public MuleMessage getReturnMessage()
+    {
+        return returnMessage;
+    }
+
+    /**
+     * Set a message to be returned to the caller as a result of this exception handling.
+     */
+    public void setReturnMessage(MuleMessage returnMessage)
+    {
+        this.returnMessage = returnMessage;
+    }
+
+    /**
+     * Set a message to be returned to the caller as a result of this exception handling.
+     */
+    public void setReturnMessage(Object returnMessage)
+    {
+        this.returnMessage = new DefaultMuleMessage(returnMessage, RequestContext.getEvent().getMessage(), muleContext);
+    }
 }

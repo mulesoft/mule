@@ -10,6 +10,7 @@
 
 package org.mule.model.seda;
 
+import org.mule.AbstractExceptionListener;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.FailedToQueueEventException;
@@ -272,10 +273,16 @@ public class SedaService extends AbstractService implements Work, WorkListener
             }
             if (result == null)
             {
-                // important that we pull event from request context here as it may
-                // have been modified
-                // (necessary to avoid scribbling between threads)
-                result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage(), muleContext);
+                if (exceptionListener != null 
+                    && exceptionListener instanceof AbstractExceptionListener 
+                    && ((AbstractExceptionListener) exceptionListener).getReturnMessage() != null)
+                {
+                    result = ((AbstractExceptionListener) exceptionListener).getReturnMessage();
+                }
+                else
+                {
+                    result = new DefaultMuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage(), muleContext);
+                }
             }
             ExceptionPayload exceptionPayload = result.getExceptionPayload();
             if (exceptionPayload == null)

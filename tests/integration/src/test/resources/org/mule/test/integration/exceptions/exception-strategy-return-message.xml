@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"	  
+      xsi:schemaLocation="
+            http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+            http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+			http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd">
+
+    <model>
+        <service name="InputService">
+            <inbound>
+                <vm:inbound-endpoint path="in" synchronous="true" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="badService" synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="ExceptionService">
+            <inbound>
+		        <vm:inbound-endpoint path="badService" />
+            </inbound>
+            <test:component throwException="true" />
+            <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy" /> 
+        </service>
+    </model>
+</mule>
