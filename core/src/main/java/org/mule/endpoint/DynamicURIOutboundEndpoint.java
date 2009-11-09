@@ -171,6 +171,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.isSynchronous();
     }
 
+    public List<String> getResponseProperties()
+    {
+        return endpoint.getResponseProperties();
+    }
+
     public MuleMessage send(MuleEvent event) throws DispatchException
     {
         if (getConnector() != null)

@@ -5,11 +5,13 @@
   xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
   xmlns:cxf-core="http://cxf.apache.org/core"
   xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
   xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
   <cxf:endpoint 
@@ -46,7 +48,7 @@
         <add-message-property key="http.version" value="HTTP/1.0"/> 
       </message-properties-transformer>
   </cxf:endpoint>
-    
+  
   <model name="TestCxfModel">
   
     <service name="greeterService">
@@ -57,6 +59,11 @@
       <component>
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
       </component>
+      <outbound>
+      	<pass-through-router>
+      		<vm:outbound-endpoint path="out" />
+      	</pass-through-router>
+      </outbound>
     </service> 
 
   </model>

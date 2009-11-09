@@ -29,6 +29,8 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.work.AbstractMuleEventWork;
 
+import java.util.List;
+
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
@@ -158,6 +160,20 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             connect();
 
             MuleMessage result = doSend(event);
+
+            if (result != null)
+            {
+                // Properties which should be carried over from the request message to the response message
+                List<String> responseProperties = ((OutboundEndpoint) endpoint).getResponseProperties();
+                for (String propertyName : responseProperties)
+                {
+                    Object propertyValue = event.getMessage().getProperty(propertyName);
+                    if (propertyValue != null)
+                    {
+                        result.setProperty(propertyName, propertyValue);
+                    }
+                }
+            }
 
             if (connector.isEnableMessageEvents())
             {

@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -22,7 +23,9 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.MuleManifest;
+import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,8 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 {
 
     private static final long serialVersionUID = 8860985949279708638L;
+
+    private List<String> responseProperties;
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
@@ -47,11 +52,27 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String endpointEncoding,
                                    String endpointBuilderName,
                                    MuleContext muleContext,
-                                   RetryPolicyTemplate retryPolicyTemplate)
+                                   RetryPolicyTemplate retryPolicyTemplate,
+                                   String responsePropertiesList)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
             endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
+        
+        responseProperties = new ArrayList<String>();
+        // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
+        responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        responseProperties.add(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+        responseProperties.add(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+        // Add any additional properties specified by the user.
+        String[] props = StringUtils.splitAndTrim(responsePropertiesList, ",");
+        if (props != null)
+        {
+            for (int i=0; i < props.length; ++i)
+            {
+                responseProperties.add(props[i]);
+            }
+        }
     }
 
     public void dispatch(MuleEvent event) throws DispatchException
@@ -82,5 +103,10 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
             throw new IllegalStateException("The connector on the endpoint: " + toString()
                                             + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
+    }
+    
+    public List<String> getResponseProperties()
+    {
+        return responseProperties;
     }
 }
