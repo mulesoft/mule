@@ -18,9 +18,9 @@ import org.apache.commons.httpclient.HttpMethod;
 
 public class MuleHttpMethodRetryHandler extends DefaultHttpMethodRetryHandler
 {
+    @Override
     public boolean retryMethod(final HttpMethod method, final IOException exception, int executionCount)
     {
-//        return false;
         if ((executionCount < this.getRetryCount()) && (exception instanceof SocketException))
         {
             return true;

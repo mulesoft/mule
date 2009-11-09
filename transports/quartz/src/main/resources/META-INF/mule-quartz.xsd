@@ -225,7 +225,7 @@
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="job-endpoint" type="endpointRefType">
                         <xsd:annotation>
-                            <xsd:documentation>The endpoint used to dispatch the scheduled event. The preferred approach is to create a global endpoint and reference it using the ref attribute. However, you can also use the address attribute to define a URI endpoint. You can use the timeout attribute to specify an arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.</xsd:documentation>
+                            <xsd:documentation>The endpoint used to dispatch the scheduled event. The preferred approach is to create a global endpoint and reference it using the ref attribute. However, you can also use the address attribute to define a URI endpoint (which supports expressions). You can use the timeout attribute to specify an arbitrary time-out value associated with the endpoint that can be used by jobs that block waiting to receive events.</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>

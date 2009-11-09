@@ -57,7 +57,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
     }
 
-    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) 
+    {
         super.prepareBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
         beanFactory.addBeanPostProcessor(new ExpressionEvaluatorPostProcessor(muleContext));
@@ -109,7 +110,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
         DefaultListableBeanFactory bf = super.createBeanFactory();
-        if(getParent()!=null)
+        if (getParent() != null)
         {
             //Copy over all processors
             AbstractBeanFactory beanFactory = (AbstractBeanFactory)getParent().getAutowireCapableBeanFactory();

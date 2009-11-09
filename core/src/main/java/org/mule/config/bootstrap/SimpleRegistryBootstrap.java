@@ -119,7 +119,6 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
 
         // ... and only then merge and process them
-
         int objectCounter = 1;
         int transformerCounter = 1;
         Properties transformers = new Properties();
@@ -195,7 +194,6 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             final String transClass = (x == -1 ? transString : transString.substring(0, x));
             try
             {
-
                 if (returnClassString != null)
                 {
                     if (returnClassString.equals("byte[]"))
