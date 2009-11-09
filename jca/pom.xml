@@ -54,6 +54,10 @@
                     <artifactId>mule-module-jbossts</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-tomcat</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.yourkit</groupId>
                     <artifactId>yjp-controller-api-redist</artifactId>
                 </exclusion>

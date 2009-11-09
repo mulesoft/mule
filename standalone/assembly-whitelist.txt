@@ -100,6 +100,7 @@ mule-module-spring-config
 mule-module-spring-extras
 mule-module-spring-security
 mule-module-sxc
+mule-module-tomcat
 mule-module-xml
 mule-tests-functional
 mule-transport-axis
