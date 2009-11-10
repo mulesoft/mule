@@ -18,9 +18,11 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.ws.security.WSPasswordCallback;
 
+/**
+ * Trivial security which simply returns the password for user "joe".
+ */
 public class ServerPasswordCallback implements CallbackHandler
 {
-
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
@@ -28,7 +30,7 @@ public class ServerPasswordCallback implements CallbackHandler
         if (pc.getIdentifer().equals("joe")) {
             // set the password on the callback. This will be compared to the
             // password which was sent from the client.
-            pc.setPassword("password");
+            pc.setPassword("secret");
         }
     }
 }

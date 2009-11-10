@@ -161,7 +161,7 @@
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlResolverVersion>1.2</xmlResolverVersion>
         <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
-        <wss4jVersion>1.5.4</wss4jVersion>
+        <wss4jVersion>1.5.8</wss4jVersion>
         <xstreamVersion>1.2.2</xstreamVersion>
         <yourKitVersion>8.0.1</yourKitVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>

@@ -13,9 +13,9 @@
 		class="org.springframework.beans.factory.config.MapFactoryBean">
 		<spring:property name="sourceMap">
 	      <spring:map>
-              <spring:entry key="action" value="UsernameToken" />
+              <spring:entry key="action" value="Signature" />
               <spring:entry key="user" value="joe" />
-              <spring:entry key="passwordType" value="PasswordDigest" />
+              <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
               <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ClientPasswordCallback" />
 	      </spring:map>
 		</spring:property>
@@ -25,7 +25,8 @@
 		class="org.springframework.beans.factory.config.MapFactoryBean">
 		<spring:property name="sourceMap">
 			<spring:map>
-                <spring:entry key="action" value="UsernameToken" />
+                <spring:entry key="action" value="Signature" />
+                <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
                 <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ServerPasswordCallback" />
 			</spring:map>
 		</spring:property>

@@ -16,10 +16,15 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 public class UsernameTokenTestCase extends FunctionalTestCase
 {
     @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/transport/cxf/wssec/cxf-secure-service.xml, org/mule/transport/cxf/wssec/username-token-conf.xml";
+    }
+    
+    @Override
     protected void doSetUp() throws Exception
     {
-        ClientPasswordCallback.setPassword("password");
-        
+        ClientPasswordCallback.setPassword("secret");        
         super.doSetUp();
     }
 
@@ -46,12 +51,6 @@ public class UsernameTokenTestCase extends FunctionalTestCase
         
         return (GreeterImpl) instance;
     }
-
-    protected String getConfigResources()
-    {
-        return "org/mule/transport/cxf/wssec/username-token-conf.xml";
-    }
-    
 }
 
 

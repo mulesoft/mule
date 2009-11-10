@@ -69,6 +69,17 @@
                     <forkMode>always</forkMode>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -335,7 +346,7 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- This should be endorsed -->
+                <!-- This needs to be provided since it's JDK-specific -->
                 <exclusion>
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk15</artifactId>
@@ -353,6 +364,13 @@
                     <artifactId>velocity-dep</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- This needs to be provided since it's JDK-specific -->
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+            <version>140</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>

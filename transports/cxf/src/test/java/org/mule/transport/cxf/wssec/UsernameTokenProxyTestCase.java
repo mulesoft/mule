@@ -18,15 +18,28 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.io.InputStream;
 
-public class UsernameTokenProxyTestCase extends FunctionalTestCase {
-	public void testProxyEnvelope() throws Exception 
+public class UsernameTokenProxyTestCase extends FunctionalTestCase 
+{
+    @Override
+    protected String getConfigResources() 
+    {
+        return "org/mule/transport/cxf/wssec/cxf-secure-proxy.xml, org/mule/transport/cxf/wssec/username-token-conf.xml";
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        ClientPasswordCallback.setPassword("secret");        
+        super.doSetUp();
+    }
+
+    public void testProxyEnvelope() throws Exception 
 	{
 		MuleMessage result = sendRequest("http://localhost:63081/proxy-envelope");
 
 		System.out.println(result.getPayloadAsString());
 		assertFalse(result.getPayloadAsString().contains("Fault"));
-//		assertFalse(result.getPayloadAsString().contains("ross"));
-		assertTrue(result.getPayloadAsString().contains("User001"));
+		assertTrue(result.getPayloadAsString().contains("joe"));
 	}
 	
 	public void testProxyBody() throws Exception 
@@ -35,28 +48,22 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
 
 		System.out.println(result.getPayloadAsString());
 		assertFalse(result.getPayloadAsString().contains("Fault"));
-		assertFalse(result.getPayloadAsString().contains("ross"));
-		assertFalse(result.getPayloadAsString().contains("User001"));
+		assertFalse(result.getPayloadAsString().contains("joe"));
 	}
 
-
-	private MuleMessage sendRequest(String url) throws MuleException 
+	protected MuleMessage sendRequest(String url) throws MuleException 
 	{
-		ClientPasswordCallback.setPassword("test");
-		
 		MuleClient client = new MuleClient();
 
-		InputStream stream = getClass().getResourceAsStream(
-				"/org/mule/transport/cxf/wssec/in-message.xml");
+		InputStream stream = getClass().getResourceAsStream(getMessageResource());
 		assertNotNull(stream);
 
 		MuleMessage result = client.send(url, new DefaultMuleMessage(stream, muleContext));
 		return result;
 	}
 	
-	protected String getConfigResources() 
+	protected String getMessageResource()
 	{
-		return "org/mule/transport/cxf/wssec/username-token-proxy-conf.xml";
+	    return "/org/mule/transport/cxf/wssec/in-message.xml";
 	}
-
 }
