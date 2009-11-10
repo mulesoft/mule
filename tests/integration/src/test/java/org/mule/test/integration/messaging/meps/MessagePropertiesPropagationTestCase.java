@@ -33,7 +33,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
         props.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, "TestGroupSize");
@@ -52,7 +52,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
         props.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, "TestGroupSize");
         props.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, "TestSequence");
@@ -71,7 +71,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testNotPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put("some", "thing");
         props.put("other", "stuff");
@@ -91,7 +91,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testNotPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("some", "thing");
         props.put("other", "stuff");
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/bizarre;charset=utf-16");
@@ -109,7 +109,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testForcePropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put("some", "thing");
         props.put("other", "stuff");
@@ -126,7 +126,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testForcePropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("some", "thing");
         props.put("other", "stuff");
         MuleMessage response = client.send("vm://cxfService2", "symbol=IBM", props);
@@ -135,5 +135,4 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         assertEquals("thing", response.getProperty("some"));
         assertEquals("stuff", response.getProperty("other"));
     }
-
 }
