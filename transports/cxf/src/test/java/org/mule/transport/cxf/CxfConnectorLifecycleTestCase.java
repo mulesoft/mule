@@ -66,7 +66,18 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
         assertTrue(service.isStarted());
         assertTrue(protocolService.isStarted());
         assertNotNull(muleContext.getRegistry().lookupService(PROTOCOL_SERVICE_NAME));
-
     }
 
+    public void testRegisterUnregisterListender() throws MuleException
+    {
+        Service service = muleContext.getRegistry().lookupService(SERVICE_NAME);
+        CxfConnector connector = (CxfConnector) muleContext.getRegistry().lookupObject(CxfConnector.class);
+
+        assertNotNull(connector.getServer("http://localhost:63081/services/Echo"));
+        service.stop();
+        assertNull(connector.getServer("http://localhost:63081/services/Echo"));
+        service.start();
+        assertNotNull(connector.getServer("http://localhost:63081/services/Echo"));
+    }
+    
 }

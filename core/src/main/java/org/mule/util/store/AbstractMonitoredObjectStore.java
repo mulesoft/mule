@@ -57,7 +57,7 @@ public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runna
         if (scheduler == null)
         {
             this.scheduler = new ScheduledThreadPoolExecutor(1);
-            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor"));
+            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", this.getClass().getClassLoader()));
             scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, TimeUnit.MILLISECONDS);
         }
     }

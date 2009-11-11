@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.http.functional;
+package org.mule.transport.cxf.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -18,7 +18,7 @@ import java.net.SocketTimeoutException;
 import java.util.Date;
 
 /**
- * See MULE-4491 "Http outbound endpoint does not use responseTimeout attribute"
+ * See MULE-4490 "Outbound CXF endpoint does not propagate any properties to "protocol" endpoint"
  */
 public class HttpResponseTimeoutTestCase extends FunctionalTestCase
 {
@@ -33,10 +33,10 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Date beforeCall = new Date();
-        
-        MuleMessage message = client.send("vm://request", "Eugene", null);
+
+        MuleMessage message = client.send("vm://request", "<test/>", null);
         assertNotNull(message);
-        
+
         Date afterCall = new Date();
         // If everything is good the connection will timeout after 5s and throw an exception.
         assertTrue(message.getExceptionPayload().getRootException() instanceof SocketTimeoutException);

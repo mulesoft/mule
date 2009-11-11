@@ -10,6 +10,7 @@
 
 package org.mule.config;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.util.StringUtils;
@@ -240,7 +241,9 @@ public class ImmutableThreadingProfile implements ThreadingProfile
             // ..else create a "NamedThreadFactory" if a proper name was passed in
             if (StringUtils.isNotBlank(name))
             {
-                pool.setThreadFactory(new NamedThreadFactory(name)); 
+                // Use MuleContext classloader so that other temporary classloaders
+                // aren't used when things are started lazily or from elsewhere.
+                pool.setThreadFactory(new NamedThreadFactory(name, MuleContext.class.getClassLoader()));
             }
             else
             {

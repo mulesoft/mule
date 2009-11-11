@@ -19,8 +19,14 @@ public class NamedThreadFactory implements ThreadFactory
 {
     private final String name;
     private final AtomicLong counter;
+    private final ClassLoader contextClassLoader;
 
     public NamedThreadFactory(String name)
+    {
+        this(name, null);
+    }
+
+    public NamedThreadFactory(String name, ClassLoader contextClassLoader)
     {
         if (StringUtils.isEmpty(name))
         {
@@ -28,13 +34,29 @@ public class NamedThreadFactory implements ThreadFactory
         }
 
         this.name = name;
+        this.contextClassLoader = contextClassLoader;
         this.counter = new AtomicLong(1);
     }
 
     public Thread newThread(Runnable runnable)
     {
-        Thread t = new Thread(runnable, name + '.' + counter.getAndIncrement());
+        Thread t = new Thread(runnable);
+        configureThread(t);
         return t;
+    }
+
+    protected void configureThread(Thread t)
+    {
+        if (contextClassLoader != null)
+        {
+            t.setContextClassLoader(contextClassLoader);
+        }
+        doConfigureThread(t);
+    }
+
+    protected void doConfigureThread(Thread t)
+    {
+        t.setName(name + '.' + counter.getAndIncrement());
     }
 
 }

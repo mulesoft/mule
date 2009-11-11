@@ -30,6 +30,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
 {
     public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
+    public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
 
     /** Prepend "default-mule-config.xml" to the list of config resources. */
     protected boolean useDefaultConfigResource = true;
@@ -58,17 +59,28 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         ConfigResource[] allResources;
         if (useDefaultConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 1];
-            allResources[0] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+            allResources = new ConfigResource[configResources.length + 2];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 2, configResources.length);
         }
         else
         {
-            allResources = configResources;
+            allResources = new ConfigResource[configResources.length + 1];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
         }
         createSpringRegistry(muleContext, createApplicationContext(muleContext, allResources));
     }
 
+    public void unconfigure(MuleContext muleContext)
+    {
+        registry.dispose();
+        muleContext.removeRegistry(registry);
+        registry = null;
+        configured = false;
+    }
+    
     protected ApplicationContext createApplicationContext(MuleContext muleContext, ConfigResource[] configResources) throws Exception
     {
         return new MuleApplicationContext(muleContext, configResources);
@@ -126,4 +138,5 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     {
         this.parentContext = parentContext;
     }
+
 }

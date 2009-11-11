@@ -10,7 +10,6 @@
 
 package org.mule.util.concurrent;
 
-
 public class DaemonThreadFactory extends NamedThreadFactory
 {
 
@@ -19,11 +18,15 @@ public class DaemonThreadFactory extends NamedThreadFactory
         super(name);
     }
 
-    public Thread newThread(Runnable runnable)
+    public DaemonThreadFactory(String name, ClassLoader contextClassLoader)
     {
-        Thread t = super.newThread(runnable);
+        super(name, contextClassLoader);
+    }
+
+    @Override
+    protected void doConfigureThread(Thread t)
+    {
         t.setDaemon(true);
-        return t;
     }
 
 }

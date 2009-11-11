@@ -78,13 +78,16 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             final ConfigResource[] allResources;
             if (useDefaultConfigResource)
             {
-                allResources = new ConfigResource[configResources.length + 1];
-                allResources[0] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-                System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+                allResources = new ConfigResource[configResources.length + 2];
+                allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+                allResources[1] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+                System.arraycopy(configResources, 0, allResources, 2, configResources.length);
             }
             else
             {
-                allResources = configResources;
+                allResources = new ConfigResource[configResources.length + 1];
+                allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+                System.arraycopy(configResources, 0, allResources, 1, configResources.length);
             }
             // end dup
 
@@ -157,13 +160,16 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
         final ConfigResource[] allResources;
         if (useDefaultConfigResource)
         {
-            allResources = new ConfigResource[configResources.length + 1];
-            allResources[0] = new ConfigResource(MULE_DEFAULTS_CONFIG);
-            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+            allResources = new ConfigResource[configResources.length + 2];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            allResources[1] = new ConfigResource(MULE_DEFAULTS_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 2, configResources.length);
         }
         else
         {
-            allResources = configResources;
+            allResources = new ConfigResource[configResources.length + 1];
+            allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
+            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
         }
 
         createSpringRegistry(muleContext, createApplicationContext(muleContext, allResources));

@@ -30,7 +30,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
 {
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    private boolean configured = false;
+    protected boolean configured = false;
 
     /**
      * Will configure a MuleContext object based on the builders configuration settings.

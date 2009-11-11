@@ -92,7 +92,9 @@ public class TcpConnector extends AbstractConnector
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
-        keepAliveMonitor = new ExpiryMonitor("SocketTimeoutMonitor", 1000);
+        // Use connector's classloader so that other temporary classloaders
+        // aren't used when things are started lazily or from elsewhere.
+        keepAliveMonitor = new ExpiryMonitor("SocketTimeoutMonitor", 1000, this.getClass().getClassLoader());
     }
 
     public void configureSocket(boolean client, Socket socket) throws SocketException

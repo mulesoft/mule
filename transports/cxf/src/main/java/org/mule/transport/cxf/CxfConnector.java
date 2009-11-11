@@ -447,5 +447,11 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     {
         this.initializeStaticBusInstance = initializeStaticBusInstance;
     }
+    
+    @Override
+    protected void doUnregisterListener(Service service, InboundEndpoint endpoint, MessageReceiver receiver)
+    {
+        uriToServer.remove(((CxfMessageReceiver)receiver).getServer().getEndpoint().getEndpointInfo().getAddress());
+    }
 
 }

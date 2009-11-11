@@ -1265,8 +1265,14 @@ public abstract class AbstractConnector
             if (receiver != null)
             {
                 destroyReceiver(receiver, endpoint);
+                doUnregisterListener(service, endpoint, receiver);
             }
         }
+    }
+
+    protected void doUnregisterListener(Service service, InboundEndpoint endpoint, MessageReceiver receiver)
+    {
+        // Template method
     }
 
     /**
@@ -1897,7 +1903,9 @@ public abstract class AbstractConnector
 
     protected ScheduledExecutorService createScheduler()
     {
-        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
+        // Use connector's classloader so that other temporary classloaders
+        // aren't used when things are started lazily or from elsewhere.
+        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler", this.getClass().getClassLoader());
         ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
         newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
