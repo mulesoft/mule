@@ -9,8 +9,10 @@
  */
 package org.mule.util.scan.annotations;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AnnotationInfo
 {
@@ -20,6 +22,16 @@ public class AnnotationInfo
     public List<NameValue> getParams()
     {
         return params;
+    }
+
+    public Map<String, Object> getParamsAsMap()
+    {
+        Map m = new HashMap(params.size());
+        for (NameValue param : params)
+        {
+            m.put(param.name, param.value);
+        }
+        return m;
     }
 
     public void setParams(List<NameValue> params)
@@ -90,7 +102,7 @@ public class AnnotationInfo
         return sb.toString();
     }
 
-    static class NameValue
+    public static class NameValue
     {
         public String name;
         public Object value;

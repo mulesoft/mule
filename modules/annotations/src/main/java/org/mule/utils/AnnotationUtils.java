@@ -213,6 +213,16 @@ public class AnnotationUtils
         return anno;
     }
 
+    public static List<AnnotationMetaData> getClassAnnotationInHeirarchy(Class bottom)
+    {
+        List<AnnotationMetaData> annos = new ArrayList<AnnotationMetaData>();
+
+        getClassAnnotationForSuperClasses(bottom, annos);
+        getClassAnnotationForInterfaces(bottom, annos);
+
+        return annos;
+    }
+
     protected static AnnotationMetaData getClassAnnotationForSuperClasses(Class<? extends Annotation> annotation, Class bottom)
     {
         if (bottom.isAnnotationPresent(annotation))
@@ -224,6 +234,30 @@ public class AnnotationUtils
             return getClassAnnotationForSuperClasses(annotation, bottom.getSuperclass());
         }
         return null;
+    }
+
+    protected static void getClassAnnotationForSuperClasses(Class bottom, List<AnnotationMetaData> annos)
+    {
+        for (Annotation annotation : bottom.getAnnotations())
+        {
+            annos.add(new AnnotationMetaData(bottom, null, ElementType.TYPE, annotation));
+        }
+
+        if (bottom.getSuperclass() != null && !bottom.getSuperclass().equals(Object.class))
+        {
+            getClassAnnotationForSuperClasses(bottom.getSuperclass(), annos);
+        }
+    }
+
+    protected static void getClassAnnotationForInterfaces(Class bottom, List<AnnotationMetaData> annos)
+    {
+        for (Class aClass : bottom.getInterfaces())
+        {
+            for (Annotation annotation : aClass.getAnnotations())
+            {
+                annos.add(new AnnotationMetaData(bottom, null, ElementType.TYPE, annotation));
+            }
+        }
     }
 
     public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class bottom)
@@ -254,7 +288,7 @@ public class AnnotationUtils
         }
     }
 
-    
+
     public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class bottom, Class<? extends Annotation> annotation)
     {
         Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
