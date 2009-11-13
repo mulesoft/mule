@@ -24,11 +24,11 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.PropertiesUtils;
+import org.mule.util.UUID;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -279,94 +279,43 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerObjects(Properties props, Registry registry) throws Exception
     {
-        // Note that calling the other register methods first will have removed any processed entries
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            final String className = entry.getValue().toString();
-            boolean optional = false;
-
-            try
-            {
-                int x = className.indexOf(",");
-                if (x > -1)
-                {
-                    Properties p = PropertiesUtils.getPropertiesFromString(className.substring(x + 1), ',');
-                    optional = p.containsKey("optional");
-                }
-                Object object = ClassUtils.instanciateClass(className);
-                String key = entry.getKey().toString();
-                Class meta = Object.class;
-                if (object instanceof ObjectProcessor)
-                {
-                    meta = ObjectProcessor.class;
-                }
-                registry.registerObject(key, object, meta);
-            }
-            catch (InvocationTargetException itex)
-            {
-                Throwable cause = ExceptionUtils.getCause(itex);
-                if (cause instanceof NoClassDefFoundError && optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw new Exception(cause);
-                }
-            }
-            catch (NoClassDefFoundError ncdfe)
-            {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw ncdfe;
-                }
-            }
-            catch (ClassNotFoundException cnfe)
-            {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw cnfe;
-                }
-            }
+            registerObject((String)entry.getKey(), (String)entry.getValue(), registry);
         }
         props.clear();
     }
 
     private void registerUnnamedObjects(Properties props, Registry registry) throws Exception
     {
-        String objectString;
         for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            objectString = (String)entry.getValue();
+            registerObject(entry.getKey() + "#" + UUID.getUUID(), (String)entry.getValue(), registry);
+        }
+        props.clear();
+    }
+
+    private void registerObject(String key, String value, Registry registry) throws Exception
+    {
             boolean optional = false;
+            String className = null;
+
             try
             {
-                int x = objectString.indexOf(",");
+                int x = value.indexOf(",");
                 if (x > -1)
                 {
-                    Properties p = PropertiesUtils.getPropertiesFromString(objectString.substring(x + 1), ',');
+                    Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
                     optional = p.containsKey("optional");
+                    className = value.substring(0, x);
                 }
-                Object o = ClassUtils.instanciateClass(objectString);
+                else
+                {
+                    className = value;
+                }
+                Object o = ClassUtils.instanciateClass(className);
                 Class meta = Object.class;
+
                 if (o instanceof ObjectProcessor)
                 {
                     meta = ObjectProcessor.class;
@@ -375,7 +324,11 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     meta = StreamCloser.class;
                 }
-                registry.registerObject(entry.getKey().toString() + "#" + o.hashCode(), o, meta);
+                else if(o instanceof BootstrapObjectFactory)
+                {
+                    o = ((BootstrapObjectFactory)o).create();
+                }
+                registry.registerObject(key, o, meta);
             }
             catch (InvocationTargetException itex)
             {
@@ -384,7 +337,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                        logger.debug("Ignoring optional object: " + className);
                     }
                 }
                 else
@@ -398,7 +351,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                        logger.debug("Ignoring optional object: " + className);
                     }
                 }
                 else
@@ -412,7 +365,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Ignoring optional unnamed object: " + objectString);
+                        logger.debug("Ignoring optional object: " + className);
                     }
                 }
                 else
@@ -420,6 +373,5 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                     throw cnfe;
                 }
             }
-        }
     }
 }
