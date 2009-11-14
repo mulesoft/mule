@@ -12,15 +12,13 @@ package org.mule.module.json.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.json.util.JsonUtils;
-import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.util.StringUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import net.sf.json.JsonConfig;
-import net.sf.json.util.PropertyFilter;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,17 +35,14 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * The returnClass for this transformer is always java.lang.String, there is no need to set this.
  */
-public class ObjectToJson extends AbstractMessageAwareTransformer
+public class ObjectToJson extends AbstractJsonTransformer
 {
     /**
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(ObjectToJson.class);
 
-    protected JsonConfig jsonConfig;
-
-    protected String excludeProperties;
-    protected String includeProperties;
+    private Map<Class, Class> serializationMixins = new HashMap<Class, Class>();
 
     protected Class sourceClass;
 
@@ -63,26 +58,23 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if (getReturnClass().equals(Object.class))
-        {
-            logger.warn("The return class is not set not type validation will be done");
-        }
-
-        if (excludeProperties != null)
-        {
-            getJsonConfig().setExcludes(StringUtils.splitAndTrim(excludeProperties, ","));
-        }
-
-        if (includeProperties != null)
-        {
-            getJsonConfig().setJsonPropertyFilter(new IncludePropertiesFilter(StringUtils.splitAndTrim(includeProperties, ",")));
-        }
 
         //restrict the handled types
         if (getSourceClass() != null)
         {
             sourceTypes.clear();
             registerSourceType(getSourceClass());
+        }
+
+        //Add shared mixins first
+        for (Map.Entry<Class, Class> entry : getMixins().entrySet())
+        {
+            getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<Class, Class> entry : serializationMixins.entrySet())
+        {
+            getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
         
     }
@@ -91,7 +83,8 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
     {
         Object src = message.getPayload();
 
-        // Checks if there's an exception
+
+// Checks if there's an exception
         if (message.getExceptionPayload() != null && this.isHandleException())
         {
             if (logger.isDebugEnabled())
@@ -101,36 +94,25 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
             src = this.getException(message.getExceptionPayload().getException());
         }
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Converting payload " + src + " to " + String.class);
-        }
-
-        String returnValue;
-        Class et = getJsonConfig().getEnclosedType();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {
-            if (et == null)
-            {
-                getJsonConfig().setEnclosedType(src.getClass());
-            }
-
-            returnValue = JsonUtils.convertJavaObjectToJson(src, getJsonConfig());
+            getMapper().writeValue(baos, src);
         }
-        finally
+        catch (IOException e)
         {
-            if (et == null)
-            {
-                getJsonConfig().setEnclosedType(null);
-            }
+            throw new TransformerException(this, e);
         }
 
-        if (logger.isDebugEnabled())
+        System.out.println(baos.toString());
+        if(returnClass.equals(byte[].class))
         {
-            logger.debug("Successfully converted to value: " + returnValue);
+            return baos.toByteArray();
         }
-
-        return returnValue;
+        else
+        {
+            return baos.toString();
+        }
     }
 
     /**
@@ -180,40 +162,6 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
         this.handleException = handleException;
     }
 
-    public JsonConfig getJsonConfig()
-    {
-        if (jsonConfig == null)
-        {
-            setJsonConfig(new JsonConfig());
-        }
-        return jsonConfig;
-    }
-
-    public void setJsonConfig(JsonConfig jsonConfig)
-    {
-        this.jsonConfig = jsonConfig;
-    }
-
-    public String getExcludeProperties()
-    {
-        return excludeProperties;
-    }
-
-    public void setExcludeProperties(String excludeProperties)
-    {
-        this.excludeProperties = excludeProperties;
-    }
-
-    public String getIncludeProperties()
-    {
-        return includeProperties;
-    }
-
-    public void setIncludeProperties(String includeProperties)
-    {
-        this.includeProperties = includeProperties;
-    }
-
     public Class getSourceClass()
     {
         return sourceClass;
@@ -224,26 +172,14 @@ public class ObjectToJson extends AbstractMessageAwareTransformer
         this.sourceClass = sourceClass;
     }
 
-    private class IncludePropertiesFilter implements PropertyFilter
+    public Map<Class, Class> getSerializationMixins()
     {
-        private String[] includedProperties;
+        return serializationMixins;
+    }
 
-        private IncludePropertiesFilter(String[] includedProperties)
-        {
-            this.includedProperties = includedProperties;
-        }
-
-        public boolean apply(Object source, String name, Object value)
-        {
-            for (int i = 0; i < includedProperties.length; i++)
-            {
-                if (includedProperties[i].equals(name))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+    public void setSerializationMixins(Map<Class, Class> serializationMixins)
+    {
+        this.serializationMixins = serializationMixins;
     }
 }
 

@@ -11,13 +11,11 @@
 package org.mule.module.json;
 
 import org.mule.module.json.filters.IsJsonFilter;
+import org.mule.module.json.transformers.FruitCollection;
+import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
 import org.mule.module.json.transformers.JsonToObject;
-import org.mule.module.json.transformers.JsonToXml;
 import org.mule.module.json.transformers.ObjectToJson;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Orange;
 
 public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -32,26 +30,26 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(filter);
         assertTrue(filter.isValidateParsing());
 
-        JsonToObject jsonToOrangeArray = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToOrangeArray");
-        assertNotNull(jsonToOrangeArray);
-        assertEquals(Orange.class, jsonToOrangeArray.getReturnClass());
-        assertNotNull(jsonToOrangeArray.getJsonConfig());
-        assertNotNull(jsonToOrangeArray.getJsonConfig().getClassMap());
-        assertEquals(Apple.class, jsonToOrangeArray.getJsonConfig().getClassMap().get("apple"));
-        assertEquals(Banana.class, jsonToOrangeArray.getJsonConfig().getClassMap().get("banana"));
+        ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
+        assertNotNull(serializer);
+        assertEquals(String.class, serializer.getReturnClass());
+        assertEquals(FruitCollection.class, serializer.getSourceClass());
+        assertEquals(3, serializer.getSerializationMixins().size());
 
-        ObjectToJson orangeArrayToJson = (ObjectToJson) muleContext.getRegistry().lookupObject("orangeToJson");
-        assertNotNull(orangeArrayToJson);
-        assertEquals(String.class, orangeArrayToJson.getReturnClass());
-        assertEquals(Orange.class, orangeArrayToJson.getSourceClass());
-        assertEquals("brand, radius", orangeArrayToJson.getExcludeProperties());
+        JsonToObject deserializer = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToFruitCollection");
+        assertNotNull(deserializer);
+        assertEquals(FruitCollection.class, deserializer.getReturnClass());
+        assertEquals(1, deserializer.getDeserializationMixins().size());
 
-        JsonToXml jsonToXml = (JsonToXml) muleContext.getRegistry().lookupObject("jsonToXml");
-        assertNotNull(jsonToXml);
-        assertEquals(String.class, jsonToXml.getReturnClass());
-        assertEquals("obj", jsonToXml.getObjectElementName());
-        assertEquals("array", jsonToXml.getArrayElementName());
-        assertEquals("value", jsonToXml.getValueElementName());
+       //Test roundTrip
+        FruitCollection fc = JsonBeanRoundTripTestCase.JSON_OBJECT;
 
+        String result = (String)serializer.transform(fc);
+        assertNotNull(result);
+        assertEquals(JsonBeanRoundTripTestCase.JSON_STRING, result);
+
+        FruitCollection result2 = (FruitCollection)deserializer.transform(result);
+        assertNotNull(result2);
+        assertEquals(fc, result2);
     }
 }

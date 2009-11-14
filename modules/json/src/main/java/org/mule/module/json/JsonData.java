@@ -11,68 +11,65 @@ package org.mule.module.json;
 
 import org.mule.util.NumberUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
-import java.util.List;
+import java.io.StringReader;
+import java.net.URL;
 
-import net.sf.ezmorph.MorphException;
-import net.sf.ezmorph.MorpherRegistry;
-import net.sf.ezmorph.bean.MorphDynaBean;
-import net.sf.ezmorph.bean.MorphDynaClass;
-
-import org.apache.commons.beanutils.DynaBean;
-import org.apache.commons.beanutils.DynaClass;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- * A wrapper for the {@link net.sf.ezmorph.bean.MorphDynaBean} object that
- * allows for nested object keys i.e. user.name will return the name property on
+ * A wrapper for the {@link org.codehaus.jackson.JsonNode} object that
+ * allows for nested object keys i.e. user/name will return the name property on
  * the user object.
  */
-public class JsonData implements DynaBean, Serializable 
+public class JsonData implements Serializable
 {
-    private MorphDynaBean morphDynaBean;
-    private List entries;
-    private boolean strict = true;
+    private JsonNode node;
 
-    public JsonData(List entries) 
+    public JsonData(JsonNode node)
     {
-        this.entries = entries;
+        this.node = node;
     }
 
-    public JsonData(MorphDynaBean morphDynaBean) 
+    public JsonData(URL node) throws IOException
     {
-        this.morphDynaBean = morphDynaBean;
+        this(node.openStream());
     }
 
-    public boolean contains(String name, String key) 
+    public JsonData(InputStream node) throws IOException
     {
-        return morphDynaBean.contains(name, key);
+        this.node = new ObjectMapper().readTree(node);
+    }
+
+    public JsonData(Reader node) throws IOException
+    {
+        this.node = new ObjectMapper().readTree(node);
+    }
+
+    public JsonData(String node) throws IOException
+    {
+        this(new StringReader(node));
     }
 
     @Override
     public boolean equals(Object obj) 
     {
-        return morphDynaBean.equals(obj);
+        return node.equals(obj);
     }
 
-    public Object get(int index) 
+    public JsonNode get(int index)
     {
-        return entries.get(index);
+        return node.get(index);
     }
 
-    /**
-     * If the data is an array, the size of the arry is returned otherwise, 1 is
-     * returned since there is a single data element
-     * 
-     * @return the size of the array data if the object is an array otherwise 1
-     */
-    public int size() 
-    {
-        return (entries != null ? entries.size() : 1);
-    }
 
     public boolean isArray() 
     {
-        return entries != null;
+        return node.isArray();
     }
 
     public Object get(String name) 
@@ -92,7 +89,14 @@ public class JsonData implements DynaBean, Serializable
             }
 
         }
-        int i = name.indexOf("->");
+        int offset = 0;
+        if(name.startsWith("'"))
+        {
+            offset = name.indexOf("'", 1);
+        }
+
+        int i = name.indexOf("/", offset);
+
         String objectName;
         if (x > 0)
         {
@@ -106,119 +110,127 @@ public class JsonData implements DynaBean, Serializable
         {
             objectName = name;
         }
+
         if (isArray() && !objectName.startsWith("[")) 
         {
-            throw new MorphException(
+            throw new IllegalArgumentException(
                     "Object is an array, but a name of the object is given: "
                             + objectName);
         }
 
-        Object o;
+        //unquote the string
+        if(objectName.startsWith("'"))
+        {
+            objectName = objectName.substring(1, objectName.length() -1);
+        }
+        JsonNode o;
         if (key != null) 
         {
-            o = morphDynaBean.get(objectName, key);
+
+           o = null; //morphDynaBean.get(objectName, key);
         } 
         else if (index > -1 && !objectName.startsWith("[")) 
         {
-            o = morphDynaBean.get(objectName, index);
-        } 
+            o = node.get(objectName).get(index);
+        }
         else if (index > -1) 
         {
-            o = get(index);
+            o = node.get(index);
         } 
         else 
         {
-            o = morphDynaBean.get(objectName);
+            o = node.get(objectName);
         }
 
-        if (o instanceof MorphDynaBean && i > 0) 
+        if (!o.isValueNode() && i > 0)
         {
-            return new JsonData((MorphDynaBean) o).get(name.substring(i + 2));
+            return new JsonData(o).get(name.substring(i + 1)); //2
         }
-        if (o instanceof MorphDynaBean && y > 0) 
+        if (!o.isValueNode() && y > 0)
         {
-            return new JsonData((MorphDynaBean) o).get(name.substring(y + 1));
+            return new JsonData(o).get(name.substring(y + 1));
         } 
-        else if (o instanceof List && i > 0) 
-        {
-            return new JsonData((List) o).get(name.substring(i + 2));
-        } 
-        else if (o instanceof List && y > 0) 
-        {
-            return new JsonData((List) o).get(name.substring(y + 1));
-        } 
+//        else if (o instanceof List && i > 0)
+//        {
+//            return new JsonData((List) o).get(name.substring(i + 1)); //2
+//        }
+//        else if (o instanceof List && y > 0)
+//        {
+//            return new JsonData((List) o).get(name.substring(y + 1));
+//        }
         else 
         {
-            return o;
+            return o.getValueAsText();
         }
     }
 
-    public Object get(String name, int index)
-    {
-        return morphDynaBean.get(name, index);
-    }
-
-    public Object get(String name, String key)
-    {
-        return morphDynaBean.get(name, key);
-    }
-
-    public DynaClass getDynaClass()
-    {
-        return morphDynaBean.getDynaClass();
-    }
-
-    public MorpherRegistry getMorpherRegistry()
-    {
-        return morphDynaBean.getMorpherRegistry();
-    }
-
-    public void remove(String name, String key)
-    {
-        morphDynaBean.remove(name, key);
-    }
-
-    public void set(String name, int index, Object value)
-    {
-        morphDynaBean.set(name, index, value);
-    }
-
-    public void set(String name, Object value)
-    {
-        morphDynaBean.set(name, value);
-    }
-
-    public void set(String name, String key, Object value)
-    {
-        morphDynaBean.set(name, key, value);
-    }
-
-    public void setDynaBeanClass(MorphDynaClass dynaClass)
-    {
-        morphDynaBean.setDynaBeanClass(dynaClass);
-    }
-
-    public void setMorpherRegistry(MorpherRegistry morpherRegistry)
-    {
-        morphDynaBean.setMorpherRegistry(morpherRegistry);
-    }
+//    public Object get(String name, int index)
+//    {
+//        return morphDynaBean.get(name, index);
+//    }
+//
+//    public Object get(String name, String key)
+//    {
+//        return morphDynaBean.get(name, key);
+//    }
+//
+//    public DynaClass getDynaClass()
+//    {
+//        return morphDynaBean.getDynaClass();
+//    }
+//
+//    public MorpherRegistry getMorpherRegistry()
+//    {
+//        return morphDynaBean.getMorpherRegistry();
+//    }
+//
+//    public void remove(String name, String key)
+//    {
+//        morphDynaBean.remove(name, key);
+//    }
+//
+//    public void set(String name, int index, Object value)
+//    {
+//        morphDynaBean.set(name, index, value);
+//    }
+//
+//    public void set(String name, Object value)
+//    {
+//        morphDynaBean.set(name, value);
+//    }
+//
+//    public void set(String name, String key, Object value)
+//    {
+//        morphDynaBean.set(name, key, value);
+//    }
+//
+//    public void setDynaBeanClass(MorphDynaClass dynaClass)
+//    {
+//        morphDynaBean.setDynaBeanClass(dynaClass);
+//    }
+//
+//    public void setMorpherRegistry(MorpherRegistry morpherRegistry)
+//    {
+//        morphDynaBean.setMorpherRegistry(morpherRegistry);
+//    }
 
     @Override
     public String toString()
     {
-        if (morphDynaBean != null)
-        {
-            return morphDynaBean.toString();
-        }
-        else if (entries != null && entries.size() > 0)
-        {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < entries.size(); i++)
-            {
-                sb.append(entries.get(i));
-            }
-            return sb.toString();
-        }
-        return ""; // avoid returning null
+        return node.toString();
+//        if (morphDynaBean != null)
+//        {
+//            return morphDynaBean.toString();
+//        }
+//        else if (entries != null && entries.size() > 0)
+//        {
+//            StringBuffer sb = new StringBuffer();
+//            for (int i = 0; i < entries.size(); i++)
+//            {
+//                sb.append(entries.get(i));
+//            }
+//            return sb.toString();
+//        }
+//        return ""; // avoid returning null
     }
 }

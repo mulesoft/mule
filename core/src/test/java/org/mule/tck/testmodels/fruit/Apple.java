@@ -34,6 +34,15 @@ public class Apple implements Fruit, Callable
 
     private FruitCleaner cleaner;
 
+    public Apple()
+    {
+    }
+
+    public Apple(boolean bitten)
+    {
+        this.bitten = bitten;
+    }
+
     public void wash()
     {
         if (cleaner != null)

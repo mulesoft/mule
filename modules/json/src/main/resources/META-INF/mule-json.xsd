@@ -27,87 +27,8 @@
                 <xsd:attribute name="validateParsing" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Will validate that the JSON string can be parsed. This can be expensive so the default is false.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-    </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="json-to-object-transformer" type="jsonTransformerType"
-                 substitutionGroup="mule:abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that will convert a JSON encoded object graph to a java object. The object type is
-                determined by the 'returnClass' attribute. Note that this transformers supports Arrays and Lists. For
-                example, to
-                convert a JSON string to an array of org.foo.Person, set the the returnClass=[Lorg.foo.Person; .
-
-                The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
-                instance of:
-                net.sf.json.JsonConfig. This can be created as a spring bean.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="object-to-json-transformer" type="objectToJsonTransformerType"
-                 substitutionGroup="mule:abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                Converts a java object to a JSON encoded object that can be consumed by other languages such as
-                Javascript or Ruby.
-
-                The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
-                instance of:
-                net.sf.json.JsonConfig. This can be created as a spring bean.
-
-                Users can configure a comma-separated list of property names to exclude or include i.e.
-                excludeProperties="address,postcode".
-
-                The returnClass for this transformer is always java.lang.String, there is no need to set this.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="json-to-xml-transformer" type="jsonXmlTransformerType"
-                 substitutionGroup="mule:abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                Converts a JSON encoded object representation in to an XML representation. Each property and enclosing
-                element are wrapped in XML elements
-                these generated element names can be set on the transformer. Names can be configured for Object
-                elements, array elements and value elements.
-
-                The returnClass for this transformer is always java.lang.String, there is no need to set this.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="jsonXmlTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="objectElementName" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The XML element name to use for representing objects in the JSON ecoded object. The default
-                            is 'o'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="arrayElementName" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The XML element name to use for representing objects in the JSON ecoded object. The default
-                            is 'a'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="valueElementName" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The XML element name to use for representing object values (properties) in the JSON ecoded
-                            object. The default
-                            is 'e'.
+                            Will validate that the JSON string can be parsed. This can be expensive so the default is
+                            false.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -115,15 +36,73 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="json-to-object-transformer" type="jsonToObjectTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that will convert a JSON encoded object graph to a java object. The object type is
+                determined by the 'returnClass' attribute. Note that this transformers supports Arrays and Lists. For
+                example, to
+                convert a JSON string to an array of org.foo.Person, set the {{returnClass=org.foo.Person\[\]}}.
+
+                The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
+                instance of:
+                net.sf.json.JsonConfig. This can be created as a spring bean.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="object-to-json-transformer" type="objectToJsonTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a java object to a JSON encoded object that can be consumed by other languages such as
+                Javascript or Ruby.
+
+                The JSON Object mapper can be configured using the {{mapper-ref}} attribute. This is an object reference
+                to an
+                instance of:
+                {{org.codehaus.jackson.Mapper}}. This can be created as a spring bean. Usually the default mapper is
+                sufficient.
+
+                Often users will want to configure exclusions or inclusions when serializing objects. This can be done
+                by
+                using the Jackson annotations directly on the object (see
+                [http://jackson.codehaus.org/1.3.0/javadoc/org/codehaus/jackson/annotate/package-frame.html])
+                If it is not possible to annotate the object directly, mixins can be used to add annotations to an
+                object using AOP.
+                There is a good description of this method here:
+                [http://www.cowtowncoder.com/blog/archives/08-01-2009_08-31-2009.html].
+                To configure mixins for you objects, either configure the
+                {{mapper-ref}} attribute or register them with the transformer using the &lt;serialization-mixin&gt;
+                element.
+
+                The returnClass for this transformer is usually {{java.lang.String}}, {{byte[]}} can also be used.
+
+                At this time the transformer does not support streaming.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="mixin-map" type="mixinMapType" substitutionGroup="mule:abstract-extension"/>
+
+
     <xsd:complexType name="jsonTransformerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="jsonConfig-ref" type="xsd:string">
+                <xsd:attribute name="mapper-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The JSON engine can be configured using the jsonConfig attribute. This is an object
+                            The JSON engine can be configured using this attribute. This is an object
                             reference to an instance of:
-                            net.sf.json.JsonConfig. This can be created as a spring bean.
+                            {{org.codehaus.jackson.ObjectCodec}}. This can be created as a bean and injected.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="mixins-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a &lt;mixin-map&gt; containing one or more mixin definitions
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -134,22 +113,9 @@
     <xsd:complexType name="objectToJsonTransformerType">
         <xsd:complexContent>
             <xsd:extension base="jsonTransformerType">
-                <xsd:attribute name="excludeProperties" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Users can configure a comma-separated list of property names to exclude i.e.
-                            excludeProperties="address,postcode".
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="includeProperties" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Configure a comma-separated list of property names to include i.e.
-                            includeProperties="name,email".
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="serialization-mixin" type="mixin"/>
+                </xsd:sequence>
                 <xsd:attribute name="sourceClass" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -160,6 +126,53 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="jsonToObjectTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="jsonTransformerType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="deserialization-mixin" type="mixin"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="mixin" mixed="true">
+
+        <xsd:attribute name="mixinClass" type="xsd:NMTOKEN" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The fully qualified classname of the mixin class that defines the annotations to overlay on the
+                    object. This must be an abstract class or interface.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="targetClass" type="xsd:NMTOKEN" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The fully qualified classname of the target class that will have the annotations injected.
+                    This is the object class that gets serialized or deserialized.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="mixinMapType" mixed="true">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xsd:element type="mixin" name="mixin"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The name of the map that is used to make a reference to it by the transformer elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -16,8 +16,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.NumberUtils;
 
-import net.sf.ezmorph.MorphException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,11 +119,11 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
             {
                 throw e;
             }
-            catch(MorphException e)
-            {
-                logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
-                return null;
-            }
+//            catch(IOException e)
+//            {
+//                logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
+//                return null;
+//            }
         }
         catch (TransformerException e)
         {

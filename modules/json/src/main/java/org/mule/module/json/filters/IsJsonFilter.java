@@ -13,12 +13,11 @@ package org.mule.module.json.filters;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * A filter that will determine if the current message payload is a JSON encoded message.
@@ -40,7 +39,19 @@ public class IsJsonFilter implements Filter
 
     public boolean accept(MuleMessage obj)
     {
-        return accept(obj.getPayload());
+        if (obj.getStringProperty("Content-Type", "").contains("application/json"))
+        {
+            return true;
+        }
+        try
+        {
+            return accept(obj.getPayloadAsString());
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to read object payload as string for isJsonFilter", e);
+            return false;
+        }
     }
 
     public boolean accept(Object obj)
@@ -49,22 +60,20 @@ public class IsJsonFilter implements Filter
         {
             if (obj instanceof String)
             {
-                if (!JSONUtils.mayBeJSON((String) obj))
+                if (!mayBeJSON((String) obj))
                 {
                     return false;
-                    //throw new JSONException("Message is not valid JSON");
                 }
-                if(isValidateParsing()) JSONObject.fromObject(obj);
+                if (isValidateParsing())
+                {
+                    new ObjectMapper().readTree((String) obj);
+                }
             }
-            else
-            {
-                //throw new JSONException("Object must be a string");
-                return false;
-            }
+
             logger.debug("Filter result = true (message is valid JSON)");
             return true;
         }
-        catch (JSONException e)
+        catch (IOException e)
         {
             logger.debug("Filter result = false (message is not valid JSON): " + e.getMessage());
             return false;
@@ -80,4 +89,22 @@ public class IsJsonFilter implements Filter
     {
         this.validateParsing = validateParsing;
     }
+
+    /**
+     * Tests if the String possibly represents a valid JSON String.
+     *
+     * @param string Valid JSON strings are:
+     *               <ul>
+     *               <li>"null"</li>
+     *               <li>starts with "[" and ends with "]"</li>
+     *               <li>starts with "{" and ends with "}"</li>
+     *               </ul>
+     * @return true if the test string starts with one of the valid json characters
+     */
+    protected boolean mayBeJSON(String string)
+    {
+        return string != null
+                && ("null".equals(string)
+                || (string.startsWith("[") && string.endsWith("]")) || (string.startsWith("{") && string.endsWith("}")));
+   }
 }

@@ -10,21 +10,36 @@
 
     <json:is-json-filter name="jsonFilter" validateParsing="true"/>
 
-    <json:json-to-object-transformer name="jsonToOrangeArray" returnClass="org.mule.tck.testmodels.fruit.Orange"
-                                     jsonConfig-ref="jsonConfig"/>
+    <!-- often you'll want to use the same mixins for serialization and deserialization, so using a map means you only define
+         them once -->
+    <json:mixin-map name="myMixins">
+        <json:mixin mixinClass="org.mule.module.json.transformers.FruitCollectionMixin"
+                targetClass="org.mule.module.json.transformers.FruitCollection"/>
+        <json:mixin
+                mixinClass="org.mule.module.json.transformers.AppleMixin"
+                targetClass="org.mule.tck.testmodels.fruit.Apple"/>
 
-    <json:object-to-json-transformer name="orangeToJson" excludeProperties="brand, radius"
-                                     sourceClass="org.mule.tck.testmodels.fruit.Orange"/>
+    </json:mixin-map>
 
-    <json:json-to-xml-transformer name="jsonToXml" arrayElementName="array" objectElementName="obj"
-                                  valueElementName="value"/>
+    <json:json-to-object-transformer name="jsonToFruitCollection" returnClass="org.mule.module.json.transformers.FruitCollection"
+                                     mixins-ref="myMixins">
+        <!-- test augmenting the mixin map with local mixins -->
+        <json:deserialization-mixin
+                mixinClass="org.mule.module.json.transformers.OrangeMixin"
+                targetClass="org.mule.tck.testmodels.fruit.Orange"/>
+        </json:json-to-object-transformer>
 
-    <spring:bean name="jsonConfig" class="net.sf.json.JsonConfig">
-        <spring:property name="classMap">
-            <spring:map value-type="java.lang.Class">
-                <spring:entry key="apple" value="org.mule.tck.testmodels.fruit.Apple"/>
-                <spring:entry key="banana" value="org.mule.tck.testmodels.fruit.Banana"/>
-            </spring:map>
-        </spring:property>
-    </spring:bean>
+    <json:object-to-json-transformer name="fruitCollectionToJson"
+                                     sourceClass="org.mule.module.json.transformers.FruitCollection">
+        <json:serialization-mixin
+                mixinClass="org.mule.module.json.transformers.FruitCollectionMixin"
+                targetClass="org.mule.module.json.transformers.FruitCollection"/>
+        <json:serialization-mixin
+                mixinClass="org.mule.module.json.transformers.AppleMixin"
+                targetClass="org.mule.tck.testmodels.fruit.Apple"/>
+        <json:serialization-mixin
+                mixinClass="org.mule.module.json.transformers.OrangeMixin"
+                targetClass="org.mule.tck.testmodels.fruit.Orange"/>
+    </json:object-to-json-transformer>
+
 </mule>

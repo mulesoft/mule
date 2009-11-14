@@ -15,13 +15,28 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformerTestCase;
 
+/**
+ * For tis test I picked difficult beans in that they are not real beans, so I could test how to use
+ * mixins to decorate the objects
+ *
+ * FruitCleaner is ignorred since there is no concrete implementation to construct
+ * bitten - is ignored because the Orage becuase there is no setter method.  On the apple I tested using a
+ * constructor
+ */
 public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
 {
+    //Note that Banana has been excluded
+    public static final String JSON_STRING = "{\"apple\":{\"washed\":false,\"bitten\":true},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
+
+    //Note that Banana is null
+    public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, new Double(3.45), "JuicyFruit"));
 
     public Transformer getTransformer() throws Exception
     {
         ObjectToJson trans = new ObjectToJson();
-        trans.setExcludeProperties("banana");
+        trans.getSerializationMixins().put(FruitCollection.class, FruitCollectionMixin.class);
+        trans.getSerializationMixins().put(Apple.class, AppleMixin.class);
+        trans.getSerializationMixins().put(Orange.class, OrangeMixin.class);
         trans.setSourceClass(FruitCollection.class);
         initialiseObject(trans);
         return trans;
@@ -31,6 +46,9 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     {
         JsonToObject trans = new JsonToObject();
         trans.setReturnClass(getTestData().getClass());
+        trans.getDeserializationMixins().put(FruitCollection.class, FruitCollectionMixin.class);
+        trans.getDeserializationMixins().put(Apple.class, AppleMixin.class);
+        trans.getDeserializationMixins().put(Orange.class, OrangeMixin.class);
         initialiseObject(trans);
         return trans;
     }
@@ -38,15 +56,12 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     public Object getTestData()
     {
         //Banana is null
-        FruitCollection bowl = new FruitCollection(new Apple(), null, new Orange(8, new Double(3.45), "JuicyFruit"));
-        bowl.getApple().setBitten(true);
-        return bowl;
+        return JSON_OBJECT;
     }
 
     public Object getResultData()
     {
         //Note that Banana has been excluded
-        return "{\"apple\":{\"appleCleaner\":null,\"bitten\":true,\"washed\":false},\"orange\":{\"arrayProperties\":[],\"bitten\":false,\"brand\":\"JuicyFruit\",\"cleaner\":null,\"listProperties\":[],\"mapProperties\":null,\"radius\":3.45,\"segments\":8}}";
+        return JSON_STRING;
     }
-
 }

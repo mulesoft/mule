@@ -9,29 +9,22 @@
  */
 package org.mule.module.json.transformers;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.module.json.JsonData;
-import org.mule.module.json.util.JsonUtils;
-import org.mule.transformer.AbstractTransformer;
 import org.mule.util.IOUtils;
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Reader;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import net.sf.ezmorph.bean.MorphDynaBean;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.JsonConfig;
 
 /**
  * A transformer that will convert a JSON encoded object graph to a java object. The object type is
@@ -42,108 +35,98 @@ import net.sf.json.JsonConfig;
  * The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
  * instance of: {@link net.sf.json.JsonConfig}. This can be created as a spring bean.
  */
-public class JsonToObject extends AbstractTransformer implements DiscoverableTransformer
+public class JsonToObject extends AbstractJsonTransformer
 {
-    protected JsonConfig jsonConfig;
+    private Map<Class, Class> deserializationMixins = new HashMap<Class, Class>();
 
-    protected Map dtoMappings;
-
-    protected int weighting = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING;
 
     public JsonToObject()
     {
-        this.registerSourceType(JSONObject.class);
+        this.registerSourceType(Reader.class);
+        this.registerSourceType(URL.class);
+        this.registerSourceType(File.class);
         this.registerSourceType(String.class);
         this.registerSourceType(InputStream.class);
         this.registerSourceType(byte[].class);
-        setReturnClass(Object.class);
-        dtoMappings = new HashMap(1);
-        dtoMappings.put("payload", HashMap.class);
+        setReturnClass(JsonData.class);
     }
 
-    public int getPriorityWeighting()
-    {
-        return weighting;
-    }
-
-    public void setPriorityWeighting(int weighting)
-    {
-        this.weighting = weighting;
-    }
 
     @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if (getReturnClass().equals(Object.class))
+        //Add shared mixins first
+        for (Map.Entry<Class, Class> entry : getMixins().entrySet())
         {
-            logger.warn("The return class is not set not type validation will be done");
+            getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
-        if (getReturnClass().isArray())
+
+        for (Map.Entry<Class, Class> entry : deserializationMixins.entrySet())
         {
-            getJsonConfig().setEnclosedType(getReturnClass());
-            getJsonConfig().setArrayMode(JsonConfig.MODE_OBJECT_ARRAY);
+            getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
-        else if (List.class.isAssignableFrom(getReturnClass()))
-        {
-            getJsonConfig().setEnclosedType(getReturnClass());
-            getJsonConfig().setArrayMode(JsonConfig.MODE_LIST);
-        }
-        else if (Set.class.isAssignableFrom(getReturnClass()))
-        {
-            getJsonConfig().setEnclosedType(getReturnClass());
-            getJsonConfig().setArrayMode(JsonConfig.MODE_SET);
-        }
+
+
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
+        Object src = message.getPayload();
+        Object returnValue;
+        InputStream is = null;
+
         try
         {
-            Object returnValue = null;
-
-            if (src instanceof byte[])
+            if (src instanceof InputStream)
             {
-                src = new String((byte[]) src, encoding);
+                is = (InputStream) src;
             }
-            else if (src instanceof InputStream)
+            else if (src instanceof File)
             {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy((InputStream) src, baos);
-                src = baos.toString();
+                is = new FileInputStream((File) src);
             }
-
-            if (src instanceof String)
+            else if (src instanceof URL)
+            {
+                is = ((URL) src).openStream();
+            }
+            else if (src instanceof byte[])
+            {
+                is = new ByteArrayInputStream((byte[]) src);
+            }
+            if (src instanceof Reader)
             {
                 if (getReturnClass().equals(JsonData.class))
                 {
-                    getJsonConfig().setEnclosedType(getReturnClass());
-                    JSON json = JSONSerializer.toJSON(src.toString(), getJsonConfig());
-                    if(json instanceof JSONArray)
-                    {
-                        getJsonConfig().setEnclosedType(List.class);
-                        getJsonConfig().setArrayMode(JsonConfig.MODE_LIST);
-                        List list = (List)JSONArray.toCollection((JSONArray)json, getJsonConfig());
-                        returnValue = new JsonData(list);
-
-                    }
-                    else
-                    {
-                        returnValue = JSONObject.toBean((JSONObject)json, getJsonConfig());
-                        returnValue = new JsonData((MorphDynaBean) returnValue);
-                    }
+                    returnValue = new JsonData((Reader) src);
                 }
                 else
                 {
-                    returnValue = JsonUtils.convertJsonToBean((String) src, getJsonConfig(), getReturnClass(),
-                            (getReturnClass().equals(DefaultMuleMessageDTO.class) ? dtoMappings : null));
+                    returnValue = getMapper().readValue((Reader) src, getReturnClass());
                 }
             }
-            else if (src instanceof JSONObject)
+            else if (src instanceof String)
             {
-                returnValue = JSONObject.toBean((JSONObject) src, getReturnClass(), new HashMap());
+                if (getReturnClass().equals(JsonData.class))
+                {
+                    returnValue = new JsonData((String) src);
+                }
+                else
+                {
+                    returnValue = getMapper().readValue((String) src, getReturnClass());
+                }
             }
-
+            else
+            {
+                if (getReturnClass().equals(JsonData.class))
+                {
+                    returnValue = new JsonData((Reader) src);
+                }
+                else
+                {
+                    returnValue = getMapper().readValue(is, getReturnClass());
+                }
+            }
             return returnValue;
         }
         catch (Exception e)
@@ -152,25 +135,20 @@ public class JsonToObject extends AbstractTransformer implements DiscoverableTra
         }
         finally
         {
-            if (src instanceof InputStream)
+            if (is != null)
             {
-                IOUtils.closeQuietly((InputStream) src);
+                IOUtils.closeQuietly(is);
             }
         }
     }
 
-
-    public JsonConfig getJsonConfig()
+    public Map<Class, Class> getDeserializationMixins()
     {
-        if (jsonConfig == null)
-        {
-            setJsonConfig(new JsonConfig());
-        }
-        return jsonConfig;
+        return deserializationMixins;
     }
 
-    public void setJsonConfig(JsonConfig jsonConfig)
+    public void setDeserializationMixins(Map<Class, Class> deserializationMixins)
     {
-        this.jsonConfig = jsonConfig;
+        this.deserializationMixins = deserializationMixins;
     }
 }
