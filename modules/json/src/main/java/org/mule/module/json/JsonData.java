@@ -142,6 +142,11 @@ public class JsonData implements Serializable
             o = node.get(objectName);
         }
 
+        if(o==null)
+        {
+            throw new IllegalArgumentException(objectName + " does not exist");
+        }
+
         if (!o.isValueNode() && i > 0)
         {
             return new JsonData(o).get(name.substring(i + 1)); //2

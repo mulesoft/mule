@@ -41,12 +41,9 @@ public class IsJsonFilterTestCase extends AbstractMuleTestCase
     
     public void testFilterTrue() throws Exception
     {
-        assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
-    }
-    
-    public void testFilterTrue2() throws Exception
-    {
-        assertTrue(filter.accept(new DefaultMuleMessage("{name=\"This is some nice JSON\",bool:true,int:1,\"id\":1,\"options\":[\"a\",\"f\"],\"doublev\":2.2}", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("{\n" +
+                "        \"in_reply_to_user_id\":null,\n" +
+                "        \"text\":\"test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492\"}", muleContext)));
     }
     
     public void testFilterNull() throws Exception

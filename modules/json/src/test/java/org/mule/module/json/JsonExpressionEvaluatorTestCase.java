@@ -24,11 +24,11 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(json, muleContext);
         JsonExpressionEvaluator eval = new JsonExpressionEvaluator();
 
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", eval.evaluate("[0]->text", message));
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", eval.evaluate("[0]/text", message));
 
-        assertEquals("Mule Test", eval.evaluate("[0]->user->name", message));
-        assertEquals("Mule Test9", eval.evaluate("[9]->user->name", message));
-        assertNull( eval.evaluate("[9]->user->XXX", message));
+        assertEquals("Mule Test", eval.evaluate("[0]/user/name", message));
+        assertEquals("Mule Test9", eval.evaluate("[9]/'user'/name", message));
+        assertNull( eval.evaluate("[9]/user/XXX", message));
     }
 
     public void testExpressionsUsingManager() throws Exception
@@ -36,15 +36,15 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         String json = IOUtils.getResourceAsString("test-data.json", getClass());
         MuleMessage message = new DefaultMuleMessage(json, muleContext);
 
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", muleContext.getExpressionManager().evaluate("#[json:[0]->text]", message));
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", muleContext.getExpressionManager().evaluate("#[json:[0]/text]", message));
 
-        assertEquals("Mule Test", muleContext.getExpressionManager().evaluate("json:[0]->user->name", message));
-        assertEquals("Mule Test9", muleContext.getExpressionManager().evaluate("#[json:[9]->user->name]", message));
-        assertNull( muleContext.getExpressionManager().evaluate("json:[9]->user->XXX", message, false));
+        assertEquals("Mule Test", muleContext.getExpressionManager().evaluate("json:[0]/user/name", message));
+        assertEquals("Mule Test9", muleContext.getExpressionManager().evaluate("#[json:[9]/'user'/name]", message));
+        assertNull( muleContext.getExpressionManager().evaluate("json:[9]/user/XXX", message, false));
 
         try
         {
-            muleContext.getExpressionManager().evaluate("json:[9]->user->XXX", message, true);
+            muleContext.getExpressionManager().evaluate("json:[9]/user/XXX", message, true);
             fail("A value was required");
         }
         catch (ExpressionRuntimeException e)
@@ -58,20 +58,20 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         String json = IOUtils.getResourceAsString("test-data.json", getClass());
         MuleMessage message = new DefaultMuleMessage(json, muleContext);
 
-        ExpressionFilter filter = new ExpressionFilter("#[json:[0]->text]");
+        ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]->favorited");
+        filter.setExpression("[0]/favorited");
         assertFalse(filter.accept(message));
 
-        filter.setExpression("[0]->truncated");
+        filter.setExpression("[0]/truncated");
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]->source");
+        filter.setExpression("[0]/source");
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]->xxx");
+        filter.setExpression("[0]/xxx");
         assertFalse(filter.accept(message));
     }
 
@@ -80,20 +80,20 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         String json = IOUtils.getResourceAsString("test-data.json", getClass());
         MuleMessage message = new DefaultMuleMessage(json, muleContext);
 
-        ExpressionFilter filter = new ExpressionFilter("#[json:[0]->text]");
+        ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]->favorited==false");
+        filter.setExpression("[0]/favorited==false");
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]->truncated != true");
+        filter.setExpression("[0]/truncated != true");
         assertFalse(filter.accept(message));
 
-        filter.setExpression("[0]->source==null");
+        filter.setExpression("[0]/source==null");
         assertFalse(filter.accept(message));
 
-        filter.setExpression("[0]->source!= null");
+        filter.setExpression("[0]/source!= null");
         assertTrue(filter.accept(message));
     }
 }

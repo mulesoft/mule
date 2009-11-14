@@ -66,7 +66,7 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
     {
         String compareTo = null;
         boolean not = false;
-        int start = expression.lastIndexOf("->");
+        int start = expression.lastIndexOf("/");
         if(start==-1) start = 0;
         int i = expression.indexOf("==", start);
 
@@ -117,13 +117,9 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
             }
             catch (IllegalArgumentException e)
             {
-                throw e;
+                logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
+                return null;
             }
-//            catch(IOException e)
-//            {
-//                logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
-//                return null;
-//            }
         }
         catch (TransformerException e)
         {

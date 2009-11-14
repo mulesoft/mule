@@ -75,7 +75,7 @@ public class IsJsonFilter implements Filter
         }
         catch (IOException e)
         {
-            logger.debug("Filter result = false (message is not valid JSON): " + e.getMessage());
+            logger.error("Filter result = false (message is not valid JSON): " + e.getMessage());
             return false;
         }
     }
