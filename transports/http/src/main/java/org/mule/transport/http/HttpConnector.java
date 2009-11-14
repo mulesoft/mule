@@ -313,7 +313,7 @@ public class HttpConnector extends TcpConnector
         this.clientConnectionManager = clientConnectionManager;
     }
 
-    HttpClient doClientConnect() throws Exception
+    protected HttpClient doClientConnect() throws Exception
     {
         HttpState state = new HttpState();
 
@@ -331,7 +331,7 @@ public class HttpConnector extends TcpConnector
         return client;
     }
 
-    void setupClientAuthorization(MuleEvent event, HttpMethod httpMethod,
+    protected void setupClientAuthorization(MuleEvent event, HttpMethod httpMethod,
                                             HttpClient client, ImmutableEndpoint endpoint)
             throws UnsupportedEncodingException
     {
@@ -360,7 +360,7 @@ public class HttpConnector extends TcpConnector
                 endpoint.getEncoding()))));
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
-        //TODO MULE-4501 this sohlud be removed and handled only in the ObjectToHttpRequest transformer
+        //TODO MULE-4501 this sohuld be removed and handled only in the ObjectToHttpRequest transformer
         else if (event!=null && event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND)!=null &&
                 httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION)==null)
         {
