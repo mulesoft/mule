@@ -26,20 +26,47 @@ import org.w3c.dom.Element;
  */
 public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
-    private Class mapClass;
-    private String name;
-    private boolean dynamicName = false;
+    protected Class mapClass;
+    protected String name;
+    protected boolean attributeName;
+    protected boolean dynamicName = false;
 
+    /**
+     * Creates a Map parser that will add the map directly to the registry
+     *
+     * @param mapClass the type of map to create
+     */
     public OrphanMapDefinitionParser(Class mapClass)
     {
         this.mapClass = mapClass;
         dynamicName = true;
     }
 
+    /**
+     * Creates a Map parser that will add the map directly to the registry
+     *
+     * @param mapClass the type of map to create
+     * @param name the name of the map property
+     */
     public OrphanMapDefinitionParser(Class mapClass, String name)
     {
         this.mapClass = mapClass;
         this.name = name;
+    }
+
+    /**
+     * Creates a Map parser that will add the map directly to the registry
+     *
+     * @param mapClass the type of map to create
+     * @param name the name of the map property
+     * @param attributeName whether the name specified is actually an attribute name on the element.  The map name will
+     * be retrieved from the element attribute.
+     */
+    public OrphanMapDefinitionParser(Class mapClass, String name, boolean attributeName)
+    {
+        this.mapClass = mapClass;
+        this.name = name;
+        this.attributeName = attributeName;
     }
 
     protected Class getBeanClass(Element element)
@@ -69,6 +96,10 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
     @java.lang.Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
+        if(attributeName)
+        {
+            return element.getAttribute(name);
+        }
         return name;
     }
 }
