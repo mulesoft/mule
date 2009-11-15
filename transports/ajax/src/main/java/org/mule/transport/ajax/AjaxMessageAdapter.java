@@ -10,17 +10,26 @@
 
 package org.mule.transport.ajax;
 
-import org.mule.api.MessagingException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultMuleMessageDTO;
 import org.mule.module.json.filters.IsJsonFilter;
-import org.mule.module.json.transformers.JsonToObject;
 import org.mule.transport.AbstractMessageAdapter;
+import org.mule.util.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * A message adapter that will accept JSON endcode {@link DefaultMuleMessageDTO} objects, 
@@ -39,7 +48,6 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
     public static final String PAYLOAD_PARAM = "payload";
     public static final String REPLYTO_PARAM = "replyTo";
 
-    protected transient JsonToObject transformer;
     protected transient IsJsonFilter filter = new IsJsonFilter();
 
     protected Object payload;
@@ -56,7 +64,7 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
         init(message);
     }
 
-    protected void init(Object message) throws MessagingException, TransformerException
+    protected void init(Object message) throws MuleException
     {
         if (message instanceof Map)
         {
@@ -66,9 +74,7 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
             {
                 if (filter.accept(p))
                 {
-                    transformer = new JsonToObject();
-                    transformer.setReturnClass(Map.class);
-                    this.payload = transformer.transform(p);
+                    this.payload = readJsonAs(p, HashMap.class);
                 }
                 else
                 {
@@ -91,18 +97,13 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
         {
             if( message.toString().indexOf("payload") > -1)
             {
-            transformer = new JsonToObject();
-            transformer.setReturnClass(DefaultMuleMessageDTO.class);
-            DefaultMuleMessageDTO dto = null;
-            dto = (DefaultMuleMessageDTO) transformer.transform(message);
+            DefaultMuleMessageDTO dto = readJsonAs(message, DefaultMuleMessageDTO.class);
             payload = dto.getPayload();
             dto.addPropertiesTo(this);
             }
             else
             {
-                transformer = new JsonToObject();
-                transformer.setReturnClass(Map.class);
-                payload = transformer.transform(message);
+               this.payload = readJsonAs(message, HashMap.class);
             }
         }
         else
@@ -110,6 +111,54 @@ public class AjaxMessageAdapter extends AbstractMessageAdapter
             payload = message;
         }
 
+    }
+
+    protected <T> T readJsonAs(Object src, Class<T> type) throws DefaultMuleException
+    {
+        InputStream in = null;
+         try
+        {
+        ObjectMapper mapper = new ObjectMapper();
+        in = getObjectAsStream(src);
+
+            return mapper.readValue(in, type);
+        }
+         catch(IOException e)
+         {
+             throw new DefaultMuleException(CoreMessages.failedToReadPayload(), e);
+         }
+        finally
+        {
+            IOUtils.closeQuietly(in);
+        }
+    }
+
+    protected InputStream getObjectAsStream(Object src) throws IOException
+    {
+        if (src instanceof InputStream)
+            {
+                return (InputStream) src;
+            }
+            else if (src instanceof File)
+            {
+                return new FileInputStream((File) src);
+            }
+            else if (src instanceof URL)
+            {
+                return ((URL) src).openStream();
+            }
+            else if (src instanceof byte[])
+            {
+                return new ByteArrayInputStream((byte[]) src);
+            }
+        else if (src instanceof String)
+            {
+                return new ByteArrayInputStream(((String) src).getBytes());
+            }
+        else
+        {
+            throw new IllegalArgumentException("OBject type not supported for JSON transform: " + src);
+        }
     }
 
     public Object getPayload()
