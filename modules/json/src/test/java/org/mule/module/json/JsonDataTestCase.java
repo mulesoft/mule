@@ -68,4 +68,12 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         // test toString() since it was broken for arrays
         assertNotNull(jsonData.toString());
     }
+
+    public void testReadingWithQuotedString() throws Exception
+    {
+        String json = IOUtils.getResourceAsString("bitly-response.json", getClass());
+        JsonData jsonData = new JsonData(json);
+
+        assertEquals("NfeyS", jsonData.get("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
+    }
 }

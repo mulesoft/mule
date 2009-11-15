@@ -44,9 +44,14 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * Also, multi-dimensional arrays can be accessed using:
  * <code>
- * filters[1]/init[1][1]
+ * filters[1]/init[1][0]
  * </code>
  *
+ * if a Json property name contains a '/' the name needs to be quoted with single quotes i.e.
+ *
+ * <code>
+ * results/'http://foo.com'/value
+ * </code>
  */
 public class JsonData implements Serializable
 {
@@ -191,73 +196,9 @@ public class JsonData implements Serializable
         }
     }
 
-//    public Object get(String name, int index)
-//    {
-//        return morphDynaBean.get(name, index);
-//    }
-//
-//    public Object get(String name, String key)
-//    {
-//        return morphDynaBean.get(name, key);
-//    }
-//
-//    public DynaClass getDynaClass()
-//    {
-//        return morphDynaBean.getDynaClass();
-//    }
-//
-//    public MorpherRegistry getMorpherRegistry()
-//    {
-//        return morphDynaBean.getMorpherRegistry();
-//    }
-//
-//    public void remove(String name, String key)
-//    {
-//        morphDynaBean.remove(name, key);
-//    }
-//
-//    public void set(String name, int index, Object value)
-//    {
-//        morphDynaBean.set(name, index, value);
-//    }
-//
-//    public void set(String name, Object value)
-//    {
-//        morphDynaBean.set(name, value);
-//    }
-//
-//    public void set(String name, String key, Object value)
-//    {
-//        morphDynaBean.set(name, key, value);
-//    }
-//
-//    public void setDynaBeanClass(MorphDynaClass dynaClass)
-//    {
-//        morphDynaBean.setDynaBeanClass(dynaClass);
-//    }
-//
-//    public void setMorpherRegistry(MorpherRegistry morpherRegistry)
-//    {
-//        morphDynaBean.setMorpherRegistry(morpherRegistry);
-//    }
-
     @Override
     public String toString()
     {
         return node.toString();
-//        if (morphDynaBean != null)
-//        {
-//            return morphDynaBean.toString();
-//        }
-//        else if (entries != null && entries.size() > 0)
-//        {
-//            StringBuffer sb = new StringBuffer();
-//            for (int i = 0; i < entries.size(); i++)
-//            {
-//                sb.append(entries.get(i));
-//            }
-//            return sb.toString();
-//        }
-//        return ""; // avoid returning null
     }
 }

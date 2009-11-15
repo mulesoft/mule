@@ -1,0 +1,13 @@
+{
+    "errorCode": 0,
+    "errorMessage": "",
+    "results": {
+        "http://rossmason.blogspot.com/2008/01/about-me.html": {
+            "hash": "NfeyS",
+            "shortKeywordUrl": "",
+            "shortUrl": "http://bit.ly/sXqVc",
+            "userHash": "sXqVc"
+        }
+    },
+    "statusCode": "OK"
+}
