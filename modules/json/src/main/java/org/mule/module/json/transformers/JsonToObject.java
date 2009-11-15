@@ -120,7 +120,7 @@ public class JsonToObject extends AbstractJsonTransformer
             {
                 if (getReturnClass().equals(JsonData.class))
                 {
-                    returnValue = new JsonData((Reader) src);
+                    returnValue = new JsonData(is);
                 }
                 else
                 {
