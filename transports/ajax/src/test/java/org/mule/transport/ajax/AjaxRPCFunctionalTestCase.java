@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
 {
-    public static final String TEST_JSON_MESSAGE = "{'payload' : {'value1' : 'foo', 'value2' : 'bar'}, 'replyTo' : '/service/response'}";
+    public static final String TEST_JSON_MESSAGE = "{\"payload\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/service/response\"}";
     @Override
     protected String getConfigResources()
     {

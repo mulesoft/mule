@@ -9,9 +9,9 @@
  */
 package org.mule.transport.ajax;
 
+import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.ajax.embedded.AjaxConnector;
-import org.mule.api.transport.Connector;
 
 public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -24,7 +24,7 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return "{'value1' : 'foo', 'value2' : 'bar'}";
+        return "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
     }
 
     public String getTestEndpointURI()

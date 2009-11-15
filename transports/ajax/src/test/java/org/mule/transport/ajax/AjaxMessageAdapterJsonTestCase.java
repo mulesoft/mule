@@ -19,7 +19,7 @@ public class AjaxMessageAdapterJsonTestCase extends AbstractMessageAdapterTestCa
 {
     public Object getValidMessage() throws Exception
     {
-        return "{'value1' : 'foo', 'value2' : 'bar'}";
+        return "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
     }
 
     public MessageAdapter createAdapter(Object payload) throws MuleException

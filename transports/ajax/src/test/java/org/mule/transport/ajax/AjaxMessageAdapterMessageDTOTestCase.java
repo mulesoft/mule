@@ -22,7 +22,7 @@ public class AjaxMessageAdapterMessageDTOTestCase extends AbstractMessageAdapter
     {
         //Mimics a payload sent from the browser
         Map map = new HashMap();
-        map.put("payload", "{'value1' : 'foo', 'value2' : 'bar'}");
+        map.put("payload", "{\"value1\" : \"foo\", \"value2\" : \"bar\"}");
         map.put("replyTo", "baz");
         return map;
     }

@@ -19,7 +19,7 @@ public class AjaxMessageAdapterMessageDTOJsonTestCase extends AbstractMessageAda
 {
     public Object getValidMessage() throws Exception
     {
-        return "{'payload' : {'value1' : 'foo', 'value2' : 'bar'}, 'replyTo' : '/services/response'}";
+        return "{\"payload\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/services/response\"}";
     }
 
     public MessageAdapter createAdapter(Object payload) throws MuleException
