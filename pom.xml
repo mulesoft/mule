@@ -112,6 +112,7 @@
         <groovyEngineVersion>1.1</groovyEngineVersion>
         <groovyVersion>1.5.6</groovyVersion>
         <hibernateVersion>3.2.2.ga</hibernateVersion>
+        <jacksonVersion>1.3.0</jacksonVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.6.ga</javassistVersion>
         <javaActivationVersion>1.1</javaActivationVersion>
@@ -1174,6 +1175,11 @@
                 <groupId>org.beanshell</groupId>
                 <artifactId>bsh</artifactId>
                 <version>${bshVersion}-osgi</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-jaxrs</artifactId>
+                <version>${jacksonVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
