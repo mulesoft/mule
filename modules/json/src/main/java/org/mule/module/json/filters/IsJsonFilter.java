@@ -56,22 +56,32 @@ public class IsJsonFilter implements Filter
 
     public boolean accept(Object obj)
     {
+
         try
         {
+            if (obj instanceof byte[])
+            {
+                obj = new String((byte[])obj);
+            }
+
             if (obj instanceof String)
             {
                 if (!mayBeJSON((String) obj))
                 {
                     return false;
                 }
+
                 if (isValidateParsing())
                 {
                     new ObjectMapper().readTree((String) obj);
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
 
-            logger.debug("Filter result = true (message is valid JSON)");
-            return true;
         }
         catch (IOException e)
         {

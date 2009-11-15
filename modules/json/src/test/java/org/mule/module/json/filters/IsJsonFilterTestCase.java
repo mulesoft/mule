@@ -51,4 +51,9 @@ public class IsJsonFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
     }
 
+    public void testFilterWithObject() throws Exception
+    {
+        assertFalse(filter.accept(new DefaultMuleMessage(new Object(), muleContext)));
+    }
+
 }
