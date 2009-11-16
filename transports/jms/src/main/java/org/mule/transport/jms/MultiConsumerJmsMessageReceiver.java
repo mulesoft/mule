@@ -29,6 +29,7 @@ import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -38,8 +39,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.resource.spi.work.WorkException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,9 +51,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 {
-    protected final BlockingDeque consumers;
+    protected final List consumers;
 
-    protected volatile int receiversCount;
+    protected final int receiversCount;
 
     private final JmsConnector jmsConnector;
 
@@ -65,21 +65,24 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         jmsConnector = (JmsConnector) connector;
 
         final boolean isTopic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
-        receiversCount = jmsConnector.getNumberOfConsumers();
-        if (isTopic && receiversCount != 1)
+        if (isTopic && jmsConnector.getNumberOfConsumers() != 1)
         {
             if (logger.isInfoEnabled())
             {
-                logger.info("Destination " + getEndpoint().getEndpointURI() + " is a topic, but " + receiversCount +
+                logger.info("Destination " + getEndpoint().getEndpointURI() + " is a topic, but " + jmsConnector.getNumberOfConsumers() +
                                 " receivers have been requested. Will configure only 1.");
             }
             receiversCount = 1;
+        }
+        else
+        {
+            receiversCount = jmsConnector.getNumberOfConsumers();
         }
         if (logger.isDebugEnabled())
         {
             logger.debug("Creating " + receiversCount + " sub-receivers for " + endpoint.getEndpointURI());
         }
-        consumers = new LinkedBlockingDeque(receiversCount);
+        consumers = new CopyOnWriteArrayList();
     }
 
     @Override
@@ -114,6 +117,11 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     {
         logger.debug("doConnect()");
 
+        if (!consumers.isEmpty())
+        {
+            throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
+        }
+        
         SubReceiver sub;
         for (int i = 0; i < receiversCount; i++)
         {
