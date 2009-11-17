@@ -16,7 +16,11 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
+import org.mule.util.scan.annotations.AnnotationInfo;
+import org.mule.util.scan.annotations.AnnotationsScanner;
+import org.mule.util.scan.annotations.ClosableClassReader;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
@@ -27,6 +31,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.objectweb.asm.ClassReader;
 
 /**
  * A helper class for reading annotations.
@@ -315,6 +321,39 @@ public class AnnotationUtils
         {
             getFieldAnnotationsForSuperClasses(bottom.getSuperclass(), annos, annotation);
         }
+    }
+
+
+    public static boolean hasAnnotation(Class<? super Annotation> annotation, Class clazz) throws IOException
+    {
+        ClassReader r = new ClosableClassReader(clazz.getName());
+        AnnotationsScanner scanner = new AnnotationsScanner();
+
+        r.accept(scanner, 0);
+        for (AnnotationInfo info : scanner.getAllAnnotations())
+        {
+            if (info.getClassName().equals(annotation.getClass().getName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasAnnotationWithPackage(String packageName, Class clazz) throws IOException
+    {
+        ClassReader r = new ClosableClassReader(clazz.getName());
+        AnnotationsScanner scanner = new AnnotationsScanner();
+
+        r.accept(scanner, 0);
+        for (AnnotationInfo info : scanner.getAllAnnotations())
+        {
+            if (info.getClassName().startsWith(packageName))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
