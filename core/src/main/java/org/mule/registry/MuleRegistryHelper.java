@@ -25,19 +25,18 @@ import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.TransformCriteria;
+import org.mule.api.registry.TransformerResolver;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerChain;
-import org.mule.transformer.TransformerWeighting;
-import org.mule.transformer.simple.ObjectToByteArray;
-import org.mule.transformer.simple.ObjectToString;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -56,22 +55,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
- * <p/>
- * TODO MULE-2228 "Java-based configuration mechanism for Mule 2.0" will extend/build
- * upon this interface.
  */
 public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposable
 {
-    private static final ObjectToString objectToString = new ObjectToString();
-    private static final ObjectToByteArray objectToByteArray = new ObjectToByteArray();
-
-    protected Map transformerListCache = new ConcurrentHashMap(8);
-    protected Map exactTransformerCache = new ConcurrentHashMap(8);
-
     /**
      * A reference to Mule's internal registry
      */
     private DefaultRegistryBroker registry;
+
+    protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
+
 
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
@@ -82,12 +75,11 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
 
     public void initialise() throws InitialisationException
     {
-        // no-op
+        //no-op
     }
 
     public void dispose()
     {
-        exactTransformerCache.clear();
         transformerListCache.clear();
     }
 
@@ -156,104 +148,29 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      */
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
-        Transformer result = (Transformer) exactTransformerCache.get(inputType.getName() + outputType.getName());
-        if (result != null)
+        Transformer trans;
+        Collection<TransformerResolver> resolvers = lookupObjects(TransformerResolver.class);
+        for (TransformerResolver resolver : resolvers)
         {
-            return result;
-        }
-        List trans = lookupTransformers(inputType, outputType);
-
-        result = getNearestTransformerMatch(trans, inputType, outputType);
-        //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
-        //byte[]
-        Transformer secondPass = null;
-
-        if (result == null)
-        {
-            //If no transformers were found but the outputType type is String or byte[] we can perform a more general search
-            // using Object.class and then convert to String or byte[] using the second pass transformer
-            if (outputType.equals(String.class))
+            try
             {
-                secondPass = objectToString;
-            }
-            else if (outputType.equals(byte[].class))
-            {
-                secondPass = objectToByteArray;
-            }
-            else
-            {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType));
-            }
-            //Perform a more general search
-            trans = lookupTransformers(inputType, Object.class);
-
-            result = getNearestTransformerMatch(trans, inputType, outputType);
-            if (result != null)
-            {
-                result = new TransformerChain(new Transformer[]{result, secondPass});
-            }
-        }
-
-        if (result != null)
-        {
-            exactTransformerCache.put(inputType.getName() + outputType.getName(), result);
-        }
-        return result;
-    }
-
-    protected Transformer getNearestTransformerMatch(List trans, Class input, Class output) throws TransformerException
-    {
-        if (trans.size() > 1)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
-            }
-            TransformerWeighting weighting = null;
-            for (Iterator iterator = trans.iterator(); iterator.hasNext();)
-            {
-                Transformer transformer = (Transformer) iterator.next();
-                TransformerWeighting current = new TransformerWeighting(input, output, transformer);
-                if (weighting == null)
+                trans = resolver.resolve(new TransformCriteria(new Class[]{inputType}, outputType, null, null));
+                if (trans != null)
                 {
-                    weighting = current;
-                }
-                else
-                {
-                    int compare = current.compareTo(weighting);
-                    if (compare == 1)
-                    {
-                        weighting = current;
-                    }
-                    else if (compare == 0)
-                    {
-                        //We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
-                        if (!weighting.getTransformer().getClass().equals(current.getTransformer().getClass()))
-                        {
-                            throw new TransformerException(CoreMessages.transformHasMultipleMatches(input, output,
-                                    current.getTransformer(), weighting.getTransformer()));
-                        }
-                    }
+                    return trans;
                 }
             }
-            return weighting.getTransformer();
+            catch (ResolverException e)
+            {
+                throw new TransformerException(e.getI18nMessage());
+            }
         }
-        else if (trans.size() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            return (Transformer) trans.get(0);
-        }
+        throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public List lookupTransformers(Class input, Class output)
     {
-        List results = (List) transformerListCache.get(input.getName() + output.getName());
+        List results = transformerListCache.get(input.getName() + output.getName());
         if (results != null)
         {
             return results;
@@ -357,88 +274,22 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
 
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
-        if (transformer instanceof DiscoverableTransformer)
-        {
-            exactTransformerCache.clear();
-            transformerListCache.clear();
-        }
         registry.registerObject(getName(transformer), transformer, Transformer.class);
+        notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.ADDED);
     }
 
-    /**
-     * Initialises all registered agents
-     *
-     * @throws org.mule.api.lifecycle.InitialisationException
-     */
-    // TODO: Spring is now taking care of the initialisation lifecycle, need to check that we still get this
-    // problem
-    // protected void initialiseAgents() throws InitialisationException
-    // {
-    // logger.info("Initialising agents...");
-    //
-    // // Do not iterate over the map directly, as 'complex' agents
-    // // may spawn extra agents during initialisation. This will
-    // // cause a ConcurrentModificationException.
-    // // Use a cursorable iteration, which supports on-the-fly underlying
-    // // data structure changes.
-    // Collection agentsSnapshot = lookupCollection(Agent.class).values();
-    // CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
-    // CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
-    //
-    // // the actual agent object refs are the same, so we are just
-    // // providing different views of the same underlying data
-    //
-    // try
-    // {
-    // while (cursor.hasNext())
-    // {
-    // Agent umoAgent = (Agent) cursor.next();
-    //
-    // int originalSize = agentsSnapshot.size();
-    // logger.debug("Initialising agent: " + umoAgent.getName());
-    // umoAgent.initialise();
-    // // thank you, we are done with you
-    // cursor.remove();
-    //
-    // // Direct calls to MuleManager.registerAgent() modify the original
-    // // agents map, re-check if the above agent registered any
-    // // 'child' agents.
-    // int newSize = agentsSnapshot.size();
-    // int delta = newSize - originalSize;
-    // if (delta > 0)
-    // {
-    // // TODO there's some mess going on in
-    // // http://issues.apache.org/jira/browse/COLLECTIONS-219
-    // // watch out when upgrading the commons-collections.
-    // Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
-    // Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
-    //
-    // // again, above are only refs, all going back to the original agents map
-    //
-    // // re-order the queue
-    // agentRegistrationQueue.clear();
-    // // 'spawned' agents first
-    // agentRegistrationQueue.addAll(head);
-    // // and the rest
-    // agentRegistrationQueue.addAll(tail);
-    //
-    // // update agents map with a new order in case we want to re-initialise
-    // // MuleManager on the fly
-    // for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
-    // {
-    // Agent theAgent = (Agent) it.next();
-    // theAgent.initialise();
-    // }
-    // }
-    // }
-    // }
-    // finally
-    // {
-    // // close the cursor as per JavaDoc
-    // cursor.close();
-    // }
-    // logger.info("Agents Successfully Initialised");
-    // }
+    protected void notifyTransformerResolvers(Transformer t, TransformerResolver.RegistryAction action)
+    {
+        if (t instanceof DiscoverableTransformer)
+        {
+            Collection<TransformerResolver> resolvers = lookupObjects(TransformerResolver.class);
+            for (TransformerResolver resolver : resolvers)
+            {
+                resolver.transformerChange(t, action);
+            }
+            transformerListCache.clear();
+        }
+    }
 
     /**
      * Looks up the service descriptor from a singleton cache and creates a new one if not found.
@@ -539,12 +390,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public void unregisterTransformer(String transformerName) throws MuleException
     {
         Transformer transformer = lookupTransformer(transformerName);
-        if (transformer instanceof DiscoverableTransformer)
-        {
-            exactTransformerCache.clear();
-            transformerListCache.clear();
-        }
+        notifyTransformerResolvers(transformer, TransformerResolver.RegistryAction.REMOVED);
         registry.unregisterObject(transformerName, Transformer.class);
+
     }
 
     /**

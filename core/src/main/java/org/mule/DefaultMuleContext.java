@@ -55,16 +55,24 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultMuleContext implements MuleContext
 {
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     private static transient Log logger = LogFactory.getLog(DefaultMuleContext.class);
 
-    /** Internal registry facade which delegates to other registries. */
+    /**
+     * Internal registry facade which delegates to other registries.
+     */
     private DefaultRegistryBroker registryBroker;
 
-    /** Simplified Mule configuration interface */
+    /**
+     * Simplified Mule configuration interface
+     */
     private MuleRegistry muleRegistryHelper;
-    
-    /** stats used for management */
+
+    /**
+     * stats used for management
+     */
     private AllStatistics stats = new AllStatistics();
 
     private WorkManager workManager;
@@ -80,8 +88,10 @@ public class DefaultMuleContext implements MuleContext
     protected ServerNotificationManager notificationManager;
 
     private MuleConfiguration config;
-    
-    /** the date in milliseconds from when the server was started */
+
+    /**
+     * the date in milliseconds from when the server was started
+     */
     private long startDate;
 
     private ExpressionManager expressionManager;
@@ -92,13 +102,13 @@ public class DefaultMuleContext implements MuleContext
     private SplashScreen shutdownScreen;
 
     public DefaultMuleContext(MuleConfiguration config,
-                              WorkManager workManager, 
-                              WorkListener workListener, 
-                              LifecycleManager lifecycleManager, 
+                              WorkManager workManager,
+                              WorkListener workListener,
+                              LifecycleManager lifecycleManager,
                               ServerNotificationManager notificationManager)
     {
         this.config = config;
-        ((MuleContextAware)config).setMuleContext(this);
+        ((MuleContextAware) config).setMuleContext(this);
         this.workManager = workManager;
         this.workListener = workListener;
         this.lifecycleManager = lifecycleManager;
@@ -123,7 +133,7 @@ public class DefaultMuleContext implements MuleContext
     {
         return new DefaultRegistryBroker(this);
     }
-    
+
     protected MuleRegistry createRegistryHelper(DefaultRegistryBroker registry)
     {
         return new MuleRegistryHelper(registry);
@@ -131,11 +141,11 @@ public class DefaultMuleContext implements MuleContext
 
     public void setSplash(SplashScreen startup, SplashScreen shutdown)
     {
-        if (isInitialised()) 
+        if (isInitialised())
         {
             return;
         }
-        
+
         startupScreen = startup;
         shutdownScreen = shutdown;
     }
@@ -151,26 +161,26 @@ public class DefaultMuleContext implements MuleContext
         {
             shutdownScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
         }
-        
+
         startupScreen.setHeader(this);
         startupScreen.setFooter(this);
         shutdownScreen.setHeader(this);
         shutdownScreen.setFooter(this);
     }
-    
+
     public synchronized void initialise() throws InitialisationException
     {
         if (lifecycleManager.getCurrentPhase().equals(Initialisable.PHASE_NAME))
         {
             return;
         }
-        
+
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
         if (getNotificationManager() == null)
         {
             throw new MuleRuntimeException(
-                CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
+                    CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
         }
         if (workManager == null)
         {
@@ -180,9 +190,10 @@ public class DefaultMuleContext implements MuleContext
         try
         {
 
-            
+
             // Initialize internal registries
             registryBroker.initialise();
+            muleRegistryHelper.initialise();
 
             //We need to start the work manager straight away since we need it to fire notifications
             workManager.start();
@@ -249,14 +260,14 @@ public class DefaultMuleContext implements MuleContext
     }
 
     public synchronized void dispose()
-    {        
+    {
         if (isDisposed())
         {
             return;
         }
 
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
-        
+
         ServerNotificationManager notificationManager = getNotificationManager();
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
 
@@ -277,6 +288,7 @@ public class DefaultMuleContext implements MuleContext
             lifecycleManager.firePhase(this, Disposable.PHASE_NAME);
             // Dispose internal registries
             registryBroker.dispose();
+            muleRegistryHelper.dispose();
         }
         catch (Exception e)
         {
@@ -562,7 +574,6 @@ public class DefaultMuleContext implements MuleContext
         }
         return transactionManager;
     }
-
 
 
     public void register() throws RegistrationException
