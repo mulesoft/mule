@@ -110,7 +110,7 @@
                                 // splash
                                 log.info '*' * 80
                                 log.info('Repackaging sources'.center(80))
-                                log.info('(full build with a -DperformRelease=true must have run before)'.center(80))
+                                log.info('(full build with a source:jar target must have run before)'.center(80))
                                 log.info '*' * 80
 
                                 def muleRoot = "$project.build.directory/../../../"
