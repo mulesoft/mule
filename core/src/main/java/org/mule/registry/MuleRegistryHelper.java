@@ -43,6 +43,8 @@ import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -149,7 +151,8 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
         Transformer trans;
-        Collection<TransformerResolver> resolvers = lookupObjects(TransformerResolver.class);
+        List<TransformerResolver> resolvers = (List<TransformerResolver>) lookupObjects(TransformerResolver.class);
+        Collections.sort(resolvers, new TransformerResolverComarator());
         for (TransformerResolver resolver : resolvers)
         {
             try
@@ -496,6 +499,24 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public boolean isRemote()
     {
         return false;
+    }
+
+
+    private class TransformerResolverComarator implements Comparator<TransformerResolver>
+    {
+        public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1)
+        {
+            if (transformerResolver.getClass().equals(TypeBasedTransformerResolver.class))
+            {
+                return 1;
+            }
+
+            if (transformerResolver1.getClass().equals(TypeBasedTransformerResolver.class))
+            {
+                return -1;
+            }
+            return 0;
+        }
     }
 }
 
