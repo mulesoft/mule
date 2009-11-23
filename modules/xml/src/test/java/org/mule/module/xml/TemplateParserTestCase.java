@@ -22,7 +22,15 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     private static final String TEST_MULE_STRING_EXPRESSION_XML = 
         "<xml><t2><tag1 attr1='blahattr1'>BLAH1</tag1><tag1 attr1='blahattr2'>BLAH2</tag1></t2></xml>";
 
-    private MuleMessage message = new DefaultMuleMessage(TEST_MULE_STRING_EXPRESSION_XML);
+    private MuleMessage message;
+    
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        
+        message = new DefaultMuleMessage(TEST_MULE_STRING_EXPRESSION_XML, muleContext);
+    }
 
     public void testXPathExpression() throws Exception
     {
