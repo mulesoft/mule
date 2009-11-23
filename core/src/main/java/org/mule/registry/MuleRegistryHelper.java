@@ -165,7 +165,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
             }
             catch (ResolverException e)
             {
-                throw new TransformerException(e.getI18nMessage());
+                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType), e);
             }
         }
         throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType));
