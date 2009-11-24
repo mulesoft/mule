@@ -10,7 +10,7 @@
     <description>Is a webapp that provides an interface to some of the examples here such as the LoanBroker, Hello World and Echo examples. It also provides examples of accessing Mule using REST style service calls and is itself an example of how to embed Mule in a webapp.</description>
 
     <properties>
-        <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
+        <muleVersion>3.0.0-M2-20091124</muleVersion>
         <webappName>mule-examples</webappName>
         <jettyVersion>6.1.11</jettyVersion>
     </properties>
