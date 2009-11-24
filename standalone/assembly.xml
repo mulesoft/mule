@@ -12,11 +12,16 @@
       <outputDirectory></outputDirectory>
     </fileSet>
 
-    <!-- Make binary directories executable. -->
+    <!-- Make binary files executable. -->
     <fileSet>
       <directory>src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <fileMode>755</fileMode>
+      <includes>
+        <include>launcher</include>
+        <include>mule</include>
+        <include>setup_local_instance.sh</include>
+      </includes>
     </fileSet>
     <fileSet>
       <directory>src/main/resources/bin</directory>
@@ -71,7 +76,7 @@
     -->
 
     <!--
-    The entire examples directory is copied over first, then for each example, the contents 
+    The entire examples directory is copied over first, then for each example, the contents
     of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
     the executable scripts.
     -->
@@ -81,13 +86,13 @@
         <excludes>
             <exclude>pom.xml</exclude>
             <exclude>all-examples/**</exclude>
-            <exclude>**/target/**</exclude> 
+            <exclude>**/target/**</exclude>
             <exclude>**/dist/**</exclude>
             <exclude>**/.*/**</exclude>
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
-            <!-- Exclude the webapp tests because Ant is not smart enough to deal 
+            <!-- Exclude the webapp tests because Ant is not smart enough to deal
                 with multiple Jetty versions. -->
             <exclude>webapp/src/test/**</exclude>
         </excludes>
@@ -388,9 +393,9 @@
     <dependencySet>
       <outputDirectory>lib/opt</outputDirectory>
 
-      <!-- Since we don't define any "includes" here, this will suck in the whole 
-      universe of transitive dependencies.  Therefore, we need to explicitly 
-      _exclude_ all libs which should _not_ go into this directory (usually 
+      <!-- Since we don't define any "includes" here, this will suck in the whole
+      universe of transitive dependencies.  Therefore, we need to explicitly
+      _exclude_ all libs which should _not_ go into this directory (usually
       because they are already in a different directory). -->
       <excludes>
 
@@ -451,12 +456,12 @@
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-bookstore</exclude>
-        
+
         <!-- lib/user -->
         <exclude>junit:junit</exclude>
         <exclude>xmlunit:xmlunit</exclude>
         <exclude>org.mule.tests:mule-tests-functional</exclude>
-        
+
         <!-- lib/boot -->
         <exclude>commons-cli:commons-cli</exclude>
         <exclude>tanukisoft:wrapper</exclude>
