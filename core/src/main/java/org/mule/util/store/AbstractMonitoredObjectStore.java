@@ -32,20 +32,39 @@ public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runna
 {
     protected final Log logger = LogFactory.getLog(this.getClass());
 
-    protected ScheduledThreadPoolExecutor scheduler;
-    protected int maxEntries = 4000;
-    protected int entryTTL = -1;
-    protected int expirationInterval = 1000;
-    protected String name;
     protected MuleContext context;
+    protected ScheduledThreadPoolExecutor scheduler;
 
+    /**
+     * the maximum number of entries that this store keeps around. Specify <em>-1</em> if the store 
+     * is supposed to be "unbounded".
+     */
+    protected int maxEntries = 4000;
+
+    /**
+     * The time-to-live for each message ID, specified in milliseconds, or <em>-1</em> for entries 
+     * that should never expire. <b>DO NOT</b> combine this with an unbounded store!
+     */
+    protected int entryTTL = -1;
+
+    /**
+     * The interval for periodic bounded size enforcement and entry expiration, specified in 
+     * milliseconds. Arbitrary positive values between 1 millisecond and several hours or days are 
+     * possible, but should be chosen carefully according to the expected message rate to prevent 
+     * out of memory conditions.
+     */
+    protected int expirationInterval = 1000;
+
+    /**
+     * A name for this store, can be used for logging and identification purposes.
+     */
+    protected String name = null;
 
     public void initialise() throws InitialisationException
     {
         if (name == null)
         {
             name = UUID.getUUID();
-            //throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("storeId", "null").getMessage());
         }
 
         if (expirationInterval <= 0)
@@ -67,14 +86,9 @@ public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runna
         expire();
     }
 
-    /**
-     * A lifecycle method where implementor should free up any resources. If an
-     * exception is thrown it should just be logged and processing should continue.
-     * This method should not throw Runtime exceptions.
-     */
     public void dispose()
     {
-        if(scheduler!=null)
+        if (scheduler != null)
         {
             scheduler.shutdown();
         }
@@ -136,5 +150,4 @@ public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runna
     }
 
     protected abstract void expire();
-
 }

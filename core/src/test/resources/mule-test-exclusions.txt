@@ -22,9 +22,6 @@ org.mule.util.TimedSocketTestCase
 # MULE-3670
 org.mule.util.store.TextFileStoreTestCase
 
-# MULE-4074
-org.mule.util.store.InMemoryStoreTestCase
-
 # MULE-4078
 org.mule.context.DefaultMuleContextTestCase
 
