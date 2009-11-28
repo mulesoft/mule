@@ -66,7 +66,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         InMemoryObjectStore s = new InMemoryObjectStore();
         s.setName(assignedComponentName);
         s.setMaxEntries(-1);
-        s.setEntryTTL(60 * 5);
+        s.setEntryTTL(60 * 5 * 1000);
         s.setExpirationInterval(6000);
         s.initialise();
         return s;
