@@ -34,7 +34,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
 
     public boolean isAcceptMuleMessage()
     {
-        return this.sourceTypes.contains(MuleMessage.class);
+        return this.sourceTypes.contains(MULE_MESSAGE_DATA_TYPE);
     }
 
     public void setAcceptMuleMessage(boolean value)

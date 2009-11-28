@@ -10,11 +10,13 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.MuleMessage;
 
-/** <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String */
+/**
+ * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
+ */
 public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer
 {
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
@@ -31,7 +33,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
         {
             // We now offer XML in byte OR String form.
             // String remains the default like before.
-            if (byte[].class.equals(returnClass))
+            if (byte[].class.equals(returnType))
             {
                 return convertToBytes(src, encoding);
             }

@@ -54,7 +54,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         registerSourceType(MapMessage.class);
         registerSourceType(StreamMessage.class);
     }
-    
+
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         try
@@ -67,18 +67,16 @@ public class JMSMessageToObject extends AbstractJmsTransformer
             Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);
 
             //We need to handle String / byte[] explicitly since this transformer does not nefine a single return type
-            //TODO I don't think we should allow a null return class
-            if (returnClass != null)
+
+            if (returnType.getType().equals(byte[].class) && result instanceof String)
             {
-                if (returnClass.equals(byte[].class) && result instanceof String)
-                {
-                    result = result.toString().getBytes(outputEncoding);
-                }
-                else if (returnClass.equals(String.class) && result instanceof byte[])
-                {
-                    result = new String((byte[]) result, outputEncoding);
-                }
+                result = result.toString().getBytes(outputEncoding);
             }
+            else if (returnType.getType().equals(String.class) && result instanceof byte[])
+            {
+                result = new String((byte[]) result, outputEncoding);
+            }
+
 
             if (logger.isDebugEnabled())
             {

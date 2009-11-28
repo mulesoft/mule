@@ -18,7 +18,7 @@ import org.mule.tck.FunctionalTestCase;
 public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 {
 
-    public static final long TIMEOUT = 1000L;
+    public static final long TIMEOUT = 2000L;
     public static final String MESSAGE = "a message";
     // i don't know if this is the "correct" response - it's *one* of the responses in 1.4,
     // and it seems vaguely reasonable.

@@ -10,9 +10,9 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.MuleMessage;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
@@ -22,7 +22,9 @@ import javax.xml.transform.Transformer;
 
 import org.w3c.dom.Document;
 
-/** <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document. */
+/**
+ * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
+ */
 public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer
 {
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
@@ -38,18 +40,18 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
                 return null;
             }
 
-            if (XMLStreamReader.class.equals(returnClass))
+            if (XMLStreamReader.class.equals(returnType))
             {
                 return getXMLInputFactory().createXMLStreamReader(sourceDoc);
             }
-            else if (returnClass.isAssignableFrom(sourceDoc.getClass()))
+            else if (returnType.getType().isAssignableFrom(sourceDoc.getClass()))
             {
                 return sourceDoc;
             }
-            
+
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
-            ResultHolder holder = getResultHolder(returnClass);
+            ResultHolder holder = getResultHolder(returnType.getType());
             if (holder == null)
             {
                 holder = getResultHolder(Document.class);

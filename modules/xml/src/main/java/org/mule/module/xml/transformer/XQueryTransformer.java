@@ -104,7 +104,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     public void initialise() throws InitialisationException
     {
 
-        if(configuration==null)
+        if (configuration == null)
         {
             configuration = new Configuration();
         }
@@ -157,16 +157,17 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                 while (result.next())
                 {
                     XQItem item = result.getItem();
-     
-                    if(Node.class.isAssignableFrom(returnClass) || Node[].class.isAssignableFrom(returnClass))
+
+                    Class type = returnType.getType();
+                    if (Node.class.isAssignableFrom(type) || Node[].class.isAssignableFrom(type))
                     {
                         results.add(item.getNode());
                     }
-                    else if(String.class.isAssignableFrom(returnClass) || String[].class.isAssignableFrom(returnClass))
+                    else if (String.class.isAssignableFrom(type) || String[].class.isAssignableFrom(type))
                     {
                         results.add(item.getItemAsString());
                     }
-                    else if(XMLStreamReader.class.isAssignableFrom(returnClass) || XMLStreamReader[].class.isAssignableFrom(returnClass))
+                    else if (XMLStreamReader.class.isAssignableFrom(type) || XMLStreamReader[].class.isAssignableFrom(type))
                     {
                         try
                         {
@@ -190,20 +191,20 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
                         }
                     }
-                    if(!returnClass.isArray())
+                    if (!type.isArray())
                     {
                         break;
                     }
                 }
-                if(returnClass.isArray())
+                if (returnType.getType().isArray())
                 {
                     return results.toArray();
                 }
-                if(results.size()==1)
+                if (results.size() == 1)
                 {
                     return results.get(0);
                 }
-                else if(results.size()==0)
+                else if (results.size() == 0)
                 {
                     return null;
                 }
@@ -217,7 +218,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
             {
                 if (transformer != null)
                 {
-                    if(transformer.getWarnings()!=null)
+                    if (transformer.getWarnings() != null)
                     {
                         logger.warn(transformer.getWarnings().getMessage(), transformer.getWarnings().fillInStackTrace());
                     }
@@ -293,7 +294,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * @param src
      * @param transformer
      * @throws net.sf.saxon.javax.xml.xquery.XQException
+     *
      * @throws org.mule.umo.transformer.TransformerException
+     *
      */
     protected void bindDocument(Object src, XQPreparedExpression transformer) throws XQException, TransformerException
     {
@@ -327,7 +330,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
             try
             {
                 DOMWriter domWriter = new DOMWriter();
-                Document dom = domWriter.write((org.dom4j.Document)src);
+                Document dom = domWriter.write((org.dom4j.Document) src);
                 transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), dom, null);
             }
             catch (DocumentException e)
@@ -338,7 +341,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
         else if (src instanceof DocumentSource)
         {
-            transformer.bindDocument(new QName(SOURCE_DOCUMENT_NAMESPACE), ((DocumentSource)src).getInputSource());
+            transformer.bindDocument(new QName(SOURCE_DOCUMENT_NAMESPACE), ((DocumentSource) src).getInputSource());
 
         }
         else
@@ -489,7 +492,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * For example: If the current event's message has a property named "myproperty", to
      * pass this in you would set the transform parameter's value to be
      * "#[mule.message:header(myproperty)]".
-     *
+     * <p/>
      * <p>
      * This method may be overloaded by a sub class to provide a different dynamic
      * parameter implementation.
@@ -515,7 +518,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         Object clone = super.clone();
         try
         {
-            ((Initialisable)clone).initialise();
+            ((Initialisable) clone).initialise();
             return clone;
         }
         catch (InitialisationException e)

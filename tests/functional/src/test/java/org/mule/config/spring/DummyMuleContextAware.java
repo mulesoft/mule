@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 
@@ -49,7 +50,7 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
 
     public Object transform(Object src, String encoding) throws TransformerException
     {
-        return null; 
+        return null;
     }
 
     public Object transform(Object src) throws TransformerException
@@ -92,4 +93,23 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return null;
     }
 
+    public void setReturnDataType(DataType type)
+    {
+        //empty
+    }
+
+    public DataType getReturnDataType()
+    {
+        return null;
+    }
+
+    public boolean isSourceDataTypeSupported(DataType dataType)
+    {
+        return false;
+    }
+
+    public List<DataType> getSourceDataTypes()
+    {
+        return null;
+    }
 }

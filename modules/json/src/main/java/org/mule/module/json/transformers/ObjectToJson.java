@@ -76,7 +76,7 @@ public class ObjectToJson extends AbstractJsonTransformer
         {
             getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
-        
+
     }
 
     public Object transform(MuleMessage message, String encoding) throws TransformerException
@@ -105,7 +105,7 @@ public class ObjectToJson extends AbstractJsonTransformer
         }
 
         System.out.println(baos.toString());
-        if(returnClass.equals(byte[].class))
+        if (returnType.equals(byte[].class))
         {
             return baos.toByteArray();
         }

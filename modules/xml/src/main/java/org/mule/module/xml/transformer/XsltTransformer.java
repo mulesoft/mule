@@ -105,7 +105,9 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     protected final GenericObjectPool transformerPool;
 
-    /** Default to Saxon */
+    /**
+     * Default to Saxon
+     */
     private volatile String xslTransformerFactoryClassName = PREFERRED_TRANSFORMER_FACTORY;
     private volatile String xslFile;
     private volatile String xslt;
@@ -158,23 +160,23 @@ public class XsltTransformer extends AbstractXmlTransformer
                 return null;
             }
 
-            ResultHolder holder = getResultHolder(returnClass);
+            ResultHolder holder = getResultHolder(returnType.getType());
 
             // If the users hasn't specified a class, lets return the same type they gave us
             if (holder == null)
             {
                 holder = getResultHolder(src.getClass());
             }
-            
+
             // If we still don't have a result type, lets fall back to using a DelayedResult
             // as it is the most efficient.
-            if (holder == null || DelayedResult.class.equals(returnClass))
+            if (holder == null || DelayedResult.class.equals(returnType))
             {
                 return getDelayedResult(message, encoding, sourceDoc);
             }
-            
+
             doTransform(message, encoding, sourceDoc, holder.getResult());
-            
+
             return holder.getResultObject();
         }
         catch (Exception e)
@@ -188,7 +190,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         return new DelayedResult()
         {
             private String systemId;
-            
+
             public void write(Result result) throws Exception
             {
                 doTransform(message, encoding, sourceDoc, result);
@@ -207,7 +209,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     protected void doTransform(MuleMessage message, String encoding, Source sourceDoc, Result result)
-        throws Exception
+            throws Exception
     {
         DefaultErrorListener errorListener = new DefaultErrorListener(this);
         javax.xml.transform.Transformer transformer = null;
@@ -231,7 +233,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             }
 
             transformer.transform(sourceDoc, result);
-            
+
             if (errorListener.isError())
             {
                 throw errorListener.getException();
@@ -356,7 +358,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             String factoryClassName = XsltTransformer.this.getXslTransformerFactory();
             TransformerFactory factory;
 
-            if(PREFERRED_TRANSFORMER_FACTORY.equals(factoryClassName) && !ClassUtils.isClassOnPath(factoryClassName, getClass()))
+            if (PREFERRED_TRANSFORMER_FACTORY.equals(factoryClassName) && !ClassUtils.isClassOnPath(factoryClassName, getClass()))
             {
                 logger.warn("Preferred Transfomer Factory " + PREFERRED_TRANSFORMER_FACTORY + " not on classpath and no default is set, defaulting to JDK");
                 factoryClassName = null;
