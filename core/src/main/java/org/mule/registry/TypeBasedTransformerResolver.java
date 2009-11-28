@@ -15,8 +15,8 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.ResolverException;
-import org.mule.api.registry.TransformCriteria;
 import org.mule.api.registry.TransformerResolver;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
@@ -24,6 +24,7 @@ import org.mule.transformer.TransformerChain;
 import org.mule.transformer.TransformerWeighting;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.util.Iterator;
 import java.util.List;
@@ -64,30 +65,30 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         objectToByteArray = new ObjectToByteArray();
     }
 
-    public Transformer resolve(TransformCriteria criteria) throws ResolverException
+    public Transformer resolve(DataType source, DataType result) throws ResolverException
     {
-        Transformer result = exactTransformerCache.get(criteria.getInputTypes()[0].getName() + criteria.getOutputType().getName());
-        if (result != null)
+        Transformer transformer = exactTransformerCache.get(source.toString() + result.toString());
+        if (transformer != null)
         {
-            return result;
+            return transformer;
         }
 
-        List trans = muleContext.getRegistry().lookupTransformers(criteria.getInputTypes()[0], criteria.getOutputType());
+        List<Transformer> trans = muleContext.getRegistry().lookupTransformers(source, result);
 
-        result = getNearestTransformerMatch(trans, criteria.getInputTypes()[0], criteria.getOutputType());
+        transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
         //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
         //byte[]
         Transformer secondPass = null;
 
-        if (result == null)
+        if (transformer == null)
         {
             //If no transformers were found but the outputType type is String or byte[] we can perform a more general search
             // using Object.class and then convert to String or byte[] using the second pass transformer
-            if (criteria.getOutputType().equals(String.class))
+            if (result.getType().equals(String.class))
             {
                 secondPass = objectToString;
             }
-            else if (criteria.getOutputType().equals(byte[].class))
+            else if (result.getType().equals(byte[].class))
             {
                 secondPass = objectToByteArray;
             }
@@ -96,20 +97,20 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
                 return null;
             }
             //Perform a more general search
-            trans = muleContext.getRegistry().lookupTransformers(criteria.getInputTypes()[0], Object.class);
+            trans = muleContext.getRegistry().lookupTransformers(source, new SimpleDataType(Object.class));
 
-            result = getNearestTransformerMatch(trans, criteria.getInputTypes()[0], criteria.getOutputType());
-            if (result != null)
+            transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
+            if (transformer != null)
             {
-                result = new TransformerChain(new Transformer[]{result, secondPass});
+                transformer = new TransformerChain(transformer, secondPass);
             }
         }
 
-        if (result != null)
+        if (transformer != null)
         {
-            exactTransformerCache.put(criteria.getInputTypes()[0].getName() + criteria.getOutputType().getName(), result);
+            exactTransformerCache.put(source.toString() + result.toString(), transformer);
         }
-        return result;
+        return transformer;
     }
 
     protected Transformer getNearestTransformerMatch(List trans, Class input, Class output) throws ResolverException

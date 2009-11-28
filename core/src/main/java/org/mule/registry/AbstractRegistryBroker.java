@@ -24,7 +24,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 {
     public void initialise() throws InitialisationException
     {
-        Iterator it = getRegistries().iterator(); 
+        Iterator it = getRegistries().iterator();
         while (it.hasNext())
         {
             ((Registry) it.next()).initialise();
@@ -33,7 +33,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     public void dispose()
     {
-        Iterator it = getRegistries().iterator(); 
+        Iterator it = getRegistries().iterator();
         while (it.hasNext())
         {
             ((Registry) it.next()).dispose();
@@ -56,15 +56,15 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     }
 
     abstract protected Collection/*<Registry>*/ getRegistries();
-    
+
     ////////////////////////////////////////////////////////////////////////////////
     // Delegating methods
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     public Object lookupObject(String key)
     {
         Object obj = null;
-        Iterator it = getRegistries().iterator(); 
+        Iterator it = getRegistries().iterator();
         while (obj == null && it.hasNext())
         {
             obj = ((Registry) it.next()).lookupObject(key);
@@ -72,11 +72,11 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         return obj;
     }
 
-    public Object lookupObject(Class type) throws RegistrationException
+    public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         // Accumulate objects from all registries.
-        Collection objects = lookupObjects(type);
-        
+        Collection<T> objects = lookupObjects(type);
+
         if (objects.size() == 1)
         {
             return objects.iterator().next();
@@ -91,11 +91,11 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         }
     }
 
-    public Collection lookupObjects(Class type)
+    public <T> Collection<T> lookupObjects(Class<T> type)
     {
-        Collection objects = new ArrayList();
-        
-        Iterator it = getRegistries().iterator(); 
+        Collection<T> objects = new ArrayList<T>();
+
+        Iterator it = getRegistries().iterator();
         while (it.hasNext())
         {
             objects.addAll(((Registry) it.next()).lookupObjects(type));
@@ -109,8 +109,8 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     }
 
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
-    {   
-        Iterator it = getRegistries().iterator(); 
+    {
+        Iterator it = getRegistries().iterator();
         Registry reg;
         while (it.hasNext())
         {
@@ -136,12 +136,12 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     public void unregisterObject(String key) throws RegistrationException
     {
-        unregisterObject(key, null);    
+        unregisterObject(key, null);
     }
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        Iterator it = getRegistries().iterator(); 
+        Iterator it = getRegistries().iterator();
         Registry reg;
         while (it.hasNext())
         {
@@ -152,5 +152,5 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
                 break;
             }
         }
-    }    
+    }
 }

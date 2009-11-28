@@ -21,6 +21,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.util.ClassUtils;
@@ -221,12 +222,17 @@ public class CoreMessages extends MessageFactory
 
     public static Message transformUnexpectedType(Class<?> class1, Class<?> returnClass)
     {
-        return factory.createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1), 
-            ClassUtils.getSimpleName(returnClass));
+        return factory.createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1),
+                ClassUtils.getSimpleName(returnClass));
+    }
+
+    public static Message transformUnexpectedType(DataType dt1, DataType dt2)
+    {
+        return factory.createMessage(BUNDLE_PATH, 53, dt1, dt2);
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name,
-        Class<?> class1, ImmutableEndpoint endpoint)
+                                                                     Class<?> class1, ImmutableEndpoint endpoint)
     {
         return factory.createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
                 (endpoint != null ? endpoint.getEndpointURI() : null));
@@ -262,8 +268,8 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 60, StringMessageUtils.toString(object), StringMessageUtils.toString(types));
     }
 
-    public static Message cannotSetPropertyOnObjectWithParamType(String property, Class<?> class1, 
-        Class<?> class2)
+    public static Message cannotSetPropertyOnObjectWithParamType(String property, Class<?> class1,
+                                                                 Class<?> class2)
     {
         return factory.createMessage(BUNDLE_PATH, 61, property, StringMessageUtils.toString(class1),
                 StringMessageUtils.toString(class2));
@@ -929,16 +935,16 @@ public class CoreMessages extends MessageFactory
         String notset = CoreMessages.notSet().getMessage();
         return factory.createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(MuleManifest.getProductDescription(), notset),
                 StringUtils.defaultString(MuleManifest.getProductVersion(), notset), StringUtils.defaultString(
-                MuleManifest.getVendorName(), notset)
-                + " "
-                + StringUtils.defaultString(
-                MuleManifest.getVendorUrl(),
-                notset));
+                        MuleManifest.getVendorName(), notset)
+                        + " "
+                        + StringUtils.defaultString(
+                        MuleManifest.getVendorUrl(),
+                        notset));
     }
 
-    public static Message noTransformerFoundForMessage(Class<?> input, Class<?> output)
+    public static Message noTransformerFoundForMessage(DataType input, DataType output)
     {
-        return factory.createMessage(BUNDLE_PATH, 237, input.getName(), output.getName());
+        return factory.createMessage(BUNDLE_PATH, 237, input, output);
     }
 
     public static Message errorReadingStream()
@@ -960,10 +966,10 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object,
-        Class<?> returnType, EntryPointResolver resolver)
+                                                                          Class<?> returnType, EntryPointResolver resolver)
     {
-        return factory.createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object), 
-            returnType.getClass().getName(), resolver);
+        return factory.createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object),
+                returnType.getClass().getName(), resolver);
     }
 
     public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object,
@@ -1046,7 +1052,7 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message transformHasMultipleMatches(Class<?> input, Class<?> output,
-        Transformer transformer1, Transformer transformer2)
+                                                      Transformer transformer1, Transformer transformer2)
     {
         return factory.createMessage(BUNDLE_PATH, 256, new Object[]{input, output,
                 transformer1.getName() + "(" + transformer1.getClass() + ")",
@@ -1157,7 +1163,7 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 301, tx);
     }
-    
+
     public static Message cannotCopyStreamPayload(String streamType)
     {
         return factory.createMessage(BUNDLE_PATH, 302, streamType);

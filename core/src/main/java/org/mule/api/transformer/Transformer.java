@@ -27,16 +27,36 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @param aClass The class to check for compatability
      * @return true if the transformer supports this type of class or false
      *         otherwise
+     * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType)} instead
      */
     boolean isSourceTypeSupported(Class aClass);
+
+    /**
+     * Determines if a particular source class can be handled by this transformer
+     *
+     * @param dataType The DataType to check for compatability
+     * @return true if the transformer supports this type of class or false
+     *         otherwise
+     * @since 3.0.0
+     */
+    boolean isSourceDataTypeSupported(DataType dataType);
 
 
     /**
      * Returns an unmodifiable list of Source types registered on this transformer
      *
      * @return an unmodifiable list of Source types registered on this transformer
+     * @deprecated use {@link #getSourceDataTypes()} instead
      */
     List<Class> getSourceTypes();
+
+    /**
+     * Returns an unmodifiable list of Source types registered on this transformer
+     *
+     * @return an unmodifiable list of Source types registered on this transformer
+     * @since 3.0.0
+     */
+    List<DataType> getSourceDataTypes();
 
     /**
      * Does this transformer allow null input?
@@ -51,7 +71,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * chain and move to the next one.
      *
      * @return true if the transformer can be ignorred if the currnet source type is not supported, false if an exception
-     * should be throw due to an incompatible source type being passed in.
+     *         should be throw due to an incompatible source type being passed in.
      */
     boolean isIgnoreBadInput();
 
@@ -68,9 +88,9 @@ public interface Transformer extends BaseTransformer, MuleContextAware
     /**
      * Thransforms the supplied data and returns the result
      *
-     * @param src the data to transform
+     * @param src      the data to transform
      * @param encoding the encoding to use by this transformer.  many transformations will not need encoding unless
-     * dealing with text so you only need to use this method if yo wish to customize the encoding
+     *                 dealing with text so you only need to use this method if yo wish to customize the encoding
      * @return the transformed data
      * @throws TransformerException if a error occurs transforming the data or if the
      *                              expected returnClass isn't the same as the transformed data
@@ -83,6 +103,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * thrown.
      *
      * @param theClass the expected return type class
+     * @deprecated use {@link #setReturnDataType(DataType)} instead
      */
     void setReturnClass(Class theClass);
 
@@ -92,7 +113,35 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * to transform and this return type.
      *
      * @return the excepted return type from this transformer
+     * @deprecated use {@link #getReturnDataType()} instead.
      */
     Class getReturnClass();
+
+
+    /**
+     * Sets the expected return type for the transformed data. If the transformed
+     * data is not of this class type a <code>TransformerException</code> will be
+     * thrown.
+     * <p/>
+     * This method superseeds {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * return type of the transformer
+     *
+     * @param type the expected return type for this transformer
+     * @since 3.0.0
+     */
+    void setReturnDataType(DataType type);
+
+    /**
+     * Specifies the return type of the result after this transformer has been executed. Mule will use this to validate
+     * the return type but also allow users to perform automatic transformations based on the source type of the object
+     * to transform and this return type.
+     * <p/>
+     * This method superseeds {@link #getReturnClass()} because it allows Generics information to be associated with the
+     * return type of the transformer
+     *
+     * @return the excepted return type for this transformer
+     * @since 3.0.0
+     */
+    DataType getReturnDataType();
 
 }

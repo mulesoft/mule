@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -33,11 +34,12 @@ import org.mule.config.i18n.CoreMessages;
 public abstract class AbstractMessageAwareTransformer extends AbstractTransformer
 {
 
-    public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
+    @Override
+    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
     {
         //TODO RM* This is a bit of hack since we could just register MuleMessage as a supportedType, but this has some
         //funny behaviour in certain ObjectToXml transformers
-        return (super.isSourceTypeSupported(aClass, exactMatch) || MuleMessage.class.isAssignableFrom(aClass)); 
+        return (super.isSourceDataTypeSupported(dataType, exactMatch) || MuleMessage.class.isAssignableFrom(dataType.getType()));
     }
 
     public final Object doTransform(Object src, String encoding) throws TransformerException

@@ -17,6 +17,7 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
@@ -67,8 +68,20 @@ public interface MuleRegistry extends Registry
      * @param input  The  desiered input type for the transformer
      * @param output the desired output type for the transformer
      * @return a list of matching transformers. If there were no matchers an empty list is returned.
+     * @deprecated
      */
-    List lookupTransformers(Class input, Class output);
+    List<Transformer> lookupTransformers(Class input, Class output);
+
+    /**
+     * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
+     * input and return the given output type of object
+     *
+     * @param source The  desired input type for the transformer
+     * @param result the desired output type for the transformer
+     * @return a list of matching transformers. If there were no matchers an empty list is returned.
+     * @since 3.0.0
+     */
+    List<Transformer> lookupTransformers(DataType source, DataType result);
 
     /**
      * Will find a transformer that is the closest match to the desired input and output.
@@ -77,12 +90,24 @@ public interface MuleRegistry extends Registry
      * @param output the desired output type for the transformer
      * @return A transformer that exactly matches or the will accept the input and output parameters
      * @throws TransformerException will be thrown if there is more than one match
+     * @deprecated
      */
     Transformer lookupTransformer(Class input, Class output) throws TransformerException;
 
-    Collection/*<Service>*/ lookupServices(String model);
+    /**
+     * Will find a transformer that is the closest match to the desired input and output.
+     *
+     * @param source The  desiered input type for the transformer
+     * @param result the desired output type for the transformer
+     * @return A transformer that exactly matches or the will accept the input and output parameters
+     * @throws TransformerException will be thrown if there is more than one match
+     * @since 3.0.0
+     */
+    Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
 
-    Collection/*<Service>*/ lookupServices();
+    Collection<Service> lookupServices(String model);
+
+    Collection<Service> lookupServices();
 
     Model lookupModel(String name);
 
@@ -90,20 +115,30 @@ public interface MuleRegistry extends Registry
 
     Agent lookupAgent(String agentName);
 
-    /** @deprecated Use lookupModel() instead */
-    Collection getModels();
+    /**
+     * @deprecated Use lookupModel() instead
+     */
+    Collection<Model> getModels();
 
-    /** @deprecated Use lookupConnector() instead */
-    Collection getConnectors();
+    /**
+     * @deprecated Use lookupConnector() instead
+     */
+    Collection<Connector> getConnectors();
 
-    /** @deprecated Use {@link org.mule.api.endpoint.EndpointFactory} for creation/lookup of individual endpoints instead */
-    Collection getEndpoints();
+    /**
+     * @deprecated Use {@link org.mule.api.endpoint.EndpointFactory} for creation/lookup of individual endpoints instead
+     */
+    Collection<ImmutableEndpoint> getEndpoints();
 
-    /** @deprecated Use lookupAgent() instead */
-    Collection getAgents();
+    /**
+     * @deprecated Use lookupAgent() instead
+     */
+    Collection<Agent> getAgents();
 
-    /** @deprecated Use lookupTransformer() instead */
-    Collection getTransformers();
+    /**
+     * @deprecated Use lookupTransformer() instead
+     */
+    Collection<Transformer> getTransformers();
 
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
@@ -120,7 +155,7 @@ public interface MuleRegistry extends Registry
     void unregisterEndpoint(String endpointName) throws MuleException;
 
     public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException;
-    
+
     void registerTransformer(Transformer transformer) throws MuleException;
 
     void unregisterTransformer(String transformerName) throws MuleException;

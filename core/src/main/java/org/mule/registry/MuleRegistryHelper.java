@@ -29,14 +29,15 @@ import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
-import org.mule.api.registry.TransformCriteria;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
@@ -145,11 +146,33 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return (Transformer) registry.lookupObject(name);
     }
 
+
     /**
      * {@inheritDoc}
+     *
+     * @deprecated
      */
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
+        return lookupTransformer(new SimpleDataType(inputType), new SimpleDataType(outputType));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated
+     */
+    public List<Transformer> lookupTransformers(Class input, Class output)
+    {
+        return lookupTransformers(new SimpleDataType(input), new SimpleDataType(output));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException
+    {
+
         Transformer trans;
         List<TransformerResolver> resolvers = (List<TransformerResolver>) lookupObjects(TransformerResolver.class);
         Collections.sort(resolvers, new TransformerResolverComarator());
@@ -157,7 +180,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         {
             try
             {
-                trans = resolver.resolve(new TransformCriteria(new Class[]{inputType}, outputType, null, null));
+                trans = resolver.resolve(source, result);
                 if (trans != null)
                 {
                     return trans;
@@ -165,45 +188,47 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
             }
             catch (ResolverException e)
             {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType), e);
+                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
             }
         }
-        throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputType, outputType));
+        throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result));
     }
 
-    public List lookupTransformers(Class input, Class output)
+    /**
+     * {@inheritDoc}
+     */
+    public List<Transformer> lookupTransformers(DataType source, DataType result)
     {
-        List results = transformerListCache.get(input.getName() + output.getName());
+        List<Transformer> results = transformerListCache.get(source.toString() + result.toString());
         if (results != null)
         {
             return results;
         }
 
-        results = new ArrayList(2);
-        Collection transformers = getTransformers();
-        for (Iterator itr = transformers.iterator(); itr.hasNext();)
+        results = new ArrayList<Transformer>(2);
+        Collection<Transformer> transformers = getTransformers();
+        for (Transformer t : transformers)
         {
-            Transformer t = (Transformer) itr.next();
             //The transformer must have the DiscoveryTransformer interface if we are going to
             //find it here
             if (!(t instanceof DiscoverableTransformer))
             {
                 continue;
             }
-            Class c = t.getReturnClass();
-            //TODO RM* this sohuld be an exception
-            if (c == null)
-            {
-                c = Object.class;
-            }
-            if (output.isAssignableFrom(c)
-                    && t.isSourceTypeSupported(input))
+            DataType dt = t.getReturnDataType();
+//            Class c = t.getReturnClass();
+//            //TODO RM* this sohuld be an exception
+//            if (c == null)
+//            {
+//                c = Object.class;
+//            }
+            if (result.isCompatibleWith(dt) && t.isSourceDataTypeSupported(source))
             {
                 results.add(t);
             }
         }
 
-        transformerListCache.put(input.getName() + output.getName(), results);
+        transformerListCache.put(source.toString() + result.toString(), results);
         return results;
     }
 
@@ -217,27 +242,27 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
     }
 
-    public Collection getModels()
+    public Collection<Model> getModels()
     {
         return registry.lookupObjects(Model.class);
     }
 
-    public Collection getConnectors()
+    public Collection<Connector> getConnectors()
     {
         return registry.lookupObjects(Connector.class);
     }
 
-    public Collection getAgents()
+    public Collection<Agent> getAgents()
     {
         return registry.lookupObjects(Agent.class);
     }
 
-    public Collection getEndpoints()
+    public Collection<ImmutableEndpoint> getEndpoints()
     {
         return registry.lookupObjects(ImmutableEndpoint.class);
     }
 
-    public Collection getTransformers()
+    public Collection<Transformer> getTransformers()
     {
         return registry.lookupObjects(Transformer.class);
     }
@@ -260,7 +285,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public Collection<Service> lookupServices(String model)
     {
         Collection<Service> services = lookupServices();
-        List modelServices = new ArrayList();
+        List<Service> modelServices = new ArrayList<Service>();
         Iterator it = services.iterator();
         Service service;
         while (it.hasNext())
@@ -438,7 +463,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return registry.lookupObject(key);
     }
 
-    public Collection lookupObjects(Class type)
+    public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return registry.lookupObjects(type);
     }

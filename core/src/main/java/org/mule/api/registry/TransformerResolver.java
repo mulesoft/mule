@@ -9,6 +9,7 @@
  */
 package org.mule.api.registry;
 
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 
 /**
@@ -17,12 +18,23 @@ import org.mule.api.transformer.Transformer;
  * <p/>
  * Any implementations of this class must be registered with the registry before it will get picked up. Typically this
  * is done using the registry-bootstrap.properties.
+ *
+ * @since 3.0.0
  */
 public interface TransformerResolver
 {
+    /**
+     * Possible registry actions that occur that will trigger an event fired via {@link #transformerChange()} method.
+     */
     enum RegistryAction
     {
+        /**
+         * signals that a transformer was added to the registry
+         */
         ADDED,
+        /**
+         * signals that a transformer was removed from the registry
+         */
         REMOVED
     }
 
@@ -30,11 +42,12 @@ public interface TransformerResolver
      * Responsible for finding a transformer with the given criteria.  Note that if a transformer is not found
      * null should be return, an exception must NOT be thrown.
      *
-     * @param criteria the transform critera
+     * @param source information about the source object including the object iself
+     * @param result information about the result object to transform to
      * @return a transformer from the registry that matches the criteria or null if a transformer was not found
      * @throws ResolverException Only thrown if an exception is thrown during the search, this exception will just be a wrapper
      */
-    Transformer resolve(TransformCriteria criteria) throws ResolverException;
+    Transformer resolve(DataType source, DataType result) throws ResolverException;
 
     /**
      * A callback that is called when a transformer is registered or unregistered from the registry.  This is used

@@ -15,23 +15,27 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.CollectionDataType;
+import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,6 +46,9 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractTransformer implements Transformer
 {
+    public static final DataType MULE_MESSAGE_DATA_TYPE = new SimpleDataType(MuleMessage.class);
+    public static final DataType MULE_MESSAGE_ADAPTER_DATA_TYPE = new SimpleDataType(MessageAdapter.class);
+
     protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
     protected MuleContext muleContext;
@@ -52,7 +59,7 @@ public abstract class AbstractTransformer implements Transformer
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected Class returnClass = Object.class;
+    protected DataType returnType = new SimpleDataType(Object.class);
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -69,7 +76,7 @@ public abstract class AbstractTransformer implements Transformer
      * A list of supported Class types that the source payload passed into this
      * transformer
      */
-    protected final List<Class> sourceTypes = new CopyOnWriteArrayList();
+    protected final List<DataType> sourceTypes = new CopyOnWriteArrayList/*<DataType>*/();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -87,12 +94,21 @@ public abstract class AbstractTransformer implements Transformer
 
     protected Object checkReturnClass(Object object) throws TransformerException
     {
-        if (returnClass != null)
+        if (returnType != null)
         {
-            if (!returnClass.isInstance(object))
+            DataType dt;
+            if (object instanceof Collection)
+            {
+                dt = new CollectionDataType((Class<? extends Collection>) object.getClass(), DataType.ANY_MIME_TYPE);
+            }
+            else
+            {
+                dt = new SimpleDataType(object.getClass(), DataType.ANY_MIME_TYPE);
+            }
+            if (!returnType.isCompatibleWith(dt))
             {
                 throw new TransformerException(
-                        CoreMessages.transformUnexpectedType(object.getClass(), returnClass),
+                        CoreMessages.transformUnexpectedType(dt, returnType),
                         this);
             }
         }
@@ -106,22 +122,54 @@ public abstract class AbstractTransformer implements Transformer
         return object;
     }
 
+    /**
+     * Register a supported data type with this transformer.  The will allow objects that match this data type to be
+     * transformed by this transformer.
+     *
+     * @param aClass the source type to allow
+     */
     protected void registerSourceType(Class aClass)
     {
-        if (!sourceTypes.contains(aClass))
-        {
-            sourceTypes.add(aClass);
+        registerSourceType(new SimpleDataType(aClass));
+    }
 
-            if (aClass.equals(Object.class))
+    /**
+     * Unregister a supported source type from this transformer
+     *
+     * @param aClass the type to remove
+     */
+    protected void unregisterSourceType(Class aClass)
+    {
+        unregisterSourceType(new SimpleDataType(aClass));
+    }
+
+    /**
+     * Register a supported data type with this transformer.  The will allow objects that match this data type to be
+     * transformed by this transformer.
+     *
+     * @param dataType the source type to allow
+     */
+    protected void registerSourceType(DataType dataType)
+    {
+        if (!sourceTypes.contains(dataType))
+        {
+            sourceTypes.add(dataType);
+
+            if (dataType.getType().equals(Object.class))
             {
                 logger.debug("java.lang.Object has been added as source type for this transformer, there will be no source type checking performed");
             }
         }
     }
 
-    protected void unregisterSourceType(Class aClass)
+    /**
+     * Unregister a supported source type from this transformer
+     *
+     * @param dataType the type to remove
+     */
+    protected void unregisterSourceType(DataType dataType)
     {
-        sourceTypes.remove(aClass);
+        sourceTypes.remove(dataType);
     }
 
     /**
@@ -157,7 +205,17 @@ public abstract class AbstractTransformer implements Transformer
      */
     public Class getReturnClass()
     {
-        return returnClass;
+        return returnType.getType();
+    }
+
+    public void setReturnDataType(DataType type)
+    {
+        this.returnType = type;
+    }
+
+    public DataType getReturnDataType()
+    {
+        return returnType;
     }
 
     /*
@@ -167,15 +225,42 @@ public abstract class AbstractTransformer implements Transformer
      */
     public void setReturnClass(Class newClass)
     {
-        returnClass = newClass;
+        returnType = new SimpleDataType(newClass);
     }
 
     public boolean isSourceTypeSupported(Class aClass)
     {
-        return isSourceTypeSupported(aClass, false);
+        return isSourceDataTypeSupported(new SimpleDataType(aClass), false);
     }
 
+    public boolean isSourceDataTypeSupported(DataType dataType)
+    {
+        return isSourceDataTypeSupported(dataType, false);
+    }
+
+    /**
+     * Determines whether that data type passed in is supported by this transformer
+     *
+     * @param aClass     the type to check against
+     * @param exactMatch if the source type on this transformer is open (can be anything) it will return true unless an
+     *                   exact match is requested using this flag
+     * @return true if the source type is supported by this transformer, false otherwise
+     * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType, boolean)}
+     */
     public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
+    {
+        return isSourceDataTypeSupported(new SimpleDataType(aClass), exactMatch);
+    }
+
+    /**
+     * Determines whether that data type passed in is supported by this transformer
+     *
+     * @param dataType   the type to check against
+     * @param exactMatch if set to true, this method will look for an exact match to the data type, if false it will look
+     *                   for a compatible data type.
+     * @return true if the source type is supported by this transformer, false otherwise
+     */
+    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
     {
         int numTypes = sourceTypes.size();
 
@@ -184,22 +269,23 @@ public abstract class AbstractTransformer implements Transformer
             return !exactMatch;
         }
 
-        for (int i = 0; i < numTypes; i++)
+        for (DataType sourceType : sourceTypes)
         {
-            Class anotherClass = sourceTypes.get(i);
             if (exactMatch)
             {
-                if (anotherClass.equals(aClass))
+                if (sourceType.equals(dataType))
                 {
                     return true;
                 }
             }
-            else if (anotherClass.isAssignableFrom(aClass))
+            else
             {
-                return true;
+                if (sourceType.isCompatibleWith(dataType))
+                {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -216,8 +302,8 @@ public abstract class AbstractTransformer implements Transformer
         {
 
             adapter = (MessageAdapter) src;
-            if ((!isSourceTypeSupported(MessageAdapter.class, true)
-                    && !isSourceTypeSupported(MuleMessage.class, true)
+            if ((!isSourceDataTypeSupported(MULE_MESSAGE_ADAPTER_DATA_TYPE, true)
+                    && !isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true)
                     && !(this instanceof AbstractMessageAwareTransformer))
                     )
             {
@@ -323,9 +409,9 @@ public abstract class AbstractTransformer implements Transformer
     {
         String name = ClassUtils.getSimpleName(this.getClass());
         int i = name.indexOf("To");
-        if (i > 0 && returnClass != null)
+        if (i > 0 && returnType != null)
         {
-            String target = ClassUtils.getSimpleName(returnClass);
+            String target = ClassUtils.getSimpleName(returnType.getType());
             if (target.equals("byte[]"))
             {
                 target = "byteArray";
@@ -336,6 +422,17 @@ public abstract class AbstractTransformer implements Transformer
     }
 
     public List<Class> getSourceTypes()
+    {
+        //A work around to support the legacy API
+        List<Class> sourceClasses = new ArrayList<Class>();
+        for (DataType sourceType : sourceTypes)
+        {
+            sourceClasses.add(sourceType.getType());
+        }
+        return Collections.unmodifiableList(sourceClasses);
+    }
+
+    public List<DataType> getSourceDataTypes()
     {
         return Collections.unmodifiableList(sourceTypes);
     }
@@ -358,7 +455,7 @@ public abstract class AbstractTransformer implements Transformer
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", name='").append(name).append('\'');
         sb.append(", ignoreBadInput=").append(ignoreBadInput);
-        sb.append(", returnClass=").append(returnClass);
+        sb.append(", returnClass=").append(returnType);
         sb.append(", sourceTypes=").append(sourceTypes);
         sb.append('}');
         return sb.toString();

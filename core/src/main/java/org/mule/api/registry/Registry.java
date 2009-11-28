@@ -22,26 +22,27 @@ public interface Registry extends Initialisable, Disposable
     // Lookup methods - these should NOT create a new object, only return existing ones
     // /////////////////////////////////////////////////////////////////////////
 
-    /** 
-     * Look up a single object by name. 
-     * 
+    /**
+     * Look up a single object by name.
+     *
      * @return object or null if not found
      */
     Object lookupObject(String key);
 
-    /** 
-     * Look up all objects of a given type. 
-     * 
+    /**
+     * Look up all objects of a given type.
+     *
      * @return collection of objects or empty collection if none found
      */
-    <T>Collection lookupObjects(Class<T> type);
 
-    /** 
-     * Look up a single object by type. 
-     * 
+    <T> Collection lookupObjects(Class<T> type);
+
+    /**
+     * Look up a single object by type.
+     *
      * @return object or null if not found
      * @throws RegistrationException if more than one object is found.
-     * */
+     */
     <T> T lookupObject(Class<T> clazz) throws RegistrationException;
 
     // /////////////////////////////////////////////////////////////////////////
