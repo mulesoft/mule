@@ -56,13 +56,14 @@ org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 # This works, but it requires tools.jar on the classpath which we currently don't require:
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
-
 # EE-979
 org.mule.security.MultiuserSecurityTestCase
 
 # MULE-4512
 org.mule.test.integration.messaging.meps.SynchronousResponseExceptionTestCase
 
+# MULE-4638
+org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 
 ##########################################################################
 # The following tests will fail if run off-line
