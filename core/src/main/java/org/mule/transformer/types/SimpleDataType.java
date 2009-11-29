@@ -59,7 +59,7 @@ public class SimpleDataType<T> implements DataType<T>
         SimpleDataType that = (SimpleDataType) dataType;
 
         //ANY_MIME_TYPE will match to a null or non-null value for MimeType        
-        if ((this.getMimeType() == null && that.getMimeType() != null || that.getMimeType() == null && this.getMimeType() != null) && !ANY_MIME_TYPE.equals(that.mimeType))
+        if ((this.getMimeType() == null && that.getMimeType() != null || that.getMimeType() == null && this.getMimeType() != null) && !ANY_MIME_TYPE.equals(this.mimeType) && !ANY_MIME_TYPE.equals(that.mimeType))
         {
             return false;
         }

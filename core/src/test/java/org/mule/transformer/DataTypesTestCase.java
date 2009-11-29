@@ -22,6 +22,9 @@ import java.util.Set;
 
 public class DataTypesTestCase extends AbstractMuleTestCase
 {
+    //Just used for testing
+    private List<Exception> listOfExceptions;
+
     public void testSimpleTypes() throws Exception
     {
         DataTypeFactory factory = new DataTypeFactory();
@@ -156,7 +159,16 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         dt2 = factory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", List.class), 0);
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
+    }
 
+    public void testGenericCollectionTypesFromField() throws Exception
+    {
+        DataTypeFactory factory = new DataTypeFactory();
+        DataType dt = factory.createFromField(getClass().getDeclaredField("listOfExceptions"));
+        assertTrue(dt instanceof CollectionDataType);
+
+        assertEquals(List.class, dt.getType());
+        assertEquals(Exception.class, ((CollectionDataType) dt).getItemType());
     }
 
     private List<Exception> listOfExceptionsMethod(String s)
