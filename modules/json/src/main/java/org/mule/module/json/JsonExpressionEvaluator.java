@@ -22,35 +22,35 @@ import org.apache.commons.logging.LogFactory;
 /**
  * An expression evaluator to allow users to define json expressions in their mule configuration, i.e.
  * <code>
- * #[json:person->addresses[0]->postcode]
+ * #[json:person/addresses[0]/postcode]
  * </code>
- *
+ * <p/>
  * See the {@link org.mule.module.json.JsonData} object for mor information about the query syntax.
- *
+ * <p/>
  * It is also possible to use this evaluator in {@link org.mule.routing.filters.ExpressionFilter} objects. For example
  * a filter could be defined as -
- *
+ * <p/>
  * <code>
- * #[json:person->registered]
+ * #[json:person/registered]
  * </code>
- *
+ * <p/>
  * Where 'registered' is a boolean value.  It is also possible to filter on the existance of a value i.e.
- *
+ * <p/>
  * <code>
- * #[json:person->favouriteColour]
+ * #[json:person/favouriteColour]
  * </code>
- *
+ * <p/>
  * Which would return true if 'favouriteColour' has been set. This evaluator also dds two logic operators you can use
  * to create more sophisticated boolean expressions; equals and not equals -
- *
+ * <p/>
  * <code>
- * #[json:person->favouriteColour == red]
+ * #[json:person/favouriteColour == red]
  * </code>
- *
+ * <p/>
  * or
- *
- *  <code>
- * #[json:person->favouriteColour != brown]
+ * <p/>
+ * <code>
+ * #[json:person/favouriteColour != brown]
  * </code>
  *
  * @see org.mule.module.json.JsonData
@@ -67,34 +67,38 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
         String compareTo = null;
         boolean not = false;
         int start = expression.lastIndexOf("/");
-        if(start==-1) start = 0;
+        if (start == -1)
+        {
+            start = 0;
+        }
         int i = expression.indexOf("==", start);
 
-        if(i > -1)
+        if (i > -1)
         {
             compareTo = expression.substring(i + 2, expression.length()).trim();
             expression = expression.substring(0, i).trim();
         }
-        else if((i = expression.indexOf("!=", start)) > -1)
+        else if ((i = expression.indexOf("!=", start)) > -1)
         {
             compareTo = expression.substring(i + 2, expression.length()).trim();
             expression = expression.substring(0, i).trim();
-            not=true;
+            not = true;
         }
         try
         {
-            JsonData data = message.getPayload(JsonData.class);
+            String json = message.getPayloadAsString();
+            JsonData data = new JsonData(json);
             try
             {
                 Object result = data.get(expression);
-                if(compareTo!=null)
+                if (compareTo != null)
                 {
-                    if(compareTo.equalsIgnoreCase("null"))
+                    if (compareTo.equalsIgnoreCase("null"))
                     {
-                        boolean answer = result==null;
+                        boolean answer = result == null;
                         return (not ? !answer : answer);
                     }
-                    else if(result instanceof Number && NumberUtils.isDigits(compareTo))
+                    else if (result instanceof Number && NumberUtils.isDigits(compareTo))
                     {
                         boolean answer = NumberUtils.createNumber(compareTo).equals(result);
                         return (not ? !answer : answer);
@@ -107,7 +111,7 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
                     else
                     {
                         boolean answer = compareTo.equals(result);
-                        return (not ? !answer : answer);                        
+                        return (not ? !answer : answer);
                     }
                 }
                 else
@@ -121,9 +125,9 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
                 return null;
             }
         }
-        catch (TransformerException e)
+        catch (Exception e)
         {
-            throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(getName()+ ":" + expression), e);
+            throw new MuleRuntimeException(CoreMessages.failedToProcessExtractorFunction(getName() + ":" + expression), e);
         }
     }
 
