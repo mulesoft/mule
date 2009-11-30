@@ -44,7 +44,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
         HttpClient client = new HttpClient();
         Credentials credentials = new UsernamePasswordCredentials("admin", "admin");
         client.getState().setCredentials(AuthScope.ANY, credentials);
-        client.getState().setAuthenticationPreemptive(true);
+        client.getParams().setAuthenticationPreemptive(true);
 
         PostMethod method = new PostMethod("https://localhost:60443/services/Echo");
         method.setDoAuthentication(true);
@@ -58,7 +58,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
         credentials = new UsernamePasswordCredentials("admin", "adminasd");
         client.getState().setCredentials(AuthScope.ANY, credentials);
-        client.getState().setAuthenticationPreemptive(true);
+        client.getParams().setAuthenticationPreemptive(true);
 
         result = client.executeMethod(method);
 
