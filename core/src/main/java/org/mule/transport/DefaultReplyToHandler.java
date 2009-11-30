@@ -70,6 +70,10 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // replyto loop
         returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         
+        // MULE-4617. This is fixed with MULE-4620, but lets remove this property
+        // anyway as it should never be true from a replyTo dispatch
+        returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+        
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession(), false);
 
