@@ -191,6 +191,12 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         return currentSize;
     }
 
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + " " + store;
+    }
+
     /**
      * Represents the object stored in the store. This class holds the Object itslef and its ID.
      */

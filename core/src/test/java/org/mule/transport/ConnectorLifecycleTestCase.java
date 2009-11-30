@@ -80,7 +80,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     {
         // Starting the connector should leave it uninitialised,
         // but connected and started.
-        System.out.println("Starting connector...");
         connector.start();
         assertEquals(1, connector.getInitialiseCount());
         assertEquals(1, connector.getConnectCount());
@@ -90,7 +89,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertEquals(0, connector.getDisposeCount());
 
         // Starting the connector against should not affect it.
-        System.out.println("Starting connector again...");
         connector.start();
         assertEquals(1, connector.getInitialiseCount());
         assertEquals(1, connector.getConnectCount());

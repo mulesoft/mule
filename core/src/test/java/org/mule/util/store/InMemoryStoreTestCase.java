@@ -137,7 +137,8 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
     {
         for (String id : identifiers)
         {
-            assertTrue(store.containsObject(id));
+            String message = "id " + id + " not in store " + store;
+            assertTrue(message, store.containsObject(id));
         }
     }
     
