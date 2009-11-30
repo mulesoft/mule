@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
-        <version>3.0.0-M2-SNAPSHOT</version>
+        <version>3.0.0-M2-20091130</version>
     </parent>
 
     <artifactId>mule-example-bookstore-parent</artifactId>
@@ -19,7 +19,7 @@
         in the dist directory, too
     -->
     <properties>
-        <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
+        <muleVersion>3.0.0-M2-20091130</muleVersion>
         <cxfVersion>2.1.2</cxfVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <jettyVersion>6.1.11</jettyVersion>
