@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.2"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+      xmlns:test="http://www.mulesource.org/schema/mule/test/2.2"
+      xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+      xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/test/2.2 http://www.mulesource.org/schema/mule/test/2.2/mule-test.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!--// START SNIPPET: full-config -->
+    <description>
+        Receives a message from another party. The service processes the message and then it gets routed via the
+        outbound router. If a result is returned from the component it is returned back to the calling party.
+    </description>
+
+    <vm:connector name="vmConnector" queueEvents="true"/>
+    <jms:activemq-connector name="jmsConnector" brokerURL="tcp://localhost:61616"/>
+
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
+    <jms:endpoint queue="test.header.received" name="receivedEndpoint" synchronous="false"/>
+    <jms:endpoint queue="test.header.notreceived" name="notReceivedEndpoint" synchronous="false"/>
+
+    <model>
+        <service name="In-Optional-Out_Out-Only-Service">
+            <inbound>
+                <vm:inbound-endpoint ref="inboundEndpoint"/>
+            </inbound>
+            <script:component>
+                <script:script engine="groovy">
+                    if (message.getProperty("foo") != null)
+                        return "foo header received"
+                    else
+                        return null
+                </script:script>
+            </script:component>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="receivedEndpoint"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+    <!--// END SNIPPET: full-config -->
+</mule>
