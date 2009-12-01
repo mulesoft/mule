@@ -293,6 +293,147 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="mulemq-connector" type="muleMqConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                The mulemq-connector element configures a MuleMQ version of the JMS connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="mulemq-xa-connector" type="muleMqConnectorType"
+        substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                The mulemq-xa-connector element configures a MuleMQ version of the JMS XA connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="muleMqConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="vendorJmsConnectorType">
+                <xsd:attribute name="realmURL" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The URL used to connect to the JMS server. If not set, the default is nsp://localhost:9000. When connecting to a cluster separate urls with a comma.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="bufferOutput" type="xsd:string" default="queued">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                           Specifies the type of write handler the client will use to send events to the realm. This can be either standard, direct or queued. Unless specified, standard is used. For better latencies use direct, however, this will impact CPU since each write is not buffered but flushed directly. The queued handler will improve CPU and may give better overall throughput since there will be some buffering between client and server. The best of both options is the standard, which attempts to write directly but will back off and buffer the IO flushes when throughput increases and impacts CPU.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="syncWrites" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets whether each write to the store will also call sync on the file system to ensure all data is written to the disk, default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="syncBatchSize" type="mule:substitutableInt" default="50">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets the size of the write sync batch, default is 50, range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="syncTime" type="mule:substitutableInt" default="20">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets the time interval between sync batches, default is 20 milliseconds, range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="globalStoreCapacity" type="mule:substitutableInt" default="1000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets that the default channel/queue capacity setting which will prevent publishing of further events once topic or queue is full, default is 1000, valid range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxUnackedSize" type="mule:substitutableInt" default="100">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies the maximum number of unacknowledged events a connection will keep in memory before beginning to remove the oldest, default is 100, range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="useJMSEngine" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            All JMS Topics require this setting to be true, however, if you wish to use different channel types with different fanout engines (in MULEMQ+ only), this can be set to false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="queueWindowSize" type="mule:substitutableInt" default="1000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When using queues, this specifies the number of messages that the server will send in each block between acknowledgments, default is 1000, range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="autoAckCount" type="mule:substitutableInt" default="500">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When auto acknowledgment mode is selected, rather than ack each event, each nth event will be acknowledged, default is 500, range is 1 to Integer.MAX_VALUE.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableSharedDurable" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows more than 1 durable subscriber on a topic sharing the same name, with only 1 consuming the events. When the first durable disconnects, the second will take over and so on. Default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="randomiseRNames" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            With multiple RNAMEs, the ability to randomize the RNAMEs is useful for load balancing between cluster nodes.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="messageThreadPoolSize" type="mule:substitutableInt" default="30">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates the maximum number of threads each connection will use to deliver asynchronous events, default is 30, range is 1 to Integer.MAX_VALUE
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="discOnClusterFailure" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                                Indicates whether the client connection will be disconnected when the cluster fails, which will cause automatic reconnect to occur, default is true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialRetryCount" type="mule:substitutableInt" default="2">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of attempts a connection will try to connect to a realm on startup, default is 2, 0 is infinite, range is Integer.MIN_VALUE to Integer.MAX_VALUE
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="muleMqMaxRedelivery" type="mule:substitutableInt" default="100">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This indicates the size of the map of redelivered events to store for each consumer, once this limit is reached the oldest will be removed, default is 100, range is 1 to 100
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="retryCommit" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                          If a transacted session commit fails, if this is true, the commit will be retried until either it succeeds or fails with a transaction timeout, default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>

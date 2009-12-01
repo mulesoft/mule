@@ -8,12 +8,16 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
+    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
+
     <jms:activemq-connector name="activeMqConnectorDefaults"/>
     <jms:activemq-connector name="activeMqConnectorBroker" brokerURL="tcp://localhost:1234"/>
     
-    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
-
     <jms:weblogic-connector name="weblogicConnector" connectionFactory-ref="connectionFactory"/>
 
     <jms:websphere-connector name="websphereConnector" connectionFactory-ref="connectionFactory"/>
+
+    <jms:mulemq-connector name="muleMqConnector" connectionFactory-ref="connectionFactory" specification="1.1"/>
+    
+    <jms:mulemq-xa-connector name="muleMqXaConnector" connectionFactory-ref="connectionFactory" specification="1.1"/>  
 </mule>

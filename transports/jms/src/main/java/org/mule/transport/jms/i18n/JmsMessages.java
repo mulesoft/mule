@@ -91,4 +91,9 @@ public class JmsMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 16);
     }
+    
+    public static Message errorMuleMqJmsSpecification()
+    {
+        return factory.createMessage(BUNDLE_PATH, 17);
+    }
 }
