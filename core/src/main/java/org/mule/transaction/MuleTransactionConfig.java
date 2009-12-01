@@ -47,10 +47,15 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
 
     private ConstraintFilter constraint = null;
 
-    private int timeout;
+    private Integer timeout;
     
-    public void setMuleContext(MuleContext context) {
-        this.timeout = context.getConfiguration().getDefaultTransactionTimeout();
+    public void setMuleContext(MuleContext context)
+    {
+        // override only if not set in config
+        if (this.timeout == null)
+        {
+            this.timeout = context.getConfiguration().getDefaultTransactionTimeout();
+        }
     }
 
     public TransactionFactory getFactory()

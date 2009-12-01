@@ -22,7 +22,7 @@ public class CustomTransactionTestCase extends FunctionalTestCase
         return "org/mule/test/config/custom-transaction-config.xml";
     }
 
-    public void testConfig() throws Exception
+    public void testConfig1() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint1");
         assertNotNull(epb);
@@ -32,5 +32,17 @@ public class CustomTransactionTestCase extends FunctionalTestCase
         assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
         assertEquals(4004, iep.getTransactionConfig().getTimeout());
+    }
+
+    public void testConfig2() throws Exception
+    {
+        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint2");
+        assertNotNull(epb);
+        InboundEndpoint iep = epb.buildInboundEndpoint();
+
+        assertNotNull(iep.getTransactionConfig());
+        assertTrue(iep.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
+        assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, iep.getTransactionConfig().getAction());
+        assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(), iep.getTransactionConfig().getTimeout());
     }
 }

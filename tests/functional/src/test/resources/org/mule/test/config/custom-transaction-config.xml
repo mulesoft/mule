@@ -14,4 +14,8 @@
     <endpoint name="testEndpoint1" address="test://test1">
         <custom-transaction factory-class="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN" timeout="4004"/>
     </endpoint>
+
+    <endpoint name="testEndpoint2" address="test://test2">
+        <custom-transaction factory-class="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
+    </endpoint>
 </mule>
