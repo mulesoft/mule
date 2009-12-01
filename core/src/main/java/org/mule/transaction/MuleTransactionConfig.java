@@ -175,7 +175,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
 
     public int getTimeout()
     {
-        return timeout;
+        return timeout == null ? 0 : timeout;
     }
 
     public void setTimeout(int timeout)
@@ -191,14 +191,14 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
             .append(", action=")
             .append(getActionAsString())
             .append(", timeout=")
-            .append(timeout)
+            .append(timeout == null ? 0 : timeout)
             .append("}");
         return buf.toString();
     }
     
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{factory, new Byte(action), constraint, new Integer(timeout)});
+        return ClassUtils.hash(new Object[]{factory, action, constraint, timeout == null ? 0 : timeout});
     }
 
     public boolean equals(Object obj)
@@ -208,9 +208,9 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
 
         final MuleTransactionConfig other = (MuleTransactionConfig) obj;
         return ClassUtils.equal(factory, other.factory)
-               && ClassUtils.equal(new Byte(action), new Byte(other.action))
+               && ClassUtils.equal(action, other.action)
                && ClassUtils.equal(constraint, other.constraint)
-               && ClassUtils.equal(new Integer(timeout), new Integer(other.timeout));
+               && ClassUtils.equal(timeout, other.timeout);
 
     }
     
