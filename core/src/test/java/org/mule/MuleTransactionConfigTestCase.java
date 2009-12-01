@@ -21,6 +21,7 @@ public class MuleTransactionConfigTestCase extends AbstractMuleTestCase
     public void testActionAndStringConversion()
     {
         MuleTransactionConfig c = new MuleTransactionConfig();
+        c.setMuleContext(muleContext);
 
         c.setAction(MuleTransactionConfig.ACTION_ALWAYS_BEGIN);
         assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN_STRING, c.getActionAsString());
@@ -37,25 +38,33 @@ public class MuleTransactionConfigTestCase extends AbstractMuleTestCase
         c.setAction(MuleTransactionConfig.ACTION_NONE);
         assertEquals(MuleTransactionConfig.ACTION_NONE_STRING, c.getActionAsString());
     }
-    
+
+    public void testDefaults() throws Exception {
+        MuleTransactionConfig c = new MuleTransactionConfig();
+        c.setMuleContext(muleContext);
+        assertEquals("Wrong default TX timeout", 30000, c.getTimeout());
+    }
+
     public void testTransactionJoinIfPossible() throws TransactionException
     {      
         MuleTransactionConfig txConfig = new MuleTransactionConfig();
+        txConfig.setMuleContext(muleContext);
         txConfig.setAction(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
         txConfig.setFactory(new TestTransactionFactory());
         assertFalse(txConfig.isTransacted());
     }
-    
+
     public void testFailNoFactory()
     {
         MuleTransactionConfig txConfig = new MuleTransactionConfig();
+        txConfig.setMuleContext(muleContext);
         txConfig.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         // note how we don't set a factory here so the default in MTC is null
         
         try
         {
             txConfig.isTransacted();
-            fail("isTransacted must fail if no factory is set");
+            fail("isTransacted() must fail if no factory is set");
         }
         catch (RuntimeException re)
         {

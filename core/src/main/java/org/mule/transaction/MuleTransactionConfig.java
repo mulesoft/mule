@@ -10,7 +10,9 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
@@ -25,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * <p/> <code>MuleTransactionConfig</code> defines transaction configuration for a
  * transactional endpoint.
  */
-public class MuleTransactionConfig implements TransactionConfig
+public class MuleTransactionConfig implements TransactionConfig, MuleContextAware
 {
     /**
      * logger used by this class
@@ -47,9 +49,8 @@ public class MuleTransactionConfig implements TransactionConfig
 
     private int timeout;
     
-    public MuleTransactionConfig()
-    {
-        // todo timeout = muleContext.getConfiguration().getDefaultTransactionTimeout();
+    public void setMuleContext(MuleContext context) {
+        this.timeout = context.getConfiguration().getDefaultTransactionTimeout();
     }
 
     public TransactionFactory getFactory()
@@ -157,7 +158,7 @@ public class MuleTransactionConfig implements TransactionConfig
         }
         catch (CloneNotSupportedException e)
         {
-            logger.fatal("Failed to clone ContraintFilter: " + e.getMessage(), e);
+            logger.fatal("Failed to clone ConstraintFilter: " + e.getMessage(), e);
             return constraint;
         }
     }
