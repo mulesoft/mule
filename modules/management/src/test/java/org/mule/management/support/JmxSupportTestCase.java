@@ -48,7 +48,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         muleContext.getRegistry().registerAgent(agent);
         muleContext.start();
 
-        List domains = Arrays.asList(mBeanServer.getDomains());
+        List<String> domains = Arrays.asList(mBeanServer.getDomains());
         assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
         assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".1"));
     }
@@ -76,7 +76,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         muleContext.getRegistry().registerAgent(agent);
         muleContext.start();
 
-        List domains = Arrays.asList(mBeanServer.getDomains());
+        List<String> domains = Arrays.asList(mBeanServer.getDomains());
         // one extra domain created by Mule's clash resolution
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 3, domains.size());
@@ -86,6 +86,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
     }
     
+    @Override
     protected void doTearDown() throws Exception
     {
         // This MBean was registered manually so needs to be unregistered manually in tearDown()

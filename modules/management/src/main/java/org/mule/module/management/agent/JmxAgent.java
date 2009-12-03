@@ -164,7 +164,7 @@ public class JmxAgent extends AbstractAgent
         }
         if (mBeanServer == null && locateServer)
         {
-            List l = MBeanServerFactory.findMBeanServer(null);
+            List<?> l = MBeanServerFactory.findMBeanServer(null);
             if (l != null && l.size() > 0)
             {
                 mBeanServer = (MBeanServer) l.get(0);
@@ -312,9 +312,8 @@ public class JmxAgent extends AbstractAgent
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                   InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = muleContext.getRegistry().lookupObjects(Model.class).iterator(); iterator.hasNext();)
+        for (Model model : muleContext.getRegistry().lookupObjects(Model.class))
         {
-            Model model = (Model) iterator.next();
             ModelServiceMBean serviceMBean = new ModelService(model);
             String rawName = serviceMBean.getName() + "(" + serviceMBean.getType() + ")";
             String name = jmxSupport.escape(rawName);
@@ -345,47 +344,40 @@ public class JmxAgent extends AbstractAgent
     protected void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        String rawName;
-        for (Iterator iterator = muleContext.getRegistry().lookupObjects(Service.class).iterator(); iterator.hasNext();)
+        for (Service service : muleContext.getRegistry().lookupObjects(Service.class))
         {
-            rawName = ((Service) iterator.next()).getName();
-            final String name = jmxSupport.escape(rawName);
+            String rawName = service.getName();
+            String name = jmxSupport.escape(rawName);
             ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Service,name=" + name);
             ServiceServiceMBean serviceMBean = new ServiceService(rawName, muleContext);
             logger.debug("Registering service with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
         }
-
     }
 
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        Iterator iter = muleContext.getRegistry().lookupObjects(Connector.class).iterator();
-        Connector connector;
-        while (iter.hasNext())
+        for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
         {
-            connector = (Connector) iter.next();
             if (connector instanceof AbstractConnector)
             {
-                for (Iterator iterator = ((AbstractConnector) connector).getReceivers().values().iterator(); iterator.hasNext();)
+                for (Iterator<?> iterator = ((AbstractConnector) connector).getReceivers().values().iterator(); iterator.hasNext();)
                 {
                     EndpointServiceMBean mBean = new EndpointService((MessageReceiver) iterator.next());
-                    final String rawName = mBean.getName();
-                    final String name = jmxSupport.escape(rawName);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(muleContext) +
-                                                    ":type=org.mule.Endpoint,service=" +
-                                                    jmxSupport.escape(mBean.getComponentName()) +
-                                                    ",name=" + name);
+                    
+                    String fullName = buildFullyQualifiedEndpointName(mBean, connector);
+                    if (logger.isInfoEnabled()) 
+                    {
+                        logger.info("Attempting to register service with name: " + fullName);
                     }
-                    ObjectName on = jmxSupport.getObjectName(
-                                                    jmxSupport.getDomainName(muleContext) +
-                                                    ":type=org.mule.Endpoint,service=" +
-                                                    jmxSupport.escape(mBean.getComponentName()) +
-                                                    ",name=" + name);
+                    
+                    ObjectName on = jmxSupport.getObjectName(fullName);
                     mBeanServer.registerMBean(mBean, on);
-                    logger.info("Registered Endpoint Service with name: " + on);
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info("Registered Endpoint Service with name: " + on);
+                    }
                 }
             }
             else
@@ -396,16 +388,29 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
+    protected String buildFullyQualifiedEndpointName(EndpointServiceMBean mBean, Connector connector)
+    {
+        String rawName = jmxSupport.escape(mBean.getName());
+        
+        StringBuilder fullName = new StringBuilder(128);
+        fullName.append(jmxSupport.getDomainName(muleContext));
+        fullName.append(":type=org.mule.Endpoint,service=");
+        fullName.append(jmxSupport.escape(mBean.getComponentName()));
+        fullName.append(",connector=");
+        fullName.append(connector.getName());
+        fullName.append(",name=");
+        fullName.append(rawName);
+        return fullName.toString();
+    }
+
     protected void registerConnectorServices() throws
                                                 MalformedObjectNameException,
                                                 NotCompliantMBeanException,
                                                 MBeanRegistrationException,
                                                 InstanceAlreadyExistsException
     {
-        Iterator iter = muleContext.getRegistry().lookupObjects(Connector.class).iterator();
-        while (iter.hasNext())
+        for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
         {
-            Connector connector = (Connector) iter.next();
             ConnectorServiceMBean mBean = new ConnectorService(connector);
             final String rawName = mBean.getName();
             final String name = jmxSupport.escape(rawName);
@@ -420,81 +425,51 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-    /**
-     * @return Returns the createServer.
-     */
     public boolean isCreateServer()
     {
         return createServer;
     }
 
-    /**
-     * @param createServer The createServer to set.
-     */
     public void setCreateServer(boolean createServer)
     {
         this.createServer = createServer;
     }
 
-    /**
-     * @return Returns the locateServer.
-     */
     public boolean isLocateServer()
     {
         return locateServer;
     }
 
-    /**
-     * @param locateServer The locateServer to set.
-     */
     public void setLocateServer(boolean locateServer)
     {
         this.locateServer = locateServer;
     }
 
-    /**
-     * @return Returns the connectorServerUrl.
-     */
     public String getConnectorServerUrl()
     {
         return connectorServerUrl;
     }
 
-    /**
-     * @param connectorServerUrl The connectorServerUrl to set.
-     */
     public void setConnectorServerUrl(String connectorServerUrl)
     {
         this.connectorServerUrl = connectorServerUrl;
     }
 
-    /**
-     * @return Returns the enableStatistics.
-     */
     public boolean isEnableStatistics()
     {
         return enableStatistics;
     }
 
-    /**
-     * @param enableStatistics The enableStatistics to set.
-     */
     public void setEnableStatistics(boolean enableStatistics)
     {
         this.enableStatistics = enableStatistics;
     }
 
-    /**
-     * @return Returns the mBeanServer.
-     */
     public MBeanServer getMBeanServer()
     {
         return mBeanServer;
     }
 
-    /**
-     * @param mBeanServer The mBeanServer to set.
-     */
     public void setMBeanServer(MBeanServer mBeanServer)
     {
         this.mBeanServer = mBeanServer;
@@ -546,7 +521,7 @@ public class JmxAgent extends AbstractAgent
         try
         {
             ObjectName query = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":*");
-            Set mbeans = mBeanServer.queryNames(query, null);
+            Set<?> mbeans = mBeanServer.queryNames(query, null);
             while (!mbeans.isEmpty())
             {
                 ObjectName name = (ObjectName) mbeans.iterator().next();

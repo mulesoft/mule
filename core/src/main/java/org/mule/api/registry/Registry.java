@@ -34,8 +34,7 @@ public interface Registry extends Initialisable, Disposable
      *
      * @return collection of objects or empty collection if none found
      */
-
-    <T> Collection lookupObjects(Class<T> type);
+    <T> Collection<T> lookupObjects(Class<T> type);
 
     /**
      * Look up a single object by type.
