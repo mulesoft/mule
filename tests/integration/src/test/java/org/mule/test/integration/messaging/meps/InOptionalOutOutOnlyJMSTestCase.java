@@ -54,7 +54,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
-        Map props = new HashMap();
+        Map<String, String> props = new HashMap<String, String>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props, 20000);
         
