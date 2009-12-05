@@ -14,10 +14,9 @@
     <vm:connector name="vm"/>
     
     <model>
-
         <service name="AsyncPersistentQueueService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="8000" synchronous="false"/>
+                <http:inbound-endpoint host="localhost" port="60217" synchronous="false"/>
             </inbound>
             <test:component/>
             <outbound>
@@ -29,7 +28,7 @@
         
         <service name="AsyncService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="8001" synchronous="false"/>
+                <http:inbound-endpoint host="localhost" port="60218" synchronous="false"/>
             </inbound>
             <test:component/>
             <outbound>
@@ -40,5 +39,4 @@
             <queue-profile persistent="true"/>
         </service>
     </model>
-    
 </mule>

@@ -58,14 +58,14 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncService");
         component.setEventCallback(new EventCallback()
         {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            public void eventReceived(MuleEventContext context, Object comp) throws Exception
             {
                 Thread.sleep(200);
                 context.getMessageAsString();
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:8000");
+        PostMethod request = new PostMethod("http://localhost:60217");
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
             .getDefaultEncoding());
         request.setRequestEntity(entity);
@@ -81,14 +81,14 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncPersistentQueueService");
         component.setEventCallback(new EventCallback()
         {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            public void eventReceived(MuleEventContext context, Object comp) throws Exception
             {
                 Thread.sleep(200);
                 context.getMessageAsString();
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:8001");
+        PostMethod request = new PostMethod("http://localhost:60218");
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
             .getDefaultEncoding());
         request.setRequestEntity(entity);
