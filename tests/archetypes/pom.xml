@@ -36,8 +36,8 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>org.codehaus.mojo.groovy</groupId>
-                            <artifactId>groovy-maven-plugin</artifactId>
+                            <groupId>org.codehaus.groovy.maven</groupId>
+                            <artifactId>gmaven-plugin</artifactId>
                             <executions>
                                 <execution>
                                     <phase>generate-test-sources</phase>
@@ -60,8 +60,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-
         </profile>
     </profiles>
-
 </project>

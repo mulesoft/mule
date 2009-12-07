@@ -27,10 +27,15 @@ if (existingProjectDir.exists())
 // make sure that the output dir is created before the actual Maven run that follows now
 existingProjectDir.mkdirs()
 
-/*
- * run Maven archetype
- */
-def cmdline = "-o "
+// determine the local repository to use. Users may have specified a different local
+// repo when invoking the original Maven bulid (-Dmaven.repo.local=xxx). Of course
+// we need to use the same local repository on the forked Maven invocation
+localRepoArgument = "-Dmaven.repo.local=${settings.localRepository}"
+
+//
+// run Maven archetype
+//
+def cmdline = "-o ${localRepoArgument} "
 
 if (project.properties.archetype == null)
 {
@@ -53,7 +58,7 @@ runMaven(cmdline, buildDir)
 
 // now that the source is generated, compile it using Maven
 // Do not run "mvn test" here since the generated source is not testable as is
-cmdline = "test-compile"
+cmdline = "${localRepoArgument} test-compile"
 runMaven(cmdline, existingProjectDir)
 
 def runMaven(String commandline, File directory)
