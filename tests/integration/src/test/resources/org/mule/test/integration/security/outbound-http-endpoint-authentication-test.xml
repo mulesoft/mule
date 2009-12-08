@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+       xmlns:mule-ss="http://www.mulesource.org/schema/mule/spring-security/2.2"
+       xmlns:ss="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/spring-security/2.2 http://www.mulesource.org/schema/mule/spring-security/2.2/mule-spring-security.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+    
+    <spring:beans>
+        <ss:authentication-manager alias="authenticationManager"/>
+
+        <ss:authentication-provider>
+            <ss:user-service id="userService">
+                <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+                <ss:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+            </ss:user-service>
+        </ss:authentication-provider>
+    </spring:beans>
+
+    <mule-ss:security-manager>
+        <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </mule-ss:security-manager>
+    
+    <vm:connector name="vmConnector" queueEvents="true"/>
+    
+    <http:endpoint name="outbound" host="localhost" port="50504" user="ross" password="ross"/>
+    <vm:endpoint name="out" path="out" connector-ref="vmConnector"/>
+    
+    <model name="http secured test model">
+        <service name="SecureService">
+            <inbound>
+                <http:inbound-endpoint host="localhost" port="50504" synchronous="true">
+                    <mule-ss:http-security-filter realm="mule-realm"/>
+                </http:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+
+</mule>

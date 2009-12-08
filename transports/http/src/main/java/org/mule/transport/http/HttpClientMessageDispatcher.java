@@ -110,6 +110,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
+        connector.setupClientAuthorization(event, httpMethod, client, endpoint);
+
         try
         {
             execute(event, httpMethod);
