@@ -74,6 +74,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         else if (ts.size() == 0)
         {
             this.sendTransformer = new ObjectToHttpClientMethodRequest();
+            this.sendTransformer.setMuleContext(connector.getMuleContext());
+            this.sendTransformer.setEndpoint(endpoint);
         }
         else
         {
@@ -85,8 +87,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        //This seems wrong
-        sendTransformer.setMuleContext(connector.getMuleContext());
         sendTransformer.initialise();
     }
 

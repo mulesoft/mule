@@ -11,11 +11,9 @@
 package org.mule.transport.http.transformers;
 
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
@@ -58,11 +56,9 @@ import org.apache.commons.lang.SerializationUtils;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer implements MuleContextAware
+public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer
 {
     
-    private MuleContext muleContext;
-
     public ObjectToHttpClientMethodRequest()
     {
         setReturnClass(HttpMethod.class);
@@ -72,11 +68,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         registerSourceType(InputStream.class);
         registerSourceType(OutputHandler.class);
         registerSourceType(NullPayload.class);
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     protected int addParameters(String queryString, PostMethod postMethod, MuleMessage msg)
@@ -111,46 +102,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 paramName = currentParam.substring(0, equals);
                 paramValue = currentParam.substring(equals + 1);
-                //Run query params through the expression evaluator
-//                Object temp = DefaultExpressionManager.evaluate(paramValue, msg, "$[", true);
-//                if (temp != null)
-//                {
-//                    //Process param collections
-//                    if (temp instanceof List)
-//                    {
-//                        StringBuffer buf = new StringBuffer();
-//                        List list = (List) temp;
-//                        for (Iterator iterator = list.iterator(); iterator.hasNext();)
-//                        {
-//                            Object object = iterator.next();
-//                            buf.append(object).append(",");
-//                        }
-//                        parameterIndex++;
-//                        postMethod.addParameter(paramName, buf.toString());
-//                    }
-//                    else if (temp instanceof Map)
-//                    {
-//                        Map map = (Map) temp;
-//                        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();)
-//                        {
-//                            Map.Entry entry = (Map.Entry) iterator.next();
-//                            parameterIndex++;
-//                            postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
-//                        }
-//                    }
-//                    else
-//                    {
-//                        parameterIndex++;
-//                        postMethod.addParameter(paramName, temp.toString());
-//                    }
-//                }
-//                else
-//                {
-                    parameterIndex++;
-                    postMethod.addParameter(paramName, paramValue);
-                //}
-
-
+                parameterIndex++;
+                postMethod.addParameter(paramName, paramValue);
             }
             equals = queryString.indexOf("&");
             if (equals > -1)
@@ -171,8 +124,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     {
         Object src = msg.getPayload();
 
-        String endpoint = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
-        if (endpoint == null)
+        String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        if (endpointString == null)
         {
             throw new TransformerException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
@@ -183,9 +136,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         try
         {
             //Allow Expressions to be embedded
-            endpoint = endpoint.replaceAll("%23", "#");
-            endpoint = muleContext.getExpressionManager().parse(endpoint, msg, true);
-            URI uri = new URI(endpoint);
+            endpointString = endpointString.replaceAll("%23", "#");
+            endpointString = muleContext.getExpressionManager().parse(endpointString, msg, true);
+            URI uri = new URI(endpointString);
             HttpMethod httpMethod;
 
             if (HttpConstants.METHOD_GET.equals(method))
