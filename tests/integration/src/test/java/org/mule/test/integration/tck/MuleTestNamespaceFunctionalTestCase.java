@@ -16,7 +16,7 @@ import org.mule.tck.exceptions.FunctionalTestException;
 
 import java.io.FileNotFoundException;
 
-public class TestNamespaceFunctionalTestCase extends FunctionalTestCase
+public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {

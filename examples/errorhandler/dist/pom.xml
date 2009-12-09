@@ -18,7 +18,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
 
@@ -64,7 +64,7 @@
             <artifactId>mule-transport-file</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        
+
 
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -221,7 +221,7 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>${javaMailVersion}</version>
-            
+
         </dependency>
          </dependencies>
 

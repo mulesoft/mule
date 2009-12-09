@@ -53,7 +53,6 @@
             <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
         </dependency>
 
-
         <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -86,12 +85,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <!--
-                added version here instead of root pom in order to avoid potential
-                issues of using an JUnit4 in the rest of the project. Currently it
-                is only needed to compile the MuleParameterized class
-            -->
-            <version>4.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

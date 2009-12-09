@@ -16,7 +16,7 @@ import org.mule.tck.functional.ResponseWriterCallback;
 
 import java.io.IOException;
 
-public class TestNamespaceTestCase extends FunctionalTestCase
+public class MuleTestNamespaceTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {

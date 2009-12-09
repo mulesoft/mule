@@ -21,7 +21,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
 
@@ -140,9 +140,9 @@
                 </configuration>
             </plugin>
 
-            <!-- 
+            <!--
                 mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
-                overwriting the previous ones. 
+                overwriting the previous ones.
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

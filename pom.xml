@@ -70,7 +70,7 @@
         <coberturaVersion>2.2</coberturaVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
-        <!-- 
+        <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
         -->
@@ -98,7 +98,7 @@
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <commonsNetVersion>2.0</commonsNetVersion>
-        <!-- TODO There is a more modern version of cryptix available: 
+        <!-- TODO There is a more modern version of cryptix available:
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
         but the PGP module would need some work in order to use it -->
         <cryptixJceVersion>20050328</cryptixJceVersion>
@@ -498,7 +498,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>3.8.2</version>
+                <version>4.7</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
@@ -1402,7 +1402,7 @@
                 </executions>
             </plugin>
 
-            <!-- 
+            <!--
                 Default is to compile to JDK 5. Individual modules may override
                 this setting.
             -->
@@ -1430,9 +1430,10 @@
                 <configuration>
                     <argLine>-Xms64m -Xmx256m</argLine>
                     <excludes>
-                        <exclude implementation="java.lang.String">**/Abstract*.*</exclude>
-                        <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
-                        <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
+                        <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
+                        <exclude>**/Abstract*.*</exclude>
+                        <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
+                        <exclude>**/Test*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -1494,7 +1495,7 @@
                 </configuration>
             </plugin>
 
-            <!-- The maven-bundle-plugin generates the MANIFEST.MF for all modules 
+            <!-- The maven-bundle-plugin generates the MANIFEST.MF for all modules
                 where <packaging>bundle</packaging> is used. -->
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -1518,8 +1519,8 @@
                 </configuration>
             </plugin>
 
-            <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules 
-                where <packaging>jar</packaging> is used (i.e., those which are 
+            <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
+                where <packaging>jar</packaging> is used (i.e., those which are
                 not OSGi bundles). -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1550,7 +1551,7 @@
                             <!-- include repository revision from buildnumber plugin -->
 
                             <!-- MULE-3783 Exclude for now as otherwise bundle manifest don't get these properties
-                                 Only a few jars that are not converted to bundles yet will have these entries missing 
+                                 Only a few jars that are not converted to bundles yet will have these entries missing
                                  and more important bundles will now have this entry.
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
@@ -1618,7 +1619,6 @@
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <link>http://www.slf4j.org/api/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
-                        <link>http://www.junit.org/junit/javadoc/3.8.1/</link>
                         <link>http://junit.sourceforge.net/javadoc/</link>
                     </links>
                     <groups>
@@ -1832,8 +1832,8 @@
         </profile>
 
         <!--
-            This profile is somewhat similar to what's in Maven's toplevel POM. It will be 
-            activated when -DperformRelease=true is given on the commandline which is 
+            This profile is somewhat similar to what's in Maven's toplevel POM. It will be
+            activated when -DperformRelease=true is given on the commandline which is
             usually used in conjunction with the install or deploy goal.
             (See http://www.propellors.net/maven/site/guides/introduction/introduction-to-the-pom.html).
 

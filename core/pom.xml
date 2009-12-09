@@ -117,12 +117,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <!--
-                added version here instead of root pom in order to avoid potential
-                issues of using an JUnit4 in the rest of the project. Currently it
-                is only needed to compile the MuleParameterized class
-            -->
-            <version>4.5</version>
-            <!--
                 Ideally, scope should be test but this fails generating the javadocs.
                 The distributions etc. make sure that this dependency does not end up
                 in the final package.

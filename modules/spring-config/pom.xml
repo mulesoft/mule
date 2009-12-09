@@ -10,8 +10,7 @@
     <packaging>bundle</packaging>
     <name>Spring Config</name>
     <description>
-        Mule Builder for use with Spring 2.X Namespace based XML
-        configuration.
+        Mule Builder for use with Spring 2.X Namespace based XML configuration.
     </description>
 
     <dependencies>
@@ -42,13 +41,11 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
-        
-        
+
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>${dom4jVersion}</version>
-            
             <exclusions>
                 <!-- no XML -->
                 <exclusion>
@@ -81,7 +78,6 @@
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>${jaxenVersion}</version>
-            
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
                  or the central repo we get transitive dependencies that we
@@ -115,5 +111,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         </dependencies>
+    </dependencies>
 </project>
