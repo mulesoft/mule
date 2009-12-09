@@ -39,7 +39,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="connectionFactory-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the connection factory, which is required for non-vendor JMS configurations.
@@ -68,7 +68,7 @@
     </xsd:element>
 
     <xsd:attributeGroup name="jmsConnectorAttributes">
-        <xsd:attribute name="redeliveryHandlerFactory-ref" type="xsd:NMTOKEN">
+        <xsd:attribute name="redeliveryHandlerFactory-ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     Reference to the redelivery handler.
@@ -253,7 +253,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
-                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN" use="optional">
+                <xsd:attribute name="connectionFactory-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             Optional reference to the connection factory. A default connection factory is provided for vendor-specific JMS configurations.

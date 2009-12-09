@@ -56,7 +56,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                         <xsd:complexType>
-                            <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
+                            <xsd:attribute name="class" type="xsd:string" use="required">
                                 <xsd:annotation>
                                     <xsd:documentation>
                                         A class name of an object that implements {{org.mule.tck.functional.EventCallback}}.

@@ -44,7 +44,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="securityManager-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="securityManager-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Bean reference to the security manager that should be used.
@@ -58,7 +58,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serverClassName" type="xsd:NMTOKEN">
+                <xsd:attribute name="serverClassName" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The target class name.

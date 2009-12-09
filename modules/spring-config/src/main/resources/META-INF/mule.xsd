@@ -443,7 +443,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
                 <xsd:complexType>
-                    <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:attribute name="ref" type="xsd:string" use="required">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The bean that will receive notifications.
@@ -1354,7 +1354,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="factory-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             A bean that implements the TransactionFactory interface that will be used to generate a transaction. This attribute and the 'factory-class' attribute are mutually exclusive; one of the two is required.
@@ -1632,7 +1632,7 @@
         <!-- these next two attributes are mutually exclusive and one is required.
              but there is no way to define this in a schema... -->
         <!-- endpoint references - dynamically checked to make sure not top level -->
-        <xsd:attribute name="ref" type="xsd:NMTOKEN">
+        <xsd:attribute name="ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     A reference to a global endpoint, which is used as a template to construct this endpoint. A template fixes the address (protocol, path, host, etc.), and may specify initial values for various properties, but further properties can be defined locally (as long as they do not change the address in any way).
@@ -1672,7 +1672,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="connector-ref" type="xsd:NMTOKEN">
+        <xsd:attribute name="connector-ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The name of the connector associated with this endpoint. This must be specified if more than one connector is defined for this transport.
@@ -1703,7 +1703,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="ref" type="xsd:NMTOKEN">
+        <xsd:attribute name="ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The reference name of a global endpoint to use. If this EndpointRef will be associated to a message such as a Reply-To address, this endpoint ref has to be available on the remote Mule instance that reads the Reply-To address.
@@ -1770,7 +1770,7 @@
     <xsd:complexType name="refFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the filter to use.
@@ -2035,7 +2035,7 @@
     </xsd:group>
 
     <xsd:complexType name="refInterceptorStackType">
-        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+        <xsd:attribute name="ref" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     The name of the interceptor stack to use.
@@ -2096,7 +2096,7 @@
     <xsd:complexType name="encryptionSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="strategy-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the encryption strategy to use. This should be configured using the 'password-encryption-strategy' element, inside a 'security-manager' element at the top level.
@@ -2122,7 +2122,7 @@
     <xsd:complexType name="refTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the transformer to use.
@@ -2419,7 +2419,7 @@
     <xsd:complexType name="encryptionTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="strategy-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
@@ -2442,7 +2442,7 @@
                     <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                         <xsd:element name="bean-property">
                             <xsd:complexType>
-                                <xsd:attribute name="name" type="xsd:NMTOKEN" use="required">
+                                <xsd:attribute name="name" type="xsd:string" use="required">
                                     <xsd:annotation>
                                         <xsd:documentation>
                                             The name of the bean property
@@ -2459,14 +2459,14 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:sequence>
-                    <xsd:attribute name="beanClass" type="xsd:NMTOKEN">
+                    <xsd:attribute name="beanClass" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The bean class to create
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="beanFactory-ref" type="xsd:NMTOKEN">
+                    <xsd:attribute name="beanFactory-ref" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
                                 A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.api.object.ObjectFactory}}.
@@ -2691,7 +2691,7 @@
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="provider-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the security provider to use.
@@ -2708,7 +2708,7 @@
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="strategy-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             A reference to the encryption strategy (which may be a Spring bean that implements the EncryptionStrategy interface).
@@ -2757,7 +2757,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="keyFactory-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="keyFactory-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the key factory to use. This should implement the ObjectFactory interface and return a byte array. This and the 'key' attribute are mutually exclusive.
@@ -3519,7 +3519,7 @@
         <xsd:complexContent>
             <xsd:extension base="multipleEndpointFilteringOutboundRouterType">
                 <xsd:attributeGroup ref="expressionAttributes"/>
-                <xsd:attribute name="default" type="xsd:NMTOKEN" use="optional">
+                <xsd:attribute name="default" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The name of the default endpoint to use if the expression returns null. This can be used as an 'else' condition to route messages that don't contain the expected routing information.
@@ -4159,7 +4159,7 @@
                     </xsd:annotation>
                 </xsd:attribute>
                 <!-- should be of type TrustManagerFactory -->
-                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="factory-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to a TrustManagerFactory configured as a Spring bean.
@@ -4371,7 +4371,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="referenceType">
-        <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="ref" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="keyType">
@@ -4380,14 +4380,14 @@
 
     <xsd:complexType name="valueType">
         <xsd:attribute name="value" type="xsd:string"/>
-        <xsd:attribute name="value-ref" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="value-ref" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="keyValueType">
         <xsd:complexContent>
             <xsd:extension base="keyType">
                 <xsd:attribute name="value" type="xsd:string"/>
-                <xsd:attribute name="value-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="value-ref" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4473,18 +4473,18 @@
     </xsd:complexType>
 
     <xsd:complexType name="serviceOverridesType">
-        <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="xaTransactedMessageReceiver" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="dispatcherFactory" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="inboundTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="outboundTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="responseTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="endpointBuilder" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="messageAdapter" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="streamMessageAdapter" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="sessionHandler" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="messageReceiver" type="xsd:string"/>
+        <xsd:attribute name="transactedMessageReceiver" type="xsd:string"/>
+        <xsd:attribute name="xaTransactedMessageReceiver" type="xsd:string"/>
+        <xsd:attribute name="dispatcherFactory" type="xsd:string"/>
+        <xsd:attribute name="inboundTransformer" type="xsd:string"/>
+        <xsd:attribute name="outboundTransformer" type="xsd:string"/>
+        <xsd:attribute name="responseTransformer" type="xsd:string"/>
+        <xsd:attribute name="endpointBuilder" type="xsd:string"/>
+        <xsd:attribute name="messageAdapter" type="xsd:string"/>
+        <xsd:attribute name="streamMessageAdapter" type="xsd:string"/>
+        <xsd:attribute name="serviceFinder" type="xsd:string"/>
+        <xsd:attribute name="sessionHandler" type="xsd:string"/>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -4510,7 +4510,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="jndiContext-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="jndiContext-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Set the complete context directly, via a bean reference.

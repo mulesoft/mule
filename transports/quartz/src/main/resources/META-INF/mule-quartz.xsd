@@ -60,7 +60,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="scheduler-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Provides an implementation of the Quartz Scheduler interface. If no value is provided, a scheduler is retrieved from the StdSchedulerFactory. If no properties are provided, the getDefaultScheduler method is called. Otherwise, a new factory instance is created using the given properties, and a scheduler is retrieved using the getScheduler method.
@@ -371,7 +371,7 @@
                 Defines an endpoint reference. The preferred approach is to create a global endpoint and reference that. However, you can also use the address attribute to define a URI endpoint.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="ref" type="xsd:NMTOKEN">
+        <xsd:attribute name="ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     A reference (name) of a global endpoint configured in your Mule instance. This is the preferred way of configuring an endpoint.

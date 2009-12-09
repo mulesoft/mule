@@ -98,7 +98,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="script-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="script-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>A reference to a script object bean, that is, a {{&lt;script:script ...&gt;}} definition.
                         </xsd:documentation>
@@ -240,7 +240,7 @@
                         <xsd:documentation>The name for this refreshable groovy bean wrapper.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="refreshableBean-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="refreshableBean-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>The reference to a {{groovy.lang.Groovy}} object to use for this component.
                         </xsd:documentation>

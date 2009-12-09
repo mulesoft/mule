@@ -32,7 +32,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="server-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="server-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The mBean server to use.

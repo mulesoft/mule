@@ -541,13 +541,13 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="uriResolver" type="xsd:NMTOKEN">
+                <xsd:attribute name="uriResolver" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>The URI resolver to use when validating the XSL output. If not set, a default resolver will be used that checks for resources on the local file system and classpath.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN">
+                <xsd:attribute name="transformerFactoryClass" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>The fully qualified class name of the {{javax.xml.TransformerFactory}} instance to use. If not specified, the default JDK factory {{TransformerFactory.newInstance()}} will be used.
                         </xsd:documentation>

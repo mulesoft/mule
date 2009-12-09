@@ -37,7 +37,7 @@
     <xsd:complexType name="pgpSecurityProviderType">
         <xsd:complexContent>
             <xsd:extension base="mule:securityProviderType">
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="keyManager-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the key manager to use.
@@ -58,14 +58,14 @@
     <xsd:complexType name="keyBasedEncryptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="mule:encryptionStrategyType">
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="keyManager-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the key manager to use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN">
+                <xsd:attribute name="credentialsAccessor-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the credentials accessor to use.
@@ -100,14 +100,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="keyManager-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the key manager to use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="credentialsAccessor-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Reference to the credentials accessor to use.

@@ -277,7 +277,7 @@
     <xsd:complexType name="customFilenameParserType">
         <xsd:complexContent>
             <xsd:extension base="filenameParserType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
+                <xsd:attribute name="class" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The implementation class name that implements org.mule.transport.file.FilenameParser.
