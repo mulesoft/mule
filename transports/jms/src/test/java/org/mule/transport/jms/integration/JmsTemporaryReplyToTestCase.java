@@ -35,22 +35,37 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     }
 
     @Test
-    public void testTemporaryReplyEnabled() throws MuleException
+    public void testTemporaryReplyEnabledAsync() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in1", TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE, response.getPayload());
+    }
+    
+    @Test
+    public void testTemporaryReplyEnabledSync() throws MuleException
+    {
+        MuleClient muleClient = new MuleClient();
+        MuleMessage response = muleClient.send("vm://in1Sync", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }
 
     @Test
-    public void testTemporaryReplyDisabled() throws MuleException
+    public void testTemporaryReplyDisabledAsync() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         MuleMessage response = muleClient.send("vm://in2", TEST_MESSAGE, null);
-
-        assertEquals(NullPayload.getInstance(), response.getPayload());
+        assertEquals(TEST_MESSAGE, response.getPayload());
     }
 
+    @Test
+    public void testTemporaryReplyDisabledSync() throws MuleException
+    {
+        MuleClient muleClient = new MuleClient();
+        MuleMessage response = muleClient.send("vm://in2Sync", TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE, response.getPayload());
+    }    
+    
     @Test
     public void testDisableTemporaryReplyOnTheConnector() throws MuleException
     {

@@ -20,6 +20,19 @@
             <inbound>
                 <vm:inbound-endpoint path="in1" synchronous="true"/>
             </inbound>
+            <echo-component/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="JMSService1Sync">
+            <inbound>
+                <vm:inbound-endpoint path="in1Sync" synchronous="true"/>
+            </inbound>
+            <echo-component/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1" />
@@ -31,9 +44,24 @@
             <inbound>
                 <vm:inbound-endpoint path="in2" synchronous="true"/>
             </inbound>
+            <echo-component/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1">
+                        <property key="disableTemporaryReplyToDestinations" value="true"/>
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="JMSService2Sync">
+            <inbound>
+                <vm:inbound-endpoint path="in2Sync" synchronous="true"/>
+            </inbound>
+            <echo-component/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" synchronous="true">
                         <property key="disableTemporaryReplyToDestinations" value="true"/>
                     </outbound-endpoint>
                 </pass-through-router>

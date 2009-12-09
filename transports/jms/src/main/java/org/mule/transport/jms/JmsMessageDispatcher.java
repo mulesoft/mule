@@ -293,8 +293,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                 }
             }
-
-            return new DefaultMuleMessage(returnOriginalMessageAsReply ? msg : NullPayload.getInstance(), connector.getMuleContext());
+            else
+            {
+                // In this case a response was never expected so we return null and not NullPayload.
+                // This generally happens when dispatch is used for an asynchronous endpoint but can also occur when send() is used 
+                // and disableTempDestinations is set.
+                return returnOriginalMessageAsReply ? new DefaultMuleMessage(msg, connector.getMuleContext()) : null;
+            }
         }
         finally
         {
