@@ -79,7 +79,7 @@ jetty-6.1.11
 jetty-util-6.1.11
 joda-time-1.6
 jsr250-api-1.0
-junit-3.8.2
+junit-4.7
 log4j-1.2.14
 mail-1.4-osgi
 mule-core
