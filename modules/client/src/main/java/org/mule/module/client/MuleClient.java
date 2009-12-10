@@ -747,7 +747,7 @@ public class MuleClient implements Disposable
     protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous)
         throws MuleException
     {
-        ImmutableEndpoint endpoint = getOutboundEndpoint(uri);
+        ImmutableEndpoint endpoint = getOutboundEndpoint(uri, synchronous);
         if (!endpoint.getConnector().isStarted() && muleContext.isStarted())
         {
             endpoint.getConnector().start();
@@ -792,7 +792,7 @@ public class MuleClient implements Disposable
         return endpoint;
     }
 
-    protected OutboundEndpoint getOutboundEndpoint(String uri) throws MuleException
+    protected OutboundEndpoint getOutboundEndpoint(String uri, boolean synchronous) throws MuleException
     {
         // There was a potential leak here between get() and putIfAbsent(). This
         // would cause the endpoint that was created to be used rather an endpoint
@@ -800,11 +800,16 @@ public class MuleClient implements Disposable
         // thread. To avoid this we test for the result of putIfAbsent result and if
         // it is non-null then an endpoint was created and added concurrently and we
         // return this instance instead.
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri);
+        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + synchronous);
         if (endpoint == null)
         {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
-            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(uri, endpoint);
+            EndpointBuilder endpointBuilder = muleContext.getRegistry()
+                .lookupEndpointFactory()
+                .getEndpointBuilder(uri);
+            endpointBuilder.setSynchronous(synchronous);
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
+                uri + ":" + synchronous, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;
