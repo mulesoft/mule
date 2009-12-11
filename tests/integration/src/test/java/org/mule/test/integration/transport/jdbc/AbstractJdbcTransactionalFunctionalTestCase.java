@@ -13,7 +13,6 @@ package org.mule.test.integration.transport.jdbc;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.MuleEventContext;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -41,6 +40,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
     private Transaction currentTx;
     protected boolean rollbacked = false;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

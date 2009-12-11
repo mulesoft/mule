@@ -9,11 +9,9 @@
  */
 package org.mule.config.dsl;
 
-import org.mule.api.service.Service;
 import org.mule.api.MuleContext;
+import org.mule.api.service.Service;
 import org.mule.model.seda.SedaService;
-import org.mule.component.DefaultJavaComponent;
-import org.mule.object.PrototypeObjectFactory;
 
 /**
  * TODO

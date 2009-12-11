@@ -17,7 +17,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
-import org.mule.service.AbstractService;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -55,6 +54,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         this.connector = connector;
     }
 
+    @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
         Destination replyToDestination = null;

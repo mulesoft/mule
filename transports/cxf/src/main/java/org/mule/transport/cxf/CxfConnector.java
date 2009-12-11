@@ -95,6 +95,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         return CXF;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         ApplicationContext context = (ApplicationContext) muleContext.getRegistry().lookupObject(SpringRegistry.SPRING_APPLICATION_CONTEXT);
@@ -154,26 +155,31 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         bus.shutdown(true);
@@ -413,7 +419,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
             }
             catch (MuleException e)
             {
-                handleException(e);;
+                handleException(e);
             }
         }
     }

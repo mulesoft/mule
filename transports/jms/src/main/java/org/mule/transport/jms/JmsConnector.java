@@ -13,7 +13,6 @@ package org.mule.transport.jms;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ConnectionNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -181,6 +180,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return JMS;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         try
@@ -294,6 +294,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return null;
     }
 
+    @Override
     protected void doDispose()
     {
         if (connection != null)
@@ -540,6 +541,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
+    @Override
     public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         JmsMessageAdapter adapter = (JmsMessageAdapter) super.getMessageAdapter(message);
@@ -547,6 +549,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return adapter;
     }
 
+    @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         return service.getName() + "~" + endpoint.getEndpointURI().getAddress();
@@ -619,6 +622,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return session;
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         //TODO: This should never be null or an exception should be thrown
@@ -635,6 +639,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         if (connection != null)
@@ -650,6 +655,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
+    @Override
     public ReplyToHandler getReplyToHandler()
     {
         return new JmsReplyToHandler(this, getDefaultResponseTransformers());
@@ -1021,6 +1027,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         this.maxRedelivery = maxRedelivery;
     }
 
+    @Override
     public boolean isResponseEnabled()
     {
         return true;

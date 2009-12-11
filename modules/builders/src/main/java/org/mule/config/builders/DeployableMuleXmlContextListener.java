@@ -47,7 +47,7 @@ public class DeployableMuleXmlContextListener implements ServletContextListener
         String config = context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         if (config == null)
         {
-            config = MuleServer.DEFAULT_CONFIGURATION;;
+            config = MuleServer.DEFAULT_CONFIGURATION;
             if (logger.isDebugEnabled())
             {
                 logger.debug("No Mule config file(s) specified, using default: " + config);

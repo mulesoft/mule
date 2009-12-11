@@ -11,10 +11,8 @@
 package org.mule.routing.response;
 
 import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
@@ -49,6 +47,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     }
 
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (timeout == -1) // undefined
@@ -113,6 +112,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
 
     }
 
+    @Override
     public void addRouter(Router router)
     {
         ((ResponseRouter) router).setTimeout(getTimeout());

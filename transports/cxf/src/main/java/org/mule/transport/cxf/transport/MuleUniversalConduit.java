@@ -17,7 +17,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -118,6 +117,7 @@ public class MuleUniversalConduit extends AbstractConduit
         this.connector = connector;
     }
     
+    @Override
     public void close(Message msg) throws IOException
     {
         OutputStream os = msg.getContent(OutputStream.class);
@@ -142,6 +142,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return LOGGER;
     }
 
+    @Override
     public synchronized Destination getBackChannel()
     {
         if (decoupledDestination == null && decoupledEndpoint != null)
@@ -458,6 +459,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return msg;
     }
 
+    @Override
     public void close()
     {
         // in decoupled case, close response Destination if reference count

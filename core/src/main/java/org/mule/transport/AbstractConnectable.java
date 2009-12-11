@@ -27,6 +27,7 @@ import org.mule.util.concurrent.WaitableBoolean;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -357,7 +358,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         // nothing to do by default
     }
 
-    //  @Override
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(80);

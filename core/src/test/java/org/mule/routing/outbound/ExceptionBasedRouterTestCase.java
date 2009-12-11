@@ -298,5 +298,5 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         {
             return o instanceof MuleMessage && ((MuleMessage) o).getPayload().equals(_message.getPayload());
         }
-    };
+    }
 }
