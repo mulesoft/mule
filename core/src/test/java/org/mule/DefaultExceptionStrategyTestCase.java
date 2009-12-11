@@ -61,10 +61,15 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 
     }
 
-    private class InstrumentedExceptionStrategy extends DefaultExceptionStrategy
+    private static class InstrumentedExceptionStrategy extends DefaultExceptionStrategy
     {
         private volatile int count = 0;
 
+        public InstrumentedExceptionStrategy()
+        {
+            super();
+        }
+        
         @Override
         protected void defaultHandler(Throwable t)
         {
@@ -83,5 +88,4 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
             return count;
         }
     }
-
 }

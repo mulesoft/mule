@@ -58,6 +58,7 @@ import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -808,8 +809,13 @@ public class MuleEventMulticaster
         }
     }
 
-    private class LoggingExceptionListener implements ExceptionListener
+    private static class LoggingExceptionListener implements ExceptionListener
     {
+        public LoggingExceptionListener()
+        {
+            super();
+        }
+        
         public void exceptionThrown(Exception e)
         {
             logger.error(e.getMessage(), e);

@@ -9,21 +9,21 @@
  */
 package org.mule.transformer;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.BloodOrange;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.SerializableToByteArray;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class TransformerWeightingTestCase extends AbstractMuleTestCase
 {
@@ -174,10 +174,15 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         assertEquals("--t1", result.getName());
     }
 
-    private class DummyTransformer extends AbstractTransformer implements DiscoverableTransformer
+    private static class DummyTransformer extends AbstractTransformer implements DiscoverableTransformer
     {
         private int weighting;
 
+        public DummyTransformer()
+        {
+            super();
+        }
+        
         public int getPriorityWeighting()
         {
             return weighting;
@@ -189,6 +194,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
             this.weighting = weighting;
         }
 
+        @Override
         protected Object doTransform(Object src, String encoding) throws TransformerException
         {
             return src;

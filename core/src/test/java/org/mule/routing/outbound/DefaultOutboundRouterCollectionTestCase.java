@@ -35,7 +35,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     private static int LATCH_AWAIT_TIMEOUT_MS = 1000;
     private Service testService;
     private MuleEvent testEvent;
-    private static MuleMessage originalMessage;
+    static MuleMessage originalMessage;
     private TestOutboundRouterCollection outboundRouter;
 
     @Override
@@ -297,6 +297,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         {
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
+                // do nothing
             }
         });
         MuleMessage result = testService.sendEvent(testEvent);
@@ -396,8 +397,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
     }
 
-    private class TestOutboundRouterCollection extends DefaultOutboundRouterCollection
+    private static class TestOutboundRouterCollection extends DefaultOutboundRouterCollection
     {
+        public TestOutboundRouterCollection()
+        {
+            super();
+        }
 
         @Override
         public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException

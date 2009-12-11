@@ -29,17 +29,16 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class BlockAttribute implements PreProcessor
 {
-
-    private Set disallowed;
+    private Set<String> disallowed;
 
     public BlockAttribute(String disallowed)
     {
-        this(new String[]{disallowed});
+        this(new String[]{ disallowed });
     }
 
     public BlockAttribute(String[] disallowed)
     {
-        this.disallowed = new HashSet(Arrays.asList(disallowed));
+        this.disallowed = new HashSet<String>(Arrays.asList(disallowed));
     }
 
     public void preProcess(PropertyConfiguration config, Element element)
@@ -58,12 +57,9 @@ public class BlockAttribute implements PreProcessor
 
     public static class BlockAttributeException extends IllegalStateException
     {
-
-        private BlockAttributeException(String message)
+        BlockAttributeException(String message)
         {
             super(message);
         }
-
     }
-
 }

@@ -37,9 +37,7 @@ import com.google.inject.spi.TypeListener;
  */
 public abstract class AbstractMuleGuiceModule extends AbstractModule
 {
-
     protected MuleContext muleContext;
-
 
     void setMuleContext(MuleContext context)
     {
@@ -49,10 +47,10 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
 
     public void configureMuleContext(MuleContext muleContext)
     {
-
+        // do nothing
     }
 
-
+    @Override
     protected final void configure()
     {
         bindListener(Matchers.any(), new TypeListener()
@@ -118,6 +116,11 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
      */
     private class MuleRegistryInjectionLister implements InjectionListener
     {
+        public MuleRegistryInjectionLister()
+        {
+            super();
+        }
+        
         public void afterInjection(Object o)
         {
             //We don't need or want to register this object again.

@@ -57,6 +57,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
         registerPreProcessor(new CheckExclusiveClassAttributeObjectFactory());
     }
 
+    @Override
     protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
         if (StringUtils.isEmpty(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)))
@@ -117,7 +118,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
     {
         private static final long serialVersionUID = 4625276914151932111L;
 
-        private CheckExclusiveClassAttributeObjectFactoryException(String message)
+        CheckExclusiveClassAttributeObjectFactoryException(String message)
         {
             super(message);
         }

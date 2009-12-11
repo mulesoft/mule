@@ -280,6 +280,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         return endpointUri;
     }
 
+    @Override
     public String getConnectionDescription()
     {
         return endpoint.getEndpointURI().toString();
@@ -297,7 +298,11 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
 
     private class DefaultInternalMessageListener implements InternalMessageListener
     {
-
+        public DefaultInternalMessageListener()
+        {
+            super();
+        }
+        
         public MuleMessage onMessage(MuleMessage message,
                                     Transaction trans,
                                     boolean synchronous,
@@ -387,6 +392,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         return receiverKey;
     }
 
+    @Override
     public InboundEndpoint getEndpoint()
     {
         return (InboundEndpoint) super.getEndpoint();
@@ -411,6 +417,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         }
     }
     
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(80);

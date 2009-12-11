@@ -56,8 +56,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("isSynchronous", false);
         endpoint.expectAndReturn("isSynchronous", false);
-        endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getProperties", new HashMap());
+        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
+        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("dispatch", C.isA(DefaultMuleEvent.class));
@@ -92,8 +92,14 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         }
     }
     
-    private class TestEventTransformer extends AbstractTransformer
+    private static class TestEventTransformer extends AbstractTransformer
     {
+        public TestEventTransformer()
+        {
+            super();
+        }
+        
+        @Override
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return "Transformed Test Data";
@@ -115,17 +121,17 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
-        endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getProperties", new HashMap());
+        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
+        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("send", new Constraint()
         {
-            public boolean eval(Object arg0)
+            public boolean eval(Object object)
             {
-                if (arg0 instanceof MuleEvent)
+                if (object instanceof MuleEvent)
                 {
-                    return "Transformed Test Data".equals(((MuleEvent)arg0).getMessage().getPayload());
+                    return "Transformed Test Data".equals(((MuleEvent) object).getMessage().getPayload());
                 }
                 return false;
             }
@@ -150,6 +156,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
+            @Override
             public MuleMessage route(MuleMessage message, MuleSession session)
             {
                 count1[0]++;
@@ -159,6 +166,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
+            @Override
             public MuleMessage route(MuleMessage message, MuleSession session)
             {
                 count2[0]++;
@@ -173,6 +181,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {
+            @Override
             public MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
             {
                 catchAllCount[0]++;

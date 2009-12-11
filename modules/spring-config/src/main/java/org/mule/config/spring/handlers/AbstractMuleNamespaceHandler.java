@@ -79,8 +79,13 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[]{});
     }
 
-    private class IgnoredDefinitionParser implements BeanDefinitionParser
+    private static class IgnoredDefinitionParser implements BeanDefinitionParser
     {
+        public IgnoredDefinitionParser()
+        {
+            super();
+        }
+        
         public BeanDefinition parse(Element element, ParserContext parserContext)
         {
             return null;
@@ -102,13 +107,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         return EndpointURIEndpointBuilder.class;
     }
 
-
     private class RegisteredMdps implements MuleDefinitionParserConfiguration
     {
-
         private Set bdps = new HashSet();
 
-        private RegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
+        public RegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
         {
             registerBeanDefinitionParser("endpoint", add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, AbstractMuleNamespaceHandler.this.getGlobalEndpointBuilderBeanClass(), requiredAttributes, new String[]{})));
             registerBeanDefinitionParser("inbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, AbstractMuleNamespaceHandler.this.getInboundEndpointFactoryBeanClass(), requiredAttributes, new String[]{})));
@@ -228,7 +231,5 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             }
             return this;
         }
-
     }
-
 }
