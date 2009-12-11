@@ -32,9 +32,9 @@ public interface SecurityManager extends Initialisable
 
     SecurityProvider removeProvider(String name);
 
-    Collection getProviders();
+    Collection<SecurityProvider> getProviders();
 
-    void setProviders(Collection providers);
+    void setProviders(Collection<SecurityProvider> providers);
 
     SecurityContext createSecurityContext(Authentication authentication)
         throws UnknownAuthenticationTypeException;
@@ -45,8 +45,8 @@ public interface SecurityManager extends Initialisable
 
     EncryptionStrategy removeEncryptionStrategy(String name);
 
-    Collection getEncryptionStrategies();
+    Collection<EncryptionStrategy> getEncryptionStrategies();
 
-    void setEncryptionStrategies(Collection strategies);
+    void setEncryptionStrategies(Collection<EncryptionStrategy> strategies);
 
 }

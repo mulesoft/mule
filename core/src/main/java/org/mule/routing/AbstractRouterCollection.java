@@ -19,7 +19,6 @@ import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.api.routing.RouterCollection;
 import org.mule.management.stats.RouterStatistics;
 
-import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -41,7 +40,8 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
 
     protected boolean matchAll = false;
 
-    protected List routers = new CopyOnWriteArrayList();
+    @SuppressWarnings("unchecked")
+    protected List<Router> routers = new CopyOnWriteArrayList();
 
     private RouterStatistics statistics;
 
@@ -61,18 +61,17 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
 
     public void dispose()
     {
-        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        for (Router router : routers)
         {
-            Router router = (Router) iterator.next();
             router.dispose();
         }
     }
 
-    public void setRouters(List routers)
+    public void setRouters(List<? extends Router> routers)
     {
-        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        for (Router router : routers)
         {
-            addRouter((Router) iterator.next());
+            addRouter(router);
         }
     }
 
@@ -94,7 +93,7 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
         }
     }
 
-    public List getRouters()
+    public List<Router> getRouters()
     {
         return routers;
     }

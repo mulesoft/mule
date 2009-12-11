@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.EncryptionStrategy;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.Authentication;
@@ -43,14 +44,16 @@ import org.apache.commons.logging.LogFactory;
 
 public class MuleSecurityManager implements SecurityManager
 {
-
     /**
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(MuleSecurityManager.class);
 
-    private Map providers = new ConcurrentHashMap();
-    private Map cryptoStrategies = new ConcurrentHashMap();
+    @SuppressWarnings("unchecked")
+    private Map<String, SecurityProvider> providers = new ConcurrentHashMap();
+
+    @SuppressWarnings("unchecked")
+    private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap();
 
     public MuleSecurityManager()
     {
@@ -59,7 +62,7 @@ public class MuleSecurityManager implements SecurityManager
 
     public void initialise() throws InitialisationException
     {
-        List all = new LinkedList(providers.values());
+        List<Initialisable> all = new LinkedList<Initialisable>(providers.values());
         // ordering: appends
         all.addAll(cryptoStrategies.values());
         LifecycleTransitionResult.initialiseAll(all.iterator());
@@ -68,13 +71,12 @@ public class MuleSecurityManager implements SecurityManager
     public Authentication authenticate(Authentication authentication)
         throws SecurityException, SecurityProviderNotFoundException
     {
-        Iterator iter = providers.values().iterator();
-
-        Class toTest = authentication.getClass();
+        Iterator<SecurityProvider> iter = providers.values().iterator();
+        Class<? extends Authentication> toTest = authentication.getClass();
 
         while (iter.hasNext())
         {
-            SecurityProvider provider = (SecurityProvider) iter.next();
+            SecurityProvider provider = iter.next();
 
             if (provider.supports(toTest))
             {
@@ -121,24 +123,24 @@ public class MuleSecurityManager implements SecurityManager
         {
             throw new IllegalArgumentException("provider Name cannot be null");
         }
-        return (SecurityProvider) providers.get(name);
+        return providers.get(name);
     }
 
     public SecurityProvider removeProvider(String name)
     {
-        return (SecurityProvider) providers.remove(name);
+        return providers.remove(name);
     }
 
-    public Collection getProviders()
+    public Collection<SecurityProvider> getProviders()
     {
-        return Collections.unmodifiableCollection(new ArrayList(providers.values()));
+        ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
+        return Collections.unmodifiableCollection(providersList);
     }
 
-    public void setProviders(Collection providers)
+    public void setProviders(Collection<SecurityProvider> providers)
     {
-        for (Iterator iterator = providers.iterator(); iterator.hasNext();)
+        for (SecurityProvider provider : providers)
         {
-            SecurityProvider provider = (SecurityProvider) iterator.next();
             addProvider(provider);
         }
     }
@@ -146,14 +148,12 @@ public class MuleSecurityManager implements SecurityManager
     public SecurityContext createSecurityContext(Authentication authentication)
         throws UnknownAuthenticationTypeException
     {
-        Iterator iter = providers.values().iterator();
-
-        Class toTest = authentication.getClass();
+        Iterator<SecurityProvider> iter = providers.values().iterator();
+        Class<? extends Authentication> toTest = authentication.getClass();
 
         while (iter.hasNext())
         {
-            SecurityProvider provider = (SecurityProvider) iter.next();
-
+            SecurityProvider provider = iter.next();
             if (provider.supports(toTest))
             {
                 return provider.createSecurityContext(authentication);
@@ -164,7 +164,7 @@ public class MuleSecurityManager implements SecurityManager
 
     public EncryptionStrategy getEncryptionStrategy(String name)
     {
-        return (EncryptionStrategy) cryptoStrategies.get(name);
+        return cryptoStrategies.get(name);
     }
 
     public void addEncryptionStrategy(EncryptionStrategy strategy)
@@ -174,22 +174,20 @@ public class MuleSecurityManager implements SecurityManager
 
     public EncryptionStrategy removeEncryptionStrategy(String name)
     {
-        return (EncryptionStrategy) cryptoStrategies.remove(name);
-
+        return cryptoStrategies.remove(name);
     }
 
-    public Collection getEncryptionStrategies()
+    public Collection<EncryptionStrategy> getEncryptionStrategies()
     {
-        return Collections.unmodifiableCollection(new ArrayList(cryptoStrategies.values()));
+        List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
+        return Collections.unmodifiableCollection(allStrategies);
     }
 
-    public void setEncryptionStrategies(Collection strategies)
+    public void setEncryptionStrategies(Collection<EncryptionStrategy> strategies)
     {
-        for (Iterator iterator = strategies.iterator(); iterator.hasNext();)
+        for (EncryptionStrategy strategy : strategies)
         {
-            EncryptionStrategy strategy = (EncryptionStrategy) iterator.next();
             addEncryptionStrategy(strategy);
         }
     }
-
 }

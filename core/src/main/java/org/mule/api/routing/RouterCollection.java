@@ -25,9 +25,9 @@ import java.util.List;
 
 public interface RouterCollection extends Initialisable, Disposable
 {
-    void setRouters(List routers);
+    void setRouters(List<? extends Router> routers);
 
-    List getRouters();
+    List<? extends Router> getRouters();
 
     void addRouter(Router router);
 

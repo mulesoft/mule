@@ -70,6 +70,7 @@ public interface EndpointFactory extends MuleContextAware
      * @throws MuleException
      * @deprecated
      */
+    @Deprecated
     InboundEndpoint getInboundEndpoint(EndpointURI endpointUri) throws MuleException;
 
     /**
@@ -77,6 +78,7 @@ public interface EndpointFactory extends MuleContextAware
      * @throws MuleException
      * @deprecated
      */
+    @Deprecated
     OutboundEndpoint getOutboundEndpoint(EndpointURI endpointUri) throws MuleException;
 
     /**

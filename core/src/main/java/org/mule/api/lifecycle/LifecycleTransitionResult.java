@@ -21,7 +21,6 @@ import java.util.Iterator;
  */
 public final class LifecycleTransitionResult
 {
-
     /**
      * The logic for processing a collection of children
      *
@@ -29,7 +28,8 @@ public final class LifecycleTransitionResult
      * @param objects An iterator over all children that must also be called
      * @throws org.mule.api.lifecycle.LifecycleException if any fail
      */
-    private static void processAllNoRetry(Class iface, Iterator objects) throws LifecycleException
+    private static void processAllNoRetry(Class<? extends Initialisable> iface, 
+        Iterator<? extends Initialisable> objects) throws LifecycleException
     {
         if (!iface.isAssignableFrom(Lifecycle.class))
         {
@@ -40,7 +40,7 @@ public final class LifecycleTransitionResult
         Method method = iface.getMethods()[0];
         // some interfaces have a single exception, others none
         boolean hasException = method.getExceptionTypes().length > 0;
-        Class exception = hasException ? method.getExceptionTypes()[0] : null;
+        Class<?> exception = hasException ? method.getExceptionTypes()[0] : null;
 
         while (objects.hasNext())
         {
@@ -49,8 +49,8 @@ public final class LifecycleTransitionResult
         }
     }
 
-    private static void processSingleNoRetry(Object target, Method method, Class exception, Class iface)
-            throws LifecycleException
+    private static void processSingleNoRetry(Object target, Method method, Class<?> exception, 
+        Class<?> iface) throws LifecycleException
     {
         if (! iface.isAssignableFrom(target.getClass()))
         {
@@ -71,10 +71,7 @@ public final class LifecycleTransitionResult
         }
     }
 
-    /**
-     * Initialise children
-     */
-    public static void initialiseAll(Iterator children) throws InitialisationException
+    public static void initialiseAll(Iterator<? extends Initialisable> children) throws InitialisationException
     {
         try
         {
@@ -86,8 +83,7 @@ public final class LifecycleTransitionResult
         }
         catch (LifecycleException e)
         {
-            throw (IllegalStateException) new IllegalStateException("Unexpected exception: " + e).initCause(e);
+            throw new IllegalStateException("Unexpected exception: ", e);
         }
     }
-
 }

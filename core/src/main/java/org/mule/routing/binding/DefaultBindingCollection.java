@@ -13,9 +13,6 @@ import org.mule.api.routing.BindingCollection;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 
-/**
- * TODO
- */
 public class DefaultBindingCollection extends AbstractRouterCollection implements BindingCollection
 {
 
