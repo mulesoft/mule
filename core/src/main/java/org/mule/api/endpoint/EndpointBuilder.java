@@ -62,7 +62,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setProperty(Object key, Object value);
     
-    void setProperties(Map properties);
+    void setProperties(Map<Object, Object> properties);
 
     void setTransactionConfig(TransactionConfig transactionConfig);
 

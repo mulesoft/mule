@@ -66,7 +66,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected List<Transformer> transformers;
     protected List<Transformer> responseTransformers;
     protected String name;
-    protected Map properties = new HashMap();
+    protected Map<Object, Object> properties = new HashMap<Object, Object>();
     protected TransactionConfig transactionConfig;
     protected Filter filter;
     protected Boolean deleteUnacceptedMessages;
@@ -93,14 +93,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return doBuildOutboundEndpoint();
     }
 
-    protected void setPropertiesFromProperties(Map properties)
+    protected void setPropertiesFromProperties(Map<Object, Object> properties)
     {
         synchronous = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
         responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
         responsePropertiesList = (String) properties.get(PROPERTY_RESPONSE_PROPERTIES);
     }
 
-    public static Boolean getBooleanProperty(Map properties, String name, Boolean dflt)
+    private static Boolean getBooleanProperty(Map<Object, Object> properties, String name, Boolean dflt)
     {
         if (properties.containsKey(name))
         {
@@ -112,7 +112,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    public static Integer getIntegerProperty(Map properties, String name, Integer dflt)
+    private static Integer getIntegerProperty(Map<Object, Object> properties, String name, Integer dflt)
     {
         if (properties.containsKey(name))
         {
@@ -127,7 +127,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
     {
         // use an explicit value here to avoid caching
-        Map properties = getProperties();
+        Map<Object, Object> properties = getProperties();
         // this sets values used below, if they appear as properties
         setPropertiesFromProperties(properties);
 
@@ -162,7 +162,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
     {
         // use an explicit value here to avoid caching
-        Map properties = getProperties();
+        Map<Object, Object> properties = getProperties();
         // this sets values used below, if they appear as properties
         setPropertiesFromProperties(properties);
 
@@ -255,10 +255,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return name != null ? name : new ObjectNameHelper(muleContext).getEndpointName(endpointURI);
     }
 
-    protected Map getProperties()
+    protected Map<Object, Object> getProperties()
     {
         // Add properties from builder, endpointURI and then seal (make unmodifiable)
-        LinkedList maps = new LinkedList();
+        LinkedList<Object> maps = new LinkedList<Object>();
         // properties from url come first
         if (null != uriBuilder)
         {
@@ -575,11 +575,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     /**
      * NOTE - this appends properties.
      */
-    public void setProperties(Map properties)
+    public void setProperties(Map<Object, Object> properties)
     {
         if (null == this.properties)
         {
-            this.properties = new HashMap();
+            this.properties = new HashMap<Object, Object>();
         }
         this.properties.putAll(properties);
     }
@@ -677,7 +677,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     }
 
-    // TODO Equals() and hashCode() only needed for tests, move to tests
+    @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, deleteUnacceptedMessages,
@@ -685,7 +685,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
     }
 
-    // TODO Equals() and hashCode() only needed for tests, move to tests
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -715,6 +715,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return ClassUtils.equal(a, b);
     }
 
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         EndpointBuilder builder = (EndpointBuilder) super.clone();

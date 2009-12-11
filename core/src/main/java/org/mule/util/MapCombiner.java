@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * then presents all the maps as a single combine map at run time.  For efficiency the combination
  * of maps is done once and then cached.
  */
-public class MapCombiner implements Map
+public class MapCombiner implements Map<Object, Object>
 {
 
     public static final String LIST = "list"; // the setter/getter
@@ -110,16 +110,19 @@ public class MapCombiner implements Map
 
     // hashcode, equals and toString don't trigger merge
 
+    @Override
     public int hashCode()
     {
         return cachedMerge.hashCode();
     }
 
+    @Override
     public boolean equals(Object o)
     {
         return cachedMerge.equals(o);
     }
 
+    @Override
     public String toString()
     {
         if (isMerged)
