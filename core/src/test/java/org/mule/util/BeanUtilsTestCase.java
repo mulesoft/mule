@@ -19,18 +19,24 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * TODO
- */
 public class BeanUtilsTestCase extends AbstractMuleTestCase
 {
-    public void testBeanPropertiesOnAProxy() throws Exception
+    private Map<String, String> map;
+
+    @Override
+    protected void doSetUp() throws Exception
     {
-        Map map = new HashMap();
+        super.doSetUp();
+
+        map = new HashMap<String, String>();
         map.put("brand", "Juicy!");
         map.put("radius", "2.32");
         map.put("segments", "22");
+        map.put("trombones", "3");
+    }
 
+    public void testBeanPropertiesOnAProxy() throws Exception
+    {
         OrangeInterface o = (OrangeInterface)Proxy.newProxyInstance(getClass().getClassLoader(),
                 new Class[]{OrangeInterface.class}, new OrangeInvocationHandler(new Orange()));
 
@@ -44,12 +50,6 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
 
     public void testBeanPropertiesWithoutFail() throws Exception
     {
-        Map map = new HashMap();
-        map.put("brand", "Juicy!");
-        map.put("radius", "2.32");
-        map.put("segments", "22");
-        map.put("trombones", "3");
-
         Orange o = new Orange();
 
         BeanUtils.populateWithoutFail(o, map, true);
@@ -60,17 +60,8 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(22), o.getSegments());
     }
 
-
     public void testBeanPropertiesWithFail() throws Exception
     {
-        Map map = new HashMap();
-        map.put("brand", "Juicy!");
-        map.put("radius", "2.32");
-        map.put("segments", "22");
-        map.put("trombones", "3");
-
-        Orange o = new Orange();
-
         try
         {
             BeanUtils.populate(new Orange(), map);
@@ -87,7 +78,7 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
     {
         private Orange orange;
 
-        private OrangeInvocationHandler(Orange orange)
+        public OrangeInvocationHandler(Orange orange)
         {
             this.orange = orange;
         }
