@@ -28,9 +28,9 @@ public interface RetryContext
     /**
      * @return a read-only meta-info map or an empty map, never null.
      */
-    Map getMetaInfo();
+    Map<Object, Object> getMetaInfo();
 
-    void setMetaInfo(Map metaInfo);
+    void setMetaInfo(Map<Object, Object> metaInfo);
 
     MuleMessage[] getReturnMessages();
 

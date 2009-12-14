@@ -95,6 +95,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -794,7 +795,7 @@ public abstract class AbstractConnector
                 
                 // Store some info. about the receiver/dispatcher which threw the ConnectException so 
                 // that we can make sure that problem has been resolved when we go to reconnect.
-                Map info = new HashMap();
+                Map<Object, Object> info = new HashMap<Object, Object>();
                 if (failed instanceof MessageReceiver)
                 {
                     info.put(RetryContext.FAILED_RECEIVER, ((MessageReceiver) failed).getReceiverKey());
@@ -1523,7 +1524,7 @@ public abstract class AbstractConnector
 
                     // Make sure the receiver or dispatcher which triggered the reconnection is now able to 
                     // connect successfully.  This info. was previously stored by the handleException() method, above.
-                    Map info = context.getMetaInfo();
+                    Map<Object, Object> info = context.getMetaInfo();
                     if (info.get(RetryContext.FAILED_RECEIVER) != null)
                     {
                         String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
@@ -2025,6 +2026,7 @@ public abstract class AbstractConnector
         {
             DelegatingInputStream is = new DelegatingInputStream((InputStream)result.getPayload())
             {
+                @Override
                 public void close() throws IOException
                 {
                     try
@@ -2086,6 +2088,7 @@ public abstract class AbstractConnector
         {
             DelegatingInputStream is = new DelegatingInputStream((InputStream)result.getPayload())
             {
+                @Override
                 public void close() throws IOException
                 {
                     try

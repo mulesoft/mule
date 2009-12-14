@@ -38,7 +38,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     protected RetryNotifier notifier = new ConnectNotifier();
     
     /** This data will be made available to the RetryPolicy via the RetryContext. */
-    private Map metaInfo;
+    private Map<Object, Object> metaInfo;
 
     private MuleContext muleContext;
 
@@ -130,12 +130,12 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
         this.notifier = retryNotifier;
     }
 
-    public Map getMetaInfo()
+    public Map<Object, Object> getMetaInfo()
     {
         return metaInfo;
     }
 
-    public void setMetaInfo(Map metaInfo)
+    public void setMetaInfo(Map<Object, Object> metaInfo)
     {
         this.metaInfo = metaInfo;
     }

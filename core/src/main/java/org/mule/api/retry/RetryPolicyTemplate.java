@@ -25,9 +25,9 @@ public interface RetryPolicyTemplate
 {
     RetryPolicy createRetryInstance();
 
-    Map getMetaInfo();
+    Map<Object, Object> getMetaInfo();
     
-    void setMetaInfo(Map metaInfo);
+    void setMetaInfo(Map<Object, Object> metaInfo);
     
     RetryNotifier getNotifier();
 
