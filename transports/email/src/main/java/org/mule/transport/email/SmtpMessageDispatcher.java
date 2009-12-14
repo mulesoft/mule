@@ -22,6 +22,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 
+import com.sun.mail.smtp.SMTPTransport;
+
 import java.net.URLDecoder;
 import java.util.Calendar;
 
@@ -49,6 +51,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return (SmtpConnector) getConnector();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (transport == null)
@@ -71,6 +74,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         if (null != transport)
@@ -86,6 +90,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         Object data = event.transformMessage();
@@ -103,6 +108,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
@@ -114,11 +120,9 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
 
-        /*
-         * Double check that the transport is still connected as some SMTP servers may 
-         * disconnect idle connections.
-         */
-        if (!transport.isConnected())
+         // Double check that the transport is still connected as some SMTP servers may 
+         // disconnect idle connections.
+        if (isTransportConnected() == false)
         {
             EndpointURI uri = endpoint.getEndpointURI();
             if (logger.isInfoEnabled())
@@ -148,7 +152,40 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
 
     }
+    
+    // Fix incompatibility between JavaMail and Exchange 
+    // see http://forums.sun.com/thread.jspa?threadID=5409031&tstart=1
+    protected boolean isTransportConnected()
+    {
+        boolean isConnected = false;
+        
+        isConnected = transport.isConnected();
+        if (isConnected)
+        {
+            SMTPTransport smtpTransport = (SMTPTransport) transport;
+            
+            String lastServerResponse = smtpTransport.getLastServerResponse();
+            if (lastServerResponse.startsWith("250") == false) 
+            {
+                isConnected = false;
+                try
+                {
+                    smtpTransport.close();
+                }
+                catch (MessagingException me)
+                {
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info("Unable to close SMTP Transport", me);
+                    }
+                }
+            }
+        }
+        
+        return isConnected;
+    }
 
+    @Override
     protected void doDispose()
     {
         // nothing doing
