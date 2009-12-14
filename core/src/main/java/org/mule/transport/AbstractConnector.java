@@ -418,7 +418,10 @@ public abstract class AbstractConnector
                     {
                         logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
                     }
-                    mr.start();
+                    if (mr.getService().isStarted())
+                    {
+                        mr.start();
+                    }
                 }
                 catch (MuleException e)
                 {

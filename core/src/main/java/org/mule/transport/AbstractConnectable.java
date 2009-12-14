@@ -43,6 +43,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     protected RetryPolicyTemplate retryTemplate;
 
     protected final WaitableBoolean connected = new WaitableBoolean(false);
+    protected final WaitableBoolean connecting = new WaitableBoolean(false);
     protected final WaitableBoolean started = new WaitableBoolean(false);
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
 
@@ -155,7 +156,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     {
         // This method may be called to ensure transport is connected, if it is
         // already connected then just return.
-        if (connected.get())
+        if (connected.get() || connecting.get())
         {
             return;
         }
@@ -164,6 +165,8 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         {
             throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
         }
+        
+        connecting.set(true);
         
         if (logger.isDebugEnabled())
         {
@@ -179,6 +182,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                     {
                         doConnect();
                         connected.set(true);
+                        connecting.set(false);
 
                         if (logger.isDebugEnabled())
                         {
@@ -251,6 +255,11 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         return connected.get();
     }
 
+    public final boolean isConnecting()
+    {
+        return connecting.get();
+    }
+
     protected boolean isDoThreading ()
     {
         return connector.getDispatcherThreadingProfile().isDoThreading();
@@ -266,7 +275,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     public final void start() throws MuleException
     {
-        if(!connected.get())
+        if(!connected.get() && !connecting.get())
         {
             startOnConnect = true;
 
@@ -281,7 +290,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             }
             return;
         }
-
+        
         if (started.compareAndSet(false, true))
         {
             if (logger.isDebugEnabled())

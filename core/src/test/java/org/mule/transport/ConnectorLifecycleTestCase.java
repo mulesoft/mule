@@ -233,14 +233,14 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.start();
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.registerListener(getTestService(), getTestInboundEndpoint("in2", "test://in2"));
 
         assertEquals(2, connector.receivers.size());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         // TODO MULE-4554 Receivers that are created (when new listener is registered) while connector is started are not started or connected
         // assertTrue(((AbstractMessageReceiver)connector.receivers.get("in2")).isConnected());
@@ -255,10 +255,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.start();
         assertEquals(2, connector.receivers.size());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isConnected());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
         connector.dispose();
         assertEquals(0, connector.receivers.size());
