@@ -33,7 +33,7 @@ public interface InboundRouterCollection extends RouterCollection
 
     boolean removeEndpoint(InboundEndpoint endpoint);
 
-    List getEndpoints();
+    List<InboundEndpoint> getEndpoints();
 
     /**
      * @param name the Endpoint identifier
@@ -42,5 +42,5 @@ public interface InboundRouterCollection extends RouterCollection
      */
     InboundEndpoint getEndpoint(String name);
 
-    void setEndpoints(List endpoints);
+    void setEndpoints(List<InboundEndpoint> endpoints);
 }
