@@ -108,6 +108,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         return interfaceClass;
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
@@ -122,7 +123,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
     {
         if (outboundRouter != null)
         {
-            return (OutboundEndpoint) outboundRouter.getEndpoints().get(0);
+            return outboundRouter.getEndpoints().get(0);
         }
         else
         {

@@ -45,6 +45,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter()
         {
+            @Override
             protected SplitMessage getMessageParts(MuleMessage message, List endpoints)
             {
                 int i = 0;
@@ -60,7 +61,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 
         router.setMuleContext(muleContext);
 
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
@@ -75,7 +76,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         router.route(message, (MuleSession) session.proxy());
         session.verify();
 
-        endpoints = new ArrayList();
+        endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint4);
         endpoints.add(endpoint5);
         endpoints.add(endpoint6);

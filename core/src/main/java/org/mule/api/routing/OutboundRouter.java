@@ -34,14 +34,14 @@ public interface OutboundRouter extends Router
      * 
      * @param endpoints a list of Endpoint instances
      */
-    void setEndpoints(List endpoints);
+    void setEndpoints(List<OutboundEndpoint> endpoints);
 
     /**
      * Gets a list of Endpoint instances associated with this router
      * 
      * @return a list of Endpoint instances
      */
-    List getEndpoints();
+    List<OutboundEndpoint> getEndpoints();
 
     /**
      * Adds an endpoint to this router

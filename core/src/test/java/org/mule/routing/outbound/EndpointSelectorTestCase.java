@@ -34,6 +34,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     ImmutableEndpoint dest3;
     EndpointSelector router;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -70,8 +71,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointCustomProperty() throws Exception
     {
-        // The "wayOut" property will determine which endpoint the message gets sent
-        // to.
+        // The "wayOut" property will determine which endpoint the message gets sent to.
         router.setExpression("wayOut");
         router.setEvaluator("header");
 
@@ -108,8 +108,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointNoMatchUseDefault() throws Exception
     {
-        Map props = new HashMap();
-        MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         router.setDefaultEndpointName("dest3");
 
         assertTrue(router.isMatch(message));

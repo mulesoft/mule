@@ -311,9 +311,8 @@ public class UniversalSender extends BasicHandler
         for (Iterator iterator = router.getRouters().iterator(); iterator.hasNext();)
         {
             OutboundRouter r = (OutboundRouter)iterator.next();
-            for (Iterator iterator1 = r.getEndpoints().iterator(); iterator1.hasNext();)
+            for (OutboundEndpoint endpoint : r.getEndpoints())
             {
-                ImmutableEndpoint endpoint = (ImmutableEndpoint)iterator1.next();
                 endpointsCache.put(endpoint.getEndpointURI().getAddress(), endpoint);
             }
         }

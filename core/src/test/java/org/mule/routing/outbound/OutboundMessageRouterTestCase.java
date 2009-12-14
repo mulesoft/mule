@@ -13,8 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -40,16 +40,16 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
 
         FilteringOutboundRouter router1 = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router1.setFilter(filter);
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         router1.setEndpoints(endpoints);
 
@@ -57,7 +57,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         PayloadTypeFilter filter2 = new PayloadTypeFilter();
         filter2.setExpectedType(Exception.class);
         router2.setFilter(filter2);
-        endpoints = new ArrayList();
+        endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint2);
         router2.setEndpoints(endpoints);
 
@@ -65,7 +65,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         assertEquals(1, messageRouter.getRouters().size());
         assertNotNull(messageRouter.removeRouter(router1));
         assertEquals(0, messageRouter.getRouters().size());
-        List list = new ArrayList();
+        
+        List<Router> list = new ArrayList<Router>();
         list.add(router1);
         list.add(router2);
         messageRouter.setRouters(list);
@@ -85,7 +86,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
         router3.setFilter(new PayloadTypeFilter(Object.class));
-        endpoints = new ArrayList();
+        endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint2);
         router3.setEndpoints(endpoints);
         messageRouter.addRouter(router3);
@@ -113,6 +114,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
+            @Override
             public MuleMessage route(MuleMessage message, MuleSession session)
                 throws RoutingException
             {
@@ -123,6 +125,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
+            @Override
             public MuleMessage route(MuleMessage message, MuleSession session)
                 throws RoutingException
             {
@@ -138,6 +141,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {
+            @Override
             public MuleMessage doCatchMessage(MuleMessage message, MuleSession session) throws RoutingException
             {
                 catchAllCount[0]++;

@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -30,17 +31,17 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
         
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
-        List recipients = new ArrayList();
+        List<String> recipients = new ArrayList<String>();
         recipients.add("test://recipient1");
         recipients.add("test://recipient2");
         StaticRecipientList router = createObject(StaticRecipientList.class);
 
         router.setRecipients(recipients);
 
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
         router.setMuleContext(muleContext);
@@ -63,65 +64,65 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
 
     public void testRecipientListRouterSync() throws Exception
-        {
-            Mock session = MuleTestUtils.getMockSession();
-            session.matchAndReturn("getService", getTestService());
+    {
+        Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getService", getTestService());
 
-            ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
-            assertNotNull(endpoint1);
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        assertNotNull(endpoint1);
 
-            List recipients = new ArrayList();
-            recipients.add("test://recipient1?synchronous=true");
-            recipients.add("test://recipient2?synchronous=true");
-            StaticRecipientList router = createObject(StaticRecipientList.class);
+        List<String> recipients = new ArrayList<String>();
+        recipients.add("test://recipient1?synchronous=true");
+        recipients.add("test://recipient2?synchronous=true");
+        StaticRecipientList router = createObject(StaticRecipientList.class);
 
-            router.setRecipients(recipients);
+        router.setRecipients(recipients);
 
-            List endpoints = new ArrayList();
-            endpoints.add(endpoint1);
-            router.setEndpoints(endpoints);
-            router.setMuleContext(muleContext);
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        endpoints.add(endpoint1);
+        router.setEndpoints(endpoints);
+        router.setMuleContext(muleContext);
 
-            assertEquals(2, router.getRecipients().size());
+        assertEquals(2, router.getRecipients().size());
 
-            MuleMessage message = new DefaultMuleMessage("test event", muleContext);
-            assertTrue(router.isMatch(message));
-            // note this router clones endpoints so that the endpointUri can be
-            // changed
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
+        assertTrue(router.isMatch(message));
+        // note this router clones endpoints so that the endpointUri can be
+        // changed
 
-            // The static recipient list router duplicates the message for each endpoint
-            // so we can't
-            // check for equality on the arguments passed to the dispatch / send methods
-            message = new DefaultMuleMessage("test event", muleContext);
-            router.getRecipients().add("test://recipient3?synchronous=true");
-            session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
-                message);
-            session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
-                message);
-            session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
-                message);
-            MuleMessage result = router.route(message, (MuleSession)session.proxy());
-            assertNotNull(result);
-            assertTrue(result.getPayload() instanceof List);
-            assertEquals(3, ((List)result.getPayload()).size());
-            session.verify();
+        // The static recipient list router duplicates the message for each endpoint
+        // so we can't
+        // check for equality on the arguments passed to the dispatch / send methods
+        message = new DefaultMuleMessage("test event", muleContext);
+        router.getRecipients().add("test://recipient3?synchronous=true");
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
+            message);
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
+            message);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy());
+        assertNotNull(result);
+        assertTrue(result.getPayload() instanceof List);
+        assertEquals(3, ((List)result.getPayload()).size());
+        session.verify();
 
-        }
+    }
 
     public void testBadRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
-        List recipients = new ArrayList();
+        List<String> recipients = new ArrayList<String>();
         recipients.add("malformed-endpointUri-recipient1");
         StaticRecipientList router = createObject(StaticRecipientList.class);
 
         router.setRecipients(recipients);
 
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
 

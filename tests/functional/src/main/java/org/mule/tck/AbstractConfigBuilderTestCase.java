@@ -329,7 +329,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
         OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
-        OutboundEndpoint outEndpoint = (OutboundEndpoint) outRouter.getEndpoints().get(0);
+        OutboundEndpoint outEndpoint = outRouter.getEndpoints().get(0);
         assertNotNull(outEndpoint);
     }
 

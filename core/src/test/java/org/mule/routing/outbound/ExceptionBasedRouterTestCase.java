@@ -77,9 +77,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         MuleMessage result = router.route(message, (MuleSession)mockSession.proxy());
         assertNull("Async call should've returned null.", result);
         mockSession.verify();
-
     }
-
 
     public void testSuccessfulExceptionRouterSynchronous() throws Exception
     {
@@ -175,7 +173,6 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         mockSession.verify();
 
         message = new DefaultMuleMessage("test event", muleContext);
-
     }
 
     /**
@@ -285,7 +282,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
     }
 
-    class IsPayloadEqual implements Constraint
+    private static class IsPayloadEqual implements Constraint
     {            
         private MuleMessage _message;
         

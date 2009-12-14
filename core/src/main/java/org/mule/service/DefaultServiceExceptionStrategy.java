@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.CollectionUtils;
 
@@ -32,6 +33,7 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
         super();
     }
 
+    @Override
     protected void defaultHandler(Throwable t)
     {
         ServiceStatistics statistics = getServiceStatistics();
@@ -44,6 +46,7 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
         super.defaultHandler(t);
     }
 
+    @Override
     protected void logFatal(MuleMessage message, Throwable t)
     {
         ServiceStatistics statistics = getServiceStatistics();
@@ -55,10 +58,11 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
         super.logFatal(message, t);
     }
 
+    @Override
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
     {
         super.routeException(message, failedEndpoint, t);
-        List<ImmutableEndpoint> endpoints = getEndpoints(t);
+        List<OutboundEndpoint> endpoints = getEndpoints(t);
         if (CollectionUtils.isNotEmpty(endpoints) && getServiceStatistics() != null)
         {
             ServiceStatistics statistics = getServiceStatistics();

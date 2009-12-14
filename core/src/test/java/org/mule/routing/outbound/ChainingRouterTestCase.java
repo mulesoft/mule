@@ -34,8 +34,9 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 {
     private Mock session;
     private ChainingRouter router;
-    private List endpoints;
+    private List<OutboundEndpoint> endpoints;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -45,15 +46,15 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?synchronous=true");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?synchronous=true");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?synchronous=true");
         assertNotNull(endpoint2);
 
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
-        endpoints = new ArrayList();
+        endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
@@ -83,7 +84,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint3);
         router.addEndpoint(endpoint3);
 
-        Map m = new HashMap();
+        Map<String, Object> m = new HashMap<String, Object>();
         m.put("barValue", "bar");
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
         assertTrue(router.isMatch(message));
@@ -105,10 +106,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterAsynchronous() throws Exception
     {
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test");
         assertNotNull(endpoint2);
 
         endpoints.clear();
@@ -132,12 +133,11 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
      */
     public void testBrokenChain() throws Exception
     {
-        final MuleMessage message = new DefaultMuleMessage("test event", muleContext);
-        final ImmutableEndpoint endpoint1 = (ImmutableEndpoint)endpoints.get(0);
+        MuleMessage message = new DefaultMuleMessage("test event", muleContext);
+        OutboundEndpoint endpoint1 = endpoints.get(0);
         session.expect("sendEvent", C.eq(message, endpoint1));
         MuleMessage result = router.route(message, (MuleSession)session.proxy());
         session.verify();
         assertNull(result);
     }
-
 }

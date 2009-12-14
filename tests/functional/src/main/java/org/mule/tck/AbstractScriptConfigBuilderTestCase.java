@@ -231,7 +231,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, service.getOutboundRouter().getRouters().size());
         OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = router.getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformers());

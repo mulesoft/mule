@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -28,22 +28,21 @@ import java.util.List;
 
 public class MulticastingRouterTestCase extends AbstractMuleTestCase
 {
-
     public void testMulticastingRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
         RegExFilter filter = new RegExFilter("(.*) Message");
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test2", null, filter, null);
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test2", null, filter, null);
         assertNotNull(endpoint2);
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
 
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
@@ -64,16 +63,16 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=true");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=true");
         assertNotNull(endpoint2);
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
         RegExFilter filter = new RegExFilter("(.*) Message");
         router.setFilter(filter);
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);
@@ -98,15 +97,15 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getService", getTestService());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);
 
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=false");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=false");
         assertNotNull(endpoint2);
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
         
-        List endpoints = new ArrayList();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);

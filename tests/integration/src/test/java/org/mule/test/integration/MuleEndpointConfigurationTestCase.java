@@ -31,6 +31,7 @@ import org.mule.transport.vm.VMConnector;
 public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/test-endpoints-config.xml";
@@ -47,7 +48,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // first Router
         OutboundRouter router1 = (OutboundRouter)outboundRouter.getRouters().get(0);
         assertEquals(1, router1.getEndpoints().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint)router1.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = router1.getEndpoints().get(0);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:60201", endpoint.getEndpointURI().getAddress());
         // cannot get this to work and get axis tests to work
@@ -59,7 +60,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // second Router
         OutboundRouter router2 = (OutboundRouter)outboundRouter.getRouters().get(1);
         assertEquals(2, router2.getEndpoints().size());
-        endpoint = (ImmutableEndpoint)router2.getEndpoints().get(0);
+        endpoint = router2.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
         // cannot get this to work and get axis tests to work
@@ -67,7 +68,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
 
-        endpoint = (ImmutableEndpoint)router2.getEndpoints().get(1);
+        endpoint = router2.getEndpoints().get(1);
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
         assertFalse(endpoint.getTransformers().isEmpty());
@@ -82,7 +83,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(service);
         assertNotNull(service.getInboundRouter().getEndpoints());
         assertEquals(1, service.getInboundRouter().getEndpoints().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = service.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
@@ -102,7 +103,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // first Router
         OutboundRouter router = (OutboundRouter)outboundRouter.getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint)router.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = router.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
         // cannot get this to work and get axis tests to work
@@ -123,7 +124,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // first Router
         OutboundRouter router = (OutboundRouter)outboundRouter.getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        ImmutableEndpoint endpoint = (ImmutableEndpoint)router.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = router.getEndpoints().get(0);
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
         // cannot get this to work and get axis tests to work
