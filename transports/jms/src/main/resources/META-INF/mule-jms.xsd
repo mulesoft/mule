@@ -311,7 +311,7 @@
     <xsd:complexType name="muleMqConnectorType">
         <xsd:complexContent>
             <xsd:extension base="vendorJmsConnectorType">
-                <xsd:attribute name="realmURL" type="xsd:string">
+                <xsd:attribute name="brokerURL" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The URL used to connect to the JMS server. If not set, the default is nsp://localhost:9000. When connecting to a cluster separate urls with a comma.

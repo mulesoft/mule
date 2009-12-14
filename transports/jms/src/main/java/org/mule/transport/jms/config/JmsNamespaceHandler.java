@@ -62,8 +62,8 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("activemq-connector", new JmsConnectorDefinitionParser(ActiveMQJmsConnector.class));
         registerBeanDefinitionParser("activemq-xa-connector", new JmsConnectorDefinitionParser(ActiveMQXAJmsConnector.class));
         
-        registerBeanDefinitionParser("mulemq-connector", new JmsConnectorDefinitionParser(MuleMQJmsConnector.class));
-        registerBeanDefinitionParser("mulemq-xa-connector", new JmsConnectorDefinitionParser(MuleMQXAJmsConnector.class));
+        registerBeanDefinitionParser("mulemq-connector", new MuleMQConnectorDefinitionParser(MuleMQJmsConnector.class));
+        registerBeanDefinitionParser("mulemq-xa-connector", new MuleMQConnectorDefinitionParser(MuleMQXAJmsConnector.class));
         
         registerBeanDefinitionParser("weblogic-connector", new JmsConnectorDefinitionParser(WeblogicJmsConnector.class));
         registerBeanDefinitionParser("websphere-connector", new JmsConnectorDefinitionParser(WebsphereJmsConnector.class));

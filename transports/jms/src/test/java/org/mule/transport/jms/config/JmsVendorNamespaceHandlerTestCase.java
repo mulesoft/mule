@@ -84,7 +84,14 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c instanceof MuleMQJmsConnector);
         assertEquals("nsp://localhost:9000", ((MuleMQJmsConnector) c).getRealmURL());
         assertEquals(JmsConstants.JMS_SPECIFICATION_11, ((MuleMQJmsConnector) c).getSpecification());
+    }
 
+    public void testMuleMQBrokerURL() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqConnectorBroker");
+        assertNotNull(c);
+        assertTrue(c instanceof MuleMQJmsConnector);
+        assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
     }
 
     public void testMuleMQXaDefaultConfig() throws Exception
@@ -93,6 +100,14 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertTrue(c instanceof MuleMQXAJmsConnector);
         assertEquals("nsp://localhost:9000", ((MuleMQXAJmsConnector) c).getRealmURL());
+    }
+
+    public void testMuleMQXaBrokerURL() throws Exception
+    {
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("muleMqXaConnectorBroker");
+        assertNotNull(c);
+        assertTrue(c instanceof MuleMQXAJmsConnector);
+        assertEquals("nsp://localhost:1234", ((MuleMQJmsConnector) c).getRealmURL());
     }
 
 }

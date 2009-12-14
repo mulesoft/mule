@@ -141,6 +141,6 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("test-property1", transformer.getDeleteProperties().get(0));
         assertEquals("test-property2", transformer.getDeleteProperties().get(1));
         assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
-        assertEquals(PropertyScope.OUTBOUND, transformer.getScope());
+        assertEquals(null, transformer.getScope());
     }
 }
