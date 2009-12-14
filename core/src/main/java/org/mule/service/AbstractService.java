@@ -526,6 +526,7 @@ public abstract class AbstractService implements Service
         return name;
     }
 
+    @Override
     public String toString()
     {
         return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
@@ -720,9 +721,9 @@ public abstract class AbstractService implements Service
     /**
      * Returns a list of all incoming endpoints on a service.
      */
-    protected List getIncomingEndpoints()
+    protected List<InboundEndpoint> getIncomingEndpoints()
     {
-        List endpoints = new ArrayList();
+        List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
 
         // Add inbound endpoints
         endpoints.addAll(inboundRouter.getEndpoints());

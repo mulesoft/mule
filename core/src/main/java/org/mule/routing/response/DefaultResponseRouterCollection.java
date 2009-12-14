@@ -13,15 +13,12 @@ package org.mule.routing.response;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 
@@ -37,7 +34,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DefaultResponseRouterCollection extends AbstractRouterCollection implements ResponseRouterCollection
 {
-    private volatile List endpoints = new CopyOnWriteArrayList();
+    @SuppressWarnings("unchecked")
+    private volatile List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();
+    
     private volatile int timeout = -1; // undefined
     private volatile boolean failOnTimeout = true;
 
@@ -149,27 +148,16 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         return endpoints.remove(endpoint);
     }
 
-    public List getEndpoints()
+    public List<InboundEndpoint> getEndpoints()
     {
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints)
+    public void setEndpoints(List<InboundEndpoint> endpoints)
     {
         if (endpoints != null)
         {
             this.endpoints.clear();
-            // Ensure all endpoints are response endpoints
-            // This will go when we start dropping suport for 1.4 and start using 1.5
-            for (Iterator it = endpoints.iterator(); it.hasNext();)
-            {
-                ImmutableEndpoint endpoint=(ImmutableEndpoint) it.next();
-                if (!(endpoint instanceof InboundEndpoint))
-                {
-                    throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseInboundEndpoints(
-                        this, endpoint));
-                }
-            }
             this.endpoints.addAll(endpoints);
         }
         else
@@ -185,15 +173,14 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
      */
     public InboundEndpoint getEndpoint(String name)
     {
-        InboundEndpoint endpointDescriptor;
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpointDescriptor = (InboundEndpoint) iterator.next();
-            if (endpointDescriptor.getName().equals(name))
+            if (endpoint.getName().equals(name))
             {
-                return endpointDescriptor;
+                return endpoint;
             }
         }
+        
         return null;
     }
 
@@ -207,7 +194,6 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         this.timeout = timeout;
     }
 
-
     public boolean isFailOnTimeout()
     {
         return failOnTimeout;
@@ -217,7 +203,6 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     {
         this.failOnTimeout = failOnTimeout;
     }
-
 
     public boolean hasEndpoints()
     {
