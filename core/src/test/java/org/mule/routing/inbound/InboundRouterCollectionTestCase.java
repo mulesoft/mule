@@ -11,7 +11,6 @@
 package org.mule.routing.inbound;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.List;
 
 public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
 {
-
     public void testAddGoodEndpoint() throws Exception
     {
         DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
@@ -31,7 +29,7 @@ public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
 
     public void testSetGoodEndpoints() throws Exception
     {
-        List list = new ArrayList();
+        List<InboundEndpoint> list = new ArrayList<InboundEndpoint>();
         list.add(getTestInboundEndpoint("test"));
         list.add(getTestInboundEndpoint("test"));
         DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
@@ -43,39 +41,4 @@ public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
         assertNotNull(router.getEndpoints());
         assertEquals(2, router.getEndpoints().size());
     }
-
-    public void testSetBadEndpoints() throws Exception
-    {
-        List list = new ArrayList();
-        list.add(getTestInboundEndpoint("test"));
-        list.add(getTestOutboundEndpoint("test"));
-        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
-        try
-        {
-            router.setEndpoints(list);
-            fail("Invalid endpoint: Exception exceptions");
-        }
-        catch (Exception e)
-        {
-            assertEquals(InvalidEndpointTypeException.class, e.getClass());
-        }
-    }
-
-    public void testSetBad2Endpoints() throws Exception
-    {
-        List list = new ArrayList();
-        list.add(getTestInboundEndpoint("test"));
-        list.add(getTestOutboundEndpoint("test"));
-        DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();
-        try
-        {
-            router.setEndpoints(list);
-            fail("Invalid endpoint: Exception exceptions");
-        }
-        catch (Exception e)
-        {
-            assertEquals(InvalidEndpointTypeException.class, e.getClass());
-        }
-    }
-
 }
