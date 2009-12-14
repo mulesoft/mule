@@ -291,10 +291,13 @@ public abstract class AbstractExceptionListener
                 {
                     endpointUri = failedEndpoint.getEndpointURI();
                 }
-                Object payload;
+                
+                // The payload needs to be serializable so that we can send it over the wire 
+                // if necessary (depends on the transport used).
+                Serializable payload;
                 if (message.getPayload() instanceof Serializable)
                 {
-                    payload = message.getPayload();
+                    payload = (Serializable) message.getPayload();
                 }
                 else
                 {

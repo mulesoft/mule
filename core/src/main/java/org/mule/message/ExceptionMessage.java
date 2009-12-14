@@ -35,6 +35,32 @@ public class ExceptionMessage extends BaseMessageDTO
     private String endpointUri;
     private Date timeStamp;
 
+    public ExceptionMessage(Serializable message,
+                            Throwable exception,
+                            String componentName,
+                            EndpointURI endpointUri)
+    {
+        super(message);
+        this.exception = exception;
+        timeStamp = new Date();
+        this.componentName = componentName;
+        this.endpointUri = endpointUri.toString();
+
+        MuleEventContext ctx = RequestContext.getEventContext();
+        if (ctx != null)
+        {
+            MuleMessage msg = ctx.getMessage();
+            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+            {
+                String propertyKey = (String) iterator.next();
+                setProperty(propertyKey, msg.getProperty(propertyKey));
+            }
+        }
+    }
+    
+    /**
+     * @deprecated Use ExceptionMessage(Serializable message...) instead
+     */
     public ExceptionMessage(Object message,
                             Throwable exception,
                             String componentName,

@@ -27,7 +27,7 @@ public class BaseMessageDTO implements Serializable
      */
     private static final long serialVersionUID = -6105691921086093748L;
 
-    protected Object payload;
+    protected Serializable payload;
 
     protected Map<String, Object> properties;
 
@@ -36,14 +36,14 @@ public class BaseMessageDTO implements Serializable
         this(NullPayload.getInstance());
     }
 
-    public BaseMessageDTO(Object payload)
+    public BaseMessageDTO(Serializable payload)
     {
         this.payload = payload;
         properties = new HashMap<String, Object>();
     }
 
 
-    public void setPayload(Object payload)
+    public void setPayload(Serializable payload)
     {
         this.payload = payload;
     }

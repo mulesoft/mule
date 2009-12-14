@@ -14,6 +14,7 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.DefaultMessageAdapter;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
@@ -29,14 +30,14 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
         super();
     }
 
-    public DefaultMuleMessageDTO(Object message)
+    public DefaultMuleMessageDTO(Serializable message)
     {
         super(message);
     }
 
     public DefaultMuleMessageDTO(MuleMessage message)
     {
-        super(message.getPayload());
+        super((Serializable) message.getPayload());
         encodePropertiesForScope(PropertyScope.INBOUND, message);
         encodePropertiesForScope(PropertyScope.OUTBOUND, message);
         encodePropertiesForScope(PropertyScope.INVOCATION, message);
