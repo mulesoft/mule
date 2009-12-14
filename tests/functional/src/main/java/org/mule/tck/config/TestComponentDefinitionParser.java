@@ -35,9 +35,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Configures a FunctionalTestComponent wrapped as a JavaComponent.  Theis parser provides a short form way of
+ * Configures a FunctionalTestComponent wrapped as a JavaComponent.  This parser provides a short form way of
  * configuring a test component in Mule.
  */
+//TODO This should really extend StaticComponentDefinitionParser from mule-core as it is quite similar.
 public class TestComponentDefinitionParser extends ComponentDefinitionParser
 {
     private static Class OBJECT_FACTORY_TYPE = SingletonObjectFactory.class;

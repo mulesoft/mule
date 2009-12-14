@@ -76,6 +76,13 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
 
         // Create a BeanDefinition for the nested object factory and set it a
         // property value for the component
+        builder.addPropertyValue("objectFactory", getObjectFactoryDefinition(element));
+
+        super.parseChild(element, parserContext, builder);
+    }
+    
+    protected AbstractBeanDefinition getObjectFactoryDefinition(Element element)
+    {
         AbstractBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
         objectFactoryBeanDefinition.setBeanClass(OBJECT_FACTORY_TYPE);
         objectFactoryBeanDefinition.getPropertyValues()
@@ -83,10 +90,6 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
         objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", properties);
         objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
         objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
-
-        builder.addPropertyValue("objectFactory", objectFactoryBeanDefinition);
-
-        super.parseChild(element, parserContext, builder);
+        return objectFactoryBeanDefinition;
     }
-
 }

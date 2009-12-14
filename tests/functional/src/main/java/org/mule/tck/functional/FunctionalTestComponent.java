@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * @see FunctionalTestNotification
  * @see FunctionalTestNotificationListener
  */
-
+// TODO This should really extend StaticComponent from mule-core as it is quite similar.
 public class FunctionalTestComponent implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
