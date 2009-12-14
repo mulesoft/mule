@@ -38,7 +38,7 @@ public class ScriptComponent extends AbstractComponent
 
     private Scriptable script;
 
-    private Map proxies;
+    private Map<String, Object> proxies;
 
     @Override
     protected void doInitialise() throws InitialisationException
@@ -55,6 +55,7 @@ public class ScriptComponent extends AbstractComponent
 
     }
 
+    @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
         // Set up initial script variables.
@@ -90,12 +91,12 @@ public class ScriptComponent extends AbstractComponent
 
     protected void configureComponentBindings() throws MuleException
     {
-        proxies = new HashMap();
+        proxies = new HashMap<String, Object>();
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy
         if (bindingCollection != null && bindingCollection.getRouters().size() > 0)
         {
-            for (Iterator it = bindingCollection.getRouters().iterator(); it.hasNext();)
+            for (Iterator<?> it = bindingCollection.getRouters().iterator(); it.hasNext();)
             {
                 InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
                 String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());
@@ -107,11 +108,11 @@ public class ScriptComponent extends AbstractComponent
                 }
                 else
                 {
-                    Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{interfaceBinding.getInterface()},
-                            new BindingInvocationHandler(interfaceBinding));
+                    Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), 
+                        new Class[]{interfaceBinding.getInterface()}, 
+                        new BindingInvocationHandler(interfaceBinding));
                     proxies.put(bindingName, proxy);
                 }
-
             }
         }
     }

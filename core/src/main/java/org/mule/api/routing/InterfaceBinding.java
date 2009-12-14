@@ -46,9 +46,9 @@ public interface InterfaceBinding extends Router
     
     ImmutableEndpoint getEndpoint();
 
-    Class getInterface();
+    Class<?> getInterface();
 
-    void setInterface(Class interfaceClass);
+    void setInterface(Class<?> interfaceClass);
 
     String getMethod();
 

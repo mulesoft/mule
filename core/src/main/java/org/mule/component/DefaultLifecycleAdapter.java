@@ -257,8 +257,8 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         // Proxy
         if (component.getBindingCollection() != null)
         {
-            Map bindings = new HashMap();
-            for (Iterator it = component.getBindingCollection().getRouters().iterator(); it.hasNext();)
+            Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
+            for (Iterator<?> it = component.getBindingCollection().getRouters().iterator(); it.hasNext();)
             {
                 InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
                 Object proxy = bindings.get(interfaceBinding.getInterface());
