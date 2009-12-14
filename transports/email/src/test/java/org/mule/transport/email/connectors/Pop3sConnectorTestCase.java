@@ -12,6 +12,7 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.Pop3sConnector;
+import org.mule.util.SystemUtils;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -20,6 +21,12 @@ import com.icegreen.greenmail.util.ServerSetup;
  */
 public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4654
+        return SystemUtils.isIbmJDK();
+    }
 
     public Pop3sConnectorTestCase()
     {
@@ -37,5 +44,4 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         connector.setMuleContext(muleContext);
         return connector;
     }
-
 }

@@ -12,8 +12,26 @@
     <name>Mule Tests</name>
 
     <modules>
-        <module>archetypes</module>
         <module>functional</module>
         <module>integration</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>archetype-tests</id>
+            <activation>
+                <property>
+                    <!--
+                         This profile is activated if NO system property
+                         'skipArchetypeTests' is found. Disable this profile
+                         by specifying -DskipArchetypeTests=true on the commandline
+                    -->
+                    <name>!skipArchetypeTests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>archetypes</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

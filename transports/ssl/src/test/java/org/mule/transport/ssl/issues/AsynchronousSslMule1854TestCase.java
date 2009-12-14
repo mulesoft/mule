@@ -13,10 +13,18 @@ package org.mule.transport.ssl.issues;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.SystemUtils;
 
-public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {
-
+public class AsynchronousSslMule1854TestCase extends FunctionalTestCase 
+{
     protected static String TEST_MESSAGE = "Test Request";
+
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4664
+        return SystemUtils.isIbmJDK();
+    }
 
     protected String getConfigResources()
     {
@@ -33,5 +41,4 @@ public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {
         assertNotNull("Response is null", response);
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
     }
-
 }

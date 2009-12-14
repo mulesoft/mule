@@ -17,10 +17,17 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpsConnector;
+import org.mule.util.SystemUtils;
 
 public class AxisConnectorHttpsTestCase extends FunctionalTestCase
 {
-    
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4666
+        return SystemUtils.isIbmJDK();
+    }
+
     public void testHttpsConnection() throws Exception{
         MuleClient client = new MuleClient();
         MuleMessage m = client.send("axis:https://localhost:62000/TestUMO?method=echo",new DefaultMuleMessage("hello", muleContext));
@@ -36,7 +43,6 @@ public class AxisConnectorHttpsTestCase extends FunctionalTestCase
     {
         return "axis-https-connector-config.xml";
     }
-    
 }
 
 

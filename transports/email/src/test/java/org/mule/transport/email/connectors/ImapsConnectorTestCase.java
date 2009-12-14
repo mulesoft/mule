@@ -12,6 +12,7 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.ImapsConnector;
+import org.mule.util.SystemUtils;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -20,6 +21,12 @@ import com.icegreen.greenmail.util.ServerSetup;
  */
 public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4653
+        return SystemUtils.isIbmJDK();
+    }
 
     public ImapsConnectorTestCase()
     {

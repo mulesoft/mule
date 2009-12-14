@@ -12,6 +12,7 @@ package org.mule.transport.cxf.issues;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
+import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,6 +22,12 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4667
+        return SystemUtils.isIbmJDK();
+    }
 
     @Override
     protected void doSetUp() throws Exception

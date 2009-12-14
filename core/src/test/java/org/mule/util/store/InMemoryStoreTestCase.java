@@ -12,11 +12,19 @@ package org.mule.util.store;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.SystemUtils;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
     private InMemoryObjectStore store = null;
     
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4652
+        return SystemUtils.isIbmJDK();
+    }
+
     @Override
     protected void doTearDown() throws Exception
     {

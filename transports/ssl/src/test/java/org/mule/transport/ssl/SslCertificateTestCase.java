@@ -14,9 +14,16 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.SystemUtils;
 
 public class SslCertificateTestCase extends FunctionalTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4657
+        return SystemUtils.isIbmJDK();
+    }
 
     protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;

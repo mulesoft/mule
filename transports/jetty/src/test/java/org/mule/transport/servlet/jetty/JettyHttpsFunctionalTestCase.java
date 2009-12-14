@@ -18,6 +18,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
+import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,14 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
+    
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4665
+        return SystemUtils.isIbmJDK();
+    }
+
     @Override
     protected String getConfigResources()
     {

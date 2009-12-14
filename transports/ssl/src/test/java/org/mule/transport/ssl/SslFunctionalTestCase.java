@@ -18,9 +18,16 @@ import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestSedaService;
+import org.mule.util.SystemUtils;
 
 public class SslFunctionalTestCase extends FunctionalTestCase 
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4659
+        return SystemUtils.isIbmJDK();
+    }
 
     protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;

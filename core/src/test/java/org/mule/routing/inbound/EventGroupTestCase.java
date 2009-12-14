@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
 
 import java.util.Arrays;
@@ -25,8 +26,14 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class EventGroupTestCase extends AbstractMuleTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4592
+        return SystemUtils.isIbmJDK();
+    }
 
-     public void testConcurrentIteration() throws Exception
+    public void testConcurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());
         assertFalse(eg.iterator().hasNext());
@@ -81,7 +88,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertFalse(g3.equals(g1));
 
         // now test Set compatibility
-        Set s = new HashSet();
+        Set<EventGroup> s = new HashSet<EventGroup>();
         s.add(g1);
 
         // make sure g1 is in the set
@@ -199,5 +206,4 @@ public class EventGroupTestCase extends AbstractMuleTestCase
             super(groupId, expectedSize);
         }
     }
-
 }

@@ -12,11 +12,18 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.SmtpsConnector;
+import org.mule.util.SystemUtils;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
 public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4662
+        return SystemUtils.isIbmJDK();
+    }
 
     public SmtpsConnectorTestCase()
     {
@@ -32,5 +39,4 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
         connector.setTrustStore("greenmail-truststore");
         return connector;
     }
-
 }
