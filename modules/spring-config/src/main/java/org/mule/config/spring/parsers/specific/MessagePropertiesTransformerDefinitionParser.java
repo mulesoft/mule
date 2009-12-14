@@ -8,20 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.security;
+package org.mule.config.spring.parsers.specific;
 
-import java.io.Serializable;
+import org.mule.transformer.simple.MessagePropertiesTransformer;
 
-/**
- * <code>SecurityContext</code> holds security information and is associated
- * with the MuleSession.
- * 
- * @see org.mule.api.MuleSession
- */
 
-public interface SecurityContext extends Serializable
+public class MessagePropertiesTransformerDefinitionParser extends TransformerDefinitionParser
 {
-    void setAuthentication(Authentication authentication);
-
-    Authentication getAuthentication();
+    public MessagePropertiesTransformerDefinitionParser()
+    {
+        super(MessagePropertiesTransformer.class);
+        addAlias("scope", "scopeName");
+    }
 }

@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public class SpringAuthenticationAdapter implements Authentication
 {
+    private static final long serialVersionUID = -5906282218126929871L;
+
     private org.springframework.security.Authentication delegate;
     private Map properties;
 

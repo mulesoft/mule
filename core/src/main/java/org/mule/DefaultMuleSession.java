@@ -35,9 +35,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +63,8 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     /**
      * The Mule service associated with the session
+     * 
+     * Note: This object uses custom serialization via the writeObject()/readObject() methods.
      */
     private transient Service service = null;
 
@@ -71,22 +75,39 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     private String id;
 
+    /**
+     * The security context associated with the session.  
+     * Note that this context will only be serialized if the SecurityContext object is Serializable.
+     */
     private SecurityContext securityContext;
 
     private Map properties = null;
 
+    /**
+     * The Mule context
+     * 
+     * Note: This object uses custom serialization via the readObject() method.
+     */
     private transient MuleContext muleContext;
 
     private transient Map<String, Object> serializedData = null;
 
+    public DefaultMuleSession(MuleContext muleContext)
+    {
+        this(null, muleContext);
+    }
+
     public DefaultMuleSession(Service service, MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        properties = new HashMap();
+        properties = new HashMap<String, Object>();
         id = UUID.getUUID();
         this.service = service;
     }
 
+    /**
+     * @deprecated Use DefaultMuleSession(Service service, MuleContext muleContext) instead
+     */
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service, MuleContext muleContext)
             throws MuleException
     {
@@ -99,9 +120,12 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this.service = service;
     }
 
+    /**
+     * @deprecated Use DefaultMuleSession(MuleContext muleContext) instead
+     */
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, MuleContext muleContext) throws MuleException
     {
-        this.muleContext = muleContext;
+        this(muleContext);
 
         if (requestSessionHandler == null)
         {
@@ -115,7 +139,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                     CoreMessages.propertiesNotSet("message").toString());
         }
 
-        properties = new HashMap();
+        properties = new HashMap<String, Object>();
         requestSessionHandler.retrieveSessionInfoFromMessage(message, this);
         id = (String) getProperty(requestSessionHandler.getSessionIDKey());
         if (id == null)
@@ -473,7 +497,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         return service;
     }
 
-    void setService(Service service)
+    public void setService(Service service)
     {
         this.service = service;
     }
@@ -541,19 +565,29 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      *
      * @return an iterater of property keys for the session properties on this
      *         session
+     * @deprecated Use getPropertyNamesAsSet() instead
      */
     public Iterator getPropertyNames()
     {
         return properties.keySet().iterator();
     }
 
+    public Set getPropertyNamesAsSet()
+    {
+        return Collections.unmodifiableSet(properties.keySet());
+    }
+
+    ////////////////////////////
+    // Serialization methods
+    ////////////////////////////
+    
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
         //Can be null if service call originates from MuleClient
         if (getService() != null)
         {
-            out.writeObject(getService().getName());
+            out.writeObject(getService() != null ? getService().getName() : "null");
         }
     }
 
@@ -572,7 +606,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             //ignore
         }
     }
-
     /**
      * Invoked after deserialization. This is called when the marker interface 
      * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked 

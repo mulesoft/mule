@@ -2245,6 +2245,21 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="scope" use="optional" default="outbound">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Property scope to/from which properties are added/removed.  The scope determines the lifespan of the properties.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="invocation"/>
+                            <xsd:enumeration value="outbound"/>
+                            <xsd:enumeration value="session"/>
+                            <xsd:enumeration value="application"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

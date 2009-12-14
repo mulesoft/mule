@@ -10,6 +10,7 @@
 
 package org.mule.util;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,13 +26,14 @@ import org.apache.commons.logging.LogFactory;
  * then presents all the maps as a single combine map at run time.  For efficiency the combination
  * of maps is done once and then cached.
  */
-public class MapCombiner implements Map<Object, Object>
+public class MapCombiner implements Map<Object, Object>, Serializable
 {
-
+    private static final long serialVersionUID = -6291404712112000383L;
+ 
     public static final String LIST = "list"; // the setter/getter
     public static final int UNLIMITED_DEPTH = -1;
 
-    private Log logger = LogFactory.getLog(getClass());
+    private transient Log logger = LogFactory.getLog(getClass());
     private int maxDepth = UNLIMITED_DEPTH;
     private List list;
     private Map cachedMerge = new HashMap();

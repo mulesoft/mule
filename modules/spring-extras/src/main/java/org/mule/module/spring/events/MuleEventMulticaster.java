@@ -493,8 +493,7 @@ public class MuleEventMulticaster
                 }
                 else
                 {
-                    MuleSession session = new DefaultMuleSession(message,
-                        ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), service, muleContext);
+                    MuleSession session = new DefaultMuleSession(service, muleContext);
                     RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformers() != null)

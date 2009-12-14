@@ -8,48 +8,36 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.http;
+package org.mule.session;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.model.SessionException;
 import org.mule.api.transport.SessionHandler;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.Base64;
 
-import java.io.IOException;
-
-import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Will read and write Http Cookie information to and from the Mule MuleSession
+ * A session handler used to store and retrieve session information on an
+ * event. The MuleSession information is stored as a header on the message (does not
+ * support Tcp, Udp, etc. unless the MuleMessage object is serialised across the
+ * wire). The session is stored in the "MULE_SESSION" property as an array of bytes (byte[])
  */
-public class HttpSessionHandler implements SessionHandler
+public class SerializeOnlySessionHandler implements SessionHandler
 {
-
-    /**
-     * logger used by this class
-     */
     protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
+        byte[] serializedSession = (byte[]) message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
         
-        Cookie[] cookies = (Cookie[]) message.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-        if (cookies != null && cookies.length > 0)
+        if (serializedSession != null)
         {
-            byte[] serializedSession = Base64.decode(cookies[0].getValue());
-            
-            if (serializedSession != null)
-            {
-                session = (MuleSession) SerializationUtils.deserialize(serializedSession);
-            }
+            session = (MuleSession) SerializationUtils.deserialize(serializedSession);
         }
         return session;
     }
@@ -59,32 +47,20 @@ public class HttpSessionHandler implements SessionHandler
      */
     public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
     {
-		session = retrieveSessionInfoFromMessage(message);
-	}
+        session = retrieveSessionInfoFromMessage(message);
+    }
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
         byte[] serializedSession = SerializationUtils.serialize(session);
-        String serializedEncodedSession;
-        try
-        {
-            serializedEncodedSession = Base64.encodeBytes(serializedSession, Base64.DONT_BREAK_LINES);
-        }
-        catch (IOException e)
-        {
-            throw new SessionException(MessageFactory.createStaticMessage("Unable to serialize MuleSession"), e);
-        }
         
         if (logger.isDebugEnabled())
         {
-            logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
+            logger.debug("Adding serialized Session header to message: " + serializedSession);
         }
-
-        message.setProperty(HttpConnector.HTTP_COOKIES_PROPERTY, new Cookie[] {
-            // TODO handle domain, path, secure (https) and expiry
-            new Cookie(null, MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession)});
+        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession);
     }
-
+    
     /**
      * @deprecated This method is no longer needed and will be removed in the next major release
      */

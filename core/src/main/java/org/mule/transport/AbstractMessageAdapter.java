@@ -132,7 +132,7 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     }
 
     /**
-     * Returns a copy of the {@link org.mule.transport.MessagePropertiesContext} object.  This is usful when copying messages
+     * Returns a copy of the {@link org.mule.transport.MessagePropertiesContext} object.  This is useful when copying messages
      * rather than using the Messaging API directly. This provides a faster method of copying message properties.
      * @return a copy of the properties on this message
      */
@@ -169,18 +169,6 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     public void addProperties(Map<String, Object> props)
     {
         addProperties(props, properties.getDefaultScope());
-        assertAccess(WRITE);
-        if (props != null)
-        {
-            synchronized (props)
-            {
-                for (Iterator iter = props.entrySet().iterator(); iter.hasNext();)
-                {
-                    Map.Entry entry = (Map.Entry) iter.next();
-                    setProperty((String) entry.getKey(), entry.getValue());
-                }
-            }
-        }
     }
 
     /** {@inheritDoc} */
@@ -224,6 +212,13 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
     {
         assertAccess(WRITE);
         return properties.removeProperty(key);
+    }
+
+    /** {@inheritDoc} */
+    public Object removeProperty(String key, PropertyScope scope)
+    {
+        assertAccess(WRITE);
+        return properties.removeProperty(key, scope);
     }
 
     /** {@inheritDoc} */
@@ -568,11 +563,11 @@ public abstract class AbstractMessageAdapter implements MessageAdapter, ThreadSa
         //
         // Having said that, you can disable these exceptions by defining
         // MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY (mule.disable.threadsafemessages)
-        // (ie by adding -Dmule.disable.threadsafemessages=true to the java command line).
+        // (i.e., by adding -Dmule.disable.threadsafemessages=true to the java command line).
         //
         // To remove the underlying cause, however, you probably need to do one of:
         //
-        // - make sure that the message adapter you are using correclty implements the
+        // - make sure that the message adapter you are using correctly implements the
         // ThreadSafeAccess interface
         //
         // - make sure that dispatcher and receiver classes copy ThreadSafeAccess instances when

@@ -13,6 +13,7 @@ package org.mule.transformers.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
@@ -140,6 +141,6 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("test-property1", transformer.getDeleteProperties().get(0));
         assertEquals("test-property2", transformer.getDeleteProperties().get(1));
         assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
+        assertEquals(PropertyScope.OUTBOUND, transformer.getScope());
     }
-
 }

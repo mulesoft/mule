@@ -10,13 +10,14 @@
 
 package org.mule.api.security;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * <code>Authentication</code> represents an authentication request and contains
  * authentication information if the request was successful
  */
-public interface Authentication
+public interface Authentication extends Serializable
 {
     void setAuthenticated(boolean b);
 

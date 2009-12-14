@@ -18,6 +18,8 @@ import org.mule.api.security.SecurityContext;
  */
 public class DefaultSecurityContext implements SecurityContext
 {
+    private static final long serialVersionUID = -3209120471953147538L;
+
     private Authentication authentication;
 
     public DefaultSecurityContext(Authentication authentication)

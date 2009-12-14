@@ -46,6 +46,7 @@ import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
@@ -208,7 +209,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new TransformerDefinitionParser(AutoTransformer.class));
         registerBeanDefinitionParser("no-action-transformer", new TransformerDefinitionParser(NoActionTransformer.class));
-        registerBeanDefinitionParser("message-properties-transformer", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
+        registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
 
         registerBeanDefinitionParser("expression-transformer", new TransformerDefinitionParser(ExpressionTransformer.class));
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));

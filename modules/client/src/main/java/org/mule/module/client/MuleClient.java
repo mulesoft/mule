@@ -754,8 +754,7 @@ public class MuleClient implements Disposable
         }
         try
         {
-            DefaultMuleSession session = new DefaultMuleSession(message,
-                ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), muleContext);
+            DefaultMuleSession session = new DefaultMuleSession(muleContext);
 
             if (user != null)
             {

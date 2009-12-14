@@ -9,7 +9,9 @@
  */
 package org.mule.transport;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleSession;
 import org.mule.api.transport.PropertyScope;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
@@ -18,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,22 +29,24 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * This object maintains a scoped map of properties.  This means that certian properties will only be visiable under some
- * scopes. The scopes support by Mule are:
+ * This object maintains a scoped map of properties.  This means that certain properties will only be visible under some
+ * scopes. The scopes supported by Mule are:
  * <ol>
  * <li> {@link org.mule.api.transport.PropertyScope#INBOUND} Contains properties that were on the message when it was
- * received by Mule. this scope is read-only.</li>
+ * received by Mule.  This scope is read-only.</li>
  * <li>{@link org.mule.api.transport.PropertyScope#INVOCATION} Any properties set on the invocation scope will be
- * available to the current service but will not be attached to any outound messages.  This is the default scope.</li>
+ * available to the current service but will not be attached to any outbound messages.</li>
  * <li>{@link org.mule.api.transport.PropertyScope#OUTBOUND} Any properties set in this scope will be attached to any
- * outbound messages resulting from this message</li>
+ * outbound messages resulting from this message.  This is the default scope.</li>
  * <li>{@link org.mule.api.transport.PropertyScope#SESSION} Any properties set on this scope will be added to the session.
- * Note that this is a convinience scope in that you cannot directly access session properties from this scope.  Session
+ * Note that this is a convenience scope in that you cannot directly access session properties from this scope.  Session
  * properties can be accessed from the {@link MuleEvent}</li>
  * </ol>
  */
 public class MessagePropertiesContext implements Serializable
 {
+    private static final long serialVersionUID = -5230693402768953742L;
+
     /**
      * The order that properties should be read in.
      */
@@ -55,7 +60,14 @@ public class MessagePropertiesContext implements Serializable
         SCOPE_ORDER.add(PropertyScope.SESSION);
     }
     
-    protected Map scopedMap;
+    /**
+     * Map of maps containing the scoped properties, each scope has its own Map.
+     */
+    protected Map<PropertyScope, Map> scopedMap;
+    
+    /**
+     * The union of all property names from all scopes.
+     */
     protected Set keySet;
 
     protected PropertyScope defaultScope = PropertyScope.OUTBOUND;
@@ -68,8 +80,6 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new HashMap(6));
         scopedMap.put(PropertyScope.INBOUND, new HashMap(6));
         scopedMap.put(PropertyScope.OUTBOUND, new HashMap(6));
-        scopedMap.put(PropertyScope.SESSION, new HashMap(6));
-
     }
 
     public MessagePropertiesContext(PropertyScope defaultScope)
@@ -98,6 +108,7 @@ public class MessagePropertiesContext implements Serializable
         Map map = (Map) scopedMap.get(scope);
         if (map == null)
         {
+            map = null;
             throw new IllegalArgumentException("Scope not registered: " + scope);
         }
         return map;
@@ -130,8 +141,13 @@ public class MessagePropertiesContext implements Serializable
     {
         if (properties != null)
         {
-            getScopedProperties(PropertyScope.SESSION).putAll(properties);
-            keySet.addAll(properties.keySet());
+            if (RequestContext.getEvent() != null)
+            {
+                for (Object key : properties.keySet())
+                {
+                    RequestContext.getEvent().getSession().setProperty(key, properties.get(key));
+                }
+            }
         }
     }
 
@@ -141,8 +157,17 @@ public class MessagePropertiesContext implements Serializable
         Object value = null;
         for (PropertyScope scope : SCOPE_ORDER)
         {
-            Map props = (Map) scopedMap.get(scope);
-            value = props.get(key);
+            if (PropertyScope.SESSION.equals(scope))
+            {
+                if (RequestContext.getEvent() != null)
+                {
+                    value = RequestContext.getEvent().getSession().getProperty(key);
+                }
+            }
+            else
+            {
+                value = scopedMap.get(scope).get(key);
+            }
             if (value != null)
             {
                 break;
@@ -153,10 +178,30 @@ public class MessagePropertiesContext implements Serializable
 
     public Object getProperty(String key, PropertyScope scope)
     {
-        Map props = getScopedProperties(scope);
-        return props.get(key);
+        if (scope == null)
+        {
+            return getProperty(key);
+        }
+        
+        Object value = null;        
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                value = RequestContext.getEvent().getSession().getProperty(key);
+            }
+        }
+        else
+        {
+            value = scopedMap.get(scope).get(key);
+        }
+        return value;
     }
 
+    /**
+     * Removes all properties from all scopes except for SESSION and INBOUND (which is read-only).
+     * You may explicitly clear the session properties by calling clearProperties(PropertyScope.SESSION)
+     */
     public void clearProperties()
     {
         Map props = getScopedProperties(PropertyScope.INVOCATION);
@@ -165,22 +210,39 @@ public class MessagePropertiesContext implements Serializable
         props = getScopedProperties(PropertyScope.OUTBOUND);
         keySet.removeAll(props.keySet());
         props.clear();
-        props = getScopedProperties(PropertyScope.SESSION);
-        keySet.removeAll(props.keySet());
-        props.clear();
-        //inbound are read Only
     }
 
     public void clearProperties(PropertyScope scope)
     {
+        if (scope == null)
+        {
+            clearProperties();
+            return;
+        }
+        
         checkScopeForWriteAccess(scope);
-        Map props = getScopedProperties(scope);
-        keySet.removeAll(props.keySet());
-        props.clear();
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                MuleSession session = RequestContext.getEvent().getSession();
+                for (Object key : session.getPropertyNamesAsSet())
+                {
+                    session.removeProperty(key);
+                }
+            }
+        }
+        else
+        {
+            Map props = getScopedProperties(scope);
+            keySet.removeAll(props.keySet());
+            props.clear();
+        }
     }
 
     /**
-     * Removes a property on this message
+     * Removes a property from all scopes except for SESSION and INBOUND (which is read-only).
+     * You may explicitly remove a session property by calling removeProperty(key, PropertyScope.SESSION)
      *
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
@@ -189,14 +251,47 @@ public class MessagePropertiesContext implements Serializable
     {
         Object value = getScopedProperties(PropertyScope.OUTBOUND).remove(key);
         Object inv = getScopedProperties(PropertyScope.INVOCATION).remove(key);
-        Object inbound = getScopedProperties(PropertyScope.INBOUND).remove(key);
-        Object session = getScopedProperties(PropertyScope.SESSION).remove(key);
     
         keySet.remove(key);
       
         if (value == null) value = inv;
-        if (value == null) value = inbound;
-        if (value == null) value = session;
+        
+        return value;
+    }
+
+    /**
+     * Removes a property from the specified property scope.
+     *
+     * @param key the property key to remove
+     * @return the removed property value or null if the property did not exist
+     */
+    public Object removeProperty(String key, PropertyScope scope)
+    {
+        if (scope == null)
+        {
+            return removeProperty(key);
+        }
+        
+        Object value = null;
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                value = RequestContext.getEvent().getSession().removeProperty(key);
+            }
+        }
+        else
+        {
+            value = getScopedProperties(scope).remove(key);
+        }
+
+        // Only remove the property from the keySet if it does not exist in any other scope besides this one.
+        if (getProperty(key, PropertyScope.OUTBOUND) == null 
+            && getProperty(key, PropertyScope.INVOCATION) == null 
+            && getProperty(key, PropertyScope.INBOUND) == null)
+        {
+            keySet.remove(key);
+        }
         
         return value;
     }
@@ -223,21 +318,62 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
+        if (scope == null)
+        {
+            setProperty(key, value);
+            return;
+        }
+        
         checkScopeForWriteAccess(scope);
-        getScopedProperties(scope).put(key, value);
-        keySet.add(key);
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                RequestContext.getEvent().getSession().setProperty(key, value);
+            }
+        }
+        else
+        {
+            getScopedProperties(scope).put(key, value);
+            keySet.add(key);
+        }
     }
 
     /** @return all property keys on this message */
     public Set getPropertyNames()
     {
-        return Collections.unmodifiableSet(keySet);
+        Set allProps = new HashSet();
+        allProps.addAll(keySet);
+        if (RequestContext.getEvent() != null)
+        {
+            allProps.addAll(RequestContext.getEvent().getSession().getPropertyNamesAsSet());
+        }
+        return allProps;
     }
 
     /** @return all property keys on this message for the given scope */
     public Set getPropertyNames(PropertyScope scope)
     {
-        return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
+        if (scope == null)
+        {
+            return getPropertyNames();
+        }
+        
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                return RequestContext.getEvent().getSession().getPropertyNamesAsSet();
+            }
+            else
+            {
+                return Collections.emptySet();
+            }
+        }
+        else
+        {
+            return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
+        }
     }
 
     protected void checkScopeForWriteAccess(PropertyScope scope)
@@ -308,7 +444,6 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new HashMap(getScopedProperties(PropertyScope.INVOCATION)));
         scopedMap.put(PropertyScope.INBOUND, new HashMap(getScopedProperties(PropertyScope.INBOUND)));
         scopedMap.put(PropertyScope.OUTBOUND, new HashMap(getScopedProperties(PropertyScope.OUTBOUND)));
-        scopedMap.put(PropertyScope.SESSION, new HashMap(getScopedProperties(PropertyScope.SESSION)));
 
         return new MessagePropertiesContext(getDefaultScope(), keySet, scopedMap);
     }

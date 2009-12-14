@@ -65,7 +65,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 throw new InitialisationException(CoreMessages.propertiesNotSet("endpoint"), this);
             }
             // Create a session for sending notifications
-            session = new DefaultMuleSession(new DefaultMuleMessage(NullPayload.getInstance(), (Map<?, ?>) null, muleContext), new NullSessionHandler(), muleContext);
+            session = new DefaultMuleSession(muleContext);
         }
         catch (Exception e)
         {

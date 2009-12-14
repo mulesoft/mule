@@ -12,7 +12,6 @@ package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
-import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.ResponseOutputStream;
@@ -239,13 +238,13 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             if (!endpoint.getFilter().accept(message))
             {
-                //TODO RM* This ain't pretty, we don't yet have an event context since the message hasn't gon to the 
+                //TODO RM* This ain't pretty, we don't yet have an event context since the message hasn't gone to the 
                 //message listener yet. So we need to create a new context so that EventAwareTransformers can be applied
                 //to response messages where the filter denied the message
                 //Maybe the filter should be checked in the MessageListener...
                 message = handleUnacceptedFilter(message);
                 RequestContext.setEvent(new DefaultMuleEvent(message, endpoint,
-                        new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), synchronous));
+                        new DefaultMuleSession(connector.getMuleContext()), synchronous));
                 return message;
             }
         }
@@ -322,7 +321,15 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                     ros = new ResponseOutputStream(outputStream);
                 }
             }
-            MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), service, connector.getMuleContext());
+            MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message);
+            if (session != null)
+            {
+                session.setService(service);
+            }
+            else
+            {
+                session = new DefaultMuleSession(service, connector.getMuleContext());
+            }
             MuleEvent muleEvent = new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
             muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 

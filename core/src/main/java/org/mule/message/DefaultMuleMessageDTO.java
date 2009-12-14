@@ -52,7 +52,7 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
         for (Iterator iterator = message.getPropertyNames(scope).iterator(); iterator.hasNext();)
         {
             String key = (String)iterator.next();
-            setProperty(scope.getScope() + "#" + key, message.getProperty(key));
+            setProperty(scope.getScopeName() + "#" + key, message.getProperty(key));
         }
     }
 
@@ -74,15 +74,15 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
         {
             i = s.indexOf("#");
             prefix = s.substring(0, i);
-            if(prefix.equals(PropertyScope.INBOUND.getScope()))
+            if(prefix.equals(PropertyScope.INBOUND.getScopeName()))
             {
                 message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.INBOUND);
             }
-            else if(prefix.equals(PropertyScope.OUTBOUND.getScope()))
+            else if(prefix.equals(PropertyScope.OUTBOUND.getScopeName()))
             {
                 message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.OUTBOUND);
             }
-            else if(prefix.equals(PropertyScope.SESSION.getScope()))
+            else if(prefix.equals(PropertyScope.SESSION.getScopeName()))
             {
                 message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.SESSION);
             }

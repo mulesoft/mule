@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<spring:bean name="date" class="java.util.Date" />
+	
+    <message-properties-transformer name="SetSessionProperty" scope="session">
+        <add-message-property key="testProperty" value-ref="date" />
+    </message-properties-transformer>
+
+    <message-properties-transformer name="SetInvocationProperty" scope="invocation">
+        <add-message-property key="testProperty" value-ref="date" />
+    </message-properties-transformer>
+
+    <custom-transformer name="RetrieveProperty" class="org.mule.test.integration.message.RetrievePropertyTransformer">
+    	<spring:property name="property" value="testProperty" />
+    </custom-transformer>
+
+    <model>
+        <service name="InService1">
+            <inbound>
+                <vm:inbound-endpoint path="in1" transformer-refs="SetSessionProperty" synchronous="true"/>
+            </inbound>
+
+            <outbound>
+                <pass-through-router>
+                     <vm:outbound-endpoint path="middle" synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="InService2">
+            <inbound>
+                <vm:inbound-endpoint path="in2" transformer-refs="SetInvocationProperty" synchronous="true"/>
+            </inbound>
+
+            <outbound>
+                <pass-through-router>
+                     <vm:outbound-endpoint path="middle" synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="ResponseService">
+            <inbound>
+                <vm:inbound-endpoint path="middle" transformer-refs="RetrieveProperty" synchronous="true" />
+            </inbound>
+        </service>
+    </model>
+</mule>

@@ -35,7 +35,8 @@ public class StaticRecipientList extends AbstractRecipientList
 
     protected List getRecipients(MuleMessage message)
     {
-        Object msgRecipients = message.removeProperty(RECIPIENTS_PROPERTY);
+        Object msgRecipients = message.getProperty(RECIPIENTS_PROPERTY);
+        message.removeProperty(RECIPIENTS_PROPERTY);
 
         if (msgRecipients == null)
         {

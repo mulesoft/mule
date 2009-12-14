@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import java.text.MessageFormat;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A configurable message transformer that allows users to add, overwrite and delete
@@ -41,6 +41,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     /** the properties map containing rename mappings for message properties */
     private Map renameProperties;
     private boolean overwrite = true;
+    private PropertyScope scope;
 
     private MuleContext muleContext;
 
@@ -83,13 +84,12 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         {
             for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
             {
-                message.removeProperty(iterator.next().toString());
+                message.removeProperty(iterator.next().toString(), scope);
             }
         }
 
         if (addProperties != null && addProperties.size() > 0)
         {
-            final Set propertyNames = message.getPropertyNames();
             for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry)iterator.next();
@@ -109,32 +109,23 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                         value = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
 
-                    if (overwrite)
+                    if (message.getProperty(key, scope) != null)
                     {
-                        if (logger.isDebugEnabled())
+                        if (overwrite)
                         {
-                            if (propertyNames.contains(key))
-                            {
-                                logger.debug("Overwriting message property " + key);
-                            }
-                        }
-                        message.setProperty(key, value);
-                    }
-                    else
-                    {
-                        if (propertyNames.contains(key))
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(MessageFormat.format(
-                                    "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
-                                    key, value));
-                            }
+                            logger.debug("Overwriting message property " + key);
+                            message.setProperty(key, value, scope);
                         }
                         else
                         {
-                            message.setProperty(key, value);
+                            logger.debug(MessageFormat.format(
+                                "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
+                                key, value, scope));
                         }
+                    }
+                    else
+                    {
+                        message.setProperty(key, value, scope);
                     }
                 }
             }
@@ -143,7 +134,6 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         /* perform renaming transformation */
         if (this.renameProperties != null && this.renameProperties.size() > 0)
         {
-            final Set propertyNames = message.getPropertyNames();
             for (Iterator iterator = this.renameProperties.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry)iterator.next();
@@ -171,7 +161,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                         }
 
                         /* log transformation */
-                        if (logger.isDebugEnabled() && !propertyNames.contains(key))
+                        if (logger.isDebugEnabled() && message.getProperty(key, scope) == null)
                         {
                             logger.debug("renaming message property " + key + " to " + value);
                         }
@@ -180,9 +170,9 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                          * store current value of the property. then remove key and
                          * store value under new key
                          */
-                        Object propValue = message.getProperty(key);
-                        message.removeProperty(key);
-                        message.setProperty(value, propValue);
+                        Object propValue = message.getProperty(key, scope);
+                        message.removeProperty(key, scope);
+                        message.setProperty(value, propValue, scope);
                     }
                 }
             }
@@ -234,5 +224,27 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     public void setOverwrite(final boolean overwrite)
     {
         this.overwrite = overwrite;
+    }
+
+    public PropertyScope getScope()
+    {
+        return scope;
+    }
+
+    public void setScope(PropertyScope scope)
+    {
+        this.scope = scope;
+    }
+    
+    /** For XML-based config */
+    public String getScopeName()
+    {
+        return scope != null ? scope.getScopeName() : null;
+    }
+
+    /** For XML-based config */
+    public void setScopeName(String scopeName)
+    {
+        this.scope = PropertyScope.get(scopeName);
     }
 }

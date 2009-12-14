@@ -23,7 +23,12 @@ public interface SessionHandler
 
     void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException;
 
+    /**
+     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
+     */
     void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException;
+
+    MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException;
 
     /**
      * The property name of the session id to use when creating the Mule session. by
@@ -31,6 +36,7 @@ public interface SessionHandler
      * session called "ID" a session id will be automatically generated
      * 
      * @return the property name of the session id that is set on the session
+     * @deprecated This method is no longer needed and will be removed in the next major release
      */
     String getSessionIDKey();
 }

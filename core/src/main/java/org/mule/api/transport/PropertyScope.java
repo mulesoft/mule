@@ -13,8 +13,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * A PropertyScope is used to assoaciate a message property with a lifetime. Some scopes may be very brief such as
- * {@link #INVOCATION} scope which only lasts until a service has been invoke or a longer running scope such as {@link #SESSION}
+ * A PropertyScope is used to associate a message property with a lifetime.  A scope may be very brief such as
+ * {@link #INVOCATION} which only lasts until a service has been invoked or longer running such as {@link #SESSION}.
  *
  */
 public final class PropertyScope implements Serializable
@@ -71,7 +71,35 @@ public final class PropertyScope implements Serializable
         this.order = order;
     }
 
-    public String getScope()
+    public static PropertyScope get(String name)
+    {
+        if (INVOCATION.getScopeName().equals(name))
+        {
+            return INVOCATION;
+        }
+        else if (INBOUND.getScopeName().equals(name))
+        {
+            return INBOUND;
+        }
+        else if (OUTBOUND.getScopeName().equals(name))
+        {
+            return OUTBOUND;
+        }
+        else if (SESSION.getScopeName().equals(name))
+        {
+            return SESSION;
+        }
+        else if (APPLICATION.getScopeName().equals(name))
+        {
+            return APPLICATION;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    public String getScopeName()
     {
         return scope;
     }
@@ -83,7 +111,7 @@ public final class PropertyScope implements Serializable
 
     public String toString()
     {
-        return getScope();
+        return getScopeName();
     }
 
     public boolean equals(Object o)

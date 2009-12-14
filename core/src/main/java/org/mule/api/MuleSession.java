@@ -17,6 +17,7 @@ import org.mule.api.service.Service;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>MuleSession</code> is the context in which a request is executed. The
@@ -36,6 +37,13 @@ public interface MuleSession extends Serializable
      * @see org.mule.api.service.Service
      */
     Service getService();
+
+    /**
+     * Sets the Service associated with the session in its current execution
+     * 
+     * @see org.mule.api.service.Service
+     */
+    void setService(Service service);
 
     /**
      * This will send an event via the configured outbound endpoint on the service
@@ -241,7 +249,12 @@ public interface MuleSession extends Serializable
      * 
      * @return an iterater of property keys for the session properties on this
      *         session
+     * @deprecated Use getPropertyNamesAsSet() instead
      */
     Iterator getPropertyNames();
 
+    /**
+     * @return property keys for all session properties
+     */
+    Set getPropertyNamesAsSet();
 }

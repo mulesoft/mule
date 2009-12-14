@@ -20,9 +20,17 @@ import org.mule.api.transport.SessionHandler;
  */
 public class NullSessionHandler implements SessionHandler
 {
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    {
+        return null;
+    }
+
+    /**
+     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
+     */
     public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
     {
-        // noop
+        session = retrieveSessionInfoFromMessage(message);
     }
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException

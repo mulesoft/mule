@@ -247,7 +247,7 @@ public final class StringMessageUtils
             try
             {
                 Set names = new TreeSet(m.getPropertyNames(scope));
-                buf.append("  ").append(scope.getScope().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
+                buf.append("  ").append(scope.getScopeName().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
 
                 for (Object name : names)
                 {
