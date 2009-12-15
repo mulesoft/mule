@@ -87,6 +87,3 @@ org.mule.test.integration.client.MuleClientRemotingHttpTestCase
 
 # MULE-4485
 org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
-
-# MULE-4620
-org.mule.test.integration.messaging.meps.InOptionalOutOutOnlyJMSTestCase
