@@ -53,13 +53,10 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
     {
         PolicyStatus status = null;
         RetryPolicy policy = createRetryInstance();
-        DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription());
+        DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), 
+            metaInfo);
         context.setMuleContext(muleContext);
 
-        if (metaInfo != null)
-        {
-            context.setMetaInfo(metaInfo);
-        }
         try
         {
             Exception cause = null;

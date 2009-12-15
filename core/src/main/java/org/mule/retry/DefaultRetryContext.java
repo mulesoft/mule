@@ -25,22 +25,21 @@ import java.util.Map;
  */
 public class DefaultRetryContext implements RetryContext, MuleContextAware
 {
-
     private MuleMessage[] returnMessages;
-    private Map metaInfo = new HashMap();
+    private Map<Object, Object> metaInfo = new HashMap<Object, Object>();
     private String description;
     private Throwable lastFailure;
     private boolean failed = false;
     private MuleContext muleContext;
 
-    public DefaultRetryContext()
+    public DefaultRetryContext(String description, Map<Object, Object> metaInfo)
     {
-        // needed for some EE policies
-    }
-
-    public DefaultRetryContext(String description)
-    {
+        super();
         this.description = description;
+        if (metaInfo != null)
+        {
+            this.metaInfo = metaInfo;
+        }
     }
 
     public void setMuleContext(MuleContext context)
@@ -53,18 +52,9 @@ public class DefaultRetryContext implements RetryContext, MuleContextAware
         return muleContext;
     }
 
-    public Map getMetaInfo()
+    public Map<Object, Object> getMetaInfo()
     {
         return Collections.unmodifiableMap(metaInfo);
-    }
-
-    public void setMetaInfo(Map metaInfo)
-    {
-        if (metaInfo == null)
-        {
-            throw new IllegalArgumentException("Can't accept null meta-info map");
-        }
-        this.metaInfo = metaInfo;
     }
 
     public MuleMessage[] getReturnMessages()

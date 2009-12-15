@@ -30,8 +30,6 @@ public interface RetryContext
      */
     Map<Object, Object> getMetaInfo();
 
-    void setMetaInfo(Map<Object, Object> metaInfo);
-
     MuleMessage[] getReturnMessages();
 
     MuleMessage getFirstReturnMessage();
