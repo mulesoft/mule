@@ -75,8 +75,8 @@ jbossts-jta-integration-4.2.3-SP5-osgi
 jcl104-over-slf4j-1.5.0
 jcr-1.0-osgi
 jdom-1.0-osgi
-jetty-6.1.11
-jetty-util-6.1.11
+jetty-6.1.22
+jetty-util-6.1.22
 joda-time-1.6
 jsr250-api-1.0
 junit-4.7
@@ -151,7 +151,7 @@ saxon-8.9.0.4-osgi
 saxon-dom-8.9.0.4-osgi
 saxon-xqj-8.9.0.4
 script-api-1.0-osgi-jdk14
-servlet-api-2.5-6.1.11
+servlet-api-2.5-20081211
 slf4j-api-1.5.0
 slf4j-log4j12-1.5.0
 smack-2.2.1-osgi

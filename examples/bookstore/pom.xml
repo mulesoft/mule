@@ -22,7 +22,7 @@
         <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
         <cxfVersion>2.1.2</cxfVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
-        <jettyVersion>6.1.11</jettyVersion>
+        <jettyVersion>6.1.22</jettyVersion>
         <xalanVersion>2.7.1</xalanVersion>
     </properties>
 
