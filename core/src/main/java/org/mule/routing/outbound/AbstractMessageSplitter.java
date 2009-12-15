@@ -80,8 +80,6 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
                 //Use sync config from endpoint
                 boolean synchronous = part.getEndpoint().isSynchronous();
-                sendMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
-                        part.getEndpoint().isSynchronous());
 
                 if (synchronous)
                 {

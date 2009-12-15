@@ -21,7 +21,7 @@
             </inbound>
             <outbound>
                 <list-message-splitter-router>
-                    <vm:outbound-endpoint path="resequencer"/>
+                    <vm:outbound-endpoint path="resequencer" synchronous="true"/>
                 </list-message-splitter-router>
             </outbound>
         </service>

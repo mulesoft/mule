@@ -200,32 +200,44 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     }
 
     /**
-     * RemoteSync causes the message dispatch to wait for a response to an event on a
-     * response channel after it sends the event. The following rules apply to
-     * RemoteSync:
-     * <ol><li>The connector has to support remoteSync. Some transports do not
-     * have the notion of a response channel.
-     * <li>Check if the endpoint has been configured for remoteSync.
-     * <li>Check if the REMOTE_SYNC message header has been set.
-     * <li>Finally, if the current service has a response router configured,
-     * that the router will handle the response channel event and we should not try
-     * and receive a response in the Message dispatcher If remotesync should not be
-     * used we must remove the REMOTE_SYNC header Note the MuleClient will
-     * automatically set the REMOTE_SYNC header when client.send(..) is called so
-     * that results are returned from remote invocations too.
-     * </ol>
-     * @param event the current event
-     * @return true if a response channel should be used to get a resposne from the
-     *         event dispatch.
+     * @deprecated
      */
     protected boolean returnResponse(MuleEvent event)
+    {
+        // Pass through false to conserve the existing behavior of this method but
+        // avoid duplication of code.
+        return returnResponse(event, false);
+    }
+
+    /**
+     * Used to determine if the dispatcher implementation should wait for a response
+     * to an event on a response channel after it sends the event. The following
+     * rules apply:
+     * <ol>
+     * <li>The connector has to support "back-channel" response. Some transports do
+     * not have the notion of a response channel.
+     * <li>Check if the endpoint is synchronous (outbound synchronicity is not
+     * explicit since 2.2 and does not use the remoteSync message property).
+     * <li>Or, if the send() method on the dispatcher was used. (This is required
+     * because the ChainingRouter uses send() with async endpoints. See MULE-4631).
+     * <li>Finally, if the current service has a response router configured, that the
+     * router will handle the response channel event and we should not try and
+     * receive a response in the Message dispatcher If remotesync should not be used
+     * we must remove the REMOTE_SYNC header Note the MuleClient will automatically
+     * set the REMOTE_SYNC header when client.send(..) is called so that results are
+     * returned from remote invocations too.
+     * </ol>
+     * 
+     * @param event the current event
+     * @return true if a response channel should be used to get a response from the
+     *         event dispatch.
+     */
+    protected boolean returnResponse(MuleEvent event, boolean doSend)
     {
         boolean remoteSync = false;
         if (event.getEndpoint().getConnector().isResponseEnabled())
         {
-            remoteSync = event.getEndpoint().isSynchronous()
-                            || event.getMessage().getBooleanProperty(
-                                MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
+            remoteSync = event.getEndpoint().isSynchronous() || doSend;
             if (remoteSync)
             {
                 // service will be null for client calls

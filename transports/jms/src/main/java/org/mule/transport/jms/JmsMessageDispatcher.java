@@ -18,6 +18,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
@@ -81,7 +82,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new IllegalStateException("No JMS Connection");
         }
-        dispatchMessage(event);
+        dispatchMessage(event, false);
     }
 
     protected void doConnect() throws Exception
@@ -99,7 +100,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return disableTemporaryDestinations;
     }
 
-    private MuleMessage dispatchMessage(MuleEvent event) throws Exception
+    private MuleMessage dispatchMessage(MuleEvent event, boolean doSend) throws Exception
     {
         Session session = null;
         MessageProducer producer = null;
@@ -158,7 +159,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction using a replyTo destination
-            useReplyToDestination = returnResponse(event) && !transacted;
+            useReplyToDestination = returnResponse(event, doSend) && !transacted;
 
             boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
@@ -354,8 +355,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
-        MuleMessage message = dispatchMessage(event);
-        return message;
+        return dispatchMessage(event, true);
     }
 
     protected void doDispose()

@@ -204,12 +204,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                     new EndpointMessageNotification(message, endpoint, service.getName(), EndpointMessageNotification.MESSAGE_RECEIVED));
         }
 
-        //If synchronous set on the endpoint, we need to set it on the message
-        if (endpoint.isSynchronous())
-        {
-            message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
-        }
         //Enforce a sync endpoint if remote sync is set
+        // TODO MULE-4622
         if (message.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false))
         {
             synchronous = true;

@@ -278,7 +278,6 @@ public class DefaultMuleEventContext implements MuleEventContext
             public Object call() throws Exception
             {
                 MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext());
-                muleMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 muleMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(muleMessage);
             }
@@ -312,7 +311,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message);
             }
@@ -348,7 +346,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointUri);
             }
@@ -386,7 +383,6 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointName);
             }

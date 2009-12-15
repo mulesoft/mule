@@ -25,6 +25,19 @@
             </custom-outbound-router>
          </outbound>
       </service>
+      
+      <service name="Part2ServiceLastEndpointDispatch" initialState="started">
+         <inbound>
+            <inbound-endpoint address="vm://in2" synchronous="true"/>
+         </inbound>
+         <outbound>
+            <custom-outbound-router class="org.mule.routing.outbound.ChainingRouter">
+               <outbound-endpoint address="jms://out1" synchronous="true"/>
+               <outbound-endpoint address="vm://out2" synchronous="true"/>
+               <outbound-endpoint address="jms://out2" synchronous="false"/>
+            </custom-outbound-router>
+         </outbound>
+      </service>
 
       <service name="Part3Service" initialState="started">
          <inbound>
