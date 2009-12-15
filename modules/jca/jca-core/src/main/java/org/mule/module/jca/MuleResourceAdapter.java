@@ -295,7 +295,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         throws MuleException
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
-            muleActivationSpec.getEndpoint(), muleContext), muleContext);
+            muleActivationSpec.getEndpoint(), muleContext));
 
         // Use asynchronous endpoint as we need to dispatch to service
         // rather than send.

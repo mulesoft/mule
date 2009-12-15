@@ -32,6 +32,7 @@ import java.util.Map;
 public class MuleClientTransactionTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
@@ -40,7 +41,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithSetRollbackOnly() throws Exception
     {
         final MuleClient client = new MuleClient();
-        final Map props = new HashMap();
+        final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
@@ -58,7 +59,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
-            new URIBuilder("jms://test.queue", muleContext), muleContext);
+            new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
@@ -89,7 +90,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithExceptionThrown() throws Exception
     {
         final MuleClient client = new MuleClient();
-        final Map props = new HashMap();
+        final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
@@ -107,7 +108,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
-            new URIBuilder("jms://test.queue", muleContext), muleContext);
+            new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
@@ -143,7 +144,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithCommit() throws Exception
     {
         final MuleClient client = new MuleClient();
-        final Map props = new HashMap();
+        final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         props.put("transacted", "true");
@@ -162,7 +163,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(
-            new URIBuilder("jms://test.queue", muleContext), muleContext);
+            new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()

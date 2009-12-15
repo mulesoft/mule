@@ -220,7 +220,7 @@ public class UniversalSender extends BasicHandler
 
             if (sync)
             {
-                EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, muleContext);
+                EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
                 builder.setSynchronous(true);
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()

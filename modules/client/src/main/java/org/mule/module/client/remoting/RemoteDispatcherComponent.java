@@ -162,7 +162,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
 
-            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), muleContext);
+            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint());
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
             ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);

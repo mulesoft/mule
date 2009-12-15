@@ -265,8 +265,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
         protocolEndpointBuilder.setTransactionConfig(originalEndpoint.getTransactionConfig());
         
-        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(originalEndpoint,
-            muleContext);
+        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(originalEndpoint);
         
         // Apply the transformers to the correct endpoint
         EndpointBuilder transformerEndpoint;

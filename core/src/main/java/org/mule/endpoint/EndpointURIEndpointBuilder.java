@@ -20,17 +20,18 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
 
     public EndpointURIEndpointBuilder()
     {
-        // blank
+        super();
     }
 
     /**
      * Called from Spring
      * 
      * @param global The global endpoint "Policy"
-     * @throws EndpointException
      */
     public EndpointURIEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
     {
+        super();
+        
         // can't (concisely) use setters where null is a possibility
         // for consistency, set directly on all fields (this also avoids logic in
         // getters)
@@ -51,25 +52,26 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         retryPolicyTemplate = global.retryPolicyTemplate;
     }
 
-    public EndpointURIEndpointBuilder(URIBuilder URIBuilder, MuleContext muleContext)
+    public EndpointURIEndpointBuilder(URIBuilder builder)
     {
-        this.muleContext = muleContext;
-        this.uriBuilder = URIBuilder;
+        super();
+        this.uriBuilder = builder;
+        this.muleContext = builder.getMuleContext();
     }
 
     public EndpointURIEndpointBuilder(String address, MuleContext muleContext)
     {
-        this(new URIBuilder(address, muleContext), muleContext);
+        this(new URIBuilder(address, muleContext));
     }
 
-    protected EndpointURIEndpointBuilder(EndpointURI endpointURI, MuleContext muleContext)
+    protected EndpointURIEndpointBuilder(EndpointURI endpointURI)
     {
-        this(new URIBuilder(endpointURI), muleContext);
+        this(new URIBuilder(endpointURI));
     }
 
-    public EndpointURIEndpointBuilder(ImmutableEndpoint source, MuleContext muleContext)
+    public EndpointURIEndpointBuilder(ImmutableEndpoint source)
     {
-        this(source.getEndpointURI(), muleContext);
+        this(source.getEndpointURI());
         setName(source.getName());
         setEncoding(source.getEncoding());
         setConnector(source.getConnector());

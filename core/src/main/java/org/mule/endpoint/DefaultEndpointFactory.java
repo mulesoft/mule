@@ -170,7 +170,7 @@ public class DefaultEndpointFactory implements EndpointFactory
         else
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri);
         }
         return source.getEndpoint(endpointBuilder);
     }

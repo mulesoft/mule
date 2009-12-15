@@ -395,8 +395,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
         // TODO Do we really need to modify the existing receiver endpoint? What happens if we don't security,
         // filters and transformers will get invoked twice?
-        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
-            muleContext);
+        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
         receiverEndpointBuilder.setFilter(null);
         // Remove the Axis Receiver Security filter now

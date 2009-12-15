@@ -120,7 +120,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         FileConnector connector = (FileConnector) getConnector();
 
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder("file://foo", muleContext), muleContext);
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder("file://foo", muleContext));
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
 
         // Endpoint wants String-typed properties
