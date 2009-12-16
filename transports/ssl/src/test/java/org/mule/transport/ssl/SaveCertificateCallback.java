@@ -10,11 +10,11 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.tck.functional.EventCallback;
 import org.mule.api.MuleEventContext;
+import org.mule.tck.functional.EventCallback;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class SaveCertificateCallback implements EventCallback
 {
@@ -29,8 +29,6 @@ public class SaveCertificateCallback implements EventCallback
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
-        // putting a Thread.sleep here doesn't make this less reliable
-        // surely it would if it was thread scribbling?
         certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
         called.set(true);
     }
