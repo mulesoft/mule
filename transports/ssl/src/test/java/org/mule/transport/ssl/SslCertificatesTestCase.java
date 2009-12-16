@@ -14,8 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.util.SystemUtils;
 
+import java.security.cert.Certificate;
 import java.util.Iterator;
 
 /**
@@ -24,14 +24,6 @@ import java.util.Iterator;
  */
 public class SslCertificatesTestCase extends FunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4658
-        return SystemUtils.isIbmJDK();
-    }
-
-    protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;
 
     protected String getConfigResources()
@@ -65,12 +57,11 @@ public class SslCertificatesTestCase extends FunctionalTestCase
             MuleMessage result = client.send("in", msg, null);
             assertEquals(msg  + " Received", result.getPayloadAsString());
         }
-        Iterator certificates = callback.getCertificates().iterator();
+        Iterator<Certificate[]> certificates = callback.getCertificates().iterator();
         for (int i = 0; i < n; ++i)
         {
             assertTrue("No cert at " + i, certificates.hasNext());
             assertNotNull("Null cert at " + i, certificates.next());
         }
     }
-
 }

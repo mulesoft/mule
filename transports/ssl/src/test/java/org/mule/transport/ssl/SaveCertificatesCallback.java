@@ -10,21 +10,22 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.tck.functional.EventCallback;
 import org.mule.api.MuleEventContext;
+import org.mule.tck.functional.EventCallback;
 
+import java.security.cert.Certificate;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 public class SaveCertificatesCallback implements EventCallback
 {
-
     // volatile since this is a thread-safe collection (see holger)
-    private volatile List certificates;
+    private volatile List<Certificate[]> certificates;
 
     public SaveCertificatesCallback()
     {
+        super();
         clear();
     }
 
@@ -33,17 +34,18 @@ public class SaveCertificatesCallback implements EventCallback
         // putting a Thread.sleep here doesn't make this less reliable
         // surely it would if it was thread scribbling?
         Thread.sleep(100);
-        certificates.add(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+
+        Certificate[] certs = (Certificate[]) context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES);
+        certificates.add(certs);
     }
 
     public void clear()
     {
-        certificates = Collections.synchronizedList(new LinkedList());
+        certificates = Collections.synchronizedList(new LinkedList<Certificate[]>());
     }
 
-    public List getCertificates()
+    public List<Certificate[]> getCertificates()
     {
         return certificates;
     }
-
 }
