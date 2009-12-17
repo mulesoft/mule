@@ -13,22 +13,11 @@ package org.mule.transport.ssl.issues;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.SystemUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4661
-        return SystemUtils.isIbmJDK();
-    }
-
-//    protected static String TEST_MESSAGE = "Test SSL Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
-    protected static String TEST_MESSAGE = "Test SSL Request";
+//    protected static String TEST_SSL_MESSAGE = "Test SSL Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
+    protected static String TEST_SSL_MESSAGE = "Test SSL Request";
 
     protected String getConfigResources()
     {
@@ -38,9 +27,7 @@ public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null);
+        assertEquals(TEST_SSL_MESSAGE + " Received", result.getPayloadAsString());
     }
-
 }
