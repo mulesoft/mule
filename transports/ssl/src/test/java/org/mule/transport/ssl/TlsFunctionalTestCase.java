@@ -10,18 +10,8 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.util.SystemUtils;
-
-
 public class TlsFunctionalTestCase extends SslFunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4660
-        return SystemUtils.isIbmJDK();
-    }
-
     protected String getConfigResources()
     {
         return "tls-functional-test.xml";
