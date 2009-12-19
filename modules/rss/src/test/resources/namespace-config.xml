@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:rss="http://www.mulesoft.org/schema/mule/rss"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/rss http://www.mulesoft.org/schema/mule/rss/3.0/mule-rss.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <model>
+        <service name="test">
+            <inbound>
+                <rss:inbound-endpoint address="http://foo.com" acceptedMimeTypes="foo/bar" lastUpdate="2009-10-01"/>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+</mule>

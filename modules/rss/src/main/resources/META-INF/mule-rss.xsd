@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/rss"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesoft.org/schema/mule/rss"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd"/>
+
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation>
+            RSS is a popular syndication format used by many websites to provide a feed of data such
+            as news or updates.
+        </xsd:documentation>
+
+        <xsd:appinfo>
+            <schemadoc:short-name>RSS</schemadoc:short-name>
+            <schemadoc:page-title>RSS Module</schemadoc:page-title>
+
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+                                          requestEvents="true"
+                                          transactions="false" streaming="true">
+                <schemadoc:inboundMEPs in-only="true" in-out="false" in-optional-out="false"/>
+                <schemadoc:outboundMEPs out-only="false" out-in="false" out-optional-in="false"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attribute name="splitFeed" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the feed entries should be split before routing the data. If split the service
+                            component will be invoked for each entry in the feed. Otherwise the feed itself will be used
+                            as the
+                            data for the message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="lastUpdate" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows the endpoint to filter out any feed entries before the given date/time. This is only
+                            used if the feed
+                            is split. the format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
+                            13:00:00. If only the date
+                            is important you can omit the time part
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptedMimeTypes" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma-separated list of mime types that can be procesed by this endpoint. Typicially users
+                            do not need to set this property
+                            unless the feed being consumed does not set the mime type correctly. The default for this
+                            value is application/rss+xml,application/rss,text/xml
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="pollingFrequency" type="xsd:long">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The frequency in milliseconds to check the feed for new entries.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--<xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>-->
+    <!--<xsd:complexType name="outboundEndpointType">-->
+    <!--<xsd:complexContent>-->
+    <!--<xsd:extension base="mule:outboundEndpointType">-->
+    <!--<xsd:attribute name="feedType" type="xsd:string" default="rss_2.0"/>-->
+    <!--<xsd:attribute name="title" type="xsd:string"/>-->
+    <!--<xsd:attribute name="description" type="xsd:string"/>-->
+    <!--<xsd:attribute name="link" type="xsd:string"/>-->
+    <!--<xsd:attribute name="copyright" type="xsd:string"/>-->
+    <!--<xsd:attribute name="authors" type="xsd:string"/>-->
+    <!--<xsd:attribute name="categories" type="xsd:string"/>-->
+    <!--</xsd:extension>-->
+    <!--</xsd:complexContent>-->
+    <!--</xsd:complexType>-->
+
+</xsd:schema>

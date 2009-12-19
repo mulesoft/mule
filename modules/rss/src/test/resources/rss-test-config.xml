@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:rss="http://www.mulesoft.org/schema/mule/rss"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/rss http://www.mulesoft.org/schema/mule/rss/3.0/mule-rss.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <model>
+        <service name="rssTester">
+            <inbound>
+                <rss:inbound-endpoint address="http://blogs.mulesoft.org/feed/" pollingFrequency="1000">
+                    <property key="followRedirects" value="true"/>
+                </rss:inbound-endpoint>
+            </inbound>
+            <component>
+                <singleton-object class="org.mule.module.rss.RssEntryCounterComponent"/>
+            </component>
+        </service>
+
+        <service name="rssTester2">
+            <inbound>
+                <rss:inbound-endpoint address="http://blogs.mulesoft.org/feed/" pollingFrequency="1000"
+                                      lastUpdate="2009-11-01">
+                    <property key="followRedirects" value="true"/>
+                </rss:inbound-endpoint>
+            </inbound>
+            <component>
+                <singleton-object class="org.mule.module.rss.RssEntryCounterComponent"/>
+            </component>
+        </service>
+    </model>
+
+</mule>
