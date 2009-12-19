@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns:a="http://abdera.apache.org"
+       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xsi:schemaLocation="
+               http://abdera.apache.org http://abdera.apache.org/schemas/abdera-spring.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+    <!-- atom -->
+    <a:provider id="customerProvider">
+
+        <a:workspace title="Foo Workspace">
+            <bean class="org.mule.module.atom.CustomerAdapter">
+                <property name="href" value="customers"/>
+            </bean>
+        </a:workspace>
+
+    </a:provider>
+
+    <mule:model name="testModel">
+
+        <mule:service name="customerService">
+            <mule:inbound>
+                <mule:inbound-endpoint address="http://localhost:9002/base" synchronous="true"/>
+            </mule:inbound>
+            <atom:component provider-ref="customerProvider"/>
+        </mule:service>
+
+    </mule:model>
+
+</beans>

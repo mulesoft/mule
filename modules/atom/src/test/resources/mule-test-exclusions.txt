@@ -1,0 +1,2 @@
+org.mule.module.atom.event.EventTest
+org.mule.module.atom.event.AtomEventTest

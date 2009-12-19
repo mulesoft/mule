@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:a="http://abdera.apache.org"
+      xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+               http://abdera.apache.org http://abdera.apache.org/schemas/abdera-spring.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+
+    <model name="testModel">
+
+        <service name="customerService">
+            <inbound>
+                <inbound-endpoint address="http://localhost:9002" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint address="vm://queue1" synchronous="true"/>
+                    <atom:route-filter route="/bar/:foo"/>
+
+                </filtering-router>
+                <filtering-router>
+                    <outbound-endpoint address="vm://queue1" synchronous="true"/>
+                    <atom:route-filter route="/baz"/>
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="queue">
+            <inbound>
+                <inbound-endpoint address="vm://queue1" synchronous="true"/>
+            </inbound>
+            <test:component appendString=" received"/>
+        </service>
+    </model>
+</mule>

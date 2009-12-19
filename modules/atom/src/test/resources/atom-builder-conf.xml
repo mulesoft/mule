@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://abdera.apache.org http://abdera.apache.org/schemas/abdera-spring.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+    <spring:beans>
+        <spring:import resource="classpath:eventqueue-atom.xml"/>
+    </spring:beans>
+
+    <http:connector name="HttpConnector"/>
+
+    <http:polling-connector name="PollingHttpConnector" pollingFrequency="1000" discardEmptyContent="false"/>
+
+    <model name="testModel">
+
+        <service name="EventPublisher">
+            <inbound>
+                <vm:inbound-endpoint path="in" synchronous="true"/>
+            </inbound>
+
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="http://localhost:9002/events" synchronous="true"
+                                       connector-ref="HttpConnector">
+                        <message-properties-transformer>
+                            <add-message-property key="Content-Type" value="application/atom+xml;type=entry"/>
+                            <delete-message-property key="http.custom.headers"/>
+                        </message-properties-transformer>
+                        <atom:entry-builder-transformer>
+                            <atom:entry-property name="author" evaluator="string" expression="Ross Mason"/>
+                            <atom:entry-property name="content" evaluator="payload" expression=""/>
+                            <atom:entry-property name="title" evaluator="header" expression="title"/>
+                            <atom:entry-property name="updated" evaluator="function" expression="now"/>
+                            <atom:entry-property name="id" evaluator="groovy"
+                                                 expression="'urn:uuid:' + java.util.UUID.randomUUID().toString()"/>
+                        </atom:entry-builder-transformer>
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="atomPubEventStore">
+            <inbound>
+                <inbound-endpoint address="http://localhost:9002" synchronous="true" connector-ref="HttpConnector"/>
+            </inbound>
+            <atom:component provider-ref="provider"/>
+        </service>
+
+        <!--<service name="eventConsumer">-->
+        <!--<inbound>-->
+        <!--<atom:inbound-endpoint address="http://localhost:9002/events" synchronous="true" splitFeed="false"/>-->
+        <!--</inbound>-->
+        <!--<component class="org.mule.module.atom.event.EventReceiver"/>-->
+        <!--</service>-->
+
+    </model>
+
+</mule>
