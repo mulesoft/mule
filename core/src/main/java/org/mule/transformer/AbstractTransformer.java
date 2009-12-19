@@ -21,6 +21,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.CollectionDataType;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -312,8 +313,16 @@ public abstract class AbstractTransformer implements Transformer
             }
         }
 
-        Class srcCls = src.getClass();
-        if (!isSourceTypeSupported(srcCls))
+        DataType sourceType = new DataTypeFactory().create(payload.getClass());
+        //Once we support mime types, it should be possible to do this since we'll be able to discern the difference
+        //between objects with the same type
+//        if(getReturnDataType().isCompatibleWith(sourceType))
+//        {
+//            logger.debug("Object is already of type: " + getReturnDataType() + " No transform to perform");
+//            return payload;
+//        }
+
+        if (!isSourceDataTypeSupported(sourceType))
         {
             if (ignoreBadInput)
             {

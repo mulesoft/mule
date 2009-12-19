@@ -19,8 +19,10 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -28,8 +30,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
+import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -638,11 +641,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * Invoked after deserialization. This is called when the marker interface 
-     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked 
-     * after the object has been deserialized passing in the current MuleContext when using either 
-     * {@link org.mule.transformer.wire.SerializationWireFormat}, 
-     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the 
+     * Invoked after deserialization. This is called when the marker interface
+     * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked
+     * after the object has been deserialized passing in the current MuleContext when using either
+     * {@link org.mule.transformer.wire.SerializationWireFormat},
+     * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
      * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
      * @param muleContext the current muleContext instance
@@ -705,9 +708,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                         transformers.add(next);
                     }
                 }
+                EndpointURI uri = new MuleEndpointURI(endpointUri, muleContext);
 
-
-                EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpointUri, muleContext);
+                TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, uri.getFullScheme(), null);
+                EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(endpointUri);
                 endpointBuilder.setTransformers(transformers);
 
                 if (isInboundEndpoint)
@@ -722,7 +726,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 }
             }
         }
-        
+
         serializedData = null;
     }
 

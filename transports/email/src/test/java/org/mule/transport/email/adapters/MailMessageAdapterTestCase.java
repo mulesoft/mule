@@ -11,7 +11,7 @@
 package org.mule.transport.email.adapters;
 
 import org.mule.api.MuleException;
-import org.mule.api.registry.ServiceDescriptorFactory;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.email.MailMessageAdapter;
@@ -29,7 +29,7 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     protected void doSetUp() throws Exception
     {
         //wee need to load the transport descriptor in order to test the message Adapter
-        muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "pop3", null);
+        muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, "pop3", null);
     }
 
     public MessageAdapter createAdapter(Object payload) throws MuleException

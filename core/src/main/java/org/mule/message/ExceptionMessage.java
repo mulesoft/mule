@@ -57,7 +57,7 @@ public class ExceptionMessage extends BaseMessageDTO
             }
         }
     }
-    
+
     /**
      * @deprecated Use ExceptionMessage(Serializable message...) instead
      */
@@ -86,9 +86,9 @@ public class ExceptionMessage extends BaseMessageDTO
 
     protected static Serializable getAsSerializable(Object message)
     {
-        if(message instanceof Serializable)
+        if (message instanceof Serializable)
         {
-            return (Serializable)message;
+            return (Serializable) message;
         }
         else
         {
@@ -118,8 +118,8 @@ public class ExceptionMessage extends BaseMessageDTO
 
     public String toString()
     {
-        return "ExceptionMessage{" + "payload=" + payload + ", context=" + properties + "exception=" + exception
-               + ", componentName='" + componentName + "'" + ", endpointUri=" + endpointUri + ", timeStamp="
-               + timeStamp + "}";
+        return "ExceptionMessage{" + "payload=" + getPayload() + ", context=" + properties + "exception=" + exception
+                + ", componentName='" + componentName + "'" + ", endpointUri=" + endpointUri + ", timeStamp="
+                + timeStamp + "}";
     }
 }

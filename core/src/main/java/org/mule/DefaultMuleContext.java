@@ -136,7 +136,7 @@ public class DefaultMuleContext implements MuleContext
 
     protected MuleRegistry createRegistryHelper(DefaultRegistryBroker registry)
     {
-        return new MuleRegistryHelper(registry);
+        return new MuleRegistryHelper(registry, this);
     }
 
     public void setSplash(SplashScreen startup, SplashScreen shutdown)

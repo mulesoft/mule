@@ -15,6 +15,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.EntryPointResolver;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouter;
@@ -892,7 +893,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 228, phaseName, object);
     }
 
-    public static Message unrecognisedServiceType(String type)
+    public static Message unrecognisedServiceType(ServiceType type)
     {
         return factory.createMessage(BUNDLE_PATH, 229, type);
     }

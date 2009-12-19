@@ -10,6 +10,7 @@
 
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.agent.Agent;
@@ -29,6 +30,7 @@ import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.registry.TransformerResolver;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
@@ -68,12 +70,14 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
 
     protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
 
+    private MuleContext muleContext;
 
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
-    public MuleRegistryHelper(DefaultRegistryBroker registry)
+    public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
         this.registry = registry;
+        this.muleContext = muleContext;
     }
 
     public void initialise() throws InitialisationException
@@ -322,7 +326,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     /**
      * Looks up the service descriptor from a singleton cache and creates a new one if not found.
      */
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
+    public ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
     {
         String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
         //TODO If we want these descriptors loaded from Spring we need to change the key mechanism
@@ -350,14 +354,22 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     /**
      * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
      */
-    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
+    protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
     {
-        Properties props = SpiUtils.findServiceDescriptor(type, name);
+        //Stripe off and use the meta-scheme if present
+        String scheme = name;
+        if (name.contains(":"))
+        {
+            scheme = name.substring(0, name.indexOf(":"));
+        }
+
+        Properties props = SpiUtils.findServiceDescriptor(type, scheme);
         if (props == null)
         {
-            throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
+            throw new ServiceException(CoreMessages.failedToLoad(type + " " + scheme));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, this, null);
+
+        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext, null);
     }
 
     public void registerAgent(Agent agent) throws MuleException
@@ -453,7 +465,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     // Delegate to internal registry
     ////////////////////////////////////////////////////////////////////////////
 
-    public Object lookupObject(Class type) throws RegistrationException
+    public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         return registry.lookupObject(type);
     }

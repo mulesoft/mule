@@ -20,22 +20,26 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.ServiceType;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.service.TransportServiceDescriptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DefaultEndpointFactory implements EndpointFactory
 {
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     protected static final Log logger = LogFactory.getLog(DefaultEndpointFactory.class);
 
     public static final String ENDPOINT_REGISTRY_PREFIX = "endpoint:";
 
     protected MuleContext muleContext;
-    
+
     public InboundEndpoint getInboundEndpoint(String uri)
-        throws MuleException
+            throws MuleException
     {
         logger.debug("DefaultEndpointFactory request for inbound endpoint for uri: " + uri);
         EndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
@@ -48,15 +52,19 @@ public class DefaultEndpointFactory implements EndpointFactory
     }
 
     public OutboundEndpoint getOutboundEndpoint(String uri)
-        throws MuleException
+            throws MuleException
     {
         logger.debug("DefaultEndpointFactory request for outbound endpoint for uri: " + uri);
         EndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
         if (endpointBuilder == null)
         {
+            MuleEndpointURI endpointURI = new MuleEndpointURI(uri, muleContext);
+            String scheme = endpointURI.getFullScheme();
+            TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
+
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-            
+
         }
         return getOutboundEndpoint(endpointBuilder);
     }
@@ -87,14 +95,13 @@ public class DefaultEndpointFactory implements EndpointFactory
     }
 
     /**
-     * 
      * @param endpoint
      * @throws RegistrationException
      */
     protected ImmutableEndpoint registerEndpoint(ImmutableEndpoint endpoint) throws RegistrationException
     {
         ImmutableEndpoint registryEndpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
-            ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode());
+                ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode());
         if (registryEndpoint == null)
         {
             muleContext.getRegistry().registerObject(ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode(), endpoint);
@@ -104,7 +111,7 @@ public class DefaultEndpointFactory implements EndpointFactory
     }
 
     public EndpointBuilder getEndpointBuilder(String uri)
-        throws MuleException
+            throws MuleException
     {
         logger.debug("DefaultEndpointFactory request for endpoint builder for uri: " + uri);
         EndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
@@ -122,7 +129,9 @@ public class DefaultEndpointFactory implements EndpointFactory
         else
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint builder for uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+            EndpointURI epURI = new MuleEndpointURI(uri, muleContext);
+            TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, epURI.getFullScheme(), null);
+            endpointBuilder = tsd.createEndpointBuilder(uri);
         }
         return endpointBuilder;
     }
@@ -164,7 +173,7 @@ public class DefaultEndpointFactory implements EndpointFactory
             if (endpointBuilder == null)
             {
                 throw new IllegalArgumentException("The endpoint with name: " + uri.getEndpointName()
-                                                   + "was not found.");
+                        + "was not found.");
             }
         }
         else

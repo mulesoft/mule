@@ -14,8 +14,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.MuleEndpointURI;
@@ -36,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
  * from an url. Note that for some endpoints, the url alone is not enough to create
  * the endpoint if a connector for the endpoint has not already been configured with
  * the Mule Manager.
- *
  */
 public class TransportFactory
 {
@@ -71,10 +70,10 @@ public class TransportFactory
         try
         {
             Connector connector;
-            String scheme = url.getSchemeMetaInfo();
+            String scheme = url.getFullScheme();
 
             TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, null);
+                    muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
@@ -86,36 +85,23 @@ public class TransportFactory
                 connector.setMuleContext(muleContext);
                 if (connector instanceof AbstractConnector)
                 {
-                    ((AbstractConnector)connector).initialiseFromUrl(url);
+                    ((AbstractConnector) connector).initialiseFromUrl(url);
                 }
             }
             else
             {
                 throw new TransportFactoryException(
-                    CoreMessages.objectNotSetInService("Connector", scheme));
+                        CoreMessages.objectNotSetInService("Connector", scheme));
             }
 
             connector.setName(new ObjectNameHelper(muleContext).getConnectorName(connector));
-
-            // TODO Do we still need to support this for 2.x?
-            // set any manager default properties for the connector
-            // these are set on the Manager with a protocol i.e.
-            // jms.specification=1.1
-//            Map props = new HashMap();
-//            PropertiesUtils.getPropertiesWithPrefix(muleContext.getRegistry().lookupProperties(),
-//                connector.getProtocol().toLowerCase(), props);
-//            if (props.size() > 0)
-//            {
-//                props = PropertiesUtils.removeNamespaces(props);
-//                BeanUtils.populateWithoutFail(connector, props, true);
-//            }
 
             return connector;
         }
         catch (Exception e)
         {
             throw new TransportFactoryException(
-                CoreMessages.failedToCreateObjectWith("Endpoint", url), e);
+                    CoreMessages.failedToCreateObjectWith("Endpoint", url), e);
         }
     }
 
@@ -132,7 +118,7 @@ public class TransportFactory
     }
 
     public Connector getOrCreateConnectorByProtocol(ImmutableEndpoint endpoint)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(endpoint.getEndpointURI());
     }
@@ -141,7 +127,7 @@ public class TransportFactory
      * Returns an initialized connector.
      */
     public Connector getOrCreateConnectorByProtocol(EndpointURI uri)
-        throws TransportFactoryException
+            throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
         if (null != connectorName)
@@ -179,13 +165,13 @@ public class TransportFactory
         Collection connectors = muleContext.getRegistry().lookupObjects(Connector.class);
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
-            connector = (Connector)iterator.next();
+            connector = (Connector) iterator.next();
             if (connector.supportsProtocol(protocol))
             {
                 results.add(connector);
             }
         }
-        if(results.size() > 1)
+        if (results.size() > 1)
         {
             StringBuffer buf = new StringBuffer();
             for (Connector result : results)
@@ -193,9 +179,9 @@ public class TransportFactory
                 buf.append(result.getName()).append(", ");
             }
             throw new IllegalStateException(
-                        CoreMessages.moreThanOneConnectorWithProtocol(protocol, buf.toString()).getMessage());
+                    CoreMessages.moreThanOneConnectorWithProtocol(protocol, buf.toString()).getMessage());
         }
-        else if(results.size() == 1)
+        else if (results.size() == 1)
         {
             return results.get(0);
         }

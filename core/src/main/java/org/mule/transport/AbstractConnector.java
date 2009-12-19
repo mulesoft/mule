@@ -27,12 +27,13 @@ import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -95,7 +96,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -127,13 +127,13 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * </ol>
  */
 public abstract class AbstractConnector
-    implements Connector, ExceptionListener, Connectable, WorkListener
+        implements Connector, ExceptionListener, Connectable, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
      */
     public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
-    
+
     private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
 
     /**
@@ -180,17 +180,17 @@ public abstract class AbstractConnector
      * Defines the dispatcher threading profile
      */
     private volatile ThreadingProfile dispatcherThreadingProfile;
-    
+
     /**
      * Defines the requester threading profile
      */
     private volatile ThreadingProfile requesterThreadingProfile;
-    
+
     /**
      * Defines the receiver threading profile
      */
     private volatile ThreadingProfile receiverThreadingProfile;
-    
+
     /**
      * @see #isCreateMultipleTransactedReceivers()
      */
@@ -202,7 +202,7 @@ public abstract class AbstractConnector
     protected volatile int numberOfConcurrentTransactedReceivers = DEFAULT_NUM_CONCURRENT_TX_RECEIVERS;
 
     private RetryPolicyTemplate retryPolicyTemplate;
-    
+
     /**
      * Optimise the handling of message notifications.  If dynamic is set to false then the
      * cached notification handler implements a shortcut for message notifications.
@@ -257,8 +257,8 @@ public abstract class AbstractConnector
     protected final AtomicBoolean disposed = new AtomicBoolean(false);
 
     /**
-     * Indicates whether the connector should start upon connecting.  This is necessary 
-     * to support asynchronous retry policies, otherwise the start() method would block 
+     * Indicates whether the connector should start upon connecting.  This is necessary
+     * to support asynchronous retry policies, otherwise the start() method would block
      * until connection is successful.
      */
     protected boolean startOnConnect = false;
@@ -338,16 +338,16 @@ public abstract class AbstractConnector
 
         setMaxDispatchersActive(getDispatcherThreadingProfile().getMaxThreadsActive());
         setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
-        
+
         this.doInitialise();
 
         // We do the management context injection here just in case we're using a default ExceptionStrategy
         //We always create a default just in case anything goes wrong before
-        if(exceptionListener==null)
+        if (exceptionListener == null)
         {
             exceptionListener = new DefaultExceptionStrategy();
-            ((DefaultExceptionStrategy)exceptionListener).setMuleContext(muleContext);
-            ((DefaultExceptionStrategy)exceptionListener).initialise();
+            ((DefaultExceptionStrategy) exceptionListener).setMuleContext(muleContext);
+            ((DefaultExceptionStrategy) exceptionListener).initialise();
         }
 
         initialised.set(true);
@@ -355,25 +355,25 @@ public abstract class AbstractConnector
 
     public final synchronized void start() throws MuleException
     {
-        if(isInitialStateStopped())
+        if (isInitialStateStopped())
         {
             setInitialStateStopped(false);
             logger.info("Connector not started because 'initialStateStopped' is true");
             return;
         }
-        
+
         if (this.isStarted())
         {
             logger.warn("Attempting to start a connector which is already started");
             return;
         }
-        
+
         this.checkDisposed();
 
         if (!this.isConnected())
         {
             startOnConnect = true;
-            
+
             // Make sure we are connected
             try
             {
@@ -461,9 +461,9 @@ public abstract class AbstractConnector
     }
 
     /**
-     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251 
-     * without breaking retry and without making large changes to the connector lifecycle.
-     * It should be removed for 3.x.
+     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251
+     *                         without breaking retry and without making large changes to the connector lifecycle.
+     *                         It should be removed for 3.x.
      */
     private final synchronized void stop(boolean disposeWorkManagers) throws MuleException
     {
@@ -472,7 +472,7 @@ public abstract class AbstractConnector
             logger.warn("Attempting to stop a connector which is not started: " + getName());
             return;
         }
-        
+
         if (this.isDisposed())
         {
             return;
@@ -485,7 +485,7 @@ public abstract class AbstractConnector
 
         // shutdown our scheduler service
         shutdownScheduler();
-        
+
         // Dispose work managers here to ensure that all jobs that are currently
         // processing or waiting can complete so that all message flow completes in
         // stop phase.  See MULE-4521
@@ -493,7 +493,7 @@ public abstract class AbstractConnector
         {
             disposeWorkManagers();
         }
-        
+
         this.doStop();
         started.set(false);
 
@@ -511,7 +511,7 @@ public abstract class AbstractConnector
                 mr.stop();
             }
         }
-        
+
         // Workaround for MULE-4553
         this.disposeDispatchers();
         this.disposeRequesters();
@@ -552,26 +552,26 @@ public abstract class AbstractConnector
             {
                 // Wait a while for existing tasks to terminate
                 if (!scheduler.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(),
-                    TimeUnit.MILLISECONDS))
+                        TimeUnit.MILLISECONDS))
                 {
                     // Cancel currently executing tasks and return list of pending
                     // tasks
                     List outstanding = scheduler.shutdownNow();
                     // Wait a while for tasks to respond to being cancelled
                     if (!scheduler.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT,
-                        TimeUnit.MILLISECONDS))
+                            TimeUnit.MILLISECONDS))
                     {
                         logger.warn(MessageFormat.format(
-                            "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
-                            outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
+                                "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
+                                outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
                     }
                     else
                     {
                         if (!outstanding.isEmpty())
                         {
                             logger.warn(MessageFormat.format(
-                                "Pool {0} terminated; {1} work items were cancelled.", name,
-                                Integer.toString(outstanding.size())));
+                                    "Pool {0} terminated; {1} work items were cancelled.", name,
+                                    Integer.toString(outstanding.size())));
                         }
                     }
 
@@ -603,7 +603,7 @@ public abstract class AbstractConnector
             logger.warn("Attempting to dispose a connector which is already disposed");
             return;
         }
-        
+
         if (logger.isInfoEnabled())
         {
             logger.info("Disposing: " + this);
@@ -639,7 +639,7 @@ public abstract class AbstractConnector
         if (receiverWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-                getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -649,7 +649,7 @@ public abstract class AbstractConnector
         if (dispatcherWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getDispatcherThreadingProfile().createWorkManager(
-                getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -659,7 +659,7 @@ public abstract class AbstractConnector
         if (requesterWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
-                getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
 
             if (requesterWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -667,10 +667,11 @@ public abstract class AbstractConnector
             }
         }
     }
+
     protected void disposeWorkManagers()
     {
         WorkManager workManager;
-        
+
         logger.debug("Disposing dispatcher work manager");
         workManager = (WorkManager) dispatcherWorkManager.get();
         if (workManager != null)
@@ -740,7 +741,7 @@ public abstract class AbstractConnector
         if (requesters != null)
         {
             logger.debug("Disposing Requesters");
-             requesters.clear();
+            requesters.clear();
             logger.debug("Requesters Disposed");
         }
     }
@@ -759,7 +760,7 @@ public abstract class AbstractConnector
     {
         handleException(exception, null);
     }
-    
+
     public void handleException(Exception exception, Connectable failed)
     {
         // unwrap any exception caused by using reflection apis, but only the top layer
@@ -769,10 +770,10 @@ public abstract class AbstractConnector
             // just because API accepts Exception, not Throwable :\
             exception = target instanceof Exception ? (Exception) target : new Exception(target);
         }
-        
+
         if (isConnected() &&
-            exception instanceof ConnectException &&      
-            !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
+                exception instanceof ConnectException &&
+                !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
         {
             logger.info("Exception caught is a ConnectException, attempting to reconnect...");
             try
@@ -785,7 +786,7 @@ public abstract class AbstractConnector
                 {
                     logger.error(de);
                 }
-                
+
                 // Log or otherwise handle exception
                 if (exceptionListener != null)
                 {
@@ -795,7 +796,7 @@ public abstract class AbstractConnector
                 {
                     throw new MuleRuntimeException(CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
                 }
-                
+
                 // Store some info. about the receiver/dispatcher which threw the ConnectException so 
                 // that we can make sure that problem has been resolved when we go to reconnect.
                 Map<Object, Object> info = new HashMap<Object, Object>();
@@ -967,7 +968,7 @@ public abstract class AbstractConnector
         this.dispatchers.setMaxIdle(maxActive);
         // this tells the pool to expire some objects eventually if we start
         // running out. This happens if one is using a lot of dynamic endpoints.
-        this.dispatchers.setMaxTotal(20*maxActive);
+        this.dispatchers.setMaxTotal(20 * maxActive);
     }
 
     private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
@@ -982,8 +983,8 @@ public abstract class AbstractConnector
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
             throw new IllegalArgumentException(
-                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
-                    endpoint.getEndpointURI().toString()).getMessage());
+                    CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
+                            endpoint.getEndpointURI().toString()).getMessage());
         }
 
         MessageDispatcher dispatcher = null;
@@ -994,13 +995,13 @@ public abstract class AbstractConnector
                 logger.debug("Borrowing a dispatcher for endpoint: " + endpoint.getEndpointURI());
             }
 
-            dispatcher = (MessageDispatcher)dispatchers.borrowObject(endpoint);
+            dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
             dispatcher.initialise();
 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Borrowed a dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
-                                + dispatcher.toString());
+                        + dispatcher.toString());
             }
 
             return dispatcher;
@@ -1034,7 +1035,7 @@ public abstract class AbstractConnector
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
-                                    + dispatcher.toString());
+                            + dispatcher.toString());
                 }
 
             }
@@ -1085,7 +1086,7 @@ public abstract class AbstractConnector
         this.requesters.setMaxIdle(maxActive);
         // this tells the pool to expire some objects eventually if we start
         // running out. This happens if one is using a lot of dynamic endpoints.
-        this.requesters.setMaxTotal(20*maxActive);
+        this.requesters.setMaxTotal(20 * maxActive);
     }
 
     private MessageRequester getRequester(InboundEndpoint endpoint) throws MuleException
@@ -1100,8 +1101,8 @@ public abstract class AbstractConnector
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
             throw new IllegalArgumentException(
-                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
-                    endpoint.getEndpointURI().toString()).getMessage());
+                    CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
+                            endpoint.getEndpointURI().toString()).getMessage());
         }
 
         MessageRequester requester = null;
@@ -1112,13 +1113,13 @@ public abstract class AbstractConnector
                 logger.debug("Borrowing a requester for endpoint: " + endpoint.getEndpointURI());
             }
 
-            requester = (MessageRequester)requesters.borrowObject(endpoint);
+            requester = (MessageRequester) requesters.borrowObject(endpoint);
             requester.initialise();
 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Borrowed a requester for endpoint: " + endpoint.getEndpointURI() + " = "
-                                + requester.toString());
+                        + requester.toString());
             }
 
             return requester;
@@ -1152,7 +1153,7 @@ public abstract class AbstractConnector
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Returning requester for endpoint: " + endpoint.getEndpointURI() + " = "
-                                    + requester.toString());
+                            + requester.toString());
                 }
 
             }
@@ -1206,7 +1207,7 @@ public abstract class AbstractConnector
         }
 
         logger.info("Registering listener: " + service.getName() + " on endpointUri: "
-                        + endpointUri.toString());
+                + endpointUri.toString());
 
         if (getReceiver(service, endpoint) != null)
         {
@@ -1219,7 +1220,10 @@ public abstract class AbstractConnector
         // Since we're managing the creation we also need to initialise
         receiver.initialise();
         receivers.put(receiverKey, receiver);
-        // receivers.put(getReceiverKey(service, endpoint), receiver);
+        if (endpoint instanceof InboundEndpointDecorator)
+        {
+            ((InboundEndpointDecorator) endpoint).onListenerAdded(service);
+        }
 
         return receiver;
     }
@@ -1227,14 +1231,14 @@ public abstract class AbstractConnector
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param service the service for which the endpoint is being registered
+     * @param service  the service for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
-            .getEndpointURI().getAddress());
+                .getEndpointURI().getAddress());
     }
 
     public final void unregisterListener(Service service, InboundEndpoint endpoint) throws Exception
@@ -1242,7 +1246,7 @@ public abstract class AbstractConnector
         if (service == null)
         {
             throw new IllegalArgumentException(
-                "The service must not be null when you unregister a listener");
+                    "The service must not be null when you unregister a listener");
         }
 
         if (endpoint == null)
@@ -1254,7 +1258,7 @@ public abstract class AbstractConnector
         if (endpointUri == null)
         {
             throw new IllegalArgumentException(
-                "The endpointUri must not be null when you unregister a listener");
+                    "The endpointUri must not be null when you unregister a listener");
         }
 
         if (logger.isInfoEnabled())
@@ -1264,8 +1268,8 @@ public abstract class AbstractConnector
 
         if (receivers != null && !receivers.isEmpty())
         {
-            MessageReceiver receiver = (MessageReceiver)receivers.remove(getReceiverKey(service,
-                endpoint));
+            MessageReceiver receiver = (MessageReceiver) receivers.remove(getReceiverKey(service,
+                    endpoint));
             if (receiver != null)
             {
                 destroyReceiver(receiver, endpoint);
@@ -1297,7 +1301,7 @@ public abstract class AbstractConnector
      * Setter for property 'dispatcherThreadingProfile'.
      *
      * @param dispatcherThreadingProfile Value to set for property
-     *            'dispatcherThreadingProfile'.
+     *                                   'dispatcherThreadingProfile'.
      */
     public void setDispatcherThreadingProfile(ThreadingProfile dispatcherThreadingProfile)
     {
@@ -1322,7 +1326,7 @@ public abstract class AbstractConnector
      * Setter for property 'requesterThreadingProfile'.
      *
      * @param requesterThreadingProfile Value to set for property
-     *            'requesterThreadingProfile'.
+     *                                  'requesterThreadingProfile'.
      */
     public void setRequesterThreadingProfile(ThreadingProfile requesterThreadingProfile)
     {
@@ -1347,7 +1351,7 @@ public abstract class AbstractConnector
      * Setter for property 'receiverThreadingProfile'.
      *
      * @param receiverThreadingProfile Value to set for property
-     *            'receiverThreadingProfile'.
+     *                                 'receiverThreadingProfile'.
      */
     public void setReceiverThreadingProfile(ThreadingProfile receiverThreadingProfile)
     {
@@ -1431,7 +1435,7 @@ public abstract class AbstractConnector
     {
         return false;
     }
-    
+
     public boolean isSyncEnabled(String protocol)
     {
         return false;
@@ -1451,7 +1455,7 @@ public abstract class AbstractConnector
                 throw new RuntimeException("getReceiverKey() returned a null key");
             }
         }
-        else 
+        else
         {
             throw new RuntimeException("Connector has not been initialized.");
         }
@@ -1496,7 +1500,7 @@ public abstract class AbstractConnector
         }
 
         return (MessageReceiver[]) CollectionUtils.toArrayOfComponentType(found,
-            MessageReceiver.class);
+                MessageReceiver.class);
     }
 
     public void connect() throws Exception
@@ -1512,84 +1516,81 @@ public abstract class AbstractConnector
         {
             logger.debug("Connecting: " + this);
         }
-            
 
-            RetryCallback callback = new RetryCallback()
+
+        RetryCallback callback = new RetryCallback()
+        {
+            public void doWork(RetryContext context) throws Exception
             {
-                public void doWork(RetryContext context) throws Exception
+                if (validateConnections && !validateConnection(context).isOk())
                 {
-                    if (validateConnections && !validateConnection(context).isOk())
-                    {
-                        throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"),
-                                                   context.getLastFailure(), null);
-                    }
-                    doConnect();
+                    throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect to resource"),
+                            context.getLastFailure(), null);
+                }
+                doConnect();
 
-                    // Make sure the receiver or dispatcher which triggered the reconnection is now able to 
-                    // connect successfully.  This info. was previously stored by the handleException() method, above.
-                    Map<Object, Object> info = context.getMetaInfo();
-                    if (info.get(RetryContext.FAILED_RECEIVER) != null)
-                    {
-                        String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
-                        MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
-                        if (validateConnections && !receiver.validateConnection(context).isOk())
-                        {
-                            throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
-                                                       context.getLastFailure(), receiver);
-                        }
-                    }
-                    else if (info.get(RetryContext.FAILED_DISPATCHER) != null)
-                    {
-                        OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_DISPATCHER);
-                        MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
-                        try
-                        {
-                            if (validateConnections && !dispatcher.validateConnection(context).isOk())
-                            {
-                                throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
-                                                           context.getLastFailure(), null);
-                            }
-                        }
-                        finally
-                        {
-                            dispatchers.returnObject(endpoint, dispatcher);
-                        }
-                    }
-                    else if (info.get(RetryContext.FAILED_REQUESTER) != null)
-                    {
-                        InboundEndpoint endpoint = (InboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
-                        MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
-                        try
-                        {
-                            if (validateConnections && !requester.validateConnection(context).isOk())
-                            {
-                                throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect requester to resource"),
-                                                           context.getLastFailure(), null);
-                            }
-                        }
-                        finally
-                        {
-                            requesters.returnObject(endpoint, requester);
-                        }
-                    }
-                    setConnected(true);
-                    
-                    logger.info("Connected: " + getWorkDescription());
-                    // TODO Make this work somehow inside the RetryTemplate
-                    //muleContext.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    //    ConnectionNotification.CONNECTION_CONNECTED));
-                    
-                    if (startOnConnect)
-                    {
-                        startAfterConnect();
-                    }                
-                }
-    
-                public String getWorkDescription()
+                // Make sure the receiver or dispatcher which triggered the reconnection is now able to
+                // connect successfully.  This info. was previously stored by the handleException() method, above.
+                Map<Object, Object> info = context.getMetaInfo();
+                if (info.get(RetryContext.FAILED_RECEIVER) != null)
                 {
-                    return getConnectionDescription();
+                    String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
+                    MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
+                    if (validateConnections && !receiver.validateConnection(context).isOk())
+                    {
+                        throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
+                                context.getLastFailure(), receiver);
+                    }
                 }
-            };
+                else if (info.get(RetryContext.FAILED_DISPATCHER) != null)
+                {
+                    OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_DISPATCHER);
+                    MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
+                    try
+                    {
+                        if (validateConnections && !dispatcher.validateConnection(context).isOk())
+                        {
+                            throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
+                                    context.getLastFailure(), null);
+                        }
+                    }
+                    finally
+                    {
+                        dispatchers.returnObject(endpoint, dispatcher);
+                    }
+                }
+                else if (info.get(RetryContext.FAILED_REQUESTER) != null)
+                {
+                    InboundEndpoint endpoint = (InboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
+                    MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
+                    try
+                    {
+                        if (validateConnections && !requester.validateConnection(context).isOk())
+                        {
+                            throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect requester to resource"),
+                                    context.getLastFailure(), null);
+                        }
+                    }
+                    finally
+                    {
+                        requesters.returnObject(endpoint, requester);
+                    }
+                }
+                setConnected(true);
+
+                logger.info("Connected: " + getWorkDescription());
+
+                if (startOnConnect)
+                {
+                    startAfterConnect();
+                }
+            }
+
+            public String getWorkDescription()
+            {
+                return getConnectionDescription();
+            }
+        };
 
         retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
     }
@@ -1614,16 +1615,16 @@ public abstract class AbstractConnector
     }
 
     /**
-     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251 
-     * without breaking retry and without making large changes to the connector lifecycle.
-     * It should be removed for 3.x.
+     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251
+     *                         without breaking retry and without making large changes to the connector lifecycle.
+     *                         It should be removed for 3.x.
      */
     private void disconnect(boolean stopWorkManagers) throws Exception
     {
         startOnConnect = isStarted();
-        
+
         this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-            ConnectionNotification.CONNECTION_DISCONNECTED));
+                ConnectionNotification.CONNECTION_DISCONNECTED));
         // TODO Shouldn't this come at the end of the method, after the receivers have been disconnected?
         connected.set(false);
 
@@ -1661,7 +1662,7 @@ public abstract class AbstractConnector
                     }
                 }
             }
-            
+
             // TODO Shouldn't stop() come before disconnect(), not after ?
             if (this.isStarted())
             {
@@ -1727,9 +1728,10 @@ public abstract class AbstractConnector
     }
 
     /**
+     * @param createMultipleTransactedReceivers
+     *         if true, multiple receivers will be
+     *         created for this connection
      * @see #isCreateMultipleTransactedReceivers()
-     * @param createMultipleTransactedReceivers if true, multiple receivers will be
-     *            created for this connection
      */
     public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers)
     {
@@ -1748,8 +1750,8 @@ public abstract class AbstractConnector
     }
 
     /**
-     * @see #getNumberOfConcurrentTransactedReceivers()
      * @param count the number of concurrent transacted receivers to start
+     * @see #getNumberOfConcurrentTransactedReceivers()
      */
     public void setNumberOfConcurrentTransactedReceivers(int count)
     {
@@ -1806,13 +1808,27 @@ public abstract class AbstractConnector
     }
 
     /**
+     * Used by Meta endpoint descriptors to register support for endpoint of the meta endpoint type.
+     * For example an RSS endpoint uses the Http connector.  By registering 'rss' as a supported
+     * meta protocol, this connector can be used when creating RSS endpoints.
+     *
+     * @param protocol the meta protocol that can be used with this connector
+     * @since 3.0.0
+     */
+    public void registerSupportedMetaProtocol(String protocol)
+    {
+        supportedProtocols.add(protocol.toLowerCase() + ":" + getProtocol().toLowerCase());
+
+    }
+
+    /**
      * Registers other protocols 'understood' by this connector. These must contain
      * scheme meta info. Unlike the {@link #registerSupportedProtocol(String)} method,
      * this allows you to register protocols that are not prefixed with the connector
      * protocol. This is useful where you use a Service Finder to discover which
      * Transport implementation to use. For example the 'wsdl' transport is a generic
      * 'finder' transport that will use Axis or CXF to create the WSDL
-     * client. These transport protocols would be wsdl-axis and wsdl-cxf, 
+     * client. These transport protocols would be wsdl-axis and wsdl-cxf,
      * but they can all support 'wsdl' protocol too.
      *
      * @param protocol the supported protocol to register
@@ -1977,7 +1993,7 @@ public abstract class AbstractConnector
         }
 
         logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                        + event.getWork().toString());
+                + event.getWork().toString());
 
         if (e instanceof Exception)
         {
@@ -2027,7 +2043,7 @@ public abstract class AbstractConnector
     {
         if (result != null && result.getPayload() instanceof InputStream)
         {
-            DelegatingInputStream is = new DelegatingInputStream((InputStream)result.getPayload())
+            DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload())
             {
                 @Override
                 public void close() throws IOException
@@ -2089,7 +2105,7 @@ public abstract class AbstractConnector
     {
         if (result != null && result.getPayload() instanceof InputStream)
         {
-            DelegatingInputStream is = new DelegatingInputStream((InputStream)result.getPayload())
+            DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload())
             {
                 @Override
                 public void close() throws IOException
@@ -2147,16 +2163,16 @@ public abstract class AbstractConnector
      *
      * @param endpointUri the {@link EndpointURI} use to create this connector
      * @throws InitialisationException If there are any problems with the
-     *             configuration set on the Endpoint or if another exception is
-     *             thrown it is wrapped in an InitialisationException.
+     *                                 configuration set on the Endpoint or if another exception is
+     *                                 thrown it is wrapped in an InitialisationException.
      */
     public void initialiseFromUrl(EndpointURI endpointUri) throws InitialisationException
     {
         if (!supportsProtocol(endpointUri.getFullScheme()))
         {
             throw new InitialisationException(
-                CoreMessages.schemeNotCompatibleWithConnector(endpointUri.getFullScheme(),
-                    this.getClass()), this);
+                    CoreMessages.schemeNotCompatibleWithConnector(endpointUri.getFullScheme(),
+                            this.getClass()), this);
         }
         Properties props = new Properties();
         props.putAll(endpointUri.getParams());
@@ -2192,15 +2208,15 @@ public abstract class AbstractConnector
      * will be called before the {@link #doInitialise()} method is called.
      *
      * @throws InitialisationException InitialisationException If there are any
-     *             problems with the configuration or if another exception is thrown
-     *             it is wrapped in an InitialisationException.
+     *                                 problems with the configuration or if another exception is thrown
+     *                                 it is wrapped in an InitialisationException.
      */
     protected synchronized void initFromServiceDescriptor() throws InitialisationException
     {
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                    muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(getProtocol()));
@@ -2264,18 +2280,18 @@ public abstract class AbstractConnector
     /**
      * Create a Message receiver for this connector
      *
-     * @param service the service that will receive events from this receiver,
-     *            the listener
+     * @param service  the service that will receive events from this receiver,
+     *                 the listener
      * @param endpoint the endpoint that defies this inbound communication
      * @return an instance of the message receiver defined in this connectors'
      *         {@link org.mule.transport.service.TransportServiceDescriptor}
      *         initialised using the service and endpoint.
      * @throws Exception if there is a problem creating the receiver. This exception
-     *             really depends on the underlying transport, thus any exception
-     *             could be thrown
+     *                   really depends on the underlying transport, thus any exception
+     *                   could be thrown
      */
     protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint)
-        throws Exception
+            throws Exception
     {
         return getServiceDescriptor().createMessageReceiver(this, service, endpoint);
     }
@@ -2285,10 +2301,11 @@ public abstract class AbstractConnector
      * (data)
      *
      * @param message the data with which to initialise the
-     *            <code>MessageAdapter</code>
+     *                <code>MessageAdapter</code>
      * @return the <code>MessageAdapter</code> for the endpoint
-     * @throws org.mule.api.MessagingException if the message parameter is not
-     *             supported
+     * @throws org.mule.api.MessagingException
+     *          if the message parameter is not
+     *          supported
      * @see org.mule.api.transport.MessageAdapter
      */
     public MessageAdapter getMessageAdapter(Object message) throws MuleException
@@ -2300,12 +2317,12 @@ public abstract class AbstractConnector
         catch (TransportServiceException e)
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                new DefaultMuleMessage(message, muleContext), e);
+                    new DefaultMuleMessage(message, muleContext), e);
         }
     }
-    
+
     public MessageAdapter getMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
-        throws MessagingException
+            throws MessagingException
     {
         try
         {
@@ -2314,10 +2331,10 @@ public abstract class AbstractConnector
         catch (TransportServiceException tse)
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                new DefaultMuleMessage(message, muleContext), tse);
+                    new DefaultMuleMessage(message, muleContext), tse);
         }
     }
-    
+
     /**
      * A map of fully qualified class names that should override those in the
      * connectors' service descriptor This map will be null if there are no overrides
@@ -2348,15 +2365,15 @@ public abstract class AbstractConnector
      * {@link org.mule.model.streaming.CallbackOutputStream}.
      *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
+     * @param message  the current message being processed
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */
     public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message)
-        throws MuleException
+            throws MuleException
     {
         throw new UnsupportedOperationException(
-            CoreMessages.streamingNotSupported(this.getProtocol()).toString());
+                CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
     public MuleContext getMuleContext()
@@ -2388,7 +2405,7 @@ public abstract class AbstractConnector
         sb.append('}');
         return sb.toString();
     }
-    
+
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;

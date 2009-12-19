@@ -73,7 +73,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     private final String name;
 
     /**
-     * Any additional properties for the endpoint 
+     * Any additional properties for the endpoint
      * // TODO This should be final. See MULE-3105
      * // TODO Shouldn't this be guarded from concurrent writes?
      */
@@ -123,9 +123,9 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     private final MuleContext muleContext;
 
     protected RetryPolicyTemplate retryPolicyTemplate;
-    
+
     private String endpointBuilderName;
-    
+
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
                             List transformers,
@@ -163,7 +163,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             updateTransformerEndpoints(responseTransformers);
             this.responseTransformers = Collections.unmodifiableList(responseTransformers);
-        }   
+        }
         this.name = name;
         // TODO Properties should be immutable. See MULE-3105
         // this.properties = Collections.unmodifiableMap(properties);
@@ -184,11 +184,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
 
-        if(transactionConfig !=null && transactionConfig.getFactory() !=null &&
+        if (transactionConfig != null && transactionConfig.getFactory() != null &&
                 transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
                 transactionConfig.getAction() != TransactionConfig.ACTION_NEVER)
         {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
             {
                 logger.debug("Endpoint has a transaction configuration. Defaulting to synchronous. Endpoint is: " + toString());
             }
@@ -250,7 +250,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         // the embedded password. This will only remove the password if the
         // uri contains all the necessary information to successfully rebuild the url
         if (uri != null && (uri.getRawUserInfo() != null) && (uri.getScheme() != null) && (uri.getHost() != null)
-            && (uri.getRawPath() != null))
+                && (uri.getRawPath() != null))
         {
             // build a pattern up that matches what we need tp strip out the password
             Pattern sanitizerPattern = Pattern.compile("(.*):.*");
@@ -258,12 +258,12 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
             if (sanitizerMatcher.matches())
             {
                 sanitizedEndPointUri = new StringBuffer(uri.getScheme()).append("://")
-                    .append(sanitizerMatcher.group(1))
-                    .append(":<password>")
-                    .append("@")
-                    .append(uri.getHost())
-                    .append(uri.getRawPath())
-                    .toString();
+                        .append(sanitizerMatcher.group(1))
+                        .append(":<password>")
+                        .append("@")
+                        .append(uri.getHost())
+                        .append(uri.getRawPath())
+                        .toString();
             }
             if (uri.getRawQuery() != null)
             {
@@ -273,11 +273,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         }
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
-               + connector + ", transformer=" + transformers + ", name='" + name + "'" + ", properties=" + properties
-               + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
-               + deleteUnacceptedMessages + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous
-               + ", initialState=" + initialState + ", responseTimeout="
-               + responseTimeout + ", endpointEncoding=" + endpointEncoding + "}";
+                + connector + ", transformer=" + transformers + ", name='" + name + "'" + ", properties=" + properties
+                + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
+                + deleteUnacceptedMessages + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous
+                + ", initialState=" + initialState + ", responseTimeout="
+                + responseTimeout + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
     public String getProtocol()
@@ -297,39 +297,45 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
 
         final AbstractEndpoint other = (AbstractEndpoint) obj;
         return equal(retryPolicyTemplate, other.retryPolicyTemplate)
-               && equal(connector, other.connector)
-               && deleteUnacceptedMessages == other.deleteUnacceptedMessages
-               && equal(endpointEncoding, other.endpointEncoding)
-               && equal(endpointUri, other.endpointUri)
-               && equal(filter, other.filter)
-               && equal(initialState, other.initialState)
-               // don't include lifecycle state as lifecycle code includes hashing
-               // && equal(initialised, other.initialised)
-               && equal(name, other.name) && equal(properties, other.properties)
-               && responseTimeout == other.responseTimeout
-               && equal(responseTransformers, other.responseTransformers)
-               && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
-               && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
+                && equal(connector, other.connector)
+                && deleteUnacceptedMessages == other.deleteUnacceptedMessages
+                && equal(endpointEncoding, other.endpointEncoding)
+                && equal(endpointUri, other.endpointUri)
+                && equal(filter, other.filter)
+                && equal(initialState, other.initialState)
+                // don't include lifecycle state as lifecycle code includes hashing
+                // && equal(initialised, other.initialised)
+                && equal(name, other.name) && equal(properties, other.properties)
+                && responseTimeout == other.responseTimeout
+                && equal(responseTransformers, other.responseTransformers)
+                && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
+                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{this.getClass(), retryPolicyTemplate, connector,
-            deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE,
-            endpointEncoding,
-            endpointUri,
-            filter,
-            initialState,
-            // don't include lifecycle state as lifecycle code includes hashing
-            // initialised,
-            name, properties, new Integer(responseTimeout),
-            responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
-            transformers});
+                deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE,
+                endpointEncoding,
+                endpointUri,
+                filter,
+                initialState,
+                // don't include lifecycle state as lifecycle code includes hashing
+                // initialised,
+                name, properties, new Integer(responseTimeout),
+                responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
+                transformers});
     }
 
     public Filter getFilter()
@@ -355,7 +361,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     /**
      * Returns an EndpointSecurityFilter for this endpoint. If one is not set, there
      * will be no authentication on events sent via this endpoint
-     * 
+     *
      * @return EndpointSecurityFilter responsible for authenticating message flow via
      *         this endpoint.
      * @see org.mule.api.security.EndpointSecurityFilter
@@ -369,7 +375,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * Determines if requests originating from this endpoint should be synchronous
      * i.e. execute in a single thread and possibly return an result. This property
      * is only used when the endpoint is of type 'receiver'
-     * 
+     *
      * @return whether requests on this endpoint should execute in a single thread.
      *         This property is only used when the endpoint is of type 'receiver'
      */
@@ -381,7 +387,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     /**
      * The timeout value for remoteSync invocations
-     * 
+     *
      * @return the timeout in milliseconds
      */
     public int getResponseTimeout()
@@ -392,7 +398,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     /**
      * Sets the state the endpoint will be loaded in. The States are 'stopped' and
      * 'started' (default)
-     * 
+     *
      * @return the endpoint starting state
      */
     public String getInitialState()
@@ -419,9 +425,14 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     {
         return retryPolicyTemplate;
     }
-    
+
     public String getEndpointBuilderName()
     {
         return endpointBuilderName;
+    }
+
+    public boolean isProtocolSupported(String protocol)
+    {
+        return connector.supportsProtocol(protocol);
     }
 }

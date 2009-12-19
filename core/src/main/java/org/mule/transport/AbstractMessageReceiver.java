@@ -23,6 +23,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.SecurityException;
@@ -47,7 +48,9 @@ import java.io.OutputStream;
  */
 public abstract class AbstractMessageReceiver extends AbstractConnectable implements MessageReceiver
 {
-    /** The Service with which this receiver is associated with */
+    /**
+     * The Service with which this receiver is associated with
+     */
     protected Service service = null;
 
     private InternalMessageListener listener;
@@ -72,7 +75,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * Creates the Message Receiver
      *
      * @param connector the endpoint that created this listener
-     * @param service the service to associate with the receiver. When data is
+     * @param service   the service to associate with the receiver. When data is
      *                  received the service <code>dispatchEvent</code> or
      *                  <code>sendEvent</code> is used to dispatch the data to the
      *                  relevant Service.
@@ -86,7 +89,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     public AbstractMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint) throws CreateException
     {
         super(endpoint);
-        
+
         setService(service);
         if (service.getResponseRouter() != null && service.getResponseRouter().getEndpoints().contains(endpoint))
         {
@@ -112,7 +115,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     public final void initialise() throws InitialisationException
     {
         super.initialise();
-        
+
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
@@ -193,9 +196,9 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     }
 
     public final MuleMessage routeMessage(MuleMessage message,
-                                         Transaction trans,
-                                         boolean synchronous,
-                                         OutputStream outputStream) throws MuleException
+                                          Transaction trans,
+                                          boolean synchronous,
+                                          OutputStream outputStream) throws MuleException
     {
 
         if (connector.isEnableMessageEvents())
@@ -244,6 +247,16 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                 return message;
             }
         }
+
+        //Notify the endpoint of the new message
+        if (endpoint instanceof InboundEndpointDecorator)
+        {
+            if (!((InboundEndpointDecorator) endpoint).onMessage(message))
+            {
+                return null;
+            }
+        }
+
         return listener.onMessage(message, trans, synchronous, outputStream);
     }
 
@@ -297,11 +310,11 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             super();
         }
-        
+
         public MuleMessage onMessage(MuleMessage message,
-                                    Transaction trans,
-                                    boolean synchronous,
-                                    OutputStream outputStream) throws MuleException
+                                     Transaction trans,
+                                     boolean synchronous,
+                                     OutputStream outputStream) throws MuleException
         {
 
             MuleMessage resultMessage = null;
@@ -400,12 +413,12 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     {
         return (InboundEndpoint) super.getEndpoint();
     }
-    
+
     public void setEndpoint(InboundEndpoint endpoint)
     {
         super.setEndpoint(endpoint);
     }
-    
+
     @Override
     protected WorkManager getWorkManager()
     {
@@ -419,7 +432,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             return null;
         }
     }
-    
+
     @Override
     public String toString()
     {

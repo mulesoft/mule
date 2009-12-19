@@ -281,12 +281,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * Load a class with a given name from the given classloader.
      */
     public static Class loadClass(final String className, final ClassLoader classLoader)
-        throws ClassNotFoundException
+            throws ClassNotFoundException
     {
         return classLoader.loadClass(className);
     }
 
-    /** Prints the current classloader hierarchy - useful for debugging. */
+    /**
+     * Prints the current classloader hierarchy - useful for debugging.
+     */
     public static void printClassLoader()
     {
         System.out.println("ClassLoaderUtils.printClassLoader");
@@ -311,7 +313,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * Ensure that the given class is properly initialized when the argument is passed in
      * as .class literal. This method can never fail unless the bytecode is corrupted or
      * the VM is otherwise seriously confused.
-     * 
+     *
      * @param clazz the Class to be initialized
      * @return the same class but initialized
      */
@@ -355,6 +357,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
 
         // try the arguments as given
+        //Constructor ctor = clazz.getConstructor(args);
         Constructor ctor = getConstructor(clazz, args);
 
         if (ctor == null)
@@ -393,8 +396,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
-        throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-        InstantiationException, IllegalAccessException, InvocationTargetException
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
+            InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class clazz;
         if (classLoader != null)
@@ -470,19 +473,23 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             Class[] types = ctors[i].getParameterTypes();
             if (types.length == paramTypes.length)
             {
-                boolean match = true;
+                int matchCount = 0;
                 for (int x = 0; x < types.length; x++)
                 {
                     if (paramTypes[x] == null)
                     {
-                        match = true;
+                        matchCount++;
                     }
                     else
                     {
-                        match = types[x].isAssignableFrom(paramTypes[x]);
+                        if (paramTypes[x].isAssignableFrom(types[x]) || types[x].isAssignableFrom(paramTypes[x]))
+                        {
+                            matchCount++;
+                        }
                     }
+
                 }
-                if (match)
+                if (matchCount == types.length)
                 {
                     return ctors[i];
                 }
@@ -831,29 +838,29 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         if (!(sys instanceof URLClassLoader))
         {
             throw new IllegalArgumentException(
-                "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
-                                + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
+                    "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
+                            + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
         }
-    
+
         // system classloader is in this case the one that launched the application,
         // which is usually something like a JDK-vendor proprietary AppClassLoader
         URLClassLoader sysCl = (URLClassLoader) sys;
-    
+
         /*
-         * IMPORTANT NOTE: The more 'natural' way would be to create a custom
-         * URLClassLoader and configure it, but then there's a chicken-and-egg
-         * problem, as all classes MuleBootstrap depends on would have been loaded by
-         * a parent classloader, and not ours. There's no straightforward way to
-         * change this, and is documented in a Sun's classloader guide. The solution
-         * would've involved overriding the ClassLoader.findClass() method and
-         * modifying the semantics to be child-first, but that way we are calling for
-         * trouble. Hacking the primordial classloader is a bit brutal, but works
-         * perfectly in case of running from the command-line as a standalone app.
-         * All Mule embedding options then delegate the classpath config to the
-         * embedder (a developer embedding Mule in the app), thus classloaders are
-         * not modified in those scenarios.
-         */
-    
+        * IMPORTANT NOTE: The more 'natural' way would be to create a custom
+        * URLClassLoader and configure it, but then there's a chicken-and-egg
+        * problem, as all classes MuleBootstrap depends on would have been loaded by
+        * a parent classloader, and not ours. There's no straightforward way to
+        * change this, and is documented in a Sun's classloader guide. The solution
+        * would've involved overriding the ClassLoader.findClass() method and
+        * modifying the semantics to be child-first, but that way we are calling for
+        * trouble. Hacking the primordial classloader is a bit brutal, but works
+        * perfectly in case of running from the command-line as a standalone app.
+        * All Mule embedding options then delegate the classpath config to the
+        * embedder (a developer embedding Mule in the app), thus classloaders are
+        * not modified in those scenarios.
+        */
+
         // get a Method ref from the normal class, but invoke on a proprietary parent
         // object,
         // as this method is usually protected in those classloaders
@@ -865,7 +872,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             URL url = (URL) it.next();
             methodAddUrl.invoke(sysCl, new Object[]{url});
         }
-    }    
+    }
 
     // this is a shorter version of the snippet from:
     // http://www.davidflanagan.com/blog/2005_06.html#000060

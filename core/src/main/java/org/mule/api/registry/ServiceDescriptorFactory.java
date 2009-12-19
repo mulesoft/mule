@@ -10,10 +10,12 @@
 
 package org.mule.api.registry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.DefaultModelServiceDescriptor;
 import org.mule.transport.service.DefaultTransportServiceDescriptor;
+import org.mule.transport.service.MetaTransportServiceDescriptor;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.SpiUtils;
@@ -27,47 +29,77 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Factory used to create a new service descriptor.
  */
-// TODO MULE-2102
-public class ServiceDescriptorFactory 
+public class ServiceDescriptorFactory
 {
-    // Service types (used for looking up the service descriptors)
-
-    /** @deprecated use {@link #TRANSPORT_SERVICE_TYPE} */
-    @Deprecated
-    public static final String PROVIDER_SERVICE_TYPE = "transport";
-    public static final String TRANSPORT_SERVICE_TYPE = "transport";
-    public static final String MODEL_SERVICE_TYPE = "model";
-    public static final String EXCEPTION_SERVICE_TYPE = "exception";
-
     protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * Factory method to create a new service descriptor.
+     *
+     * @param type        the service type to create
+     * @param name        the name of the service.  In the case of a stransport service, the full endpoint sheme should be used here
+     *                    i.e. 'cxf:http'
+     * @param props       The properties defined by this service type
+     * @param overrides   any overrides that should be configured on top of the standard propertiers for the service
+     * @param muleContext the MuleContext for this mule instance
+     * @param classLoader the ClassLoader to use when loading classes
+     * @return a ServiceDescriptor instance that can be used to create the service objects associated with the service name
+     * @throws ServiceException if the service cannot be located
      */
-    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, MuleRegistry registry, ClassLoader classLoader) throws ServiceException
-    {       
+    public static ServiceDescriptor create(ServiceType type, String name, Properties props, Properties overrides, MuleContext muleContext, ClassLoader classLoader) throws ServiceException
+    {
         if (overrides != null)
         {
             props.putAll(overrides);
         }
 
+        String scheme = name;
+        String metaScheme = null;
+        int i = name.indexOf(":");
+        if (i > -1)
+        {
+            scheme = name.substring(i + 1);
+            metaScheme = name.substring(0, i);
+        }
+        //TODO we currently need to filter out transports that implement the meta scheme the old way
+        if ("axis".equals(metaScheme) || "axis-wsdl".equals(metaScheme) || "cxf".equals(metaScheme) || "cxf-wsdl".equals(metaScheme) || "jms".equals(metaScheme) || "ajax".equals(metaScheme))
+        {
+            //handle things the old wy for now
+            metaScheme = null;
+        }
+        else if (name.startsWith("jetty:http"))
+        {
+            scheme = "jetty";
+        }
+
         String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
-        
+
         ServiceDescriptor sd;
-        if (type.equals(TRANSPORT_SERVICE_TYPE))
+        if (type.equals(ServiceType.TRANSPORT))
         {
             try
             {
-                sd = new DefaultTransportServiceDescriptor(name, props, registry, classLoader);
+                if (metaScheme != null)
+                {
+                    sd = new MetaTransportServiceDescriptor(metaScheme, scheme, props, classLoader);
+                }
+                else
+                {
+                    sd = new DefaultTransportServiceDescriptor(scheme, props, classLoader);
+                }
+            }
+            catch (ServiceException e)
+            {
+                throw e;
             }
             catch (Exception e)
             {
-                throw (IllegalStateException) new IllegalStateException("Cannot create transport " + name).initCause(e);
+                throw new ServiceException(CoreMessages.failedToCreate("Transport: " + name));
             }
-            Properties exceptionMappingProps = SpiUtils.findServiceDescriptor(EXCEPTION_SERVICE_TYPE, name + "-exception-mappings");
+            Properties exceptionMappingProps = SpiUtils.findServiceDescriptor(ServiceType.EXCEPTION, name + "-exception-mappings");
             ((TransportServiceDescriptor) sd).setExceptionMappings(exceptionMappingProps);
         }
-        else if (type.equals(MODEL_SERVICE_TYPE))
+        else if (type.equals(ServiceType.MODEL))
         {
             sd = new DefaultModelServiceDescriptor(name, props);
         }
@@ -92,8 +124,8 @@ public class ServiceDescriptorFactory
             if (realService != null)
             {
                 // Recursively look up the service descriptor for the real service.
-                return registry.lookupServiceDescriptor(
-                    ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, realService, overrides);
+                return muleContext.getRegistry().lookupServiceDescriptor(
+                        ServiceType.TRANSPORT, realService, overrides);
             }
             else
             {

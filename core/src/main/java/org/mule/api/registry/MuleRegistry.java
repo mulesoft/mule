@@ -214,6 +214,6 @@ public interface MuleRegistry extends Registry
 
     // TODO These methods are a mess (they blur lookup with creation, uris with names). Need to clean this up.
 
-    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+    ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides)
             throws ServiceException;
 }

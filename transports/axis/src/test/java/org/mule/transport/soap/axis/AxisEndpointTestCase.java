@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.registry.ServiceDescriptorFactory;
+import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -25,22 +25,22 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         String url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
-        
+
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
         url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
-        
+
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
     }
@@ -50,19 +50,19 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         String url = "axis:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
-        
+
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
         assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
         assertEquals("http://admin:****@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.toString());
+                endpointUri.toString());
     }
 
     public void testEndpointFinder() throws Exception
@@ -70,17 +70,17 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
         endpointUri.initialise();
-        
+
         assertEquals("soap", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
+                endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
         TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                muleContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, "soap", null);
+                muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, "soap", null);
         if (sd != null)
         {
             //TODO TC: How do we assert this state in the new model?

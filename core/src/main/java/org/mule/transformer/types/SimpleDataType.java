@@ -25,7 +25,7 @@ public class SimpleDataType<T> implements DataType<T>
         this.mimeType = mimeType;
     }
 
-    public SimpleDataType(Class type)
+    public SimpleDataType(Class<T> type)
     {
         this.type = type;
     }

@@ -23,9 +23,11 @@ public class MuleProperties
 
     // End System properties
 
-    /********************************************************************************
+    /**
+     * *****************************************************************************
      * MuleEvent Level properties
-     *******************************************************************************/
+     * *****************************************************************************
+     */
     public static final String MULE_EVENT_PROPERTY = PROPERTY_PREFIX + "EVENT";
     public static final String MULE_EVENT_TIMEOUT_PROPERTY = PROPERTY_PREFIX + "EVENT_TIMEOUT";
     public static final String MULE_METHOD_PROPERTY = "method";
@@ -46,7 +48,9 @@ public class MuleProperties
     public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     public static final String MULE_ENCODING_PROPERTY = PROPERTY_PREFIX + "ENCODING";
     public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
-    /** @deprecated This property is no longer needed and will be removed in the next major release */
+    /**
+     * @deprecated This property is no longer needed and will be removed in the next major release
+     */
     public static final String MULE_SESSION_ID_PROPERTY = PROPERTY_PREFIX + "SESSION_ID";
     public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
     public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
@@ -61,19 +65,25 @@ public class MuleProperties
     public static final String MULE_CREDENTIALS_PROPERTY = PROPERTY_PREFIX + "CREDENTIALS";
     // End MuleEvent Level properties
 
-    /********************************************************************************
+    /**
+     * *****************************************************************************
      * Generic Service descriptor properties
-     *******************************************************************************/
+     * *****************************************************************************
+     */
     public static final String SERVICE_FINDER = "service.finder";
-    
-    /********************************************************************************
+
+    /**
+     * *****************************************************************************
      * Model Service descriptor properties
-     *******************************************************************************/
+     * *****************************************************************************
+     */
     public static final String MODEL_CLASS = "model";
 
-    /********************************************************************************
+    /**
+     * *****************************************************************************
      * Transport Service descriptor properties
-     *******************************************************************************/
+     * *****************************************************************************
+     */
     public static final String CONNECTOR_CLASS = "connector";
     public static final String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
     public static final String CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS = "transacted.message.receiver";
@@ -89,6 +99,7 @@ public class MuleProperties
     public static final String CONNECTOR_SERVICE_FINDER = "service.finder";
     public static final String CONNECTOR_SERVICE_ERROR = "service.error";
     public static final String CONNECTOR_SESSION_HANDLER = "session.handler";
+    public static final String CONNECTOR_META_ENDPOINT_BUILDER = "meta.endpoint.builder";
     // End Connector Service descriptor properties
 
     public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
@@ -122,16 +133,16 @@ public class MuleProperties
     public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
 
     /**
-    * Specifies whether mule should process messages sysnchonously, i.e. that a
-    * mule-model can only process one message at a time, or asynchronously. The
-    * default value is 'false'.
-    */
+     * Specifies whether mule should process messages sysnchonously, i.e. that a
+     * mule-model can only process one message at a time, or asynchronously. The
+     * default value is 'false'.
+     */
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
 
     /**
      * The prefix for any Mule-specific properties set in the system properties
      */
     public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
-    public static final String MULE_CONTEXT_PROPERTY= SYSTEM_PROPERTY_PREFIX + "context";
-    public static final String MULE_ENCODING_SYSTEM_PROPERTY= SYSTEM_PROPERTY_PREFIX + "encoding";
+    public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
+    public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
 }

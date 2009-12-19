@@ -77,7 +77,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
             // TODO Either remove because this should never happen or i18n the
             // message
             throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+                    + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -187,7 +187,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
             // TODO Either remove because this should never happen or i18n the
             // message
             throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+                    + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -233,7 +233,10 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         }
         if (endpoint == null)
         {
-            if (other.endpoint != null) return false;
+            if (other.endpoint != null)
+            {
+                return false;
+            }
         }
         else if (!endpoint.equals(other.endpoint))
         {
@@ -242,4 +245,8 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return true;
     }
 
+    public boolean isProtocolSupported(String protocol)
+    {
+        return getConnector().supportsProtocol(protocol);
+    }
 }

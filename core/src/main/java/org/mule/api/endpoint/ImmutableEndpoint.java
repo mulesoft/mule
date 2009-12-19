@@ -92,6 +92,7 @@ public interface ImmutableEndpoint extends Serializable
     /**
      * The transformers used when a response is returned from invoking this endpoint.
      * If an endpoint has no response transformers an empty list is returned.
+     *
      * @return the transformer to use when receiving the response data
      */
     List<Transformer> getResponseTransformers();
@@ -175,7 +176,6 @@ public interface ImmutableEndpoint extends Serializable
      * for a response is the {@link #isSynchronous()} flag is set to true.
      *
      * @return the timeout in milliseconds
-     *
      */
     int getResponseTimeout();
 
@@ -195,13 +195,16 @@ public interface ImmutableEndpoint extends Serializable
      * For inbound endpoints the Retry Policy determines how the connection to the underlying transport will be
      * managed if the connection is lost.
      * For outbound endpoints, the Retry Policy will attempt to retry dispatching, sending and receiving an event
+     *
      * @return the Policy factory to use when retrying a connection or dispatching an event
      */
     RetryPolicyTemplate getRetryPolicyTemplate();
-    
+
     /**
      * The name of the endpoint builder used to create this endpoint. May be used to
      * an endpoints builder for example to recreate endpoints for deserialized events.
      */
     String getEndpointBuilderName();
+
+    boolean isProtocolSupported(String protocol);
 }

@@ -4,7 +4,6 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:smtps="http://www.mulesoft.org/schema/mule/smtps"
       xmlns:cxf-core="http://cxf.apache.org/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
@@ -13,37 +12,40 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
-               http://www.mulesoft.org/schema/mule/smtps http://www.mulesoft.org/schema/mule/smtps/3.0/mule-smtps.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
                http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.0/mule-jetty.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
-  <!--<cxf:connector name="cxfConnector" configurationLocation="cxf.xml" initializeStaticBusInstance="false" /> -->
-  <http:connector name="HttpConnector" keepAlive="true" sendTcpNoDelay="false" receiveBufferSize="0" sendBufferSize="0" />
-  <jetty:connector name="jettyConnector"/>
-  
-  <model name="proxies">
+    <!--<cxf:connector name="cxfConnector" configurationLocation="cxf.xml" initializeStaticBusInstance="false" /> -->
+    <http:connector name="HttpConnector" keepAlive="true" sendTcpNoDelay="false" receiveBufferSize="0"
+                    sendBufferSize="0"/>
+    <jetty:connector name="jettyConnector"/>
 
-    <service name="echoProxy">
-      <inbound>
-        <cxf:inbound-endpoint address="jetty://localhost:63082/services/EchoProxy" proxy="true" synchronous="true" protocolConnector="jettyConnector">
+    <model name="proxies">
 
-        </cxf:inbound-endpoint>
-      </inbound>
-      <outbound>
-        <pass-through-router>
-          <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" proxy="true" synchronous="true" protocolConnector="HttpConnector"/>
-        </pass-through-router>
-      </outbound>
-    </service>
+        <service name="echoProxy">
+            <inbound>
+                <cxf:inbound-endpoint address="jetty://localhost:63082/services/EchoProxy" proxy="true"
+                                      synchronous="true" protocolConnector="jettyConnector">
 
-    <service name="echoService">
-      <inbound>
-        <cxf:inbound-endpoint
-          address="jetty://localhost:63081/services/Echo" frontend="simple" synchronous="true"  protocolConnector="jettyConnector"/>
-      </inbound>
-      <component class="org.mule.component.simple.EchoComponent" />
-    </service>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" proxy="true"
+                                           synchronous="true" protocolConnector="HttpConnector"/>
+                </pass-through-router>
+            </outbound>
+        </service>
 
-  </model>
+        <service name="echoService">
+            <inbound>
+                <cxf:inbound-endpoint
+                        address="jetty://localhost:63081/services/Echo" frontend="simple" synchronous="true"
+                        protocolConnector="jettyConnector"/>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent"/>
+        </service>
+
+    </model>
 </mule>

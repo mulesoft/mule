@@ -21,8 +21,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -140,8 +140,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         endpointURI.initialise();
 
         Connector connector = getConnector();
-
-        if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
+        if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
                     connector.getProtocol(), endpointURI).getMessage());
@@ -177,7 +176,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         Connector connector = getConnector();
 
-        if (connector != null && endpointURI != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
+        if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
                     connector.getProtocol(), endpointURI).getMessage());
@@ -225,8 +224,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected TransactionConfig getDefaultTransactionConfig()
     {
-        // TODO Do we need a new instance per endpoint, or can a single instance be
-        // shared?
         return new MuleTransactionConfig();
     }
 
@@ -480,7 +477,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             throws ServiceException
     {
         TransportServiceDescriptor sd = (TransportServiceDescriptor) muleContext.getRegistry()
-                .lookupServiceDescriptor(ServiceDescriptorFactory.TRANSPORT_SERVICE_TYPE, scheme, overrides);
+                .lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, overrides);
         if (null != sd)
         {
             return sd;
@@ -494,6 +491,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     private Connector getConnector(EndpointURI endpointURI, MuleContext muleContext) throws EndpointException
     {
         String scheme = uriBuilder.getEndpoint().getFullScheme();
+        TransportFactory factory = new TransportFactory(muleContext);
+
         Connector connector;
         try
         {
@@ -506,9 +505,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                             uriBuilder.getEndpoint().getConnectorName()));
                 }
             }
+            else if (isAlwaysCreateConnector())
+            {
+                connector = factory.createConnector(endpointURI);
+                muleContext.getRegistry().registerConnector(connector);
+            }
             else
             {
-                TransportFactory factory = new TransportFactory(muleContext);
                 connector = factory.getConnectorByProtocol(scheme);
                 if (connector == null)
                 {
@@ -532,6 +535,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return connector;
     }
 
+    /**
+     * Some endpoint may always require a new connector to be created for every endpoint
+     *
+     * @return the default if false but cusotm endpoints can override
+     * @since 3.0.0
+     */
+    protected boolean isAlwaysCreateConnector()
+    {
+        return false;
+    }
+
     // Builder setters
 
     public void setConnector(Connector connector)
@@ -549,7 +563,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     public void setTransformers(List<Transformer> transformers)
-    {               
+    {
         this.transformers = transformers;
     }
 
@@ -665,7 +679,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.retryPolicyTemplate = retryPolicyTemplate;
 
     }
-    
+
     public URIBuilder getEndpointBuilder()
     {
         return uriBuilder;

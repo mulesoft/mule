@@ -13,6 +13,7 @@ package org.mule.config;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ExceptionReader;
+import org.mule.api.registry.ServiceType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
@@ -55,7 +56,9 @@ public final class ExceptionHelper
 
     private static String J2SE_VERSION = "";
 
-    /** todo How do you get the j2ee version?? */
+    /**
+     * todo How do you get the j2ee version??
+     */
     private static final String J2EE_VERSION = "1.3ee";
 
     private static Properties errorDocs = new Properties();
@@ -83,7 +86,9 @@ public final class ExceptionHelper
         initialise();
     }
 
-    /** Do not instanciate. */
+    /**
+     * Do not instanciate.
+     */
     private ExceptionHelper()
     {
         // no-op
@@ -102,8 +107,8 @@ public final class ExceptionHelper
             registerExceptionReader(new NamingExceptionReader());
             J2SE_VERSION = System.getProperty("java.specification.version");
 
-            String name = SpiUtils.SERVICE_ROOT + SpiUtils.EXCEPTION_SERVICE_PATH
-                          + "mule-exception-codes.properties";
+            String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
+                    + "/mule-exception-codes.properties";
             InputStream in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
             if (in == null)
             {
@@ -114,8 +119,8 @@ public final class ExceptionHelper
 
             reverseErrorCodes = MapUtils.invertMap(errorCodes);
 
-            name = SpiUtils.SERVICE_ROOT + SpiUtils.EXCEPTION_SERVICE_PATH
-                   + "mule-exception-config.properties";
+            name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath()
+                    + "/mule-exception-config.properties";
             in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
             if (in == null)
             {
@@ -148,7 +153,7 @@ public final class ExceptionHelper
         }
         else if (clazz instanceof Class)
         {
-            return (Class)clazz;
+            return (Class) clazz;
         }
         else
         {
@@ -162,7 +167,7 @@ public final class ExceptionHelper
                 return null;
             }
             reverseErrorCodes.put(key, clazz);
-            return (Class)clazz;
+            return (Class) clazz;
         }
     }
 
@@ -173,7 +178,7 @@ public final class ExceptionHelper
         {
             if (m instanceof Properties)
             {
-                return (Properties)m;
+                return (Properties) m;
             }
             else
             {
@@ -182,14 +187,17 @@ public final class ExceptionHelper
         }
         else
         {
-            String name = SpiUtils.SERVICE_ROOT + SpiUtils.EXCEPTION_SERVICE_PATH + protocol + "-exception-mappings.properties";
+            String name = SpiUtils.SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
             InputStream in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
             if (in == null)
             {
                 errorMappings.put(protocol, "not found");
-                logger.warn("Failed to load error mappings from: " + name
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Failed to load error mappings from: " + name
                             + " This may be because there are no error code mappings for protocol: "
                             + protocol);
+                }
                 return null;
             }
 
@@ -203,7 +211,7 @@ public final class ExceptionHelper
             {
                 throw new IllegalArgumentException("Failed to load resource: " + name);
             }
-            
+
             errorMappings.put(protocol, p);
             return p;
         }
@@ -362,7 +370,7 @@ public final class ExceptionHelper
         {
             if (cause instanceof MuleException)
             {
-                exception = (MuleException)cause;
+                exception = (MuleException) cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
             // address some misbehaving exceptions, avoid endless loop
@@ -422,7 +430,7 @@ public final class ExceptionHelper
                 buf.append("(").append(exceptions.size() - i + 1).append(" more...)");
                 break;
             }
-            Throwable throwable = (Throwable)iterator.next();
+            Throwable throwable = (Throwable) iterator.next();
             ExceptionReader er = getExceptionReader(throwable);
             buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
@@ -430,12 +438,12 @@ public final class ExceptionHelper
             {
                 StackTraceElement e = throwable.getStackTrace()[0];
                 buf.append("  ")
-                    .append(e.getClassName())
-                    .append(":")
-                    .append(e.getLineNumber())
-                    .append(" (")
-                    .append(getJavaDocUrl(throwable.getClass()))
-                    .append(")\n");
+                        .append(e.getClassName())
+                        .append(":")
+                        .append(e.getLineNumber())
+                        .append(" (")
+                        .append(getJavaDocUrl(throwable.getClass()))
+                        .append(")\n");
             }
         }
         return buf.toString();
@@ -443,7 +451,7 @@ public final class ExceptionHelper
 
     /**
      * Registers an exception reader with Mule
-     * 
+     *
      * @param reader the reader to register.
      */
     public static void registerExceptionReader(ExceptionReader reader)
@@ -453,7 +461,7 @@ public final class ExceptionHelper
 
     /**
      * Gets an exception reader for the exception
-     * 
+     *
      * @param t the exception to get a reader for
      * @return either a specific reader or an instance of DefaultExceptionReader.
      *         This method never returns null;

@@ -22,10 +22,10 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
-import org.mule.config.MuleManifest;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -56,9 +56,9 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String responsePropertiesList)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
-            deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
-        
+                deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
+                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
+
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
         responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
@@ -68,43 +68,20 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         String[] props = StringUtils.splitAndTrim(responsePropertiesList, ",");
         if (props != null)
         {
-            for (int i=0; i < props.length; ++i)
-            {
-                responseProperties.add(props[i]);
-            }
+            responseProperties.addAll(Arrays.asList(props));
         }
     }
 
     public void dispatch(MuleEvent event) throws DispatchException
     {
-        if (getConnector() != null)
-        {
-            getConnector().dispatch(this, event);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the
-            // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
+        getConnector().dispatch(this, event);
     }
 
     public MuleMessage send(MuleEvent event) throws DispatchException
     {
-        if (getConnector() != null)
-        {
-            return getConnector().send(this, event);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the
-            // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
+        return getConnector().send(this, event);
     }
-    
+
     public List<String> getResponseProperties()
     {
         return responseProperties;

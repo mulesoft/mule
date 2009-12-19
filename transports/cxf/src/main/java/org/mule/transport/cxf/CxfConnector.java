@@ -68,7 +68,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     private Map<String, Set<Service>> serviceToProtocolServices = Collections.synchronizedMap(new HashMap<String, Set<Service>>());
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
     private boolean initializeStaticBusInstance = true;
-    
+
     public CxfConnector()
     {
         super();
@@ -81,15 +81,16 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         registerSupportedProtocol("https");
         registerSupportedProtocol("jms");
         registerSupportedProtocol("vm");
+        registerSupportedProtocol("jetty");
     }
-    
+
     @Override
     public boolean supportsProtocol(String protocol)
     {
         // we can listen on any protocol
         return protocol.startsWith("cxf:") || super.supportsProtocol(protocol);
     }
-    
+
     public String getProtocol()
     {
         return CXF;
@@ -99,21 +100,21 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     protected void doInitialise() throws InitialisationException
     {
         ApplicationContext context = (ApplicationContext) muleContext.getRegistry().lookupObject(SpringRegistry.SPRING_APPLICATION_CONTEXT);
-        
+
         if (configurationLocation != null)
         {
             bus = new SpringBusFactory(context).createBus(configurationLocation, true);
         }
         else
         {
-            bus = new SpringBusFactory(context).createBus((String)null, true);
+            bus = new SpringBusFactory(context).createBus((String) null, true);
         }
-        
+
         if (!initializeStaticBusInstance)
         {
             BusFactory.setDefaultBus(null);
         }
-        
+
         MuleUniversalTransport transport = new MuleUniversalTransport(this);
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
@@ -143,7 +144,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
-        
+
         // Registers the listener
         try
         {
@@ -222,14 +223,14 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         Server server = cxfReceiver.getServer();
 
         uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
-        
+
         // TODO MULE-2228 Simplify this API
         SedaService outerProtocolService = new SedaService();
         outerProtocolService.setMuleContext(muleContext);
 
         String uniqueServiceName = createServiceName(server.getEndpoint());
         outerProtocolService.setName(uniqueServiceName);
-        
+
         outerProtocolService.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
@@ -252,34 +253,34 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         // and if using http/https
         // we need to default to POST and set the Content-Type
         if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
-            || scheme.equals("servlet"))
+                || scheme.equals("servlet"))
         {
             originalEndpoint.getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             originalEndpoint.getProperties().put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
         }
 
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
-        
+
         EndpointBuilder protocolEndpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         protocolEndpointBuilder.setSynchronous(sync);
         protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
         protocolEndpointBuilder.setTransactionConfig(originalEndpoint.getTransactionConfig());
-        
+
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(originalEndpoint);
-        
+
         // Apply the transformers to the correct endpoint
         EndpointBuilder transformerEndpoint;
         if (cxfReceiver.isApplyTransformersToProtocol())
         {
-            transformerEndpoint = protocolEndpointBuilder; 
+            transformerEndpoint = protocolEndpointBuilder;
             receiverEndpointBuilder.setTransformers(Collections.<Transformer>emptyList());
             receiverEndpointBuilder.setResponseTransformers(Collections.<Transformer>emptyList());
         }
         else
-        {  
+        {
             transformerEndpoint = receiverEndpointBuilder;
         }
-        
+
         // Ensure that the transformers aren't empty before setting them. Otherwise Mule will get confused
         // and won't add the default transformers.
         if (originalEndpoint.getTransformers() != null && !originalEndpoint.getTransformers().isEmpty())
@@ -291,49 +292,49 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         {
             transformerEndpoint.setResponseTransformers(originalEndpoint.getResponseTransformers());
         }
-        
+
         // apply the filters to the correct endpoint
         EndpointBuilder filterEndpoint;
         if (cxfReceiver.isApplyFiltersToProtocol())
         {
-            filterEndpoint = protocolEndpointBuilder;   
-            receiverEndpointBuilder.setFilter(null);                                                                                                
+            filterEndpoint = protocolEndpointBuilder;
+            receiverEndpointBuilder.setFilter(null);
         }
         else
-        {  
+        {
             filterEndpoint = receiverEndpointBuilder;
         }
         filterEndpoint.setFilter(originalEndpoint.getFilter());
-        
+
         // apply the security filter to the correct endpoint
         EndpointBuilder secFilterEndpoint;
         if (cxfReceiver.isApplySecurityToProtocol())
         {
-            secFilterEndpoint = protocolEndpointBuilder;   
-            receiverEndpointBuilder.setSecurityFilter(null);                                                                                               
+            secFilterEndpoint = protocolEndpointBuilder;
+            receiverEndpointBuilder.setSecurityFilter(null);
         }
         else
-        {  
+        {
             secFilterEndpoint = receiverEndpointBuilder;
-        }             
+        }
         secFilterEndpoint.setSecurityFilter(originalEndpoint.getSecurityFilter());
 
         String connectorName = (String) originalEndpoint.getProperty(CxfConstants.PROTOCOL_CONNECTOR);
-        if (connectorName != null) 
+        if (connectorName != null)
         {
             protocolEndpointBuilder.setConnector(muleContext.getRegistry().lookupConnector(connectorName));
         }
-        
+
         InboundEndpoint protocolEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint(protocolEndpointBuilder);
+                .lookupEndpointFactory()
+                .getInboundEndpoint(protocolEndpointBuilder);
 
         InboundEndpoint receiverEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint(receiverEndpointBuilder);
+                .lookupEndpointFactory()
+                .getInboundEndpoint(receiverEndpointBuilder);
 
         receiver.setEndpoint(receiverEndpoint);
-        
+
         outerProtocolService.setInboundRouter(new DefaultInboundRouterCollection());
         outerProtocolService.getInboundRouter().addEndpoint(protocolEndpoint);
 
@@ -346,7 +347,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         serviceToProtocolServices.get(receiver.getService().getName()).add(outerProtocolService);
 
     }
-    
+
     /**
      * Build a unique name for the endpoint that is well suited for exposure by JMX.
      */
@@ -354,7 +355,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     {
         StringBuilder name = new StringBuilder(CXF_SERVICE_COMPONENT_NAME);
         name.append("{");
-        
+
         String address = endpoint.getEndpointInfo().getAddress();
         name.append(address.replace(":", "|"));
         name.append("}");
@@ -365,8 +366,8 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
-     * @param service the service for which the endpoint is being registered
+     *
+     * @param service  the service for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against. In this case it
      *         is the service name, which is equivilent to the Axis service name.
@@ -389,7 +390,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         // Only register/start the outer (CxfServiceComponent/protocol) services once
         // the inner (user) service is started
         if (event.getAction() == ServiceNotification.SERVICE_STARTED
-            && serviceToProtocolServices.get(event.getSource()) != null)
+                && serviceToProtocolServices.get(event.getSource()) != null)
         {
             try
             {
@@ -406,7 +407,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         // We need to stop the outer services first if they are not already stopped
         // to avoid request failures.
         else if (event.getAction() == ServiceNotification.SERVICE_STOPPING
-                 && serviceToProtocolServices.get(event.getSource()) != null)
+                && serviceToProtocolServices.get(event.getSource()) != null)
         {
             try
             {
@@ -422,13 +423,13 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
             }
         }
     }
-    
+
     @Override
     public boolean isSyncEnabled(String protocol)
     {
         protocol = protocol.toLowerCase();
         if (protocol.equals("http") || protocol.equals("https") || protocol.equals("ssl") || protocol.equals("tcp")
-            || protocol.equals("servlet"))
+                || protocol.equals("servlet"))
         {
             return true;
         }
@@ -452,11 +453,11 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     {
         this.initializeStaticBusInstance = initializeStaticBusInstance;
     }
-    
+
     @Override
     protected void doUnregisterListener(Service service, InboundEndpoint endpoint, MessageReceiver receiver)
     {
-        uriToServer.remove(((CxfMessageReceiver)receiver).getServer().getEndpoint().getEndpointInfo().getAddress());
+        uriToServer.remove(((CxfMessageReceiver) receiver).getServer().getEndpoint().getEndpointInfo().getAddress());
     }
 
 }

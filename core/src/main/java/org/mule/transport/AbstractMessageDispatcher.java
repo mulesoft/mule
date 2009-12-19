@@ -18,6 +18,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpointDecorator;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.transaction.Transaction;
@@ -45,7 +46,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     public final void initialise() throws InitialisationException
     {
         super.initialise();
-        
+
         doInitialise();
     }
 
@@ -72,8 +73,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     {
         event.setSynchronous(false);
         event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-            event.getEndpoint().getEndpointURI().toString());
-        
+                event.getEndpoint().getEndpointURI().toString());
+
         // Apply Security filter if one is set
         ImmutableEndpoint endpoint = event.getEndpoint();
         if (endpoint.getSecurityFilter() != null)
@@ -87,7 +88,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 // TODO MULE-863: Do we need this warning?
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
-                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                        SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                 handleException(e);
                 return;
             }
@@ -128,7 +129,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
         event.setSynchronous(true);
         event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-            event.getEndpoint().getEndpointURI().getUri().toString());
+                event.getEndpoint().getEndpointURI().getUri().toString());
         event = OptimizedRequestContext.unsafeSetEvent(event);
 
         // Apply Security filter if one is set
@@ -143,7 +144,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             {
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
-                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                        SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                 handleException(e);
                 return event.getMessage();
             }
@@ -156,6 +157,15 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
         try
         {
+            //Notify the endpoint of the new message
+            if (endpoint instanceof OutboundEndpointDecorator)
+            {
+                if (!((OutboundEndpointDecorator) endpoint).onMessage(event.getMessage()))
+                {
+                    return null;
+                }
+            }
+
             // Make sure we are connected
             connect();
 
@@ -183,7 +193,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                     component = event.getService().getName();
                 }
                 connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event.getEndpoint(),
-                    component, EndpointMessageNotification.MESSAGE_SENT));
+                        component, EndpointMessageNotification.MESSAGE_SENT));
             }
             return result;
         }
@@ -227,7 +237,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
      * set the REMOTE_SYNC header when client.send(..) is called so that results are
      * returned from remote invocations too.
      * </ol>
-     * 
+     *
      * @param event the current event
      * @return true if a response channel should be used to get a response from the
      *         event dispatch.
@@ -273,6 +283,14 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             try
             {
+                if (endpoint instanceof OutboundEndpointDecorator)
+                {
+                    //Notify the endpoint of the new message
+                    if (!((OutboundEndpointDecorator) endpoint).onMessage(event.getMessage()))
+                    {
+                        return;
+                    }
+                }
                 // Make sure we are connected
                 connect();
                 doDispatch(event);
@@ -286,7 +304,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                     }
 
                     connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event
-                        .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
+                            .getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
                 }
             }
             catch (Exception e)
@@ -330,13 +348,13 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             return null;
         }
     }
-    
+
     public OutboundEndpoint getEndpoint()
     {
         return (OutboundEndpoint) super.getEndpoint();
     }
-    
+
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
-    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;                                             
+    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
 }

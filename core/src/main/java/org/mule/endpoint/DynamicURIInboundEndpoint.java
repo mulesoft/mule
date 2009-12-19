@@ -19,7 +19,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.config.MuleManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -161,24 +160,19 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     public MuleMessage request(long timeout) throws Exception
     {
-        if (getConnector() != null)
-        {
-            return getConnector().request(this, timeout);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the
-            // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
+        return getConnector().request(this, timeout);
     }
 
     public String getEndpointBuilderName()
     {
         return endpoint.getEndpointBuilderName();
     }
-    
+
+    public boolean isProtocolSupported(String protocol)
+    {
+        return getConnector().supportsProtocol(protocol);
+    }
+
     public int hashCode()
     {
         final int prime = 31;
