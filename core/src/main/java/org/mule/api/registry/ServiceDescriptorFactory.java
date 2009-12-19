@@ -62,7 +62,7 @@ public class ServiceDescriptorFactory
             metaScheme = name.substring(0, i);
         }
         //TODO we currently need to filter out transports that implement the meta scheme the old way
-        if ("axis".equals(metaScheme) || "axis-wsdl".equals(metaScheme) || "cxf".equals(metaScheme) || "cxf-wsdl".equals(metaScheme) || "jms".equals(metaScheme) || "ajax".equals(metaScheme))
+        if ("axis".equals(metaScheme) || "wsdl-axis".equals(metaScheme) || "cxf".equals(metaScheme) || "wsdl-cxf".equals(metaScheme) || "jms".equals(metaScheme) || "ajax".equals(metaScheme))
         {
             //handle things the old wy for now
             metaScheme = null;
