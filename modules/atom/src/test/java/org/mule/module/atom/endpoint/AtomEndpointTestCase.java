@@ -17,7 +17,7 @@ import org.mule.transport.file.FileConnector;
 import org.mule.transport.http.HttpPollingConnector;
 
 /**
- * TODO
+ * Simple test that endpoints get parsed correctly
  */
 public class AtomEndpointTestCase extends AbstractMuleTestCase
 {
