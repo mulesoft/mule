@@ -18,6 +18,7 @@ import org.mule.api.security.TlsIndirectKeyStore;
 import org.mule.api.security.TlsProtocolHandler;
 import org.mule.api.security.provider.SecurityProviderFactory;
 import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.util.SystemUtils;
 
 import java.io.IOException;
 import java.security.Provider;
@@ -267,6 +268,11 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
     protected AbstractConnector createJettyConnector()
     {
         SslSocketConnector cnn = new SslSocketConnector();
+        
+        if (SystemUtils.isIbmJDK())
+        {
+            cnn.setProtocol("SSL_TLS");
+        }
        
         if (tls.getKeyStore() != null) cnn.setKeystore(tls.getKeyStore());
         if (tls.getKeyPassword() != null) cnn.setKeyPassword(tls.getKeyPassword());
