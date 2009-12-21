@@ -111,7 +111,7 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
     @Override
     public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
     {
-        throw new UnsupportedOperationException("buildOutboundEndpoint");
+        throw new UnsupportedOperationException("Outbound RSS endpoints not supported");
     }
 
     @Override

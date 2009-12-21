@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -104,6 +105,12 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
         {
             throw new EndpointException(e);
         }
+    }
+
+    @Override
+    public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
+    {
+        throw new UnsupportedOperationException("Outbound ATOM endpoints not supported");
     }
 
     public String getLastUpdate()
