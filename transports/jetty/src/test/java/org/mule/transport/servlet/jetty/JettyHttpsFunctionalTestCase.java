@@ -27,7 +27,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
-    
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -54,8 +53,8 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 assertTrue(callbackMade.compareAndSet(false, true));
-//                MuleMessage msg = context.getMessage();
-//                assertNotNull(msg.getProperty(HttpsConnector.LOCAL_CERTIFICATES));
+                MuleMessage msg = context.getMessage();
+                assertEquals(TEST_MESSAGE, msg.getPayloadAsString());
             }
         };
 

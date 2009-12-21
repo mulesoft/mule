@@ -22,12 +22,13 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServlet;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -36,25 +37,24 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
- * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an http inound endpoint.
- * One server is created for each connector declared, many Jetty endpoints can share the same connector.
+ * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an 
+ * http inound endpoint. One server is created for each connector declared, many Jetty endpoints 
+ * can share the same connector.
  */
-
 public class JettyHttpConnector extends AbstractConnector
 {
-
     public static final String JETTY = "jetty";
     public static final String REST = "rest";
 
     private Server httpServer;
 
-    private Map serverPorts;
+    private List<Integer> serverPorts;
 
     private String configFile;
 
     private JettyReceiverServlet receiverServlet;
 
-    private Class servletClass;
+    private Class<? extends HttpServlet> servletClass;
 
     private ServletHolder holder;
 
@@ -64,9 +64,10 @@ public class JettyHttpConnector extends AbstractConnector
     {
         super();
         registerSupportedProtocol("http");
-        registerSupportedProtocol("jetty");
+        registerSupportedProtocol(JETTY);
         registerSupportedProtocol(REST);
-        serverPorts = new HashMap(4);
+
+        serverPorts = new ArrayList<Integer>();
     }
 
     public String getProtocol()
@@ -95,7 +96,7 @@ public class JettyHttpConnector extends AbstractConnector
 
             public void contextDestroyed(ServletContextEvent sce) { }
         });
-        
+
         if (configFile != null)
         {
             try
@@ -157,14 +158,12 @@ public class JettyHttpConnector extends AbstractConnector
                 receiverServlet.removeReceiver(receiver);
             }
             httpServer.stop();
-            
         }
         catch (Exception e)
         {
             throw new LifecycleException(CoreMessages.failedToStop("Jetty Http Receiver"), e, this);
         }
     }
-
 
     /**
      * Template method where any connections should be made for the connector
@@ -187,11 +186,11 @@ public class JettyHttpConnector extends AbstractConnector
         //do nothing
     }
 
-
     void registerListener(MessageReceiver receiver) throws Exception
     {
         EndpointURI uri = receiver.getEndpointURI();
-        if (serverPorts.keySet().contains(new Integer(uri.getPort())))
+        Integer receiverPort = Integer.valueOf(uri.getPort());
+        if (serverPorts.contains(receiverPort))
         {
             logger.debug("Http server already listening on: " + uri.getPort());
             receiverServlet.addReceiver(receiver);
@@ -215,7 +214,7 @@ public class JettyHttpConnector extends AbstractConnector
 
         httpServer.addConnector(cnn);
 
-        serverPorts.put(new Integer(uri.getPort()), null);
+        serverPorts.add(receiverPort);
         receiverServlet.addReceiver(receiver);
 
         cnn.start();
@@ -261,21 +260,16 @@ public class JettyHttpConnector extends AbstractConnector
         return new JettyReceiverServlet();
     }
 
-    public Class getServletClass()
+    public Class<? extends HttpServlet> getServletClass()
     {
         return servletClass;
     }
 
-    public void setServletClass(Class servletClass)
+    public void setServletClass(Class<? extends HttpServlet> servletClass)
     {
         this.servletClass = servletClass;
     }
 
-    /**
-     * Getter for property 'replyToHandler'.
-     *
-     * @return Value for property 'replyToHandler'.
-     */
     @Override
     public ReplyToHandler getReplyToHandler()
     {
