@@ -7,7 +7,7 @@
         <version>3.0.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-rss</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Mule RSS Module</name>
     <description>Mule RSS Endpoints</description>
 
