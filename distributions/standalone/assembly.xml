@@ -373,6 +373,8 @@
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
         <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-annotations</include>
+        <include>org.mule.modules:mule-module-atom</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-guice</include>
@@ -382,6 +384,7 @@
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-rss</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring-config</include>
         <include>org.mule.modules:mule-module-spring-extras</include>
@@ -429,6 +432,8 @@
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
+        <exclude>org.mule.modules:mule-module-atom</exclude>
+        <exclude>org.mule.modules:mule-module-annotations</exclude>
         <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
@@ -441,6 +446,7 @@
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
+        <exclude>org.mule.modules:mule-module-rss</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring-config</exclude>
         <exclude>org.mule.modules:mule-module-spring-extras</exclude>
@@ -532,7 +538,6 @@
           <include>xerces:xml-serializer</include>
           <include>xalan:xalan</include>
       </includes>
-   </dependencySet>
-
+    </dependencySet>
   </dependencySets>
 </assembly>
