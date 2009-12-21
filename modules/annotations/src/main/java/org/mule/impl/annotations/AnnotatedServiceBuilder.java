@@ -25,6 +25,7 @@ import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
+import org.mule.config.EndpointAnnotationsParserFactory;
 import org.mule.config.annotations.Service;
 import org.mule.config.annotations.endpoints.Bind;
 import org.mule.config.annotations.endpoints.Channel;
@@ -68,6 +69,7 @@ public class AnnotatedServiceBuilder
     private final TemplateParser parser = TemplateParser.createAntStyleParser();
     protected RegistryMap regProps;
     protected AnnotatedEndpointBuilder builder;
+    protected EndpointAnnotationsParserFactory parserFactory;
 
     public Model getModel()
     {
@@ -86,6 +88,8 @@ public class AnnotatedServiceBuilder
         this.context = context;
         this.regProps = new RegistryMap(context.getRegistry());
         this.builder = new AnnotatedEndpointBuilder(context);
+        this.parserFactory = context.getRegistry().lookupObject(EndpointAnnotationsParserFactory.class);
+        assert parserFactory != null;
     }
 
     protected ObjectFactory createObjectFactory(Object object)
@@ -294,17 +298,16 @@ public class AnnotatedServiceBuilder
         Channel channelAnno = metaData.getAnnotation().annotationType().getAnnotation(Channel.class);
         if (channelAnno != null && channelAnno.type() == channelType)
         {
-            Collection c = context.getRegistry().lookupObjects(EndpointAnnotationParser.class);
-            for (Iterator iterator = c.iterator(); iterator.hasNext();)
+            EndpointAnnotationParser parser = parserFactory.getEndpointParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+            if (parser == null)
             {
-                EndpointAnnotationParser parser = (EndpointAnnotationParser) iterator.next();
-                if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
-                {
-                    return parser.parseInboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
-                }
+                //TODO i18n
+                throw new AnnotationException(AnnotationsMessages.createStaticMessage("No parser found for annotation: " + metaData));
             }
-            //TODO i18n
-            throw new AnnotationException(AnnotationsMessages.createStaticMessage("No parser found for annotation: " + metaData));
+            else
+            {
+                return parser.parseInboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
+            }
         }
         return null;
     }
@@ -314,14 +317,15 @@ public class AnnotatedServiceBuilder
         Channel channelAnno = metaData.getAnnotation().annotationType().getAnnotation(Channel.class);
         if (channelAnno != null && channelAnno.type() == channelType)
         {
-            Collection c = context.getRegistry().lookupObjects(EndpointAnnotationParser.class);
-            for (Iterator iterator = c.iterator(); iterator.hasNext();)
+            EndpointAnnotationParser parser = parserFactory.getEndpointParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+            if (parser == null)
             {
-                EndpointAnnotationParser parser = (EndpointAnnotationParser) iterator.next();
-                if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
-                {
-                    return parser.parseOutboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
-                }
+                //TODO i18n
+                throw new AnnotationException(AnnotationsMessages.createStaticMessage("No parser found for annotation: " + metaData));
+            }
+            else
+            {
+                return parser.parseOutboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
             }
         }
         return null;

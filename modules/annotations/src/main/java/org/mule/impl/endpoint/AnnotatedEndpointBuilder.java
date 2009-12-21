@@ -79,7 +79,7 @@ public class AnnotatedEndpointBuilder
         ImmutableEndpoint endpoint;
         EndpointBuilder endpointBuilder = getEndpointBuilder(epData);
 
-        if (epData.getProperties() != null)
+        if (epData.getProperties() != null && epData.getProperties().size() > 0)
         {
             endpointBuilder.setProperties(epData.getProperties());
         }
@@ -104,18 +104,18 @@ public class AnnotatedEndpointBuilder
         AbstractConnector connector;
         if (epData.getConnectorName() != null)
         {
-            connector = (AbstractConnector)muleContext.getRegistry().lookupConnector(getPropertyValue(epData.getConnectorName()));
+            connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(getPropertyValue(epData.getConnectorName()));
         }
         else if (epData.getConnector() != null)
         {
-            connector = (AbstractConnector)epData.getConnector();
+            connector = (AbstractConnector) epData.getConnector();
         }
         else
         {
             //We always create a new connecotr for annotations when one has not been configured
             MuleEndpointURI uri = new MuleEndpointURI(getPropertyValue(epData.getAddress()), muleContext);
 
-            connector = (AbstractConnector)transportFactory.createConnector(uri);
+            connector = (AbstractConnector) transportFactory.createConnector(uri);
             //The ibeans transport factory will not always create a new connector, check before registering
             if (muleContext.getRegistry().lookupConnector(connector.getName()) == null)
             {
@@ -126,8 +126,8 @@ public class AnnotatedEndpointBuilder
 
         //Set threading for this connector. Note we simplify by setting all profiles with a single value 'threads'
         //that can be set by the user
-        String threadsString = (String)epData.getProperties().get("threads");
-        if(threadsString!=null)
+        String threadsString = (String) epData.getProperties().get("threads");
+        if (threadsString != null)
         {
             int threads = Integer.valueOf(threadsString);
             connector.setMaxDispatchersActive(threads);

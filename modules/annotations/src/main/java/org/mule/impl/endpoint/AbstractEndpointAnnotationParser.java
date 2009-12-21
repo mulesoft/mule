@@ -40,9 +40,12 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
 
     protected AnnotatedEndpointBuilder getEndpointBuilder() throws MuleException
     {
-        assert muleContext != null;
-
-        return new AnnotatedEndpointBuilder(muleContext);
+        AnnotatedEndpointBuilder builder = muleContext.getRegistry().lookupObject(AnnotatedEndpointBuilder.class);
+        if (builder == null)
+        {
+            builder = new AnnotatedEndpointBuilder(muleContext);
+        }
+        return builder;
     }
 
     public OutboundEndpoint parseOutboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException
