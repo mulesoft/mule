@@ -34,7 +34,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * Will split the feed into entries.  This router also filters out any entries that are older than the last one read
+ * The filter can be configured with a date from which to accept feed entries
  */
 public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
 {
@@ -43,7 +44,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
      */
     protected transient final Log logger = LogFactory.getLog(InboundFeedSplitter.class);
 
-    public static final String RSS_FEED_PROPERTY = "RssFeed";
+    public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
     private List<String> acceptedContentTypes;
     private ObjectToRssFeed objectToFeed = new ObjectToRssFeed();
@@ -80,7 +81,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
                 {
                     continue;
                 }
-                m.setProperty(RSS_FEED_PROPERTY, feed, PropertyScope.INVOCATION);
+                m.setProperty(FEED_PROPERTY, feed, PropertyScope.INVOCATION);
                 MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getService(), muleEvent);
                 events.add(e);
 

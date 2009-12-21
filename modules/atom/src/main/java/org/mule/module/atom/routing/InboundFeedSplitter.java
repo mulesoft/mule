@@ -33,8 +33,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An inbound router that will split a Feed into entries. A filter can be applied to the entires to omit
- * certain entires, the most common use of this would be to filter out entries that have already been read
+ * An inbound router that will split a Feed into entries. A filter can be applied to the entries to omit
+ * certain entries, the most common use of this would be to filter out entries that have already been read
  * by using the {@link org.mule.module.atom.routing.EntryLastUpdatedFilter} filter.
  */
 public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
@@ -44,7 +44,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
      */
     protected transient final Log logger = LogFactory.getLog(InboundFeedSplitter.class);
 
-    public static final String ATOM_FEED_PROPERTY = "AtomFeed";
+    public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
     private List<String> acceptedContentTypes;
     private ObjectToFeed objectToFeed = new ObjectToFeed();
@@ -81,7 +81,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
                 {
                     continue;
                 }
-                m.setProperty(ATOM_FEED_PROPERTY, feed, PropertyScope.INVOCATION);
+                m.setProperty(FEED_PROPERTY, feed, PropertyScope.INVOCATION);
                 MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getService(), muleEvent);
                 events.add(e);
             }
