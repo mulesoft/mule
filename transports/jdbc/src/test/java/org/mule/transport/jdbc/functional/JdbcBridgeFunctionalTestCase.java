@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc.functional;
 
+import org.mule.util.SystemUtils;
+
 import java.sql.Connection;
 import java.util.List;
 
@@ -24,6 +26,13 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     {
         super();
         this.setPopulateTestData(false);
+    }
+    
+        @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4670
+        return SystemUtils.isIbmJDK();
     }
     
     protected String getConfigResources()

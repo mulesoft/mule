@@ -1,5 +1,5 @@
 /*
- * $Id: JXPathFilter.java 11195 2008-03-06 04:13:01Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

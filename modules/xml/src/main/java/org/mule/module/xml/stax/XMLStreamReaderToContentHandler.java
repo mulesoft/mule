@@ -1,4 +1,4 @@
-/* $Id: XMLStreamReaderToContentHandler.java,v 1.6 2006/01/23 18:50:02 sandoz Exp $
+/* $Id$
  *
  * Copyright (c) 2004, Sun Microsystems, Inc.
  * All rights reserved.
