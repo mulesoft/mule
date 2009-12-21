@@ -13,9 +13,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 
 import java.util.Map;
@@ -65,7 +62,6 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
             try
             {
                 BeanUtils.setProperty(this, entry.getKey().toString(), entry.getValue());
-                properties.remove(entry.getKey());
             }
             catch (Exception e)
             {
@@ -75,15 +71,4 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
         super.setProperties(properties);
     }
 
-    @Override
-    public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
-    {
-        throw new UnsupportedOperationException("Building outbound endpoints not supported by this builder");
-    }
-
-    @Override
-    public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
-    {
-        throw new UnsupportedOperationException("Building inbound endpoints not supported by this builder");
-    }
 }
