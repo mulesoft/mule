@@ -13,8 +13,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpPollingConnector;
@@ -27,9 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * TODO
+ * Creates RSS endpoints. Right now only inbound endpoints are supported, i.e. poll an RSS URL
  */
-public class RssEndpointBuilder extends EndpointURIEndpointBuilder
+public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
 {
     public static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
     public static final String SHORT_DATE_FORMAT = "yyyy-MM-dd";
@@ -105,12 +105,6 @@ public class RssEndpointBuilder extends EndpointURIEndpointBuilder
         {
             throw new EndpointException(e);
         }
-    }
-
-    @Override
-    public OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
-    {
-        throw new UnsupportedOperationException("buildOutboundEndpoint");
     }
 
     @Override
