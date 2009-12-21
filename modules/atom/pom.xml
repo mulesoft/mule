@@ -7,7 +7,7 @@
         <version>3.0.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-atom</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Mule ATOM Module</name>
     <description>Mule ATOM Endpoints and Serivce Component</description>
 
@@ -187,6 +187,7 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <artifactId>tm-extractors</artifactId>
             <groupId>org.textmining</groupId>
