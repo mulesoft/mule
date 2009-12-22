@@ -10,7 +10,7 @@
 package org.mule.module.rss.transformers;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.AbstractDiscoverableTransformer;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -27,7 +27,7 @@ import org.xml.sax.InputSource;
 /**
  * Converts an RSS data representation into a SyndFeed object
  */
-public class ObjectToRssFeed extends AbstractTransformer
+public class ObjectToRssFeed extends AbstractDiscoverableTransformer
 {
     public ObjectToRssFeed()
     {
@@ -37,6 +37,7 @@ public class ObjectToRssFeed extends AbstractTransformer
         registerSourceType(Document.class);
         registerSourceType(InputSource.class);
         registerSourceType(File.class);
+        setReturnClass(SyndFeed.class);
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
