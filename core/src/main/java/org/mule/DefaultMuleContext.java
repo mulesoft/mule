@@ -285,7 +285,9 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
+            //MULE-4690 dispose lifecycle is called twice, once here and once on the registryBroker.dispose
             lifecycleManager.firePhase(this, Disposable.PHASE_NAME);
+
             // Dispose internal registries
             registryBroker.dispose();
             muleRegistryHelper.dispose();
