@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+    http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd
+    http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+
+	<vm:endpoint name="testin" path="in" />
+
+	<vm:endpoint name="vmExceptionEndpoint" path="errProxy"
+		synchronous="false" />
+
+	<model>
+
+		<service name="TestASyncErrorHandling">
+			<inbound>
+				<vm:inbound-endpoint ref="testin" />
+			</inbound>
+			<outbound>
+
+				<filtering-router>
+					<vm:outbound-endpoint ref="vmExceptionEndpoint" />
+				</filtering-router>
+			</outbound>
+		</service>
+
+		<service name="ErrorHandler">
+			<inbound>
+				<vm:inbound-endpoint ref="vmExceptionEndpoint" />
+			</inbound>
+
+			<outbound>
+				<pass-through-router>
+					<stdio:outbound-endpoint system="OUT" />
+				</pass-through-router>
+			</outbound>
+		</service>
+
+	</model>
+</mule>

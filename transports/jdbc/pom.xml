@@ -53,6 +53,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jbossts</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>            
+        </dependency>        
+        <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <scope>test</scope>
@@ -62,6 +68,12 @@
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.7</version>
+            <scope>test</scope>
+        </dependency>        
     </dependencies>
 
     <profiles>

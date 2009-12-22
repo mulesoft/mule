@@ -14,7 +14,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 
-public class AbstractConnectableTestCase extends AbstractMuleTestCase
+public class ConnectableTestCase extends AbstractMuleTestCase
 {
 
     /**
