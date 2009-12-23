@@ -10,7 +10,6 @@
 
 package org.mule;
 
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
@@ -18,9 +17,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
+public class ExceptionListenerTestCase extends AbstractMuleTestCase
 {
-
     public void testAddGoodEndpoint() throws Exception
     {
         AbstractExceptionListener router = new DefaultServiceExceptionStrategy();
@@ -32,34 +30,19 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
 
     public void testSetGoodEndpoints() throws Exception
     {
-        List list = new ArrayList();
+        List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
         list.add(getTestOutboundEndpoint("test"));
         list.add(getTestOutboundEndpoint("test"));
+        
         AbstractExceptionListener router = new DefaultServiceExceptionStrategy();
         assertNotNull(router.getEndpoints());
         assertEquals(0, router.getEndpoints().size());
+        
         router.addEndpoint(getTestOutboundEndpoint("test"));
         assertEquals(1, router.getEndpoints().size());
+        
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());
         assertEquals(2, router.getEndpoints().size());
     }
-
-    public void testSetBadEndpoints() throws Exception
-    {
-        List list = new ArrayList();
-        list.add(getTestInboundEndpoint("test"));
-        list.add(getTestOutboundEndpoint("test"));
-        AbstractExceptionListener router = new DefaultServiceExceptionStrategy();
-        try
-        {
-            router.setEndpoints(list);
-            fail("Invalid endpoint: Exception exceptions");
-        }
-        catch (Exception e)
-        {
-            assertEquals(InvalidEndpointTypeException.class, e.getClass());
-        }
-    }
-
 }
