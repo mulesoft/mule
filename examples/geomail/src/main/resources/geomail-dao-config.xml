@@ -8,7 +8,7 @@
     <!-- Now we set up a simple datasource. Use a better one in production. -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-        <property name="url" value="jdbc:hsqldb:/opt/db/geomail"/>
+        <property name="url" value="jdbc:hsqldb:target/geomail"/>
         <property name="username" value="sa"/>
         <property name="password" value=""/>
     </bean>
