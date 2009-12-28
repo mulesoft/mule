@@ -35,5 +35,11 @@ export MULE_LIB
 #     exec "$MULE_BASE/bin/mule" -config hello-config.xml
 # elif [ 2 = $i ]
 # then
-     "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/hello/hello-http-config.xml    
 # fi
+
+if [ -f "$MULE_BASE/apps/hello/hello-http-config.xml" ]; then
+     "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/hello/hello-http-config.xml
+else
+    echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
+fi         
+
