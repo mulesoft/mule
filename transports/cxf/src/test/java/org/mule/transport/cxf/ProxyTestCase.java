@@ -18,6 +18,7 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.cxf.testmodels.AsyncService;
 import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
@@ -157,6 +158,12 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:63081/services/greeter-proxy", msg, null);
         String resString = result.getPayloadAsString();
+        
+        // TODO MULE-4584 Mule CXF proxy service reset http response status to 200
+        // when the backend web service fails
+
+        // assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
+        // !result.getProperty("http.status").equals(HttpConstants.SC_OK));
         
         assertTrue(resString.indexOf("invalid was not recognized") != -1);
     }
