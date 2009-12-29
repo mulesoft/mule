@@ -15,6 +15,9 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.TransactionNotification;
+import org.mule.util.UUID;
+
+import java.text.MessageFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +29,8 @@ public abstract class AbstractTransaction implements Transaction
 {
 
     protected final transient Log logger = LogFactory.getLog(getClass());
+
+    protected String id = UUID.getUUID();
 
     protected MuleContext muleContext;
 
@@ -147,7 +152,7 @@ public abstract class AbstractTransaction implements Transaction
 
     public String getId()
     {
-        return String.valueOf(this.hashCode());
+        return id;
     }
 
     @Override
@@ -162,6 +167,6 @@ public abstract class AbstractTransaction implements Transaction
         {
             status = -1;
         }
-        return super.toString() + "[status=" + status + "]";
+        return MessageFormat.format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
     }
 }

@@ -168,7 +168,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         }
 
         return new StringBuilder().append(getClass().getName())
-                .append('@').append(System.identityHashCode(this))
+                .append('@').append(id)
                 .append("[status=").append(statusName)
                 .append(", key=").append(key)
                 .append(", resource=").append(resource)
