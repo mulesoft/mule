@@ -52,7 +52,8 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     protected static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
     protected static final int ROUTING_EVENT_ACTION_START_RANGE = 1300;
     protected static final int COMPONENT_EVENT_ACTION_START_RANGE = 1400;
-    protected static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
+    
+    public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
     public static final Object NULL_MESSAGE = "";
