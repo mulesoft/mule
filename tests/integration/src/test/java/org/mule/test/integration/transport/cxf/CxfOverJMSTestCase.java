@@ -18,6 +18,14 @@ import org.mule.tck.FunctionalTestCase;
 public class CxfOverJMSTestCase extends FunctionalTestCase
 {
 
+    private static final String req = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                                      + "<soap:Body>"
+                                      + "<ns2:echo xmlns:ns2=\"http://simple.component.mule.org/\">"
+                                      + "<ns2:echo>hello</ns2:echo>"
+                                      + "</ns2:echo>"
+                                      + "</soap:Body>"
+                                      + "</soap:Envelope>";
+
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transport/cxf/cxf-over-jms-config.xml";
@@ -26,15 +34,6 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
     public void testCxf() throws Exception
     {
         MuleClient client = new MuleClient();
-        String req = 
-            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soap:Body>" +
-                    "<ns2:echo xmlns:ns2=\"http://simple.component.mule.org/\">" +                        
-                        "<ns2:echo>hello</ns2:echo>" +
-                    "</ns2:echo>" +
-                "</soap:Body>" +
-            "</soap:Envelope>";
-        
         client.dispatch("jms://TestComponent", new DefaultMuleMessage(req, muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
@@ -49,4 +48,15 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         assertNotNull(message.getPayload());
         assertTrue(message.getPayloadAsString().equals("hello"));
     }
+
+    // MULE-4677
+    public void testCxfOverJMSSyncProxy() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleMessage result = client.send("http://localhost:63081/services/testBridge",
+            new DefaultMuleMessage(req, muleContext));
+        assertNotNull(result.getPayload());
+        assertTrue(result.getPayloadAsString().contains("<ns2:echo>hello</ns2:echo>"));
+    }
+
 }

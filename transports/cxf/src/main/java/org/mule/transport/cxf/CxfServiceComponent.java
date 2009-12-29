@@ -21,11 +21,13 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.xml.stax.StaxSource;
@@ -291,6 +293,18 @@ public class CxfServiceComponent implements Callable, Lifecycle
             {
                 muleResMsg.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, p);            
             }
+
+            // MULE-4677
+            // Account for the case where reply-to needs to be handled at the protocol, and not cxf, level.
+            boolean protocolReplyTo = false;
+            InboundEndpoint endpoint = receiver.getEndpoint();
+            if (endpoint.isSynchronous() && receiver.getEndpoint().getEndpointURI().getScheme().equals("jms"))
+            {
+                protocolReplyTo = true;
+                // Disable CXF replyTo
+                muleReqMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true",
+                    PropertyScope.INVOCATION);
+            }
             
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(m);
@@ -314,7 +328,16 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 }
             }
             
-            muleResMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true");
+            // MULE-4677
+            // Account for the case where reply-to needs to be handled at the protocol, and not cxf, level.
+            if (protocolReplyTo)
+            {
+                muleResMsg.removeProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+            }
+            else
+            {
+                muleResMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true", PropertyScope.INVOCATION);
+            }
             return muleResMsg;
         }
         catch (MuleException e)

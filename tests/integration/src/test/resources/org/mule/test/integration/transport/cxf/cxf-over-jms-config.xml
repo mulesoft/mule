@@ -45,6 +45,25 @@
                 </chaining-router>
             </outbound>
         </service>
+        
+        <service name="TestCxfJmsProxy">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/testBridge" proxy="true" synchronous="true"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="jms://testEcho" proxy="true" synchronous="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="TestEcho">
+            <inbound>
+                <cxf:inbound-endpoint address="jms://testEcho" frontend="simple" synchronous="true" proxy="true"/>
+            </inbound>
+            <echo-component/>
+        </service>
+        
     </model>
     
 </mule>
