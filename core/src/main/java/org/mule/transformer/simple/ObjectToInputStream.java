@@ -19,9 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
- * <code>ObjectToInputStream</code> converts serilaizable object to a input stream but
- * treats <code>java.lang.String</code> differently by converting to bytes using
- * the <code>String.getBytrs()</code> method.
+ * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
+ * but treats <code>java.lang.String</code>, <code>byte[]</code> and
+ * <code>org.mule.api.transport.OutputHandler</code> differently by using their
+ * byte[] content rather thqn Serializing them.
  */
 public class ObjectToInputStream extends SerializableToByteArray
 {
@@ -42,6 +43,10 @@ public class ObjectToInputStream extends SerializableToByteArray
             {
                 return new ByteArrayInputStream(((String) src).getBytes(encoding));
             }
+            else if (src instanceof byte[])
+            {
+                return new ByteArrayInputStream((byte[]) src);
+            }
             else if (src instanceof OutputHandler)
             {
                 OutputHandler oh = (OutputHandler) src;
@@ -51,15 +56,15 @@ public class ObjectToInputStream extends SerializableToByteArray
 
                 return new ByteArrayInputStream(out.toByteArray());
             }
+            else
+            {
+                return new ByteArrayInputStream((byte[]) super.doTransform(src, encoding));
+            }
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
-
-
-        byte[] bytes = (byte[]) super.doTransform(src, encoding);
-        return new ByteArrayInputStream(bytes);
     }
 
 }

@@ -56,7 +56,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         Object expectedResult = this.getResultData();
         assertNotNull(expectedResult);
 
-        assertTrue(this.compareResults(expectedResult, result));
+        assertTrue("Trasnformation result does not match expected result", this.compareResults(
+            expectedResult, result));
     }
 
     public void testRoundtripTransform() throws Exception
@@ -145,7 +146,11 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             return Arrays.equals((byte[]) expected, (byte[]) result);
         }
 
-        if (expected instanceof InputStream)
+        if (expected instanceof InputStream && result instanceof InputStream)
+        {
+            return IOUtils.toString((InputStream) expected).equals(IOUtils.toString((InputStream) result));
+        }
+        else if (expected instanceof InputStream)
         {
             expected = IOUtils.toString((InputStream)expected);
         }
