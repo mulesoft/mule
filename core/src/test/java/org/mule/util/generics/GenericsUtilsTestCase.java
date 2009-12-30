@@ -149,8 +149,7 @@ public class GenericsUtilsTestCase extends AbstractMuleTestCase
 
     protected void executeTest() throws NoSuchMethodException
     {
-        String methodName = getName().trim();
-        //methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+        String methodName = getName().trim().replaceFirst("test", "").toLowerCase();
         for (int i = 0; i < this.methods.length; i++)
         {
             if (methodName.equals(this.methods[i]))
