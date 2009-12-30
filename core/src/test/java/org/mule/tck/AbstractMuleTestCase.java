@@ -367,6 +367,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         watchdog = createWatchdog();
         watchdog.start();
 
+        if (verbose)
+        {
+            System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + getName(), '=', 80));
+        }
+
         try
         {
             if (getTestInfo().getRunCount() == 0)
