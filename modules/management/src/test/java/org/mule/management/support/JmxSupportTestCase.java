@@ -12,7 +12,6 @@ package org.mule.management.support;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxModernSupport;
 
@@ -42,10 +41,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-        JmxAgent agent = new JmxAgent();
-        agent.setMuleContext(muleContext);
-        agent.initialise();
-        muleContext.getRegistry().registerAgent(agent);
         muleContext.start();
 
         List<String> domains = Arrays.asList(mBeanServer.getDomains());
@@ -70,10 +65,6 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-        JmxAgent agent = new JmxAgent();
-        agent.setMuleContext(muleContext);
-        agent.initialise();
-        muleContext.getRegistry().registerAgent(agent);
         muleContext.start();
 
         List<String> domains = Arrays.asList(mBeanServer.getDomains());
@@ -86,11 +77,4 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
     }
     
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        // This MBean was registered manually so needs to be unregistered manually in tearDown()
-        unregisterMBeansByMask(TEST_DOMAIN + ":name=TestDuplicates");
-        super.doTearDown();
-    }
 }

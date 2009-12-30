@@ -15,6 +15,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -43,6 +44,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.lang.management.ManagementFactory;
 import java.rmi.server.ExportException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,7 +97,8 @@ public class JmxAgent extends AbstractAgent
      */
     protected boolean locateServer = true;
 
-    private boolean createServer = true;
+    // don't create mbean server by default, use a platform mbean server
+    private boolean createServer = false;
     private String connectorServerUrl;
     private MBeanServer mBeanServer;
     private JMXConnectorServer connectorServer;
@@ -158,23 +161,37 @@ public class JmxAgent extends AbstractAgent
         {
             return;
         }
-        if (mBeanServer == null && !locateServer && !createServer)
+
+        try
         {
-            throw new InitialisationException(ManagementMessages.createOrLocateShouldBeSet(), this);
-        }
-        if (mBeanServer == null && locateServer)
-        {
-            List<?> l = MBeanServerFactory.findMBeanServer(null);
-            if (l != null && l.size() > 0)
+            Object agent = muleContext.getRegistry().lookupObject(this.getClass());
+            // if we find ourselves, but not initialized yet - proceed with init, otherwise return
+            if (agent == this && this.initialized.get())
             {
-                mBeanServer = (MBeanServer) l.get(0);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Found an existing JMX agent in the registry, we're done here.");
+                }
+                return;
             }
         }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+
         if (mBeanServer == null && createServer)
         {
+            // here we create a new mbean server, not using a platform one
             mBeanServer = MBeanServerFactory.createMBeanServer();
             serverCreated.set(true);
         }
+
+        if (mBeanServer == null && locateServer)
+        {
+            mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        }
+
         if (mBeanServer == null)
         {
             throw new InitialisationException(ManagementMessages.cannotLocateOrCreateServer(), this);
@@ -194,7 +211,7 @@ public class JmxAgent extends AbstractAgent
             // and unregister once context stopped
             muleContext.registerListener(new MuleContextStoppedListener());
         } 
-        catch (NotificationException e) 
+        catch (NotificationException e)
         {
             throw new InitialisationException(e, this);
         }
@@ -521,10 +538,10 @@ public class JmxAgent extends AbstractAgent
         try
         {
             ObjectName query = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":*");
-            Set<?> mbeans = mBeanServer.queryNames(query, null);
+            Set<ObjectName> mbeans = mBeanServer.queryNames(query, null);
             while (!mbeans.isEmpty())
             {
-                ObjectName name = (ObjectName) mbeans.iterator().next();
+                ObjectName name = mbeans.iterator().next();
                 try
                 {
                     mBeanServer.unregisterMBean(name);

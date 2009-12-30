@@ -10,9 +10,11 @@
 package org.mule.module.management.config;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.processors.ProvideDefaultNameFromElement;
-import org.mule.module.management.agent.JmxAgent;
+import org.mule.module.management.agent.JmxAgentConfigurer;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 
     protected Class<?> getBeanClass(Element element)
     {
-        return JmxAgent.class;
+        return JmxAgentConfigurer.class;
     }
 
     @Override

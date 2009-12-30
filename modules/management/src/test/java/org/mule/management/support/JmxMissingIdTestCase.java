@@ -37,9 +37,6 @@ public class JmxMissingIdTestCase extends TestCase
         contextBuilder.setMuleConfiguration(config);
         muleContext = new DefaultMuleContextFactory().createMuleContext(contextBuilder);
 
-        JmxAgent jmxAgent = new JmxAgent();
-        muleContext.getRegistry().registerAgent(jmxAgent);
-        
         muleContext.start();
     }
     

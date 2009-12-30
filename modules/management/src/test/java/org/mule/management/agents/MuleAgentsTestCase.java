@@ -21,9 +21,19 @@ import javax.management.MBeanServerFactory;
 
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
+
+    protected JmxAgent jmxAgent;
+
     public MuleAgentsTestCase()
     {
-        setStartContext(true);
+        setStartContext(false);
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        jmxAgent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
     }
 
     public void testRemoveNonExistentAgent() throws Exception
@@ -34,20 +44,19 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
 
     public void testAgentsRegistrationOrder() throws Exception
     {
-        JmxAgent agentFirst = new JmxAgent();
         // If you specified "JmxAgent", it was the first one in the map,
         // but for "jmxAgent" the order was not preserved.
         // MX4JAgent depends on JmxAgent having finished initilisation
         // before proceeding, otherwise it is not able to find any
         // MBeanServer.
-        agentFirst.setName("jmxAgent");
-        muleContext.getRegistry().registerAgent(agentFirst);
+        jmxAgent.setName("jmxAgent");
 
         Mx4jAgent agentSecond = new Mx4jAgent();
         agentSecond.setName("mx4jAgent");
         muleContext.getRegistry().registerAgent(agentSecond);
 
         // should not throw an exception
+        muleContext.start();
     }
 
     /**
@@ -57,7 +66,6 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
      */
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
-        JmxAgent jmxAgent = new JmxAgent();
         List servers = MBeanServerFactory.findMBeanServer(null);
         MBeanServer server;
         server = servers == null || servers.isEmpty()
@@ -66,6 +74,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setCreateServer(false);
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
-        muleContext.getRegistry().registerAgent(jmxAgent);
+
+        muleContext.start();
     }
 }

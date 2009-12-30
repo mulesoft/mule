@@ -46,7 +46,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="true" >
+                <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="false" >
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether the agent should create an MBean server if one couldn't be found or locateServer was set to false.

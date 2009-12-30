@@ -32,7 +32,7 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;
         
-        assertEquals(true, jmxAgent.isCreateServer());
+        assertEquals(false, jmxAgent.isCreateServer());
         assertEquals(true, jmxAgent.isLocateServer());
         assertEquals(true, jmxAgent.isEnableStatistics());
 

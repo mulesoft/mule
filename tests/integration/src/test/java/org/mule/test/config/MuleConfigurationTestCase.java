@@ -40,6 +40,7 @@ public class MuleConfigurationTestCase extends TestCase
     @Override
     protected void tearDown() throws Exception
     {
+        muleContext.dispose();
         muleContext = null;
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(failOnMessageScribbling);
     } 

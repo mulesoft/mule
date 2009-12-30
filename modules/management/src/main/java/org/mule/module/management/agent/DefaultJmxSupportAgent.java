@@ -14,6 +14,8 @@ import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.RegistrationException;
 import org.mule.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
@@ -109,15 +111,18 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         try
         {
             Agent agent = createRmiAgent();
+            final MuleRegistry registry = muleContext.getRegistry();
             if (!isAgentRegistered(agent))
             {
-                muleContext.getRegistry().registerAgent(agent);
+                registry.registerAgent(agent);
             }
-            
+
+            // any existing jmx agent will be modified with remote connector settings
             agent = createJmxAgent();
-            if (!isAgentRegistered(agent))
+            // there must be only one jmx agent, so lookup by type instead
+            if (registry.lookupObject(JmxAgent.class) == null)
             {
-                muleContext.getRegistry().registerAgent(agent);
+                registry.registerAgent(agent);
             }
             
             if (loadLog4jAgent)
@@ -125,14 +130,14 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createLog4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    muleContext.getRegistry().registerAgent(agent);
+                    registry.registerAgent(agent);
                 }
             }
             
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
-                muleContext.getRegistry().registerAgent(agent);
+                registry.registerAgent(agent);
             }
             
             if (loadJdmkAgent)
@@ -140,7 +145,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    muleContext.getRegistry().registerAgent(agent);
+                    registry.registerAgent(agent);
                 }
             }
 
@@ -149,7 +154,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    muleContext.getRegistry().registerAgent(agent);
+                    registry.registerAgent(agent);
                 }
             }
 
@@ -158,13 +163,13 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createProfilerAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    muleContext.getRegistry().registerAgent(agent);
+                    registry.registerAgent(agent);
                 }
             }
 
             // remove this agent once it has registered the other agents
             //TODO RM* this currently does nothing!!!
-            muleContext.getRegistry().unregisterAgent(name);
+            registry.unregisterAgent(name);
         }
         catch (MuleException e)
         {
@@ -174,7 +179,23 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     public JmxAgent createJmxAgent()
     {
-        JmxAgent agent = new JmxAgent();
+        JmxAgent agent = null;
+        try
+        {
+            agent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+            if (agent == null)
+            {
+                // nothingregistered yet
+                agent = new JmxAgent();
+            }
+        }
+        catch (RegistrationException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        // otherwise, just augment an existing jmx agent with remote connector
+
         String remotingUri = null;
         if (StringUtils.isBlank(host) && StringUtils.isBlank(port))
         {
@@ -189,7 +210,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             mergedProps.putAll(props);
             
             RMIClientSocketFactory factory = new FixedHostRmiClientSocketFactory(host);
-            mergedProps.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, factory);
+            mergedProps.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
+                            factory);
             agent.setConnectorServerProperties(mergedProps);
         }
 

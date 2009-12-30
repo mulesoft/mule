@@ -52,7 +52,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         super.doSetUp();
         serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         muleContext.getRegistry().registerAgent(new RmiRegistryAgent());
-        jmxAgent = new JmxAgent();
+        jmxAgent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
     }
 
@@ -64,7 +64,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     public void testDefaultProperties() throws Exception
     {
         jmxAgent.setCredentials(getValidCredentials());
-        muleContext.getRegistry().registerAgent(jmxAgent);
         muleContext.start();
     }
 
@@ -72,7 +71,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
-        muleContext.getRegistry().registerAgent(jmxAgent);
         muleContext.start();
 
         JMXConnector connector = null;
@@ -98,7 +96,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
-        muleContext.getRegistry().registerAgent(jmxAgent);
         muleContext.start();
 
         JMXConnector connector = null;
@@ -124,7 +121,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(null);
-        muleContext.getRegistry().registerAgent(jmxAgent);
         muleContext.start();
 
         JMXConnector connector = null;

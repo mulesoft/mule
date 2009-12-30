@@ -24,6 +24,7 @@ public class DefaultJmxSupportAgentTestCase extends AbstractMuleTestCase
     public void testHostPropertyEnablesClientSocketFactory () throws Exception
     {
         DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
+        agent.setMuleContext(muleContext);
         agent.setHost("127.0.0.1");
         JmxAgent jmxAgent = agent.createJmxAgent();
         Map props = jmxAgent.getConnectorServerProperties();
