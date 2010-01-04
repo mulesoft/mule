@@ -53,12 +53,6 @@
         </dependency>
 
         <!-- This is the actual language implementation -->
-         <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>groovy-engine</artifactId>
-            <!-- we use our own retrotranslated version -->
-            <classifier>jdk14</classifier>
-        </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
