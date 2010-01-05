@@ -55,7 +55,7 @@ cxf-tools-common-2.2.2
 dom4j-1.6.1-osgi
 FastInfoset-1.2.3
 geronimo-stax-api_1.0_spec-1.0.1
-groovy-all-1.6.5
+groovy-all-1.7.0
 guice-2.0
 hibernate-3.2.2.ga-osgi
 jackson-core-asl-1.3.1
