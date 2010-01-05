@@ -1,8 +1,5 @@
 #! /bin/sh
 
-# There is no need to call this if you set the MULE_HOME in your environment
-# but you must also define MULE_LIB for the example (see below)
-# or specify the config as a file: URI (see README.txt)
 if [ -z "$MULE_HOME" ] ; then
   # find the name of the real MULE_HOME which is two levels up
   MULE_HOME=`pwd`
@@ -17,29 +14,25 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
-# This extends the classpath to include the configuration directory
-# Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
-MULE_LIB=./conf
-export MULE_LIB
-
-# TODO stdio may have lifecycle issues currently, disable it
-# echo "The Hello example is available in two variations:"
-# echo "  1. Hello from the Command Line"
-# echo "  2. Hello using the HTTP transport"
-# echo "     (surf to http://localhost:8888/?name=Dolly)"
-# echo "Select the one you wish to execute and press Enter..."
-# read i
-
-# if [ 1 = $i ]
-# then
-#     exec "$MULE_BASE/bin/mule" -config hello-config.xml
-# elif [ 2 = $i ]
-# then
-# fi
-
-if [ -f "$MULE_BASE/apps/hello/hello-http-config.xml" ]; then
-     "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/hello/hello-http-config.xml
-else
+if [ ! -d "$MULE_BASE/apps/mule-example-hello" ]
+then
     echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
+    exit 1
 fi         
+
+echo "The Hello example is available in two variations:"
+echo "  1. Hello from the Command Line"
+echo "  2. Hello using the HTTP transport"
+echo "     (surf to http://localhost:8888/?name=Dolly)"
+echo "Select the one you wish to execute and press Enter..."
+read i
+
+if [ 1 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-hello/hello-config.xml
+elif [ 2 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-hello/hello-http-config.xml
+fi
+
 

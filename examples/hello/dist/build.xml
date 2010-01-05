@@ -75,15 +75,15 @@
            description="Deploy the application to the Mule server">
 
         <copy file="${dir.build}/${app.name}.jar"
-              todir="${dir.mule.home}/apps/hello/lib"
-              overwrite="true"
-              verbose="true"/>
+              todir="${dir.mule.home}/apps/${app.name}/lib"
+              overwrite="true" verbose="true"/>
 
-       <copy file="${dir.classes}/hello-http-config.xml"
-             todir="${dir.mule.home}/apps/hello"
-             overwrite="true"
-             verbose="true"/>
-              
+       <copy todir="${dir.mule.home}/apps/${app.name}"
+             overwrite="true" verbose="true">
+            <fileset dir="${dir.classes}">
+                <include name="**/*.xml"/>
+            </fileset>
+       </copy>              
    </target>
 
    <target name="setup">

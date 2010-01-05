@@ -15,22 +15,12 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
-    <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
-    
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
-    <!-- Download any additional libraries needed to run the application -->
-    <target name="get.libraries">
-        <get src="${url.maven.repo}/xmlunit/xmlunit/1.1/xmlunit-1.1.jar"
-             dest="${dir.user.lib}/xmlunit-1.1.jar"
-             verbose="true"
-             usetimestamp="true"/>
-    </target>
-
-    <target name="init" depends="get.libraries">
+    <target name="init">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
         
@@ -82,10 +72,16 @@
            depends="package" 
            description="Deploy the application to the Mule server">
            
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
-              overwrite="true"
-              verbose="true"/>
+	        <copy file="${dir.build}/${app.name}.jar"
+	              todir="${dir.mule.home}/apps/${app.name}/lib"
+	              overwrite="true" verbose="true"/>
+
+	       <copy todir="${dir.mule.home}/apps/${app.name}"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.classes}">
+	                <include name="**/*.xml"/>
+	            </fileset>
+	       </copy>              
    </target>
 
    <target name="setup">

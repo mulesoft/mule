@@ -30,17 +30,17 @@
 
         <!-- ActiveMQ -->            
         <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-             dest="${dir.user.lib}/activemq-core-4.1.2.jar"
+             dest="${dir.mule.home}/apps/${app.name}/lib/activemq-core-4.1.2.jar"
              verbose="true"
              usetimestamp="true"/>
 
         <!-- OpenEJB -->
         <get src="${url.maven.repo}/openejb/openejb-core/1.0/openejb-core-1.0.jar"
-             dest="${dir.user.lib}/openejb-core-1.0.jar"
+             dest="${dir.mule.home}/apps/${app.name}/lib/openejb-core-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/castor/castor/1.0/castor-1.0.jar"
-             dest="${dir.user.lib}/castor-1.0.jar"
+             dest="${dir.mule.home}/apps/${app.name}/lib/castor-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
@@ -118,10 +118,16 @@
            depends="package" 
            description="Deploy the application to the Mule server">
            
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
-              overwrite="true"
-              verbose="true"/>
+	        <copy file="${dir.build}/${app.name}.jar"
+	              todir="${dir.mule.home}/apps/${app.name}/lib"
+	              overwrite="true" verbose="true"/>
+
+	       <copy todir="${dir.mule.home}/apps/${app.name}"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.classes}">
+	                <include name="**/*.xml"/>
+	            </fileset>
+	       </copy>              
    </target>
 
    <target name="setup">

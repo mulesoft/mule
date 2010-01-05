@@ -130,7 +130,7 @@
                     <target>5</target>
                 </configuration>
             </plugin>        
-            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
+            <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
                 overwriting the previous one. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -144,12 +144,14 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/hello</outputDirectory>                            
+                            <outputDirectory>${MULE_HOME}/apps/${artifactId}</outputDirectory>                            
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <resources>                            
                                 <resource>
                                     <directory>${basedir}/target/classes</directory>
                                     <includes>
-                                        <include>hello-http-config.xml</include>
+                                        <include>*.xml</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -168,7 +170,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/${artifactId}/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
