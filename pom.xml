@@ -905,7 +905,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>1.6.5</version>
+                <version>1.7.0</version>
                 <exclusions>
                     <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                     <exclusion>
