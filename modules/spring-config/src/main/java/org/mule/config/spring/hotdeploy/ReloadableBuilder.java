@@ -82,18 +82,18 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
                 allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
                 allResources[1] = new ConfigResource(MULE_DEFAULTS_CONFIG);
                 System.arraycopy(configResources, 0, allResources, 2, configResources.length);
+                // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
+                this.monitoredResource = new File(allResources[2].getUrl().getFile());
             }
             else
             {
                 allResources = new ConfigResource[configResources.length + 1];
                 allResources[0] = new ConfigResource(MULE_SPRING_CONFIG);
                 System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+                // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
+                this.monitoredResource = new File(allResources[1].getUrl().getFile());
             }
             // end dup
-
-
-            // need getUrl().getFile(), otherwise lastModified timestamp always returns 0
-            this.monitoredResource = new File(allResources[1].getUrl().getFile());
 
             // TODO this is really a job of a deployer and deployment descriptor info
             ClassLoader parent = MuleBootstrapUtils.isStandalone()
