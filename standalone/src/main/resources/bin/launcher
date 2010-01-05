@@ -1,4 +1,10 @@
 #! /bin/sh
 
-cp=.:$MULE_HOME/conf:$MULE_HOME/lib/opt/groovy-all-1.7..jar:$MULE_HOME/lib/boot/commons-cli-1.2.jar
-java -Dmule.home=$MULE_HOME -cp "$cp" org.codehaus.groovy.tools.GroovyStarter --main groovy.ui.GroovyMain --conf $MULE_HOME/bin/launcher.conf "$@"
+groovyJar=`ls $MULE_HOME/lib/opt/groovy-all*`
+commonsCliJar=`ls $MULE_HOME/lib/boot/commons-cli-*.jar`
+
+cp=.:${MULE_HOME}/conf
+cp=${cp}:${groovyJar}
+cp=${cp}:${commonsCliJar}
+
+java -Dmule.home=${MULE_HOME} -cp "${cp}" org.codehaus.groovy.tools.GroovyStarter --main groovy.ui.GroovyMain --conf ${MULE_HOME}/bin/launcher.conf "$@"
