@@ -15,20 +15,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <!--
-                    2.2-beta-2 is broken due to a regression. Attempting
-                    to configure permissions via multiple includes/excludes
-                    adds duplicate entries to the assembly:
-
-                    http://jira.codehaus.org/browse/MASSEMBLY-285
-
-                    2.2-beta-1 is broken too:
-                    http://jira.codehaus.org/browse/MASSEMBLY-194
-                    Fixed in 2.2-beta-2, but it has a blocker regression in turn.
-
-                    WT$%#^!
-                    -->
-                <version>2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -53,7 +39,6 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <!-- version is managed in the pluginManagement of the toplevel pom -->
                 <executions>
                     <!-- Disable for now since this will completely change for OSGi.
                     <execution>
