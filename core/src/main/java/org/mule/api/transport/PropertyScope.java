@@ -109,11 +109,13 @@ public final class PropertyScope implements Serializable
         return order;
     }
 
+    @Override
     public String toString()
     {
         return getScopeName();
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -139,6 +141,7 @@ public final class PropertyScope implements Serializable
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         int result;
@@ -151,11 +154,11 @@ public final class PropertyScope implements Serializable
      * Used for comparing {@link PropertyScope} instances in a map. The {@link PropertyScope#getOrder()}
      * property is used to determine the order in the map
      */
-    public static class ScopeComparator implements Comparator, Serializable
+    public static class ScopeComparator implements Comparator<PropertyScope>, Serializable
     {
         private static final long serialVersionUID = -3346258000312580166L;
 
-        public int compare(Object o, Object o1)
+        public int compare(PropertyScope o, PropertyScope o1)
         {
             if (o == o1)
             {
@@ -165,7 +168,7 @@ public final class PropertyScope implements Serializable
             {
                 return 0;
             }
-            return (((PropertyScope) o).getOrder() < ((PropertyScope) o1).getOrder() ? -1 : 1);
+            return (o.getOrder() < o1.getOrder() ? -1 : 1);
         }
     }
 }
