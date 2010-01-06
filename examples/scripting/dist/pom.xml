@@ -139,47 +139,6 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
-
-            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.script</groupId>
-                                    <artifactId>jython-engine</artifactId>
-                                    <version>1.1</version>
-                                    <!-- we use our own retrotranslated version -->
-                                    <classifier>jdk14</classifier>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.python</groupId>
-                                    <artifactId>jython</artifactId>
-                                    <version>2.2.1</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
                 overwriting the previous one. -->
             <plugin>
@@ -229,6 +188,18 @@
                                     <artifactId>${artifactId}</artifactId>
                                     <version>${version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.script</groupId>
+                                    <artifactId>jython-engine</artifactId>
+                                    <version>1.1</version>
+                                    <!-- we use our own retrotranslated version -->
+                                    <classifier>jdk14</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.python</groupId>
+                                    <artifactId>jython</artifactId>
+                                    <version>2.2.1</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

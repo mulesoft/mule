@@ -116,6 +116,11 @@
                                     <version>${version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>mule-example-loanbroker-common</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

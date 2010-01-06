@@ -3,7 +3,7 @@ setlocal
 if "%MULE_HOME%" == "" SET MULE_HOME=%~dp0..\..
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
-if exist "%MULE_BASE%\apps\mule-example-loanbroker" goto :run
+if exist "%MULE_BASE%\apps\mule-example-loanbroker-esn" goto :run
 echo This example requires you to build it before running it.  Please follow the instructions in the README.txt file.
 goto :eof
 

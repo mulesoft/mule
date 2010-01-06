@@ -11,7 +11,7 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
-if [ ! -d "$MULE_BASE/apps/mule-example-loanbroker" ]
+if [ ! -d "$MULE_BASE/apps/mule-example-loanbroker-esn" ]
 then
     echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
     exit 1

@@ -155,6 +155,16 @@
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>mule-example-loanbroker-common</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>mule-example-loanbroker-credit-agency</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-core</artifactId>
                                     <version>${activemqVersion}</version>

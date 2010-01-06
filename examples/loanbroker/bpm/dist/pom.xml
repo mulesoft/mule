@@ -104,6 +104,11 @@
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>mule-example-loanbroker-common</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.apache.derby</groupId>
                                     <artifactId>derby</artifactId>
                                     <version>10.3.1.4</version>
