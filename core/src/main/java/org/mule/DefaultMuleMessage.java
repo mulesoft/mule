@@ -46,6 +46,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -196,55 +197,55 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a trnsformr that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transfromers added to the reqgistry will be checked for compatability
+     * try and resolve a transformer that can do this transformation. If a transformer cannot be 
+     * found an exception is thrown. Any transformers added to the registry will be checked for 
+     * compatability.
      *
      * @param outputType the desired return type
-     * @param encoding   the encoding to use if required
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     *         message *unless* the payload is an inputstream in which case the stream will be read and the payload will become
-     *         the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     *                              payload
+     * @param encoding the encoding to use if required
+     * @return The converted payload of this message. Note that this method will not alter the 
+     *          payload of this message <b>unless</b> the payload is an {@link InputStream} in which
+     *          case the stream will be read and the payload will become the fully read stream.
+     * @throws TransformerException if a transformer cannot be found or there is an error during 
+     *          transformation of the payload.
      * @since 3.0.0
      */
+    @SuppressWarnings("unchecked")
     protected <T> T getPayload(DataType<T> resultType, String encoding) throws TransformerException
     {
-        //Handle null by ignoring the request
+        // Handle null by ignoring the request
         if (resultType == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
         }
 
         //TODO handling of mime type
-        DataType source = new DataTypeFactory().create(getPayload().getClass());
+        DataType<?> source = new DataTypeFactory().create(getPayload().getClass());
 
-
-        //If no conversion is necessary, just return the payload as-is
+        // If no conversion is necessary, just return the payload as-is
         if (resultType.isCompatibleWith(source))
         {
             return (T) getPayload();
         }
 
-        //The transformer to execute on this message
+        // The transformer to execute on this message
         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, resultType);
-
-        //no transformers found
         if (transformer == null)
         {
             throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
         }
+        
         // Pass in the adapter itself
         Object result = transformer.transform(this, encoding);
 
         // Unless we disallow Object.class as a valid return type we need to do this extra check
         if (!resultType.getType().isAssignableFrom(result.getClass()))
         {
-            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType.getType().getName(), result.getClass()));
+            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
         }
-        //If the payload is a stream and we've consumed it, then we should
-        //set the payload on the message
-        //This is the only time this method will alter the payload on the message
+        
+        // If the payload is a stream and we've consumed it, then we should set the payload on the 
+        // message. This is the only time this method will alter the payload on the message
         if (isPayloadConsumed(source.getType()))
         {
             setPayload(result);

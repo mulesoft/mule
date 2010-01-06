@@ -704,9 +704,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 175, header, value);
     }
 
-    public static Message transformOnObjectNotOfSpecifiedType(String name, Object expectedType)
+    public static Message transformOnObjectNotOfSpecifiedType(DataType<?> resultType, Object expectedType)
     {
-        return factory.createMessage(BUNDLE_PATH, 177, name, expectedType);
+        return factory.createMessage(BUNDLE_PATH, 177, resultType.getType().getName(), expectedType.getClass());
     }
 
     public static Message cannotUseTxAndRemoteSync()
