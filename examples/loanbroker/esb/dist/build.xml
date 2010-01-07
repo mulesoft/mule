@@ -14,7 +14,9 @@
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
+    <property name="dir.common" value="../common"/>
     <property name="dir.common.tests" value="../common-tests"/>
+    <property name="dir.credit.agency" value="../credit-agency"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="https://maven.atlassian.com/repository/public/"/>
@@ -27,20 +29,19 @@
 
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
-
+        <mkdir dir="${dir.build}/lib"/>
         <!-- ActiveMQ -->            
         <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-             dest="${dir.mule.home}/apps/${app.name}/lib/activemq-core-4.1.2.jar"
+             dest="${dir.build}/lib/activemq-core-4.1.2.jar"
              verbose="true"
              usetimestamp="true"/>
-
         <!-- OpenEJB -->
         <get src="${url.maven.repo}/openejb/openejb-core/1.0/openejb-core-1.0.jar"
-             dest="${dir.mule.home}/apps/${app.name}/lib/openejb-core-1.0.jar"
+             dest="${dir.build}/lib/openejb-core-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/castor/castor/1.0/castor-1.0.jar"
-             dest="${dir.mule.home}/apps/${app.name}/lib/castor-1.0.jar"
+             dest="${dir.build}/lib/castor-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
@@ -67,7 +68,9 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
-            <!-- Include dependent test jar-->
+            <fileset dir="${dir.common}/${dir.build}">
+                <include name="*.jar"/>
+            </fileset>
             <fileset dir="${dir.common.tests}/${dir.build}">
                 <include name="*.jar"/>
             </fileset>
@@ -121,11 +124,28 @@
 	        <copy file="${dir.build}/${app.name}.jar"
 	              todir="${dir.mule.home}/apps/${app.name}/lib"
 	              overwrite="true" verbose="true"/>
-
 	       <copy todir="${dir.mule.home}/apps/${app.name}"
 	             overwrite="true" verbose="true">
 	            <fileset dir="${dir.classes}">
 	                <include name="**/*.xml"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.build}/lib">
+	                <include name="**/*.jar"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.common}/${dir.build}">
+	                <include name="**/*.jar"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.credit.agency}/${dir.build}">
+	                <include name="**/*.jar"/>
 	            </fileset>
 	       </copy>              
    </target>

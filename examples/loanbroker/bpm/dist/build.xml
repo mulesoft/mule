@@ -14,6 +14,7 @@
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
+    <property name="dir.common" value="../common"/>
     <property name="dir.common.tests" value="../common-tests"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
@@ -26,12 +27,13 @@
 
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
+        <mkdir dir="${dir.build}/lib"/>
         <get src="${url.maven.repo}/bsh/bsh/1.3.0/bsh-1.3.0.jar"
-             dest="${dir.mule.home}/apps/${app.name}/lib/bsh-1.3.0.jar"
+             dest="${dir.build}/lib/bsh-1.3.0.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/org/apache/derby/derby/10.3.1.4/derby-10.3.1.4.jar"
-             dest="${dir.mule.home}/apps/${app.name}/lib/derby-10.3.1.4.jar"
+             dest="${dir.build}/lib/derby-10.3.1.4.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
@@ -58,7 +60,9 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
-            <!-- Include dependent test jar-->
+            <fileset dir="${dir.common}/${dir.build}">
+                <include name="*.jar"/>
+            </fileset>
             <fileset dir="${dir.common.tests}/${dir.build}">
                 <include name="*.jar"/>
             </fileset>
@@ -112,11 +116,22 @@
 	        <copy file="${dir.build}/${app.name}.jar"
 	              todir="${dir.mule.home}/apps/${app.name}/lib"
 	              overwrite="true" verbose="true"/>
-
 	       <copy todir="${dir.mule.home}/apps/${app.name}"
 	             overwrite="true" verbose="true">
 	            <fileset dir="${dir.classes}">
 	                <include name="**/*.xml"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.build}/lib">
+	                <include name="**/*.jar"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.common}/${dir.build}">
+	                <include name="**/*.jar"/>
 	            </fileset>
 	       </copy>              
    </target>

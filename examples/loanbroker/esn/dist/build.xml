@@ -14,6 +14,7 @@
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
+    <property name="dir.common" value="../common"/>
     <property name="dir.common.tests" value="../common-tests"/>
 
 
@@ -44,7 +45,9 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
-            <!-- Include dependent test jar-->
+            <fileset dir="${dir.common}/${dir.build}">
+                <include name="*.jar"/>
+            </fileset>
             <fileset dir="${dir.common.tests}/${dir.build}">
                 <include name="*.jar"/>
             </fileset>
@@ -95,11 +98,16 @@
 	        <copy file="${dir.build}/${app.name}.jar"
 	              todir="${dir.mule.home}/apps/${app.name}/lib"
 	              overwrite="true" verbose="true"/>
-
 	       <copy todir="${dir.mule.home}/apps/${app.name}"
 	             overwrite="true" verbose="true">
 	            <fileset dir="${dir.classes}">
 	                <include name="**/*.xml"/>
+	            </fileset>
+	       </copy>              
+	       <copy todir="${dir.mule.home}/apps/${app.name}/lib"
+	             overwrite="true" verbose="true">
+	            <fileset dir="${dir.common}/${dir.build}">
+	                <include name="**/*.jar"/>
 	            </fileset>
 	       </copy>              
    </target>

@@ -61,8 +61,6 @@
                target="1.5">
             <classpath refid="classpath.mule"/>
         </javac>
-        
-
     </target>
 
    <target name="package" 
@@ -77,19 +75,6 @@
                 <include name="**/*"/>
             </fileset>
         </jar>
-
-   </target>
-
-   <target name="deploy" 
-           depends="package" 
-           description="Deploy the application to the Mule server">
-        <!-- Don't deploy this jar -->
-        <!--
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
-              overwrite="true"
-              verbose="true"/>
-        -->
    </target>
 
    <target name="setup">
@@ -112,13 +97,13 @@
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <antcall target="package"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <antcall target="package"/>
    </target>
 
 </project>
