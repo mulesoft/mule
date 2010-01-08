@@ -61,20 +61,28 @@ public class EventGeneratorJob implements Job
 
         String receiverKey = (String)map.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);
         if (receiverKey == null)
+        {
             throw new JobExecutionException(QuartzMessages.receiverNotInJobDataMap().getMessage());
+        }
 
         String connectorName = (String)map.get(QuartzMessageReceiver.QUARTZ_CONNECTOR_PROPERTY);
         if (connectorName == null)
+        {
             throw new JobExecutionException(QuartzMessages.connectorNotInJobDataMap().getMessage());
+        }
 
         AbstractConnector connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(connectorName);
         if (connector == null)
+        {
             throw new JobExecutionException(QuartzMessages.noConnectorFound(connectorName).getMessage());
+        }
 
         AbstractMessageReceiver receiver = (AbstractMessageReceiver)connector.lookupReceiver(receiverKey);
         if (receiver == null)
+        {
             throw new JobExecutionException(
                 QuartzMessages.noReceiverInConnector(receiverKey, connectorName).getMessage());
+        }
 
         Object payload = jobExecutionContext.getJobDetail().getJobDataMap().get(
             QuartzConnector.PROPERTY_PAYLOAD);
