@@ -33,7 +33,7 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return false;
     }
 
-    public List<Class> getSourceTypes()
+    public List<Class<?>> getSourceTypes()
     {
         return null;
     }
@@ -108,7 +108,7 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return false;
     }
 
-    public List<DataType> getSourceDataTypes()
+    public List<DataType<?>> getSourceDataTypes()
     {
         return null;
     }

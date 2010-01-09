@@ -37,6 +37,7 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -77,7 +78,8 @@ public abstract class AbstractTransformer implements Transformer
      * A list of supported Class types that the source payload passed into this
      * transformer
      */
-    protected final List<DataType> sourceTypes = new CopyOnWriteArrayList/*<DataType>*/();
+    @SuppressWarnings("unchecked")
+    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList/*<DataType>*/();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -129,7 +131,7 @@ public abstract class AbstractTransformer implements Transformer
      *
      * @param aClass the source type to allow
      */
-    protected void registerSourceType(Class aClass)
+    protected void registerSourceType(Class<?> aClass)
     {
         registerSourceType(new SimpleDataType(aClass));
     }
@@ -139,7 +141,7 @@ public abstract class AbstractTransformer implements Transformer
      *
      * @param aClass the type to remove
      */
-    protected void unregisterSourceType(Class aClass)
+    protected void unregisterSourceType(Class<?> aClass)
     {
         unregisterSourceType(new SimpleDataType(aClass));
     }
@@ -248,6 +250,7 @@ public abstract class AbstractTransformer implements Transformer
      * @return true if the source type is supported by this transformer, false otherwise
      * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType, boolean)}
      */
+    @Deprecated
     public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
     {
         return isSourceDataTypeSupported(new SimpleDataType(aClass), exactMatch);
@@ -430,18 +433,18 @@ public abstract class AbstractTransformer implements Transformer
         return name;
     }
 
-    public List<Class> getSourceTypes()
+    public List<Class<?>> getSourceTypes()
     {
         //A work around to support the legacy API
-        List<Class> sourceClasses = new ArrayList<Class>();
-        for (DataType sourceType : sourceTypes)
+        List<Class<?>> sourceClasses = new ArrayList<Class<?>>();
+        for (DataType<?> sourceType : sourceTypes)
         {
             sourceClasses.add(sourceType.getType());
         }
         return Collections.unmodifiableList(sourceClasses);
     }
 
-    public List<DataType> getSourceDataTypes()
+    public List<DataType<?>> getSourceDataTypes()
     {
         return Collections.unmodifiableList(sourceTypes);
     }

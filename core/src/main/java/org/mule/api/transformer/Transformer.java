@@ -29,7 +29,8 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      *         otherwise
      * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType)} instead
      */
-    boolean isSourceTypeSupported(Class aClass);
+    @Deprecated
+    boolean isSourceTypeSupported(Class<?> aClass);
 
     /**
      * Determines if a particular source class can be handled by this transformer
@@ -39,7 +40,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      *         otherwise
      * @since 3.0.0
      */
-    boolean isSourceDataTypeSupported(DataType dataType);
+    boolean isSourceDataTypeSupported(DataType<?> dataType);
 
 
     /**
@@ -48,7 +49,8 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @return an unmodifiable list of Source types registered on this transformer
      * @deprecated use {@link #getSourceDataTypes()} instead
      */
-    List<Class> getSourceTypes();
+    @Deprecated
+    List<Class<?>> getSourceTypes();
 
     /**
      * Returns an unmodifiable list of Source types registered on this transformer
@@ -56,7 +58,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @return an unmodifiable list of Source types registered on this transformer
      * @since 3.0.0
      */
-    List<DataType> getSourceDataTypes();
+    List<DataType<?>> getSourceDataTypes();
 
     /**
      * Does this transformer allow null input?
@@ -105,7 +107,8 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @param theClass the expected return type class
      * @deprecated use {@link #setReturnDataType(DataType)} instead
      */
-    void setReturnClass(Class theClass);
+    @Deprecated
+    void setReturnClass(Class<?> theClass);
 
     /**
      * Specifies the Java type of the result after this transformer has been executed. Mule will use this to validate
@@ -115,7 +118,8 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @return the excepted return type from this transformer
      * @deprecated use {@link #getReturnDataType()} instead.
      */
-    Class getReturnClass();
+    @Deprecated
+    Class<?> getReturnClass();
 
 
     /**
@@ -129,7 +133,7 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @param type the expected return type for this transformer
      * @since 3.0.0
      */
-    void setReturnDataType(DataType type);
+    void setReturnDataType(DataType<?> type);
 
     /**
      * Specifies the return type of the result after this transformer has been executed. Mule will use this to validate
@@ -142,6 +146,6 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * @return the excepted return type for this transformer
      * @since 3.0.0
      */
-    DataType getReturnDataType();
+    DataType<?> getReturnDataType();
 
 }
