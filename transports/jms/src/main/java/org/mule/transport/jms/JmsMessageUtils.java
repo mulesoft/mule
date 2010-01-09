@@ -13,6 +13,7 @@ package org.mule.transport.jms;
 import org.mule.api.transport.OutputHandler;
 import org.mule.util.ArrayUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -118,14 +119,14 @@ public class JmsMessageUtils
         {
             return session.createTextMessage((String) object);
         }
-        else if (object instanceof Map && validateMapMessageType((Map)object))
+        else if (object instanceof Map<?, ?> && validateMapMessageType((Map<?, ?>)object))
         {
             MapMessage mMsg = session.createMapMessage();
-            Map src = (Map) object;
+            Map<?, ?> src = (Map<?, ?>) object;
 
-            for (Iterator i = src.entrySet().iterator(); i.hasNext();)
+            for (Iterator<?> i = src.entrySet().iterator(); i.hasNext();)
             {
-                Map.Entry entry = (Map.Entry) i.next();
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
                 mMsg.setObject(entry.getKey().toString(), entry.getValue());
             }
 
@@ -133,7 +134,7 @@ public class JmsMessageUtils
         }
         else if (object instanceof InputStream)
         {
-            StreamMessage sMsg = session.createStreamMessage();
+            StreamMessage streamMessage = session.createStreamMessage();
             InputStream temp = (InputStream) object;
 
             byte[] buffer = new byte[4096];
@@ -143,21 +144,25 @@ public class JmsMessageUtils
             {
                 while ((len = temp.read(buffer)) != -1)
                 {
-                    sMsg.writeBytes(buffer, 0, len);
+                    streamMessage.writeBytes(buffer, 0, len);
                 }
             }
             catch (IOException e)
             {
                 throw new JMSException("Failed to read input stream to create a stream message: " + e);
             }
+            finally
+            {
+                IOUtils.closeQuietly(temp);
+            }
 
-            return sMsg;
+            return streamMessage;
         }
-        else if (object instanceof List)
+        else if (object instanceof List<?>)
         {
             StreamMessage sMsg = session.createStreamMessage();
-            List list = (List) object;
-            for (Iterator iter = list.iterator(); iter.hasNext();)
+            List<?> list = (List<?>) object;
+            for (Iterator<?> iter = list.iterator(); iter.hasNext();)
             {
                 Object o = iter.next();
                 if (validateStreamMessageType(o))
@@ -223,7 +228,7 @@ public class JmsMessageUtils
             Map<String, Object> map = new HashMap<String, Object>();
             MapMessage m = (MapMessage) source;
 
-            for (Enumeration e = m.getMapNames(); e.hasMoreElements();)
+            for (Enumeration<?> e = m.getMapNames(); e.hasMoreElements();)
             {
                 String name = (String) e.nextElement();
                 Object obj = m.getObject(name);
@@ -242,7 +247,7 @@ public class JmsMessageUtils
         }
         else if (source instanceof StreamMessage)
         {
-            List result = new ArrayList();
+            List<Object> result = new ArrayList<Object>();
             try
             {
                 StreamMessage sMsg = (StreamMessage) source;
@@ -477,9 +482,9 @@ public class JmsMessageUtils
      *
      * @param candidate Map to validate
      */
-    protected static boolean validateMapMessageType(Map candidate)
+    protected static boolean validateMapMessageType(Map<?, ?> candidate)
     {
-        for (Iterator iterator = candidate.values().iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = candidate.values().iterator(); iterator.hasNext();)
         {
             Object o = iterator.next();
             if(!validateStreamMessageType(o) || !(o instanceof Serializable))
