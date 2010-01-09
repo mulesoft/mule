@@ -22,6 +22,4 @@ public interface WireFormat extends MuleContextAware
     Object read(InputStream is) throws MuleException;
 
     void write(OutputStream out, Object o, String encoding) throws MuleException;
-
-    void setTransferObjectClass(Class clazz);
 }

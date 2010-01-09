@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TransformerPairWireFormat implements WireFormat
 {
-
     /**
      * logger used by this class
      */
@@ -42,7 +41,6 @@ public class TransformerPairWireFormat implements WireFormat
 
     protected Transformer inboundTransformer;
     protected Transformer outboundTransformer;
-    protected Class transferObjectClass;
     protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
@@ -144,10 +142,5 @@ public class TransformerPairWireFormat implements WireFormat
     public void setOutboundTransformer(Transformer outboundTransformer)
     {
         this.outboundTransformer = outboundTransformer;
-    }
-
-    public void setTransferObjectClass(Class clazz)
-    {
-        transferObjectClass = clazz;
     }
 }

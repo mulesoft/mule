@@ -18,7 +18,6 @@ import org.mule.transformer.simple.MuleMessageToByteArray;
  */
 public class SerializedMuleMessageWireFormat extends TransformerPairWireFormat
 {
-
     public SerializedMuleMessageWireFormat()
     {
         setInboundTransformer(new ByteArrayToMuleMessage());
