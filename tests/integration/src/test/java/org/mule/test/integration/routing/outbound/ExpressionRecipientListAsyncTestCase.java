@@ -14,13 +14,14 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
 public class ExpressionRecipientListAsyncTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-recipient-list-async-test.xml";
@@ -30,13 +31,13 @@ public class ExpressionRecipientListAsyncTestCase extends FunctionalTestCase
     {
         String message = "test";
         MuleClient client = new MuleClient();
-        Map props = new HashMap(3);
+        Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("recipient1", "vm://service1.queue");
         props.put("recipient2", "vm://service2.queue");
         props.put("recipient3", "vm://service3.queue");
         client.dispatch("vm://distributor.queue", message, props);
 
-        List results = new ArrayList(3);
+        List<Object> results = new ArrayList<Object>(3);
 
         MuleMessage result = client.request("vm://collector.queue", 5000);
         assertNotNull(result);

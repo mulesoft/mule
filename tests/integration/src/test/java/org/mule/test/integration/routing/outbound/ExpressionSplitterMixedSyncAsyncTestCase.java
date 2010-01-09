@@ -23,6 +23,7 @@ import java.util.List;
 
 public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test.xml";
@@ -40,7 +41,7 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
         assertTrue(result instanceof MuleMessageCollection);
         MuleMessageCollection coll = (MuleMessageCollection) result;
         assertEquals(2, coll.size());
-        List results = (List) coll.getPayload();
+        List<?> results = (List<?>) coll.getPayload();
 
         //ServiceTwo endpoint is async
         assertTrue(results.contains("Apple Received in ServiceOne"));

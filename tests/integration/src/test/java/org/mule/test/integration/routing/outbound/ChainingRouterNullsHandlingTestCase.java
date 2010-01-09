@@ -17,11 +17,10 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.Map;
-
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
     
+    @Override
     protected String getConfigResources() 
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-null-handling.xml";
@@ -30,7 +29,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
     public void testNoComponentFails() throws Exception 
     {
         MuleClient muleClient = new MuleClient();
-        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null, muleContext);
+        MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
         MuleMessage result = muleClient.send("vm://incomingPass", message);
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
@@ -39,7 +38,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
     public void testLastComponentFails() throws Exception 
     {
         MuleClient muleClient = new MuleClient();
-        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null, muleContext);
+        MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
         MuleMessage result = muleClient.send("vm://incomingLastFail", message);
         assertNotNull("Should be a NullPayload instead.", result);
         assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());
@@ -54,7 +53,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
     public void testFirstComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient();
-        MuleMessage message = new DefaultMuleMessage("thePayload", (Map) null, muleContext);
+        MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
         MuleMessage result = muleClient.send("vm://incomingFirstFail", message);
         assertNotNull("Should be a NullPayload instead.", result);
         assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());

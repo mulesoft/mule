@@ -15,11 +15,12 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test.xml";
@@ -29,7 +30,7 @@ public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
     {
         String message = "test";
         MuleClient client = new MuleClient();
-        Map props = new HashMap(3);
+        Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("recipient1", "vm://service1.queue");
         props.put("recipient2", "vm://service2.queue");
         props.put("recipient3", "vm://service3.queue");

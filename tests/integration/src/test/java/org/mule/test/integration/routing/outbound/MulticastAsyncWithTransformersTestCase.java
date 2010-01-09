@@ -23,6 +23,7 @@ import java.util.List;
 
 public class MulticastAsyncWithTransformersTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/multicaster-async-with-transformers-test.xml";
@@ -36,7 +37,7 @@ public class MulticastAsyncWithTransformersTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         client.dispatch("vm://distributor.queue", fruitBowl, null);
 
-        List results = new ArrayList(3);
+        List<Object> results = new ArrayList<Object>(3);
 
         //We have to wait a lot longer here since groovy takes an age to compile the first time
         MuleMessage result = client.request("vm://collector.queue", 5000);

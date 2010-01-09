@@ -58,6 +58,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
         XMLUnit.setIgnoreWhitespace(true);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test.xml";
@@ -74,7 +75,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
         assertTrue(result instanceof MuleMessageCollection);
         MuleMessageCollection coll = (MuleMessageCollection) result;
         assertEquals(2, coll.size());
-        List results = (List) coll.getPayload();
+        List<?> results = (List<?>) coll.getPayload();
 
         XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString());
         XMLUnit.compareXML(EXPECTED_MESSAGE_2, results.get(1).toString());

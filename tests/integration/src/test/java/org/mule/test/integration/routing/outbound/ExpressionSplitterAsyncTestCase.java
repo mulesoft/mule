@@ -22,6 +22,7 @@ import java.util.List;
 
 public class ExpressionSplitterAsyncTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-async-test.xml";
@@ -35,7 +36,7 @@ public class ExpressionSplitterAsyncTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         client.dispatch("vm://distributor.queue", fruitBowl, null);
 
-        List results = new ArrayList(3);
+        List<Object> results = new ArrayList<Object>(3);
 
         MuleMessage result = client.request("vm://collector.queue", 5000);
         assertNotNull(result);

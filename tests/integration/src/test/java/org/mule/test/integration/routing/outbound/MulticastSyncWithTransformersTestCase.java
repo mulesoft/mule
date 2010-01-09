@@ -23,6 +23,7 @@ import java.util.List;
 
 public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test.xml";
@@ -40,7 +41,7 @@ public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
         assertTrue(result instanceof MuleMessageCollection);
         MuleMessageCollection coll = (MuleMessageCollection) result;
         assertEquals(3, coll.size());
-        List results = (List) coll.getPayload();
+        List<?> results = (List<?>) coll.getPayload();
 
         assertTrue(results.contains("Apple Received"));
         assertTrue(results.contains("Banana Received"));

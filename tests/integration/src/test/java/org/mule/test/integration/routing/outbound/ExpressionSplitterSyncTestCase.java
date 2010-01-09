@@ -23,6 +23,7 @@ import java.util.List;
 
 public class ExpressionSplitterSyncTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-sync-test.xml";
@@ -40,7 +41,7 @@ public class ExpressionSplitterSyncTestCase extends FunctionalTestCase
         assertTrue(result instanceof MuleMessageCollection);
         MuleMessageCollection coll = (MuleMessageCollection) result;
         assertEquals(3, coll.size());
-        List results = (List) coll.getPayload();
+        List<?> results = (List<?>) coll.getPayload();
 
         assertTrue(results.contains("Apple Received in ServiceOne"));
         assertTrue(results.contains("Banana Received in ServiceTwo"));
