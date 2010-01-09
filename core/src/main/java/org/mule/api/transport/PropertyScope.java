@@ -13,9 +13,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * A PropertyScope is used to associate a message property with a lifetime.  A scope may be very brief such as
- * {@link #INVOCATION} which only lasts until a service has been invoked or longer running such as {@link #SESSION}.
- *
+ * A PropertyScope is used to associate a message property with a lifetime.  A scope may be very 
+ * brief such as {@link #INVOCATION} which only lasts until a service has been invoked or longer 
+ * running such as {@link #SESSION}.
  */
 public final class PropertyScope implements Serializable
 {

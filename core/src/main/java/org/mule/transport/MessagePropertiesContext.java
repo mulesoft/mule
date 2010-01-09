@@ -439,7 +439,7 @@ public class MessagePropertiesContext implements Serializable
         map.put(PropertyScope.OUTBOUND, 
             new HashMap<String, Object>(getScopedProperties(PropertyScope.OUTBOUND)));
 
-        return new MessagePropertiesContext(getDefaultScope(), keys, scopedMap);
+        return new MessagePropertiesContext(getDefaultScope(), keys, map);
     }
 
     @Override
