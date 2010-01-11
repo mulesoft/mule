@@ -17,10 +17,9 @@ public class SunSecurityProviderInfo implements SecurityProviderInfo
 {
 
     private static final String KEY_MANAGER_ALGORITHM = "SunX509";
-
     private static final String PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
-
     private static final String PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
+    private static final String DEFAULT_SSL_TYPE = "SSLv3";
 
     public String getKeyManagerAlgorithm()
     {
@@ -35,6 +34,11 @@ public class SunSecurityProviderInfo implements SecurityProviderInfo
     public String getProviderClass()
     {
         return PROVIDER_CLASS;
+    }
+
+    public String getDefaultSslType()
+    {
+        return DEFAULT_SSL_TYPE;
     }
 
 }

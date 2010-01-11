@@ -21,5 +21,7 @@ public interface SecurityProviderInfo
     String getProtocolHandler();
 
     String getProviderClass();
+    
+    String getDefaultSslType();
 
 }

@@ -115,7 +115,6 @@ public final class TlsConfiguration
 
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
-    public static final String DEFAULT_SSL_TYPE = "SSLv3";
     public static final String JSSE_NAMESPACE = "javax.net";
 
     private Log logger = LogFactory.getLog(getClass());
@@ -123,7 +122,7 @@ public final class TlsConfiguration
     private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
     private SecurityProviderInfo spInfo = spFactory.getSecurityProviderInfo();
     private Provider provider = spFactory.getProvider();
-    private String sslType = DEFAULT_SSL_TYPE;
+    private String sslType = spInfo.getDefaultSslType();
 
     // global
     private String protocolHandler = spInfo.getProtocolHandler();
@@ -155,7 +154,6 @@ public final class TlsConfiguration
     private TrustManagerFactory trustManagerFactory = null;
     private boolean explicitTrustStoreOnly = false;
     private boolean requireClientAuthentication = false;
-
 
     /**
      * Support for TLS connections with a given initial value for the key store

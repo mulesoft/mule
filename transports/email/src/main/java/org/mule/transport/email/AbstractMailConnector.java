@@ -38,7 +38,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
 
     public static final String MAILBOX = "INBOX";
 
-    private Map sessions = new HashMap();
+    private Map<ImmutableEndpoint, SessionDetails> sessions = new HashMap<ImmutableEndpoint, SessionDetails>();
     private String mailboxFolder;
     private int defaultPort;
 
@@ -81,15 +81,20 @@ public abstract class AbstractMailConnector extends AbstractConnector
         this.mailboxFolder = mailboxFolder;
     }
 
-    public synchronized SessionDetails getSessionDetails(ImmutableEndpoint endpoint) throws UnsupportedEncodingException
+    public SessionDetails getSessionDetails(ImmutableEndpoint endpoint) throws UnsupportedEncodingException
     {
-        SessionDetails sessionDetails = (SessionDetails) sessions.get(endpoint);
-        if (null == sessionDetails)
+        // do not use this connector's implicit mutex by making this method synchronized. This
+        // may interfere with other methods using the same mutex for different purposes.
+        synchronized (sessions)
         {
-            sessionDetails = newSession(endpoint);
-            sessions.put(endpoint, sessionDetails);
+            SessionDetails sessionDetails = sessions.get(endpoint);
+            if (null == sessionDetails)
+            {
+                sessionDetails = newSession(endpoint);
+                sessions.put(endpoint, sessionDetails);
+            }
+            return sessionDetails;
         }
-        return sessionDetails;
     }
     
     public URLName urlFromEndpoint(ImmutableEndpoint endpoint) throws UnsupportedEncodingException

@@ -17,10 +17,9 @@ public class IBMSecurityProviderInfo implements SecurityProviderInfo
 {
 
     private static final String KEY_MANAGER_ALGORITHM = "IbmX509";
-
     private static final String PROTOCOL_HANDLER = "com.ibm.net.ssl.internal.www.protocol";
-
     private static final String PROVIDER_CLASS = "com.ibm.jsse.IBMJSSEProvider";
+    private static final String DEFAULT_SSL_TYPE = "SSL_TLS";
 
     public String getKeyManagerAlgorithm()
     {
@@ -35,6 +34,11 @@ public class IBMSecurityProviderInfo implements SecurityProviderInfo
     public String getProviderClass()
     {
         return PROVIDER_CLASS;
+    }
+
+    public String getDefaultSslType()
+    {
+        return DEFAULT_SSL_TYPE;
     }
 
 }
