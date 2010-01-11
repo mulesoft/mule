@@ -81,9 +81,13 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         // Value not required + found
         result = eval.evaluate("foo?, baz", message);
-        assertNotNull(result);
+        assertNotNull(result);        
         assertTrue(result instanceof Map);
-
+        assertEquals(2, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("moo"));
+        assertTrue(((Map)result).values().contains("maz"));
+        assertFalse(((Map)result).values().contains("mar"));
+        
         // Value not required + not found
         result = eval.evaluate("fool?", message);
         assertNotNull(result);
@@ -126,12 +130,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(2, ((List)result).size());
         assertTrue(((List)result).contains("moo"));
         assertTrue(((List)result).contains("maz"));
+        // redundant since we already know that the map is of size 2
         assertFalse(((List)result).contains("mar"));
 
         // Value not required + found
         result = eval.evaluate("foo?, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("moo"));
+        assertTrue(((List)result).contains("maz"));
+        // redundant since we already know that the map is of size 2
+        assertFalse(((List)result).contains("mar"));        
 
         // Value not required + not found
         result = eval.evaluate("fool?", message);
@@ -187,7 +197,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (ExpressionRuntimeException e)
         {
-            //exprected
+            //expected
         }
 
     }
@@ -210,7 +220,11 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         result = muleContext.getExpressionManager().evaluate("#[headers:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
-
+        assertEquals(2, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("moo"));
+        assertTrue(((Map)result).values().contains("maz"));
+        assertFalse(((Map)result).values().contains("mar"));
+        
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers:fool?]", message);
         assertNotNull(result);
@@ -225,7 +239,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (ExpressionRuntimeException e)
         {
-            //exprected
+            //expected
         }
 
         assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:{count}]", message));
@@ -248,6 +262,10 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         result = muleContext.getExpressionManager().evaluate("#[headers-list:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("moo"));
+        assertTrue(((List)result).contains("maz"));
+        assertFalse(((List)result).contains("mar"));        
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:fool?]", message);
@@ -263,7 +281,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (ExpressionRuntimeException e)
         {
-            //exprected
+            //expected
         }
     }
 }

@@ -90,7 +90,7 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (Exception e1)
         {
-            //Exprected
+            //Expected
         }
     }
 }

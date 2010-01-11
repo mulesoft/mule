@@ -58,6 +58,15 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         ((DataHandler)result).writeTo(baos);
         assertEquals("moo", baos.toString());
         
+        // Value not required + found
+        result = eval.evaluate("foo?", message);
+        assertNotNull(result);
+        assertTrue(result instanceof DataHandler);
+        baos = new ByteArrayOutputStream(4);
+        ((DataHandler)result).writeTo(baos);
+        assertEquals("moo", baos.toString());
+        
+        // Value not required + not found
         result = eval.evaluate("fool?", message);
         assertNull(result);
 
