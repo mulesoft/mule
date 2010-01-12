@@ -20,7 +20,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -192,7 +191,7 @@ public class ExpiryMonitor implements Runnable, Disposable
         {
             this.nanoseconds = nanoseconds;
             this.expirable = expirable;
-            created = Utils.nanoTime();
+            created = System.nanoTime();
         }
 
         public long getNanoSeconds()
@@ -207,12 +206,12 @@ public class ExpiryMonitor implements Runnable, Disposable
 
         public boolean isExpired()
         {
-            return (Utils.nanoTime() - nanoseconds) > created;
+            return (System.nanoTime() - nanoseconds) > created;
         }
 
         public void reset()
         {
-            created = Utils.nanoTime();
+            created = System.nanoTime();
         }
     }
 }

@@ -16,7 +16,6 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded
@@ -73,7 +72,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
             boolean written = false;
             while (!written)
             {
-                Long key = Long.valueOf(Utils.nanoTime());
+                Long key = Long.valueOf(System.nanoTime());
                 written = (store.put(key, obj) == null);
             }
 
@@ -139,7 +138,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         // expire further if entry TTLs are enabled
         if ((entryTTL > 0) && (currentSize != 0))
         {
-            final long now = Utils.nanoTime();
+            final long now = System.nanoTime();
             int expiredEntries = 0;
             Map.Entry<?, ?> oldestEntry;
 

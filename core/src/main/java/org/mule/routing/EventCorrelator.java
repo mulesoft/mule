@@ -38,7 +38,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
+
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
@@ -130,7 +130,6 @@ public class EventCorrelator
                 //no op
             }
 
-
             public void run()
             {
                 while (true)
@@ -139,7 +138,7 @@ public class EventCorrelator
                     for (Object o : eventGroups.values())
                     {
                         EventGroup group = (EventGroup) o;
-                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < Utils.nanoTime())
+                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
                         {
                             expired.add(group);
                         }

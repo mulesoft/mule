@@ -14,7 +14,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.SystemUtils;
 import org.mule.util.UUID;
 
 import java.util.Arrays;
@@ -26,13 +25,6 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class EventGroupTestCase extends AbstractMuleTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4592
-        return SystemUtils.isIbmJDK();
-    }
-
     public void testConcurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());

@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
-
 import org.apache.commons.collections.IteratorUtils;
 
 /**
@@ -52,7 +50,7 @@ public class EventGroup implements Comparable, Serializable
     public EventGroup(Object groupId, int expectedSize)
     {
         super();
-        this.created = Utils.nanoTime();
+        this.created = System.nanoTime();
         this.events = new ArrayList<MuleEvent>(expectedSize > 0 ? expectedSize : 10);
         this.expectedSize = expectedSize;
         this.groupId = groupId;
@@ -205,7 +203,6 @@ public class EventGroup implements Comparable, Serializable
      * Return the creation timestamp of the current group in nanoseconds.
      * 
      * @return the timestamp when this group was instantiated.
-     * @see Utils#nanoTime()
      */
     public long getCreated()
     {
