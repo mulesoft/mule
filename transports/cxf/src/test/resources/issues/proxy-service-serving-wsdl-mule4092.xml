@@ -8,9 +8,7 @@
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
      <model name="NileIntegrationGateway">
-
           <service name="OnlineStoreGateway">
-               
                <inbound>
                     <cxf:inbound-endpoint address="http://localhost:8777/services/onlinestore"
                          proxy="true" synchronous="true"
@@ -18,11 +16,6 @@
                          serviceName="OnlineStoreService">
                     </cxf:inbound-endpoint>
                </inbound>
-               
           </service>
-
      </model>
-
-
-
 </mule>

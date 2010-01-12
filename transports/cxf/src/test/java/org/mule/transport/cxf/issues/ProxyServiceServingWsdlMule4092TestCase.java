@@ -22,18 +22,26 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4667
-        return SystemUtils.isIbmJDK();
-    }
-
+    private String expectedWsdlFileName;
+    
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         XMLUnit.setIgnoreWhitespace(true);
+        
+        if (SystemUtils.isSunJDK())
+        {
+            expectedWsdlFileName = "test.wsdl";
+        }
+        else if (SystemUtils.isIbmJDK())
+        {
+            expectedWsdlFileName = "test.wsdl.ibm";
+        }
+        else
+        {
+            fail("Unknown JDK");
+        }
     }
 
     @Override
@@ -44,8 +52,11 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 
     public void testProxyServiceWSDL() throws MalformedURLException, IOException, Exception
     {
-        assertTrue(compareResults(getXML("issues/test.wsdl"), IOUtils.toString(new URL(
-            "http://localhost:8777/services/onlinestore?wsdl").openStream())));
+        String expected = getXML("issues/" + expectedWsdlFileName);
+        
+        URL url = new URL("http://localhost:8777/services/onlinestore?wsdl");
+        String wsdlFromService = IOUtils.toString(url.openStream());
+        assertTrue(compareResults(expected, wsdlFromService));
     }
 
     protected String getXML(String requestFile) throws Exception
