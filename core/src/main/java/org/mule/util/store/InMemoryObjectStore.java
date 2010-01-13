@@ -127,7 +127,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         return null;
     }
 
-    public final void expire()
+    public void expire()
     {
         // this is not guaranteed to be precise, but we don't mind
         int currentSize = store.size();

@@ -13,6 +13,9 @@ package org.mule.util.store;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.AbstractMuleTestCase;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
     private InMemoryObjectStore store = null;
@@ -181,10 +184,53 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
 
     private void createNonexpiringObjectStore()
     {
-        store = new InMemoryObjectStore();
-        // entryTTL=-1 means we will have to expire manually
-        store.setEntryTTL(-1);
-        // run the expire thread in very, very large intervals (irreleavent to this test)
-        store.setExpirationInterval(Integer.MAX_VALUE);
+        store = new NonExpiringInMemoryObjectStore();
+    }
+    
+    /**
+     * Special subclass that coordinates with the expire thread. Upon calling <code>initialize</code>
+     * the scheduler in {@link AbstractMonitoredObjectStore} runs once. The tests in this test case
+     * rely on the fact that no expiry happens during their execution. This implementation waits for
+     * the first run of the expire method in initialize and only then continues with the execution 
+     * of the current thread.
+     */
+    private static class NonExpiringInMemoryObjectStore extends InMemoryObjectStore
+    {
+        private CountDownLatch expireLatch;
+
+        public NonExpiringInMemoryObjectStore()
+        {
+            super();
+            // entryTTL=-1 means we will have to expire manually
+            setEntryTTL(-1);
+            // run the expire thread in very, very large intervals (irreleavent to this test)
+            setExpirationInterval(Integer.MAX_VALUE);
+            
+            expireLatch = new CountDownLatch(1);
+        }
+        
+        @Override
+        public void initialise() throws InitialisationException
+        {
+            super.initialise();
+            
+            // now wait for the first expire to happen
+            try
+            {
+                expireLatch.await(30, TimeUnit.SECONDS);
+            }
+            catch (InterruptedException ie)
+            {
+                throw new RuntimeException("Interrupted while waiting for the first expire", ie);
+            }
+        }
+
+        @Override
+        public void expire()
+        {
+            super.expire();
+            // expire successful ... signal initialize that it can continue
+            expireLatch.countDown();
+        }
     }
 }
