@@ -40,6 +40,7 @@ import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.monitor.Expirable;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -391,7 +392,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 if (!endpoint.isSynchronous())
                 {
                     logger.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
-                    body = IOUtils.toByteArray((InputStream) body);
+                    body = new ByteArrayInputStream(IOUtils.toByteArray((InputStream) body));
                 }
             }
 
