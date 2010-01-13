@@ -161,7 +161,7 @@ public class MuleEndpointURI implements EndpointURI
     {
         try
         {
-            String scheme = getFullScheme(); // (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
+            String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
             TransportServiceDescriptor sd;
             sd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
             if (sd == null)
