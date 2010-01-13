@@ -11,6 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.RequestContext;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.OutputHandler;
@@ -44,10 +45,13 @@ public class HttpServerConnection
     // this should rather be isKeepSocketOpen as this is the main purpose of this flag
     private boolean keepAlive = false;
     private final String encoding;
+    private final boolean sync;
 
-    public HttpServerConnection(final Socket socket, String encoding, HttpConnector connector) throws IOException
+    public HttpServerConnection(final Socket socket, ImmutableEndpoint endpoint) throws IOException
     {
         super();
+
+        HttpConnector connector = (HttpConnector) endpoint.getConnector();
 
         if (socket == null)
         {
@@ -68,10 +72,20 @@ public class HttpServerConnection
         {
             socket.setSoTimeout(connector.getServerSoTimeout());
         }
-        
+
+        if (endpoint.getEncoding() != null)
+        {
+            encoding = endpoint.getEncoding();
+        }
+        else
+        {
+            encoding = connector.getMuleContext().getConfiguration().getDefaultEncoding();
+        }
+
+        sync = endpoint.isSynchronous();
+
         this.in = socket.getInputStream();
         this.out = new DataOutputStream(socket.getOutputStream());
-        this.encoding = encoding;
     }
 
     private void setSocketTcpNoDelay() throws IOException
@@ -187,7 +201,8 @@ public class HttpServerConnection
             {
                 return null;
             }
-            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding),
+                this.in, encoding, sync);
         }
         catch (IOException e)
         {

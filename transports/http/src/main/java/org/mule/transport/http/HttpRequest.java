@@ -11,6 +11,7 @@
 package org.mule.transport.http;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ public class HttpRequest
     private InputStream entity = null;
     private String defaultEncoding;
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding)
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding, boolean sync)
         throws IOException
     {
         super();
@@ -59,19 +60,29 @@ public class HttpRequest
                 Header contentLength = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_LENGTH);
                 Header transferEncoding = this.headers.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
                 InputStream in = content;
-                if (transferEncoding != null)
+                if (sync)
                 {
-                    if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
-                    {
-                        in = new ChunkedInputStream(in);
-                    }
+                    // If we are running async we need to read stream into a byte[].
+                    // This is because when the HttpConnection gets closed it closes
+                    // the InputStream which may happen before it is read.
+                    in = new ByteArrayInputStream(IOUtils.toByteArray((InputStream) in));
                 }
-                else if (contentLength != null)
+                else
                 {
-                    long len = getContentLength();
-                    if (len >= 0)
+                    if (transferEncoding != null)
                     {
-                        in = new ContentLengthInputStream(in, len);
+                        if (transferEncoding.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1)
+                        {
+                            in = new ChunkedInputStream(in);
+                        }
+                    }
+                    else if (contentLength != null)
+                    {
+                        long len = getContentLength();
+                        if (len >= 0)
+                        {
+                            in = new ContentLengthInputStream(in, len);
+                        }
                     }
                 }
                 this.entity = in;
@@ -79,9 +90,9 @@ public class HttpRequest
         }
     }
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding) throws IOException
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding, boolean sync) throws IOException
     {
-        this(requestLine, headers, null, defaultEncoding);
+        this(requestLine, headers, null, defaultEncoding, sync);
     }
 
     public RequestLine getRequestLine()
