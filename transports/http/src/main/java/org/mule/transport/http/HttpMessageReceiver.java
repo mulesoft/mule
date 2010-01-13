@@ -309,11 +309,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 					if ("keep-alive".equalsIgnoreCase(value) && endpointOverride) 
                     {
                         response.setKeepAlive(true);
-                    	
-                        Header header = new Header(HttpConstants.HEADER_KEEP_ALIVE, "timeout=" 
-                            + httpConnector.getKeepAliveTimeout());
-                        response.addHeader(header); 
-                        
+
                         if (response.getHttpVersion().equals(HttpVersion.HTTP_1_0))
                         {
                             connectionHeader = new Header(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
