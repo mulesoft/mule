@@ -30,8 +30,17 @@
                             <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                         </transformers>
                     </outbound-endpoint>
-                    <sxc:filter pattern="//purchaseOrder[@country]"/>
+                    <sxc:filter pattern="//test:purchaseOrder[@country]"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
+                </sxc:filtering-router>
+                
+                <sxc:filtering-router>
+                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true">
+                        <transformers>
+                            <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
+                        </transformers>
+                    </outbound-endpoint>
+                    <sxc:filter pattern="//purchaseOrder[@country]"/>
                 </sxc:filtering-router>
             </outbound>
         </service>

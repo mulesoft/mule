@@ -26,10 +26,18 @@ public class HttpRoutingTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient();
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
 
         MuleMessage res = client.send("http://localhost:63081/proxy", out.toByteArray(), null);
+        System.out.println(res.getPayloadAsString());
+        assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
+        assertTrue(res.getPayloadAsString().contains("Alice"));
+        
+        out = new ByteArrayOutputStream();
+        IOUtils.copy(getClass().getResourceAsStream("/namespace-purchase-order.xml"), out);
+        
+        res = client.send("http://localhost:63081/proxy", out.toByteArray(), null);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
         assertTrue(res.getPayloadAsString().contains("Alice"));

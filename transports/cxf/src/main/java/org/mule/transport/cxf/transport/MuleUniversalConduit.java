@@ -420,9 +420,25 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         }
         
+        // part workaround for some of MULE-4533. Needs a cleaner solution
         message.removeProperty(CxfConstants.OPERATION);
         message.removeProperty(CxfConstants.INBOUND_OPERATION);
         message.removeProperty(CxfConstants.INBOUND_SERVICE);
+        message.removeProperty(CxfConstants.IN_INTERCEPTORS);
+        message.removeProperty(CxfConstants.IN_FAULT_INTERCEPTORS);
+        message.removeProperty(CxfConstants.OUT_INTERCEPTORS);
+        message.removeProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
+        message.removeProperty(CxfConstants.APPLY_FILTERS_TO_PROTOCOL);
+        message.removeProperty(CxfConstants.APPLY_SECURITY_TO_PROTOCOL);
+        message.removeProperty(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL);
+        message.removeProperty(CxfConstants.WSDL_LOCATION);
+        message.removeProperty(CxfConstants.DATA_BINDING);
+        message.removeProperty(CxfConstants.ENABLE_MULE_SOAP_HEADERS);
+        message.removeProperty(CxfConstants.FEATURES);
+        message.removeProperty(CxfConstants.FRONTEND);
+        message.removeProperty(CxfConstants.PROXY);
+        message.removeProperty(CxfConstants.SERVICE_NAME);
+        message.removeProperty(CxfConstants.PROTOCOL_CONNECTOR);
         
         MuleEvent event = new DefaultMuleEvent(message, protocolEndpoint, session, true);
         event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
