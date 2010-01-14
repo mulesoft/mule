@@ -13,11 +13,14 @@ package org.mule.transport.jms.integration;
 import org.mule.api.config.MuleProperties;
 import org.mule.message.ExceptionMessage;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
 /**
@@ -25,6 +28,8 @@ import org.junit.Test;
  */
 public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
 {
+    public static final String DEADLETTER_QUEUE_NAME = "dlq";
+
     public JmsExceptionStrategyTestCase(JmsVendorConfiguration config)
     {
         super(config);

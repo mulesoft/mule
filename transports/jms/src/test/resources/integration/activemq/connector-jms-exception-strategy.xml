@@ -6,6 +6,18 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <jms:activemq-connector name="jmsConnector"/>
+    <jms:activemq-connector name="jmsConnector" />
+    
+    <jms:endpoint name="in" queue="in">
+	    <jms:transaction action="ALWAYS_BEGIN"/>
+	</jms:endpoint>
+    
+    <jms:endpoint name="out" queue="out">
+        <jms:transaction action="ALWAYS_JOIN"/>
+	</jms:endpoint>
+
+    <jms:endpoint name="dlq" queue="dlq">
+        <jms:transaction action="ALWAYS_JOIN"/>
+	</jms:endpoint>
 
 </mule>

@@ -12,8 +12,6 @@
 
     <vm:connector name="vmConnector"/>
 
-    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector2"/>
-    
     <model name="Model">
 
         <service name="JMSService1">
@@ -23,7 +21,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" />
+                    <outbound-endpoint ref="out1" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -35,7 +33,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1" />
+                    <outbound-endpoint ref="out2" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -47,9 +45,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1">
-                        <property key="disableTemporaryReplyToDestinations" value="true"/>
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="out3" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -61,9 +57,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" synchronous="true">
-                        <property key="disableTemporaryReplyToDestinations" value="true"/>
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="out4" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -74,7 +68,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
+                    <outbound-endpoint ref="out5"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -86,19 +80,19 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
-                    <reply-to ref="replyTo"/>
+                    <outbound-endpoint ref="out5" />
+                    <reply-to ref="in" />
                 </pass-through-router>
             </outbound>
             <async-reply timeout="5001" failOnTimeout="true">
-                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
+                <inbound-endpoint ref="in" />
                 <single-async-reply-router/>
             </async-reply>
         </service>
 
         <service name="TestService1">
             <inbound>
-                <inbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1"/>
+                <inbound-endpoint ref="out2" />
             </inbound>
             <test:component appendString=" #[mule:context.serviceName]"/>
         </service>

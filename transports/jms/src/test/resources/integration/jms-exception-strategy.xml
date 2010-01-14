@@ -12,24 +12,19 @@
     <model name="test">
         <service name="DeadLetter">
             <inbound>
-                <jms:inbound-endpoint queue="in">
-                    <jms:transaction action="ALWAYS_BEGIN"/>
-                </jms:inbound-endpoint>
+                <inbound-endpoint ref="in" />
             </inbound>
             <test:component throwException="true"/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="out">
-                        <jms:transaction action="ALWAYS_JOIN"/>
-                    </jms:outbound-endpoint>
+                    <outbound-endpoint ref="out" />
                 </pass-through-router>
             </outbound>
             <default-service-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <jms:outbound-endpoint queue="dlq">
-                    <jms:transaction action="ALWAYS_JOIN"/>
-                </jms:outbound-endpoint>
+                <outbound-endpoint ref="dlq" />
             </default-service-exception-strategy>
         </service>
     </model>
+
 </mule>
