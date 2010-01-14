@@ -140,7 +140,6 @@
         <mx4jVersion>2.1.1</mx4jVersion>
         <neethiVersion>2.0.4</neethiVersion>
         <ognlVersion>2.7.3</ognlVersion>
-        <openSamlVersion>1.1b</openSamlVersion>
         <oroVersion>2.0.8</oroVersion>
         <osgiSpecVersion>1.0</osgiSpecVersion>
         <paxLoggingVersion>1.1.1</paxLoggingVersion>
@@ -1117,11 +1116,6 @@
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
                 <version>${xmlSecurityVersion}-osgi</version>
-            </dependency>
-            <dependency>
-                <groupId>opensaml</groupId>
-                <artifactId>opensaml</artifactId>
-                <version>${openSamlVersion}-osgi</version>
             </dependency>
             <dependency>
                 <groupId>xml-resolver</groupId>

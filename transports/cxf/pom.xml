@@ -425,12 +425,6 @@
             <artifactId>geronimo-annotation_1.0_spec</artifactId>
         </dependency>
         
-        <dependency>  
-            <groupId>opensaml</groupId>  
-            <artifactId>opensaml</artifactId>  
-            <version>${openSamlVersion}</version> 
-        </dependency>
-        
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
