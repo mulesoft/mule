@@ -12,10 +12,10 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
-    <http:endpoint name="base" host="localhost" port="60198" synchronous="true"/>
-    <http:endpoint name="adapted" host="localhost" port="60199" synchronous="true"/>
-    <http:endpoint name="ignored" address="http://localhost:60200" synchronous="true"/>
-    <endpoint name="inbound" address="http://localhost:60201" synchronous="true"/>
+    <http:endpoint name="base" host="localhost" port="60207" synchronous="true"/>
+    <http:endpoint name="adapted" host="localhost" port="60219" synchronous="true"/>
+    <http:endpoint name="ignored" address="http://localhost:60220" synchronous="true"/>
+    <endpoint name="inbound" address="http://localhost:60221" synchronous="true"/>
 
     <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 

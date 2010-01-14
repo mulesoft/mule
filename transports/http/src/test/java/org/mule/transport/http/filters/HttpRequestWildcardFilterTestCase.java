@@ -22,7 +22,7 @@ import java.util.Map;
 public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 {
     private static final String HTTP_ENDPOINT = "http://localhost:60201";
-    private static final String REF_ENDPOINT = "http://localhost:60199";
+    private static final String REF_ENDPOINT = "http://localhost:60225";
     private static final String TEST_HTTP_MESSAGE = "Hello=World";
     private static final String TEST_BAD_MESSAGE = "xyz";
 

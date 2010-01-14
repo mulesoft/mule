@@ -67,11 +67,10 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
     public void testBoth() throws Exception
     {
         assertEquals(
-                StringAppendTestTransformer.append(" response",
-                        StringAppendTestTransformer.append(" response 2",
-                                        StringAppendTestTransformer.append(" transformed 2",
-                                                StringAppendTestTransformer.appendDefault(
-                                        OUTBOUND_MESSAGE)) + " Received")),
+            StringAppendTestTransformer.append(" response",
+                StringAppendTestTransformer.append(" response 2",
+                    StringAppendTestTransformer.append(" transformed 2",
+                        StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received")),
                 sendTo("both").getPayloadAsString());
     }
 

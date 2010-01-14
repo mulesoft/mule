@@ -22,7 +22,7 @@
 
         <service name="reference">
             <inbound>
-                <inbound-endpoint address="http://localhost:60199" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60225" synchronous="true"/>
             </inbound>
             <echo-component/>
         </service>
