@@ -12,6 +12,7 @@ package org.mule.transport.jms.integration;
 
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleParameterized;
 import org.mule.transport.jms.JmsConstants;
@@ -38,6 +39,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicPublisher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -144,6 +147,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      */
     private boolean useTopics = false;
 
+    private MuleClient client = null;
+    
     /**
      * Implement this interface to provide a callback which will be executed immediately 
      * after sending/receiving a message.
@@ -227,11 +232,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     @After
     public void after() throws Exception
     {
-        super.tearDown();
         purge(getJmsConfig().getInboundDestinationName());
         purge(getJmsConfig().getOutboundDestinationName());
         purge(getJmsConfig().getMiddleDestinationName());
         purge(getJmsConfig().getDeadLetterDestinationName());
+        purgeTopics();
+        super.tearDown();
     }
 
     public AbstractJmsFunctionalTestCase(JmsVendorConfiguration config)
@@ -701,6 +707,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         Session s = null;
         try
         {
+            logger.debug("purging queue : " + destination);
             c = getConnection(false, false);
             assertNotNull(c);
             c.start();
@@ -711,7 +718,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
             while (consumer.receiveNoWait() != null)
             {
-                logger.warn("Destination " + destination + " isn't empty, draining it");
+                logger.debug("Destination " + destination + " isn't empty, draining it");
             }
         }
         finally
@@ -727,6 +734,85 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             }
         }
 
+    }
+
+    /**
+     * Purge all of the topics which are created during testing
+     * TODO DZ: we should be getting this list dynamically, and only calling them for the topic tests
+     * @throws Exception
+     */
+    protected void purgeTopics() throws Exception
+    {
+        String destination = "broadcast";
+        purgeTopic(destination, "Client1");
+        purgeTopic(destination, "Client2");
+        purgeTopic(destination, "mule.JmsConnectorC1.broadcast");
+        purgeTopic(destination, "mule.JmsConnectorC2.broadcast");        
+    }
+            
+    /**
+     * Clear the specified topic
+     * 
+     * @param destination
+     * @param topic
+     * @throws Exception
+     */
+    protected void purgeTopic(String destination, String topic) throws Exception
+    {
+        Connection c = null;
+        Session s = null;
+
+        try
+        {
+            logger.debug("purging topic : " + topic);
+            c = (TopicConnection) getConnection(true, false);
+            if (c == null)
+            {
+                logger.debug("could not create a connection to topic : " + destination);
+            }
+
+            c.start();
+            s = ((TopicConnection) c).createTopicSession(true, Session.SESSION_TRANSACTED);
+
+            logger.debug("created topic session");
+            Topic dest = s.createTopic(destination);
+            logger.debug("created topic destination");
+
+            TopicPublisher t;
+
+            MessageConsumer consumer = null;
+
+            try
+            {
+                consumer = s.createDurableSubscriber((Topic) dest, topic);
+                logger.debug("created consumer");
+                while (consumer.receiveNoWait() != null)
+                {
+                    logger.debug("Topic " + topic + " isn't empty, draining it");
+                }
+                logger.debug("topic should be empty");
+                consumer.close();
+                s.unsubscribe(topic);
+            }
+            catch (JMSException e)
+            {
+                logger.debug("could not unsubscribe : " + topic);
+            }
+        }
+        
+        finally
+        {
+            if (c != null)
+            {
+                c.stop();
+                if (s != null)
+                {
+                    s.close();
+                }
+                c.close();
+            }
+        }
+        logger.debug("completed draining topic :" + topic);
     }
 
     /** Verify that no message is pending on the default output queue. */
