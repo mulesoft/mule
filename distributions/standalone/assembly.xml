@@ -501,27 +501,6 @@
       </includes>
     </dependencySet>
 
-    <!-- Mule examples -->
-    <dependencySet>
-      <outputDirectory>lib/user</outputDirectory>
-      <!-- Don't put the version number in the examples. -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
-      <includes>
-        <include>org.mule.examples:mule-example-echo</include>
-        <include>org.mule.examples:mule-example-errorhandler</include>
-        <!-- TODO examples structure and location will be changed. They must not be in lib/user anymore -->
-        <!--<include>org.mule.examples:mule-example-hello</include>-->
-        <include>org.mule.examples:mule-example-loanbroker-common</include>
-        <include>org.mule.examples:mule-example-loanbroker-esn</include>
-        <include>org.mule.examples:mule-example-loanbroker-esb</include>
-        <include>org.mule.examples:mule-example-loanbroker-bpm</include>
-        <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
-        <include>org.mule.examples:mule-example-scripting</include>
-        <include>org.mule.examples:mule-example-stockquote</include>
-        <include>org.mule.examples:mule-example-bookstore</include>
-      </includes>
-    </dependencySet>
-
     <!--
         These XML dependencies end up in the "endorsed" directory
         and must be excluded from other dependencySets, otherwise

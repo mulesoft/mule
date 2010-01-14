@@ -92,15 +92,6 @@ log4j-1.2.14
 mail-1.4-osgi
 mule-core
 mule-core-tests
-mule-example-echo
-mule-example-errorhandler
-mule-example-loanbroker-bpm
-mule-example-loanbroker-common
-mule-example-loanbroker-credit-agency
-mule-example-loanbroker-esb
-mule-example-loanbroker-esn
-mule-example-scripting
-mule-example-stockquote
 mule-module-acegi
 mule-module-annotations
 mule-module-atom
