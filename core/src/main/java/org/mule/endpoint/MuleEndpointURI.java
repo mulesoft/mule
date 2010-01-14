@@ -372,14 +372,7 @@ public class MuleEndpointURI implements EndpointURI
             String maskinfo = userInfo.substring(0, userInfo.indexOf(":")) + ":****";
             return uri.toASCIIString().replace(userInfo, maskinfo);
         }
-        if (schemeMetaInfo != null)
-        {
-            return schemeMetaInfo + ":" + uri.toASCIIString();
-        }
-        else
-        {
-            return uri.toASCIIString();
-        }
+        return uri.toASCIIString();
     }
 
     public String getTransformers()
