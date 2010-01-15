@@ -49,17 +49,55 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         receiveAndAssertNone();
 
         // Verify that an ExceptionMessage got sent to dead letter queue instead.
-        Message output = receive(getJmsConfig().getDeadLetterDestinationName(), getTimeout(), null);
-        assertTrue("Message should be ObjectMessage but is " + output.getClass(), output instanceof ObjectMessage);
-        Object payload = ((ObjectMessage) output).getObject();
-        assertTrue(payload instanceof ExceptionMessage);
+        Message message = receive(getJmsConfig().getDeadLetterDestinationName(), getTimeout(), null);
+
+        Object obj = null;
+        // ExceptionMessage got serialized by JMS provider
+        if (message instanceof BytesMessage)
+        {
+            byte[] messageBytes = new byte[(int) ((BytesMessage) message).getBodyLength()];
+            ((BytesMessage) message).readBytes(messageBytes);
+            obj = SerializationUtils.deserialize(messageBytes);
+        }
+        // ExceptionMessage did not get serialized by JMS provider
+        else if (message instanceof ObjectMessage)
+        {
+            obj = ((ObjectMessage) message).getObject();
+        }
+        else
+        {
+            fail("Message is an unexpected type: " + message.getClass().getName());
+        }
+        assertTrue(obj instanceof ExceptionMessage);
+
         // The payload should be the original message, not the reply message
         // since the FTC threw an exception.
-        assertEquals(DEFAULT_INPUT_MESSAGE, ((ExceptionMessage) payload).getPayload());
+        
+        Object payload = ((ExceptionMessage) obj).getPayload();
+        // Original JMS message was serializable
+        if (payload instanceof TextMessage)
+        {
+            assertEquals(DEFAULT_INPUT_MESSAGE, ((TextMessage) payload).getText());
+        }
+        // Original JMS message was not serializable and toString() was called
+        // instead
+        // (see AbstractExceptionListener.routeException() )
+        else if (payload instanceof String)
+        {
+            assertEquals(DEFAULT_INPUT_MESSAGE, payload);
+        }
+        else
+        {
+            fail("Payload is an unexpected type: " + payload.getClass().getName());
+        }
 
-        String dest = output.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        assertNotNull(dest);
-        assertEquals(getJmsConfig().getDeadLetterEndpoint(), dest);
+        String dest = message.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+        // Some JMS providers do not allow custom properties to be set on JMS
+        // messages
+        if (dest != null)
+        {
+            assertEquals(getJmsConfig().getDeadLetterEndpoint(), dest);
+        }
     }
 
     @Test
