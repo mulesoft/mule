@@ -344,11 +344,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         this.configurationBuilder = configbuilder;
     }
 
-    public String getModelName()
-    {
-        return defaultJcaModelName;
-    }
-
     public void setModelName(String modelName)
     {
         this.defaultJcaModelName = modelName;
@@ -441,6 +436,124 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     public void setWorkingDirectory(String workingDirectory)
     {
         muleConfiguration.setWorkingDirectory(workingDirectory);
+    }
+
+    // Although get methods for config properties aren't really required we need to
+    // include them otherwise Geronimo does not consider them valid properties
+    
+    public String getConfigurationBuilder()
+    {
+        return configurationBuilder;
+    }
+
+    public String getConfigurations()
+    {
+        return configurations;
+    }
+
+    public String getUserName()
+    {
+        return username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public String getModelName()
+    {
+        return defaultJcaModelName;
+    }
+    
+    public String getClusterId()
+    {
+        return muleConfiguration.getClusterId();
+    }
+
+    public String getDefaultEncoding()
+    {
+        return muleConfiguration.getDefaultEncoding();
+    }
+
+    public int getDefaultQueueTimeout()
+    {
+        return muleConfiguration.getDefaultQueueTimeout();
+    }
+
+    public int getDefaultResponseTimeout()
+    {
+        return muleConfiguration.getDefaultResponseTimeout();
+    }
+
+    public int getDefaultTransactionTimeout()
+    {
+        return muleConfiguration.getDefaultTransactionTimeout();
+    }
+
+    public String getDomainId()
+    {
+        return muleConfiguration.getDomainId();
+    }
+
+    public String getId()
+    {
+        return muleConfiguration.getId();
+    }
+
+    public String getMuleHomeDirectory()
+    {
+        return muleConfiguration.getMuleHomeDirectory();
+    }
+
+    public int getShutdownTimeout()
+    {
+        return muleConfiguration.getShutdownTimeout();
+    }
+
+    public String getSystemModelType()
+    {
+        return muleConfiguration.getSystemModelType();
+    }
+
+    public String getSystemName()
+    {
+        return muleConfiguration.getSystemName();
+    }
+
+    public String getWorkingDirectory()
+    {
+        return muleConfiguration.getWorkingDirectory();
+    }
+
+    public boolean isAutoWrapMessageAwareTransform()
+    {
+        return muleConfiguration.isAutoWrapMessageAwareTransform();
+    }
+
+    public boolean isCacheMessageAsBytes()
+    {
+        return muleConfiguration.isCacheMessageAsBytes();
+    }
+
+    public boolean isCacheMessageOriginalPayload()
+    {
+        return muleConfiguration.isCacheMessageOriginalPayload();
+    }
+
+    public boolean isClientMode()
+    {
+        return muleConfiguration.isClientMode();
+    }
+
+    public boolean isDefaultSynchronousEndpoints()
+    {
+        return muleConfiguration.isDefaultSynchronousEndpoints();
+    }
+
+    public boolean isEnableStreaming()
+    {
+        return muleConfiguration.isEnableStreaming();
     }
 
     @Override
