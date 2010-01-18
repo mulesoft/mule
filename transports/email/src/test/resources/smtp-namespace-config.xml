@@ -33,10 +33,8 @@
                      subject="subject">
         <smtps:header key="foo" value="bar"/>
         <smtps:header key="baz" value="boz"/>
-        <smtps:tls-client path="greenmail-truststore"
-                          storePassword="password"/>
-        <smtps:tls-trust-store path="greenmail-truststore"
-                               storePassword="password"/>
+        <smtps:tls-client path="empty.jks" storePassword="password"/>
+        <smtps:tls-trust-store path="empty.jks" storePassword="password"/>
     </smtps:connector>
 
     <smtp:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>

@@ -12,7 +12,6 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.ImapsConnector;
-import org.mule.util.SystemUtils;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -21,13 +20,6 @@ import com.icegreen.greenmail.util.ServerSetup;
  */
 public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4653
-        return SystemUtils.isIbmJDK();
-    }
-
     public ImapsConnectorTestCase()
     {
         super(ServerSetup.PROTOCOL_IMAPS, 50011);
@@ -39,9 +31,8 @@ public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         connector.setName("ImapsConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
-        connector.setTrustStorePassword("password");
-        connector.setTrustStore("greenmail-truststore");
+        connector.setTrustStore("greenmail.jks");
+        connector.setTrustStorePassword("changeit");
         return connector;
     }
-
 }

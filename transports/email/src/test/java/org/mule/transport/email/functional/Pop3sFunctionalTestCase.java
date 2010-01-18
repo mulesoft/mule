@@ -10,17 +10,9 @@
 
 package org.mule.transport.email.functional;
 
-import org.mule.util.SystemUtils;
 
 public class Pop3sFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4656
-        return SystemUtils.isIbmJDK();
-    }
-
     public Pop3sFunctionalTestCase()
     {
         super(65436, STRING_MESSAGE, "pop3s");
@@ -30,5 +22,4 @@ public class Pop3sFunctionalTestCase extends AbstractEmailFunctionalTestCase
     {
         doRequest();
     }
-
 }

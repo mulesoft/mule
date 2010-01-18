@@ -10,17 +10,9 @@
 
 package org.mule.transport.email.functional;
 
-import org.mule.util.SystemUtils;
 
 public class SmtpsFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4663
-        return SystemUtils.isIbmJDK();
-    }
-
     public SmtpsFunctionalTestCase()
     {
         super(65439, STRING_MESSAGE, "smtps");

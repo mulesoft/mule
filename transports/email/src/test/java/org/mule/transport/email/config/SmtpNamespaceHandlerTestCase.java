@@ -63,10 +63,10 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         // authenticator?
 
         //The full path gets resolved, we're just checkng that the property got set
-        assertTrue(c.getClientKeyStore().endsWith("/greenmail-truststore"));
+        assertTrue(c.getClientKeyStore().endsWith("/empty.jks"));
         assertEquals("password", c.getClientKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
-        assertTrue(c.getTrustStore().endsWith("/greenmail-truststore"));
+        assertTrue(c.getTrustStore().endsWith("/empty.jks"));
         assertEquals("password", c.getTrustStorePassword());
 
         assertTrue(c.isConnected());

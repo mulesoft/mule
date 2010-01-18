@@ -12,22 +12,14 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.Pop3sConnector;
-import org.mule.util.SystemUtils;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
 /**
- * Simple tests for pulling from an IMAP server.
+ * Simple tests for pulling from an POP3 server.
  */
 public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4654
-        return SystemUtils.isIbmJDK();
-    }
-
     public Pop3sConnectorTestCase()
     {
         super(ServerSetup.PROTOCOL_POP3S, 50009);
@@ -39,8 +31,8 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         connector.setName("Pop3sConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
-        connector.setTrustStorePassword("password");
-        connector.setTrustStore("greenmail-truststore");
+        connector.setTrustStore("greenmail.jks");
+        connector.setTrustStorePassword("changeit");
         connector.setMuleContext(muleContext);
         return connector;
     }

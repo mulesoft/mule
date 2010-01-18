@@ -14,12 +14,15 @@
 
     <imaps:connector name="imapsConnector">
         <imaps:tls-client path="clientKeystore" storePassword="mulepassword"/>
-        <imaps:tls-trust-store path="greenmail-truststore" storePassword="password"/>
+        <!-- 
+            Use the greenmail.jks that ships in the greenmail jar and that's used by greenmail's
+            DummySSLServerSocketFactory.
+        -->
+        <imaps:tls-trust-store path="greenmail.jks" storePassword="changeit"/>
     </imaps:connector>
     <vm:connector name="vmConnector"/>
 
     <model name="test">
-
         <service name="relay">
             <inbound>
                 <imaps:inbound-endpoint user="bob" password="password" host="localhost" port="65444"/>
@@ -30,7 +33,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>
