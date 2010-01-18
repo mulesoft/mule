@@ -29,7 +29,7 @@
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="vm://unreliable" connector-ref="default"/>
+                    <vm:outbound-endpoint path="unreliable" connector-ref="default"/>
                     <vm:outbound-endpoint path="error" connector-ref="queue"/>
                 </exception-based-router>
             </outbound>
@@ -37,7 +37,7 @@
 
         <service name="unreliable">
             <inbound>
-                <vm:inbound-endpoint address="vm://unreliable" connector-ref="default"/>
+                <vm:inbound-endpoint path="unreliable" connector-ref="default"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -47,7 +47,7 @@
                 <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
                     <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
                     <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
-                    <outbound-endpoint name="matchingEndpoint2" address="vm://match2" connector-ref="queue"/>
+                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" connector-ref="queue"/>
                 </endpoint-selector-router>
             </outbound>
         </service>

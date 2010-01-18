@@ -29,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling
  * and transaction management. Derived implementations of these class must be thread
- * safe as several threads can be started at once for an improveded throuput.
+ * safe as several threads can be started at once for an improved throughput.
  */
 public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -49,7 +49,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint)}
+     *             {@link #TransactedPollingMessageReceiver(Connector, Service, InboundEndpoint)}
      *             instead
      */
     public TransactedPollingMessageReceiver(Connector connector,
