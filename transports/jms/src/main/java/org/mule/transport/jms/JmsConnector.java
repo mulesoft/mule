@@ -25,6 +25,7 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.transaction.TransactionCoordination;
@@ -367,38 +368,22 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             catch (CommunicationException ce)
             {
-                logger.warn("JNDI communication error", ce);
-                
-                // Our connection to JNDI failed. Make a single attempt to reconnect to JNDI.
                 try
                 {
-                    /*
-                     Uncomment for manual testing ... this gives you time to restart the JNDI
-                     server
-
-                    try
+                    final Transaction tx = TransactionCoordination.getInstance().getTransaction();
+                    if (tx != null)
                     {
-                        logger.info("sleep for 20 secs before JNDI retry");
-                        Thread.sleep(20000);
-                        logger.info("done sleeping");
+                        tx.setRollbackOnly();
                     }
-                    catch (InterruptedException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                    */
-
-                    // re-connect to JNDI
-                    this.initJndiContext();
-                    
-                    // now retry the lookup.
-                    return jndiContext.lookup(jndiName);
                 }
-                catch (InitialisationException ie)
+                catch (TransactionException e)
                 {
-                    // this may actually never happen as we were connected to JNDI before
-                    throw new MuleRuntimeException(JmsMessages.errorInitializingJndi(), ie);
+                    throw new MuleRuntimeException(
+                            MessageFactory.createStaticMessage("Failed to mark transaction for rollback: "), e);
                 }
+
+                // re-throw
+                throw ce;
             }
         }
     }
