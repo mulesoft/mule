@@ -18,6 +18,7 @@ import org.mule.util.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -73,6 +74,8 @@ public class ObjectToInputStreamTestCase extends AbstractMuleTestCase
 
     public static boolean compare(InputStream input1, InputStream input2)
     {
-        return IOUtils.toString((InputStream) input1).equals(IOUtils.toString((InputStream) input2));
+        byte[] bytes1 = IOUtils.toByteArray(input1);
+        byte[] bytes2 = IOUtils.toByteArray(input2);
+        return Arrays.equals(bytes1, bytes2);
     }
 }

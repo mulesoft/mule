@@ -22,6 +22,7 @@ import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -120,9 +121,11 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         assertTrue("Did not receive a message with String contents",
             received.getContent() instanceof String);
         verifyMessage((String) received.getContent());
-        assertNotNull(received.getRecipients(Message.RecipientType.TO));
-        assertEquals(1, received.getRecipients(Message.RecipientType.TO).length);
-        assertEquals(received.getRecipients(Message.RecipientType.TO)[0].toString(), email);
+        
+        Address[] recipients = received.getRecipients(Message.RecipientType.TO);
+        assertNotNull(recipients);
+        assertEquals("number of recipients", 1, recipients.length);
+        assertEquals("recipient", email, recipients[0].toString());
     }
 
     protected void verifyMessage(String receivedText)
@@ -137,10 +140,10 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         assertEquals(1, server.getReceivedMessages().length);
 
         MuleClient client = new MuleClient();
-        MuleMessage message = client.request("vm://receive", 5000);
+        MuleMessage reply = client.request("vm://receive", 5000);
         
-        assertNotNull(message);
-        Object payload = message.getPayload();
+        assertNotNull(reply);
+        Object payload = reply.getPayload();
         if (isMimeMessage)
         {
             assertTrue(payload instanceof MimeMessage);

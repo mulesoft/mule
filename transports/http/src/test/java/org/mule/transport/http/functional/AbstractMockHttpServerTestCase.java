@@ -17,8 +17,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase
 {
+    private static final long MOCK_HTTP_SERVER_STARTUP_TIMEOUT = 30000;
     private CountDownLatch serverStartLatch = new CountDownLatch(1);
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -27,11 +29,12 @@ public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase
         new Thread(httpServer).start();
 
         // wait for the simple server thread to come up
-        assertTrue(serverStartLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertTrue("MockHttpServer start failed", 
+            serverStartLatch.await(MOCK_HTTP_SERVER_STARTUP_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     /**
      * Subclasses must implement this method to return their Subclass of {@link MockHttpServer}.
      */
-    protected abstract MockHttpServer getHttpServer(CountDownLatch serverStartLatch);
+    protected abstract MockHttpServer getHttpServer(CountDownLatch latch);
 }

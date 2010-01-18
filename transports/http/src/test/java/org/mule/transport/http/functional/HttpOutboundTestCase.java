@@ -25,9 +25,9 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     private CountDownLatch testLatch = new CountDownLatch(1);
     private String httpMethod = null;
     
-    protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
+    protected MockHttpServer getHttpServer(CountDownLatch latch)
     {
-        return new SimpleHttpServer(LISTEN_PORT, serverStartLatch, testLatch);
+        return new SimpleHttpServer(LISTEN_PORT, latch, testLatch);
     }
 
     protected String getConfigResources()

@@ -16,6 +16,7 @@ import org.mule.transport.email.GreenMailUtilities;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
@@ -130,19 +131,24 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
                 "?connector=" + connectorName;
     }
 
-    protected void assertMessageOk(Object message) throws Exception
+    protected void assertMessageOk(Object mailMessage) throws Exception
     {
-        assertTrue("Did not receive a MimeMessage", message instanceof MimeMessage);
-        MimeMessage received = (MimeMessage) message;
+        assertTrue("Did not receive a MimeMessage", mailMessage instanceof MimeMessage);
+        
+        MimeMessage received = (MimeMessage) mailMessage;
+        
         // for some reason, something is adding a newline at the end of messages
         // so we need to strip that out for comparison
         assertTrue("Did not receive a message with String contents",
             received.getContent() instanceof String);
+        
         String receivedText = ((String) received.getContent()).trim();
         assertEquals(MESSAGE, receivedText);
-        assertNotNull(received.getRecipients(Message.RecipientType.TO));
-        assertEquals(1, received.getRecipients(Message.RecipientType.TO).length);
-        assertEquals(received.getRecipients(Message.RecipientType.TO)[0].toString(), EMAIL);
+        
+        Address[] recipients = received.getRecipients(Message.RecipientType.TO);
+        assertNotNull(recipients);
+        assertEquals("recipients", 1, recipients.length);
+        assertEquals("recipient", EMAIL, recipients[0].toString());
     }
 
     protected String uniqueName(String root)
