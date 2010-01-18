@@ -374,7 +374,7 @@ public class ClientWrapper
         
         // remove username/password
         idx = uri.indexOf('@');
-    	int slashIdx = uri.indexOf("//");
+        int slashIdx = uri.indexOf("//");
         if (idx != -1 && slashIdx != -1)
         {
             uri = uri.substring(0, slashIdx + 2) + uri.substring(idx + 1);

@@ -22,9 +22,9 @@
                 <test:return-data>OUTPUT MESSAGE</test:return-data>
             </test:component>
             <outbound>
-            	<pass-through-router>
-	                <outbound-endpoint ref="out"/>
-	            </pass-through-router>
+                <pass-through-router>
+                    <outbound-endpoint ref="out"/>
+                </pass-through-router>
             </outbound>
          </service>
          

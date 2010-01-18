@@ -241,18 +241,18 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         return buildResponseMessage(muleRes, response);
     }
 
-	private Map<String, Object> getInovcationProperties(MuleEvent event) 
-	{
-		Map<String, Object> props = new HashMap<String, Object>();
+    private Map<String, Object> getInovcationProperties(MuleEvent event)
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
         EndpointURI uri = endpoint.getEndpointURI();
         if (uri.getUser() != null) 
         {
-        	props.put(BindingProvider.USERNAME_PROPERTY, uri.getUser());
-        	props.put(BindingProvider.PASSWORD_PROPERTY, uri.getPassword());
+            props.put(BindingProvider.USERNAME_PROPERTY, uri.getUser());
+            props.put(BindingProvider.PASSWORD_PROPERTY, uri.getPassword());
         }
-		return props;
-	}
+        return props;
+    }
 
     protected MuleMessage buildResponseMessage(MuleMessage transportResponse, Object[] response) 
     {

@@ -75,8 +75,8 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
                 throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
                     message, e);
             }                   
-        	
-        	super.preRouteMessage(message);
+
+            super.preRouteMessage(message);
             
             if (peerCertificateChain != null)
             {
@@ -90,22 +90,22 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
 
         public void handshakeCompleted(HandshakeCompletedEvent event)
         {
-			try
-			{
-	            localCertificateChain = event.getLocalCertificates();
-	            try
-	            {
-	                peerCertificateChain = event.getPeerCertificates();
-	            }
-	            catch (SSLPeerUnverifiedException e)
-	            {
-	                logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
-	            }
-			}
-			finally
-			{
-	            latch.countDown();
-			}
+            try
+            {
+                localCertificateChain = event.getLocalCertificates();
+                try
+                {
+                    peerCertificateChain = event.getPeerCertificates();
+                }
+                catch (SSLPeerUnverifiedException e)
+                {
+                    logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
+                }
+            }
+            finally
+            {
+                latch.countDown();
+            }
         }
     }
 

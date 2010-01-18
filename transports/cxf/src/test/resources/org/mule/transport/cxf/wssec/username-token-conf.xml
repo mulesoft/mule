@@ -10,24 +10,24 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <spring:bean name="wss4jOutConfiguration"
-		class="org.springframework.beans.factory.config.MapFactoryBean">
-		<spring:property name="sourceMap">
-	      <spring:map>
+        class="org.springframework.beans.factory.config.MapFactoryBean">
+        <spring:property name="sourceMap">
+          <spring:map>
               <spring:entry key="action" value="UsernameToken" />
               <spring:entry key="user" value="joe" />
               <spring:entry key="passwordType" value="PasswordDigest" />
               <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ClientPasswordCallback" />
-	      </spring:map>
-		</spring:property>
-	</spring:bean>
+          </spring:map>
+        </spring:property>
+    </spring:bean>
 
     <spring:bean name="wss4jInConfiguration"
-		class="org.springframework.beans.factory.config.MapFactoryBean">
-		<spring:property name="sourceMap">
-			<spring:map>
+        class="org.springframework.beans.factory.config.MapFactoryBean">
+        <spring:property name="sourceMap">
+            <spring:map>
                 <spring:entry key="action" value="UsernameToken" />
                 <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ServerPasswordCallback" />
-			</spring:map>
-		</spring:property>
-	</spring:bean>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
 </mule>

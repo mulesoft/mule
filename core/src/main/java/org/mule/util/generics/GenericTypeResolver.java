@@ -355,13 +355,13 @@ public abstract class GenericTypeResolver
                     // the nearest match on the bridge method will be the bounded type.
                     TypeVariable typeVariableArgument = (TypeVariable) actualTypeArgument;
                     Type resolvedType = typeVariableMap.get(typeVariableArgument);
-					if (resolvedType == null) {
-						resolvedType = extractBoundForTypeVariable(typeVariableArgument);
-					}
-					typeVariableMap.put(variable, resolvedType);
-				}
-			}
-		}
-	}
+                    if (resolvedType == null) {
+                        resolvedType = extractBoundForTypeVariable(typeVariableArgument);
+                    }
+                    typeVariableMap.put(variable, resolvedType);
+                }
+            }
+        }
+    }
 
 }

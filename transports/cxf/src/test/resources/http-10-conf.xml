@@ -60,9 +60,9 @@
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
       </component>
       <outbound>
-      	<pass-through-router>
-      		<vm:outbound-endpoint path="out" />
-      	</pass-through-router>
+          <pass-through-router>
+              <vm:outbound-endpoint path="out" />
+          </pass-through-router>
       </outbound>
     </service> 
 

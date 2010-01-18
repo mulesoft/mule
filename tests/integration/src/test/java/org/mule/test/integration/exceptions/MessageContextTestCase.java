@@ -17,24 +17,24 @@ import org.mule.tck.FunctionalTestCase;
 
 public class MessageContextTestCase extends FunctionalTestCase 
 {
-	String request = "Hello World";
+    String request = "Hello World";
 
-	@Override
+    @Override
     protected String getConfigResources() 
-	{
-		return "org/mule/test/integration/exceptions/message-context-test.xml";
-	}
+    {
+        return "org/mule/test/integration/exceptions/message-context-test.xml";
+    }
 
-	/**
-	 * Test for MULE-4361
-	 */
-	public void testAlternateExceptionStrategy() throws Exception 
-	{
-	    MuleClient client = new MuleClient();
-	    DefaultMuleMessage msg = new DefaultMuleMessage(request, client.getMuleContext());
-	    MuleMessage response = client.send("testin", msg, 200000);
-	    assertNotNull(response);
-	    Thread.sleep(10000); // Wait for test to finish
+    /**
+     * Test for MULE-4361
+     */
+    public void testAlternateExceptionStrategy() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        DefaultMuleMessage msg = new DefaultMuleMessage(request, client.getMuleContext());
+        MuleMessage response = client.send("testin", msg, 200000);
+        assertNotNull(response);
+        Thread.sleep(10000); // Wait for test to finish
 
-	}
+    }
 }

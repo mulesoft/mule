@@ -34,36 +34,36 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     }
 
     public void testProxyEnvelope() throws Exception 
-	{
-		MuleMessage result = sendRequest("http://localhost:63081/proxy-envelope");
+    {
+        MuleMessage result = sendRequest("http://localhost:63081/proxy-envelope");
 
-		System.out.println(result.getPayloadAsString());
-		assertFalse(result.getPayloadAsString().contains("Fault"));
-		assertTrue(result.getPayloadAsString().contains("joe"));
-	}
-	
-	public void testProxyBody() throws Exception 
-	{
-		MuleMessage result = sendRequest("http://localhost:63081/proxy-body");
+        System.out.println(result.getPayloadAsString());
+        assertFalse(result.getPayloadAsString().contains("Fault"));
+        assertTrue(result.getPayloadAsString().contains("joe"));
+    }
 
-		System.out.println(result.getPayloadAsString());
-		assertFalse(result.getPayloadAsString().contains("Fault"));
-		assertFalse(result.getPayloadAsString().contains("joe"));
-	}
+    public void testProxyBody() throws Exception
+    {
+        MuleMessage result = sendRequest("http://localhost:63081/proxy-body");
 
-	protected MuleMessage sendRequest(String url) throws MuleException 
-	{
-		MuleClient client = new MuleClient();
+        System.out.println(result.getPayloadAsString());
+        assertFalse(result.getPayloadAsString().contains("Fault"));
+        assertFalse(result.getPayloadAsString().contains("joe"));
+    }
 
-		InputStream stream = getClass().getResourceAsStream(getMessageResource());
-		assertNotNull(stream);
+    protected MuleMessage sendRequest(String url) throws MuleException
+    {
+        MuleClient client = new MuleClient();
 
-		MuleMessage result = client.send(url, new DefaultMuleMessage(stream, muleContext));
-		return result;
-	}
-	
-	protected String getMessageResource()
-	{
-	    return "/org/mule/transport/cxf/wssec/in-message.xml";
-	}
+        InputStream stream = getClass().getResourceAsStream(getMessageResource());
+        assertNotNull(stream);
+
+        MuleMessage result = client.send(url, new DefaultMuleMessage(stream, muleContext));
+        return result;
+    }
+
+    protected String getMessageResource()
+    {
+        return "/org/mule/transport/cxf/wssec/in-message.xml";
+    }
 }

@@ -37,8 +37,8 @@ public class Http10FunctionalTestCase extends FunctionalTestCase
     
     public void testHttp10EnforceNonChunking() throws Exception
     {
-    	HttpClient client = setupHttpClient();
-    	
+        HttpClient client = setupHttpClient();
+
         GetMethod request = new GetMethod("http://localhost:60213/streaming");
         client.executeMethod(request);
         assertEquals("hello", request.getResponseBodyAsString());

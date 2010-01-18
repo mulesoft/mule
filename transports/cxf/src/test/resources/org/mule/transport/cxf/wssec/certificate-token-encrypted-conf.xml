@@ -10,28 +10,28 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <spring:bean name="wss4jOutConfiguration"
-		class="org.springframework.beans.factory.config.MapFactoryBean">
-		<spring:property name="sourceMap">
-	      <spring:map>
+        class="org.springframework.beans.factory.config.MapFactoryBean">
+        <spring:property name="sourceMap">
+          <spring:map>
               <spring:entry key="action" value="Timestamp Signature Encrypt" />
               <spring:entry key="user" value="joe" />
               <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
               <spring:entry key="encryptionPropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
               <spring:entry key="encryptionUser" value="joe"/>
               <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ClientPasswordCallback" />
-	      </spring:map>
-		</spring:property>
-	</spring:bean>
+          </spring:map>
+        </spring:property>
+    </spring:bean>
 
     <spring:bean name="wss4jInConfiguration"
-		class="org.springframework.beans.factory.config.MapFactoryBean">
-		<spring:property name="sourceMap">
-			<spring:map>
+        class="org.springframework.beans.factory.config.MapFactoryBean">
+        <spring:property name="sourceMap">
+            <spring:map>
                 <spring:entry key="action" value="Timestamp Signature Encrypt" />
                 <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
                 <spring:entry key="decryptionPropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
                 <spring:entry key="passwordCallbackClass" value="org.mule.transport.cxf.wssec.ServerPasswordCallback" />
-			</spring:map>
-		</spring:property>
-	</spring:bean>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
 </mule>

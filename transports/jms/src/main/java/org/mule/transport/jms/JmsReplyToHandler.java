@@ -192,7 +192,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         if (jmsCorrelationId == null)
         {
             jmsCorrelationId = eventMsg.getProperty("JMSMessageID");
-		}
+        }
         if (jmsCorrelationId != null)
         {
             replyToMessage.setJMSCorrelationID(jmsCorrelationId.toString());

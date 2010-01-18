@@ -67,11 +67,11 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
     public void testBasicAuthWithCxfClient() throws Exception
     {
-    	MuleClient client = new MuleClient();
-    	
-    	MuleMessage result = client.send("cxfOutbound", "Hello", null);
-    	
-    	assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        MuleClient client = new MuleClient();
+
+        MuleMessage result = client.send("cxfOutbound", "Hello", null);
+
+        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
 
     @Override

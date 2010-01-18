@@ -9,14 +9,14 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-	<custom-transformer name="validateResponse" class="org.mule.tck.transformer.ValidateResponse" />
-	
+    <custom-transformer name="validateResponse" class="org.mule.tck.transformer.ValidateResponse" />
+
     <model>
         <service name="ComponentException">
             <inbound>
                 <vm:inbound-endpoint synchronous="true" path="in1" />
             </inbound>
-       		<!-- Component throws an exception -->
+               <!-- Component throws an exception -->
             <test:component throwException="true" />
         </service>
 
@@ -25,16 +25,16 @@
                 <vm:inbound-endpoint synchronous="true" path="in2" />
             </inbound>
             <outbound>
-            	<pass-through-router>
-            		<!-- Router throws an exception -->
-            		<outbound-endpoint address="vm://service999" synchronous="true" />
-            	</pass-through-router>
+                <pass-through-router>
+                    <!-- Router throws an exception -->
+                    <outbound-endpoint address="vm://service999" synchronous="true" />
+                </pass-through-router>
             </outbound>
         </service>
 
         <service name="InboundTransformerException">
             <inbound>
-           		<!-- Transformer throws an exception -->
+                   <!-- Transformer throws an exception -->
                 <vm:inbound-endpoint synchronous="true" path="in3" transformer-refs="validateResponse" />
             </inbound>
             <test:component />
@@ -45,10 +45,10 @@
                 <vm:inbound-endpoint synchronous="true" path="in4" />
             </inbound>
             <outbound>
-            	<pass-through-router>
-            		<!-- Transformer throws an exception -->
-            		<outbound-endpoint address="vm://service1" synchronous="true" transformer-refs="validateResponse" />
-            	</pass-through-router>
+                <pass-through-router>
+                    <!-- Transformer throws an exception -->
+                    <outbound-endpoint address="vm://service1" synchronous="true" transformer-refs="validateResponse" />
+                </pass-through-router>
             </outbound>
         </service>
 
@@ -57,10 +57,10 @@
                 <vm:inbound-endpoint synchronous="true" path="in5" />
             </inbound>
             <outbound>
-            	<pass-through-router>
-            		<!-- Response transformer throws an exception -->
-            		<outbound-endpoint address="vm://service1" synchronous="true" responseTransformer-refs="validateResponse" />
-            	</pass-through-router>
+                <pass-through-router>
+                    <!-- Response transformer throws an exception -->
+                    <outbound-endpoint address="vm://service1" synchronous="true" responseTransformer-refs="validateResponse" />
+                </pass-through-router>
             </outbound>
         </service>
 

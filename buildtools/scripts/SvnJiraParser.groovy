@@ -115,7 +115,7 @@ public class SvnJiraParser
         if(options.h)
         {
             cliBuilder.usage()
-            System.exit(1)        	
+            System.exit(1)
         }
         
         if (options.f)
@@ -172,7 +172,7 @@ public class SvnJiraParser
         statuses = c.jira1.getStatuses(token)
         
         priorityMap = getKeyedMap(priorities)
-        statusMap = getKeyedMap(statuses)    	
+        statusMap = getKeyedMap(statuses)
     }
     
     /**
@@ -182,7 +182,7 @@ public class SvnJiraParser
     {
         outputFile = new File(outputFileName);
         outputFile.delete(); //delete file so it only contains the latest results
-        outputFile.append("Key, Summary, Last Updated, Status, Assignee, Priority, Automated Tests, Pass/Fail, Verified By, Notes\n");    	
+        outputFile.append("Key, Summary, Last Updated, Status, Assignee, Priority, Automated Tests, Pass/Fail, Verified By, Notes\n");
     }
     
     /**
@@ -284,6 +284,6 @@ public class SvnJiraParser
         // escape double quotes in the summary field with a preceding double quote, i.e. text1 "FOO" text2 becomes text1 ""FOO"" text2
         def escapedSummary = "\"" + ((String)issue.summary).replaceAll("\"","\"\"") + "\"";
         outputFile.append(issue.key + ", " + escapedSummary + ", " + issue.updated + ", " + 
-                statusMap[issue.status] + ", " + issue.assignee + ", " + priorityMap[issue.priority] + "\n")    	
+                statusMap[issue.status] + ", " + issue.assignee + ", " + priorityMap[issue.priority] + "\n")
     }
 }

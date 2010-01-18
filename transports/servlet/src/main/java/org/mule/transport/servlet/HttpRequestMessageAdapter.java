@@ -51,7 +51,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
 
     private String characterEncoding;
 
-	private final Map <String, String> requestParameters;
+    private final Map <String, String> requestParameters;
     
     public HttpRequestMessageAdapter(Object message) throws MuleException
     {

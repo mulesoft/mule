@@ -312,7 +312,7 @@ public class FileConnector extends AbstractConnector
 
     public void setWorkDirectory(String workDirectoryName) throws IOException 
     {
-		this.workDirectoryName = workDirectoryName;
+        this.workDirectoryName = workDirectoryName;
         if (workDirectoryName != null)
         {
             File workDirectory = FileUtils.openDirectory(workDirectoryName);
@@ -324,20 +324,20 @@ public class FileConnector extends AbstractConnector
         }
     }
     
-	public String getWorkDirectory() 
-	{
-		return workDirectoryName;
-	}
+    public String getWorkDirectory()
+    {
+        return workDirectoryName;
+    }
 
-	public void setWorkFileNamePattern(String workFileNamePattern) 
-	{
-		this.workFileNamePattern = workFileNamePattern;
-	}
+    public void setWorkFileNamePattern(String workFileNamePattern)
+    {
+        this.workFileNamePattern = workFileNamePattern;
+    }
 
-	public String getWorkFileNamePattern() 
-	{
-		return workFileNamePattern;
-	}
+    public String getWorkFileNamePattern()
+    {
+        return workFileNamePattern;
+    }
 
     public boolean isOutputAppend()
     {

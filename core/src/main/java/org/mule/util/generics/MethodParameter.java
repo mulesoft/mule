@@ -404,14 +404,14 @@ public class MethodParameter
         if (methodOrConstructor instanceof Method)
         {
             return new MethodParameter((Method) methodOrConstructor, parameterIndex);
-		}
-		else if (methodOrConstructor instanceof Constructor) {
-			return new MethodParameter((Constructor) methodOrConstructor, parameterIndex);
-		}
-		else {
-			throw new IllegalArgumentException(
-					"Given object [" + methodOrConstructor + "] is neither a Method nor a Constructor");
-		}
-	}
+        }
+        else if (methodOrConstructor instanceof Constructor) {
+            return new MethodParameter((Constructor) methodOrConstructor, parameterIndex);
+        }
+        else {
+            throw new IllegalArgumentException(
+                    "Given object [" + methodOrConstructor + "] is neither a Method nor a Constructor");
+        }
+    }
 
 }

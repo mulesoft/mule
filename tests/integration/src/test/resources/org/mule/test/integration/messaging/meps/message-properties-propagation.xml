@@ -17,59 +17,59 @@
         http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <endpoint name="httpService" 
-    		  address="http://www.webservicex.net/stockquote.asmx/GetQuote" />
+              address="http://www.webservicex.net/stockquote.asmx/GetQuote" />
 
-	<endpoint name="cxfService" 
-			  address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" />
+    <endpoint name="cxfService"
+              address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" />
 
-	<model>
-		<service name="httpService1">
-			<inbound>
-				<vm:inbound-endpoint path="httpService1" synchronous="true" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-				    <outbound-endpoint ref="httpService" synchronous="true" />
-				</pass-through-router>
-			</outbound>
-		</service>	
+    <model>
+        <service name="httpService1">
+            <inbound>
+                <vm:inbound-endpoint path="httpService1" synchronous="true" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="httpService" synchronous="true" />
+                </pass-through-router>
+            </outbound>
+        </service>
 
-		<service name="cxfService1">
-			<inbound>
-				<vm:inbound-endpoint path="cxfService1" synchronous="true" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-				    <outbound-endpoint ref="cxfService" synchronous="true" />
-				</pass-through-router>
-			</outbound>
-		</service>	
+        <service name="cxfService1">
+            <inbound>
+                <vm:inbound-endpoint path="cxfService1" synchronous="true" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="cxfService" synchronous="true" />
+                </pass-through-router>
+            </outbound>
+        </service>
 
-		<service name="httpService2">
-			<inbound>
-				<vm:inbound-endpoint path="httpService2" synchronous="true" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-				    <outbound-endpoint ref="httpService" synchronous="true">
-				    	<property key="responseProperties" value="some,other" />
-				   	</outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>	
+        <service name="httpService2">
+            <inbound>
+                <vm:inbound-endpoint path="httpService2" synchronous="true" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="httpService" synchronous="true">
+                        <property key="responseProperties" value="some,other" />
+                       </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
 
-		<service name="cxfService2">
-			<inbound>
-				<vm:inbound-endpoint path="cxfService2" synchronous="true" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-				    <outbound-endpoint ref="cxfService" synchronous="true">
-				    	<property key="responseProperties" value="some,other" />
-				   	</outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>	
-	</model>
+        <service name="cxfService2">
+            <inbound>
+                <vm:inbound-endpoint path="cxfService2" synchronous="true" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="cxfService" synchronous="true">
+                        <property key="responseProperties" value="some,other" />
+                       </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
 
 </mule>

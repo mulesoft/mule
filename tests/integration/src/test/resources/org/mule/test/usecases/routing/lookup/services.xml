@@ -4,7 +4,7 @@
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
  
- 	<description>Mock web services to process the message</description>
+     <description>Mock web services to process the message</description>
  
     <model>
         <service name="BadResponse">
@@ -12,14 +12,14 @@
                 <inbound-endpoint address="http://localhost:8888/services/BadResponse" />
             </inbound>
             <static-component>
-            	<return-data>
+                <return-data>
                     <![CDATA[
                         <Response>
                             <Data />
                             <ErrorStatus>Internal server fault (#345200)</ErrorStatus>
                         </Response>
                     ]]>
-            	</return-data>
+                </return-data>
             </static-component>
         </service>
 
@@ -28,16 +28,16 @@
                 <inbound-endpoint address="http://localhost:8890/services/GoodOne" />
             </inbound>
             <static-component>
-            	<return-data>
+                <return-data>
                     <![CDATA[
                         <Response>
                             <Data>
-                                <ID>1005</ID>	
+                                <ID>1005</ID>
                             </Data>
                             <ErrorStatus>Success</ErrorStatus>
                         </Response>
                     ]]>
-            	</return-data>
+                </return-data>
             </static-component>
         </service>
     </model>

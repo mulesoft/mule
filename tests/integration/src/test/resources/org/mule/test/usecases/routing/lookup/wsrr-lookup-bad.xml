@@ -29,8 +29,8 @@
         <Address>http://localhost:8890/services/WrongServiceName?synchronous=true&amp;responseTransformers=validateResponse</Address>
         <PortType>
           <name>WrongServiceName</name>
-	  <namespace>http://www.ibm.com</namespace>
-	  <version>1.0</version>
+      <namespace>http://www.ibm.com</namespace>
+      <version>1.0</version>
         </PortType>
         <Property>
           <name>ws-platform</name>

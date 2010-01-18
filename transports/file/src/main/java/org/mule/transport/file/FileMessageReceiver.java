@@ -210,7 +210,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             String workFileName = sourceFileOriginalName;
             
             workFileName = fileConnector.getFilenameParser().getFilename(fileParserMsgAdaptor,
-            		workFileNamePattern);
+                    workFileNamePattern);
             // don't use new File() directly, see MULE-1112
             workFile = FileUtils.newFile(workDir, workFileName);
             
@@ -488,20 +488,20 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     
     private void move(final File sourceFile,File destinationFile) throws DefaultMuleException
     {
-		if (destinationFile != null)
-		{
-			// move sourceFile to new destination. Do not use FileUtils here as it ultimately
-		    // falls back to copying the file which will cause problems on large files again -
-		    // which is what we're trying to avoid in the first place
-		    boolean fileWasMoved = sourceFile.renameTo(destinationFile);
-			
-			// move didn't work - bail out
-			if (!fileWasMoved)
-			{
-				throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
-					destinationFile.getAbsolutePath()));
-			}
-		}
+        if (destinationFile != null)
+        {
+            // move sourceFile to new destination. Do not use FileUtils here as it ultimately
+            // falls back to copying the file which will cause problems on large files again -
+            // which is what we're trying to avoid in the first place
+            boolean fileWasMoved = sourceFile.renameTo(destinationFile);
+
+            // move didn't work - bail out
+            if (!fileWasMoved)
+            {
+                throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
+                    destinationFile.getAbsolutePath()));
+            }
+        }
     }
     
 }

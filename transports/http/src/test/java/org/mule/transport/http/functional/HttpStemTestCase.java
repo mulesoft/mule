@@ -37,7 +37,7 @@ public class HttpStemTestCase extends FunctionalTestCase
     
     protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
     {
-    	FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
         assertNotNull(testComponent);
          
         EventCallback callback = new EventCallback()

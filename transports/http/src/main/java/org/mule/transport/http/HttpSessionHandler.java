@@ -59,8 +59,8 @@ public class HttpSessionHandler implements SessionHandler
      */
     public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
     {
-		session = retrieveSessionInfoFromMessage(message);
-	}
+        session = retrieveSessionInfoFromMessage(message);
+    }
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {

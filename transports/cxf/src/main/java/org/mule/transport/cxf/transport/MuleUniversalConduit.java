@@ -358,10 +358,10 @@ public class MuleUniversalConduit extends AbstractConduit
         String result = value != null ? value : getTargetOrEndpoint();
 
         if (username != null) {
-        	 int slashIdx = result.indexOf("//");
-        	 if (slashIdx != -1) {
-        		 result = result.substring(0, slashIdx + 2) + username + ":" + password + "@" + result.substring(slashIdx+2);
-        	 }
+             int slashIdx = result.indexOf("//");
+             if (slashIdx != -1) {
+                 result = result.substring(0, slashIdx + 2) + username + ":" + password + "@" + result.substring(slashIdx+2);
+             }
         }
         
         // REVISIT: is this really correct?

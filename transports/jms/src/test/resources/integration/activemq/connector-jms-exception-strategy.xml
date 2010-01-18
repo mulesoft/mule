@@ -9,15 +9,15 @@
     <jms:activemq-connector name="jmsConnector" />
     
     <jms:endpoint name="in" queue="in">
-	    <jms:transaction action="ALWAYS_BEGIN"/>
-	</jms:endpoint>
+        <jms:transaction action="ALWAYS_BEGIN"/>
+    </jms:endpoint>
     
     <jms:endpoint name="out" queue="out">
         <jms:transaction action="ALWAYS_JOIN"/>
-	</jms:endpoint>
+    </jms:endpoint>
 
     <jms:endpoint name="dlq" queue="dlq">
         <jms:transaction action="ALWAYS_JOIN"/>
-	</jms:endpoint>
+    </jms:endpoint>
 
 </mule>

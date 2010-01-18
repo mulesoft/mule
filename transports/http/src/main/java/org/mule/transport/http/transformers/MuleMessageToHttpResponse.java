@@ -111,17 +111,17 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
                     {
                         if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0))
                         {
-                        	// Ensure that we convert the payload to an in memory representation
-                        	// so we don't end up with a chunked response
-                        	len = msg.getPayloadAsBytes().length;
+                            // Ensure that we convert the payload to an in memory representation
+                            // so we don't end up with a chunked response
+                            len = msg.getPayloadAsBytes().length;
 
-                        	response.setBody(msg);
-                        	
-                        	Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
+                            response.setBody(msg);
+
+                            Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
                             response.setHeader(header);
                         } else {
-	                        Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
-	                        response.addHeader(header);
+                            Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
+                            response.addHeader(header);
                         }
                     }
                     else

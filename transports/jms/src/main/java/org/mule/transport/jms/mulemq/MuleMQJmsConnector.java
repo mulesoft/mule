@@ -354,13 +354,13 @@ public class MuleMQJmsConnector extends JmsConnector
         this.muleMqMaxRedelivery = mulqMqMaxRedelivery;
     }
 
-	public void setRetryCommit(boolean retryCommit) 
-	{
-		this.retryCommit = retryCommit;
-	}
+    public void setRetryCommit(boolean retryCommit)
+    {
+        this.retryCommit = retryCommit;
+    }
 
-	public boolean isRetryCommit() 
-	{
-		return retryCommit;
-	}
+    public boolean isRetryCommit()
+    {
+        return retryCommit;
+    }
 }

@@ -12,12 +12,12 @@
     <endpoint name="out1" address="${outbound.destination}" connector-ref="jmsConnector1"/>
 
     <endpoint name="out2" address="${outbound.destination}" connector-ref="jmsConnector2">
-    	<properties>
-	    	<spring:entry key="disableTemporaryReplyToDestinations" value="true" />
-	    	<spring:entry key="returnOriginalMessageAsReply" value="true" />
-    	</properties>
-	</endpoint>
-	
+        <properties>
+            <spring:entry key="disableTemporaryReplyToDestinations" value="true" />
+            <spring:entry key="returnOriginalMessageAsReply" value="true" />
+        </properties>
+    </endpoint>
+
     <endpoint name="out3" address="${outbound.destination}" connector-ref="jmsConnector2"/>
 
 </mule>

@@ -14,21 +14,21 @@ package org.mule.example.gpswalker;
  */
 public class GpsCoord {
 
-	private float latitude;
-	private float longitude;
+    private float latitude;
+    private float longitude;
 
-	public GpsCoord(float lat, float lng) {
-		latitude = lat;
-		longitude = lng;
-	}
+    public GpsCoord(float lat, float lng) {
+        latitude = lat;
+        longitude = lng;
+    }
 
-	public float getLatitude() {
-		return latitude;
-	}
+    public float getLatitude() {
+        return latitude;
+    }
 
-	public float getLongitude() {
-		return longitude;
-	}
+    public float getLongitude() {
+        return longitude;
+    }
 
     public void setLatitude(float latitude)
     {

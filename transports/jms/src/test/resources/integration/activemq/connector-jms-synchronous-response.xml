@@ -10,8 +10,8 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector1">
-    	<spring:property name="disableTemporaryReplyToDestinations" value="true" />
-    	<spring:property name="returnOriginalMessageAsReply" value="true" />
+        <spring:property name="disableTemporaryReplyToDestinations" value="true" />
+        <spring:property name="returnOriginalMessageAsReply" value="true" />
     </jms:activemq-connector>
 
     <jms:activemq-connector name="jmsConnector2" />

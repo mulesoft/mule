@@ -101,7 +101,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         }
         else
         {
-        	argTypes = connector.getArgTypes(endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), RequestContext.getEvent());
+            argTypes = connector.getArgTypes(endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), RequestContext.getEvent());
             methodArguments = new Object[args.size()];
             methodArguments = args.toArray(methodArguments);
         }

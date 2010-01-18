@@ -271,9 +271,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
-            	message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, 
-    	                HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
-            	
+                message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
+                        HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
+
                 preRouteMessage(message);
                 MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
 
@@ -306,7 +306,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 {
                     String value = connectionHeader.getValue();
                     boolean endpointOverride = getEndpointKeepAliveValue(endpoint);
-					if ("keep-alive".equalsIgnoreCase(value) && endpointOverride) 
+                    if ("keep-alive".equalsIgnoreCase(value) && endpointOverride)
                     {
                         response.setKeepAlive(true);
 

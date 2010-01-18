@@ -4,7 +4,7 @@
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
  
-	<custom-transformer name="validateResponse" class="org.mule.test.usecases.routing.lookup.ValidateResponse" />
+    <custom-transformer name="validateResponse" class="org.mule.test.usecases.routing.lookup.ValidateResponse" />
 
     <model>        
         <service name="Router">
@@ -12,10 +12,10 @@
                 <inbound-endpoint address="vm://router" />
             </inbound>
             <static-component>
-            	<return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup.xml" />
+                <return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup.xml" />
             </static-component>
             <outbound>
-            	<recipient-list-exception-based-router evaluator="xpath" expression="//Endpoint/Address" />
+                <recipient-list-exception-based-router evaluator="xpath" expression="//Endpoint/Address" />
             </outbound>
         </service>
 
@@ -24,10 +24,10 @@
                 <inbound-endpoint address="vm://routerBad" />
             </inbound>
             <static-component>
-            	<return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup-bad.xml" />
+                <return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup-bad.xml" />
             </static-component>
             <outbound>
-            	<recipient-list-exception-based-router evaluator="xpath" expression="//Endpoint/Address" />
+                <recipient-list-exception-based-router evaluator="xpath" expression="//Endpoint/Address" />
             </outbound>
         </service>
     </model>
