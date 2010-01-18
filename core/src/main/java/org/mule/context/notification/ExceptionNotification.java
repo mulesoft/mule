@@ -38,6 +38,7 @@ public class ExceptionNotification extends ServerNotification
         return this.exception;
     }
 
+    @Override
     public String getType()
     {
         return TYPE_ERROR;

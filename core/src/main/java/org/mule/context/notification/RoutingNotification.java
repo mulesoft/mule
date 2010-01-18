@@ -39,6 +39,7 @@ public class RoutingNotification extends ServerNotification
         resourceIdentifier = identifier;
     }
 
+    @Override
     protected String getPayloadToString()
     {
         try
@@ -51,6 +52,7 @@ public class RoutingNotification extends ServerNotification
         }
     }
 
+    @Override
     public String getType()
     {
         if (action == MISSED_ASYNC_REPLY)

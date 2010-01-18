@@ -73,7 +73,7 @@ public interface BeanAssembler
     /**
      * Insert the bean we have built into the target (typically the parent bean).
      *
-     * <p>This is the most complex case because the bean can have an aribtrary type.
+     * <p>This is the most complex case because the bean can have an arbitrary type.
      * @param oldName The identifying the bean (typically element name).
      */
     void insertBeanInTarget(String oldName);

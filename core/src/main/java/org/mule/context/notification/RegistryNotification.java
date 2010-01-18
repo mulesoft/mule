@@ -52,6 +52,7 @@ public class RegistryNotification extends ServerNotification
     }
 
 
+    @Override
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier

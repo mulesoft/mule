@@ -48,6 +48,7 @@ public class TransactionNotification extends ServerNotification implements Block
         return this.transactionStringId;
     }
 
+    @Override
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", transactionStringId=" + transactionStringId

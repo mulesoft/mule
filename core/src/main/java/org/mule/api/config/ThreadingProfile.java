@@ -28,7 +28,7 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  * should really be a separate factory).
  *
  * <p>{@link ImmutableThreadingProfile} is a simple read-only implementation that
- * makes a local copy of any {@link org.mule.api.config.ThreadingProfile} passed to a consructor.</p>
+ * makes a local copy of any {@link org.mule.api.config.ThreadingProfile} passed to a constructor.</p>
  *
  * <p>{@link org.mule.config.ChainedThreadingProfile} is a mutable implementation that can take
  * default values from an existing {@link org.mule.api.config.ThreadingProfile}.  The default values

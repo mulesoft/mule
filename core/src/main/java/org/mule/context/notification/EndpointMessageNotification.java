@@ -58,6 +58,7 @@ public class EndpointMessageNotification extends ServerNotification
     }
 
 
+    @Override
     protected String getPayloadToString()
     {
         try
@@ -70,6 +71,7 @@ public class EndpointMessageNotification extends ServerNotification
         }
     }
 
+    @Override
     public String toString()
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint

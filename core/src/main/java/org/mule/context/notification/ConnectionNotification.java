@@ -39,11 +39,13 @@ public class ConnectionNotification extends ServerNotification
         resourceIdentifier = identifier;
     }
 
+    @Override
     protected String getPayloadToString()
     {
         return source.toString();
     }
 
+    @Override
     public String getType()
     {
         if (action == CONNECTION_DISCONNECTED)
