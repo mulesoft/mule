@@ -67,7 +67,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     {
                         if (!queue.offer(id, 0, timeout))
                         {
-                            queueManager.doRemove(queue, item);
+                            queueManager.doRemove(queue, id);
                             return false;
                         }
                         else
@@ -77,7 +77,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     }
                     catch (InterruptedException e)
                     {
-                        queueManager.doRemove(queue, item);
+                        queueManager.doRemove(queue, id);
                         throw e;
                     }
                 }
