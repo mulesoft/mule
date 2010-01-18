@@ -135,7 +135,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         }
         catch (MuleException e)
         {
-            throw new IOException(e.getDetailedMessage());
+            IOException iox = new IOException(e.getDetailedMessage());
+            iox.initCause(e);
+            throw iox;
         }
         finally
         {
