@@ -30,7 +30,7 @@ public class SecurityNotification extends ServerNotification
     public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
     static {
-        registerAction("authenitication failed", SECURITY_AUTHENTICATION_FAILED);
+        registerAction("authentication failed", SECURITY_AUTHENTICATION_FAILED);
     }
 
     public SecurityNotification(org.mule.api.security.SecurityException message, int action)
