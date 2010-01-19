@@ -424,11 +424,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleEvent#getId()
-     */
     public String getId()
     {
         return id;
@@ -442,11 +437,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return getProperty(name, /* defaultValue */null);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleEvent#getProperty(java.lang.String, java.lang.Object)
-     */
     public Object getProperty(String name, Object defaultValue)
     {
         Object property = message.getProperty(name);
@@ -459,21 +449,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return (property == null ? defaultValue : property);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleEvent#getEndpoint()
-     */
     public ImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString()
     {

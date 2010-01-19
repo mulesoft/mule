@@ -104,11 +104,6 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         assertTrue(!listener.wasFired());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-     */
     public void timeExpired(TimeEvent e)
     {
         assertTrue(e.getTimeExpired() > 0);
@@ -122,15 +117,9 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
 
         private boolean wasFired;
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-         */
         public void timeExpired(TimeEvent e)
         {
             wasFired = true;
-
         }
 
         /**

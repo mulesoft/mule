@@ -201,11 +201,6 @@ public abstract class AbstractTransformer implements Transformer
         name = string;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transformer.Transformer#getReturnClass()
-     */
     public Class getReturnClass()
     {
         return returnType.getType();
@@ -221,11 +216,6 @@ public abstract class AbstractTransformer implements Transformer
         return returnType;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transformer.Transformer#setReturnClass(java.lang.String)
-     */
     public void setReturnClass(Class newClass)
     {
         returnType = new SimpleDataType(newClass);
@@ -394,11 +384,6 @@ public abstract class AbstractTransformer implements Transformer
         return endpoint;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.transformer.Transformer#setConnector(org.mule.api.transport.Connector)
-     */
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;

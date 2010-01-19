@@ -326,21 +326,11 @@ public class DefaultXASession implements XAResource
         resourceManager.removeSuspendedTransactionalResource(xid);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.transaction.xa.XAResource#getDefaultTransactionTimeout()
-     */
     public int getTransactionTimeout() throws XAException
     {
         return (int)(resourceManager.getDefaultTransactionTimeout() / 1000);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.transaction.xa.XAResource#setDefaultTransactionTimeout(int)
-     */
     public boolean setTransactionTimeout(int timeout) throws XAException
     {
         resourceManager.setDefaultTransactionTimeout(timeout * 1000);

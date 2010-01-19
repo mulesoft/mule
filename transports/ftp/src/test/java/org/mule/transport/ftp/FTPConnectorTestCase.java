@@ -34,22 +34,19 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     static final String TEST_ENDPOINT_URI = "ftp://foo:bar@example.com";
     static final String VALID_MESSAGE = "This is a valid FTP message";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
-     */
     @Override
     public Connector createConnector() throws Exception
     {
         return internalGetConnector(false);
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return VALID_MESSAGE.getBytes();
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return TEST_ENDPOINT_URI;
@@ -137,11 +134,13 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
             super(uri);
         }
 
+        @Override
         public Object makeObject() throws Exception
         {
             return "custom object";
         }
 
+        @Override
         public void activateObject(final Object obj) throws Exception
         {
             // empty no-op, do not call super

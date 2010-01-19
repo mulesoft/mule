@@ -51,6 +51,7 @@ public class ResponseWriter extends FilterWriter
         return encoding;
     }
 
+    @Override
     public void close() throws IOException
     {
         if (outStream != null)
@@ -60,11 +61,7 @@ public class ResponseWriter extends FilterWriter
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.io.Writer#flush()
-     */
+    @Override
     public void flush() throws IOException
     {
         if (outStream != null)

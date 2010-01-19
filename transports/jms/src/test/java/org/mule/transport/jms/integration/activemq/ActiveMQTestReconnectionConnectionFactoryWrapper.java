@@ -74,11 +74,6 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
         init();
     }
 
-    /*
-     * (non-Javadoc)
-     * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
-     * createQueueConnection()
-     */
     @Override
     public QueueConnection createQueueConnection() throws JMSException
     {
@@ -90,11 +85,6 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
                 StreamConnection.class, TransportListener.class}, this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
-     * createQueueConnection(java.lang.String, java.lang.String)
-     */
     @Override
     public QueueConnection createQueueConnection(String userName, String password) throws JMSException
     {
@@ -106,11 +96,6 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
                 StreamConnection.class, TransportListener.class}, this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
-     * createTopicConnection()
-     */
     @Override
     public TopicConnection createTopicConnection() throws JMSException
     {
@@ -122,11 +107,6 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
                 StreamConnection.class, TransportListener.class}, this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
-     * createTopicConnection(java.lang.String, java.lang.String)
-     */
     @Override
     public TopicConnection createTopicConnection(String userName, String password) throws JMSException
     {
@@ -139,23 +119,12 @@ public class ActiveMQTestReconnectionConnectionFactoryWrapper extends ActiveMQCo
     }
 
     // For InvocationHandler interface
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#invoke
-     * (java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
-     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         registration();
         return method.invoke(connection, args);
     }
 
-    /*
-     * (non-Javadoc)
-     * @seecom.mulesource.qatests.util.jms.activemq.TestReconnectionFactoryWrapper#
-     * getTargetObject()
-     */
     public Object getTargetObject()
     {
         return connection;

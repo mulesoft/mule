@@ -22,25 +22,14 @@ public class InvalidSatsuma implements Fruit
 
     private boolean bitten = false;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.testmodels.fruit.Fruit#bite()
-     */
     public void bite()
     {
         bitten = true;
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.testmodels.fruit.Fruit#isBitten()
-     */
     public boolean isBitten()
     {
         return bitten;
     }
-
 }

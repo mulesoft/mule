@@ -28,10 +28,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
     private File testFile;
     private byte[] resultData;
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.tck.AbstractTransformerTestCase#doSetUp()
-     */
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -48,21 +45,20 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.tck.AbstractTransformerTestCase#doTearDown()
-     */
+    @Override
     protected void doTearDown() throws Exception
     {
         assertTrue(testFile.delete());
         super.doTearDown();
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         return new FileToByteArray();
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;

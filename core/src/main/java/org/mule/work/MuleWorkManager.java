@@ -46,6 +46,7 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -167,23 +168,11 @@ public class MuleWorkManager implements WorkManager
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#doWork(javax.resource.spi.work.Work)
-     */
     public void doWork(Work work) throws WorkException
     {
         executeWork(new WorkerContext(work), syncWorkExecutor);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#doWork(javax.resource.spi.work.Work,
-     *      long, javax.resource.spi.work.ExecutionContext,
-     *      javax.resource.spi.work.WorkListener)
-     */
     public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
         throws WorkException
     {
@@ -192,11 +181,6 @@ public class MuleWorkManager implements WorkManager
         executeWork(workWrapper, syncWorkExecutor);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#startWork(javax.resource.spi.work.Work)
-     */
     public long startWork(Work work) throws WorkException
     {
         WorkerContext workWrapper = new WorkerContext(work);
@@ -205,13 +189,6 @@ public class MuleWorkManager implements WorkManager
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#startWork(javax.resource.spi.work.Work,
-     *      long, javax.resource.spi.work.ExecutionContext,
-     *      javax.resource.spi.work.WorkListener)
-     */
     public long startWork(Work work,
                           long startTimeout,
                           ExecutionContext execContext,
@@ -223,11 +200,6 @@ public class MuleWorkManager implements WorkManager
         return System.currentTimeMillis() - workWrapper.getAcceptedTime();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#scheduleWork(javax.resource.spi.work.Work)
-     */
     public void scheduleWork(Work work) throws WorkException
     {
         WorkerContext workWrapper = new WorkerContext(work);
@@ -235,13 +207,6 @@ public class MuleWorkManager implements WorkManager
         executeWork(workWrapper, scheduleWorkExecutor);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.resource.spi.work.MuleWorkManager#scheduleWork(javax.resource.spi.work.Work,
-     *      long, javax.resource.spi.work.ExecutionContext,
-     *      javax.resource.spi.work.WorkListener)
-     */
     public void scheduleWork(Work work,
                              long startTimeout,
                              ExecutionContext execContext,

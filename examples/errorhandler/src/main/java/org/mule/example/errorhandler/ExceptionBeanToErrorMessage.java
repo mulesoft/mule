@@ -21,11 +21,7 @@ public class ExceptionBeanToErrorMessage extends AbstractTransformer
         registerSourceType(ExceptionBean.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-     */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

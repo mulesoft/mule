@@ -36,49 +36,31 @@ public abstract class StdioConnector extends AbstractConnector
     protected OutputStream outputStream;
     protected InputStream inputStream;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.Connector#registerListener(org.mule.api.MuleSession,
-     *      org.mule.api.endpoint.Endpoint)
-     */
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         return serviceDescriptor.createMessageReceiver(this, service, endpoint,
             new Object[]{new Long(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY)});
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.AbstractConnector#doStop()
-     */
+    @Override
     public void doStop()
     {
         // template method
     }
 
+    @Override
     protected void doDispose()
     {
         IOUtils.closeQuietly(inputStream);
         IOUtils.closeQuietly(outputStream);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transport.AbstractConnector#doStart()
-     */
+    @Override
     public void doStart()
     {
         // template method
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.Connector#getProtocol()
-     */
 
     public String getProtocol()
     {

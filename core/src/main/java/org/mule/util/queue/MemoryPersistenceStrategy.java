@@ -29,11 +29,6 @@ public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
         return UUID.getUUID();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#store(java.lang.Object)
-     */
     public Object store(String queue, Object obj) throws IOException
     {
         if (obj == null)
@@ -45,51 +40,26 @@ public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#load(java.lang.Object)
-     */
     public Object load(String queue, Object id) throws IOException
     {
         return map.get(id);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#remove(java.lang.Object)
-     */
     public void remove(String queue, Object id) throws IOException
     {
         map.remove(id);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#restore()
-     */
     public List restore() throws IOException
     {
         return new ArrayList();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#open()
-     */
     public void open() throws IOException
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.QueuePersistenceStrategy#close()
-     */
     public void close() throws IOException
     {
         // nothing to do

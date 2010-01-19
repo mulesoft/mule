@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,11 +65,6 @@ public abstract class AbstractModel implements Model
         this.name = name;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.model.Model#getEntryPointResolver()
-     */
     public EntryPointResolverSet getEntryPointResolverSet()
     {
         if (null == entryPointResolverSet)
@@ -78,11 +74,6 @@ public abstract class AbstractModel implements Model
         return entryPointResolverSet;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.model.Model#setEntryPointResolver(org.mule.api.model.EntryPointResolver)
-     */
     public void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet)
     {
         this.entryPointResolverSet = entryPointResolverSet;
@@ -105,21 +96,11 @@ public abstract class AbstractModel implements Model
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.model.Model#getLifecycleAdapterFactory()
-     */
     public LifecycleAdapterFactory getLifecycleAdapterFactory()
     {
         return lifecycleAdapterFactory;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.model.Model#setLifecycleAdapterFactory(org.mule.api.lifecycle.LifecycleAdapterFactory)
-     */
     public void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdapterFactory)
     {
         this.lifecycleAdapterFactory = lifecycleAdapterFactory;

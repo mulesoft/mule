@@ -10,10 +10,9 @@
 
 package org.mule.transport.file.transformers;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.transport.file.transformers.FileToString;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -29,11 +28,7 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
     File _testData = null;
     final String _resultData = "The dog is on the table, where's the dog?";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#doSetUp()
-     */
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -43,52 +38,32 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
         fw.close();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#doTearDown()
-     */
+    @Override
     protected void doTearDown() throws Exception
     {
         assertTrue(_testData.delete());
         super.doTearDown();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
-     */
+    @Override
     public Object getResultData()
     {
         return _resultData;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
-     */
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
-     */
+    @Override
     public Object getTestData()
     {
         return _testData;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTransformer()
-     */
+    @Override
     public Transformer getTransformer() throws Exception
     {
         return new FileToString();

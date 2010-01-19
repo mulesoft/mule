@@ -73,11 +73,13 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
         this.sendStream = BooleanUtils.toBoolean((String) endpoint.getProperties().get("sendStream"));
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     public void doConnect() throws Exception
     {
         if (connector instanceof PromptStdioConnector)
@@ -88,16 +90,13 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         // noop
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-     */
+    @Override
     public void poll()
     {
         try
@@ -182,6 +181,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
             this.ssc = ssc;
         }
 
+        @Override
         public void run()
         {
             if (delay > 0)

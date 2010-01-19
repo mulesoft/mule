@@ -44,11 +44,6 @@ public class ConnectionFactoryWrapper
         this.factory = factory;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.ConnectionFactory#createConnection()
-     */
     public Connection createConnection() throws JMSException
     {
         XAConnection xac = ((XAConnectionFactory) factory).createXAConnection();
@@ -57,12 +52,6 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.ConnectionFactory#createConnection(java.lang.String,
-     *      java.lang.String)
-     */
     public Connection createConnection(String username, String password) throws JMSException
     {
         XAConnection xac = ((XAConnectionFactory) factory).createXAConnection(username, password);
@@ -71,11 +60,6 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.QueueConnectionFactory#createQueueConnection()
-     */
     public QueueConnection createQueueConnection() throws JMSException
     {
         XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection();
@@ -84,12 +68,6 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.QueueConnectionFactory#createQueueConnection(java.lang.String,
-     *      java.lang.String)
-     */
     public QueueConnection createQueueConnection(String username, String password) throws JMSException
     {
         XAQueueConnection xaqc = ((XAQueueConnectionFactory) factory).createXAQueueConnection(username,
@@ -99,11 +77,6 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.TopicConnectionFactory#createTopicConnection()
-     */
     public TopicConnection createTopicConnection() throws JMSException
     {
         XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection();
@@ -112,12 +85,6 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.jms.TopicConnectionFactory#createTopicConnection(java.lang.String,
-     *      java.lang.String)
-     */
     public TopicConnection createTopicConnection(String username, String password) throws JMSException
     {
         XATopicConnection xatc = ((XATopicConnectionFactory) factory).createXATopicConnection(username,

@@ -62,31 +62,16 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
         muleContext = context;
     }
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.api.context.Agent#getName()
-    */
     public String getName()
     {
         return this.name;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.context.Agent#setName(java.lang.String)
-     */
     public void setName(String name)
     {
         this.name = name;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.context.Agent#getDescription()
-     */
     public String getDescription()
     {
         return "Profiler JMX Agent";
@@ -182,11 +167,6 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.lifecycle.Disposable#dispose()
-     */
     public void dispose()
     {
         try
@@ -200,21 +180,11 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.context.Agent#registered()
-     */
     public void registered()
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.context.Agent#unregistered()
-     */
     public void unregistered()
     {
         // nothing to do

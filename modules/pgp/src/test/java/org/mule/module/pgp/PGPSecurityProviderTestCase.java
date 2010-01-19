@@ -13,11 +13,11 @@ package org.mule.module.pgp;
 import org.mule.api.security.Authentication;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.io.FileInputStream;
-import java.net.URL;
-
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
+
+import java.io.FileInputStream;
+import java.net.URL;
 
 public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 {
@@ -25,6 +25,7 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 
     private Message message;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
@@ -54,11 +55,7 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
         message = (Message)mf.generateMessages(in).iterator().next();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractMuleTestCase#tearDown()
-     */
+    @Override
     protected void doTearDown() throws Exception
     {
         securityProvider = null;

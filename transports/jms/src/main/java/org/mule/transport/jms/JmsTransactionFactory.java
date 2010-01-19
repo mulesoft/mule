@@ -23,11 +23,6 @@ public class JmsTransactionFactory implements TransactionFactory
 {
     private String name;
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.TransactionFactory#beginTransaction(org.mule.api.transport.MessageDispatcher)
-     */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         JmsTransaction tx = new JmsTransaction(muleContext);

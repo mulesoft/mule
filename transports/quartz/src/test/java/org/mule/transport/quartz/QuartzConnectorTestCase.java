@@ -12,15 +12,9 @@ package org.mule.transport.quartz;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.quartz.QuartzConnector;
 
 public class QuartzConnectorTestCase extends AbstractConnectorTestCase
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getConnector()
-     */
     @Override
     public Connector createConnector() throws Exception
     {
@@ -29,21 +23,13 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getValidMessage()
-     */
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "test";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getTestEndpointURI()
-     */
+    @Override
     public String getTestEndpointURI()
     {
         return "quartz:/myService?repeatInterval=1000";

@@ -64,11 +64,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.MessageDispatcher#dispatch(org.mule.api.MuleEvent)
-     */
     public final void dispatch(MuleEvent event) throws DispatchException
     {
         event.setSynchronous(false);
@@ -212,6 +207,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     /**
      * @deprecated
      */
+    @Deprecated
     protected boolean returnResponse(MuleEvent event)
     {
         // Pass through false to conserve the existing behavior of this method but
@@ -279,6 +275,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             super(event);
         }
 
+        @Override
         protected void doRun()
         {
             try
@@ -349,6 +346,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
     }
 
+    @Override
     public OutboundEndpoint getEndpoint()
     {
         return (OutboundEndpoint) super.getEndpoint();

@@ -12,10 +12,10 @@ package org.mule.module.pgp;
 
 import org.mule.api.security.Authentication;
 
-import java.util.Map;
-
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
+
+import java.util.Map;
 
 public class PGPAuthentication implements Authentication
 {
@@ -30,41 +30,21 @@ public class PGPAuthentication implements Authentication
         this.message = message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.Authentication#setAuthenticated(boolean)
-     */
     public void setAuthenticated(boolean b)
     {
         authenticated = b;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.Authentication#isAuthenticated()
-     */
     public boolean isAuthenticated()
     {
         return authenticated;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.Authentication#getCredentials()
-     */
     public Object getCredentials()
     {
         return message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.Authentication#getDetails()
-     */
     public Object getDetails()
     {
         return userKeyBundle;
@@ -75,11 +55,6 @@ public class PGPAuthentication implements Authentication
         userKeyBundle = kb;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.Authentication#getPrincipal()
-     */
     public Object getPrincipal()
     {
         return userName;

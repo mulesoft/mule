@@ -50,6 +50,7 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected synchronized void doDispatch(MuleEvent event) throws Exception
     {
         OutputStream out = connector.getOutputStream();
@@ -84,27 +85,26 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
         out.flush();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.Connector#send(org.mule.api.MuleEvent)
-     */
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
         return event.getMessage();
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method

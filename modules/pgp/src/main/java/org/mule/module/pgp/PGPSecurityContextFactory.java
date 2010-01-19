@@ -17,11 +17,6 @@ import org.mule.api.security.SecurityContextFactory;
 public class PGPSecurityContextFactory implements SecurityContextFactory
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityContextFactory#create(org.mule.api.security.Authentication)
-     */
     public SecurityContext create(Authentication authentication)
     {
         return new PGPSecurityContext((PGPAuthentication)authentication);

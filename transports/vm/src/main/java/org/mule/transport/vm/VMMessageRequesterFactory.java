@@ -20,11 +20,7 @@ import org.mule.transport.AbstractMessageRequesterFactory;
  */
 public class VMMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.transport.MessageDispatcherFactory#create(org.mule.api.transport.Connector)
-     */
+    @Override
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new VMMessageRequester(endpoint);

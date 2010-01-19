@@ -21,11 +21,7 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
  */
 public class StdioMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transport.MessageDispatcherFactory#create(org.mule.api.transport.Connector)
-     */
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new StdioMessageDispatcher(endpoint);

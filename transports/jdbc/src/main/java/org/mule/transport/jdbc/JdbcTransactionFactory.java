@@ -21,11 +21,6 @@ import org.mule.api.transaction.TransactionFactory;
 public class JdbcTransactionFactory implements TransactionFactory
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.TransactionFactory#beginTransaction()
-     */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         JdbcTransaction tx = new JdbcTransaction(muleContext);
@@ -33,11 +28,6 @@ public class JdbcTransactionFactory implements TransactionFactory
         return tx;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.TransactionFactory#isTransacted()
-     */
     public boolean isTransacted()
     {
         return true;

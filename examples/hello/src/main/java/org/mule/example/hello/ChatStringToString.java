@@ -27,11 +27,7 @@ public class ChatStringToString extends AbstractTransformer
         this.setReturnClass(String.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-     */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         ChatString chatString = (ChatString)src;

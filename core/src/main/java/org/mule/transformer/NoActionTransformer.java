@@ -26,11 +26,7 @@ public final class NoActionTransformer extends AbstractTransformer
         setReturnClass(Object.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.transformer.Transformer#transform(java.lang.Object)
-     */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return src;

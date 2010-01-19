@@ -32,11 +32,6 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
         super("pgp");
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityProvider#authenticate(org.mule.api.security.Authentication)
-     */
     public Authentication authenticate(Authentication authentication) throws SecurityException
     {
         PGPAuthentication auth = (PGPAuthentication) authentication;
@@ -78,16 +73,13 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
         return auth;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.security.SecurityProvider#supports(java.lang.Class)
-     */
+    @Override
     public boolean supports(Class aClass)
     {
         return PGPAuthentication.class.isAssignableFrom(aClass);
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         try

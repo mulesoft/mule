@@ -26,11 +26,7 @@ public class StringToNameString extends AbstractTransformer
         this.setReturnClass(NameString.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-     */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return new NameString((String) src);

@@ -12,11 +12,7 @@ package org.mule.util.queue;
 
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#createQueueManager()
-     */
+    @Override
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
@@ -24,11 +20,7 @@ public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCa
         return mgr;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#isPersistent()
-     */
+    @Override
     protected boolean isPersistent()
     {
         return false;

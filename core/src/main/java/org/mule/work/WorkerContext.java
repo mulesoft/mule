@@ -57,6 +57,7 @@ public class WorkerContext implements Work
      */
     private static final WorkListener NULL_WORK_LISTENER = new WorkAdapter()
     {
+        @Override
         public void workRejected(WorkEvent event)
         {
             if (event.getException() != null)
@@ -161,11 +162,6 @@ public class WorkerContext implements Work
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.resource.spi.work.Work#release()
-     */
     public void release()
     {
         worker.release();
@@ -276,11 +272,6 @@ public class WorkerContext implements Work
         return workException;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
     public void run()
     {
         if (isTimedOut())
@@ -394,6 +385,7 @@ public class WorkerContext implements Work
         return endLatch;
     }
 
+    @Override
     public String toString()
     {
         return "Work: " + worker;

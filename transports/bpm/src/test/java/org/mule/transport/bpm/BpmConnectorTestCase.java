@@ -22,11 +22,7 @@ import com.mockobjects.dynamic.Mock;
 public class BpmConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getConnector()
-     */
+    @Override
     public Connector createConnector() throws Exception
     {
         ProcessConnector c = new ProcessConnector();
@@ -48,21 +44,13 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase
         bpms.verify();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getValidMessage()
-     */
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "test";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getTestEndpointURI()
-     */
+    @Override
     public String getTestEndpointURI()
     {
         return "bpm://dummyProcess?processId=1234";

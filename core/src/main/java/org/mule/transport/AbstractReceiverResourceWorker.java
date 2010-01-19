@@ -33,11 +33,6 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
         this.resource = resource;
     }
 
-
-    /**
-    * (non-Javadoc)
-    *
-    */
     @Override
     public void doRun()
     {

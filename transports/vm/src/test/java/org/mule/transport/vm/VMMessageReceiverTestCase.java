@@ -16,25 +16,22 @@ import org.mule.transport.AbstractMessageReceiverTestCase;
 
 public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
     VMMessageReceiver receiver;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         receiver = new VMMessageReceiver(endpoint.getConnector(), service, endpoint);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
-     */
+    @Override
     public MessageReceiver getMessageReceiver()
     {
         return receiver;
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://test");

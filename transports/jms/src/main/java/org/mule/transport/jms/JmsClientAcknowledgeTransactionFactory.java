@@ -22,11 +22,6 @@ import org.mule.api.transaction.TransactionFactory;
 
 public class JmsClientAcknowledgeTransactionFactory implements TransactionFactory
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.TransactionFactory#beginTransaction(java.lang.Object)
-     */
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction(muleContext);
@@ -38,5 +33,4 @@ public class JmsClientAcknowledgeTransactionFactory implements TransactionFactor
     {
         return false;
     }
-
 }

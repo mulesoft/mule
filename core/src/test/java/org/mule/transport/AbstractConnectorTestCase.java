@@ -39,11 +39,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+    @Override
     protected void doSetUp() throws Exception
     {
         Connector connector = createConnector();
@@ -54,6 +50,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerConnector(connector);
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         Connector connector = getConnector();

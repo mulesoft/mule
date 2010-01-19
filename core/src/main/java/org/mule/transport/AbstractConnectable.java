@@ -72,11 +72,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.util.ExceptionListener#onException(java.lang.Throwable)
-     */
     public void exceptionThrown(Exception e)
     {
         try

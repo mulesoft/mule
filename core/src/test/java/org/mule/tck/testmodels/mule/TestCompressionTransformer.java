@@ -28,6 +28,7 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
         this.setStrategy(new GZipCompression());
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return null;
@@ -63,12 +64,7 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
         this.containerProperty = containerProperty;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone() ensures that isn't not cloned before all
-     *      properties have been set on it
-     */
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         if (containerProperty == null)

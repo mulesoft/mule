@@ -57,11 +57,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         super.doTearDown();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
-     */
+    @Override
     public Connector createConnector() throws Exception
     {
         FileConnector connector = new FileConnector();
@@ -70,11 +66,13 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         return connector;
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "file://" + muleContext.getConfiguration().getWorkingDirectory();
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return validMessage;

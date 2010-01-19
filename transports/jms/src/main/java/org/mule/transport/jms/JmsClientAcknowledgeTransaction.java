@@ -42,21 +42,13 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         this.message = message;
     }
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
-    */
+    @Override
     protected void doBegin() throws TransactionException
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doCommit()
-     */
+    @Override
     protected void doCommit() throws TransactionException
     {
         try
@@ -74,11 +66,7 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doRollback()
-     */
+    @Override
     protected void doRollback() throws TransactionException
     {
         // If a message has been bound, rollback is forbidden
@@ -88,12 +76,7 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.api.Transaction#bindResource(java.lang.Object,
-     *      java.lang.Object)
-     */
+    @Override
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         if (key instanceof Message)

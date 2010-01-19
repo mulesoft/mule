@@ -29,11 +29,7 @@ public class EmailMessageToString extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-     */
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Message msg = (Message) src;

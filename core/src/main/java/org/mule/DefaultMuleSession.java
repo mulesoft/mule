@@ -108,6 +108,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     /**
      * @deprecated Use DefaultMuleSession(Service service, MuleContext muleContext) instead
      */
+    @Deprecated
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service, MuleContext muleContext)
             throws MuleException
     {
@@ -123,6 +124,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     /**
      * @deprecated Use DefaultMuleSession(MuleContext muleContext) instead
      */
+    @Deprecated
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, MuleContext muleContext) throws MuleException
     {
         this(muleContext);
@@ -255,11 +257,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#dispatchEvent(org.mule.api.MuleEvent)
-     */
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
         if (event.getEndpoint() instanceof OutboundEndpoint)
@@ -314,11 +311,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#sendEvent(org.mule.api.MuleEvent)
-     */
     // TODO This method is practically the same as dispatchEvent(MuleEvent event),
     // so we could use some refactoring here.
     public MuleMessage sendEvent(MuleEvent event) throws MuleException
@@ -403,44 +395,22 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#isValid()
-     */
     public boolean isValid()
     {
         return valid;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#setValid(boolean)
-     */
     public void setValid(boolean value)
     {
         valid = value;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#receiveEvent(org.mule.api.endpoint.Endpoint,
-     *      long, org.mule.api.MuleEvent)
-     */
     public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
         InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
         return requestEvent(endpoint, timeout);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.api.MuleSession#receiveEvent(org.mule.api.endpoint.Endpoint,
-     *      long, org.mule.api.MuleEvent)
-     */
     public MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException
     {
         try
@@ -567,6 +537,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      *         session
      * @deprecated Use getPropertyNamesAsSet() instead
      */
+    @Deprecated
     public Iterator getPropertyNames()
     {
         return properties.keySet().iterator();

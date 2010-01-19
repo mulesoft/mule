@@ -35,9 +35,6 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
         this.xaConnection = xac;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.transport.jms.xa.ConnectionInvocationHandler#getTargetObject()
-     */
     public Object getTargetObject()
     {
         return xaConnection;
