@@ -15,6 +15,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsSupport;
+import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.xa.ResourceManagerSystemException;
 
@@ -28,14 +29,15 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesTestCase
 {
-
     private final int timeout = getTestTimeoutSecs() * 1000 / 20;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/service/service-inflight-messages-jms.xml";
     }
 
+    @Override
     public void testInFlightMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestService");
@@ -52,6 +54,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         assertSedaQueueEmpty(service);
     }
 
+    @Override
     public void testInFlightMessagesPausedService() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestService");
@@ -66,79 +69,71 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
         // assertOutboundQueueEmpty(listener);
     }
 
+    @Override
     public void testInFlightStopPersistentMessages() throws Exception
     {
-        // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)
+        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+        final TestJMSMessageListener listener = createTestJMSConsumer();
+        populateSedaQueue(service, NUM_MESSAGES);
 
-        // Service service =
-        // muleContext.getRegistry().lookupService("TestPersistentQueueService");
-        // final TestJMSMessageListener listener = createTestJMSConsumer();
-        // populateSedaQueue(service, NUM_MESSAGES);
-        //
-        // muleContext.stop();
-        //
-        // // Persistent queue is being used so seda queue is not emptied when
-        // service
-        // // is stopped
-        // assertSedaQueueNotEmpty(service);
-        //
-        // // Start, process some messages, stop and make sure no messages get lost.
-        // muleContext.start();
-        // reregisterTestJMSConsumer(listener);
-        //
-        // assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
-        // assertNoLostMessages(NUM_MESSAGES, service, listener);
-        // assertSedaQueueEmpty(service);
-        // // TODO Enable the following assertion once MULE-4072 is fixed
-        // // assertOutboundQueueEmpty(listener);
+        muleContext.stop();
+        
+        // Persistent queue is being used so seda queue is not emptied when the service is stopped
+        assertSedaQueueNotEmpty(service);
+
+        // Start, process some messages, stop and make sure no messages get lost.
+        muleContext.start();
+        reregisterTestJMSConsumer(listener);
+
+        assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
+        assertNoLostMessages(NUM_MESSAGES, service, listener);
+        assertSedaQueueEmpty(service);
+        
+        // TODO Enable the following assertion once MULE-4072 is fixed
+        // assertOutboundQueueEmpty(listener);
 
     }
 
+    @Override
     public void testInFlightStopPersistentMessagesPausedService() throws Exception
     {
-        // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)
+        Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
+        TestJMSMessageListener listener = createTestJMSConsumer();
+        populateSedaQueue(service, NUM_MESSAGES);
 
-        // Service service =
-        // muleContext.getRegistry().lookupService("PausedTestPersistentQueueService"
-        // );
-        // TestJMSMessageListener listener = createTestJMSConsumer();
-        // populateSedaQueue(service, NUM_MESSAGES);
-        //
-        // muleContext.stop();
-        //
-        // // Paused service does not process messages before or during stop().
-        // assertNoLostMessages(NUM_MESSAGES, service, listener);
-        //
-        // // Start, process some messages, stop and make sure no messages get lost.
-        // muleContext.start();
-        // reregisterTestJMSConsumer(listener);
-        // service.resume();
-        //
-        // listener.countdownLatch.await(LATCH_WAIT_TIME_MILLIS,
-        // TimeUnit.MILLISECONDS);
-        // assertNoLostMessages(NUM_MESSAGES, service, listener);
-        // assertSedaQueueEmpty(service);
+        muleContext.stop();
+
+        // Paused service does not process messages before or during stop().
+        assertNoLostMessages(NUM_MESSAGES, service, listener);
+
+        // Start, process some messages, stop and make sure no messages get lost.
+        muleContext.start();
+        reregisterTestJMSConsumer(listener);
+        service.resume();
+
+        listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS);
+        assertNoLostMessages(NUM_MESSAGES, service, listener);
+        assertSedaQueueEmpty(service);
     }
 
+    @Override
     public void testInFlightDisposePersistentMessages() throws Exception
     {
-        // TODO MULE-4253 (THIS SCENARIO FAILS INTERMITTENTLY)
-        // Service service =
-        // muleContext.getRegistry().lookupService("TestPersistentQueueService");
-        // TestJMSMessageListener listener = createTestJMSConsumer();
-        // populateSedaQueue(service, NUM_MESSAGES);
-        //
-        // muleContext.stop();
-        //
-        // // Dispose and restart Mule and let it run for a short while
-        // muleContext.dispose();
-        // muleContext = createMuleContext();
-        // muleContext.start();
-        // reregisterTestJMSConsumer(listener);
-        //
-        // assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
-        // assertNoLostMessages(NUM_MESSAGES, service, listener);
-        // assertSedaQueueEmpty(service);
+        Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+        TestJMSMessageListener listener = createTestJMSConsumer();
+        populateSedaQueue(service, NUM_MESSAGES);
+
+        muleContext.stop();
+
+        // Dispose and restart Mule and let it run for a short while
+        muleContext.dispose();
+        muleContext = createMuleContext();
+        muleContext.start();
+        reregisterTestJMSConsumer(listener);
+
+        assertTrue(listener.countdownLatch.await(timeout, TimeUnit.MILLISECONDS));
+        assertNoLostMessages(NUM_MESSAGES, service, listener);
+        assertSedaQueueEmpty(service);
     }
 
     private TestJMSMessageListener createTestJMSConsumer() throws MuleException, JMSException
@@ -156,8 +151,8 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
 
     private MessageConsumer createJMSMessageConsumer() throws MuleException, JMSException
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://out");
+        InboundEndpoint endpoint = 
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("jms://out");
         JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
         JmsSupport jmsSupport = jmsConnector.getJmsSupport();
         MessageConsumer consumer = jmsSupport.createConsumer(jmsConnector.getSession(endpoint),
@@ -170,16 +165,16 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
      * queue 2) Events dispatched to outbound vm endpooint 3) Events that were unable
      * to be sent to stopped service and raised exceptions
      */
-    private synchronized void assertNoLostMessages(int numMessages,
-                                                   Service service,
-                                                   TestJMSMessageListener listener)
-        throws ResourceManagerSystemException
+    private synchronized void assertNoLostMessages(int numMessages, Service service,
+        TestJMSMessageListener listener) throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
-        logger.warn("SEDA Queue: " + queueSession.getQueue(service.getName() + ".service").size()
-                    + ", Outbound JMS consumer: " + (NUM_MESSAGES - listener.countdownLatch.getCount()));
-        assertEquals(numMessages, (NUM_MESSAGES - listener.countdownLatch.getCount())
-                                  + queueSession.getQueue(service.getName() + ".service").size());
+        Queue serviceQueue = queueSession.getQueue(service.getName() + ".service");
+        int queueSize = serviceQueue.size();
+        
+        logger.warn("SEDA Queue: " + queueSize + ", Outbound JMS consumer: " + 
+            (NUM_MESSAGES - listener.countdownLatch.getCount()));
+        assertEquals(numMessages, (NUM_MESSAGES - listener.countdownLatch.getCount()) + queueSize);
     }
 
     protected void assertOutboundQueueEmpty(TestJMSMessageListener listener)
@@ -189,6 +184,11 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
 
     private class TestJMSMessageListener implements MessageListener
     {
+        public TestJMSMessageListener()
+        {
+            super();
+        }
+        
         CountDownLatch countdownLatch = new CountDownLatch(ServiceInFlightMessagesJMSTestCase.NUM_MESSAGES);
 
         public void onMessage(Message message)
@@ -196,5 +196,4 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
             countdownLatch.countDown();
         }
     }
-
 }
