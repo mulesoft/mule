@@ -233,8 +233,16 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public void after() throws Exception
     {
         purge(getJmsConfig().getInboundDestinationName());
+        purge(getJmsConfig().getInboundDestinationName() + "1");
+        purge(getJmsConfig().getInboundDestinationName() + "2");
+        purge(getJmsConfig().getInboundDestinationName() + "3");
         purge(getJmsConfig().getOutboundDestinationName());
+        purge(getJmsConfig().getOutboundDestinationName() + "1");
+        purge(getJmsConfig().getOutboundDestinationName() + "2");
+        purge(getJmsConfig().getOutboundDestinationName() + "3");
         purge(getJmsConfig().getMiddleDestinationName());
+        purge(getJmsConfig().getMiddleDestinationName() + "2");
+        purge(getJmsConfig().getMiddleDestinationName() + "3");
         purge(getJmsConfig().getDeadLetterDestinationName());
         purgeTopics();
         super.tearDown();
