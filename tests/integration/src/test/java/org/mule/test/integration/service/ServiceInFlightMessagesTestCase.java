@@ -20,10 +20,10 @@ import org.mule.util.xa.ResourceManagerSystemException;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
-
     private static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/service/service-inflight-messages.xml";
@@ -87,7 +87,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 
     public void testInFlightStopPersistentMessagesPausedService() throws Exception
     {
-
         Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
 
@@ -115,7 +114,8 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    public void testInFlightDisposePersistentMessages() throws Exception
+    // disabled until MULE-4712 is resolved
+    public void _testInFlightDisposePersistentMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
@@ -132,8 +132,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 
         assertNoLostMessages(NUM_MESSAGES, service);
 
-        // Let mule finnish up with the rest of the messages until seda queue is
-        // empty
+        // Let mule finish up with the rest of the messages until seda queue is empty
         muleContext.start();
         Thread.sleep(WAIT_TIME_MILLIS * 8);
         muleContext.stop();
@@ -159,10 +158,14 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         throws ResourceManagerSystemException
     {
         QueueSession queueSession = getTestQueueSession();
-        logger.warn("SEDA Queue: " + queueSession.getQueue("out").size() + ", Outbound endpoint vm queue: "
-                    + queueSession.getQueue(service.getName() + ".service").size());
-        assertEquals(numMessages, queueSession.getQueue("out").size()
-                                  + queueSession.getQueue(service.getName() + ".service").size());
+        
+        int outQueueSize = queueSession.getQueue("out").size();
+        
+        String serviceName = service.getName() + ".service";
+        int serviceQueueSize = queueSession.getQueue(serviceName).size();
+        
+        logger.warn("SEDA Queue: " + outQueueSize + ", Outbound endpoint vm queue: " + serviceQueueSize);
+        assertEquals(numMessages, outQueueSize + serviceQueueSize);
     }
 
     protected synchronized void assertSedaQueueEmpty(Service service) throws ResourceManagerSystemException
@@ -200,5 +203,4 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         QueueSession queueSession = tqm.getQueueSession();
         return queueSession;
     }
-
 }
