@@ -82,7 +82,6 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 
         assertNoLostMessages(NUM_MESSAGES, service);
         assertSedaQueueEmpty(service);
-
     }
 
     public void testInFlightStopPersistentMessagesPausedService() throws Exception
@@ -114,8 +113,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    // disabled until MULE-4712 is resolved
-    public void _testInFlightDisposePersistentMessages() throws Exception
+    public void testInFlightDisposePersistentMessages() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
