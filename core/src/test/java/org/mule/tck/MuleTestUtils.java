@@ -120,7 +120,7 @@ public final class MuleTestUtils
     public static InboundEndpoint getTestInboundEndpoint(String name,
                                                             final MuleContext context,
                                                             String uri,
-                                                            List transformers,
+                                                            List<Transformer> transformers,
                                                             Filter filter,
                                                             Map properties) throws Exception
     {
@@ -136,7 +136,7 @@ public final class MuleTestUtils
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
                                                             final MuleContext context,
                                                             String uri,
-                                                            List transformers,
+                                                            List<Transformer> transformers,
                                                             Filter filter,
                                                             Map properties) throws Exception
     {
@@ -152,13 +152,13 @@ public final class MuleTestUtils
 
     private static ImmutableEndpoint getTestEndpoint(String name,
                                                      String uri,
-                                                     List transformers,
+                                                     List<Transformer> transformers,
                                                      Filter filter,
                                                      Map properties,
                                                      MuleContext context,
                                                      EndpointSource source) throws Exception
     {
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("name", name);
         props.put("endpointURI", new MuleEndpointURI("test://test", context));
         props.put("connector", "testConnector");
@@ -345,17 +345,17 @@ public final class MuleTestUtils
         return getTestService("appleService", Apple.class, context);
     }
 
-    public static Service getTestService(String name, Class clazz, MuleContext context) throws Exception
+    public static Service getTestService(String name, Class<?> clazz, MuleContext context) throws Exception
     {
         return getTestService(name, clazz, null, context);
     }
 
-    public static Service getTestService(String name, Class clazz, Map props, MuleContext context) throws Exception
+    public static Service getTestService(String name, Class<?> clazz, Map props, MuleContext context) throws Exception
     {
         return getTestService(name, clazz, props, context, true);        
     }
 
-    public static Service getTestService(String name, Class clazz, Map props, MuleContext context, boolean initialize) throws Exception
+    public static Service getTestService(String name, Class<?> clazz, Map props, MuleContext context, boolean initialize) throws Exception
     {
         SedaModel model = new SedaModel();
         model.setMuleContext(context);

@@ -53,9 +53,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -586,12 +588,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, null, null, null);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name, List transformers) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, List<Transformer> transformers) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, List transformers) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, List<Transformer> transformers) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
