@@ -32,6 +32,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
@@ -39,8 +40,7 @@ import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -681,7 +681,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         private volatile int testCount = 0;
         private volatile int runCount = 0;
         // @GuardedBy(this)
-        private Set registeredTestMethod = new HashSet();
+        private Set<String> registeredTestMethod = new HashSet<String>();
 
         public TestInfo(TestCase test)
         {
@@ -693,16 +693,15 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 // We find the physical classpath root URL of the test class and
                 // use that to find the correct resource. Works fine everywhere,
                 // regardless of classloaders. See MULE-2414
-                URL[] urls = new URL[]{ClassUtils.getClassPathRoot(test.getClass())};
-                URL fileUrl = new URLClassLoader(urls).getResource("mule-test-exclusions.txt");
-
+                URL classUrl = ClassUtils.getClassPathRoot(test.getClass());
+                URLClassLoader tempClassLoader = new URLClassLoader(new URL[]{ classUrl });
+                URL fileUrl = tempClassLoader.getResource("mule-test-exclusions.txt");
                 if (fileUrl != null)
                 {
-                    // in case .txt is in jar
-                    URI fileUri = new URI(StringUtils.removeStart(fileUrl.toString(), "jar:"));
+                    InputStream in = fileUrl.openStream();
 
                     // this iterates over all lines in the exclusion file
-                    Iterator lines = FileUtils.lineIterator(FileUtils.newFile(fileUri));
+                    Iterator<?> lines = IOUtils.lineIterator(in, "UTF-8");
 
                     // ..and this finds non-comments that match the test case name
                     excluded = IteratorUtils.filteredIterator(lines, new Predicate()
@@ -712,13 +711,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                             return StringUtils.equals(name, StringUtils.trimToEmpty((String) object));
                         }
                     }).hasNext();
+                    
+                    in.close();
                 }
             }
             catch (IOException ioex)
-            {
-                // ignore
-            }
-            catch (URISyntaxException e)
             {
                 // ignore
             }
