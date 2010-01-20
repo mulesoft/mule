@@ -29,11 +29,7 @@ def version = 3.0
 
 // Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
 // as a parameter to the script.
-def davfs = "DAVMountPoint"
-if (args.size() > 0)
-{
-    davfs = args[0]
-}
+davfs = "DAVMountPoint"
 
 // schema are indexed by the xsd file names (eg mule-foo.xsd is "foo")
 def schemaNames = []
@@ -42,7 +38,7 @@ def schemaDestinations = [:]
 def schemaDestinationPaths = [:]
 
 // assume we are running in the buildtools/scripts directory
-def root = "../.."
+root = "../.."
 
 // destination base
 def base = "http://www.mulesoft.org/schema/mule/"
@@ -53,13 +49,33 @@ def servicexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 def testxsd = /.*(\/|\\)tests(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-test\.xsd/
 def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
-def checkCurrentDirectory = {
-  if (! (new File("").getCanonicalFile().getName() == "scripts")) {
-    println "# "
-    println "# WARNING: run from in the scripts directory"
-    println "# "
-    System.exit(1)
-  }
+def parseArguments(def arguments)
+{
+	def cliBuilder = new CliBuilder()
+	cliBuilder.d(longOpt: "davmountpoint", "mount point of the DAV filesystem")
+	cliBuilder.h(longOpt: "help", "show usage info")
+	cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
+	
+	options = cliBuilder.parse(arguments)
+	if (!options)
+	{
+    	println ""
+	    println "Error parsing options " + args
+	    println ""
+	    System.exit(1)
+	}
+
+	if (options.h)
+	{
+    	cliBuilder.usage()
+	    System.exit(0)
+	}
+
+	root = options.r
+	if (options.d)
+	{
+		davfs = options.d
+	}
 }
 
 def scanForSchemaAndInferDestinations = {
@@ -189,7 +205,7 @@ def generateDeployCommand = {
   }
 }
 
-checkCurrentDirectory()
+parseArguments(args)
 scanForSchemaAndInferDestinations()
 checkSchema()
 scanAndCheckConfigs()
