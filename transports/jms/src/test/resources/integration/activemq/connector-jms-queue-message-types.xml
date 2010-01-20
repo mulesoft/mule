@@ -8,4 +8,7 @@
 
     <jms:activemq-connector name="jmsConnector" disableTemporaryReplyToDestinations="true"/>    
 
+    <jms:endpoint name="in" queue="in"/>
+    <jms:endpoint name="out" queue="out"/>
+
 </mule>
