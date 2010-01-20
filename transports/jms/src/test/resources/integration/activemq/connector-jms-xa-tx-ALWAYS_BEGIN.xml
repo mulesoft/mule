@@ -14,4 +14,7 @@
                                       poolExhaustedAction="WAIT"/>
     </jms:activemq-xa-connector>
 
+    <jms:endpoint name="in" queue="in"/>
+    <jms:endpoint name="out" queue="out"/>
+
 </mule>

@@ -9,10 +9,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <endpoint name="in" address="${inbound.destination}"/>
-    <endpoint name="middle" address="${middle.destination}"/>
-    <endpoint name="out" address="${outbound.destination}"/>
-
     <model name="jmsTest">
 
         <service name="InputPart">

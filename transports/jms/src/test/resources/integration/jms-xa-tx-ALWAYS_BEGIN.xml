@@ -15,9 +15,6 @@
 
     <jbossts:transaction-manager/>
 
-    <endpoint name="in" address="${inbound.destination}"/>
-    <endpoint name="out" address="${outbound.destination}"/>
-
     <model name="TEST">
         <service name="Part1">
             <inbound>
