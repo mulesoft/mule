@@ -28,7 +28,7 @@ import org.apache.commons.collections.Predicate;
 public class AgentSorter
 {
     @SuppressWarnings("unchecked")
-    public static List sortAgents(Collection<Agent> agents)
+    public static List<Agent> sortAgents(Collection<Agent> agents)
     {
         List<Agent> sortedAgents = new ArrayList<Agent>();
         
