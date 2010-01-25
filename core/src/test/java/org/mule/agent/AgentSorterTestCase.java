@@ -10,13 +10,15 @@
 
 package org.mule.agent;
 
+import org.mule.api.agent.Agent;
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
-public class AgentSorterTestCase extends TestCase
+public class AgentSorterTestCase extends AbstractMuleTestCase
 {
     public void testListWithoutDependencies()
     {
@@ -24,12 +26,12 @@ public class AgentSorterTestCase extends TestCase
         MockAgent b = new MockAgent_B();
         MockAgent c = new MockAgent_C();
 
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(b);
         agents.add(c);
 
-        List result = AgentSorter.sortAgents(agents);
+        List<Agent> result = AgentSorter.sortAgents(agents);
         Assert.assertEquals(3, result.size());
     }
     
@@ -39,12 +41,12 @@ public class AgentSorterTestCase extends TestCase
         MockAgent b = new MockAgent_B();
         MockAgent c = new MockAgent_C(new Class[] { MockAgent_A.class });
         
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(b);
         agents.add(c);
 
-        List result = AgentSorter.sortAgents(agents);
+        List<?> result = AgentSorter.sortAgents(agents);
         Assert.assertEquals(3, result.size());
         
         int indexOfA = result.indexOf(a);
@@ -58,12 +60,12 @@ public class AgentSorterTestCase extends TestCase
         MockAgent b = new MockAgent_B();
         MockAgent c = new MockAgent_C();
         
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(b);
         agents.add(c);
 
-        List result = AgentSorter.sortAgents(agents);
+        List<?> result = AgentSorter.sortAgents(agents);
         Assert.assertEquals(3, result.size());
         
         int indexOfA = result.indexOf(a);
@@ -78,7 +80,7 @@ public class AgentSorterTestCase extends TestCase
         MockAgent a = new MockAgent_A(new Class[] { MockAgent_B.class });
         MockAgent b = new MockAgent_B(new Class[] { MockAgent_A.class });
         
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(b);
 
@@ -100,13 +102,13 @@ public class AgentSorterTestCase extends TestCase
         MockAgent c = new MockAgent_C(new Class[] { MockAgent_B.class });
         MockAgent d = new MockAgent_D(new Class[] { MockAgent_A.class, MockAgent_C.class });
         
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(d);
         agents.add(c);
         agents.add(b);
 
-        List result = AgentSorter.sortAgents(agents);
+        List<Agent> result = AgentSorter.sortAgents(agents);
         Assert.assertEquals(4, result.size());
         
         Assert.assertEquals(a, result.get(0));
@@ -120,11 +122,11 @@ public class AgentSorterTestCase extends TestCase
         MockAgent a = new MockAgent_A();
         MockAgent b = new MockAgent_B(new Class[] { MockAgent_C.class });
         
-        List agents = new ArrayList();
+        List<Agent> agents = new ArrayList<Agent>();
         agents.add(a);
         agents.add(b);
 
-        List result = AgentSorter.sortAgents(agents);
+        List<Agent> result = AgentSorter.sortAgents(agents);
         Assert.assertEquals(2, result.size());
     }
 
