@@ -698,21 +698,27 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 URL fileUrl = tempClassLoader.getResource("mule-test-exclusions.txt");
                 if (fileUrl != null)
                 {
-                    InputStream in = fileUrl.openStream();
-
-                    // this iterates over all lines in the exclusion file
-                    Iterator<?> lines = IOUtils.lineIterator(in, "UTF-8");
-
-                    // ..and this finds non-comments that match the test case name
-                    excluded = IteratorUtils.filteredIterator(lines, new Predicate()
+                    InputStream in = null;
+                    try
                     {
-                        public boolean evaluate(Object object)
+                        in = fileUrl.openStream();
+
+                        // this iterates over all lines in the exclusion file
+                        Iterator<?> lines = IOUtils.lineIterator(in, "UTF-8");
+
+                        // ..and this finds non-comments that match the test case name
+                        excluded = IteratorUtils.filteredIterator(lines, new Predicate()
                         {
-                            return StringUtils.equals(name, StringUtils.trimToEmpty((String) object));
-                        }
-                    }).hasNext();
-                    
-                    in.close();
+                            public boolean evaluate(Object object)
+                            {
+                                return StringUtils.equals(name, StringUtils.trimToEmpty((String) object));
+                            }
+                        }).hasNext();
+                    }
+                    finally
+                    {
+                        IOUtils.closeQuietly(in);
+                    }
                 }
             }
             catch (IOException ioex)
