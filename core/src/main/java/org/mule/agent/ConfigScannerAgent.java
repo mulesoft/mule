@@ -75,6 +75,7 @@ public class ConfigScannerAgent extends AbstractAgent
     /**
      * Should be a 1 line description of the agent
      */
+    @Override
     public String getDescription()
     {
         return getName() + " scanning for files in " + configDirName;
@@ -106,6 +107,7 @@ public class ConfigScannerAgent extends AbstractAgent
         // do nothing
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (configDirName == null)
@@ -124,11 +126,13 @@ public class ConfigScannerAgent extends AbstractAgent
         }
     }
 
+    @Override
     public List getDependentAgents()
     {
         return Collections.EMPTY_LIST;
     }
 
+    @Override
     public String toString()
     {
         return getDescription();
@@ -143,8 +147,9 @@ public class ConfigScannerAgent extends AbstractAgent
     {
         int errorCount = 0;
         int errorThreshold = 3;
-        List processedFiles = new ArrayList();
+        List<String> processedFiles = new ArrayList<String>();
 
+        @Override
         public void run()
         {
             while (true)
@@ -202,7 +207,7 @@ public class ConfigScannerAgent extends AbstractAgent
     {
         try
         {
-            Class cfgBuilderClass = ClassUtils.loadClass(
+            Class<?> cfgBuilderClass = ClassUtils.loadClass(
                 "org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.class);
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
                 cfgBuilderClass, configFile);

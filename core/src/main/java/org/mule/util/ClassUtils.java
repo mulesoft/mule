@@ -48,7 +48,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     public static final Object[] NO_ARGS = new Object[]{};
     public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[]{};
 
-    private static final Map wrapperToPrimitiveMap = new HashMap();
+    private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
 
     static
     {
@@ -63,7 +63,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         wrapperToPrimitiveMap.put(Void.TYPE, Void.TYPE);
     }
 
-    public static boolean isConcrete(Class clazz)
+    public static boolean isConcrete(Class<?> clazz)
     {
         if (clazz == null)
         {
@@ -86,11 +86,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
-    public static URL getResource(final String resourceName, final Class callingClass)
+    public static URL getResource(final String resourceName, final Class<?> callingClass)
     {
-        URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+        URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
         {
-            public Object run()
+            public URL run()
             {
                 final ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 return cl != null ? cl.getResource(resourceName) : null;
@@ -99,9 +99,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (url == null)
         {
-            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
             {
-                public Object run()
+                public URL run()
                 {
                     return ClassUtils.class.getClassLoader().getResource(resourceName);
                 }
@@ -110,9 +110,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (url == null)
         {
-            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+            url = AccessController.doPrivileged(new PrivilegedAction<URL>()
             {
-                public Object run()
+                public URL run()
                 {
                     return callingClass.getClassLoader().getResource(resourceName);
                 }
@@ -122,11 +122,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return url;
     }
 
-    public static Enumeration getResources(final String resourceName, final Class callingClass)
+    public static Enumeration<URL> getResources(final String resourceName, final Class<?> callingClass)
     {
-        Enumeration enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
+        Enumeration<URL> enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
         {
-            public Object run()
+            public Enumeration<URL> run()
             {
                 try
                 {
@@ -142,9 +142,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (enumeration == null)
         {
-            enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
+            enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
             {
-                public Object run()
+                public Enumeration<URL> run()
                 {
                     try
                     {
@@ -160,9 +160,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (enumeration == null)
         {
-            enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
+            enumeration = AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>()
             {
-                public Object run()
+                public Enumeration<URL> run()
                 {
                     try
                     {
@@ -195,12 +195,12 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param callingClass The Class object of the calling object
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
-    public static Class loadClass(final String className, final Class callingClass)
+    public static Class loadClass(final String className, final Class<?> callingClass)
             throws ClassNotFoundException
     {
-        Class clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
+        Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
-            public Object run()
+            public Class<?> run()
             {
                 try
                 {
@@ -217,9 +217,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
+            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
             {
-                public Object run()
+                public Class<?> run()
                 {
                     try
                     {
@@ -235,9 +235,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
+            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
             {
-                public Object run()
+                public Class<?> run()
                 {
                     try
                     {
@@ -253,9 +253,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
+            clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
             {
-                public Object run()
+                public Class<?> run()
                 {
                     try
                     {
@@ -317,7 +317,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param clazz the Class to be initialized
      * @return the same class but initialized
      */
-    public static Class initializeClass(Class clazz)
+    public static Class<?> initializeClass(Class<?> clazz)
     {
         try
         {
@@ -331,11 +331,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
     }
 
-    public static Object instanciateClass(Class clazz, Object... constructorArgs)
+    public static Object instanciateClass(Class<?> clazz, Object... constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException
     {
-        Class[] args;
+        Class<?>[] args;
         if (constructorArgs != null)
         {
             args = new Class[constructorArgs.length];
@@ -358,7 +358,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         // try the arguments as given
         //Constructor ctor = clazz.getConstructor(args);
-        Constructor ctor = getConstructor(clazz, args);
+        Constructor<?> ctor = getConstructor(clazz, args);
 
         if (ctor == null)
         {
@@ -369,7 +369,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         if (ctor == null)
         {
             StringBuffer argsString = new StringBuffer(100);
-            for (Class arg : args)
+            for (Class<?> arg : args)
             {
                 argsString.append(arg.getName()).append(", ");
             }
@@ -387,11 +387,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return instanciateClass(name, constructorArgs, (ClassLoader) null);
     }
 
-    public static Object instanciateClass(String name, Object[] constructorArgs, Class callingClass)
+    public static Object instanciateClass(String name, Object[] constructorArgs, Class<?> callingClass)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        Class clazz = loadClass(name, callingClass);
+        Class<?> clazz = loadClass(name, callingClass);
         return instanciateClass(clazz, constructorArgs);
     }
 
@@ -399,7 +399,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        Class clazz;
+        Class<?> clazz;
         if (classLoader != null)
         {
             clazz = loadClass(name, classLoader);
@@ -415,7 +415,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return instanciateClass(clazz, constructorArgs);
     }
 
-    public static Class[] getParameterTypes(Object bean, String methodName)
+    public static Class<?>[] getParameterTypes(Object bean, String methodName)
     {
         if (!methodName.startsWith("set"))
         {
@@ -445,7 +445,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param parameterTypes an array of argument types or null
      * @return the Method object or null if none was found
      */
-    public static Method getMethod(Class clazz, String name, Class[] parameterTypes)
+    public static Method getMethod(Class<?> clazz, String name, Class<?>[] parameterTypes)
     {
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; i++)
@@ -512,8 +512,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
-    public static List getSatisfiableMethods(Class implementation,
-                                             Class[] parameterTypes,
+    public static List getSatisfiableMethods(Class<?> implementation,
+                                             Class<?>[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
                                              Set ignoredMethodNames)
