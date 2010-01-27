@@ -13,7 +13,6 @@ package org.mule.agent;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.NullSessionHandler;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -24,7 +23,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
-import org.mule.transport.NullPayload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +53,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSED));
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // first see if we're logging notifications to an endpoint
@@ -73,6 +72,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         }
     }
 
+    @Override
     protected void logEvent(ServerNotification e)
     {
         if (endpoint != null && !ignoredNotifications.contains(new Integer(e.getAction())))
@@ -118,6 +118,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     /**
      * Should be a 1 line description of the agent
      */
+    @Override
     public String getDescription()
     {
         StringBuffer buf = new StringBuffer();

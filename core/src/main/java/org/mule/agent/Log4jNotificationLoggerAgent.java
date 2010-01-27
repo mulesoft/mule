@@ -52,6 +52,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
      *
      * @return the description of this Agent
      */
+    @Override
     public String getDescription()
     {
         StringBuffer buf = new StringBuffer(DEFAULT_DESCRIPTION_BUFFER_SIZE);
@@ -80,6 +81,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         this.logName = logName;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (logConfigFile != null)
@@ -125,6 +127,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         */
     }
 
+    @Override
     protected void logEvent(ServerNotification e)
     {
         if (eventLogger != null)

@@ -33,31 +33,37 @@ public class NullLifecycleAdapter extends DefaultLifecycleAdapter
         super(componentObject, component, entryPointResolver, muleContext);
     }
 
+    @Override
     public void start() throws MuleException
     {
         // no-op
     }
 
+    @Override
     public void stop() throws MuleException
     {
         // no-op
     }
 
+    @Override
     public void dispose()
     {
         // no-op
     }
 
+    @Override
     public boolean isStarted()
     {
         return true;
     }
 
+    @Override
     public boolean isDisposed()
     {
         return false;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         // no-op

@@ -16,7 +16,7 @@ package org.mule.api.util;
 public interface StreamCloser
 {
 
-    boolean canClose(Class streamType);
+    boolean canClose(Class<?> streamType);
 
     void close(Object stream) throws Exception;
 

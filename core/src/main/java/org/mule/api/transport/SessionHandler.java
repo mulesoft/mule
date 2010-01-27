@@ -26,6 +26,7 @@ public interface SessionHandler
     /**
      * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
      */
+    @Deprecated
     void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException;
 
     MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException;
@@ -38,5 +39,6 @@ public interface SessionHandler
      * @return the property name of the session id that is set on the session
      * @deprecated This method is no longer needed and will be removed in the next major release
      */
+    @Deprecated
     String getSessionIDKey();
 }

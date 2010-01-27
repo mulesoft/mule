@@ -32,6 +32,7 @@ import java.util.Iterator;
  * @deprecated along with bridge-service - use an empty service and, if you want an efficient transfer of messages,
  * add a forwarding-consumer.
  */
+@Deprecated
 public class BridgeComponent implements ServiceAware, Callable
 {
 
@@ -46,11 +47,12 @@ public class BridgeComponent implements ServiceAware, Callable
     {
         // Add a ForwardingConsumer, which punts message to oubound router, unless already present
         boolean registered = false;
-        if(service.getInboundRouter()==null)
+        if (service.getInboundRouter() == null)
         {
             service.setInboundRouter(new DefaultInboundRouterCollection());
         }
-        for (Iterator routers = service.getInboundRouter().getRouters().iterator(); routers.hasNext();)
+        
+        for (Iterator<?> routers = service.getInboundRouter().getRouters().iterator(); routers.hasNext();)
         {
             InboundRouter router = (InboundRouter) routers.next();
             //Remove if present
@@ -61,6 +63,7 @@ public class BridgeComponent implements ServiceAware, Callable
             registered = registered || router instanceof ForwardingConsumer;
 
         }
+        
         if (! registered)
         {
             service.getInboundRouter().addRouter(new ForwardingConsumer());

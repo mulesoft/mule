@@ -13,6 +13,7 @@ package org.mule.agent;
 import org.mule.AbstractAgent;
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
+import org.mule.api.agent.Agent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
@@ -127,9 +128,9 @@ public class ConfigScannerAgent extends AbstractAgent
     }
 
     @Override
-    public List getDependentAgents()
+    public List<Class<Agent>> getDependentAgents()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

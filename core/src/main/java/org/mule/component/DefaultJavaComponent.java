@@ -30,9 +30,11 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     protected LifecycleAdapter singletonComponentLifecycleAdapter;
 
+    /**
+     * For spring only
+     */
     public DefaultJavaComponent()
     {
-        // For spring only
         super();
     }
 
@@ -48,6 +50,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         super(objectFactory, entryPointResolverSet, bindingCollection);
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         super.doStart();
@@ -87,6 +90,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         super.doStop();
@@ -105,6 +109,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected void doDispose()
     {
         super.doDispose();
@@ -116,6 +121,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception
     {
         LifecycleAdapter componentLifecycleAdapter;
@@ -131,6 +137,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         return componentLifecycleAdapter;
     }
 
+    @Override
     protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter) throws Exception
     {
         if (singletonComponentLifecycleAdapter == null && lifecycleAdapter != null)

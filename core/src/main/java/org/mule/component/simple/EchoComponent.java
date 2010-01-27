@@ -20,6 +20,7 @@ import org.mule.api.component.simple.EchoService;
 public class EchoComponent extends LogComponent implements EchoService
 {
 
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         super.onCall(context);

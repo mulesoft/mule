@@ -89,6 +89,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         this.objectFactory = objectFactory;
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         super.doStart();
@@ -105,6 +106,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         super.doStop();
@@ -121,6 +123,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected void doDispose()
     {
         super.doDispose();
@@ -137,6 +140,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     public Class getObjectType()
     {
         if (objectFactory != null)
@@ -149,12 +153,14 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         }
     }
 
+    @Override
     protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception
     {
         // no-op
         return null;
     }
 
+    @Override
     protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter)
     {
         // no-op

@@ -57,16 +57,19 @@ public class PooledJavaComponent extends AbstractJavaComponent
         this.poolingProfile = poolingProfile;
     }
 
+    @Override
     protected LifecycleAdapter borrowComponentLifecycleAdaptor() throws Exception
     {
         return (LifecycleAdapter) lifecycleAdapterPool.borrowObject();
     }
 
+    @Override
     protected void returnComponentLifecycleAdaptor(LifecycleAdapter lifecycleAdapter)
     {
         lifecycleAdapterPool.returnObject(lifecycleAdapter);
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         super.doStart();
@@ -77,6 +80,7 @@ public class PooledJavaComponent extends AbstractJavaComponent
         lifecycleAdapterPool.start();
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         super.doStop();

@@ -60,11 +60,13 @@ public class TlsPropertiesSocketFactory extends SSLSocketFactory
         return factory;
     }
 
+    @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException
     {
         return getFactory().createSocket(s, host, port, autoClose);
     }
 
+    @Override
     public String[] getDefaultCipherSuites()
     {
         try 
@@ -77,6 +79,7 @@ public class TlsPropertiesSocketFactory extends SSLSocketFactory
         }
     }
 
+    @Override
     public String[] getSupportedCipherSuites()
     {
         try 
@@ -89,27 +92,32 @@ public class TlsPropertiesSocketFactory extends SSLSocketFactory
         }
     }
 
-    public Socket createSocket(String arg0, int arg1) throws IOException
+    @Override
+    public Socket createSocket(String host, int port) throws IOException
     {
-        return getFactory().createSocket(arg0, arg1);
+        return getFactory().createSocket(host, port);
     }
 
-    public Socket createSocket(InetAddress arg0, int arg1) throws IOException
+    @Override
+    public Socket createSocket(InetAddress host, int port) throws IOException
     {
-        return getFactory().createSocket(arg0, arg1);
+        return getFactory().createSocket(host, port);
     }
 
-    public Socket createSocket(String arg0, int arg1, InetAddress arg2, int arg3) throws IOException
+    @Override
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException
     {
-        return getFactory().createSocket(arg0, arg1);
+        return getFactory().createSocket(host, port);
     }
 
-    public Socket createSocket(InetAddress arg0, int arg1, InetAddress arg2, int arg3) throws IOException
+    @Override
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException
     {
-        return getFactory().createSocket(arg0, arg1, arg2, arg3);
+        return getFactory().createSocket(address, port, localAddress, localPort);
     }
 
     // see http://forum.java.sun.com/thread.jspa?threadID=701799&messageID=4280973
+    @Override
     public Socket createSocket() throws IOException
     {
         return getFactory().createSocket();

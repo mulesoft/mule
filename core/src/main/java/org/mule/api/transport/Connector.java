@@ -172,6 +172,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @throws Exception if the call to the underlying protocal cuases an exception
      * @deprecated Use request(ImmutableEndpoint endpoint, long timeout)
      */
+    @Deprecated
     MuleMessage request(String uri, long timeout) throws Exception;
 
     /**
