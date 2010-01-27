@@ -10,6 +10,8 @@
 
 package org.mule.transport.tcp.integration;
 
+import org.mule.util.SystemUtils;
+
 /**
  * Tests a model for which synchonous=true for environment (was "and connector", but that is
  * no longer possible).
@@ -27,6 +29,12 @@ package org.mule.transport.tcp.integration;
  */
 public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4713
+        return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
+    }
 
     public StreamingSynchCapacityTestCase()
     {
@@ -37,5 +45,4 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
     {
         return "tcp-streaming2-test.xml";
     }
-
 }

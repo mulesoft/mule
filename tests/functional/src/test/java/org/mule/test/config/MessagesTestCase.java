@@ -34,7 +34,9 @@ public class MessagesTestCase extends AbstractMuleTestCase
         }
         catch (MissingResourceException e)
         {
-            assertTrue(e.getMessage().startsWith("Can't find bundle"));
+            // IBM JDK6: Can't find resource for bundle ...
+            // Sun/IBM JDK5: Can't find bundle for base name ...
+            assertTrue(e.getMessage().matches(".*Can't find.*bundle.*"));
         }
     }
 
