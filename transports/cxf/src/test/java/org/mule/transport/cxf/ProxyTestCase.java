@@ -159,13 +159,10 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:63081/services/greeter-proxy", msg, null);
         String resString = result.getPayloadAsString();
         
-        // TODO MULE-4584 Mule CXF proxy service reset http response status to 200
-        // when the backend web service fails
-
-        // assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-        // !result.getProperty("http.status").equals(HttpConstants.SC_OK));
+        assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
+          result.getProperty("http.status").equals(HttpConstants.SC_OK));
         
-        assertTrue(resString.indexOf("invalid was not recognized") != -1);
+        assertTrue(resString.indexOf("Fault") != -1);
     }
 
     public void testProxyWithIntermediateTransform() throws Exception 

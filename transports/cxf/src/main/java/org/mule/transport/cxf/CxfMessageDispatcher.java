@@ -17,9 +17,12 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.security.WebServiceSecurityException;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
 import org.mule.util.TemplateParser;
 
@@ -39,6 +42,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
+import org.apache.commons.httpclient.HttpException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -274,6 +278,21 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         else
         {
             result = new DefaultMuleMessage(response, transportResponse, connector.getMuleContext());
+        }
+        
+        String statusCode = (String) transportResponse.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        if (statusCode == null || Integer.parseInt(statusCode) != HttpConstants.SC_OK)
+        {
+            String payload;
+            try
+            {
+                payload = transportResponse.getPayloadAsString();
+            }
+            catch (Exception e)
+            {
+                payload = "Invalid status code: " + statusCode;
+            }
+            result.setExceptionPayload(new DefaultExceptionPayload(new HttpException(payload)));
         }
 
         return result;
