@@ -38,6 +38,7 @@
     -->
 
     <custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+        <spring:property name="someProperty" value="someValue" />
         <dispatcher-threading-profile maxBufferSize="2"/>
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         <service-overrides xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"/>
@@ -134,9 +135,12 @@
     <model name="main">
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
             <outbound-endpoint address=" test://component.exceptions "/>
+            <spring:property name="testProperty" value="testValue" />
         </custom-exception-strategy>
 
-        <custom-entry-point-resolver-set class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
+        <custom-entry-point-resolver-set class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet">
+        	<spring:property name="testProperty" value="testValue" />
+        </custom-entry-point-resolver-set>
 
         <service name="orangeComponent">
             <inbound>
@@ -173,7 +177,9 @@
             <async-reply timeout="10001">
                 <inbound-endpoint address="test://response1"/>
                 <inbound-endpoint ref="appleResponseEndpoint"/>
-                <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+                <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator">
+                	<spring:property name="testProperty" value="testValue" />
+                </custom-async-reply-router>
             </async-reply>
 
             <default-service-exception-strategy>
@@ -196,7 +202,9 @@
                     <payload-type-filter expectedType="java.lang.String"/>
                 </selective-consumer-router>
                 <idempotent-receiver-router/>
-                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy">
+                	<spring:property name="testProperty" value="testValue" />
+                </custom-catch-all-strategy>
             </inbound>
 
             <component>
@@ -221,6 +229,16 @@
 
             <!--<custom-exception-strategy class="org.mule.DefaultExceptionStrategy"/>-->
             <default-connector-exception-strategy/>
+        </service>
+        
+        <service name="anotherComponent">
+            <inbound>
+				<inbound-endpoint address="test://KiwiIn" />
+				<custom-correlation-aggregator-router class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
+					<spring:property name="testProperty" value="testValue" />
+				</custom-correlation-aggregator-router>
+            </inbound>
+            <component class="org.mule.tck.testmodels.fruit.Kiwi" />
         </service>
     </model>
 </mule>

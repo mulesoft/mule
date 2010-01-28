@@ -21,6 +21,8 @@ public class TestCatchAllStrategy implements RouterCatchAllStrategy
 {
     private OutboundEndpoint endpoint;
 
+    private String testProperty;
+
     public void setEndpoint(OutboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -36,5 +38,15 @@ public class TestCatchAllStrategy implements RouterCatchAllStrategy
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Caught an event in the router!", '*', 40));
         return null;
+    }
+
+    public String getTestProperty()
+    {
+        return testProperty;
+    }
+
+    public void setTestProperty(String testProperty)
+    {
+        this.testProperty = testProperty;
     }
 }

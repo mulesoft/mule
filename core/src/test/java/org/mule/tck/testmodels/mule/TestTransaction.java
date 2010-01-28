@@ -24,6 +24,8 @@ public class TestTransaction extends AbstractSingleResourceTransaction
     private AtomicBoolean committed = new AtomicBoolean(false);
     private AtomicBoolean rolledBack = new AtomicBoolean(false);
 
+    private String testProperty;
+
     public TestTransaction(MuleContext muleContext)
     {
         super(muleContext);
@@ -62,13 +64,13 @@ public class TestTransaction extends AbstractSingleResourceTransaction
         rolledBack.set(true);
     }
 
-//    public boolean isCommitted()
-//    {
-//        return committed.get();
-//    }
-//
-//    public boolean isRolledBack()
-//    {
-//        return rolledBack.get();
-//    }
+    public String getTestProperty()
+    {
+        return testProperty;
+    }
+
+    public void setTestProperty(String testProperty)
+    {
+        this.testProperty = testProperty;
+    }
 }

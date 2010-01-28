@@ -20,6 +20,7 @@ import org.mule.api.model.EntryPointResolverSet;
  */
 public class TestEntryPointResolverSet implements EntryPointResolverSet
 {
+    private String testProperty;
 
     /**
      * Will add a resolver to the list of resolvers to invoke on a compoent.
@@ -46,5 +47,15 @@ public class TestEntryPointResolverSet implements EntryPointResolverSet
     public boolean removeEntryPointResolver(EntryPointResolver resolver)
     {
         return false;
+    }
+
+    public String getTestProperty()
+    {
+        return testProperty;
+    }
+
+    public void setTestProperty(String testProperty)
+    {
+        this.testProperty = testProperty;
     }
 }
