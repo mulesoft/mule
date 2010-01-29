@@ -12,7 +12,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-annotations</artifactId>
-    <name>Annotations</name>
+    <name>Annotations Module</name>
     <packaging>jar</packaging>
     <description>Annotations for configuring Mule at various levels such as services, endpoints, entry points and
         routers.

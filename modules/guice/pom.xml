@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-guice</artifactId>
-    <name>Guice</name>
+    <name>Guice Module</name>
     <packaging>jar</packaging>
     <version>3.0.0-M2-SNAPSHOT</version>
     <description>Allows users to configure Mule to use Guice for DI/object creation.
