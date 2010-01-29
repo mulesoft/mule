@@ -281,7 +281,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         }
         
         String statusCode = (String) transportResponse.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-        if (statusCode == null || Integer.parseInt(statusCode) != HttpConstants.SC_OK)
+        if (statusCode != null && Integer.parseInt(statusCode) != HttpConstants.SC_OK)
         {
             String payload;
             try
