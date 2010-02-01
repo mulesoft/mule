@@ -11,9 +11,17 @@
 package org.mule.transport.http.issues;
 
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
+import org.mule.util.SystemUtils;
 
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
+
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-4713
+        return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
+    }
 
     public StreamingSpeedMule1389TestCase()
     {
