@@ -13,14 +13,17 @@ package org.mule.test.integration.messaging.meps;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -178,7 +181,14 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         BufferedReader input = null;
         try 
         {
-            input = new BufferedReader(new InputStreamReader(new URL(TEST_URL).openStream()));
+            URLConnection conn = new URL(TEST_URL).openConnection();
+            // setting these timeouts ensures the client does not deadlock indefinitely
+            // when the server has problems.
+            conn.setConnectTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
+            conn.setReadTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
+            InputStream in = conn.getInputStream();
+
+            input = new BufferedReader(new InputStreamReader(in));
 
             String response = "";
             String line;

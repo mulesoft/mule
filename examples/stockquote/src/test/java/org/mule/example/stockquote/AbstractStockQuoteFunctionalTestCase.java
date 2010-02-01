@@ -12,13 +12,16 @@ package org.mule.example.stockquote;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Locale;
 
 public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTestCase
@@ -33,6 +36,11 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
         // that the 3rd-party web service is off-line.
         setFailOnTimeout(false);
     }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // TODO The following is a duplicated in MessagePropertiesPropagationTestCase under 
+    // tests/integration; refactor to put this in one place perhaps a WebserviceTestCase 
+    /////////////////////////////////////////////////////////////////////////////////////////    
     
     /**
      * If a simple call to the web service indicates that it is not responding properly,
@@ -56,7 +64,14 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
         BufferedReader input = null;
         try 
         {
-            input = new BufferedReader(new InputStreamReader(new URL(TEST_URL).openStream()));
+            URLConnection conn = new URL(TEST_URL).openConnection();
+            // setting these timeouts ensures the client does not deadlock indefinitely
+            // when the server has problems.
+            conn.setConnectTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
+            conn.setReadTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
+            InputStream in = conn.getInputStream();
+
+            input = new BufferedReader(new InputStreamReader(in));            
 
             String response = "";
             String line;
