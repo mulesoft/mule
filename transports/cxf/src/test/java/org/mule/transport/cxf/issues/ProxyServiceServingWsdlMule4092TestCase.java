@@ -23,12 +23,12 @@ import org.custommonkey.xmlunit.XMLUnit;
 public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
 {
     private String expectedWsdlFileName;
-    
+
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        XMLUnit.setIgnoreWhitespace(true);        
+        XMLUnit.setIgnoreWhitespace(true);
         setupExpectedWsdlFileName();
     }
 
@@ -39,7 +39,7 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
      */
     private void setupExpectedWsdlFileName()
     {
-        if (SystemUtils.isSunJDK())
+        if (SystemUtils.isSunJDK() || SystemUtils.isAppleJDK())
         {
             expectedWsdlFileName = "test.wsdl";
         }
@@ -69,7 +69,7 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
     public void testProxyServiceWSDL() throws MalformedURLException, IOException, Exception
     {
         String expected = getXML("issues/" + expectedWsdlFileName);
-        
+
         URL url = new URL("http://localhost:8777/services/onlinestore?wsdl");
         String wsdlFromService = IOUtils.toString(url.openStream());
         assertTrue(compareResults(expected, wsdlFromService));

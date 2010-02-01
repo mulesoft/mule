@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 // @ThreadSafe
+
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
     // class logger
@@ -43,7 +44,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     /**
      * Get the operating system environment variables. This should work for Windows
      * and Linux.
-     * 
+     *
      * @return Map<String, String> or an empty map if there was an error.
      */
     public static synchronized Map getenv()
@@ -153,12 +154,18 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1;
     }
 
+    public static boolean isAppleJDK()
+    {
+        return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("APPLE") != -1;
+    }
+
     public static boolean isIbmJDK()
     {
         return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
     }
 
     // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
+
     private static CommandLine parseCommandLine(String args[], String opts[][]) throws DefaultMuleException
     {
         Options options = new Options();
@@ -192,7 +199,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      */
     // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     public static String getCommandLineOption(String option, String args[], String opts[][])
-        throws DefaultMuleException
+            throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
         return line.getOptionValue(option);
@@ -205,7 +212,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      */
     // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
     public static boolean hasCommandLineOption(String option, String args[], String opts[][])
-        throws DefaultMuleException
+            throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
         return line.hasOption(option);
@@ -237,7 +244,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * format. <code>-Dkey</code> is interpreted as <code>-Dkey=true</code>,
      * everything else is ignored. Whitespace in values is properly handled but needs
      * to be quoted properly: <code>-Dkey="some value"</code>.
-     * 
+     *
      * @param input String with property definitionn
      * @return a {@link Map} of property String keys with their defined values
      *         (Strings). If no valid key-value pairs can be parsed, the map is
@@ -257,7 +264,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         int tokenStart = 0;
 
         // this is the main loop that scans for all tokens
-        findtoken : while (tokenStart < input.length())
+        findtoken:
+        while (tokenStart < input.length())
         {
             // find first definition or bail
             tokenStart = StringUtils.indexOf(input, "-D", tokenStart);
@@ -308,7 +316,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
             }
 
             // apparently there's a key, so find the end
-            findkey : while (keyEnd < input.length())
+            findkey:
+            while (keyEnd < input.length())
             {
                 cursor = input.charAt(keyEnd);
 
