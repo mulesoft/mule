@@ -39,10 +39,10 @@ public final class TemplateParser
      */
     protected static final Log logger = LogFactory.getLog(TemplateParser.class);
 
-    public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}");
-    public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]");
-    public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}");
-    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("#\\[[^#]+\\]");
+    public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]", Pattern.CASE_INSENSITIVE);
+    public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("#\\[[^#]+\\]", Pattern.CASE_INSENSITIVE);
 
     private final Pattern pattern;
     private final int pre;
@@ -136,6 +136,11 @@ public final class TemplateParser
     protected String parse(Map props, String template, TemplateCallback callback)
     {
         String result = template;
+        Map newProps = null;
+        if (props != null)
+        {
+            newProps = new CaseInsensitiveHashMap(props);
+        }
 
         Matcher m = pattern.matcher(result);
 
@@ -150,9 +155,9 @@ public final class TemplateParser
             {
                 value = callback.match(propname);
             }
-            else if (props != null)
+            else if (newProps != null)
             {
-                value = props.get(propname);
+                value = newProps.get(propname);
             }
 
             if (value == null)
