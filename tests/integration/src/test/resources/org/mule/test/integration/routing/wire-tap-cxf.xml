@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd
+        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <model>
+        <service name="Echo">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
+                    serviceClass="org.mule.transport.cxf.testmodels.Echo" synchronous="true"/>
+                <wire-tap-router>
+                    <vm:outbound-endpoint path="ToTapper"/>
+                </wire-tap-router>
+            </inbound>
+            <echo-component/>
+        </service>
+
+        <service name="WireTapper">
+            <inbound>
+                <vm:inbound-endpoint path="ToTapper"/>
+            </inbound>
+            <!-- 
+                Something is utterly broken with the entry point resolving in this case. From the
+                stacktrace it seems that the wrong Java method is looked up. Hardcoding the 
+                lookup makes things work for this test.
+            -->
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent">
+                <callable-entry-point-resolver/>
+            </component>
+        </service>
+    </model>
+</mule>
