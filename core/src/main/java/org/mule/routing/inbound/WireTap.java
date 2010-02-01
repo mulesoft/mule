@@ -20,7 +20,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.DispatchException;
 
 /**
  * An inbound router that can forward every message to another destination as defined
@@ -32,6 +31,7 @@ public class WireTap extends SelectiveConsumer
 {
     private volatile OutboundEndpoint tap;
 
+    @Override
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
         if (tap != null)
@@ -45,6 +45,7 @@ public class WireTap extends SelectiveConsumer
         }
     }
 
+    @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         RequestContext.setEvent(null);
@@ -57,7 +58,7 @@ public class WireTap extends SelectiveConsumer
             // send a copy of the message as it may get processed by a different thread.
             MuleMessage originalMessage = event.getMessage();
             MuleMessage tapMessage = new DefaultMuleMessage(originalMessage.getPayload(),
-                originalMessage.getAdapter());
+                originalMessage.getAdapter(), muleContext);
             
             tap.dispatch(new DefaultMuleEvent(tapMessage, tap, session, false));
         }
@@ -65,10 +66,7 @@ public class WireTap extends SelectiveConsumer
         {
             throw e;
         }
-        catch (MuleException e)
-        {
-            throw new DispatchException(event.getMessage(), tap, e);
-        }
+
         return super.process(event);
     }
 
