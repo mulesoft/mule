@@ -21,9 +21,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.service.TransportFactory;
@@ -42,22 +40,26 @@ import javax.servlet.http.HttpServletResponse;
  * Receives Http requests via a Servlet and routes them to listeners with servlet://
  * endpoints
  * <p/>
- * There needs to be a ServletConnector configured on the Mule Server, this connector
- * must have the servletUrl property set that matches the Url for the container that this
- * Servlet is hosted in, i.e. something like http://192.168.10.21:8888
  */
 
 public class MuleReceiverServlet extends AbstractReceiverServlet
 {
-    /** Serial version */
+    /**
+     * Serial version
+     */
     private static final long serialVersionUID = 6631307373079767439L;
 
     protected ServletConnector connector = null;
 
     protected void doInit() throws ServletException
     {
-        String servletConnectorName = getServletConfig().getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
-        if (servletConnectorName == null)
+        connector = getOrCreateServletConnector(getServletConfig().getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY));
+    }
+
+    protected ServletConnector getOrCreateServletConnector(String name) throws ServletException
+    {
+        ServletConnector connector;
+        if (name == null)
         {
             connector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
             if (connector == null)
@@ -76,51 +78,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else
         {
-            connector = (ServletConnector) muleContext.getRegistry().lookupConnector(servletConnectorName);
+            connector = (ServletConnector) muleContext.getRegistry().lookupConnector(name);
             if (connector == null)
             {
-                throw new ServletException(ServletMessages.noServletConnectorFound(servletConnectorName).toString());
+                throw new ServletException(ServletMessages.noServletConnectorFound(name).toString());
             }
         }
-    }
 
-    protected void doHead(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "HEAD");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-            else
-            {
-                response.setStatus(HttpConstants.SC_OK);
-            }
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "GET");
-            writeResponse(response, responseMessage);
-        }
-        catch (RuntimeException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
+        return connector;
     }
 
     protected void setupRequestMessage(HttpServletRequest request,
@@ -131,28 +96,28 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         EndpointURI uri = receiver.getEndpointURI();
         String reqUri = request.getRequestURI().toString();
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, reqUri);
-        
+
         String queryString = request.getQueryString();
-        if (queryString != null) 
+        if (queryString != null)
         {
-            reqUri += "?"+queryString;
+            reqUri += "?" + queryString;
         }
 
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, reqUri);
-        
+
         String path;
-        if ("servlet".equals(uri.getScheme())) 
+        if ("servlet".equals(uri.getScheme()))
         {
             path = HttpConnector.normalizeUrl(request.getContextPath());
             if ("/".equals(path))
             {
                 path = HttpConnector.normalizeUrl(request.getServletPath());
-            } 
-            else 
+            }
+            else
             {
                 path = path + HttpConnector.normalizeUrl(request.getServletPath());
             }
-            
+
             String pathPart2 = uri.getAddress();
 
             if (!path.endsWith("/"))
@@ -170,147 +135,50 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 // "/foo/" + "bar"
                 path = path + pathPart2;
             }
-        } 
-        else 
+        }
+        else
         {
             // The Jetty transport has normal paths
             path = HttpConnector.normalizeUrl(uri.getPath());
         }
-        
+
         requestMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, path);
-        
+
         // Call this to keep API compatability
         setupRequestMessage(request, requestMessage);
     }
+
 
     protected void setupRequestMessage(HttpServletRequest request, MuleMessage requestMessage)
     {
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         try
         {
-            MuleMessage responseMessage = doMethod(request, response, "POST");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-        catch (RuntimeException e)
-        {
-            throw e;
+            MessageReceiver receiver = getReceiverForURI(request);
+
+            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
+
+            setupRequestMessage(request, requestMessage, receiver);
+
+            MuleMessage result = routeMessage(receiver, requestMessage, request);
+            writeResponse(response, result);
         }
         catch (Exception e)
         {
-            handleException(e, e.getMessage(), response);
+            handleException(e, ServletMessages.failedToProcessRequest().getMessage(), response);
         }
     }
 
-    protected MuleMessage doMethod(HttpServletRequest request, HttpServletResponse response, String method)
-        throws MuleException
-    {
-        MessageReceiver receiver = getReceiverForURI(request);
-        
-        MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
-        requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-        
-        setupRequestMessage(request, requestMessage, receiver);
-        
-        return routeMessage(receiver, requestMessage, request);
-    }
 
     protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
-        throws MuleException
+            throws MuleException
     {
         return receiver.routeMessage(requestMessage, true);
-    }
-
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "OPTIONS");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
-    }
-
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "PUT");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
-    }
-
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "DELETE");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
-    }
-
-    protected void doTrace(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "TRACE");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
-    }
-
-    protected void doConnect(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            MuleMessage responseMessage = doMethod(request, response, "CONNECT");
-            if (responseMessage != null)
-            {
-                writeResponse(response, responseMessage);
-            }
-        }
-        catch (Exception e)
-        {
-            handleException(e, e.getMessage(), response);
-        }
     }
 
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
@@ -319,41 +187,36 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         String uri = getReceiverName(httpServletRequest);
         if (uri == null)
         {
-            throw new EndpointException(
-                    HttpMessages.unableToGetEndpointUri(httpServletRequest.getRequestURI()));
+            throw new EndpointException(HttpMessages.unableToGetEndpointUri(httpServletRequest.getRequestURI()));
         }
 
         MessageReceiver receiver = (MessageReceiver) getReceivers().get(uri);
 
+
+        // Lets see if the uri matches up with the last part of
+        // any of the receiver keys.
         if (receiver == null)
         {
-            receiver = (AbstractMessageReceiver) getReceivers().get(uri);
-            
-            // Lets see if the uri matches up with the last part of
-            // any of the receiver keys.
-            if (receiver == null)
-            {
-                receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
-            }
+            receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
+        }
 
-            if (receiver == null)
-            {
-                throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
-            }
+        if (receiver == null)
+        {
+            throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
         }
         InboundEndpoint endpoint = receiver.getEndpoint();
-        
+
         // Ensure that this receiver is using a dynamic (mutable) endpoint
-        if (!(endpoint instanceof DynamicURIInboundEndpoint)) 
+        if (!(endpoint instanceof DynamicURIInboundEndpoint))
         {
             endpoint = new DynamicURIInboundEndpoint(receiver.getEndpoint());
             receiver.setEndpoint(endpoint);
         }
-        
+
         // Tell the dynamic endpoint about our new URL
         //Note we don't use the servlet: prefix since we need to be dealing with the raw endpoint here
         EndpointURI epURI = new MuleEndpointURI(getRequestUrl(httpServletRequest), muleContext);
-        
+
         try
         {
             epURI.initialise();

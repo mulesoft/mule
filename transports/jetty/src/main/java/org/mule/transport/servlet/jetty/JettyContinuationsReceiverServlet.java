@@ -18,6 +18,9 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.HttpRequestMessageAdapter;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,32 +32,39 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
     private Object mutex = new Object();
 
     @Override
-    protected MuleMessage doMethod(HttpServletRequest request, HttpServletResponse response, String method) throws MuleException
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        final Continuation continuation = ContinuationSupport.getContinuation(request, mutex);
-        synchronized (mutex)
+        try
         {
-            MessageReceiver receiver = getReceiverForURI(request);
+            final Continuation continuation = ContinuationSupport.getContinuation(request, mutex);
+            synchronized (mutex)
+            {
+                MessageReceiver receiver = getReceiverForURI(request);
 
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-            //Need to remove this if set, we'll be returning a result but we need to make the request async
-            requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-            //This will allow Mule to continue the response once the service has do its processing
-            requestMessage.setReplyTo(continuation);
-            setupRequestMessage(request, requestMessage, receiver);
+                MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
+                requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
+                //Need to remove this if set, we'll be returning a result but we need to make the request async
+                requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+                //This will allow Mule to continue the response once the service has do its processing
+                requestMessage.setReplyTo(continuation);
+                setupRequestMessage(request, requestMessage, receiver);
 
-            //we force asynchronous in the {@link #routeMessage} method
-            routeMessage(receiver, requestMessage, request);
+                //we force asynchronous in the {@link #routeMessage} method
+                routeMessage(receiver, requestMessage, request);
 
-            continuation.suspend(10000);
+                continuation.suspend(10000);
+            }
+
+            writeResponse(response, (MuleMessage) continuation.getObject());
         }
-
-        return (MuleMessage)continuation.getObject();
+        catch (Exception e)
+        {
+            throw new ServletException(e);
+        }
     }
 
     protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
-        throws MuleException
+            throws MuleException
     {
         //Force asynchronous processing since we are using continuations
         return receiver.routeMessage(requestMessage, false);
