@@ -25,7 +25,7 @@ import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
-import org.mule.config.EndpointAnnotationsParserFactory;
+import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.annotations.Service;
 import org.mule.config.annotations.endpoints.Bind;
 import org.mule.config.annotations.endpoints.Channel;
@@ -69,7 +69,7 @@ public class AnnotatedServiceBuilder
     private final TemplateParser parser = TemplateParser.createAntStyleParser();
     protected RegistryMap regProps;
     protected AnnotatedEndpointBuilder builder;
-    protected EndpointAnnotationsParserFactory parserFactory;
+    protected AnnotationsParserFactory parserFactory;
 
     public Model getModel()
     {
@@ -88,7 +88,7 @@ public class AnnotatedServiceBuilder
         this.context = context;
         this.regProps = new RegistryMap(context.getRegistry());
         this.builder = new AnnotatedEndpointBuilder(context);
-        this.parserFactory = context.getRegistry().lookupObject(EndpointAnnotationsParserFactory.class);
+        this.parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
         assert parserFactory != null;
     }
 
@@ -352,6 +352,7 @@ public class AnnotatedServiceBuilder
     }
 
     //TODO Move this to an Object processor
+
     protected void processEndpointBindings(Class componentFactoryClass, org.mule.api.service.Service service) throws MuleException
     {
         Field[] fields = componentFactoryClass.getDeclaredFields();

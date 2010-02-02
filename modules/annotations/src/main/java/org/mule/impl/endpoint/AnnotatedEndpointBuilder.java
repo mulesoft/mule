@@ -33,7 +33,7 @@ import java.util.List;
  * This is a wrapper builder that can process {@link AnnotatedEndpointData} objects (Annotaiton config data)
  * and turn them into {@link org.mule.api.endpoint.EndpointBuilder} or {@link org.mule.api.endpoint.ImmutableEndpoint} objects.
  * <p/>
- * THis is an internal class that should only be used the Annotaiton parser code.
+ * THis is an internal class that should only be used by the Annotation parser code.
  */
 public class AnnotatedEndpointBuilder
 {
@@ -76,6 +76,8 @@ public class AnnotatedEndpointBuilder
 
     public ImmutableEndpoint processEndpoint(AnnotatedEndpointData epData) throws MuleException
     {
+        preprocessEndpointData(epData);
+
         ImmutableEndpoint endpoint;
         EndpointBuilder endpointBuilder = getEndpointBuilder(epData);
 
@@ -162,6 +164,17 @@ public class AnnotatedEndpointBuilder
             muleContext.getRegistry().registerEndpointBuilder(epData.getName(), endpointBuilder);
         }
         return endpoint;
+    }
+
+    /**
+     * This method can be overridden to process endpoints before they get built. This may be useful in environments
+     * where the characteristics of the endpoint change depending on the deployed environment
+     *
+     * @param data the endpoint data to process
+     */
+    protected void preprocessEndpointData(AnnotatedEndpointData data)
+    {
+        //no=op
     }
 
     public Object convertProperty(Class type, String property)
