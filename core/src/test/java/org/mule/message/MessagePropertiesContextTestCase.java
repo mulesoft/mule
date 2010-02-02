@@ -9,6 +9,8 @@
  */
 package org.mule.message;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.MessagePropertiesContext;
@@ -35,7 +37,43 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("doo", PropertyScope.INBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.OUTBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.SESSION));
+    }
 
+    public void testSessionScope() throws Exception
+    {
+        MuleEvent e = getTestEvent("testing");
+        e.getSession().setProperty("SESSION_PROP", "Value1");
+        RequestContext.setEvent(e);
+
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+
+        assertEquals("Value1", mpc.getProperty("SESSION_PROP", PropertyScope.SESSION));
+        //test case insensitivity
+        assertEquals("Value1", mpc.getProperty("SESSION_prop", PropertyScope.SESSION));
+        assertNull(mpc.getProperty("SESSION_X", PropertyScope.SESSION));
+    }
+
+    public void testPropertyScopeOrder() throws Exception
+    {
+        MuleEvent e = getTestEvent("testing");
+        e.getSession().setProperty("Prop", "session");
+        RequestContext.setEvent(e);
+
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        //Note that we cannot write to the Inbound scope, its read only
+        mpc.setProperty("Prop", "invocation", PropertyScope.INVOCATION);
+        mpc.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
+
+        assertEquals("outbound", mpc.getProperty("Prop"));
+        mpc.removeProperty("Prop", PropertyScope.OUTBOUND);
+
+        assertEquals("invocation", mpc.getProperty("Prop"));
+        mpc.removeProperty("Prop", PropertyScope.INVOCATION);
+
+        assertEquals("session", mpc.getProperty("Prop"));
+        assertNull(mpc.getProperty("Prop", PropertyScope.INBOUND));
+        assertNull(mpc.getProperty("Prop", PropertyScope.INVOCATION));
+        assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
 
     }
 }
