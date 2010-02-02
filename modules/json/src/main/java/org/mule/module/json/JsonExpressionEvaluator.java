@@ -120,8 +120,13 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
             }
             catch (IllegalArgumentException e)
             {
-                logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
-                return null;
+                if (compareTo == null)
+                {
+                    logger.debug("returning null for json expression: " + expression + ": " + e.getMessage());
+                    return null;
+                }
+                //If the element does not exist but is matching against 'null' return true, otherwise false
+                return (compareTo.equalsIgnoreCase("null")) & !not;
             }
         }
         catch (Exception e)
