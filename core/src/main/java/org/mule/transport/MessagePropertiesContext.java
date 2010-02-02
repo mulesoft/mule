@@ -100,9 +100,9 @@ public class MessagePropertiesContext implements Serializable
     /**
      * Ctor used for copying only
      *
-     * @param defaultScope
-     * @param keySet
-     * @param scopedMap
+     * @param defaultScope The default scope to add properties to if a scope is not defined
+     * @param keySet       the set ofkeys for the Message properties context being copied
+     * @param scopedMap    the map of actual properties to be copied
      */
     private MessagePropertiesContext(PropertyScope defaultScope, Set<String> keySet,
                                      Map<PropertyScope, Map<String, Object>> scopedMap)
@@ -123,15 +123,6 @@ public class MessagePropertiesContext implements Serializable
         return map;
     }
 
-//    protected void registerInvocationProperties(Map<String, Object> properties)
-//    {
-//        if (properties != null)
-//        {
-//            getScopedProperties(PropertyScope.INVOCATION).putAll(properties);
-//            keySet.addAll(properties.keySet());
-//        }
-//    }
-
     public PropertyScope getDefaultScope()
     {
         return defaultScope;
@@ -144,32 +135,16 @@ public class MessagePropertiesContext implements Serializable
             Map props = new HashMap(properties.size());
             for (String key : properties.keySet())
             {
-                props.put(key /*.toLowerCase()*/, properties.get(key));
+                props.put(key, properties.get(key));
             }
             getScopedProperties(PropertyScope.INBOUND).putAll(props);
             keySet.addAll(props.keySet());
         }
     }
 
-//    protected void registerSessionProperties(Map<String, Object> properties)
-//    {
-//        if (properties != null)
-//        {
-//            if (RequestContext.getEvent() != null)
-//            {
-//                for (Object key : properties.keySet())
-//                {
-//                    RequestContext.getEvent().getSession().setProperty(key, properties.get(key));
-//                }
-//            }
-//        }
-//    }
-
     public Object getProperty(String key)
     {
         Object value = null;
-        //Case insensitive
-        //key = key.toLowerCase();
         for (PropertyScope scope : SCOPE_ORDER)
         {
             if (PropertyScope.SESSION.equals(scope))
@@ -193,8 +168,6 @@ public class MessagePropertiesContext implements Serializable
 
     public Object getProperty(String key, PropertyScope scope)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         if (scope == null)
         {
             return getProperty(key);
@@ -266,8 +239,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public Object removeProperty(String key)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         Object value = getScopedProperties(PropertyScope.OUTBOUND).remove(key);
         Object inv = getScopedProperties(PropertyScope.INVOCATION).remove(key);
 
@@ -289,8 +260,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public Object removeProperty(String key, PropertyScope scope)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         if (scope == null)
         {
             return removeProperty(key);
@@ -328,8 +297,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         getScopedProperties(defaultScope).put(key, value);
         keySet.add(key);
     }
@@ -344,8 +311,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         if (scope == null)
         {
             setProperty(key, value);
@@ -418,8 +383,6 @@ public class MessagePropertiesContext implements Serializable
 
     public Object getProperty(String key, Object defaultValue)
     {
-        //Case insensitive
-        //key = key.toLowerCase();
         Object value = getProperty(key);
         if (value == null)
         {
