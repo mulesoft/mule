@@ -32,7 +32,7 @@ import org.apache.commons.collections.map.AbstractHashedMap;
  * using {@link java.util.Collections#synchronizedMap(Map)}. This class may throw
  * exceptions when accessed by concurrent threads without synchronization.
  *
- * @since Mule 3.0.0
+ * @since 3.0.0
  */
 public class CaseInsensitiveHashMap extends AbstractHashedMap implements Serializable
 {
@@ -115,7 +115,7 @@ public class CaseInsensitiveHashMap extends AbstractHashedMap implements Seriali
     {
         if (key1 instanceof String && key2 instanceof String)
         {
-            return (key1 == key2 || ((String) key1).equalsIgnoreCase((String) key2));
+            return (((String) key1).equalsIgnoreCase((String) key2));
         }
         else
         {
