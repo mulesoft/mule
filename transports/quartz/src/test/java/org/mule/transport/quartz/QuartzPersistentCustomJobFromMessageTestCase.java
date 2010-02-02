@@ -17,8 +17,7 @@ import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTestCase
 {
-//    private static final long TIMEOUT = 30000;
-    private static final long TIMEOUT = 3000000;
+    private static final long TIMEOUT = 30000;
 
     @Override
     protected String getConfigResources()
@@ -33,7 +32,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTest
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setEndpointRef("vm://resultQueue");
         client.send("vm://customJobQueue", jobConfig, null);
-        
+
         MuleMessage result = client.request("vm://resultQueue", TIMEOUT);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof ScheduledDispatchJobConfig);
