@@ -53,11 +53,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -79,14 +77,21 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Name of a property to override the default test watchdog timeout.
-     * @see #DEFAULT_MULE_TEST_TIMEOUT_SECS 
+     *
+     * @see #DEFAULT_MULE_TEST_TIMEOUT_SECS
      */
     public static final String PROPERTY_MULE_TEST_TIMEOUT = "mule.test.timeoutSecs";
-    
+
     /**
      * Default test watchdog timeout in seconds.
      */
     public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 60;
+
+    /**
+     * If the annotations module is on the classpath, also enable annotations config builder
+     */
+    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
+
 
     protected static MuleContext muleContext;
 
@@ -159,10 +164,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * Timeout used for the test watchdog
      */
     private int testTimeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
-    
+
     /**
      * When a test case depends on a 3rd-party resource such as a public web service,
-     * it may be desirable to not fail the test upon timeout but rather to simply log 
+     * it may be desirable to not fail the test upon timeout but rather to simply log
      * a warning.
      */
     private boolean failOnTimeout = true;
@@ -198,7 +203,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             String variableName = PROPERTY_MULE_TEST_TIMEOUT.toUpperCase().replace(".", "_");
             timeoutString = System.getenv(variableName);
         }
-        
+
         if (timeoutString != null)
         {
             try
@@ -330,7 +335,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         getTestInfo().setDisposeManagerPerSuite(val);
     }
-    
+
     public int getTestTimeoutSecs()
     {
         return testTimeoutSecs;
@@ -344,7 +349,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public void handleTimeout(long timeout, TimeUnit unit)
     {
         String msg = "Timeout of " + unit.toMillis(timeout) + "ms exceeded - exiting VM! (modify via -Dmule.test.timeoutSecs=XX)";
-        
+
         if (failOnTimeout)
         {
             logger.fatal(msg);
@@ -358,8 +363,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Normal JUnit method
-     * @throws Exception
      *
+     * @throws Exception
      * @see #doSetUp()
      */
     @Override
@@ -419,6 +424,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
+            //If the annotations module is on the classpath, add the annotations config builder to the list
+            //This will enable annotations config for this instance
+            if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
+            {
+                builders.add((ConfigurationBuilder) ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER,
+                        ClassUtils.NO_ARGS, getClass()));
+            }
             builders.add(getBuilder());
             addBuilders(builders);
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
@@ -434,6 +446,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     //This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
     //creating the MuleContext.
+
     protected void addBuilders(List<ConfigurationBuilder> builders)
     {
         //No op
@@ -483,8 +496,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Normal JUnit method
-     * @throws Exception
      *
+     * @throws Exception
      * @see #doTearDown()
      */
     @Override
@@ -694,7 +707,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 // use that to find the correct resource. Works fine everywhere,
                 // regardless of classloaders. See MULE-2414
                 URL classUrl = ClassUtils.getClassPathRoot(test.getClass());
-                URLClassLoader tempClassLoader = new URLClassLoader(new URL[]{ classUrl });
+                URLClassLoader tempClassLoader = new URLClassLoader(new URL[]{classUrl});
                 URL fileUrl = tempClassLoader.getResource("mule-test-exclusions.txt");
                 if (fileUrl != null)
                 {
@@ -794,10 +807,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         this.failOnTimeout = failOnTimeout;
     }
-    
+
     /**
      * Determines if the test case should perform graceful shutdown or not.
      * Default is false so that tests run more quickly.
+     *
      * @return
      */
     protected boolean isGracefulShutdown()
@@ -812,7 +826,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
      *
      * @param clazz the class to create an instance of.
-     * @param <T> Object of this type will be returned
+     * @param <T>   Object of this type will be returned
      * @return an initialised instance of <code>class</code>
      * @throws Exception if there is a problem creating or initializing the object
      */
@@ -828,24 +842,28 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * create an instance first set any additional data on the object then call {@link #initialiseObject(Object)}.
      *
      * @param clazz the class to create an instance of.
-     * @param args constructor parameters
-     * @param <T> Object of this type will be returned
+     * @param args  constructor parameters
+     * @param <T>   Object of this type will be returned
      * @return an initialised instance of <code>class</code>
      * @throws Exception if there is a problem creating or initializing the object
      */
     @SuppressWarnings("unchecked")
     protected <T extends Object> T createObject(Class<T> clazz, Object... args) throws Exception
     {
-        if(args==null) args = ClassUtils.NO_ARGS;
+        if (args == null)
+        {
+            args = ClassUtils.NO_ARGS;
+        }
         Object o = ClassUtils.instanciateClass(clazz, args);
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
-        return (T)o;
+        return (T) o;
     }
 
     /**
      * A convenience method that will register an object in the registry using its hashcode as the key.  This will cause the object
      * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
      * lifecycle as the MuleContext
+     *
      * @param o the object to register and initialise it
      * @throws RegistrationException
      */
