@@ -55,12 +55,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
+ * This builder will process annotations on an object and create a Mule service using Router, endpoint and service annotation
+ * to construct the service.
+ *
+ * @since 3.0.0
  */
 public class AnnotatedServiceBuilder
 {
@@ -176,21 +178,21 @@ public class AnnotatedServiceBuilder
 
     protected void processInboundRouters(Class componentFactoryClass, org.mule.api.service.Service service) throws MuleException
     {
-        Collection routerParsers = context.getRegistry().lookupObjects(RouterAnnotationParser.class);
         for (int i = 0; i < componentFactoryClass.getAnnotations().length; i++)
         {
             Annotation annotation = componentFactoryClass.getAnnotations()[i];
             Router routerAnnotation = annotation.annotationType().getAnnotation(Router.class);
             if (routerAnnotation != null && routerAnnotation.type() == RouterType.Inbound)
             {
-                for (Iterator iterator = routerParsers.iterator(); iterator.hasNext();)
+                RouterAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
+                if (parser != null)
                 {
-                    RouterAnnotationParser parser = (RouterAnnotationParser) iterator.next();
-                    if (parser.supports(annotation, componentFactoryClass, null))
-                    {
-                        service.getInboundRouter().addRouter(parser.parseRouter(annotation));
-                        break;
-                    }
+                    service.getInboundRouter().addRouter(parser.parseRouter(annotation));
+                }
+                else
+                {
+                    //TODO i18n
+                    throw new IllegalStateException("Cannot find parser for router annotation: " + annotation.toString());
                 }
             }
         }
@@ -198,28 +200,31 @@ public class AnnotatedServiceBuilder
 
     protected void processReplyRouters(Class componentFactoryClass, org.mule.api.service.Service service) throws MuleException
     {
-        Collection routerParsers = context.getRegistry().lookupObjects(RouterAnnotationParser.class);
         List<AnnotationMetaData> annotations = AnnotationUtils.getClassAndMethodAnnotations(componentFactoryClass);
         for (AnnotationMetaData metaData : annotations)
         {
             Router routerAnnotation = metaData.getAnnotation().annotationType().getAnnotation(Router.class);
             if (routerAnnotation != null && routerAnnotation.type() == RouterType.ReplyTo)
             {
-                for (Iterator iterator = routerParsers.iterator(); iterator.hasNext();)
+
+
+                RouterAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+                if (parser != null)
                 {
-                    RouterAnnotationParser parser = (RouterAnnotationParser) iterator.next();
-                    if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
+                    org.mule.api.routing.Router router = parser.parseRouter(metaData.getAnnotation());
+                    //Todo, wrap lifecycle
+                    if (router instanceof MuleContextAware)
                     {
-                        org.mule.api.routing.Router router = parser.parseRouter(metaData.getAnnotation());
-                        //Todo, wrap lifecycle
-                        if (router instanceof MuleContextAware)
-                        {
-                            ((MuleContextAware) router).setMuleContext(context);
-                        }
-                        router.initialise();
-                        service.getResponseRouter().addRouter(router);
-                        break;
+                        ((MuleContextAware) router).setMuleContext(context);
                     }
+                    router.initialise();
+                    service.getResponseRouter().addRouter(router);
+                    break;
+                }
+                else
+                {
+                    //TODO i18n
+                    throw new IllegalStateException("Cannot find parser for router annotation: " + metaData.getAnnotation().toString());
                 }
             }
         }
@@ -238,17 +243,18 @@ public class AnnotatedServiceBuilder
             {
                 if (router != null)
                 {
-                    //This is only here to add some validation
-                    throw new IllegalStateException("You can onnly configure one outbound router on a service");
+                    //TODO i18n
+                    throw new IllegalStateException("You can only configure one outbound router on a service");
                 }
-                for (Iterator iterator = routerParsers.iterator(); iterator.hasNext();)
+                RouterAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+                if (parser != null)
                 {
-                    RouterAnnotationParser parser = (RouterAnnotationParser) iterator.next();
-                    if (parser.supports(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember()))
-                    {
-                        router = (OutboundRouter) parser.parseRouter(metaData.getAnnotation());
-                        break;
-                    }
+                    router = (OutboundRouter) parser.parseRouter(metaData.getAnnotation());
+                }
+                else
+                {
+                    //TODO i18n
+                    throw new IllegalStateException("Cannot find parser for router annotation: " + metaData.getAnnotation().toString());
                 }
             }
         }

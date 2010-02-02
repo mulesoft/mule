@@ -12,7 +12,9 @@ package org.mule.utils;
 import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -23,9 +25,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -86,17 +86,22 @@ public class AnnotationUtils
 
     static synchronized ExpressionArgument parseAnnotation(Annotation annotation, Class paramType, MuleContext muleContext)
     {
-        Collection c = muleContext.getRegistry().lookupObjects(ExpressionParser.class);
-        for (Iterator iterator = c.iterator(); iterator.hasNext();)
+        AnnotationsParserFactory factory;
+        try
         {
-            ExpressionParser parser = (ExpressionParser) iterator.next();
-            if (parser.supports(annotation))
-            {
-                return parser.parse(annotation, paramType);
-            }
+            factory = muleContext.getRegistry().lookupObject(AnnotationsParserFactory.class);
         }
-
-        throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
+        catch (RegistrationException e)
+        {
+            //TODO better exception message
+            throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
+        }
+        ExpressionParser parser = factory.getExpressionParser(annotation);
+        if (parser == null)
+        {
+            throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
+        }
+        return parser.parse(annotation, paramType);
     }
 
     public static List<AnnotationMetaData> getClassAndMethodAnnotations(Class c)
