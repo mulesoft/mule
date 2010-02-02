@@ -12,22 +12,14 @@ package org.mule.example.stockquote;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Locale;
 
 public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTestCase
 {
-    public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
-
     public AbstractStockQuoteFunctionalTestCase()
     {
         super();
@@ -36,12 +28,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
         // that the 3rd-party web service is off-line.
         setFailOnTimeout(false);
     }
-    
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // TODO The following is a duplicated in MessagePropertiesPropagationTestCase under 
-    // tests/integration; refactor to put this in one place perhaps a WebserviceTestCase 
-    /////////////////////////////////////////////////////////////////////////////////////////    
-    
+        
     /**
      * If a simple call to the web service indicates that it is not responding properly,
      * we disable the test case so as to not report a test failure which has nothing to do
@@ -49,65 +36,12 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
      * 
      * see EE-947
      */
+    @Override
     protected boolean isDisabledInThisEnvironment()
     {
-        return !isWebServiceOnline();
+        return (WebServiceOnlineCheck.isWebServiceOnline() == false);
     }
     
-    /**
-     * @return true if the web service is functioning correctly
-     */
-    protected boolean isWebServiceOnline()
-    {
-        logger.debug("Verifying that the web service is on-line...");
-        
-        BufferedReader input = null;
-        try 
-        {
-            URLConnection conn = new URL(TEST_URL).openConnection();
-            // setting these timeouts ensures the client does not deadlock indefinitely
-            // when the server has problems.
-            conn.setConnectTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
-            conn.setReadTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
-            InputStream in = conn.getInputStream();
-
-            input = new BufferedReader(new InputStreamReader(in));            
-
-            String response = "";
-            String line;
-            while ((line = input.readLine()) != null) 
-            {
-                response += line;
-            }
-
-            if (StringUtils.containsIgnoreCase(response, "Cisco"))
-            {
-                return true;
-            }
-            else
-            {
-                logger.warn("Unexpected response, web service does not seem to be on-line: \n" + response);
-                return false;
-            }
-        } 
-        catch (Exception e) 
-        {
-            logger.warn("Exception occurred, web service does not seem to be on-line: " + e);
-            return false;
-        } 
-        finally
-        {
-            if (input != null)
-            {
-                try
-                {
-                    input.close();
-                }
-                catch (IOException ioe) {}
-            }
-        }
-    }
-
     public void testStockQuoteExample() throws Exception
     {
         MuleClient client = new MuleClient();

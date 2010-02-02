@@ -13,24 +13,15 @@ package org.mule.test.integration.messaging.meps;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 {
-    public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
-
     public MessagePropertiesPropagationTestCase()
     {
         super();
@@ -40,7 +31,17 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         setFailOnTimeout(false);
     }
     
-    
+    /**
+     * If a simple call to the web service indicates that it is not responding properly,
+     * we disable the test case so as to not report a test failure which has nothing to do
+     * with Mule.
+     */
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return (WebServiceOnlineCheck.isWebServiceOnline() == false);
+    }
+
     @Override
     protected String getConfigResources()
     {
@@ -53,11 +54,13 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+        
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
         props.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, "TestGroupSize");
         props.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, "TestSequence");
+        
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
@@ -72,10 +75,12 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
         props.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, "TestGroupSize");
         props.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, "TestSequence");
+        
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
@@ -91,11 +96,13 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testNotPropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put("some", "thing");
         props.put("other", "stuff");
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/bizarre;charset=utf-16");
+        
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
         assertNull(response.getProperty("some"));
@@ -111,10 +118,12 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testNotPropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");
         props.put("other", "stuff");
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/bizarre;charset=utf-16");
+        
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
         assertNull(response.getProperty("some"));
@@ -129,10 +138,12 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testForcePropagatedPropertiesWithHttpTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
         props.put("some", "thing");
         props.put("other", "stuff");
+        
         MuleMessage response = client.send("vm://httpService2", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
@@ -146,82 +157,15 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     public void testForcePropagatedPropertiesWithCxfTransport() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map<String, String> props = new HashMap<String, String>();
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");
         props.put("other", "stuff");
+        
         MuleMessage response = client.send("vm://cxfService2", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
         assertEquals("thing", response.getProperty("some"));
         assertEquals("stuff", response.getProperty("other"));
-    }
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // TODO The following is a copy/paste from the StockQuote example, it could ideally share 
-    // a common super-class so that the code is not duplicated here.
-    //////////////////////////////////////////////////////////////////////////////////////////
-    
-    /**
-     * If a simple call to the web service indicates that it is not responding properly,
-     * we disable the test case so as to not report a test failure which has nothing to do
-     * with Mule.
-     */
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        return !isWebServiceOnline();
-    }
-    
-    /**
-     * @return true if the web service is functioning correctly
-     */
-    protected boolean isWebServiceOnline()
-    {
-        logger.debug("Verifying that the web service is on-line...");
-        
-        BufferedReader input = null;
-        try 
-        {
-            URLConnection conn = new URL(TEST_URL).openConnection();
-            // setting these timeouts ensures the client does not deadlock indefinitely
-            // when the server has problems.
-            conn.setConnectTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
-            conn.setReadTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
-            InputStream in = conn.getInputStream();
-
-            input = new BufferedReader(new InputStreamReader(in));
-
-            String response = "";
-            String line;
-            while ((line = input.readLine()) != null) 
-            {
-                response += line;
-            }
-
-            if (StringUtils.containsIgnoreCase(response, "Cisco"))
-            {
-                return true;
-            }
-            else
-            {
-                logger.warn("Unexpected response, web service does not seem to be on-line: \n" + response);
-                return false;
-            }
-        } 
-        catch (Exception e) 
-        {
-            logger.warn("Exception occurred, web service does not seem to be on-line: " + e);
-            return false;
-        } 
-        finally
-        {
-            if (input != null)
-            {
-                try
-                {
-                    input.close();
-                }
-                catch (IOException ioe) {}
-            }
-        }
     }
 }
