@@ -18,24 +18,19 @@ import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
 {
-
     public void testMessageSerialization() throws Exception
     {
         ObjectToXml t1 = createObject(ObjectToXml.class);
         t1.setAcceptMuleMessage(true);
 
-        Map props = new HashMap();
-        props.put("object", new Apple());
-        props.put("string", "hello");
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setEncoding("UTF-8");
         msg.setCorrelationId("1234");
         msg.setProperty("number", new Integer(1), PropertyScope.INVOCATION);
+        msg.setProperty("object", new Apple(), PropertyScope.OUTBOUND);
+        msg.setProperty("string", "hello", PropertyScope.OUTBOUND);
 
         String xml = (String) t1.transform(msg);
         assertNotNull(xml);
@@ -47,13 +42,13 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertTrue(result instanceof MuleMessage);
 
         msg = (MuleMessage) result;
-//TODO RM*
-//        assertEquals("test", msg.getPayload());
-//        assertEquals(new Apple(), msg.getProperty("object", PropertyScope.OUTBOUND));
-//        assertEquals("hello", msg.getProperty("object"));
-//        assertEquals(new Integer(1), msg.getProperty("number", PropertyScope.INVOCATION));
-//        assertEquals("1234", msg.getCorrelationId());
-//        assertEquals("UTF-8", msg.getEncoding());
+
+        assertEquals("test", msg.getPayload());
+        assertEquals(new Apple(), msg.getProperty("object", PropertyScope.OUTBOUND));
+        assertEquals("hello", msg.getProperty("string"));
+        assertEquals(new Integer(1), msg.getProperty("number", PropertyScope.INVOCATION));
+        assertEquals("1234", msg.getCorrelationId());
+        assertEquals("UTF-8", msg.getEncoding());
 
     }
 }
