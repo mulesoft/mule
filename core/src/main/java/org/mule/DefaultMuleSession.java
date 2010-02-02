@@ -28,6 +28,7 @@ import org.mule.api.transport.ReceiveException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
+import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -101,7 +102,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public DefaultMuleSession(Service service, MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        properties = new CaseInsensitiveMap/*<String, Object>*/();
+        properties = new CaseInsensitiveHashMap/*<String, Object>*/();
         id = UUID.getUUID();
         this.service = service;
     }
