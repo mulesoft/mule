@@ -16,12 +16,21 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.MessagePropertiesContext;
+import org.mule.util.StringMessageUtils;
+
+import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.After;
 import org.junit.Test;
 
 public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
 {
+    public void doTearDown()
+    {
+        RequestContext.clear();
+    }
+    
     @Test
     public void testPropertiesCase() throws Exception
     {
@@ -146,5 +155,14 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("doo", PropertyScope.INBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.OUTBOUND));
         assertNull(mpc.getProperty("doo", PropertyScope.SESSION));
+
+        Set<String> keys = mpc.getPropertyNames();
+        assertEquals(2, keys.size());
+
+        for (String key : keys)
+        {
+            assertTrue(key.equals("FOO") || key.equals("DOO"));
+            assertFalse(key.equals("foo") || key.equals("doo"));
+        }
     }
 }
