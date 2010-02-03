@@ -439,11 +439,11 @@ public class MessagePropertiesContext implements Serializable
                 Map<String, Object>>(new PropertyScope.ScopeComparator());
 
         map.put(PropertyScope.INVOCATION,
-                new HashMap<String, Object>(getScopedProperties(PropertyScope.INVOCATION)));
+                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.INVOCATION)));
         map.put(PropertyScope.INBOUND,
-                new HashMap<String, Object>(getScopedProperties(PropertyScope.INBOUND)));
+                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.INBOUND)));
         map.put(PropertyScope.OUTBOUND,
-                new HashMap<String, Object>(getScopedProperties(PropertyScope.OUTBOUND)));
+                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.OUTBOUND)));
 
         return new MessagePropertiesContext(getDefaultScope(), keys, map);
     }
