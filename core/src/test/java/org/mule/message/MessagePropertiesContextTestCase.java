@@ -16,16 +16,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.MessagePropertiesContext;
-import org.mule.util.StringMessageUtils;
 
 import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.junit.After;
 import org.junit.Test;
 
 public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
 {
+    @Override
     public void doTearDown()
     {
         RequestContext.clear();
@@ -37,9 +36,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         //Default scope
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.setProperty("FOO", "BAR");
-
+        mpc.setProperty("ABC", "abc");
         mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
-
         doTest(mpc);
     }
 
@@ -56,7 +54,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         //test case insensitivity
         assertEquals("Value1", mpc.getProperty("SESSION_prop", PropertyScope.SESSION));
         assertNull(mpc.getProperty("SESSION_X", PropertyScope.SESSION));
-
     }
 
     @Test
@@ -81,7 +78,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("Prop", PropertyScope.INBOUND));
         assertNull(mpc.getProperty("Prop", PropertyScope.INVOCATION));
         assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
-
     }
 
     @Test
@@ -90,9 +86,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         //Creates a MPC implicitly
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
 
-         msg.setProperty("FOO", "BAR");
+        msg.setProperty("FOO", "BAR");
         assertEquals("BAR", msg.getProperty("foo"));
-
 
         msg.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
 
@@ -130,14 +125,13 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         //Default scope
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         mpc.setProperty("FOO", "BAR");
+        mpc.setProperty("ABC", "abc");
         mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
-
         doTest(mpc);
 
         //Serialize and deserialize
         byte[] bytes = SerializationUtils.serialize(mpc);
         mpc = (MessagePropertiesContext) SerializationUtils.deserialize(bytes);
-
         doTest(mpc);
     }
 
@@ -146,6 +140,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         //Look in all scopes
         assertEquals("BAR", mpc.getProperty("foo"));
         assertEquals("DAR", mpc.getProperty("doo"));
+        assertEquals("abc", mpc.getProperty("abc"));
 
         //Look in specific scope
         assertEquals("BAR", mpc.getProperty("foO", PropertyScope.OUTBOUND)); //default scope
@@ -157,12 +152,12 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("doo", PropertyScope.SESSION));
 
         Set<String> keys = mpc.getPropertyNames();
-        assertEquals(2, keys.size());
+        assertEquals(3, keys.size());
 
         for (String key : keys)
         {
-            assertTrue(key.equals("FOO") || key.equals("DOO"));
-            assertFalse(key.equals("foo") || key.equals("doo"));
+            assertTrue(key.equals("FOO") || key.equals("DOO") || key.equals("ABC"));
+            assertFalse(key.equals("foo") || key.equals("doo") || key.equals("abc"));
         }
     }
 }
