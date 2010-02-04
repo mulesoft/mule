@@ -19,7 +19,6 @@ import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.Iterator;
 import java.util.Set;
 
 public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
@@ -32,7 +31,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setEncoding("UTF-8");
         msg.setCorrelationId("1234");
-        msg.setProperty("number", new Integer(1), PropertyScope.INVOCATION);
+        msg.setProperty("number", Integer.valueOf(1), PropertyScope.INVOCATION);
         msg.setProperty("object", new Apple(), PropertyScope.OUTBOUND);
         msg.setProperty("string", "hello", PropertyScope.OUTBOUND);
 
@@ -75,9 +74,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertEquals("1234", msg.getCorrelationId());
         assertEquals("UTF-8", msg.getEncoding());
 
-
         Set<String> keys = msg.getPropertyNames();
-
         assertEquals(5, keys.size());
 
         //Remove Mule properties
@@ -89,6 +86,5 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
             assertTrue(key.equals("number") || key.equals("string") || key.equals("object"));
             assertFalse(key.equals("NUMBER") || key.equals("STRING") || key.equals("OBJECT"));
         }
-
     }
 }

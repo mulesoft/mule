@@ -372,12 +372,14 @@ public class MuleServer implements Runnable
         {
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
             builders.add(cfgBuilder);
-            //If the annotations module is on the classpath, add the annotations config builder to the list
-            //This will enable annotations config for this instance
+            
+            // If the annotations module is on the classpath, add the annotations config builder to the list
+            // This will enable annotations config for this instance
             if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
             {
-                builders.add((ConfigurationBuilder) ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER,
-                        ClassUtils.NO_ARGS, getClass()));
+                Object configBuilder = ClassUtils.instanciateClass(
+                    CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
+                builders.add((ConfigurationBuilder) configBuilder);
             }
 
             Properties startupProperties = null;
@@ -407,12 +409,12 @@ public class MuleServer implements Runnable
         {
             logger.fatal(msg.toString() + " " + e.getMessage(), e);
         }
-        List msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
         msgs.add(msg.getMessage());
         Throwable root = ExceptionHelper.getRootException(e);
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
-        msgs.add(CoreMessages.fatalErrorInShutdown());
+        msgs.add(CoreMessages.fatalErrorInShutdown().getMessage());
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
 
@@ -513,6 +515,12 @@ public class MuleServer implements Runnable
      */
     private class MuleShutdownHook extends Thread
     {
+        public MuleShutdownHook()
+        {
+            super();
+        }
+        
+        @Override
         public void run()
         {
             doShutdown();

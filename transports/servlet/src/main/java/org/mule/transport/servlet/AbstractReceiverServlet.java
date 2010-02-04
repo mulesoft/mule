@@ -66,6 +66,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     private MuleMessageToHttpResponse responseTransformer = new MuleMessageToHttpResponse();
 
+    @Override
     public final void init() throws ServletException
     {
         String timeoutString = getServletConfig().getInitParameter(REQUEST_TIMEOUT_PROPERTY);
@@ -137,6 +138,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     protected void doInit() throws ServletException
     {
+        // template method
     }
 
     protected void writeResponse(HttpServletResponse servletResponse, MuleMessage message) throws Exception

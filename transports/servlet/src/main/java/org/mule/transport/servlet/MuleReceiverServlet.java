@@ -51,6 +51,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected ServletConnector connector = null;
 
+    @Override
     protected void doInit() throws ServletException
     {
         connector = getOrCreateServletConnector(getServletConfig().getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY));
@@ -58,17 +59,17 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected ServletConnector getOrCreateServletConnector(String name) throws ServletException
     {
-        ServletConnector connector;
+        ServletConnector servletConnector;
         if (name == null)
         {
-            connector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
-            if (connector == null)
+            servletConnector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
+            if (servletConnector == null)
             {
-                connector = new ServletConnector();
-                connector.setName("_generatedServletConnector");
+                servletConnector = new ServletConnector();
+                servletConnector.setName("_generatedServletConnector");
                 try
                 {
-                    muleContext.getRegistry().registerConnector(connector);
+                    muleContext.getRegistry().registerConnector(servletConnector);
                 }
                 catch (MuleException e)
                 {
@@ -78,14 +79,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else
         {
-            connector = (ServletConnector) muleContext.getRegistry().lookupConnector(name);
-            if (connector == null)
+            servletConnector = (ServletConnector) muleContext.getRegistry().lookupConnector(name);
+            if (servletConnector == null)
             {
                 throw new ServletException(ServletMessages.noServletConnectorFound(name).toString());
             }
         }
 
-        return connector;
+        return servletConnector;
     }
 
     protected void setupRequestMessage(HttpServletRequest request,
@@ -151,6 +152,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected void setupRequestMessage(HttpServletRequest request, MuleMessage requestMessage)
     {
+        // template method
     }
 
     @Override
@@ -174,7 +176,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
-
     protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
             throws MuleException
     {
@@ -191,7 +192,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
 
         MessageReceiver receiver = (MessageReceiver) getReceivers().get(uri);
-
 
         // Lets see if the uri matches up with the last part of
         // any of the receiver keys.
