@@ -19,7 +19,6 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  * <code>PoolingProfile</code> is a configuration object used to define the object
  * pooling parameters for the service it is associated with.
  */
-
 public class PoolingProfile
 {
 
@@ -40,8 +39,6 @@ public class PoolingProfile
 
     // Constants used to determine the exhausted action of the pool
     public static final int WHEN_EXHAUSTED_FAIL = 0;
-    /** @deprecated use WHEN_EXHAUSTED_WAIT instead */
-    public static final int WHEN_EXHAUSTED_BLOCK = 1;
     public static final int WHEN_EXHAUSTED_WAIT = 1;
     public static final int WHEN_EXHAUSTED_GROW = 2;
 
@@ -98,7 +95,8 @@ public class PoolingProfile
     public static final int DEFAULT_POOL_INITIALISATION_POLICY = INITIALISE_ONE;
 
     // map pool exhaustion strings to their respective values
-    public static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    @SuppressWarnings("unchecked")
+    public static final Map<String, Integer> POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -114,7 +112,8 @@ public class PoolingProfile
     };
 
     // map pool initialisation policy strings to their respective values
-    public static final Map POOL_INITIALISATION_POLICIES = new CaseInsensitiveMap()
+    @SuppressWarnings("unchecked")
+    public static final Map<String, Integer> POOL_INITIALISATION_POLICIES = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
