@@ -224,10 +224,10 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * Options that don't have an argument will have the String "true".
      */
     // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
-    public static Map getCommandLineOptions(String args[], String opts[][]) throws DefaultMuleException
+    public static Map<String, Object> getCommandLineOptions(String args[], String opts[][]) throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
-        Map ret = new HashMap();
+        Map<String, Object> ret = new HashMap<String, Object>();
         Option[] options = line.getOptions();
 
         for (int i = 0; i < options.length; i++)

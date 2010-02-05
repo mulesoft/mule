@@ -57,7 +57,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         /////////////////////////////////////////
         // Command-line config
         /////////////////////////////////////////
-        Map options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+        Map<String, Object> options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
         String config = (String)options.get("config");
         if (StringUtils.isNotBlank(config))
         {
@@ -79,19 +79,20 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
             if (synchronous)
             {
                 long start = System.currentTimeMillis();
-                List results = loanBrokerApp.requestSend(i, "CustomerRequests");
+                List<Object> results = loanBrokerApp.requestSend(i, "CustomerRequests");
                 System.out.println(LocaleMessage.responseNumQuotes(results.size()));
-                List output = new ArrayList(results.size());
+                List<String> output = new ArrayList<String>(results.size());
                 int x = 1;
-                for (Iterator iterator = results.iterator(); iterator.hasNext(); x++)
+                for (Iterator<Object> iterator = results.iterator(); iterator.hasNext(); x++)
                 {
-                    LoanQuote quote = (LoanQuote)iterator.next();
+                    LoanQuote quote = (LoanQuote) iterator.next();
                     output.add(x + ". " + quote.toString());
                 }
+                
                 System.out.println(StringMessageUtils.getBoilerPlate(output, '*', 80));
                 long cur = System.currentTimeMillis();
                 System.out.println(DateUtils.getFormattedDuration(cur - start));
-                System.out.println(LocaleMessage.responseAvgRequest(((cur - start) / x) ));
+                System.out.println(LocaleMessage.responseAvgRequest(((cur - start) / x)));
             }
             else
             {

@@ -214,18 +214,17 @@ public abstract class AbstractLoanBrokerApp
         }
     }
 
-    public List requestSend(int number, String endpoint) throws Exception
+    public List<Object> requestSend(int number, String endpoint) throws Exception
     {
         return requestSend(number, endpoint, null);
     }
 
-    public List requestSend(int number, String endpoint, Map properties) throws Exception
+    public List<Object> requestSend(int number, String endpoint, Map properties) throws Exception
     {
-        List results = new ArrayList(number);
-        MuleMessage result;
+        List<Object> results = new ArrayList<Object>(number);
         for (int i = 0; i < number; i++)
         {
-            result = client.send(endpoint, createRequest(), properties);
+            MuleMessage result = client.send(endpoint, createRequest(), properties);
             if (result != null)
             {
                 results.add(result.getPayload());
@@ -238,9 +237,9 @@ public abstract class AbstractLoanBrokerApp
     {
         if (synchronous)
         {
-            List list = this.requestSend(number, "CustomerRequests");
+            List<Object> list = requestSend(number, "CustomerRequests");
             int i = 1;
-            for (Iterator iterator = list.iterator(); iterator.hasNext(); i++)
+            for (Iterator<Object> iterator = list.iterator(); iterator.hasNext(); i++)
             {
                 System.out.println(
                     LocaleMessage.request(i, iterator.next().toString()));

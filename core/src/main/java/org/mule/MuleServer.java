@@ -29,7 +29,6 @@ import org.mule.util.SystemUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -111,8 +110,6 @@ public class MuleServer implements Runnable
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected Map options = Collections.EMPTY_MAP;
-
     /**
      * The MuleContext should contain anything which does not belong in the Registry.
      * There is one MuleContext per Mule instance. Assuming it has been created, a
@@ -154,11 +151,11 @@ public class MuleServer implements Runnable
 
     protected void init(String[] args) throws IllegalArgumentException
     {
-        Map options;
+        Map<String, Object> commandlineOptions;
 
         try
         {
-            options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+            commandlineOptions = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
         }
         catch (DefaultMuleException me)
         {
@@ -169,9 +166,9 @@ public class MuleServer implements Runnable
         // properties
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
-        String config = (String) options.get("config");
+        String config = (String) commandlineOptions.get("config");
         // Try default if no config file was given.
-        if (config == null && !options.containsKey("idle"))
+        if (config == null && !commandlineOptions.containsKey("idle"))
         {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
             // try to load the config as a file as well
@@ -193,7 +190,7 @@ public class MuleServer implements Runnable
         }
 
         // TODO old builders need to be retrofitted to understand the new app/lib
-        final String productionMode = (String) options.get("production");
+        final String productionMode = (String) commandlineOptions.get("production");
         //if (productionMode == null)
         //{
         try
@@ -211,9 +208,9 @@ public class MuleServer implements Runnable
 
 
         // Configuration builder
-        String cfgBuilderClassName = (String) options.get("builder");
+        String cfgBuilderClassName = (String) commandlineOptions.get("builder");
 
-        if (options.containsKey("idle"))
+        if (commandlineOptions.containsKey("idle"))
         {
             setConfigurationResources("IDLE");
             cfgBuilderClassName = CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER;
@@ -241,13 +238,13 @@ public class MuleServer implements Runnable
         }
 
         // Startup properties
-        String propertiesFile = (String) options.get("props");
+        String propertiesFile = (String) commandlineOptions.get("props");
         if (propertiesFile != null)
         {
             setStartupPropertiesFile(propertiesFile);
         }
 
-        StartupContext.get().setStartupOptions(options);
+        StartupContext.get().setStartupOptions(commandlineOptions);
     }
 
     /**
