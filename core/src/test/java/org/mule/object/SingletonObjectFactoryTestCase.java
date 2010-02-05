@@ -10,13 +10,11 @@
 
 package org.mule.object;
 
-import org.mule.api.object.ObjectFactory;
-
 public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
 
     @Override
-    public ObjectFactory getObjectFactory()
+    public AbstractObjectFactory getUninitialisedObjectFactory()
     {
         return new SingletonObjectFactory();
     }
@@ -24,20 +22,22 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     @Override
     public void testGetObjectClass() throws Exception
     {
-        SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
+        SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
         factory.setObjectClass(Object.class);
         factory.setMuleContext(muleContext);
         factory.initialise();
+        
         assertEquals(Object.class, factory.getObjectClass());
     }
 
     @Override
     public void testGet() throws Exception
     {
-        SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
+        SingletonObjectFactory factory = (SingletonObjectFactory) getUninitialisedObjectFactory();
         factory.setObjectClass(Object.class);
         factory.setMuleContext(muleContext);
         factory.initialise();
+        
         assertSame(factory.getInstance(), factory.getInstance());
     }
 

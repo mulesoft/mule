@@ -109,7 +109,7 @@ public class CommonsPoolObjectPool implements ObjectPool
                 numToBorrow = 1;
             }
 
-            List holderList = new ArrayList(numToBorrow);
+            List<Object> holderList = new ArrayList<Object>(numToBorrow);
             try
             {
                 for (int t = 0; t < numToBorrow; t++)
@@ -155,8 +155,7 @@ public class CommonsPoolObjectPool implements ObjectPool
             catch (Exception ex)
             {
                 // declared Exception is never thrown from pool; this is a known bug
-                // in
-                // the pool API
+                // in the pool API
             }
         }
     }
@@ -196,7 +195,6 @@ public class CommonsPoolObjectPool implements ObjectPool
         {
             pool.clear();
         }
-
     }
 
     public void close()
@@ -216,7 +214,6 @@ public class CommonsPoolObjectPool implements ObjectPool
                 pool = null;
             }
         }
-
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -234,7 +231,6 @@ public class CommonsPoolObjectPool implements ObjectPool
      */
     class PoolabeObjectFactoryAdaptor implements PoolableObjectFactory
     {
-
         public void activateObject(Object obj) throws Exception
         {
             // nothing to do
@@ -262,7 +258,5 @@ public class CommonsPoolObjectPool implements ObjectPool
         {
             return true;
         }
-
     }
-
 }

@@ -134,7 +134,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
     }
 
     @Override
-    public int hashCode ()
+    public int hashCode()
     {
         int result;
         result = (bitten ? 1 : 0);

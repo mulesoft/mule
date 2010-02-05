@@ -11,7 +11,6 @@
 package org.mule.object;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.object.ObjectFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
@@ -19,7 +18,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 
     public void testInitialisationFailure() throws Exception
     {
-        AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
+        AbstractObjectFactory factory = getUninitialisedObjectFactory();
 
         try
         {
@@ -44,9 +43,10 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 
     public void testInitialiseWithClass() throws Exception
     {
-        AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
+        AbstractObjectFactory factory = getUninitialisedObjectFactory();
         factory.setObjectClass(Object.class);
-        //Will init the object        
+
+        // Will init the object        
         muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
 
         assertNotNull(factory.getInstance());
@@ -54,16 +54,17 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 
     public void testInitialiseWithClassName() throws Exception
     {
-        AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
+        AbstractObjectFactory factory = getUninitialisedObjectFactory();
         factory.setObjectClassName(Object.class.getName());
-        //Will init the object
+
+        // Will init the object
         muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
         assertNotNull(factory.getInstance());
     }
 
     public void testDispose() throws Exception
     {
-        AbstractObjectFactory factory = (AbstractObjectFactory) getObjectFactory();
+        AbstractObjectFactory factory = getUninitialisedObjectFactory();
         factory.setObjectClass(Object.class);
         //Will init the object
         muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
@@ -82,7 +83,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
-    public abstract ObjectFactory getObjectFactory();
+    public abstract AbstractObjectFactory getUninitialisedObjectFactory();
 
     public abstract void testGetObjectClass() throws Exception;
 

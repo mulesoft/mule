@@ -147,10 +147,6 @@ public class PoolingProfile
         this.maxWait = pp.getMaxWait();
         this.exhaustedAction = pp.getExhaustedAction();
         this.initialisationPolicy = pp.getInitialisationPolicy();
-//        if (pp.getPoolFactory() != null)
-//        {
-//            poolFactory = pp.getPoolFactory();
-//        }
     }
 
     public PoolingProfile(int maxActive,

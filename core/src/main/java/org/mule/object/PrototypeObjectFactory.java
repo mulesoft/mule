@@ -34,12 +34,12 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
         super(objectClassName, properties);
     }
 
-    public PrototypeObjectFactory(Class objectClass)
+    public PrototypeObjectFactory(Class<?> objectClass)
     {
         super(objectClass);
     }
 
-    public PrototypeObjectFactory(Class objectClass, Map properties)
+    public PrototypeObjectFactory(Class<?> objectClass, Map properties)
     {
         super(objectClass, properties);
     }
