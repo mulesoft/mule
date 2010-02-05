@@ -4181,7 +4181,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="maxWait" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_BLOCK.</xsd:documentation>
+                        <xsd:documentation>Specifies the number of milliseconds to wait for a pooled component to become available when the pool is exhausted and the exhaustedAction is set to WHEN_EXHAUSTED_WAIT.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <!-- <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/> -->
