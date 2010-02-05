@@ -21,7 +21,6 @@ import org.mule.util.ClassUtils;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
     protected String objectClassName;
     protected SoftReference<Class<?>> objectClass = null;
     protected Map properties = null;
-    protected List initialisationCallbacks = new ArrayList();
+    protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
     protected MuleContext muleContext;
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -57,19 +56,37 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
 
     public AbstractObjectFactory(String objectClassName, Map properties)
     {
+        super();
         this.objectClassName = objectClassName;
         this.properties = properties;
+        setupObjectClassFromObjectClassName();
     }
 
-    public AbstractObjectFactory(Class objectClass)
+    public AbstractObjectFactory(Class<?> objectClass)
     {
         this(objectClass, null);
     }
 
     public AbstractObjectFactory(Class<?> objectClass, Map properties)
     {
+        super();
+        this.objectClassName = objectClass.getName();
         this.objectClass = new SoftReference<Class<?>>(objectClass);
         this.properties = properties;
+    }
+
+    protected Class<?> setupObjectClassFromObjectClassName()
+    {
+        try
+        {
+            Class<?> klass = ClassUtils.getClass(objectClassName);
+            objectClass = new SoftReference<Class<?>>(klass);
+            return klass;
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public void setMuleContext(MuleContext context)
@@ -79,29 +96,19 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
 
     public void initialise() throws InitialisationException
     {
-        if ((objectClass == null || (objectClass.get() == null)) && objectClassName == null)
+        if ((objectClassName == null) || (objectClass == null))
         {
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
-
-        if ((objectClass == null || (objectClass.get() == null)) && objectClassName != null)
-        {
-            try
-            {
-                objectClass = new SoftReference<Class<?>>(ClassUtils.getClass(objectClassName));
-            }
-            catch (ClassNotFoundException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
     }
-
+    
     public void dispose()
     {
         this.objectClass.clear();
         this.objectClass.enqueue();
+        this.objectClass = null;
+        
         this.objectClassName = null;
     }
 
@@ -110,13 +117,19 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
      */
     public Object getInstance() throws Exception
     {
-        if (objectClass == null || objectClass.get() == null)
+        if (objectClass == null)
         {
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
+        
+        Class<?> klass = objectClass.get();
+        if (klass == null)
+        {
+            klass = setupObjectClassFromObjectClassName();
+        }
 
-        Object object = ClassUtils.instanciateClass(objectClass.get());
+        Object object = ClassUtils.instanciateClass(klass);
 
         if (properties != null)
         {
@@ -127,25 +140,35 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
         
         return object;
     }
-    
+
     protected void fireInitialisationCallbacks(Object component) throws InitialisationException
     {
-        InitialisationCallback callback;
-        for (Iterator iterator = initialisationCallbacks.iterator(); iterator.hasNext();)
+        for (InitialisationCallback callback : initialisationCallbacks)
         {
-            callback = (InitialisationCallback) iterator.next();
             callback.initialise(component);
         }
     }
 
     public Class<?> getObjectClass()
     {
-        return objectClass.get();
+        if (objectClass != null)
+        {
+            Class<?> klass = objectClass.get();
+            if (klass == null)
+            {
+                klass = setupObjectClassFromObjectClassName();
+            }
+            return klass;
+        }
+
+        // objectClass may be null if this factory was not yet initialized or was disposed
+        return null;
     }
 
     public void setObjectClass(Class<?> objectClass)
     {
         this.objectClass = new SoftReference<Class<?>>(objectClass);
+        this.objectClassName = objectClass.getName();
     }
 
     protected String getObjectClassName()
@@ -156,6 +179,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, MuleContex
     public void setObjectClassName(String objectClassName)
     {
         this.objectClassName = objectClassName;
+        setupObjectClassFromObjectClassName();
     }
 
     protected Map getProperties()

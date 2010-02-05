@@ -50,8 +50,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
 
     public void testDirectComponentCreation() throws Exception
     {
-        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
-            Apple.class);
+        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(Apple.class);
 
         assertNotNull(component.getObjectFactory());
         assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
