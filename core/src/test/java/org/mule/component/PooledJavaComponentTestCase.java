@@ -207,9 +207,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertEquals(0, component.lifecycleAdapterPool.getNumActive());
     }
 
-    // disable this test only for the current checkin ... need to fix PrototypeObjectFactory
-    // in order to make this work
-    public void ___testObjectUniqueness() throws Exception
+    public void testObjectUniqueness() throws Exception
     {
         ObjectFactory objectFactory = new PrototypeObjectFactory(UniqueComponent.class);
         
@@ -282,8 +280,14 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
 
     private String getIdFromObjectCreatedByPool(PooledJavaComponent component) throws Exception
     {
-        Object obj = ((DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject;
+        DefaultLifecycleAdapter lifecycleAdapter = 
+            (DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor();
+        Object obj = lifecycleAdapter.componentObject.get();
+        
+        // there is a slight chance that GC kicks in before we can get a hard reference to the 
+        // object. If this occurs, talk do Dirk and Andrew P about how to fix this
         assertNotNull(obj);
+        
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
      
         String id = ((UniqueComponent) obj).getId();
