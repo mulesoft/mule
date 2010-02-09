@@ -63,16 +63,19 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposable
 {
+    protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
+
     /**
      * A reference to Mule's internal registry
      */
     private DefaultRegistryBroker registry;
 
+    /**
+     * We cache transformer searches so that we only search once
+     */
     protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
 
     private MuleContext muleContext;
-
-    protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
@@ -80,16 +83,25 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         this.muleContext = muleContext;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void initialise() throws InitialisationException
     {
         //no-op
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose()
     {
         transformerListCache.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Connector lookupConnector(String name)
     {
         return (Connector) registry.lookupObject(name);
@@ -106,8 +118,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      * should be used instead.<br/><br/>
      *
      * @param name the idendtifer/name used to register endpoint in registry
+     * @return foo
      */
-    public ImmutableEndpoint lookupEndpoint(String name)
+    /*public ImmutableEndpoint lookupEndpoint(String name)
     {
         Object obj = registry.lookupObject(name);
         if (obj instanceof ImmutableEndpoint)
@@ -123,8 +136,11 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
                     + " is a global endpoint you should use the EndpointFactory to create endpoint instances from global endpoints.");
             return null;
         }
-    }
+    }*/
 
+    /**
+     * {@inheritDoc}
+     */
     public EndpointBuilder lookupEndpointBuilder(String name)
     {
         Object o = registry.lookupObject(name);
@@ -140,21 +156,28 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public EndpointFactory lookupEndpointFactory()
     {
         return (EndpointFactory) registry.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Transformer lookupTransformer(String name)
     {
         return (Transformer) registry.lookupObject(name);
     }
 
-
     /**
      * {@inheritDoc}
      *
-     * @deprecated
+     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
+     * method should only be used internally to discover transformers, typically a user does not need ot do this
+     * directly
      */
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
@@ -164,7 +187,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     /**
      * {@inheritDoc}
      *
-     * @deprecated
+     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead.  This
+     * method should only be used internally to discover transformers, typically a user does not need ot do this
+     * directly
      */
     public List<Transformer> lookupTransformers(Class input, Class output)
     {
@@ -179,7 +204,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
 
         Transformer trans;
         List<TransformerResolver> resolvers = (List<TransformerResolver>) lookupObjects(TransformerResolver.class);
-        Collections.sort(resolvers, new TransformerResolverComarator());
+        Collections.sort(resolvers, new TransformerResolverComparator());
         for (TransformerResolver resolver : resolvers)
         {
             try
@@ -220,12 +245,6 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
                 continue;
             }
             DataType dt = t.getReturnDataType();
-//            Class c = t.getReturnClass();
-//            //TODO RM* this sohuld be an exception
-//            if (c == null)
-//            {
-//                c = Object.class;
-//            }
             if (result.isCompatibleWith(dt) && t.isSourceDataTypeSupported(source))
             {
                 results.add(t);
@@ -236,56 +255,89 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Model lookupModel(String name)
     {
         return (Model) registry.lookupObject(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Model lookupSystemModel()
     {
         return lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Model> getModels()
     {
         return registry.lookupObjects(Model.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Connector> getConnectors()
     {
         return registry.lookupObjects(Connector.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Agent> getAgents()
     {
         return registry.lookupObjects(Agent.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<ImmutableEndpoint> getEndpoints()
     {
         return registry.lookupObjects(ImmutableEndpoint.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Transformer> getTransformers()
     {
         return registry.lookupObjects(Transformer.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Agent lookupAgent(String name)
     {
         return (Agent) registry.lookupObject(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Service lookupService(String name)
     {
         return (Service) registry.lookupObject(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Service> lookupServices()
     {
         return lookupObjects(Service.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Collection<Service> lookupServices(String model)
     {
         Collection<Service> services = lookupServices();
@@ -295,7 +347,6 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         while (it.hasNext())
         {
             service = (Service) it.next();
-            // TODO Make this comparison more robust.
             if (model.equals(service.getModel().getName()))
             {
                 modelServices.add(service);
@@ -304,6 +355,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return modelServices;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
         registry.registerObject(getName(transformer), transformer, Transformer.class);
@@ -372,61 +426,97 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerAgent(Agent agent) throws MuleException
     {
         registry.registerObject(getName(agent), agent, Agent.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerConnector(Connector connector) throws MuleException
     {
         registry.registerObject(getName(connector), connector, Connector.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
     {
         registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
     {
         registry.registerObject(name, builder, EndpointBuilder.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerModel(Model model) throws MuleException
     {
         registry.registerObject(getName(model), model, Model.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerService(Service service) throws MuleException
     {
         registry.registerObject(getName(service), service, Service.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterService(String serviceName) throws MuleException
     {
         registry.unregisterObject(serviceName, Service.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterAgent(String agentName) throws MuleException
     {
         registry.unregisterObject(agentName, Agent.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterConnector(String connectorName) throws MuleException
     {
         registry.unregisterObject(connectorName, Connector.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterEndpoint(String endpointName) throws MuleException
     {
         registry.unregisterObject(endpointName, ImmutableEndpoint.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterModel(String modelName) throws MuleException
     {
         registry.unregisterObject(modelName, Model.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterTransformer(String transformerName) throws MuleException
     {
         Transformer transformer = lookupTransformer(transformerName);
@@ -436,13 +526,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     }
 
     /**
-     * Will execute any processors on an object and fire any lifecycle methods according to the current lifecycle without actually
-     * registering the object in the registry.  This is useful for prototype objects that are created per request and would
-     * clutter the registry with single use objects.
-     *
-     * @param object the object to process
-     * @return the same object with any processors and lifecycle methods called
-     * @throws org.mule.api.MuleException if the registry fails to perform the lifecycle change or process object processors for the object.
+     * {@inheritDoc}
      */
     public Object applyProcessorsAndLifecycle(Object object) throws MuleException
     {
@@ -451,11 +535,17 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object applyProcessors(Object object) throws MuleException
     {
         return registry.getTransientRegistry().applyProcessors(object);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object applyLifecycle(Object object) throws MuleException
     {
         return registry.getTransientRegistry().applyLifecycle(object);
@@ -465,46 +555,77 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     // Delegate to internal registry
     ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         return registry.lookupObject(type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object lookupObject(String key)
     {
         return registry.lookupObject(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return registry.lookupObjects(type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         registry.registerObject(key, value, metadata);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerObject(String key, Object value) throws RegistrationException
     {
         registry.registerObject(key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void registerObjects(Map objects) throws RegistrationException
     {
         registry.registerObjects(objects);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         registry.unregisterObject(key, metadata);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void unregisterObject(String key) throws RegistrationException
     {
         registry.unregisterObject(key);
     }
 
+    /**
+     * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NamedObject}, then
+     * {@link org.mule.api.NamedObject#getName()} will be returned, otherwise a name is generated using the class name
+     * and a generated UUID.
+     * @param obj the object to inspect
+     * @return the name for this object
+     */
     protected String getName(Object obj)
     {
         String name = null;
@@ -523,23 +644,32 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     // Registry Metadata
     ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     public String getRegistryId()
     {
         return this.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isReadOnly()
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isRemote()
     {
         return false;
     }
 
 
-    private class TransformerResolverComarator implements Comparator<TransformerResolver>
+    private class TransformerResolverComparator implements Comparator<TransformerResolver>
     {
         public int compare(TransformerResolver transformerResolver, TransformerResolver transformerResolver1)
         {
