@@ -55,7 +55,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
 
     public Object getResultData()
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>(3);
         list.add("this");
         list.add("is");
         list.add("groovy!");
