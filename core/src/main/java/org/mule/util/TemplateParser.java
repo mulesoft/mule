@@ -136,8 +136,8 @@ public final class TemplateParser
     protected String parse(Map props, String template, TemplateCallback callback)
     {
         String result = template;
-        Map newProps = null;
-        if (props != null)
+        Map newProps = props;
+        if (props != null && !(props instanceof CaseInsensitiveHashMap))
         {
             newProps = new CaseInsensitiveHashMap(props);
         }

@@ -10,14 +10,14 @@
 package org.mule.impl.registry;
 
 import org.mule.api.registry.Registry;
+import org.mule.util.CaseInsensitiveHashMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Provides a {@link java.util.HashMap} view of values stored in the registry
  */
-public class RegistryMap extends HashMap
+public class RegistryMap extends CaseInsensitiveHashMap
 {
     private Registry registry;
 
