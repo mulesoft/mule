@@ -12,7 +12,10 @@
        http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.0/mule-bpm.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <bpm:jbpm-connector name="bpmConnector" />
+    <bpm:jbpm-connector name="bpmConnector">
+    	<bpm:process name="simple" resource="simple-process.jpdl.xml" />
+    	<bpm:process name="message" resource="message-process.jpdl.xml" />
+    </bpm:jbpm-connector>
     
     <model name="processModel">
 

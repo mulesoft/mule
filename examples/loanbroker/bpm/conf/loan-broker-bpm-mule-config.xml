@@ -14,7 +14,9 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <bpm:jbpm-connector name="jBpmConnector" />
+    <bpm:jbpm-connector name="jBpmConnector">
+    	<bpm:process name="loanBroker" resource="loan-broker-process.jpdl.xml" />
+    </bpm:jbpm-connector>
 
     <jms:activemq-connector name="jmsConnector" />
 

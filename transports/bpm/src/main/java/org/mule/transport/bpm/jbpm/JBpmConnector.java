@@ -14,6 +14,8 @@ import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.ClassUtils;
 
+import java.util.Properties;
+
 public class JBpmConnector extends ProcessConnector 
 {
     public static final String JBPM_WRAPPER_CLASS = "org.mule.transport.jbpm.Jbpm";
@@ -22,17 +24,12 @@ public class JBpmConnector extends ProcessConnector
     
     private Object processEngine;
     
+    private Properties processDefinitions;
+
     @Override
     protected BPMS createBpms() throws Exception
     {
-        if (configurationResource != null)
-        {
-            return (BPMS) ClassUtils.instanciateClass(JBPM_WRAPPER_CLASS, configurationResource);
-        }
-        else
-        {
-            return (BPMS) ClassUtils.instanciateClass(JBPM_WRAPPER_CLASS);
-        }
+        return (BPMS) ClassUtils.instanciateClass(JBPM_WRAPPER_CLASS, configurationResource, processDefinitions);
     }
 
     public void setConfigurationResource(String configurationResource)
@@ -53,5 +50,10 @@ public class JBpmConnector extends ProcessConnector
     public void setProcessEngine(Object processEngine)
     {
         this.processEngine = processEngine;
+    }
+    
+    public void setProcessDefinitions(Properties processDefinitions)
+    {
+        this.processDefinitions = processDefinitions;
     }
 }

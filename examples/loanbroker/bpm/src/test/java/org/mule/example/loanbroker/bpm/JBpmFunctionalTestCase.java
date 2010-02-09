@@ -53,13 +53,6 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     }
 
     @Override
-    protected void doSetUp() throws Exception 
-    {
-        ProcessConnector jBpmConnector = (ProcessConnector) muleContext.getRegistry().lookupConnector("jBpmConnector");
-        ((Jbpm) jBpmConnector.getBpms()).deployProcess("loan-broker-process.jpdl.xml");     
-    }
-
-    @Override
     public void testLotsOfLoanRequests() throws Exception
     {
         MuleClient client = new MuleClient();

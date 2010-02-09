@@ -78,6 +78,15 @@
     <xsd:complexType name="jBpmConnectorType">
         <xsd:complexContent>
             <xsd:extension base="abstractBpmConnectorType">
+                <xsd:sequence>
+                	<xsd:element name="process" type="processType" maxOccurs="unbounded">
+	                    <xsd:annotation>
+	                        <xsd:documentation>
+	                        	A process definition to be loaded into jBPM when the connector is initialized.
+	                        </xsd:documentation>
+	                    </xsd:annotation>
+	                </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="configurationResource" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -96,6 +105,35 @@
         </xsd:complexContent>
    </xsd:complexType>
  
+    <xsd:complexType name="processType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="mule:abstractExtensionType">
+            	<!--
+                <xsd:sequence>
+                    <xsd:element name="text" type="xsd:string" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Used for embedding the process definition inside the XML. This is useful for simple processes where you are just mocking up a quick application.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                -->
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The process definition file. The file can be on the classpath or local file system.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="resource" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>The process definition file. The file can be on the classpath or local file system.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="customElement">
         <xsd:choice>
             <xsd:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>

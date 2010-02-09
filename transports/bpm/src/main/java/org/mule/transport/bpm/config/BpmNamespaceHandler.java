@@ -10,6 +10,7 @@
 package org.mule.transport.bpm.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.endpoint.URIBuilder;
@@ -35,6 +36,8 @@ public class BpmNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("outbound-router", new BpmOutboundRouterDefinitionParser());
         // TODO MULE-3205
         //registerBeanDefinitionParser("component", new ComponentDefinitionParser(ProcessComponent.class));
+
+        registerMuleBeanDefinitionParser("process", new ChildMapEntryDefinitionParser("processDefinitions", "name", "resource"));
 
         registerBeanDefinitionParser("jbpm-connector", new MuleOrphanDefinitionParser(JBpmConnector.class, true));
     }

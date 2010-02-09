@@ -19,6 +19,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.jbpm.api.Configuration;
@@ -46,6 +47,8 @@ public class Jbpm implements BPMS, Initialisable, Disposable
 
     private String configurationResource;
     
+    private Properties processDefinitions;
+    
     /**
      * Indicates whether jBPM has been instantiated by the connector (false) or was
      * passed in from somewhere else (true).
@@ -66,11 +69,13 @@ public class Jbpm implements BPMS, Initialisable, Disposable
 
     /**
      * Creates the Mule wrapper for jBPM
-     * @param The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
+     * @param configurationResource - The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
+     * @param processDefinitions - A list of process definitions to load into jBPM upon initialization.
      */
-    public Jbpm(String configurationResource)
+    public Jbpm(String configurationResource, Properties processDefinitions)
     {
         this.configurationResource = configurationResource;
+        this.processDefinitions = processDefinitions;
     }
 
     /**
@@ -93,6 +98,20 @@ public class Jbpm implements BPMS, Initialisable, Disposable
             }
             setProcessEngine(config.buildProcessEngine());  
             containerManaged = false;
+        }
+        if (processDefinitions != null)
+        {
+            for (Object def : processDefinitions.values())
+            {
+                try
+                {
+                    deployProcess((String) def);
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to deploy process definition: " + e.getMessage());
+                }
+            }
         }
     }
     
@@ -291,4 +310,13 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         this.configurationResource = configurationResource;
     }
 
+    public Properties getProcessDefinitions()
+    {
+        return processDefinitions;
+    }
+
+    public void setProcessDefinitions(Properties processDefinitions)
+    {
+        this.processDefinitions = processDefinitions;
+    }
 }

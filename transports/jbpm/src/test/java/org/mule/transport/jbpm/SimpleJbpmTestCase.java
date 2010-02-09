@@ -26,23 +26,8 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
         return "jbpm-functional-test.xml";
     }
 
-    public void testDeploy() throws Exception 
+    public void testSimpleProcess() throws Exception 
     {
-        BPMS bpms = connector.getBpms();
-        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
-
-        Object process = bpms.startProcess("simple", null, null);
-        assertNotNull(process);
-        Object processId = bpms.getId(process);
-        
-        process = bpms.lookupProcess(processId);
-        assertNotNull(process);        
-    }
-    
-    public void testSimpleProcess() throws Exception {
-        // Deploy the process definition.
-        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
-
         MuleMessage response;
         Object process;
         BPMS bpms = connector.getBpms();
@@ -73,9 +58,6 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
 
     public void testSimpleProcessWithParameters() throws Exception
     {
-        // Deploy the process definition.
-        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
-
         MuleMessage response;
         Object process;
         BPMS bpms = connector.getBpms();
