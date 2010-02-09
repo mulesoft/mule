@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jdbc</artifactId>
+            <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -66,8 +66,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh</artifactId>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

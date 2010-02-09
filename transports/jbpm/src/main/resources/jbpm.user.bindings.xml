@@ -1,0 +1,4 @@
+<bindings>
+	<activity binding="org.mule.transport.jbpm.MuleBinding" />
+	<eventlistener binding="org.mule.transport.jbpm.MuleBinding" />
+</bindings>

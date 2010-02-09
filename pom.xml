@@ -113,11 +113,11 @@
         <hibernateVersion>3.2.2.ga</hibernateVersion>
         <jacksonVersion>1.3.1</jacksonVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
-        <javassistVersion>3.6.ga</javassistVersion>
+        <javassistVersion>3.7.ga</javassistVersion>
         <javaActivationVersion>1.1</javaActivationVersion>
         <javaElVersion>2.1.0</javaElVersion>
         <javaMailVersion>1.4</javaMailVersion>
-        <javaScriptVersion>1.0</javaScriptVersion>
+        <javaScriptVersion>2.0.5</javaScriptVersion>
         <javaServletVersion>2.4.0</javaServletVersion>
         <javaServletJspVersion>2.1.0</javaServletJspVersion>
         <javaWsdlVersion>1.6.1</javaWsdlVersion>
@@ -128,7 +128,7 @@
         <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
-        <jbpmVersion>3.2.2</jbpmVersion>
+        <jbpmVersion>4.2</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.22</jettyVersion>

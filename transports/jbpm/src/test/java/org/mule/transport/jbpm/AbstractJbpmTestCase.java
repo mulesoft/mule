@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.bpm.jbpm;
+package org.mule.transport.jbpm;
 
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.bpm.tests.AbstractBpmTestCase;

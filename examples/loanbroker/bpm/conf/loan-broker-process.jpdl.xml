@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process description="LoanBroker BPM example" name="LoanBroker" xmlns="http://jbpm.org/4.3/jpdl">
+
+    <!-- *******************************************************************
+                        Loan Broker Process Definition
+         ******************************************************************* -->
+
+    <!-- Request received from customer -->
+    <start name="customerRequest">
+        <transition to="validateCustomerRequest" />
+    </start>
+
+	<!-- The payload which was received from Mule when starting the process is in the variable "incoming".
+		Here we store into the variable "customerRequest". -->
+	<script name="validateCustomerRequest" expr="#{incoming}" var="customerRequest">
+        <transition to="sendToCreditAgency" />
+    </script>
+	
+    <!-- Send customer info. to credit agency -->
+	<mule name="sendToCreditAgency" 
+		  payloadSource="customerRequest.customer" endpoint="CreditAgency" synchronous="false">
+		<transition to="waitForCreditAgency" />
+	</mule>	
+	
+    <!-- Wait for the customer's credit profile to arrive. -->
+    <state name="waitForCreditAgency">
+        <timer duedate="4 hours" />
+        <transition to="validateCreditProfile" />
+    </state>
+
+	<script name="validateCreditProfile" expr="#{incoming}" var="creditProfile">
+        <transition to="prepareLoanQuoteRequest" />
+    </script>
+
+    <!-- Prepare a quote request to send to the banks which includes the customer's credit info. -->
+    <java name="prepareLoanQuoteRequest" 
+    	  class="org.mule.example.loanbroker.bpm.activity.PrepareLoanQuoteRequest" 
+    	  method="prepareRequest" var="loanRequest">
+    	<arg><object expr="#{customerRequest}"/></arg>
+    	<arg><object expr="#{creditProfile}"/></arg>
+        <transition to="sendToBanks" />
+    </java>
+
+    <!-- Send the request to one of three banks, depending on the loan amount and customer credit info. -->
+    <decision name="sendToBanks">
+        <transition to="sendToBigBank">
+            <condition expr="#{customerRequest.loanAmount >= 20000}" />
+            <condition expr="#{creditProfile.creditHistory >= 24}" />
+            <condition expr="#{creditProfile.creditScore >= 5}" />
+        </transition>
+        <transition to="sendToMediumBank">
+            <condition expr="#{customerRequest.loanAmount >= 10000}" />
+            <condition expr="#{creditProfile.creditHistory >= 12}" />
+            <condition expr="#{creditProfile.creditScore >= 3}" />
+        </transition>
+        <transition to="sendToSmallBank">
+            <condition expr="#{creditProfile.creditHistory >= 6}" />
+            <condition expr="#{creditProfile.creditScore >= 1}" />
+        </transition>
+        <!-- If the credit info. doesn't meet minimum requirements based on the loan amount,
+             the loan is just denied. -->
+        <transition to="loanDenied" />
+    </decision>
+
+	<mule name="sendToBigBank" 
+		  payloadSource="loanRequest" endpoint="BigBank" synchronous="true">
+		<transition to="validateLoanQuote" />
+	</mule>	
+
+	<mule name="sendToMediumBank" 
+		  payloadSource="loanRequest" endpoint="MediumBank" synchronous="true">
+		<transition to="validateLoanQuote" />
+	</mule>	
+
+	<mule name="sendToSmallBank" 
+		  payloadSource="loanRequest" endpoint="SmallBank" synchronous="true">
+		<transition to="validateLoanQuote" />
+	</mule>	
+
+	<script name="validateLoanQuote" expr="#{incoming}" var="loanQuote">
+        <transition to="sendCustomerResponse" />
+    </script>
+	
+	<mule name="sendCustomerResponse" 
+		  payloadSource="loanQuote" endpoint="CustomerResponses" synchronous="false">
+		<transition to="loanApproved" />
+	</mule>	
+
+    <end name="loanApproved" />
+
+    <end name="loanDenied" />
+
+</process>

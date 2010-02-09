@@ -14,6 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.client.MuleClient;
@@ -91,10 +93,19 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
         {
             if (bpms == null)
             {
+                bpms = createBpms();
+            }
+            if (bpms == null)
+            {
                 throw new ConfigurationException(
                     MessageFactory.createStaticMessage("The bpms property must be set for this connector."));
             }
 
+            if (bpms instanceof Initialisable)
+            {
+                ((Initialisable) bpms).initialise();
+            }
+            
             // Set a callback so that the BPMS may generate messages within Mule.
             bpms.setMessageService(this);
             
@@ -111,9 +122,21 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
         }
     }
 
+    /** 
+     * Override this method to create the BPMS upon initialization of the connector.
+     * @return an initialized BPMS
+     */
+    protected BPMS createBpms() throws Exception
+    {
+        return null;
+    }
+    
     protected void doDispose()
     {
-        // template method
+        if (bpms instanceof Disposable)
+        {
+            ((Disposable) bpms).dispose();
+        }
     }
 
     protected void doConnect() throws Exception
@@ -202,6 +225,8 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
                                 + ", processId = " + processId));
         }
 
+        logger.debug("Generating Mule message for process name = " + processName + " id = " + processId + ", synchronous = " + synchronous);
+        
         if (synchronous)
         {
             // Send the process-generated Mule message synchronously.

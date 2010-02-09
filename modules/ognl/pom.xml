@@ -33,7 +33,7 @@
          <dependency>
             <groupId>jboss</groupId>
             <artifactId>javassist</artifactId>
-            <version>${javassistVersion}-osgi</version>
+            <version>${javassistVersion}</version>
         </dependency>
         
         <!-- Unit tests -->

@@ -8,14 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.bpm.jbpm;
+package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
-import org.mule.transport.bpm.jbpm.Jbpm;
-import org.mule.util.NumberUtils;
 
 /**
  * Tests the connector against jBPM with a simple process.
@@ -28,9 +26,22 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
         return "jbpm-functional-test.xml";
     }
 
+    public void testDeploy() throws Exception 
+    {
+        BPMS bpms = connector.getBpms();
+        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
+
+        Object process = bpms.startProcess("simple", null, null);
+        assertNotNull(process);
+        Object processId = bpms.getId(process);
+        
+        process = bpms.lookupProcess(processId);
+        assertNotNull(process);        
+    }
+    
     public void testSimpleProcess() throws Exception {
         // Deploy the process definition.
-        ((Jbpm) bpms).deployProcess("simple-process.xml");
+        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
 
         MuleMessage response;
         Object process;
@@ -42,9 +53,9 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
             response = client.send("bpm://simple", "data", null);
             process = response.getPayload();
 
-            long processId = NumberUtils.toLong(bpms.getId(process));
+            String processId = (String)bpms.getId(process);
             // The process should be started and in a wait state.
-            assertFalse(processId == -1);
+            assertFalse(processId == null);
             assertEquals("dummyState", bpms.getState(process));
 
             // Advance the process one step.
@@ -63,7 +74,7 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
     public void testSimpleProcessWithParameters() throws Exception
     {
         // Deploy the process definition.
-        ((Jbpm) bpms).deployProcess("simple-process.xml");
+        ((Jbpm) bpms).deployProcess("simple-process.jpdl.xml");
 
         MuleMessage response;
         Object process;
@@ -77,10 +88,10 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
                                    "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
             process = response.getPayload();
 
-            long processId =
-                    response.getLongProperty(ProcessConnector.PROPERTY_PROCESS_ID, -1);
+            String processId =
+                    response.getStringProperty(ProcessConnector.PROPERTY_PROCESS_ID, null);
             // The process should be started and in a wait state.
-            assertFalse(processId == -1);
+            assertFalse(processId == null);
             assertEquals("dummyState", bpms.getState(process));
 
             // Advance the process one step.

@@ -14,28 +14,22 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <bpm:connector name="jBpmConnector" bpms-ref="jbpm" />
+    <bpm:jbpm-connector name="jBpmConnector" />
 
-    <vm:connector name="syncVm" />
+    <jms:activemq-connector name="jmsConnector" />
 
-    <vm:connector name="asyncVm"/>
-
-    <!-- We could use JMS instead of VM to make the example more realistic.
-        <jms:activemq-connector name="jmsConnector" />
-    -->
-
-    <!-- Customer loan requests to the Loan Broker -->
-    <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm" />
-    <!-- Requests to the credit agency -->
-    <vm:endpoint name="CreditAgency" path="credit.agency" connector-ref="syncVm" />
-    <!-- Customer credit profiles from the credit agency -->
-    <vm:endpoint name="CreditProfiles" path="credit.profiles" connector-ref="syncVm" />
-    <!-- Final loan quote to the customer -->
-    <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm" />
+	<!-- Customer loan requests to the Loan Broker -->
+	<jms:endpoint name="CustomerRequests" queue="customer.requests" />
+	<!-- Requests to the credit agency -->
+	<jms:endpoint name="CreditAgency" queue="credit.agency" />
+	<!-- Customer credit profiles from the credit agency -->
+	<jms:endpoint name="CreditProfiles" queue="credit.profiles" />
+	<!-- Final loan quote to the customer -->
+	<jms:endpoint name="CustomerResponses" queue="customer.responses" />
     <!-- Bigger banks handle bigger loans.  -->
-    <vm:endpoint name="BigBank" path="big.bank" connector-ref="syncVm" />
-    <vm:endpoint name="MediumBank" path="medium.bank" connector-ref="syncVm" />
-    <vm:endpoint name="SmallBank" path="small.bank" connector-ref="syncVm" />
+    <vm:endpoint name="BigBank" path="big.bank" synchronous="true" />
+    <vm:endpoint name="MediumBank" path="medium.bank" synchronous="true" />
+    <vm:endpoint name="SmallBank" path="small.bank" synchronous="true" />
 
     <model name="loan-broker">
 
@@ -70,19 +64,19 @@
                     <!-- Outgoing message = Customer -->
                     <outbound-endpoint ref="CreditAgency" />
 
+                    <!-- Outgoing message = LoanQuoteRequest -->
+                    <outbound-endpoint ref="BigBank">
+                        <property key="method" value="getLoanQuote"/>
+                    </outbound-endpoint>
+                    <outbound-endpoint ref="MediumBank">
+                        <property key="method" value="getLoanQuote"/>
+                    </outbound-endpoint>
+                    <outbound-endpoint ref="SmallBank">
+                        <property key="method" value="getLoanQuote"/>
+                    </outbound-endpoint>
+
                     <!-- Outgoing message = LoanQuote -->
                     <outbound-endpoint ref="CustomerResponses" />
-
-                    <!-- Outgoing message = LoanQuoteRequest -->
-                    <outbound-endpoint ref="BigBank" synchronous="true">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
-                    <outbound-endpoint ref="MediumBank" synchronous="true">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
-                    <outbound-endpoint ref="SmallBank" synchronous="true">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
                 </bpm:outbound-router>
             </outbound>
         </service>
@@ -124,83 +118,4 @@
             <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
     </model>
-
-    <!-- ***************************************************
-         BPMS Configuration
-         *************************************************** -->
-    <context:property-placeholder location="derby.properties"/>
-
-    <!-- BPMS object for Mule's BPM Connector -->
-    <spring:bean id="jbpm" class="org.mule.transport.bpm.jbpm.Jbpm" destroy-method="destroy">
-        <spring:property name="jbpmConfiguration">
-            <spring:ref local="jbpmConfig" />
-        </spring:property>
-    </spring:bean>
-
-    <!-- jBPM Configuration -->
-    <spring:bean id="jbpmConfig"
-        class="org.springmodules.workflow.jbpm31.LocalJbpmConfigurationFactoryBean">
-        <spring:property name="sessionFactory">
-            <spring:ref local="jbpmSessionFactory" />
-        </spring:property>
-        <spring:property name="configuration">
-            <spring:value>jbpm.cfg.xml</spring:value>
-        </spring:property>
-        <spring:property name="processDefinitions">
-            <spring:list>
-                <spring:bean id="loanBroker"
-                    class="org.springmodules.workflow.jbpm31.definition.ProcessDefinitionFactoryBean">
-                    <spring:property name="definitionLocation">
-                        <spring:value>loan-broker-process.xml</spring:value>
-                    </spring:property>
-                </spring:bean>
-            </spring:list>
-        </spring:property>
-        <spring:property name="createSchema">
-            <spring:value>false</spring:value>
-        </spring:property>
-    </spring:bean>
-
-
-    <!-- JBPM Hibernate SessionFactory -->
-    <spring:bean id="jbpmSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-        <spring:property name="dataSource">
-            <spring:ref local="jbpmDataSource" />
-        </spring:property>
-        <spring:property name="mappingLocations">
-            <spring:value>classpath*:/org/jbpm/**/*.hbm.xml</spring:value>
-        </spring:property>
-        <spring:property name="typeDefinitions">
-            <spring:ref local="jbpmTypes" />
-        </spring:property>
-        <spring:property name="hibernateProperties">
-            <spring:props>
-                <spring:prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</spring:prop>
-                <spring:prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</spring:prop>
-                <!-- Create/update the database tables automatically when the JVM starts up -->
-                <spring:prop key="hibernate.hbm2ddl.auto">update</spring:prop>
-            </spring:props>
-        </spring:property>
-    </spring:bean>
-
-    <!-- JBPM Datasource -->
-    <spring:bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <spring:property name="driverClassName">
-            <spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value>
-           </spring:property>
-        <spring:property name="url">
-            <spring:value>${database.connection}</spring:value>
-        </spring:property>
-    </spring:bean>
-
-    <!-- JBPM data types -->
-    <spring:bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
-        <spring:property name="typeName">
-            <spring:value>string_max</spring:value>
-        </spring:property>
-        <spring:property name="typeClass">
-            <spring:value>org.jbpm.db.hibernate.StringMax</spring:value>
-        </spring:property>
-    </spring:bean>
-
 </mule>

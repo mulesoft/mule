@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process name="message"
+	description="Generates a Mule message and processes its response."
+	xmlns="http://jbpm.org/4.3/jpdl">
+
+	<start name="start">
+		<transition to="sendMessage" />
+	</start>
+
+	<mule name="sendMessage" endpoint="test:///tmp" payload="Message in a bottle."
+		synchronous="true">
+		<transition to="waitForSomething" />
+	</mule>
+
+	<state name="waitForSomething">
+		<transition to="end" />
+	</state>
+
+	<end name="end" />
+
+</process>

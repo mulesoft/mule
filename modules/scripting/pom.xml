@@ -47,19 +47,15 @@
 
         <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
         <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>script-api</artifactId>
-            <classifier>jdk14</classifier>
+	      <groupId>org.livetribe</groupId>
+	      <artifactId>livetribe-jsr223</artifactId>
+		  <version>${javaScriptVersion}</version>
         </dependency>
 
         <!-- This is the actual language implementation -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>net.sf.retrotranslator</groupId>
-            <artifactId>retrotranslator-runtime</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

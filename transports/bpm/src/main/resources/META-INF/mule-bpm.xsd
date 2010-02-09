@@ -31,16 +31,9 @@
 
     <xsd:element name="connector" type="bpmConnectorType" substitutionGroup="mule:abstract-connector"/>
 
-    <xsd:complexType name="bpmConnectorType">
+    <xsd:complexType name="abstractBpmConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule using the BPM transport. 
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -59,6 +52,43 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             This field will be used to correlate messages with processes.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+   </xsd:complexType>
+ 
+    <xsd:complexType name="bpmConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBpmConnectorType">
+                <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule using the BPM transport. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+   </xsd:complexType>
+ 
+    <xsd:element name="jbpm-connector" type="jBpmConnectorType" substitutionGroup="mule:abstract-connector"/>
+
+    <xsd:complexType name="jBpmConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBpmConnectorType">
+                <xsd:attribute name="configurationResource" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="processEngine-ref" type="xsd:IDREF">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

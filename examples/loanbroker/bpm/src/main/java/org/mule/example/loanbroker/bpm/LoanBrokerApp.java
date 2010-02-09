@@ -41,6 +41,8 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
     @Override
     protected void init() throws Exception
     {
+        String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
+        System.getProperties().put("hibernate.dbURL", "jdbc:derby:" + dbName + ";sql.enforce_strict_size=true");
         // before initialisation occurs, the database must be cleaned and a new one created
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         super.init();
