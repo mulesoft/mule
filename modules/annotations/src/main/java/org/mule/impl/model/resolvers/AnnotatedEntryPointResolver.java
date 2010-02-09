@@ -18,6 +18,7 @@ import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.annotations.Entrypoint;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.model.resolvers.AbstractEntryPointResolver;
 import org.mule.transport.NullPayload;
@@ -25,11 +26,14 @@ import org.mule.util.ClassUtils;
 import org.mule.utils.AnnotationUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.sf.cglib.proxy.Enhancer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -79,11 +83,11 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         //on the method
         if (methodName != null)
         {
-            method = getMethodByName(methodName, component.getClass());
+            method = getMethodByName(methodName, component);
             if (method == null)
             {
                 //TODO i18n
-                throw new IllegalArgumentException("Method not found: " + methodName + " on object: " + component.getClass());
+                throw new IllegalArgumentException("Method not found: " + methodName + " on object: " + component.getClass() + ". If the component is a proxy there needs to be an interface on the proxy that defines this method");
             }
             payload = getPayloadForMethod(method, component, context);
         }
@@ -112,17 +116,30 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
     protected Object[] getPayloadForMethod(Method method, Object component, MuleEventContext context) throws TransformerException, InitialisationException
     {
         Object[] payload;
-        if (AnnotationUtils.methodHasParamAnnotations(method))
+        Method m = method;
+        //If we are using cglib enhanced service objects, we need to read annotations from the real component class
+        if(Enhancer.isEnhanced(component.getClass()))
         {
-            payload = getPayloadFromMessageWithAnnotations(method, context);
+            try
+            {
+                m = component.getClass().getSuperclass().getMethod(method.getName(), method.getParameterTypes());
+            }
+            catch (NoSuchMethodException e)
+            {
+                throw new TransformerException(CoreMessages.createStaticMessage(e.getMessage()), e);
+            }
+        }
+        if (AnnotationUtils.methodHasParamAnnotations(m))
+        {
+            payload = getPayloadFromMessageWithAnnotations(m, context);
         }
         else
         {
             payload = getPayloadFromMessage(context);
             List methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils.getClassTypes(payload), true, true, ignoredMethods);
-            if (methods.size() == 0 && method.getParameterTypes().length == 1)
+            if (methods.size() == 0 && m.getParameterTypes().length == 1)
             {
-                Object temp = context.getMessage().getPayload(method.getParameterTypes()[0]);
+                Object temp = context.getMessage().getPayload(m.getParameterTypes()[0]);
                 payload = new Object[]{temp};
             }
         }
@@ -181,17 +198,30 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
 //        }
     }
 
-    protected Method getMethodByName(String name, Class clazz)
+    protected Method getMethodByName(String name, Object object)
     {
-        Method m = null;
-        for (int i = 0; i < clazz.getMethods().length; i++)
+        Set<Class> classes = new HashSet<Class>();
+        Class clazz = object.getClass();
+        
+        if(Proxy.isProxyClass(clazz))
         {
-            m = clazz.getMethods()[i];
-            if (m.getName().equals(name))
+            classes.addAll(Arrays.asList(clazz.getInterfaces()));
+        }
+        else
+        {
+            classes.add(object.getClass());
+        }
+
+        for (Class aClass : classes)
+        {
+            for (Method m : aClass.getMethods())
             {
-                break;
+                if (m.getName().equals(name))
+                {
+                    return m;
+                }
             }
         }
-        return m;
+        return null;
     }
 }

@@ -65,6 +65,12 @@
         </dependency>
 
         <dependency>
+            <artifactId>cglib-nodep</artifactId>
+            <groupId>cglib</groupId>
+            <version>2.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
