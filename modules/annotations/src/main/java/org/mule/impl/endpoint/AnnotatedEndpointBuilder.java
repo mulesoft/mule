@@ -52,7 +52,7 @@ public class AnnotatedEndpointBuilder
 
     protected String getPropertyValue(String key)
     {
-        return parser.parse(new RegistryMap(muleContext.getRegistry()), key);
+        return parser.parse(regMap, key);
     }
 
     protected EndpointBuilder getEndpointBuilder(AnnotatedEndpointData epData) throws MuleException
