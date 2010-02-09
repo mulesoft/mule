@@ -13,8 +13,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,6 +43,7 @@ public class TransformerChain extends AbstractMessageAwareTransformer
     public TransformerChain(Transformer... transformers)
     {
         this(Arrays.asList(transformers));
+        this.name = generateTransformerName();
     }
 
     public TransformerChain(String name, List<Transformer> transformers)
@@ -110,4 +113,23 @@ public class TransformerChain extends AbstractMessageAwareTransformer
             transformer.setEndpoint(endpoint);
         }
     }
+
+    @Override
+    protected String generateTransformerName()
+    {
+        String name = transformers.get(0).getClass().getSimpleName();
+        int i = name.indexOf("To");
+        DataType dt = transformers.get(transformers.size() -1).getReturnDataType();
+        if (i > 0 && dt != null)
+        {
+            String target = dt.getType().getSimpleName();
+            if (target.equals("byte[]"))
+            {
+                target = "byteArray";
+            }
+            name = name.substring(0, i + 2) + StringUtils.capitalize(target);
+        }
+        return name;
+    }
+
 }
