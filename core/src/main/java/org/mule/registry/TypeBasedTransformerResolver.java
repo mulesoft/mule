@@ -10,6 +10,7 @@
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -103,6 +104,14 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
             if (transformer != null)
             {
                 transformer = new TransformerChain(transformer, secondPass);
+                try
+                {
+                    muleContext.getRegistry().registerTransformer(transformer);
+                }
+                catch (MuleException e)
+                {
+                    throw new ResolverException(e.getI18nMessage(), e);
+                }
             }
         }
 
