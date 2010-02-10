@@ -21,6 +21,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -41,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
  * endpoints
  * <p/>
  */
-
 public class MuleReceiverServlet extends AbstractReceiverServlet
 {
     /**
@@ -95,7 +95,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
 
         EndpointURI uri = receiver.getEndpointURI();
-        String reqUri = request.getRequestURI().toString();
+        String reqUri = request.getRequestURI();
         requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, reqUri);
 
         String queryString = request.getQueryString();
@@ -188,10 +188,11 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         String uri = getReceiverName(httpServletRequest);
         if (uri == null)
         {
-            throw new EndpointException(HttpMessages.unableToGetEndpointUri(httpServletRequest.getRequestURI()));
+            throw new EndpointException(
+                    HttpMessages.unableToGetEndpointUri(httpServletRequest.getRequestURI()));
         }
 
-        MessageReceiver receiver = (MessageReceiver) getReceivers().get(uri);
+        MessageReceiver receiver = getReceivers().get(uri);
 
         // Lets see if the uri matches up with the last part of
         // any of the receiver keys.
@@ -202,8 +203,20 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
         if (receiver == null)
         {
-            throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
+            //Now match wild cards
+            for (Object key : getReceivers().keySet())
+            {
+                if (new WildcardFilter(key.toString()).accept(uri))
+                {
+                    receiver = connector.getReceivers().get(key);
+                }
+            }
+            if (receiver == null)
+            {
+                throw new NoReceiverForEndpointException(uri);
+            }
         }
+
         InboundEndpoint endpoint = receiver.getEndpoint();
 
         // Ensure that this receiver is using a dynamic (mutable) endpoint
@@ -277,7 +290,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         return name;
     }
 
-    protected Map getReceivers()
+    protected Map<Object, MessageReceiver> getReceivers()
     {
         return connector.getReceivers();
     }
