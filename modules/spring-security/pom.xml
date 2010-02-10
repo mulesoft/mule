@@ -18,10 +18,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -72,8 +74,6 @@
         </dependency>
 
         <!-- Unit tests -->
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
-                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -98,6 +98,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

@@ -32,7 +32,10 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
         </dependency>
+
+        <!-- test dependencies -->
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>

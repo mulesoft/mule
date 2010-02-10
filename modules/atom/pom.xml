@@ -20,30 +20,18 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <scope>test</scope>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
@@ -68,7 +56,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-spring</artifactId>
@@ -97,7 +84,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-jcr</artifactId>
@@ -122,7 +108,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-server</artifactId>
@@ -155,10 +140,9 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <!--
             The servlet-api dependency is needed to make this module compile. Make sure
-            it is in line with the version that abdera uses. Must be 'provided', 
+            it is in line with the version that abdera uses. Must be 'provided',
             though to avoid it ending up in the distributions.
         -->
         <dependency>
@@ -175,6 +159,24 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
@@ -187,7 +189,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <artifactId>tm-extractors</artifactId>
             <groupId>org.textmining</groupId>

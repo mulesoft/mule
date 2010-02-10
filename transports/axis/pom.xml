@@ -15,10 +15,12 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-soap</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -27,30 +29,23 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jetty</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
+            <version>${version}</version>
         </dependency>
-        
-        <!-- 
+        <!--
              org.apache.axis:axis does not declare its dependencies properly. The
              alternative is to use axis:axis but that has dependencies with missing
              POMs. The duplication here seems to be the lesser evil.
              -->
-        
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
             <version>${axisVersion}-osgi</version>
-            
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -59,7 +54,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
         </dependency>
@@ -87,16 +82,20 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
         </dependency>
-        
         <!-- needed by the Axis Service component -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
         </dependency>
 
         <!-- Unit tests -->
-        
-        <!-- Needed for common SOAP test classes -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jetty</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-soap</artifactId>

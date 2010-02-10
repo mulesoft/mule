@@ -39,21 +39,16 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
         </dependency>
-        
-        
-        
-    <dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
-            
-            
         </dependency>
          <dependency>
             <groupId>javax.xml.soap</groupId>
             <artifactId>saaj-api</artifactId>
             <version>${saajVersion}</version>
-            
             <exclusions>
                 <exclusion>
                     <groupId>javax.activation</groupId>
@@ -61,17 +56,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
             <version>${saajVersion}</version>
-            
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>${dom4jVersion}</version>
-            
             <exclusions>
                 <!-- no XML -->
                 <exclusion>
@@ -100,5 +93,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         </dependencies>
+    </dependencies>
 </project>

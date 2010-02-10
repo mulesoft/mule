@@ -15,20 +15,21 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-stax-api_1.0_spec</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -70,7 +71,7 @@
             <artifactId>xstream</artifactId>
             <version>${xstreamVersion}-osgi</version>
         </dependency>
-        <!-- 
+        <!--
             This dependency is needed by some extra XStream converters
         -->
         <dependency>
@@ -87,7 +88,7 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>${jaxenVersion}-osgi</version>
@@ -128,7 +129,7 @@
             <groupId>net.java.dev.stax-utils</groupId>
             <artifactId>stax-utils</artifactId>
         </dependency>
-        
+
         <!-- XSLT Support -->
         <dependency>
             <groupId>net.sf.saxon</groupId>

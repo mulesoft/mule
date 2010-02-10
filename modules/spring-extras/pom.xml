@@ -17,10 +17,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -53,9 +55,6 @@
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- Used by SpringTransactionFactory -->
-        
-        
 
         <!-- For test cases only -->
         <dependency>
@@ -93,17 +92,13 @@
             <artifactId>mockobjects-core</artifactId>
             <scope>test</scope>
         </dependency>
-    <dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
-            
-            
         </dependency>
          <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commonsCollectionsVersion}</version>
-            
         </dependency>
-         </dependencies>
+    </dependencies>
 </project>

@@ -12,18 +12,16 @@
     <description>Integrates Mule as a global Tomcat service, to be used with deployable configuration builder</description>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>catalina</artifactId>
             <version>6.0.20</version>
             <scope>provided</scope>
         </dependency>
-        
     </dependencies>
 </project>

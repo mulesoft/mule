@@ -15,16 +15,17 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossts-common</artifactId>
@@ -40,7 +41,7 @@
             <artifactId>jbossts-jta-integration</artifactId>
             <version>${jbossTsVersion}-osgi</version>
         </dependency>
-        
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>

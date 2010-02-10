@@ -17,10 +17,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -41,7 +43,6 @@
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
-        
 
         <!-- Unit tests -->
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
@@ -73,9 +74,7 @@
             <groupId>org.acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
             <version>${acegiVersion}-osgi</version>
-            
             <exclusions>
-
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
@@ -127,6 +126,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         </dependencies>
-
+    </dependencies>
 </project>

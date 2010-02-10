@@ -395,10 +395,12 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -419,12 +421,10 @@
             <artifactId>saxon</artifactId>
             <version>${saxonVersion}-osgi</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-annotation_1.0_spec</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -475,7 +475,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Needed for common SOAP test classes -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-soap</artifactId>
@@ -485,8 +484,7 @@
         </dependency>
 
         <!-- for integration tests -->
-        <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->      
-
+        <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
@@ -529,14 +527,13 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>${javaMailVersion}-osgi</version>
         </dependency>
          <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
             <version>${javaXmlWsVersion}-osgi</version>
             <exclusions>
-                <exclusion> 
+                <exclusion>
                     <groupId>javax.jws</groupId>
                     <artifactId>jsr181</artifactId>
                 </exclusion>

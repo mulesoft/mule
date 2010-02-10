@@ -15,10 +15,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -27,8 +29,8 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
+            <version>${version}</version>
         </dependency>
-
          <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
@@ -50,7 +52,7 @@
             <artifactId>yjp-controller-api-redist</artifactId>
             <version>${yourKitVersion}-osgi</version>
         </dependency>
-        
+
         <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -58,22 +60,22 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
             <artifactId>wrapper</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -91,5 +93,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

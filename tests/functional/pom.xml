@@ -15,11 +15,13 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <!-- needed for org.springframework.beans.factory.FactoryBean interface -->
         <dependency>

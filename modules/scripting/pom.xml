@@ -20,10 +20,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -44,14 +46,12 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
-
         <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
         <dependency>
-	      <groupId>org.livetribe</groupId>
-	      <artifactId>livetribe-jsr223</artifactId>
-		  <version>${javaScriptVersion}</version>
+            <groupId>org.livetribe</groupId>
+            <artifactId>livetribe-jsr223</artifactId>
+            <version>${javaScriptVersion}</version>
         </dependency>
-
         <!-- This is the actual language implementation -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
