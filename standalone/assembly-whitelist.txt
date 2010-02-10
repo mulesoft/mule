@@ -17,6 +17,7 @@ axiom-api-1.2.5
 axiom-impl-1.2.5
 axis-1.4-osgi
 backport-util-concurrent-3.1-osgi
+cglib-nodep-2.2
 cometd-api-0.9.20080221
 cometd-bayeux-6.1.11
 commons-beanutils-1.8.0
