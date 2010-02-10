@@ -67,7 +67,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>${cglibVersion}-osgi</version>
+            <version>${cglibVersion}</version>
         </dependency>
 
         <dependency>
