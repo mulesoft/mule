@@ -15,6 +15,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpsConnector;
@@ -81,7 +82,7 @@ public class ServletConnector extends AbstractConnector
         return SERVLET;
     }
 
-    public Map getReceivers()
+    public Map<Object, MessageReceiver> getReceivers()
     {
         return receivers;
     }

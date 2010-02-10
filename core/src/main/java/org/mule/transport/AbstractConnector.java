@@ -89,14 +89,12 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -108,10 +106,10 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * systems and protocols in order to send and receive data. <p/> The
  * <code>AbstractConnector</code> provides getter and setter methods for endpoint
  * name, transport name and protocol. It also provides methods to stop and start
- * connecotors and sets up a dispatcher threadpool which allows deriving connectors
+ * connectors and sets up a dispatcher threadpool which allows deriving connectors
  * the possibility to dispatch work to separate threads. This functionality is
  * controlled with the <i> doThreading</i> property on the threadingProfiles for
- * dispachers and receivers. The lifecycle for a connector is -
+ * dispatchers and receivers. The lifecycle for a connector is -
  * <ol>
  * <li>Create
  * <li>Initialise
@@ -175,7 +173,7 @@ public abstract class AbstractConnector
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
-    protected final ConcurrentMap receivers = new ConcurrentHashMap();
+    protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
 
     /**
      * Defines the dispatcher threading profile
@@ -409,19 +407,18 @@ public abstract class AbstractConnector
 
         if (receivers != null)
         {
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+            for (MessageReceiver receiver : receivers.values())
             {
                 final List<MuleException> errors = new ArrayList<MuleException>();
                 try
                 {
-                    MessageReceiver mr = (MessageReceiver) iterator.next();
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Starting receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                        logger.debug("Starting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                     }
-                    if (mr.getService().isStarted())
+                    if (receiver.getService().isStarted())
                     {
-                        mr.start();
+                        receiver.start();
                     }
                 }
                 catch (MuleException e)
@@ -497,14 +494,13 @@ public abstract class AbstractConnector
         // disconnect too)
         if (receivers != null)
         {
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+            for (MessageReceiver receiver : receivers.values())
             {
-                MessageReceiver mr = (MessageReceiver) iterator.next();
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
+                    logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                 }
-                mr.stop();
+                receiver.stop();
             }
         }
 
@@ -694,10 +690,8 @@ public abstract class AbstractConnector
         {
             logger.debug("Disposing Receivers");
 
-            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+            for (MessageReceiver receiver : receivers.values())
             {
-                MessageReceiver receiver = (MessageReceiver) iterator.next();
-
                 try
                 {
                     this.destroyReceiver(receiver, receiver.getEndpoint());
@@ -1249,8 +1243,7 @@ public abstract class AbstractConnector
 
         if (receivers != null && !receivers.isEmpty())
         {
-            MessageReceiver receiver = (MessageReceiver) receivers.remove(getReceiverKey(service,
-                    endpoint));
+            MessageReceiver receiver = receivers.remove(getReceiverKey(service, endpoint));
             if (receiver != null)
             {
                 destroyReceiver(receiver, endpoint);
@@ -1429,7 +1422,7 @@ public abstract class AbstractConnector
             Object key = getReceiverKey(service, endpoint);
             if (key != null)
             {
-                return (MessageReceiver) receivers.get(key);
+                return receivers.get(key);
             }
             else
             {
@@ -1447,7 +1440,7 @@ public abstract class AbstractConnector
      *
      * @return Value for property 'receivers'.
      */
-    public Map getReceivers()
+    public Map<Object, MessageReceiver> getReceivers()
     {
         return Collections.unmodifiableMap(receivers);
     }
@@ -1456,7 +1449,7 @@ public abstract class AbstractConnector
     {
         if (key != null)
         {
-            return (MessageReceiver) receivers.get(key);
+            return receivers.get(key);
         }
         else
         {
@@ -1469,11 +1462,10 @@ public abstract class AbstractConnector
         WildcardFilter filter = new WildcardFilter(wildcardExpression);
         filter.setCaseSensitive(false);
 
-        List found = new ArrayList();
+        List<MessageReceiver> found = new ArrayList<MessageReceiver>();
 
-        for (Iterator iterator = receivers.entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
         {
-            Map.Entry e = (Map.Entry) iterator.next();
             if (filter.accept(e.getKey()))
             {
                 found.add(e.getValue());
@@ -1516,7 +1508,7 @@ public abstract class AbstractConnector
                 if (info.get(RetryContext.FAILED_RECEIVER) != null)
                 {
                     String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
-                    MessageReceiver receiver = (MessageReceiver) receivers.get(receiverKey);
+                    MessageReceiver receiver =  receivers.get(receiverKey);
                     if (validateConnections && !receiver.validateConnection(context).isOk())
                     {
                         throw new ConnectException(MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
@@ -1613,9 +1605,8 @@ public abstract class AbstractConnector
         {
             if (receivers != null)
             {
-                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+                for (MessageReceiver receiver : receivers.values())
                 {
-                    MessageReceiver receiver = (MessageReceiver) iterator.next();
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Disconnecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
@@ -1629,9 +1620,8 @@ public abstract class AbstractConnector
         {
             if (receivers != null)
             {
-                for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();)
+                for (MessageReceiver receiver : receivers.values())
                 {
-                    MessageReceiver receiver = (MessageReceiver) iterator.next();
                     // TODO MULE-3969
                     if (receiver instanceof AbstractMessageReceiver && ((AbstractMessageReceiver) receiver).isStarted())
                     {
