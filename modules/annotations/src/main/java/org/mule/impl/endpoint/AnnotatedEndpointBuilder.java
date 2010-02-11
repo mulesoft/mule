@@ -50,22 +50,14 @@ public class AnnotatedEndpointBuilder
         regMap = new RegistryMap(muleContext.getRegistry());
     }
 
-    protected String getPropertyValue(String key)
+    protected String parsePlaceholderValues(String key)
     {
         return parser.parse(regMap, key);
     }
 
     protected EndpointBuilder getEndpointBuilder(AnnotatedEndpointData epData) throws MuleException
     {
-        String uri;
-        if (MuleEndpointURI.isMuleUri(epData.getAddress()))
-        {
-            uri = epData.getAddress();
-        }
-        else
-        {
-            uri = getPropertyValue(epData.getAddress());
-        }
+        String uri = parsePlaceholderValues(epData.getAddress());
 
         EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointFactory()
                 .getEndpointBuilder(uri);
@@ -100,13 +92,13 @@ public class AnnotatedEndpointBuilder
 
         if (epData.getEncoding() != null)
         {
-            endpointBuilder.setEncoding(getPropertyValue(epData.getEncoding()));
+            endpointBuilder.setEncoding(parsePlaceholderValues(epData.getEncoding()));
         }
 
         AbstractConnector connector;
         if (epData.getConnectorName() != null)
         {
-            connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(getPropertyValue(epData.getConnectorName()));
+            connector = (AbstractConnector) muleContext.getRegistry().lookupConnector(parsePlaceholderValues(epData.getConnectorName()));
         }
         else if (epData.getConnector() != null)
         {
@@ -115,7 +107,7 @@ public class AnnotatedEndpointBuilder
         else
         {
             //We always create a new connecotr for annotations when one has not been configured
-            MuleEndpointURI uri = new MuleEndpointURI(getPropertyValue(epData.getAddress()), muleContext);
+            MuleEndpointURI uri = new MuleEndpointURI(parsePlaceholderValues(epData.getAddress()), muleContext);
 
             connector = (AbstractConnector) transportFactory.createConnector(uri);
             //The ibeans transport factory will not always create a new connector, check before registering
@@ -140,7 +132,7 @@ public class AnnotatedEndpointBuilder
 
         if (epData.getName() != null)
         {
-            endpointBuilder.setName(getPropertyValue(epData.getName()));
+            endpointBuilder.setName(parsePlaceholderValues(epData.getName()));
         }
 
 
@@ -179,7 +171,7 @@ public class AnnotatedEndpointBuilder
 
     public Object convertProperty(Class type, String property)
     {
-        String prop = getPropertyValue(property);
+        String prop = parsePlaceholderValues(property);
         Collection c = muleContext.getRegistry().lookupObjects(PropertyConverter.class);
         for (Iterator iterator = c.iterator(); iterator.hasNext();)
         {
