@@ -12,6 +12,7 @@ package org.mule.util;
 
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,7 +81,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
 
     public void testToStringSingleElement() throws Exception
     {
-        Collection c = Arrays.asList(new Object[]{"foo"});
+        Collection<String> c = Arrays.asList("foo");
 
         assertEquals("[foo]", CollectionUtils.toString(c, false));
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR + "]",
@@ -89,7 +90,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
 
     public void testToStringMultipleElements() throws Exception
     {
-        Collection c = Arrays.asList(new Object[]{"foo", this.getClass()});
+        Collection<Serializable> c = Arrays.asList("foo", this.getClass());
 
         assertEquals("[foo, " + this.getClass().getName() + "]", CollectionUtils.toString(c, false));
 
@@ -100,7 +101,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
 
     public void testToStringTooManyElements()
     {
-        Collection test = new ArrayList(100);
+        Collection<Number> test = new ArrayList<Number>(100);
         for (int i = 0; i < 100; i++)
         {
             test.add(new Integer(i));

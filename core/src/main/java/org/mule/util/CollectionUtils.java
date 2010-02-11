@@ -37,7 +37,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
      * @throws ArrayStoreException if the elements in <code>objects</code> cannot
      *             be cast to <code>clazz</code>.
      */
-    public static Object[] toArrayOfComponentType(Collection objects, Class clazz)
+    public static <T>T[] toArrayOfComponentType(Collection objects, Class<T> clazz)
     {
         if (objects == null)
         {
@@ -51,16 +51,16 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 
         if (objects.isEmpty())
         {
-            return (Object[]) Array.newInstance(clazz, 0);
+            return (T[]) Array.newInstance(clazz, 0);
         }
 
         int i = 0, size = objects.size();
-        Object[] result = (Object[]) Array.newInstance(clazz, size);
+        T[] result = (T[]) Array.newInstance(clazz, size);
         Iterator iter = objects.iterator();
 
         while (i < size && iter.hasNext())
         {
-            result[i++] = iter.next();
+            result[i++] = (T)iter.next();
         }
 
         return result;
