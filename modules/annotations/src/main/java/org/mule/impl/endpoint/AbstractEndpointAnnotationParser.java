@@ -16,7 +16,6 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.config.annotations.converters.PropertiesConverter;
 import org.mule.config.annotations.endpoints.Channel;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
@@ -24,6 +23,8 @@ import org.mule.util.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * TODO
@@ -31,7 +32,6 @@ import java.util.Map;
 public abstract class AbstractEndpointAnnotationParser implements EndpointAnnotationParser, MuleContextAware
 {
     protected MuleContext muleContext;
-    private PropertiesConverter converter = new PropertiesConverter();
 
     public void setMuleContext(MuleContext context)
     {
@@ -64,9 +64,23 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
         return channel != null && channel.identifer().equals(getIdentifier());
     }
 
-    protected Map convertProperties(String properties)
+    protected Properties convertProperties(String[] properties)
     {
-        return (Map) converter.convert(properties, muleContext);
+        if(properties==null || properties.length==0)
+        {
+            return null;
+        }
+        
+        Properties props = new Properties();
+        for (String property : properties)
+        {
+            StringTokenizer st = new StringTokenizer(property, "=");
+            if(st.hasMoreTokens())
+            {
+                props.setProperty(st.nextToken().trim(), st.nextToken().trim());
+            }
+        }
+        return props;
     }
 
     protected <T> T lookupConfig(String location, Class<T> type) throws ConfigurationException
