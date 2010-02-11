@@ -13,13 +13,17 @@
 	<description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+        </dependency>
 		<!-- Generic BPM Transport -->
 		<dependency>
 			<groupId>org.mule.transports</groupId>
 			<artifactId>mule-transport-bpm</artifactId>
 			<version>${version}</version>
-		</dependency>
-		
+		</dependency>		
 		<!-- jBPM -->
 		<dependency>
 			<groupId>org.jbpm.jbpm4</groupId>
@@ -60,7 +64,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<!-- Hibernate and dependencies -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -78,7 +81,6 @@
 			<artifactId>javassist</artifactId>
 			<version>${javassistVersion}</version>
 		</dependency>
-
 		<!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
 		<dependency>
 			<groupId>commons-jxpath</groupId>
@@ -86,24 +88,30 @@
 		</dependency>
 
 		<!-- Unit tests only -->
-		<dependency>
-			<!-- Simple Java DB for persistence -->
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-bpm</artifactId>
-			<version>${version}</version>
-			<scope>test</scope>
-			<type>test-jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-vm</artifactId>
-			<version>${version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Simple Java DB for persistence -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-bpm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
