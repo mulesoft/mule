@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.Callable;
 
 import java.io.InputStream;
 
-public class PartialReadComponent implements Callable 
+public class PartialReadComponent implements Callable
 {
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
