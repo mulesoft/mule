@@ -27,7 +27,7 @@ import org.apache.commons.collections.IteratorUtils;
  * This can be used by components such as routers to managed related events.
  */
 // @ThreadSafe
-public class EventGroup implements Comparable, Serializable
+public class EventGroup implements Comparable<EventGroup>, Serializable
 {
     /**
      * Serial version
@@ -64,12 +64,12 @@ public class EventGroup implements Comparable, Serializable
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object o)
+    @SuppressWarnings("unchecked")
+    public int compareTo(EventGroup other)
     {
-        EventGroup other = (EventGroup) o;
         Object otherId = other.getGroupId();
 
-        if (groupId instanceof Comparable && otherId instanceof Comparable)
+        if (groupId instanceof Comparable<?> && otherId instanceof Comparable<?>)
         {
             return ((Comparable) groupId).compareTo(otherId);
         }
@@ -140,7 +140,8 @@ public class EventGroup implements Comparable, Serializable
      * 
      * @return an iterator over collected {@link MuleEvent}s.
      */
-    public Iterator iterator()
+    @SuppressWarnings("unchecked")
+    public Iterator<MuleEvent> iterator()
     {
         synchronized (this)
         {
@@ -261,10 +262,10 @@ public class EventGroup implements Comparable, Serializable
             if (currentSize > 0)
             {
                 buf.append(" [");
-                Iterator i = events.iterator();
+                Iterator<MuleEvent> i = events.iterator();
                 while (i.hasNext())
                 {
-                    MuleEvent event = (MuleEvent) i.next();
+                    MuleEvent event = i.next();
                     buf.append(event.getMessage().getUniqueId());
                     if (i.hasNext())
                     {
@@ -284,12 +285,10 @@ public class EventGroup implements Comparable, Serializable
     {
         if(events.size()==0) return new DefaultMessageCollection(null);
         MuleMessageCollection col = new DefaultMessageCollection(events.get(0).getMuleContext());
-        for (Iterator iterator = events.iterator(); iterator.hasNext();)
+        for (MuleEvent event : events)
         {
-            MuleEvent event = (MuleEvent) iterator.next();
             col.addMessage(event.getMessage());
         }
         return col;
     }
-
 }

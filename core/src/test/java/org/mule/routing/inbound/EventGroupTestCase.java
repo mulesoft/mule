@@ -120,22 +120,6 @@ public class EventGroupTestCase extends AbstractMuleTestCase
             // expected
         }
 
-        // test comparison against incompatible object
-        try
-        {
-            g1.compareTo("foo");
-            fail("expected ClassCastException");
-        }
-        catch (ClassCastException cce)
-        {
-            // expected
-        }
-
-        // these tests use the groupId
-        assertNotNull(g1);
-        assertNotNull(g2);
-        assertNotNull(g3);
-        
         assertEquals(0, g1.compareTo(g2));
         /*
          * guids are randomly generated, we cannot compare them with '<' '>'
@@ -148,7 +132,11 @@ public class EventGroupTestCase extends AbstractMuleTestCase
 
         // when the groupId is not Comparable, the creation time is used as fallback
         g1 = new EventGroup(new Object());
+        // sleep a mini bit to ensure that both event groups do not accidentially have the same 
+        // creation timestamp
+        Thread.sleep(10);
         g2 = new EventGroup(new Object());
+        
         // g1 is older (smaller) than g2
         assertTrue(g1.compareTo(g2) < 0);
         assertTrue(g2.compareTo(g1) > 0);
