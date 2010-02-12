@@ -8,7 +8,6 @@
         <artifactId>mule-examples</artifactId>
         <version>3.0.0-M2-SNAPSHOT</version>
     </parent>
-
     <artifactId>mule-example-bookstore-parent</artifactId>
     <packaging>pom</packaging>
     <name>Bookstore Example</name>
