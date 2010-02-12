@@ -64,8 +64,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
         else
         {
-            server = MuleManifest.getProductName() + "/"
-                    + MuleManifest.getProductVersion();
+            server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
         }
     }
 
@@ -119,7 +118,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 
                             Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
                             response.setHeader(header);
-                        } else {
+                        } 
+                        else 
+                        {
                             Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
                             response.addHeader(header);
                         }
