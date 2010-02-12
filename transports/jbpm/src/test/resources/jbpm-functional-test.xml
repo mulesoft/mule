@@ -5,26 +5,22 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.0/mule-bpm.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
     <bpm:jbpm-connector name="bpmConnector">
     	<bpm:process name="simple" resource="simple-process.jpdl.xml" />
     	<bpm:process name="message" resource="message-process.jpdl.xml" />
+    	<bpm:process name="fork" resource="fork-process.jpdl.xml" />
     </bpm:jbpm-connector>
     
     <model name="processModel">
-
-        <service name="fromSimpleProcess">
-            <inbound>
-                <bpm:inbound-endpoint process="simple" />
-            </inbound>
-            <component class="org.mule.component.simple.LogComponent"/>
-        </service>
 
         <service name="fromMessageProcess">
             <inbound>
@@ -38,6 +34,48 @@
             </outbound>
         </service>
 
+        <service name="fromForkedProcess">
+            <inbound>
+                <bpm:inbound-endpoint process="fork"/>
+            </inbound>
+            <component class="org.mule.component.simple.LogComponent"/>
+            <outbound>
+                <bpm:outbound-router>
+                    <vm:outbound-endpoint path="queueA"/>
+                    <vm:outbound-endpoint path="echo"/>
+                    <vm:outbound-endpoint path="queueB"/>
+                </bpm:outbound-router>
+            </outbound>
+        </service>
+
+        <service name="ServiceA" initialState="stopped">
+            <inbound>
+                <vm:inbound-endpoint path="queueA"/>
+            </inbound>
+            <test:component>
+            	<test:return-data>Response A</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <bpm:outbound-endpoint process="fork" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="ServiceB">
+            <inbound>
+                <vm:inbound-endpoint path="queueB"/>
+            </inbound>
+            <test:component>
+            	<test:return-data>Response B</test:return-data>
+            </test:component>
+            <outbound>
+                <pass-through-router>
+                    <bpm:outbound-endpoint process="fork" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        
         <service name="echoService">
             <inbound>
                 <vm:inbound-endpoint path="echo"/>

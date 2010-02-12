@@ -32,19 +32,19 @@ import org.jbpm.pvm.internal.model.ExecutionImpl;
 
 public class MuleActivity extends JpdlActivity implements EventListener
 {
-    boolean synchronous;
-    String endpoint;
-    String transformers;
-    Map properties;
+    private boolean synchronous;
+    private String endpoint;
+    private String transformers;
+    private Map properties;
 
     // Use "payload" to easily specify the payload as a string directly in the jPDL.
     // Use "payloadSource" to get the payload from a process variable.
-    String payload;
-    String payloadSource;
+    private String payload;
+    private String payloadSource;
 
     // The name of the variable can be changed by setting field "var" in the
     // process definition
-    String variableName;
+    private String variableName;
     
     // The actual payload (as an object) will be stored here.
     private Object payloadObject;
@@ -113,9 +113,8 @@ public class MuleActivity extends JpdlActivity implements EventListener
 
         // TODO: this probably isn't the best. I'm casting to an Impl because it's
         // the only way I could see to get the name of the process definition
-        props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl)execution).getProcessDefinition().getName());
-        props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getProcessInstance().getId());
-        props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, execution.getProcessInstance().getId());
+        props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
+        props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getId());
 
         if (properties != null)
         {

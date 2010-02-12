@@ -32,7 +32,7 @@ public class MessagingJbpmTestCase extends AbstractJbpmTestCase
     public void testSendMessageProcess() throws Exception
     {
         // Deploy the process definition.
-        ((Jbpm)bpms).deployProcess("message-process.jpdl.xml");
+        ((Jbpm) bpms).deployProcess("message-process.jpdl.xml");
 
         MuleMessage response;
         Object process;
@@ -43,11 +43,12 @@ public class MessagingJbpmTestCase extends AbstractJbpmTestCase
             // Create a new process.
         	response = client.send("bpm://message", "data", null);                  	
             process = response.getPayload();
+            assertTrue(bpms.isProcess(process)); 
 
             String processId = (String)bpms.getId(process);
-            // The process should be started and in a wait state.
+            // The process should have sent a synchronous message, followed by an asynchronous message and now be in a wait state.
             assertFalse(processId == null);
-            assertEquals("waitForSomething", bpms.getState(process));
+            assertEquals("waitForResponse", bpms.getState(process));
 
             // Advance the process one step.
             response = client.send("bpm://message/" + processId, "data", null);

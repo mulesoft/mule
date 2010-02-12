@@ -43,6 +43,8 @@ public class Jbpm implements BPMS, Initialisable, Disposable
 {
     protected static final Logger log = LoggerFactory.getLogger(Jbpm.class);
 
+    public static final String PROCESS_ENDED = "Process has ended";
+    
     protected ProcessEngine processEngine = null;
 
     private String configurationResource;
@@ -139,24 +141,24 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * 
      * @return the newly-created ProcessInstance
      */
-    public Object startProcess(Object processType) throws Exception
+    public Object startProcess(Object processDefinitionKey) throws Exception
     {
-        return startProcess(processType, /* transition */null, /* processVariables */null);
+        return startProcess(processDefinitionKey, null, null);
     }
-
+    
     /**
      * Start a new process.
      * 
      * @return the newly-created ProcessInstance
      */
-    public synchronized Object startProcess(Object processType, Object processInstanceKey, Map processVariables) throws Exception
+    public synchronized Object startProcess(Object processDefinitionKey, Object signalName, Map variables) throws Exception
     {
-        ProcessInstance processInstance = processEngine.getExecutionService().startProcessInstanceByKey(
-            (String) processType, (Map) processVariables, (String) processInstanceKey);
+        ProcessInstance processInstance = 
+            processEngine.getExecutionService().startProcessInstanceByKey((String) processDefinitionKey, (Map) variables);
 
         if (processInstance == null)
         {
-            throw new IllegalArgumentException("No process definition found for process " + processType);
+            throw new IllegalArgumentException("No process definition found for process " + processDefinitionKey);
         }
 
         return processInstance;
@@ -169,7 +171,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      */
     public Object advanceProcess(Object executionId) throws Exception
     {
-        return advanceProcess(executionId, /* transition */null, /* processVariables */null);
+        return advanceProcess(executionId, null, null);
     }
 
     /**
@@ -181,9 +183,30 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * @param processVariables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
-    public synchronized Object advanceProcess(Object processId, Object transition, Map processVariables) throws Exception
+    public synchronized Object advanceProcess(Object executionId, Object signalName, Map parameters) throws Exception
     {
-        return processEngine.getExecutionService().signalExecutionById((String) processId, processVariables);
+        // Get Process ID
+        String processId;
+        Execution execution = processEngine.getExecutionService().findExecutionById((String) executionId);
+        if (execution.getProcessInstance() != null)
+        {
+            processId = execution.getProcessInstance().getId();
+        }
+        else
+        {
+            processId = execution.getId();
+        }
+
+        processEngine.getExecutionService().signalExecutionById((String) executionId, (String) signalName, parameters);
+
+        // Refresh process info. from the DB
+        ProcessInstance process = processEngine.getExecutionService().findProcessInstanceById(processId);
+        if (process == null)
+        {
+            // The process has already ended, so we return a mock/skeleton ProcessInstance with the expected ID and state = "ended"
+            process = new EndedProcess(processId);
+        }
+        return process;
     }
 
     /**
@@ -191,23 +214,42 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * 
      * @return the updated ProcessInstance
      */
-    public synchronized Object updateProcess(Object executionId, Map processVariables) throws Exception
+    public synchronized Object updateProcess(Object executionId, Map variables) throws Exception
     {
-        // Set any process variables.
-        if (processVariables != null && !processVariables.isEmpty())
+        // Get Process ID
+        String processId;
+        Execution execution = processEngine.getExecutionService().findExecutionById((String) executionId);
+        if (execution.getProcessInstance() != null)
         {
-            processEngine.getExecutionService().setVariables((String) executionId, processVariables);
+            processId = execution.getProcessInstance().getId();
+        }
+        else
+        {
+            processId = execution.getId();
         }
 
-        return processEngine.getExecutionService().findExecutionById((String) executionId).getProcessInstance();
+        // Set any process variables.
+        if (variables != null && !variables.isEmpty())
+        {
+            processEngine.getExecutionService().setVariables((String) executionId, variables);
+        }
+
+        // Refresh process info. from the DB
+        ProcessInstance process = processEngine.getExecutionService().findProcessInstanceById(processId);
+        if (process == null)
+        {
+            // The process has already ended, so we return a mock/skeleton ProcessInstance with the expected ID and state = "ended"
+            process = new EndedProcess(processId);
+        }
+        return process;
     }
 
     /**
      * Delete a process instance.
      */
-    public synchronized void abortProcess(Object processId) throws Exception
+    public synchronized void abortProcess(Object processInstanceId) throws Exception
     {
-        processEngine.getExecutionService().endProcessInstance((String) processId, Execution.STATE_ENDED);
+        processEngine.getExecutionService().endProcessInstance((String) processInstanceId, Execution.STATE_ENDED);
     }
 
     // ///////////////////////////////////////////////////////////////////////////
@@ -227,16 +269,31 @@ public class Jbpm implements BPMS, Initialisable, Disposable
     public Object getState(Object process) throws Exception
     {
         ProcessInstance processInstance = (ProcessInstance) process;
-        Set activities = processInstance.findActiveActivityNames();
-        if( activities != null && activities.size() > 0 ) {
-            return activities.iterator().next();
+        if (processInstance == null || processInstance.isEnded())
+        {
+            return ProcessInstance.STATE_ENDED;
         }
-        return null;
+        
+        Set activities = processInstance.findActiveActivityNames();
+        String state = null;
+        // Separate concurrent paths of execution with a "/"
+        for (Object activityName : activities)
+        {
+            if (state == null)
+            {
+                state = (String) activityName;
+            }
+            else
+            {
+                state += " / " + activityName;
+            }
+        }
+        return state;
     }
 
     public boolean hasEnded(Object process) throws Exception
     {
-        return ((ProcessInstance) process).isEnded();
+        return process == null ? true : ((ProcessInstance) process).isEnded();
     }
 
     /**
@@ -267,23 +324,14 @@ public class Jbpm implements BPMS, Initialisable, Disposable
             .deploy();
     }
 
-    /*
-     * TODO: in jbpm4 tasks now seem to be gotten via person not whole process instance
-    public List <TaskInstance> loadTasks(ProcessInstance processInstance)
-    {
-        List <TaskInstance> taskInstances;
-        taskService.
-    }
-    */
-    
     public void completeTask(Task task)
     {
-        completeTask(task, /* transition */null);
+        completeTask(task, null, null);
     }
 
-    public synchronized void completeTask(Task task, String transition)
+    public synchronized void completeTask(Task task, String outcome, Map variables)
     {
-        processEngine.getTaskService().completeTask(task.getId());
+        processEngine.getTaskService().completeTask(task.getId(), outcome, variables);
     }
 
     // ///////////////////////////////////////////////////////////////////////////

@@ -5,15 +5,21 @@
 	xmlns="http://jbpm.org/4.3/jpdl">
 
 	<start name="start">
-		<transition to="sendMessage" />
+		<transition to="sendSynchronousMessage" />
 	</start>
 
-	<mule name="sendMessage" endpoint="test:///tmp" payload="Message in a bottle."
-		synchronous="true">
-		<transition to="waitForSomething" />
+	<mule name="sendSynchronousMessage" 
+		endpoint="vm://echo" payload="Message in a bottle."
+		synchronous="true" var="echoResponse">
+		<transition to="sendAsynchronousMessage" />
 	</mule>
 
-	<state name="waitForSomething">
+	<mule name="sendAsynchronousMessage" endpoint="test://queue" payloadSource="echoResponse"
+		synchronous="false">
+		<transition to="waitForResponse" />
+	</mule>
+
+	<state name="waitForResponse">
 		<transition to="end" />
 	</state>
 
