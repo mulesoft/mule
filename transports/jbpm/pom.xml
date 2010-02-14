@@ -1,93 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mule.transports</groupId>
-		<artifactId>mule-transports</artifactId>
-		<version>3.0.0-M2-SNAPSHOT</version>
-	</parent>
-	<artifactId>mule-transport-jbpm</artifactId>
-	<packaging>bundle</packaging>
-	<name>BPM Transport: JBoss jBPM</name>
-	<description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
+        <version>3.0.0-M2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-transport-jbpm</artifactId>
+    <packaging>bundle</packaging>
+    <name>BPM Transport: JBoss jBPM</name>
+    <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
 
-	<dependencies>
+    <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>
-		<!-- Generic BPM Transport -->
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-bpm</artifactId>
-			<version>${version}</version>
-		</dependency>		
-		<!-- jBPM -->
-		<dependency>
-			<groupId>org.jbpm.jbpm4</groupId>
-			<artifactId>jbpm-jpdl</artifactId>
-			<version>${jbpmVersion}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jbpm.jbpm4</groupId>
-					<artifactId>jbpm-enterprise</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jbpm.jbpm4</groupId>
-					<artifactId>jbpm-test-base</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.ant</groupId>
-					<artifactId>ant</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.identity.idm</groupId>
-					<artifactId>idm-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.identity.idm</groupId>
-					<artifactId>idm-hibernate</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-entitymanager</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jboss</groupId>
-					<artifactId>jboss-j2ee</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- Hibernate and dependencies -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>3.3.2.GA</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.transaction</groupId>
-					<artifactId>jta</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>javassist</artifactId>
-			<version>${javassistVersion}</version>
-		</dependency>
-		<!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
-		<dependency>
-			<groupId>commons-jxpath</groupId>
-			<artifactId>commons-jxpath</artifactId>
-		</dependency>
+        <!-- Generic BPM Transport -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-bpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- jBPM -->
+        <dependency>
+            <groupId>org.jbpm.jbpm4</groupId>
+            <artifactId>jbpm-jpdl</artifactId>
+            <version>${jbpmVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jbpm.jbpm4</groupId>
+                    <artifactId>jbpm-enterprise</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jbpm.jbpm4</groupId>
+                    <artifactId>jbpm-test-base</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.identity.idm</groupId>
+                    <artifactId>idm-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.identity.idm</groupId>
+                    <artifactId>idm-hibernate</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jboss</groupId>
+                    <artifactId>jboss-j2ee</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Hibernate and dependencies -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>3.3.2.GA</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.transaction</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassistVersion}</version>
+        </dependency>
+        <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+        </dependency>
 
-		<!-- Unit tests only -->
+        <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
