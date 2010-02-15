@@ -26,7 +26,7 @@
             <inbound>
                 <bpm:inbound-endpoint process="message"/>
             </inbound>
-            <component class="org.mule.component.simple.LogComponent"/>
+            <log-component />
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="echo"/>
@@ -38,7 +38,7 @@
             <inbound>
                 <bpm:inbound-endpoint process="fork"/>
             </inbound>
-            <component class="org.mule.component.simple.LogComponent"/>
+            <log-component />
             <outbound>
                 <bpm:outbound-router>
                     <vm:outbound-endpoint path="queueA"/>
@@ -80,7 +80,7 @@
             <inbound>
                 <vm:inbound-endpoint path="echo"/>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component />
         </service>
         
     </model>

@@ -10,14 +10,13 @@
 
 package org.mule.transport.jbpm;
 
+import org.jbpm.api.ProcessInstance;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.bpm.BPMS;
 
-import org.jbpm.api.ProcessInstance;
-
 /**
- * Tests the connector against jBPM with a forked execution process.
+ * Tests the connector against jBPM with a simple process.
  */
 public class ForkedProcessTestCase extends AbstractJbpmTestCase
 {
@@ -56,7 +55,8 @@ public class ForkedProcessTestCase extends AbstractJbpmTestCase
                         
             // The process should have ended.
             process = (ProcessInstance) bpms.lookupProcess(process.getId());
-            assertTrue(bpms.hasEnded(process));
+            assertTrue("Process should have ended, but is in state " + bpms.getState(process), 
+            		bpms.hasEnded(process));
         }
         finally
         {
