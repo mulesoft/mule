@@ -203,18 +203,12 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
         if (receiver == null)
         {
-            //Now match wild cards
-            for (Object key : getReceivers().keySet())
-            {
-                if (new WildcardFilter(key.toString()).accept(uri))
-                {
-                    receiver = connector.getReceivers().get(key);
-                }
-            }
-            if (receiver == null)
-            {
-                throw new NoReceiverForEndpointException(uri);
-            }
+            receiver = matchReceiverByWildcard(uri, receiver);
+        }
+
+        if (receiver == null)
+        {
+            throw new NoReceiverForEndpointException(uri);
         }
 
         InboundEndpoint endpoint = receiver.getEndpoint();
@@ -239,6 +233,20 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         catch (InitialisationException e)
         {
             throw new EndpointException(e);
+        }
+        return receiver;
+    }
+
+    protected MessageReceiver matchReceiverByWildcard(String uri, MessageReceiver receiver)
+    {
+        // Now match wild cards
+        for (Object key : getReceivers().keySet())
+        {
+            if (new WildcardFilter(key.toString()).accept(uri))
+            {
+                receiver = connector.getReceivers().get(key);
+                break;
+            }
         }
         return receiver;
     }
