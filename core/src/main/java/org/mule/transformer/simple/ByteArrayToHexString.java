@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -29,7 +30,7 @@ public class ByteArrayToHexString extends AbstractTransformer
     {
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
     public boolean getUpperCase()

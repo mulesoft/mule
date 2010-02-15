@@ -13,6 +13,7 @@ package org.mule.transformer.codec;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.XMLEntityCodec;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class XmlEntityEncoder extends AbstractTransformer
         registerSourceType(String.class);
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

@@ -13,6 +13,7 @@ package org.mule.transformer.simple;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 /**
@@ -33,7 +34,7 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
     public ObjectArrayToString()
     {
         registerSourceType(Object[].class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

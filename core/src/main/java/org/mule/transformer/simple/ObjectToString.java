@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -23,6 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+
+import javax.activation.MimeType;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return
@@ -42,7 +45,9 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
         registerSourceType(OutputHandler.class);
-        setReturnClass(String.class);
+        //deliberately set the mime for this transformer to text plain so that other transformers
+        //that serialize string types such as XML or JSON will not match this
+        setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

@@ -25,6 +25,14 @@ import java.util.Collection;
  */
 public class DataTypeFactory
 {
+    public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, "text/plain");
+    public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, "text/xml");
+    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, "application/json");
+    public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, "text/html");
+    public static final DataType<String> XHTML_STRING = new SimpleDataType<String>(String.class, "text/xhtml");
+    public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, "application/atom+xml");
+    public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, "application/atom+rss");
+
     public DataType create(Class type)
     {
         return create(type, (String) null);
