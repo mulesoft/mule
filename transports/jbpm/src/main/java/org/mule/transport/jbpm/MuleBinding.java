@@ -10,8 +10,6 @@
 
 package org.mule.transport.jbpm;
 
-import org.mule.transport.bpm.ProcessConnector;
-
 import org.jbpm.jpdl.internal.activity.JpdlBinding;
 import org.jbpm.jpdl.internal.xml.JpdlParser;
 import org.jbpm.pvm.internal.util.XmlUtil;
@@ -36,7 +34,7 @@ public class MuleBinding extends JpdlBinding
         // TODO: Map properties
         muleActivity.setPayload(XmlUtil.attribute(element, "payload", false, parse, null));
         muleActivity.setPayloadSource(XmlUtil.attribute(element, "payloadSource", false, parse, null));
-        muleActivity.setVariableName(XmlUtil.attribute(element, "var", false, parse, ProcessConnector.PROCESS_VARIABLE_INCOMING));
+        muleActivity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));
 
         return muleActivity;
     }

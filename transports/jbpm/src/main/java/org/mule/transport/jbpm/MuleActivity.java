@@ -11,7 +11,6 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.transport.bpm.MessageService;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.StringUtils;
@@ -42,8 +41,7 @@ public class MuleActivity extends JpdlActivity implements EventListener
     private String payload;
     private String payloadSource;
 
-    // The name of the variable can be changed by setting field "var" in the
-    // process definition
+    // Variable into which the synchronous response will be stored.  If null, the response will not be stored at all.
     private String variableName;
     
     // The actual payload (as an object) will be stored here.
@@ -122,7 +120,7 @@ public class MuleActivity extends JpdlActivity implements EventListener
         }
 
         MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, synchronous);
-        if (synchronous)
+        if (synchronous && variableName != null)
         {
             if (response != null)
             {
