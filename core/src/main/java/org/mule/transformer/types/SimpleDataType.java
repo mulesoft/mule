@@ -22,7 +22,7 @@ public class SimpleDataType<T> implements DataType<T>
     public SimpleDataType(Class type, String mimeType)
     {
         this.type = type;
-        this.mimeType = mimeType;
+        this.mimeType = (mimeType==null?ANY_MIME_TYPE:mimeType);
     }
 
     public SimpleDataType(Class<T> type)
@@ -42,7 +42,7 @@ public class SimpleDataType<T> implements DataType<T>
 
     public void setMimeType(String mimeType)
     {
-        this.mimeType = mimeType;
+        this.mimeType = (mimeType==null?ANY_MIME_TYPE:mimeType);
     }
 
     public boolean isCompatibleWith(DataType dataType)

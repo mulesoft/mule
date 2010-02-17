@@ -13,6 +13,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,12 +43,13 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         //Check mime type matching
         dt2 = factory.create(IOException.class, "application/exception+java");
 
-        assertFalse(dt.isCompatibleWith(dt2));
+        //Will match because the default mime type is '*/*'
+        assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType("*/*");
+        dt.setMimeType(MimeTypes.BINARY);
 
-        assertTrue(dt.isCompatibleWith(dt2));
+        assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         dt = factory.create(Exception.class);
@@ -74,12 +76,13 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         //Check mime type matching
         dt2 = factory.create(ArrayList.class, "application/list+java");
 
-        assertFalse(dt.isCompatibleWith(dt2));
+        //Will match because the default mime type is '*/*'        
+        assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType("*/*");
+        dt.setMimeType(MimeTypes.BINARY);
 
-        assertTrue(dt.isCompatibleWith(dt2));
+        assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         dt = factory.create(List.class);
@@ -107,12 +110,13 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         //Check mime type matching
         dt2 = factory.create(ArrayList.class, IOException.class, "application/list+java");
 
-        assertFalse(dt.isCompatibleWith(dt2));
+        //Will match because the default mime type is '*/*'
+        assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType("*/*");
+        dt.setMimeType(MimeTypes.BINARY);
 
-        assertTrue(dt.isCompatibleWith(dt2));
+        assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         //Test Generic Item types don't match

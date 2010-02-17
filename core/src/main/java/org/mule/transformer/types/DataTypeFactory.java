@@ -25,17 +25,16 @@ import java.util.Collection;
  */
 public class DataTypeFactory
 {
-    public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, "text/plain");
-    public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, "text/xml");
-    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, "application/json");
-    public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, "text/html");
-    public static final DataType<String> XHTML_STRING = new SimpleDataType<String>(String.class, "text/xhtml");
-    public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, "application/atom+xml");
-    public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, "application/atom+rss");
+    public static final DataType<String> TEXT_STRING = new SimpleDataType<String>(String.class, MimeTypes.TEXT);
+    public static final DataType<String> XML_STRING = new SimpleDataType<String>(String.class, MimeTypes.XML);
+    public static final DataType<String> JSON_STRING = new SimpleDataType<String>(String.class, MimeTypes.JSON);
+    public static final DataType<String> HTML_STRING = new SimpleDataType<String>(String.class, MimeTypes.HTML);
+    public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
+    public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);
 
     public DataType create(Class type)
     {
-        return create(type, (String) null);
+        return create(type, MimeTypes.ANY);
     }
 
     public DataType create(Class type, String mimeType)
@@ -90,13 +89,18 @@ public class DataTypeFactory
             MuleMessage mm = (MuleMessage) o;
             type = mm.getPayload().getClass();
             //TODO better mime handling, see MULE-4639
-//            mime = mm.getStringProperty("Content-Type", null);
-//            if(mime!=null)
-//            {
-//                int i = mime.indexOf(";");
-//                mime = (i >-1 ? mime.substring(0, i) : mime);
-//            }
+            mime = mm.getStringProperty("Content-Type", null);
+            if(mime!=null)
+            {
+                int i = mime.indexOf(";");
+                mime = (i >-1 ? mime.substring(0, i) : mime);
+            }
         }
+        if(mime==null)
+        {
+            mime = MimeTypes.ANY;
+        }
+
         return create(type, mime);
     }
 
