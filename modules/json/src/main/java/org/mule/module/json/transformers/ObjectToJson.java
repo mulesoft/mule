@@ -12,6 +12,7 @@ package org.mule.module.json.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,8 +51,7 @@ public class ObjectToJson extends AbstractJsonTransformer
 
     public ObjectToJson()
     {
-        this.registerSourceType(Object.class);
-        this.setReturnClass(String.class);
+        this.setReturnDataType(DataTypeFactory.JSON_STRING);
     }
 
     @Override
