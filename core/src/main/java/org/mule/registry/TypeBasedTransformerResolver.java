@@ -62,8 +62,17 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     public void initialise() throws InitialisationException
     {
-        objectToString = new ObjectToString();
-        objectToByteArray = new ObjectToByteArray();
+        try
+        {
+            objectToString = new ObjectToString();
+            objectToByteArray = new ObjectToByteArray();
+            muleContext.getRegistry().applyProcessorsAndLifecycle(objectToString);
+            muleContext.getRegistry().applyProcessorsAndLifecycle(objectToByteArray);
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     public Transformer resolve(DataType source, DataType result) throws ResolverException
