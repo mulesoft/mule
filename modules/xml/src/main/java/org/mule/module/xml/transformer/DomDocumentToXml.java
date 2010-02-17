@@ -13,6 +13,7 @@ package org.mule.module.xml.transformer;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
@@ -23,7 +24,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
 
     public DomDocumentToXml()
     {
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.XML_STRING);
     }
 
     public Object transform(MuleMessage message, String encoding) throws TransformerException
