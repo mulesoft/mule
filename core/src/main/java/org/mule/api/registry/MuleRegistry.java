@@ -52,6 +52,9 @@ public interface MuleRegistry extends Registry
      * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration.
      * These endpoint builder are either global endpoints or they are builders used to create named
      * endpoints configured on routers and exception strategies.
+     *
+     * @param name the name of the endpointBuilder to find
+     * @return An endpointBuilder with the name specified or null if there is no endpoint builder with that name
      */
     EndpointBuilder lookupEndpointBuilder(String name);
 
@@ -68,7 +71,7 @@ public interface MuleRegistry extends Registry
      * @param input  The  desiered input type for the transformer
      * @param output the desired output type for the transformer
      * @return a list of matching transformers. If there were no matchers an empty list is returned.
-     * @deprecated
+     * @deprecated use {@link #lookupTransformers(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
      */
     List<Transformer> lookupTransformers(Class input, Class output);
 
@@ -90,7 +93,7 @@ public interface MuleRegistry extends Registry
      * @param output the desired output type for the transformer
      * @return A transformer that exactly matches or the will accept the input and output parameters
      * @throws TransformerException will be thrown if there is more than one match
-     * @deprecated
+     * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
      */
     Transformer lookupTransformer(Class input, Class output) throws TransformerException;
 
