@@ -9,6 +9,7 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
@@ -16,10 +17,13 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 
 public class TransformDiscoveryTestCase extends AbstractMuleTestCase
 {
+    private DataTypeFactory factory = new DataTypeFactory();
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -29,29 +33,29 @@ public class TransformDiscoveryTestCase extends AbstractMuleTestCase
 
     public void testSimpleDiscovery() throws Exception
     {
-        Transformer t = muleContext.getRegistry().lookupTransformer(new SimpleDataType(String.class), new SimpleDataType(Apple.class));
+        Transformer t = muleContext.getRegistry().lookupTransformer(factory.create(String.class), factory.create(Apple.class));
         assertNotNull(t);
         assertEquals(StringToApple.class, t.getClass());
 
-        t = muleContext.getRegistry().lookupTransformer(new SimpleDataType(String.class), new SimpleDataType(Orange.class));
+        t = muleContext.getRegistry().lookupTransformer(factory.create(String.class), factory.create(Orange.class));
         assertNotNull(t);
         assertEquals(StringToOrange.class, t.getClass());
 
 
         try
         {
-            muleContext.getRegistry().lookupTransformer(new SimpleDataType(String.class), new SimpleDataType(Banana.class));
+            t = muleContext.getRegistry().lookupTransformer(factory.create(String.class), factory.create(Banana.class));
             fail("There is no transformer to go from String to Banana");
         }
         catch (TransformerException e)
         {
-            //exprected
+            //expected
         }
 
 
         muleContext.getRegistry().registerTransformer(new StringToRedApple());
 
-        t = muleContext.getRegistry().lookupTransformer(new SimpleDataType(String.class), new SimpleDataType(RedApple.class));
+        t = muleContext.getRegistry().lookupTransformer(factory.create(String.class), factory.create(RedApple.class));
         assertNotNull(t);
         assertEquals(StringToRedApple.class, t.getClass());
     }
