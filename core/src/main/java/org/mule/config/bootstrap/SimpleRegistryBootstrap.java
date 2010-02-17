@@ -21,6 +21,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -60,19 +61,19 @@ import org.apache.commons.logging.LogFactory;
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
  * </pre>
- * Loading transformers has a slightly different notation since you can define the 'returnClass' and 'name'of
+ * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and 'name'of
  * the transformer as parameters i.e.
  * <pre>
  * transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
+ * transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
  * transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </pre>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name'
- * parameter is specified. If no 'returnClass' is specified the defualt in the transformer will be used.
+ * parameter is specified. If no 'returnClass' is specified the default in the transformer will be used.
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.api.context.MuleContextAware} and lifecylce interfaces such as {@link org.mule.api.lifecycle.Initialisable}.
+ * {@link org.mule.api.context.MuleContextAware} and lifecycle interfaces such as {@link org.mule.api.lifecycle.Initialisable}.
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
@@ -195,8 +196,15 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             final String transClass = (x == -1 ? transString : transString.substring(0, x));
             try
             {
+                String mime = null;
                 if (returnClassString != null)
                 {
+                    int i = returnClassString.indexOf(":");
+                    if(i > -1)
+                    {
+                        mime = returnClassString.substring(i + 1);
+                        returnClassString = returnClassString.substring(0, i);
+                    }
                     if (returnClassString.equals("byte[]"))
                     {
                         returnClass = byte[].class;
@@ -213,7 +221,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
                 if (returnClass != null)
                 {
-                    trans.setReturnDataType(new SimpleDataType(returnClass));
+                    trans.setReturnDataType(new DataTypeFactory().create(returnClass, mime));
                 }
                 if (name != null)
                 {
