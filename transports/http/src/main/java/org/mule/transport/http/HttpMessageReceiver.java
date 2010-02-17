@@ -56,6 +56,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
+import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -127,7 +128,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     {
         private HttpServerConnection conn;
         private String cookieSpec;
-        private boolean enableCookies;
+        private boolean enableCookies=true;
         private String remoteClientAddress;
 
         public HttpWorker(Socket socket) throws IOException
@@ -461,7 +462,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 {
                     if (enableCookies)
                     {
-                        Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
+                        CookieSpec cs = CookieHelper.getCookieSpec(cookieSpec);
+
+                        Cookie[] cookies = cs.parse(endpoint.getEndpointURI().getHost(),
+                                endpoint.getEndpointURI().getPort(),
+                                endpoint.getEndpointURI().getPath(),
+                                endpoint.getEndpointURI().getScheme().equalsIgnoreCase("https"),
+                                header); //CookieHelper.parseCookies(header, cookieSpec);
                         if (cookies.length > 0)
                         {
                             // yum!

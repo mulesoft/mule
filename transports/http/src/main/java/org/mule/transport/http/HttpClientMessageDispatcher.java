@@ -185,7 +185,18 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             if (cookies != null && cookies.length > 0)
             {
                 client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
-                client.getState().addCookies(cookies);
+
+                for (Cookie cookie : cookies)
+                {
+                    cookie.setDomain(endpoint.getEndpointURI().getHost());
+                    if(StringUtils.isNotBlank(endpoint.getEndpointURI().getPath()))
+                    {
+                        cookie.setPath(endpoint.getEndpointURI().getPath());
+                    }
+                    cookie.setSecure(endpoint.getEndpointURI().getScheme().equalsIgnoreCase("https"));
+                    client.getState().addCookie(cookie);
+                }
+
             }
         }
         else if (cookieObject instanceof Map)
