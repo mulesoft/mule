@@ -19,7 +19,6 @@ import javax.crypto.Cipher;
 
 public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
-    
     protected static boolean isCryptographyExtensionInstalled()
     {
         // see MULE-3671
@@ -43,15 +42,16 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
         return (isCryptographyExtensionInstalled() == false);
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
-        URL url;
-    
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPublic.gpg");
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        
+        URL url = loader.getResource("./serverPublic.gpg");
         keyM.setPublicKeyRingFileName(url.getFile());
     
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPrivate.gpg");
+        url = loader.getResource("./serverPrivate.gpg");
         keyM.setSecretKeyRingFileName(url.getFile());
     
         keyM.setSecretAliasId("0x6168F39C");
@@ -64,11 +64,11 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
         kbStrategy.initialise();
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         kbStrategy = null;
     }
-
 }
 
 
