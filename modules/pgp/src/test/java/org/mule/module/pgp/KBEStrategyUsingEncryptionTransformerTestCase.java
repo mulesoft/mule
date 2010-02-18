@@ -16,38 +16,9 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 
-import java.net.URL;
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
-    private KeyBasedEncryptionStrategy kbStrategy;
-    
-    protected void doSetUp() throws Exception
-    {
-        PGPKeyRingImpl keyM = new PGPKeyRingImpl();
-        URL url;
-
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPublic.gpg");
-        keyM.setPublicKeyRingFileName(url.getFile());
-
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPrivate.gpg");
-        keyM.setSecretKeyRingFileName(url.getFile());
-
-        keyM.setSecretAliasId("0x6168F39C");
-        keyM.setSecretPassphrase("TestingPassphrase");
-        keyM.initialise();
-
-        kbStrategy = new KeyBasedEncryptionStrategy();
-        kbStrategy.setKeyManager(keyM);
-        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor());
-        kbStrategy.initialise();
-    }
-
-    protected void doTearDown() throws Exception
-    {
-        kbStrategy = null;
-    }
-    
     public void testEncrypt() throws Exception
     {
         String msg = "Test Message";
