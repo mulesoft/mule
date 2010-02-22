@@ -60,7 +60,6 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         String userId = (String)getCredentialsAccessor().getCredentials(event);
 
         byte[] creds = null;
-
         try
         {
             creds = message.getPayloadAsBytes();
@@ -72,9 +71,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
                 CoreMessages.failedToReadPayload(), event.getMessage(), e1);
         }
 
-        final Authentication authResult;
         Authentication authentication;
-
         try
         {
             authentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
@@ -85,6 +82,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
                 CoreMessages.failedToReadPayload(), event.getMessage(), e1);
         }
 
+        final Authentication authResult;
         try
         {
             authResult = getSecurityManager().authenticate(authentication);

@@ -19,6 +19,9 @@ import javax.crypto.Cipher;
 
 public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
+    protected KeyBasedEncryptionStrategy kbStrategy;
+    protected PGPKeyRing keyManager;
+
     protected static boolean isCryptographyExtensionInstalled()
     {
         // see MULE-3671
@@ -33,8 +36,6 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
             throw new AssertionError(e);
         }
     }
-
-    protected KeyBasedEncryptionStrategy kbStrategy;
     
     @Override
     protected boolean isDisabledInThisEnvironment()
@@ -62,12 +63,15 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
         kbStrategy.setKeyManager(keyM);
         kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor());
         kbStrategy.initialise();
+        
+        keyManager = keyM;
     }
 
     @Override
     protected void doTearDown() throws Exception
     {
         kbStrategy = null;
+        keyManager = null;
     }
 }
 

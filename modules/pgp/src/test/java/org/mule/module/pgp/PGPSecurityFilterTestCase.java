@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
-    
     protected static final String TARGET = "/encrypted.txt";
     protected static final String DIRECTORY = "output";
     protected static final String MESSAGE_EXCEPTION = "No signed message found. Message payload is of type: String";
@@ -49,6 +49,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
         Map<String, String> props = new HashMap<String, String>();
         props.put("TARGET_FILE", TARGET);
+
         MuleClient client = new MuleClient();
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
@@ -57,7 +58,11 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         {
             // check if file exists
             FileReader outputFile = new FileReader(DIRECTORY + TARGET);
+            String fileContents = IOUtils.toString(outputFile);
             outputFile.close();
+            
+            // see the GenerateTestMessage class for the content of the message
+            assertTrue(fileContents.contains("This is a test message")); 
             
             // delete file not to be confused with tests to be performed later
             File f = FileUtils.newFile(DIRECTORY + TARGET);
@@ -72,18 +77,16 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     private byte[] loadEncryptedMessage() throws IOException
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
-        
-        int length = (int) FileUtils.newFile(url.getFile()).length();
-        byte[] msg = new byte[length];
 
         FileInputStream in = new FileInputStream(url.getFile());
-        in.read(msg);
+        byte[] msg = IOUtils.toByteArray(in);
         in.close();
         
         return msg;
     }
 
-    public void testAuthenticationNotAuthorised() throws Exception
+    // see MULE-3672
+    public void _testAuthenticationNotAuthorised() throws Exception
     {
         MuleClient client = new MuleClient();
 
@@ -93,5 +96,4 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         ExceptionPayload excPayload = reply.getExceptionPayload();
         assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
     }
-
 }

@@ -71,5 +71,4 @@ public class PGPAuthentication implements Authentication
         // TODO
 
     }
-
 }
