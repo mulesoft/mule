@@ -91,6 +91,7 @@ public class FtpConnector extends AbstractConnector
         return FTP;
     }
 
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         List args = getReceiverArguments(endpoint.getProperties());
@@ -229,6 +230,7 @@ public class FtpConnector extends AbstractConnector
     }
 
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         try
@@ -249,26 +251,31 @@ public class FtpConnector extends AbstractConnector
         pools = new HashMap<String, ObjectPool>();
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         if (logger.isDebugEnabled())
@@ -509,9 +516,15 @@ public class FtpConnector extends AbstractConnector
             {
                 throw new ConnectException(e, this);
             }
+            
             try
             {
                 OutputStream out = client.storeFileStream(filename);
+                if (out == null)
+                {
+                    throw new IOException("FTP operation failed: " + client.getReplyString());
+                }
+                
                 return new CallbackOutputStream(out,
                         new CallbackOutputStream.Callback()
                         {
