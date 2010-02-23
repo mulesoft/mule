@@ -79,8 +79,6 @@
 
         <acegiVersion>1.0.7</acegiVersion>
         <antVersion>1.6.5</antVersion>
-        <antlrVersion>2.7.7</antlrVersion>
-        <aopAllianceVersion>1.0.0</aopAllianceVersion>
         <asmVersion>3.1</asmVersion>
         <axisVersion>1.4</axisVersion>
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
@@ -96,7 +94,6 @@
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <commonsNetVersion>2.0</commonsNetVersion>
         <!-- TODO There is a more modern version of cryptix available:
         http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
@@ -115,16 +112,10 @@
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaActivationVersion>1.1</javaActivationVersion>
-        <javaElVersion>2.1.0</javaElVersion>
         <javaMailVersion>1.4</javaMailVersion>
         <javaScriptVersion>2.0.5</javaScriptVersion>
-        <javaServletVersion>2.4.0</javaServletVersion>
-        <javaServletJspVersion>2.1.0</javaServletJspVersion>
         <javaWsdlVersion>1.6.1</javaWsdlVersion>
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
-        <javaXmlRpcVersion>1.1.0</javaXmlRpcVersion>
-        <javaXmlSoapVersion>1.3.0</javaXmlSoapVersion>
-        <javaXmlStreamVersion>1.0.1</javaXmlStreamVersion>
         <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
@@ -133,16 +124,13 @@
         <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.22</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
-        <jxlVersion>2.6.3</jxlVersion>
         <log4jVersion>1.2.14</log4jVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
-        <neethiVersion>2.0.4</neethiVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <osgiSpecVersion>1.0</osgiSpecVersion>
-        <paxLoggingVersion>1.1.1</paxLoggingVersion>
         <quartzVersion>1.6.0</quartzVersion>
         <saajVersion>1.3</saajVersion>
         <saxonVersion>8.9.0.4</saxonVersion>
@@ -150,14 +138,11 @@
         <smackVersion>2.2.1</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>2.5.6</springVersion>
-        <springModulesVersion>0.9</springModulesVersion>
         <springSecurityVersion>2.0.4</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <woodstoxVersion>3.2.6</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
-        <wsCommonsAxiomVersion>1.2.7</wsCommonsAxiomVersion>
-        <wsCommonsSchemaVersion>1.4.2</wsCommonsSchemaVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlResolverVersion>1.2</xmlResolverVersion>
         <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
