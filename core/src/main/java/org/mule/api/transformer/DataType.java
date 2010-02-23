@@ -10,8 +10,9 @@
 package org.mule.api.transformer;
 
 /**
- * Defines a Java type associated with additional information about the data.  This may be a mime type for the type or
- * for collections, the collection item type can be stored with the collection type.
+ * Defines a Java type associated with additional information about the data.  This may be a mime 
+ * type for the type or for collections, the collection item type can be stored with the collection 
+ * type.
  *
  * @since 3.0.0
  */
@@ -24,7 +25,7 @@ public interface DataType<T>
      *
      * @return the class object of the source object. This must not be null
      */
-    Class getType();
+    Class<T> getType();
 
     /**
      * The mime type of the the source object to transform.

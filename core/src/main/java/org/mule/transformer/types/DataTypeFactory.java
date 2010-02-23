@@ -20,8 +20,8 @@ import java.lang.reflect.Proxy;
 import java.util.Collection;
 
 /**
- * Factory class used to create {@link org.mule.api.transformer.DataType} objects based on the parameter types passed into the
- * factory methods.
+ * Factory class used to create {@link org.mule.api.transformer.DataType} objects based on the 
+ * parameter types passed into the factory methods.
  */
 public class DataTypeFactory
 {
@@ -32,16 +32,16 @@ public class DataTypeFactory
     public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
     public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);
 
-    public DataType create(Class type)
+    public <T> DataType<T> create(Class<T> type)
     {
         return create(type, MimeTypes.ANY);
     }
 
-    public DataType create(Class type, String mimeType)
+    public <T> DataType<T> create(Class<T> type, String mimeType)
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            Class<? extends Collection> cType = (Class<? extends Collection>) type;
+            Class<? extends Collection> cType = (Class<? extends Collection>)type;
             Class itemType = GenericsUtils.getCollectionType(cType);
             if (itemType == null)
             {

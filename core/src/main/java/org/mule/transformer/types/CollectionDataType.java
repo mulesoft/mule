@@ -77,7 +77,7 @@ public class CollectionDataType<T> extends SimpleDataType<T>
 
         if (collType != null)
         {
-            return new CollectionDataType((Class<? extends Collection>) m.getReturnType(), collType, mimeType);
+            return new CollectionDataType(m.getReturnType(), collType, mimeType);
         }
         else
         {

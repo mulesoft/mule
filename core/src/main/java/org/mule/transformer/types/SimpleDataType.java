@@ -12,17 +12,18 @@ package org.mule.transformer.types;
 import org.mule.api.transformer.DataType;
 
 /**
- * A data type that simply wraps a Java type.  This type also allows a mime type to be associated with the Java type.
+ * A data type that simply wraps a Java type.  This type also allows a mime type to be associated
+ * with the Java type.
  */
 public class SimpleDataType<T> implements DataType<T>
 {
-    protected Class type;
+    protected Class<T> type;
     protected String mimeType = ANY_MIME_TYPE;
 
     public SimpleDataType(Class type, String mimeType)
     {
         this.type = type;
-        this.mimeType = (mimeType==null?ANY_MIME_TYPE:mimeType);
+        this.mimeType = (mimeType == null ? ANY_MIME_TYPE : mimeType);
     }
 
     public SimpleDataType(Class<T> type)
@@ -30,7 +31,7 @@ public class SimpleDataType<T> implements DataType<T>
         this.type = type;
     }
 
-    public Class getType()
+    public Class<T> getType()
     {
         return type;
     }
