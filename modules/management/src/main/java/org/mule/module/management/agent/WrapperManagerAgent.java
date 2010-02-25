@@ -19,6 +19,11 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.tanukisoftware.wrapper.jmx.WrapperManager;
+import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
+
 import java.util.List;
 
 import javax.management.InstanceNotFoundException;
@@ -29,11 +34,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.tanukisoftware.wrapper.jmx.WrapperManager;
-import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
 
 /**
  * This agent integrates Java Service Wrapper into Mule. See
@@ -72,7 +72,7 @@ public class WrapperManagerAgent extends AbstractAgent
 
     public WrapperManagerAgent()
     {
-        super("Wrapper Manager");
+        super("wrapper-manager");
     }
 
     public void initialise() throws InitialisationException

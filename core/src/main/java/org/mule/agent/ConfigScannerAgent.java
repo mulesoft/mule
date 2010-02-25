@@ -19,14 +19,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * EXPERIMENTAL!!!
@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ConfigScannerAgent extends AbstractAgent
 {
-    public static final String AGENT_NAME = "Mule Config Scanner";
+    public static final String AGENT_NAME = "config-scanner";
 
     /**
      * logger used by this class
@@ -79,7 +79,7 @@ public class ConfigScannerAgent extends AbstractAgent
     @Override
     public String getDescription()
     {
-        return getName() + " scanning for files in " + configDirName;
+        return "Mule Config Scanner scanning for files in " + configDirName;
     }
 
     public void start() throws MuleException

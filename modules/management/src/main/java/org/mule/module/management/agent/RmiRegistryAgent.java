@@ -16,15 +16,15 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Binds to an existing RMI registry or creates a new one on a defined URI. The
@@ -49,7 +49,7 @@ public class RmiRegistryAgent extends AbstractAgent
 
     public RmiRegistryAgent()
     {
-        super("rmi-server");
+        super("rmi-registry");
     }
 
     public String getDescription()

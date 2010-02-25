@@ -186,7 +186,8 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public WorkManager createWorkManager(String name, int shutdownTimeout)
     {
-        return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
+        // we deliberately don't instantiate the chained profile as we just want a cloned copy, not recursion
+        return workManagerFactory.createWorkManager(new ImmutableThreadingProfile(this), name, shutdownTimeout);
     }
 
     public ExecutorService createPool()
@@ -196,7 +197,8 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public ExecutorService createPool(String name)
     {
-        return poolFactory.createPool(name, this);
+        // we deliberately don't instantiate the chained profile as we just want a cloned copy, not recursion
+        return poolFactory.createPool(name, new ImmutableThreadingProfile(this));
     }
 
     public boolean isDoThreading()
