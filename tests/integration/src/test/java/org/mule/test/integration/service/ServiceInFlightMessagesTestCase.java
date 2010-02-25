@@ -163,7 +163,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         String serviceName = service.getName() + ".service";
         int serviceQueueSize = queueSession.getQueue(serviceName).size();
         
-        logger.warn("SEDA Queue: " + outQueueSize + ", Outbound endpoint vm queue: " + serviceQueueSize);
+        logger.info("SEDA Queue: " + outQueueSize + ", Outbound endpoint vm queue: " + serviceQueueSize);
         assertEquals(numMessages, outQueueSize + serviceQueueSize);
     }
 
