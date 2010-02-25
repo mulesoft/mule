@@ -37,7 +37,7 @@ public class DataTypeFactory
         return create(type, MimeTypes.ANY);
     }
 
-    public <T> DataType<T> create(Class<T> type, String mimeType)
+    public <T> DataType<T> create(Class<?> type, String mimeType)
     {
         if (Collection.class.isAssignableFrom(type))
         {
