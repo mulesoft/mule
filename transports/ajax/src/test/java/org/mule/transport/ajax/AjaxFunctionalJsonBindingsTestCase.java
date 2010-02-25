@@ -25,16 +25,16 @@ import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalTestCase extends FunctionalTestCase
+public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 {
     public static final int SERVER_PORT = 58080;
-    
+
     private BayeuxClient client;
 
     @Override
     protected String getConfigResources()
     {
-        return "ajax-embedded-functional-test.xml";
+        return "ajax-embedded-functional-json-bindings-test.xml";
     }
 
     @Override
@@ -56,8 +56,9 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         //client.stop();
     }
 
-    public void testClientSubscribeWithString() throws Exception
+     public void testClientSubscribeWithJsonObjectResponse() throws Exception
     {
+
         final Latch latch = new Latch();
 
         final AtomicReference<Object> data = new AtomicReference<Object>();
@@ -80,18 +81,16 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         latch.await(10, TimeUnit.SECONDS);
 
         assertNotNull(data.get());
-        assertEquals("{\"data\":\"Ross Received\",\"channel\":\"/test1\"}", data.get());
+        assertEquals("{\"data\":{\"name\":\"Ross\"},\"channel\":\"/test1\"}", data.get());
     }
 
-    public void testClientPublishWithString() throws Exception
+    public void testClientPublishWithJsonObject() throws Exception
     {
-        client.publish("/test2", "Ross", null);
+        client.publish("/test2", "{\"name\":\"Ross\"}", null);
         MuleClient muleClient = new MuleClient();
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);
-        assertEquals("Ross Received", msg.getPayloadAsString());
+        assertEquals("Received: DummyJsonBean{name='Ross'}", msg.getPayloadAsString());
     }
-
-
 }

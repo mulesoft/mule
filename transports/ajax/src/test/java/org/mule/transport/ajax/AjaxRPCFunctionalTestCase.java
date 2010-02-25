@@ -10,15 +10,46 @@
 
 package org.mule.transport.ajax;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.concurrent.Latch;
 
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.cometd.Client;
+import org.cometd.Message;
+import org.cometd.MessageListener;
+import org.mortbay.cometd.client.BayeuxClient;
+import org.mortbay.jetty.client.Address;
+import org.mortbay.jetty.client.HttpClient;
 
 public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
 {
-    public static final String TEST_JSON_MESSAGE = "{\"payload\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/service/response\"}";
+    public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
+
+    public static final int SERVER_PORT = 58080;
+
+    private BayeuxClient client;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        HttpClient http = new HttpClient();
+        http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
+
+        client = new BayeuxClient(http, new Address("localhost", SERVER_PORT), "/ajax/cometd");
+        http.start();
+        //need to start the client before you can add subscriptions
+        client.start();
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        //9 times out of 10 this throws a "ava.lang.IllegalStateException: Not running" exception, it can be ignored
+        client.stop();
+    }
+
     @Override
     protected String getConfigResources()
     {
@@ -27,13 +58,28 @@ public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
 
     public void testDispatchReceiveSimple() throws Exception
     {
-        MuleClient client = new MuleClient();
-        client.dispatch("endpoint1", TEST_JSON_MESSAGE, null);
+        final Latch latch = new Latch();
 
-        MuleMessage result = client.request("result", 5000L);
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof Map);
-        assertEquals("foo", ((Map)result.getPayload()).get("value1"));
-        assertEquals("bar", ((Map)result.getPayload()).get("value2"));
+        final AtomicReference<Object> data = new AtomicReference<Object>();
+        client.addListener(new MessageListener()
+        {
+            public void deliver(Client client, Client client1, Message message)
+            {
+                if (message.getData() != null)
+                {
+                    //This simulate what the browser would receive
+                    data.set((message.getData()));
+                    latch.release();
+                }
+            }
+        });
+        //The '/response' channel is set on the request message
+        client.subscribe("/response");
+        //Simulates dispatching from the browser
+        client.publish("/request", TEST_JSON_MESSAGE, null);
+        latch.await(10, TimeUnit.SECONDS);
+
+        assertNotNull(data.get());
+        assertEquals("{\"value1\":\"foo\",\"value2\":\"bar\"}", data.get());
     }
 }

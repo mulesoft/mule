@@ -10,6 +10,9 @@
 package org.mule.transport.ajax.embedded;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -18,11 +21,15 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.container.AjaxServletConnector;
-import org.mule.transport.ajax.i18n.AjaxMessages;
+import org.mule.transport.ajax.container.MuleAjaxServlet;
 
 import java.util.HashMap;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
@@ -30,6 +37,7 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
@@ -37,7 +45,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and 
  * subscribe events.
  */
-public class AjaxConnector extends AjaxServletConnector
+public class AjaxConnector extends AjaxServletConnector implements MuleContextNotificationListener<MuleContextNotification>
 {
     public static final String PROTOCOL = "ajax";
 
@@ -51,7 +59,7 @@ public class AjaxConnector extends AjaxServletConnector
     {
         super();
         registerSupportedProtocol("ajax");
-        setInitialStateStopped(false);
+        setInitialStateStopped(true);
     }
 
     public String getProtocol()
@@ -77,6 +85,24 @@ public class AjaxConnector extends AjaxServletConnector
 //                throw new InitialisationException(e, this);
 //            }
 //        }
+    }
+
+    public void onNotification(MuleContextNotification notification)
+    {
+
+        if(notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+        {
+            //We delay starting until the context has been started since we need the MuleAjaxServlet to initialise first
+            setInitialStateStopped(false);
+            try
+            {
+                start();
+            }
+            catch (MuleException e)
+            {
+                throw new MuleRuntimeException(CoreMessages.failedToStart(getName()), e);
+            }
+        }
     }
 
     AbstractBayeux getBayeux(ImmutableEndpoint endpoint)
@@ -113,14 +139,13 @@ public class AjaxConnector extends AjaxServletConnector
 
     protected void doStart() throws MuleException
     {
-        try
+       try
         {
             httpServer.start();
-
         }
         catch (Exception e)
         {
-            throw new LifecycleException(CoreMessages.failedToStart("Jetty Http Receiver"), e, this);
+            throw new RuntimeException(CoreMessages.failedToStart("Jetty Http Receiver").getMessage(), e);
         }
     }
 
@@ -195,7 +220,7 @@ public class AjaxConnector extends AjaxServletConnector
 
                 ContinuationCometdServlet servlet = createServletForConnector(connector, endpoint);
                 holder = new BayeuxHolder(connector, servlet);
-                if(getBayeux()==null) setBayeux(servlet.getBayeux());
+                //if(getBayeux()==null) setBayeux(servlet.getBayeux());
                // connector.start();
 
                 connectors.put(connectorKey, holder);
@@ -204,8 +229,8 @@ public class AjaxConnector extends AjaxServletConnector
             {
                 holder.increment();
             }
-            AbstractBayeux bayeux = holder.servlet.getBayeux();
-            bayeux.setJSONCommented(isJsonCommented());
+//            AbstractBayeux bayeux = holder.servlet.getBayeux();
+//            bayeux.setJSONCommented(isJsonCommented());
         }
         return holder;
     }
@@ -259,26 +284,36 @@ public class AjaxConnector extends AjaxServletConnector
     protected ContinuationCometdServlet createServletForConnector(Connector connector, ImmutableEndpoint endpoint) throws MuleException
     {
 
-        ContinuationCometdServlet servlet = new ContinuationCometdServlet();
+        ContinuationCometdServlet servlet = new MuleAjaxServlet();
 
         Context context = new Context(this.getHttpServer(), "/", Context.NO_SESSIONS);
         context.setConnectorNames(new String[]{connector.getName()});
+        context.addEventListener(new ServletContextListener() {
+            public void contextInitialized(ServletContextEvent sce)
+            {
+                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
+                sce.getServletContext().setAttribute(MuleAjaxServlet.AJAX_CONNECTOR_NAME_PROPERTY, getName());
+            }
+
+            public void contextDestroyed(ServletContextEvent sce) { }
+        });
 
         ServletHolder holder = new ServletHolder();
         holder.setServlet(servlet);
         context.setResourceBase(endpoint.getEndpointURI().getPath());
         context.addServlet(holder, "/ajax/*");
-        context.addServlet("org.mortbay.jetty.servlet.DefaultServlet", "/");
+        context.addServlet(DefaultServlet.class, "/");
 
-        try
-        {
-            connector.start();
-            context.start();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(AjaxMessages.failedToStartAjaxServlet(), e, this);
-        }
+//        try
+//        {
+//            //we need start so that the Bayeux instance is created. (to register listeners we need an instance of Bayeux available)
+//            connector.start();
+//            context.start();
+//        }
+//        catch (Exception e)
+//        {
+//            throw new InitialisationException(AjaxMessages.failedToStartAjaxServlet(), e, this);
+//        }
 
         if(getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
         holder.setInitParameter("JSONCommented", Boolean.toString(isJsonCommented()));
@@ -288,7 +323,6 @@ public class AjaxConnector extends AjaxServletConnector
         if(getTimeout() != INT_VALUE_NOT_SET) holder.setInitParameter("timeout", Integer.toString(getTimeout()));
         if(getRefsThreshold() != INT_VALUE_NOT_SET) holder.setInitParameter("refsThreshold", Integer.toString(getRefsThreshold()));
         holder.setInitParameter("requestAvailable", Boolean.toString(isRequestAvailable()));
-        holder.setInitParameter("directDeliver", Boolean.toString(isDirectDeliver()));
 
         return servlet;
     }
@@ -322,5 +356,4 @@ public class AjaxConnector extends AjaxServletConnector
             return servlet.getBayeux();
         }
     }
-
 }

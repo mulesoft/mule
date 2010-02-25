@@ -9,10 +9,10 @@
  */
 package org.mule.transport.ajax;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.ajax.embedded.AjaxConnector;
-import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.ajax.container.AjaxServletConnector;
+import org.mule.transport.ajax.embedded.AjaxConnector;
 
 public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -28,7 +28,6 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertNotNull(connector);
 
-        assertTrue(connector.isDirectDeliver());
         assertTrue(connector.isJsonCommented());
         assertEquals(1000, connector.getInterval());
         assertEquals(1, connector.getLogLevel());

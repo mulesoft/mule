@@ -13,13 +13,11 @@ import org.mule.api.MuleException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageAdapterTestCase;
 
-import java.util.Map;
-
 public class AjaxMessageAdapterMessageDTOJsonTestCase extends AbstractMessageAdapterTestCase
 {
     public Object getValidMessage() throws Exception
     {
-        return "{\"payload\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/services/response\"}";
+        return "{\"data\":{\"value1\":\"foo\",\"value2\":\"bar\"},\"replyTo\":\"/response\"}";
     }
 
     public MessageAdapter createAdapter(Object payload) throws MuleException
@@ -27,11 +25,16 @@ public class AjaxMessageAdapterMessageDTOJsonTestCase extends AbstractMessageAda
         return new AjaxMessageAdapter(payload);
     }
 
-    protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    public void testCustomMessageProps() throws Exception
     {
-        assertTrue(payload instanceof Map);
+        MessageAdapter adapter = createAdapter(getValidMessage());
+        assertEquals("/response", adapter.getReplyTo());
+    }
 
-        assertEquals("foo", ((Map)payload).get("value1"));
-        assertEquals("bar", ((Map)payload).get("value2"));
+    @Override
+    protected void doTestMessageEqualsPayload(Object payload1, Object payload2) throws Exception
+    {
+        //Mule will set the data field as the payload
+        assertEquals("{\"value1\":\"foo\",\"value2\":\"bar\"}", payload2);
     }
 }

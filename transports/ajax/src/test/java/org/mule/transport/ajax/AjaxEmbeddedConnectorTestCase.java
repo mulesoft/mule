@@ -19,6 +19,9 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
     {
         AjaxConnector c = new AjaxConnector();
         c.setName("test");
+        //By default the connector is not started until the servlet container is up.  We start it here because
+        //this test looks at the connector lifecycle
+        c.setInitialStateStopped(false);
         return c;
     }
 

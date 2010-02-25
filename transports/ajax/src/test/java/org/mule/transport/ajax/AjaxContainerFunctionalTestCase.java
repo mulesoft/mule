@@ -27,12 +27,10 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        super.doSetUp();
-
-        httpServer = new Server(58883);
+        httpServer = new Server(SERVER_PORT);
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
-        c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/cometd/*");
+        c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
         c.addEventListener(new ServletContextListener() {
             public void contextInitialized(ServletContextEvent sce)
             {
@@ -43,17 +41,22 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
         });
 
         httpServer.start();
+
+        super.doSetUp();
+
     }
 
     @Override
     protected void doTearDown() throws Exception
     {
+        super.doTearDown();
         if(httpServer!=null) httpServer.stop();
+
     }
 
     @Override
     protected String getConfigResources()
     {
-        return "ajax-container-functional-roundtrip-test.xml";
+        return "ajax-container-functional-test.xml";
     }
 }

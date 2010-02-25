@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <vm:connector name="vm"/>
 
-    <ajax:servlet-endpoint name="endpoint1" path="/service/request"/>
-    <ajax:servlet-endpoint name="endpoint2" path="/service/response"/>
-
-    <vm:endpoint name="result" path="result"/>
+    <ajax:servlet-endpoint name="endpoint1" path="/request"/>
 
     <model name="main">
         <service name="testComponent">
@@ -25,17 +17,7 @@
                 <inbound-endpoint ref="endpoint1"/>
             </inbound>
             <echo-component/>
-        </service>
-
-        <service name="testComponent2">
-            <inbound>
-                <inbound-endpoint ref="endpoint2"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="result"/>
-                </pass-through-router>
-            </outbound>
+            <!-- Reply-to channel is set on the message -->
         </service>
     </model>
 </mule>

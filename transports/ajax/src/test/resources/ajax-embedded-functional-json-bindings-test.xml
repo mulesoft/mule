@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
+      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
+
+    <ajax:endpoint name="ajax-endpoint1" address="http://0.0.0.0:58080/test1"/>
+    <ajax:endpoint name="ajax-endpoint2" address="http://0.0.0.0:58080/test2"/>
+
+    <model name="main">
+
+        <service name="clientSubscribe-test1">
+            <description>This service will send an instance of JsonBean to any clients listening on "/test1" channel</description>
+            <inbound>
+                <vm:inbound-endpoint path="in1"/>
+            </inbound>
+            <component class="org.mule.transport.ajax.DummyAjaxComponent"/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="ajax-endpoint1"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="clientPublish-test2">
+            <description>This service will receive on "/test2" channel but the request will be converted to a JsonBean instance</description>
+            <inbound>
+                <inbound-endpoint ref="ajax-endpoint2">
+                    <json:json-to-object-transformer returnClass="org.mule.transport.ajax.DummyJsonBean"/>
+                </inbound-endpoint>
+            </inbound>
+            <component class="org.mule.transport.ajax.DummyAjaxComponent2"/>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="in2"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+
+    </model>
+</mule>

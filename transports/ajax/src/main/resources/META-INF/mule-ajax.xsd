@@ -91,13 +91,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="directDeliver" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            True if published messages are delivered directly to subscribers (default). If false, a message copy is created with only supported fields (default true).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="refsThreshold" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>

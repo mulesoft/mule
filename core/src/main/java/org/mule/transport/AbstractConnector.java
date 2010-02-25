@@ -262,6 +262,12 @@ public abstract class AbstractConnector
      */
     protected boolean startOnConnect = false;
 
+    /**
+     * The will cause the connector not to start when {@link #start()} is called. The only way to start the connector
+     * is to call {@link #setInitialStateStopped(boolean)} with 'false' and then calling {@link #start()}.
+     * This flag is used internally since some connectors that rely on external servers may need to wait for that server
+     * to become available before starting
+     */
     protected boolean initialStateStopped = false;
     /**
      * Whether to test a connection on each take.
@@ -356,7 +362,6 @@ public abstract class AbstractConnector
     {
         if (isInitialStateStopped())
         {
-            setInitialStateStopped(false);
             logger.info("Connector not started because 'initialStateStopped' is true");
             return;
         }
@@ -909,11 +914,35 @@ public abstract class AbstractConnector
         this.requesterFactory = requesterFactory;
     }
 
+    /**
+     * The will cause the connector not to start when {@link #start()} is called. The only way to start the connector
+     * is to call {@link #setInitialStateStopped(boolean)} with 'false' and then calling {@link #start()}.
+     * This flag is used internally since some connectors that rely on external servers may need to wait for that server
+     * to become available before starting.
+     *
+     * @return true if the connector is not to be started with normal lifecycle, flase otherwise
+     *
+     * @since 3.0.0
+     */
     public boolean isInitialStateStopped()
     {
         return initialStateStopped;
     }
 
+    /**
+     * The will cause the connector not to start when {@link #start()} is called. The only way to start the connector
+     * is to call {@link #setInitialStateStopped(boolean)} with 'false' and then calling {@link #start()}.
+     * This flag is used internally since some connectors that rely on external servers may need to wait for that server
+     * to become available before starting.
+
+     * The only time this method should be used is when a subclassing connector needs to delay the start lifecycle due to
+     * a dependence on an external system. Most users can ignore this.
+     *
+     * @param true to stop the connector starting through normal lifecycle.  It will be the responsibility
+     * of the code that sets this property to start the connector
+     *
+     * @since 3.0.0
+     */
     public void setInitialStateStopped(boolean initialStateStopped)
     {
         this.initialStateStopped = initialStateStopped;

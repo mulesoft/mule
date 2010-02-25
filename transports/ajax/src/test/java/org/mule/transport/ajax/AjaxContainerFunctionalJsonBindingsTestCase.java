@@ -20,14 +20,13 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCase
+public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJsonBindingsTestCase
 {
     private Server httpServer;
 
     @Override
     protected void doSetUp() throws Exception
     {
-
         httpServer = new Server(SERVER_PORT);
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
@@ -42,6 +41,7 @@ public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCas
         });
 
         httpServer.start();
+
         super.doSetUp();
 
     }
@@ -51,11 +51,12 @@ public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCas
     {
         super.doTearDown();
         if(httpServer!=null) httpServer.stop();
+
     }
 
     @Override
     protected String getConfigResources()
     {
-        return "ajax-container-rpc-test.xml";
+        return "ajax-container-functional-json-bindings-test.xml";
     }
 }

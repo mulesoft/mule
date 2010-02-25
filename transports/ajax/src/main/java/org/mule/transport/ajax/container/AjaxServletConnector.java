@@ -16,7 +16,7 @@ import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxReplyToHandler;
 import org.mule.transport.servlet.ServletConnector;
 
-import dojox.cometd.DataFilter;
+import org.cometd.DataFilter;
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
@@ -94,9 +94,8 @@ public class AjaxServletConnector extends ServletConnector
     {
         super();
         registerSupportedProtocolWithoutPrefix("ajax");
-        //Dont start until the servletContianer is up
+        //Dont start until the servletContainer is up
         setInitialStateStopped(true);
-
     }
 
     public AbstractBayeux getBayeux()
@@ -108,7 +107,6 @@ public class AjaxServletConnector extends ServletConnector
     {
         this.bayeux = bayeux;
         this.getBayeux().setJSONCommented(isJsonCommented());
-        this.getBayeux().setDirectDeliver(isDirectDeliver());
         if(getLogLevel() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setLogLevel(getLogLevel());
         if(getMaxInterval() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setMaxInterval(getMaxInterval());
         if(getInterval() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setInterval(getMaxInterval());
@@ -215,16 +213,6 @@ public class AjaxServletConnector extends ServletConnector
     public void setRequestAvailable(boolean requestAvailable)
     {
         this.requestAvailable = requestAvailable;
-    }
-
-    public boolean isDirectDeliver()
-    {
-        return directDeliver;
-    }
-
-    public void setDirectDeliver(boolean directDeliver)
-    {
-        this.directDeliver = directDeliver;
     }
 
     public int getRefsThreshold()

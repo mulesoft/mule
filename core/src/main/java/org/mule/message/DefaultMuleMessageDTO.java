@@ -67,6 +67,16 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
         this.replyTo = replyTo;
     }
 
+    public Object getData()
+    {
+        return getPayload();
+    }
+
+    public void setData(Object data)
+    {
+        this.setPayload(data);
+    }
+
     public void addPropertiesTo(MessageAdapter message)
     {
         String prefix;

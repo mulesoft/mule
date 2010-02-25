@@ -22,8 +22,8 @@ public class AjaxMessageAdapterMessageDTOTestCase extends AbstractMessageAdapter
     {
         //Mimics a payload sent from the browser
         Map map = new HashMap();
-        map.put("payload", "{\"value1\" : \"foo\", \"value2\" : \"bar\"}");
-        map.put("replyTo", "baz");
+        map.put("data","{\"value1\":\"foo\",\"value2\":\"bar\"}");
+        map.put("replyTo", "/reply");
         return map;
     }
 
@@ -32,11 +32,16 @@ public class AjaxMessageAdapterMessageDTOTestCase extends AbstractMessageAdapter
         return new AjaxMessageAdapter(payload);
     }
 
-    protected void doTestMessageEqualsPayload(Object message, Object payload) throws Exception
+    public void testCustomMessageProps() throws Exception
     {
-        assertTrue(payload instanceof Map);
+        MessageAdapter adapter = createAdapter(getValidMessage());
+        assertEquals("/reply", adapter.getReplyTo());
+    }
 
-        assertEquals("foo", ((Map)payload).get("value1"));
-        assertEquals("bar", ((Map)payload).get("value2"));
+    @Override
+    protected void doTestMessageEqualsPayload(Object payload1, Object payload2) throws Exception
+    {
+        //Mule will set the data field as the payload
+        assertEquals("{\"value1\":\"foo\",\"value2\":\"bar\"}", payload2);
     }
 }

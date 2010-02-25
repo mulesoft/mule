@@ -18,8 +18,8 @@ import org.mule.transport.ajax.container.AjaxServletConnector;
 
 import java.util.List;
 
-import dojox.cometd.Channel;
-import dojox.cometd.Client;
+import org.cometd.Channel;
+import org.cometd.Client;
 import org.mortbay.cometd.AbstractBayeux;
 
 /**
