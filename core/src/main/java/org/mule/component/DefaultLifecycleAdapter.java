@@ -182,7 +182,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
                 // unregister a hard ref to the component object
                 muleContext.getRegistry().unregisterObject(createRegistryHardRefName(component));
 
-                ((Disposable) componentObject.get()).dispose();
                 componentObject.clear();
                 componentObject.enqueue();
 
