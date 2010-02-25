@@ -10,10 +10,13 @@
 package org.mule.module.scripting.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+
+import java.util.Arrays;
 
 public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
@@ -67,5 +70,18 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
                 "#[groovy:registry.'name.with.dots'.washed]", null);
         assertNotNull(result);
         assertEquals(false, result);
+    }
+
+    public void testComplexExpressionLowLevelParsing() throws Exception
+    {
+        muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
+
+        MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"), muleContext);
+        String result = muleContext.getExpressionManager().parse("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]",
+                                                                 msg);
+
+        assertNotNull(result);
+        assertEquals("Expressions didn't evaluate correctly",
+                     "0 - TEST", result);
     }
 }

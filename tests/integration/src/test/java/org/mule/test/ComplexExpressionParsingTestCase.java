@@ -23,19 +23,6 @@ import java.util.List;
 public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase
 {
 
-    public void testComplexExpressionLowLevelParsing() throws Exception
-    {
-        muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
-
-        MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"), muleContext);
-        String result = muleContext.getExpressionManager().parse("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]",
-                                                                 msg);
-
-        assertNotNull(result);
-        assertEquals("Expressions didn't evaluate correctly",
-                     "0 - TEST", result);
-    }
-
     public void testComplexExpressionJdbcParsing() throws Exception
     {
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
