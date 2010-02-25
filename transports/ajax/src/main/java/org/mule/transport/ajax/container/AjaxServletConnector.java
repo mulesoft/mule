@@ -10,6 +10,9 @@
 package org.mule.transport.ajax.container;
 
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.service.Service;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ajax.AjaxMessageReceiver;
@@ -229,5 +232,13 @@ public class AjaxServletConnector extends ServletConnector
     public ReplyToHandler getReplyToHandler()
     {
         return new AjaxReplyToHandler(getDefaultResponseTransformers(), this);
+    }
+
+    @Override
+    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
+    {
+        AjaxMessageReceiver receiver = (AjaxMessageReceiver)super.registerListener(service, endpoint);
+        receiver.setBayeux(getBayeux());
+        return receiver;
     }
 }
