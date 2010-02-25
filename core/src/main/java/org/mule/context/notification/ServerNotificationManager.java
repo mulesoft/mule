@@ -21,6 +21,9 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.util.ClassUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -30,13 +33,11 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
+import edu.emory.mathcs.backport.java.util.Queue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off
  * switches in the config.
@@ -250,6 +251,13 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
                 // ignore - we just loop round
             }
         }
+    }
+
+    /**
+     * @return DIRECT reference to an event queue
+     */
+    public Queue getEventQueue() {
+        return eventQueue;
     }
 
     /**

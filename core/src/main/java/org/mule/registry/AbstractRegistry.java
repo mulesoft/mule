@@ -77,6 +77,12 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key)
+    {
+        return (T) lookupObject(key);
+    }
+
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
         // Accumulate objects from all registries.

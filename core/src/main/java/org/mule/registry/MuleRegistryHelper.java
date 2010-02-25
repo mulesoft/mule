@@ -564,12 +564,10 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return registry.lookupObject(type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Object lookupObject(String key)
+    @SuppressWarnings("unchecked")
+    public <T> T lookupObject(String key)
     {
-        return registry.lookupObject(key);
+        return (T) registry.lookupObject(key);
     }
 
     /**
@@ -578,6 +576,17 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return registry.lookupObjects(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key)
+    {
+        return (T)registry.get(key);
+    }
+
+    public <T> Map<String, T> lookupByType(Class<T> type)
+    {
+        return registry.lookupByType(type);
     }
 
     /**

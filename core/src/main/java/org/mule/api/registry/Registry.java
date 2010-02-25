@@ -23,11 +23,15 @@ public interface Registry extends Initialisable, Disposable
     // /////////////////////////////////////////////////////////////////////////
 
     /**
-     * Look up a single object by name.
-     *
+     * Alias method performing the lookup, here to simplify syntax when called from dynamic languages.
+     */
+    <T> T get(String key);
+
+    /** 
+     * Look up a single object by name. 
      * @return object or null if not found
      */
-    Object lookupObject(String key);
+    <T> T lookupObject(String key);
 
     /**
      * Look up all objects of a given type.
@@ -44,6 +48,10 @@ public interface Registry extends Initialisable, Disposable
      */
     <T> T lookupObject(Class<T> clazz) throws RegistrationException;
 
+    /**
+     * @return key/object pairs
+     */
+    <T> Map<String, T> lookupByType(Class<T> type);
     // /////////////////////////////////////////////////////////////////////////
     // Registration methods
     // /////////////////////////////////////////////////////////////////////////

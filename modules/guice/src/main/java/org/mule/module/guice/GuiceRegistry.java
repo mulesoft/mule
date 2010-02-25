@@ -65,12 +65,22 @@ public class GuiceRegistry extends AbstractRegistry
         //nothing to do
     }
 
-    public Object lookupObject(String key)
+    public <T> T lookupObject(String key)
     {
         return null;
     }
 
-    public <T> Collection lookupObjects(Class<T> type)
+    public <T> T get(String key)
+    {
+        return null;
+    }
+
+    public <T> Map<String, T> lookupByType(Class<T> type)
+    {
+        return null;
+    }
+
+    public <T> Collection<T> lookupObjects(Class<T> type)
     {
         try
         {
@@ -84,11 +94,11 @@ public class GuiceRegistry extends AbstractRegistry
                 }
                 return list;
             }
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         catch (ConfigurationException e)
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

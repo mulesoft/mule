@@ -98,11 +98,6 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         return poolExhaustedAction;
     }
 
-    public String getPoolExhaustedActionAsString()
-    {
-        return null;
-    }
-
     public RejectedExecutionHandler getRejectedExecutionHandler()
     {
         return rejectedExecutionHandler;

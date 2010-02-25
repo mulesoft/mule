@@ -47,7 +47,7 @@ public class TransientRegistry extends AbstractRegistry
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
     //@ThreadSafe synchronized(registry)
-    private Map registry = new HashMap();
+    private final Map<String, Object> registry = new HashMap<String, Object>();
 
     private MuleContext context;
 
@@ -158,15 +158,36 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    public Object lookupObject(String key)
+    @SuppressWarnings("unchecked")
+    public <T> Map<String, T> lookupByType(Class<T> type)
     {
         synchronized(registry)
         {
-            return registry.get(key);
+            final Map<String, T> results = new HashMap<String, T>();
+            for (Map.Entry<String, Object> entry : registry.entrySet())
+            {
+                final Class clazz = entry.getValue().getClass();
+                if (type.isAssignableFrom(clazz))
+                {
+                    results.put(entry.getKey(), (T) entry.getValue());
+                }
+            }
+
+            return results;
         }
     }
 
-    public <T>Collection lookupObjects(Class<T> returntype)
+    @SuppressWarnings("unchecked")
+    public <T> T  lookupObject(String key)
+    {
+        synchronized(registry)
+        {
+            return (T) registry.get(key);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Collection<T> lookupObjects(Class<T> returntype)
     {
         synchronized(registry)
         {
@@ -201,8 +222,8 @@ public class TransientRegistry extends AbstractRegistry
             theObject = processor.process(theObject);
         }
         //Then any other processors
-        Collection<ObjectProcessor> processors = lookupObjects(PreInitProcessor.class);
-        for (ObjectProcessor processor : processors)
+        Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
+        for (PreInitProcessor processor : processors)
         {
             theObject = processor.process(theObject);
             if(theObject==null)

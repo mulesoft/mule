@@ -20,17 +20,17 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
 import org.mule.registry.AbstractRegistry;
-import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpringRegistry extends AbstractRegistry
 {
@@ -148,17 +148,22 @@ public class SpringRegistry extends AbstractRegistry
         }
     }
 
-    public <T>Collection lookupObjects(Class<T> type)
+    public <T> Collection<T> lookupObjects(Class<T> type)
+    {
+        // MULE-2762
+        //if (logger.isDebugEnabled())
+        //{
+        //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
+        //}
+        return lookupByType(type).values();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Map<String, T> lookupByType(Class<T> type)
     {
         try
         {
-            Map map = applicationContext.getBeansOfType(type);
-            // MULE-2762
-            //if (logger.isDebugEnabled())
-            //{
-            //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
-            //}
-            return map.values();
+            return applicationContext.getBeansOfType(type);
         }
         catch (FatalBeanException fbex)
         {
@@ -169,8 +174,9 @@ public class SpringRegistry extends AbstractRegistry
         catch (Exception e)
         {
             logger.debug(e);
-            return CollectionUtils.EMPTY_COLLECTION;
+            return Collections.emptyMap();
         }
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////

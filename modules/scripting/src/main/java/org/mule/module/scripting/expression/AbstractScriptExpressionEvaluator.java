@@ -78,7 +78,7 @@ public abstract class AbstractScriptExpressionEvaluator implements ExpressionEva
     protected Scriptable getScript(String expression)
     {
         Scriptable script = (Scriptable)cache.get(expression);
-        if(script==null)
+        if (script==null)
         {
             script = new Scriptable(muleContext);
             script.setScriptEngineName(getName());

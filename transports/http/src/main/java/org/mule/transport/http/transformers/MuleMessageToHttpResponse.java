@@ -23,6 +23,9 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.util.StringUtils;
 
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -31,9 +34,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
-
 /**
  * Converts a {@link MuleMessage} into an Http response.
  */
@@ -41,8 +41,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 {
     public static final String CUSTOM_HEADER_PREFIX = "";
 
-    // @GuardedBy("itself")
-    private SimpleDateFormat format;
     private String server;
 
     public MuleMessageToHttpResponse()
@@ -54,8 +52,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     @Override
     public void initialise() throws InitialisationException
     {
-        format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
-
         // When running with the source code, Meta information is not set
         // so product name and version are not available, hence we hard code
         if (MuleManifest.getProductName() == null)
@@ -118,8 +114,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 
                             Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
                             response.setHeader(header);
-                        } 
-                        else 
+                        }
+                        else
                         {
                             Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
                             response.addHeader(header);
@@ -187,11 +183,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         {
             version = HttpConstants.HTTP11;
         }
-        String date;
-        synchronized (format)
-        {
-            date = format.format(new Date());
-        }
+        String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
 
         String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
         if (contentType == null)

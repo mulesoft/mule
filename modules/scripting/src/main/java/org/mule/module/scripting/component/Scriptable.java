@@ -20,6 +20,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -181,6 +181,7 @@ public class Scriptable implements Initialisable, MuleContextAware
         //The script can overwrite this binding
         bindings.put("result", NullPayload.getInstance());
         bindings.put("muleContext", muleContext);
+        bindings.put("registry", muleContext.getRegistry());
     }
 
     public void populateBindings(Bindings bindings, Object payload)
@@ -195,6 +196,10 @@ public class Scriptable implements Initialisable, MuleContextAware
     public void populateBindings(Bindings bindings, MessageAdapter message)
     {
         populateDefaultBindings(bindings);
+        if (message == null)
+        {
+            message = new DefaultMessageAdapter(NullPayload.getInstance());
+        }
         bindings.put("message", message);
         //This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
         //and not this method directly.
@@ -203,10 +208,8 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("src", message.getPayload());
 
         // Set any message properties as variables for the script.
-        String propertyName;
-        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+        for (String propertyName : message.getPropertyNames())
         {
-            propertyName = (String)iterator.next();
             bindings.put(propertyName, message.getProperty(propertyName));
         }
     }
