@@ -51,7 +51,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
         QueueSession session = connector.getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
-        queue.put(event);
+        if (!queue.offer(event, connector.getQueueTimeout()))
+        {
+            // queue is full
+            throw new DispatchException(
+                    VMMessages.queueIsFull(queue.getName(), queue.size()),
+                    event.getMessage(), event.getEndpoint());
+        }
         if (logger.isDebugEnabled())
         {
             logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);
@@ -64,19 +70,20 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         final VMMessageReceiver receiver = connector.getReceiver(endpointUri);
         // Apply any outbound transformers on this event before we dispatch
-        event.transformMessage();
+
         if (receiver == null)
         {
             throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
-                event.getEndpoint().getEndpointURI()));
+                                                                                      event.getEndpoint().getEndpointURI()));
         }
 
-        MuleMessage message = event.getMessage(); 
-        connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        event.transformMessage();
 
-        TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(), 
-            connector.getExceptionListener(), event.getMuleContext());
-        
+        MuleMessage message = event.getMessage();
+        connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(),
+                                                         connector.getExceptionListener(), event.getMuleContext());
+
         TransactionCallback cb = new TransactionCallback()
         {
             public Object doInTransaction() throws Exception

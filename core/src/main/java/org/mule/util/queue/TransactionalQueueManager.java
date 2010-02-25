@@ -10,6 +10,9 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.util.queue.QueuePersistenceStrategy.Holder;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -34,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  * strategy on the manager. Default straties are provided for Memory, Jounaling,
  * Cache and File.
  */
-public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager
+public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager, MuleContextAware
 {
 
     private static Log logger = LogFactory.getLog(TransactionalQueueManager.class);
@@ -45,7 +48,18 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     private QueuePersistenceStrategy persistenceStrategy;
 
     private QueueConfiguration defaultQueueConfiguration = new QueueConfiguration(false);
-    
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
@@ -294,7 +308,21 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                     return queueAdded.remove(queueAdded.size() - 1);
                 }
             }
-            Object o = queue.poll(timeout);
+            Object o;
+            try
+            {
+                o = queue.poll(timeout);
+            }
+            catch (InterruptedException e)
+            {
+                // TODO MULE-4718 MuleContext is missing isStopping() method
+                if (!Stoppable.PHASE_NAME.equals(getMuleContext().getLifecycleManager().getExecutingPhase()))
+                {
+                    throw e;
+                }
+                // if disposing, ignore
+                return null;
+            }
             if (o != null)
             {
                 if (removed == null)

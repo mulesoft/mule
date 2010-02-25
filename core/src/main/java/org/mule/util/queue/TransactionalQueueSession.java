@@ -10,6 +10,7 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
@@ -100,7 +101,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                 if (localContext != null)
                 {
                     return ((TransactionalQueueManager.QueueTransactionContext) localContext).poll(queue,
-                        timeout);
+                                                                                                   timeout);
                 }
                 else
                 {
@@ -114,10 +115,21 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     return null;
                 }
             }
+            catch (InterruptedException iex)
+            {
+                // TODO MULE-4718 MuleContext is missing isStopping() method
+                if (!Stoppable.PHASE_NAME.equals(queueManager.getMuleContext().getLifecycleManager().getExecutingPhase()))
+                {
+                    throw iex;
+                }
+                // if stopping, ignore
+                return null;
+            }
             catch (IOException e)
             {
                 throw new RuntimeException(e);
             }
+
         }
 
         public Object peek() throws InterruptedException

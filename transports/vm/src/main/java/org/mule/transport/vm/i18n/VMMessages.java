@@ -24,6 +24,11 @@ public class VMMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 1, name, uri);
     }
+
+    public static Message queueIsFull(String queueName, int maxCapacity)
+    {
+        return factory.createMessage(BUNDLE_PATH, 2, queueName, maxCapacity);
+    }
 }
 
 
