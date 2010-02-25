@@ -43,6 +43,7 @@ public class ScriptComponent extends AbstractComponent
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        script.setMuleContext(muleContext);
         super.doInitialise();
         try
         {
