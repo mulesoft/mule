@@ -307,20 +307,20 @@ public class TransientRegistry extends AbstractRegistry
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         Object obj;
-        synchronized(registry)
+        synchronized (registry)
         {
             obj = registry.remove(key);
         }
 
-            try
-            {
-                context.getLifecycleManager().applyPhases(obj, Disposable.PHASE_NAME);
+        try
+        {
+            context.getLifecycleManager().applyPhases(obj, Disposable.PHASE_NAME);
 
-            }
-            catch (MuleException e)
-            {
-                throw new RegistrationException(e);
-            }
+        }
+        catch (MuleException e)
+        {
+            throw new RegistrationException(e);
+        }
 
     }
 
