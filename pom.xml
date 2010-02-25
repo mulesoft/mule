@@ -9,8 +9,8 @@
 
     <!-- Organization -->
     <organization>
-        <name>MuleSource, Inc.</name>
-        <url>http://www.mulesource.com</url>
+        <name>MuleSoft, Inc.</name>
+        <url>http://www.mulesoft.com</url>
     </organization>
 
     <!-- Project -->
@@ -21,12 +21,12 @@
         between heterogeneous systems and services, Mule provides the basis for
         service oriented architecture (SOA).
     </description>
-    <url>http://mule.mulesource.org</url>
+    <url>http://www.mulesoft.org</url>
     <inceptionYear>2003</inceptionYear>
     <licenses>
         <license>
             <name>CPAL v1.0</name>
-            <url>http://www.mulesource.com/CPAL</url>
+            <url>http://www.mulesoft.com/CPAL</url>
         </license>
     </licenses>
     <mailingLists>
@@ -40,7 +40,7 @@
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://mule.mulesource.org/jira/browse/MULE</url>
+        <url>http://www.mulesoft.org/jira/browse/MULE</url>
     </issueManagement>
 
     <!-- Build -->
@@ -65,7 +65,7 @@
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
          -->
-        <productUrl>http://mule.mulesource.org</productUrl>
+        <productUrl>http://www.mulesoft.org</productUrl>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
@@ -1109,7 +1109,7 @@
 
     <ciManagement>
         <system>bamboo</system>
-        <url>http://bamboo.mulesource.org/bamboo</url>
+        <url>http://bamboo.mulesoft.org</url>
         <notifiers>
             <notifier>
                 <type>mail</type>
@@ -1121,7 +1121,7 @@
     </ciManagement>
 
     <distributionManagement>
-        <downloadUrl>http://mule.mulesource.org/display/MULE/Download</downloadUrl>
+        <downloadUrl>http://www.mulesoft.org/display/MULE/Download</downloadUrl>
         <repository>
             <id>mule-releases</id>
             <name>Mule Release Repository</name>
@@ -1483,7 +1483,7 @@
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${pom.organization.url}/support</Support>
                             <Description>Mule ESB and Integration Platform</Description>
-                            <License>CPAL v1.0 http://www.mulesource.com/CPAL/</License>
+                            <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
                             <Vendor-Url>${pom.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->

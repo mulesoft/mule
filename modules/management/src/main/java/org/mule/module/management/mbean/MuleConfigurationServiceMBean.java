@@ -18,6 +18,8 @@ package org.mule.module.management.mbean;
  */
 public interface MuleConfigurationServiceMBean
 {
+    String DEFAULT_JMX_NAME = "type=org.mule.Configuration,name=GlobalConfiguration";
+
     public boolean isSynchronous();
 
     public int getSynchronousEventTimeout();

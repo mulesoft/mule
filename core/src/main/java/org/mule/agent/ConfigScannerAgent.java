@@ -128,12 +128,6 @@ public class ConfigScannerAgent extends AbstractAgent
     }
 
     @Override
-    public List<Class<Agent>> getDependentAgents()
-    {
-        return Collections.emptyList();
-    }
-
-    @Override
     public String toString()
     {
         return getDescription();

@@ -75,7 +75,7 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
         return new Subject(true, principals, Collections.EMPTY_SET, Collections.EMPTY_SET);
     }
 
-    public void setCredentials (Map<String, Object> newCredentials)
+    public void setCredentials (Map<String, String> newCredentials)
     {
         this.credentials.clear();
         if (newCredentials == null || newCredentials.isEmpty())

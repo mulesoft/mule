@@ -47,7 +47,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * Username/password combinations for JMX Remoting
      * authentication.
      */
-    private Map<String, Object> credentials = new HashMap<String, Object>();
+    private Map<String, String> credentials = new HashMap<String, String>();
 
     /**
      * Should be a 1 line description of the agent
@@ -179,13 +179,13 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     public JmxAgent createJmxAgent()
     {
-        JmxAgent agent = null;
+        JmxAgent agent;
         try
         {
             agent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
             if (agent == null)
             {
-                // nothingregistered yet
+                // nothing registered yet
                 agent = new JmxAgent();
             }
         }
@@ -329,7 +329,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         this.host = host;
     }
 
-    public void setCredentials(Map<String, Object> credentials)
+    public void setCredentials(Map<String, String> credentials)
     {
         this.credentials = credentials;
     }

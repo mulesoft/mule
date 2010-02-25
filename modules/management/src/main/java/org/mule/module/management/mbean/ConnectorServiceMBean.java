@@ -17,6 +17,7 @@ import java.beans.ExceptionListener;
 
 public interface ConnectorServiceMBean extends Initialisable
 {
+    String DEFAULT_JMX_NAME_PREFIX = "type=org.mule.Connector,name=";
 
     boolean isStarted();
 

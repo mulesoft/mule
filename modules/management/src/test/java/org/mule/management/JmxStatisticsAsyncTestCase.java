@@ -80,6 +80,6 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 
     private ServiceStatistics getServiceStatistics()
     {
-        return (ServiceStatistics) muleContext.getStatistics().getComponentStatistics().iterator().next();
+        return muleContext.getStatistics().getServiceStatistics().iterator().next();
     }
 }

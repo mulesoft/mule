@@ -18,6 +18,7 @@ import org.mule.api.management.stats.Statistics;
  */
 public interface StatisticsServiceMBean extends Statistics
 {
+    String DEFAULT_JMX_NAME = "type=org.mule.Statistics,name=AllStatistics";
 
     String printCSVSummary ();
 

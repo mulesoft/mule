@@ -10,14 +10,13 @@
 
 package org.mule.management.stats;
 
-import org.mule.api.management.stats.Statistics;
 import org.mule.management.stats.printers.AbstractTablePrinter;
 import org.mule.management.stats.printers.SimplePrinter;
 
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>AllStatistics</code> TODO
@@ -27,7 +26,7 @@ public class AllStatistics
     private boolean isStatisticsEnabled;
     private long startTime;
 
-    private HashMap componentStat = new HashMap();
+    private Map<String, ServiceStatistics> serviceStats = new HashMap<String, ServiceStatistics>();
 
     /**
      * 
@@ -47,15 +46,13 @@ public class AllStatistics
 
         if (printer instanceof AbstractTablePrinter)
         {
-            printer.print(componentStat.values());
+            printer.print(serviceStats.values());
         }
         else
         {
-            Iterator it = componentStat.values().iterator();
-
-            while (it.hasNext())
+            for (ServiceStatistics serviceStatistics : serviceStats.values())
             {
-                printer.print(it.next());
+                printer.print(serviceStatistics);
             }
         }
         // printer.println("-----------------------------");
@@ -65,12 +62,9 @@ public class AllStatistics
 
     public synchronized void clear()
     {
-
-        Iterator it = getComponentStatistics().iterator();
-
-        while (it.hasNext())
+        for (ServiceStatistics serviceStatistics : getServiceStatistics())
         {
-            ((Statistics) it.next()).clear();
+            (serviceStatistics).clear();
         }
         startTime = System.currentTimeMillis();
     }
@@ -90,11 +84,9 @@ public class AllStatistics
     {
         isStatisticsEnabled = b;
 
-        Iterator it = componentStat.values().iterator();
-
-        while (it.hasNext())
+        for (ServiceStatistics serviceStatistics : serviceStats.values())
         {
-            ((ServiceStatistics) it.next()).setEnabled(b);
+            (serviceStatistics).setEnabled(b);
         }
     }
 
@@ -112,7 +104,7 @@ public class AllStatistics
     {
         if (stat != null)
         {
-            componentStat.put(stat.getName(), stat);
+            serviceStats.put(stat.getName(), stat);
         }
     }
 
@@ -120,13 +112,21 @@ public class AllStatistics
     {
         if (stat != null)
         {
-            componentStat.remove(stat.getName());
+            serviceStats.remove(stat.getName());
         }
     }
 
-    public synchronized Collection getComponentStatistics()
+    /**
+     * @deprecated use #getServiceStatistics
+     */
+    @Deprecated
+    public synchronized Collection<ServiceStatistics> getComponentStatistics()
     {
-        return componentStat.values();
+        return serviceStats.values();
     }
 
+    public synchronized Collection<ServiceStatistics> getServiceStatistics()
+    {
+        return serviceStats.values();
+    }
 }

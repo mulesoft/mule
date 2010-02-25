@@ -77,9 +77,9 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
         return "Profiler JMX Agent";
     }
 
-    public List getDependentAgents()
+    public List<Class<? extends Agent>> getDependentAgents()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public void initialise() throws InitialisationException

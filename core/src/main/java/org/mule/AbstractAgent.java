@@ -48,7 +48,7 @@ public abstract class AbstractAgent implements Agent, MuleContextAware
         return name;
     }
 
-    public List<Class<Agent>> getDependentAgents()
+    public List<Class<? extends Agent>> getDependentAgents()
     {
         return Collections.emptyList();
     }

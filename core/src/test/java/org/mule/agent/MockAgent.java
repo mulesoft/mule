@@ -35,7 +35,7 @@ public class MockAgent extends Object implements Agent
         dependencies = Arrays.asList(classes);
     }
 
-    public List getDependentAgents()
+    public List<Class<? extends Agent>> getDependentAgents()
     {
         return dependencies;
     }

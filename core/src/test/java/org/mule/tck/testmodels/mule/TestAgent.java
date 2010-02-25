@@ -70,9 +70,9 @@ public class TestAgent implements Agent
         // nothing to do
     }
 
-    public List getDependentAgents()
+    public List<Class<? extends Agent>> getDependentAgents()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public String getFrobbit()

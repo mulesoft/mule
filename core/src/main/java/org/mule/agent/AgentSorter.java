@@ -14,7 +14,6 @@ import org.mule.api.agent.Agent;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -71,14 +70,11 @@ public class AgentSorter
         return sortedAgents;
     }
     
-    private static boolean dependentAgentsPresent(List<Class<Agent>> dependentClasses, 
+    private static boolean dependentAgentsPresent(List<Class<? extends Agent>> dependentClasses,
         Collection<Agent> allRegisteredAgents,  List<Agent> sortedAgents)
     {
-        Iterator<Class<Agent>> dependencyIterator = dependentClasses.iterator();
-        while (dependencyIterator.hasNext())
+        for (Class<? extends Agent> dependentClass : dependentClasses)
         {
-            Class<Agent> dependentClass = dependencyIterator.next();
-            
             if (!classExistsInCollection(dependentClass, allRegisteredAgents))
             {
                 // this agent is currently not registed, ignore this dependency
@@ -93,16 +89,16 @@ public class AgentSorter
         return true;
     }
     
-    private static boolean classExistsInCollection(Class<Agent> clazz, Collection<Agent> collection)
+    private static boolean classExistsInCollection(Class<? extends Agent> clazz, Collection<? extends Agent> collection)
     {
         return CollectionUtils.exists(collection, new ClassEqualityPredicate(clazz));
     }
     
     private static class ClassEqualityPredicate implements Predicate
     {
-        private Class<Agent> requiredClass;
+        private Class<? extends Agent> requiredClass;
 
-        public ClassEqualityPredicate(Class<Agent> requiredClass)
+        public ClassEqualityPredicate(Class<? extends Agent> requiredClass)
         {
             super();
             this.requiredClass = requiredClass;

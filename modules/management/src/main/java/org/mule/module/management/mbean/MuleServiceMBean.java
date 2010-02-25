@@ -20,6 +20,8 @@ import java.util.Date;
  */
 public interface MuleServiceMBean
 {
+    String DEFAULT_JMX_NAME = "type=org.mule.MuleContext,name=MuleServerInfo";
+
     boolean isInitialised();
 
     boolean isStopped();

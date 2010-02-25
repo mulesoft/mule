@@ -50,11 +50,9 @@ import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,7 +67,7 @@ public abstract class AbstractService implements Service
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected ServiceStatistics stats = null;
+    protected ServiceStatistics stats;
 
     /**
      * Determines if the service has been stopped
@@ -583,12 +581,11 @@ public abstract class AbstractService implements Service
 
     protected void registerListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -607,12 +604,11 @@ public abstract class AbstractService implements Service
 
     protected void unregisterListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -631,12 +627,11 @@ public abstract class AbstractService implements Service
 
     protected void startListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
@@ -650,14 +645,12 @@ public abstract class AbstractService implements Service
     // This is not called by anything?!
     protected void stopListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
-            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
-                    endpoint);
+            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this, endpoint);
             if (receiver != null)
             {
                 receiver.stop();
@@ -667,12 +660,11 @@ public abstract class AbstractService implements Service
 
     protected void connectListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
             AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
             MessageReceiver receiver = connector.getReceiver(this, endpoint);
             if (receiver != null && connector.isConnected())
@@ -693,12 +685,11 @@ public abstract class AbstractService implements Service
 
     protected void disconnectListeners() throws MuleException
     {
-        InboundEndpoint endpoint;
-        List endpoints = getIncomingEndpoints();
+        @SuppressWarnings("unchecked")
+        List<InboundEndpoint> endpoints = getIncomingEndpoints();
 
-        for (Iterator it = endpoints.iterator(); it.hasNext();)
+        for (InboundEndpoint endpoint : endpoints)
         {
-            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)
@@ -720,6 +711,7 @@ public abstract class AbstractService implements Service
 
     /**
      * Returns a list of all incoming endpoints on a service.
+     * TODO generify
      */
     protected List<InboundEndpoint> getIncomingEndpoints()
     {

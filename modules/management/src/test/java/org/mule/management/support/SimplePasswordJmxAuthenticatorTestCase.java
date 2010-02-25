@@ -35,7 +35,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 
     public void testSuccessfulAuthentication()
     {
-        Map<String, Object> credentials = getValidCredentials();
+        Map<String, String> credentials = getValidCredentials();
 
         authenticator.setCredentials(credentials);
 
@@ -66,7 +66,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 
     public void testNullOrEmptyCredentialsConfigured()
     {
-        Map<String, Object> credentials = Collections.emptyMap();
+        Map<String, String> credentials = Collections.emptyMap();
 
         // shouldn't fail
         authenticator.setCredentials(credentials);
@@ -181,9 +181,9 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected Map<String, Object> getValidCredentials ()
+    protected Map<String, String> getValidCredentials ()
     {
-        Map<String, Object> credentials = new HashMap<String, Object>(1);
+        Map<String, String> credentials = new HashMap<String, String>(1);
         credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
 
         return credentials;

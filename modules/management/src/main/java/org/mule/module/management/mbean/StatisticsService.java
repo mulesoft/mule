@@ -12,6 +12,7 @@ package org.mule.module.management.mbean;
 
 import org.mule.api.MuleContext;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
 import org.mule.management.stats.printers.XMLPrinter;
@@ -38,7 +39,7 @@ public class StatisticsService implements StatisticsServiceMBean
     protected static final Log logger = LogFactory.getLog(StatisticsService.class);
 
     private AllStatistics stats = new AllStatistics();
-    private MuleContext muleContext = null;
+    private MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
     {
@@ -79,9 +80,18 @@ public class StatisticsService implements StatisticsServiceMBean
 
     }
 
+    /**
+     * @deprecated use #getServiceStatistics
+     */
+    @Deprecated
     public Collection getComponentStatistics()
     {
-        return stats.getComponentStatistics();
+        return stats.getServiceStatistics();
+    }
+
+    public Collection<ServiceStatistics> getServiceStatistics()
+    {
+        return stats.getServiceStatistics();
     }
 
     public void logSummary()

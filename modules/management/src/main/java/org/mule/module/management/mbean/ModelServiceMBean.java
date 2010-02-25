@@ -17,6 +17,7 @@ import org.mule.api.MuleException;
  */
 public interface ModelServiceMBean
 {
+    String DEFAULT_JMX_NAME_PREFIX = "type=org.mule.Model,name=";
 
     void start() throws MuleException;
 
