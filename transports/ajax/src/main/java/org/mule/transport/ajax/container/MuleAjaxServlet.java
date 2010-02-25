@@ -71,6 +71,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
             if (connector == null)
             {
                 connector = new AjaxServletConnector();
+                connector.setName("ajax.servlet." + getServletContext().getServerInfo());
                 try
                 {
                     muleContext.getRegistry().registerConnector(connector);
