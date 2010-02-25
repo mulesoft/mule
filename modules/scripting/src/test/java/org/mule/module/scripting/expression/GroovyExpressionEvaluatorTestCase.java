@@ -74,7 +74,9 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testComplexExpressionLowLevelParsing() throws Exception
     {
-        muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
+        final GroovyExpressionEvaluator evaluator = new GroovyExpressionEvaluator();
+        evaluator.setMuleContext(muleContext);
+        muleContext.getExpressionManager().registerEvaluator(evaluator);
 
         MuleMessage msg = new DefaultMuleMessage(Arrays.asList(0, "test"), muleContext);
         String result = muleContext.getExpressionManager().parse("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]",
