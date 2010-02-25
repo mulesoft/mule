@@ -23,6 +23,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -109,6 +110,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         // (Add one to maximum number of active threads to account for the service
         // work item that is running continuously and polling the SEDA queue.)
         ChainedThreadingProfile threadingProfile = new ChainedThreadingProfile(this.threadingProfile);
+        threadingProfile.setMuleContext(muleContext);
         threadingProfile.setMaxThreadsActive(threadingProfile.getMaxThreadsActive() + 1);
         //TODO it would be nicer if the shutdown value was encapsulated in the Threading profile, but it is more difficult than it seems
         workManager = threadingProfile.createWorkManager(getName(), muleContext.getConfiguration().getShutdownTimeout());

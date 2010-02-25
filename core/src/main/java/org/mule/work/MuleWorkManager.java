@@ -27,9 +27,11 @@
 
 package org.mule.work;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.work.WorkExecutor;
 
@@ -46,7 +48,6 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
  * thread allocation for Mule components and connectors. This code has been adapted
  * from the Geronimo implementation.
  */
-public class MuleWorkManager implements WorkManager
+public class MuleWorkManager implements WorkManager, MuleContextAware
 {
     /**
      * logger used by this class
@@ -82,7 +83,7 @@ public class MuleWorkManager implements WorkManager
     private volatile ExecutorService workExecutorService;
     private final String name;
     private int gracefulShutdownTimeout;
-
+    private MuleContext muleContext;
     
     /**
      * Various policies used for work execution
@@ -107,6 +108,7 @@ public class MuleWorkManager implements WorkManager
 
     public synchronized void start() throws MuleException
     {
+        gracefulShutdownTimeout = getMuleContext().getConfiguration().getShutdownTimeout();
         
         if (workExecutorService == null)
         {
@@ -264,5 +266,19 @@ public class MuleWorkManager implements WorkManager
     public boolean isStarted()
     {
         return (workExecutorService != null && !workExecutorService.isShutdown());
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+        if (this.threadingProfile != null && muleContext != null)
+        {
+            threadingProfile.setMuleContext(muleContext);
+        }
     }
 }

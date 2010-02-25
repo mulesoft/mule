@@ -190,7 +190,7 @@ public abstract class AbstractModel implements Model
         this.muleContext = context;
         //Because we allow a default Exception strategy for the model we need to inject the
         //muleContext when we get it
-        if(exceptionListener instanceof MuleContextAware)
+        if (exceptionListener instanceof MuleContextAware)
         {
             ((MuleContextAware)exceptionListener).setMuleContext(muleContext);
         }

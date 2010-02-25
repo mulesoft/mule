@@ -28,7 +28,7 @@ public class MuleContextProcessor implements InjectProcessor
 
     public Object process(Object object)
     {
-        if(object instanceof MuleContextAware)
+        if (object instanceof MuleContextAware)
         {
             ((MuleContextAware)object).setMuleContext(context);
         }

@@ -12,19 +12,14 @@ package org.mule.config;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.NamedThreadFactory;
-import org.mule.util.concurrent.WaitPolicy;
+import org.mule.config.pool.ThreadPoolFactory;
 import org.mule.work.MuleWorkManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 
 public class ImmutableThreadingProfile implements ThreadingProfile
@@ -38,9 +33,11 @@ public class ImmutableThreadingProfile implements ThreadingProfile
     private int poolExhaustedAction;
     private boolean doThreading;
 
+    private ThreadPoolFactory poolFactory = ThreadPoolFactory.newInstance();
     private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
     private RejectedExecutionHandler rejectedExecutionHandler;
     private ThreadFactory threadFactory;
+    private MuleContext muleContext;
 
     public ImmutableThreadingProfile(int maxThreadsActive,
                             int maxThreadsIdle,
@@ -99,6 +96,11 @@ public class ImmutableThreadingProfile implements ThreadingProfile
     public int getPoolExhaustedAction()
     {
         return poolExhaustedAction;
+    }
+
+    public String getPoolExhaustedActionAsString()
+    {
+        return null;
     }
 
     public RejectedExecutionHandler getRejectedExecutionHandler()
@@ -171,14 +173,14 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
-    public ThreadPoolExecutor createPool()
+    public ExecutorService createPool()
     {
         return createPool(null);
     }
 
-    public ThreadPoolExecutor createPool(String name)
+    public ExecutorService createPool(String name)
     {
-        return createPool(name, this);
+        return poolFactory.createPool(name, this);
     }
 
     public boolean isDoThreading()
@@ -191,6 +193,29 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         throw new UnsupportedOperationException(getClass().getName());
     }
 
+    public ThreadPoolFactory getPoolFactory()
+    {
+        return poolFactory;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+
+        // propagate mule context
+        if (this.workManagerFactory instanceof MuleContextAware)
+        {
+            ((MuleContextAware) workManagerFactory).setMuleContext(muleContext);
+        }
+
+        poolFactory.setMuleContext(muleContext);
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
     public String toString()
     {
         return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
@@ -201,85 +226,27 @@ public class ImmutableThreadingProfile implements ThreadingProfile
                         + ", threadFactory=" + threadFactory + "}";
     }
 
-    public static class DefaultWorkManagerFactory implements WorkManagerFactory
+    public static class DefaultWorkManagerFactory implements WorkManagerFactory, MuleContextAware
     {
+
+        protected MuleContext muleContext;
 
         public WorkManager createWorkManager(ThreadingProfile profile, String name, int shutdownTimeout)
         {
-            return new MuleWorkManager(profile, name, shutdownTimeout);
-        }
-
-    }
-
-    // this should be a separate factory, really
-    public static ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
-    {
-
-        BlockingQueue buffer;
-
-        if (tp.getMaxBufferSize() > 0 && tp.getMaxThreadsActive() > 1)
-        {
-            buffer = new LinkedBlockingDeque(tp.getMaxBufferSize());
-        }
-        else
-        {
-            buffer = new SynchronousQueue();
-        }
-
-        ThreadPoolExecutor pool =
-                new ThreadPoolExecutor(Math.min(tp.getMaxThreadsIdle(), tp.getMaxThreadsActive()),
-                        tp.getMaxThreadsActive(), tp.getThreadTTL(),
-                        TimeUnit.MILLISECONDS, buffer);
-
-        // use a custom ThreadFactory if one has been configured
-        if (tp.getThreadFactory() != null)
-        {
-            pool.setThreadFactory(tp.getThreadFactory());
-        }
-        else
-        {
-            // ..else create a "NamedThreadFactory" if a proper name was passed in
-            if (StringUtils.isNotBlank(name))
+            final WorkManager workManager = new MuleWorkManager(profile, name, shutdownTimeout);
+            if (muleContext != null)
             {
-                // Use MuleContext classloader so that other temporary classloaders
-                // aren't used when things are started lazily or from elsewhere.
-                pool.setThreadFactory(new NamedThreadFactory(name, MuleContext.class.getClassLoader()));
+                MuleContextAware contextAware = (MuleContextAware) workManager;
+                contextAware.setMuleContext(muleContext);
             }
-            else
-            {
-                // let ThreadPoolExecutor create a default ThreadFactory;
-                // see Executors.defaultThreadFactory()
-            }
+
+            return workManager;
         }
 
-        if (tp.getRejectedExecutionHandler() != null)
+        public void setMuleContext(MuleContext context)
         {
-            pool.setRejectedExecutionHandler(tp.getRejectedExecutionHandler());
+            this.muleContext = context;
         }
-        else
-        {
-            switch (tp.getPoolExhaustedAction())
-            {
-                case WHEN_EXHAUSTED_DISCARD_OLDEST :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
-                    break;
-                case WHEN_EXHAUSTED_RUN :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-                    break;
-                case WHEN_EXHAUSTED_ABORT :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-                    break;
-                case WHEN_EXHAUSTED_DISCARD :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-                    break;
-                default :
-                    // WHEN_EXHAUSTED_WAIT
-                    pool.setRejectedExecutionHandler(new WaitPolicy(tp.getThreadWaitTimeout(), TimeUnit.MILLISECONDS));
-                    break;
-            }
-        }
-
-        return pool;
     }
 
 }

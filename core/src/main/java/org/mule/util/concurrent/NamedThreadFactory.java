@@ -59,4 +59,18 @@ public class NamedThreadFactory implements ThreadFactory
         t.setName(name + '.' + counter.getAndIncrement());
     }
 
+    public ClassLoader getContextClassLoader()
+    {
+        return contextClassLoader;
+    }
+
+    public AtomicLong getCounter()
+    {
+        return counter;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
 }

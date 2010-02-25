@@ -10,15 +10,17 @@
 
 package org.mule.api.config;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.config.ImmutableThreadingProfile;
+import org.mule.config.pool.ThreadPoolFactory;
 
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
@@ -35,7 +37,7 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  * can be either dynamic (read whenever the value is queried) or static (a local copy of the
  * default is made when the profile is first constructed).</p>
  */
-public interface ThreadingProfile
+public interface ThreadingProfile extends MuleContextAware
 {
 
     /**
@@ -89,23 +91,23 @@ public interface ThreadingProfile
 
         // initializer
         {
-            Integer value = new Integer(WHEN_EXHAUSTED_WAIT);
+            Integer value = WHEN_EXHAUSTED_WAIT;
             this.put("WHEN_EXHAUSTED_WAIT", value);
             this.put("WAIT", value);
 
-            value = new Integer(WHEN_EXHAUSTED_DISCARD);
+            value = WHEN_EXHAUSTED_DISCARD;
             this.put("WHEN_EXHAUSTED_DISCARD", value);
             this.put("DISCARD", value);
 
-            value = new Integer(WHEN_EXHAUSTED_DISCARD_OLDEST);
+            value = WHEN_EXHAUSTED_DISCARD_OLDEST;
             this.put("WHEN_EXHAUSTED_DISCARD_OLDEST", value);
             this.put("DISCARD_OLDEST", value);
 
-            value = new Integer(WHEN_EXHAUSTED_ABORT);
+            value = WHEN_EXHAUSTED_ABORT;
             this.put("WHEN_EXHAUSTED_ABORT", value);
             this.put("ABORT", value);
 
-            value = new Integer(WHEN_EXHAUSTED_RUN);
+            value = WHEN_EXHAUSTED_RUN;
             this.put("WHEN_EXHAUSTED_RUN", value);
             this.put("RUN", value);
         }
@@ -162,13 +164,15 @@ public interface ThreadingProfile
 
     WorkManager createWorkManager(String name, int shutdownTimeout);
 
-    ThreadPoolExecutor createPool();
+    ExecutorService createPool();
 
-    ThreadPoolExecutor createPool(String name);
+    ExecutorService createPool(String name);
 
     boolean isDoThreading();
 
     void setDoThreading(boolean doThreading);
+
+    ThreadPoolFactory getPoolFactory();
 
     interface WorkManagerFactory
     {

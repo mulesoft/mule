@@ -196,6 +196,12 @@ public class DefaultMuleContext implements MuleContext
             muleRegistryHelper.initialise();
 
             //We need to start the work manager straight away since we need it to fire notifications
+            if (workManager instanceof MuleContextAware)
+            {
+                MuleContextAware contextAware = (MuleContextAware) workManager;
+                contextAware.setMuleContext(this);
+            }
+
             workManager.start();
             getNotificationManager().start(workManager, workListener);
 

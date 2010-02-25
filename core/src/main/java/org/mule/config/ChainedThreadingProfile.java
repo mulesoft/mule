@@ -10,23 +10,26 @@
 
 package org.mule.config;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
+import org.mule.config.pool.ThreadPoolFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * This was written (perhaps too far in advance) with an eye to how we will manage default values
  * in a dynamic environment.  Since very little has been decided in that direction the correct
- * behaviour is unclear - changing the default value of "dyanamic"
+ * behaviour is unclear - changing the default value of "dynamic"
  * {@link org.mule.config.ChainedThreadingProfile#ChainedThreadingProfile(ThreadingProfile)}
  * will switch behaviour between dynamic and static chaining.
  *
  * <p>Note that within Spring, as far as I understand things, object creation is always ordered
  * so that dependencies are correctly resolved.  In that case, in a static scenario (or in a
- * dynamic one that rebuilds the instances) dyanmic and static behaviour should be identical.</p>
+ * dynamic one that rebuilds the instances) dynamic and static behaviour should be identical.</p>
  *
  * <p>Also, the "lazy" chaining is an optimisation - all hierarchies should be grounded in a final
  * default which is {@link ImmutableThreadingProfile} and, as such, return reliable
@@ -44,11 +47,14 @@ public class ChainedThreadingProfile implements ThreadingProfile
     private Integer poolExhaustedAction;
     private Boolean doThreading;
 
+    private ThreadPoolFactory poolFactory = ThreadPoolFactory.newInstance();
     private WorkManagerFactory workManagerFactory = new ImmutableThreadingProfile.DefaultWorkManagerFactory();
     private RejectedExecutionHandler rejectedExecutionHandler;
     private ThreadFactory threadFactory;
 
     private ThreadingProfile delegate;
+
+    private MuleContext muleContext;
 
     /**
      * Generate a mutable threading profile with fixed default values taken from
@@ -64,7 +70,6 @@ public class ChainedThreadingProfile implements ThreadingProfile
      * Generate a mutable threading profile with dynamic default values taken from the
      * given delegate.
      *
-     * @param delegate
      */
     public ChainedThreadingProfile(ThreadingProfile delegate)
     {
@@ -91,27 +96,27 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public int getMaxThreadsActive()
     {
-        return null != maxThreadsActive ? maxThreadsActive.intValue() : delegate.getMaxThreadsActive();
+        return null != maxThreadsActive ? maxThreadsActive : delegate.getMaxThreadsActive();
     }
 
     public int getMaxThreadsIdle()
     {
-        return null != maxThreadsIdle ? maxThreadsIdle.intValue() : delegate.getMaxThreadsIdle();
+        return null != maxThreadsIdle ? maxThreadsIdle : delegate.getMaxThreadsIdle();
     }
 
     public long getThreadTTL()
     {
-        return null != threadTTL ? threadTTL.longValue() : delegate.getThreadTTL();
+        return null != threadTTL ? threadTTL : delegate.getThreadTTL();
     }
 
     public long getThreadWaitTimeout()
     {
-        return null != threadWaitTimeout ? threadWaitTimeout.longValue() : delegate.getThreadWaitTimeout();
+        return null != threadWaitTimeout ? threadWaitTimeout : delegate.getThreadWaitTimeout();
     }
 
     public int getPoolExhaustedAction()
     {
-        return null != poolExhaustedAction ? poolExhaustedAction.intValue() : delegate.getPoolExhaustedAction();
+        return null != poolExhaustedAction ? poolExhaustedAction : delegate.getPoolExhaustedAction();
     }
 
     public RejectedExecutionHandler getRejectedExecutionHandler()
@@ -126,27 +131,27 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public void setMaxThreadsActive(int maxThreadsActive)
     {
-        this.maxThreadsActive = new Integer(maxThreadsActive);
+        this.maxThreadsActive = maxThreadsActive;
     }
 
     public void setMaxThreadsIdle(int maxThreadsIdle)
     {
-        this.maxThreadsIdle = new Integer(maxThreadsIdle);
+        this.maxThreadsIdle = maxThreadsIdle;
     }
 
     public void setThreadTTL(long threadTTL)
     {
-        this.threadTTL = new Long(threadTTL);
+        this.threadTTL = threadTTL;
     }
 
     public void setThreadWaitTimeout(long threadWaitTimeout)
     {
-        this.threadWaitTimeout = new Long(threadWaitTimeout);
+        this.threadWaitTimeout = threadWaitTimeout;
     }
 
     public void setPoolExhaustedAction(int poolExhaustPolicy)
     {
-        this.poolExhaustedAction = new Integer(poolExhaustPolicy);
+        this.poolExhaustedAction = poolExhaustPolicy;
     }
 
     public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
@@ -161,12 +166,12 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public int getMaxBufferSize()
     {
-        return null != maxBufferSize ? maxBufferSize.intValue() : delegate.getMaxBufferSize();
+        return null != maxBufferSize ? maxBufferSize : delegate.getMaxBufferSize();
     }
 
     public void setMaxBufferSize(int maxBufferSize)
     {
-        this.maxBufferSize = new Integer(maxBufferSize);
+        this.maxBufferSize = maxBufferSize;
     }
 
     public WorkManagerFactory getWorkManagerFactory()
@@ -184,24 +189,47 @@ public class ChainedThreadingProfile implements ThreadingProfile
         return workManagerFactory.createWorkManager(this, name, shutdownTimeout);
     }
 
-    public ThreadPoolExecutor createPool()
+    public ExecutorService createPool()
     {
         return createPool(null);
     }
 
-    public ThreadPoolExecutor createPool(String name)
+    public ExecutorService createPool(String name)
     {
-        return ImmutableThreadingProfile.createPool(name, this);
+        return poolFactory.createPool(name, this);
     }
 
     public boolean isDoThreading()
     {
-        return null != doThreading ? doThreading.booleanValue() : delegate.isDoThreading();
+        return null != doThreading ? doThreading : delegate.isDoThreading();
     }
 
     public void setDoThreading(boolean doThreading)
     {
-        this.doThreading = Boolean.valueOf(doThreading);
+        this.doThreading = doThreading;
+    }
+
+    public ThreadPoolFactory getPoolFactory()
+    {
+        return poolFactory;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+
+        // propagate mule context
+        if (this.workManagerFactory instanceof MuleContextAware)
+        {
+            ((MuleContextAware) workManagerFactory).setMuleContext(muleContext);
+        }
+
+        poolFactory.setMuleContext(muleContext);
     }
 
     public String toString()
