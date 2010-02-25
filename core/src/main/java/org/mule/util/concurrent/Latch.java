@@ -21,4 +21,9 @@ public class Latch extends CountDownLatch
         super(1);
     }
 
+    public void release()
+    {
+        countDown();
+    }
+
 }
