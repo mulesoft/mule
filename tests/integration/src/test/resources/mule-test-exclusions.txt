@@ -90,3 +90,4 @@ org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
 
 #MULE-4387
 org.mule.test.integration.service.ServiceInFlightMessagesTestCase
+org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
