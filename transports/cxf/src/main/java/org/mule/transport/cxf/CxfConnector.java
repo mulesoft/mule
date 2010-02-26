@@ -43,7 +43,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -221,16 +220,14 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     {
         CxfMessageReceiver cxfReceiver = (CxfMessageReceiver) receiver;
         Server server = cxfReceiver.getServer();
-
+        Service service = cxfReceiver.getService();
+        
         uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
 
         // TODO MULE-2228 Simplify this API
         SedaService outerProtocolService = new SedaService();
         outerProtocolService.setMuleContext(muleContext);
-
-        String uniqueServiceName = createServiceName(server.getEndpoint());
-        outerProtocolService.setName(uniqueServiceName);
-
+        outerProtocolService.setName(service.getName() + "_cxfComponent");
         outerProtocolService.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
@@ -302,7 +299,8 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         }
         else
         {
-            filterEndpoint = receiverEndpointBuilder;
+            filterEndpoint = receiverEndpointBuilder;  
+            protocolEndpointBuilder.setFilter(null);  
         }
         filterEndpoint.setFilter(originalEndpoint.getFilter());
 
@@ -346,22 +344,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         }
         serviceToProtocolServices.get(receiver.getService().getName()).add(outerProtocolService);
 
-    }
-
-    /**
-     * Build a unique name for the endpoint that is well suited for exposure by JMX.
-     */
-    protected String createServiceName(Endpoint endpoint)
-    {
-        StringBuilder name = new StringBuilder(CXF_SERVICE_COMPONENT_NAME);
-        name.append("{");
-
-        String address = endpoint.getEndpointInfo().getAddress();
-        name.append(address.replace(":", "|"));
-        name.append("}");
-        name.append(endpoint.getService().getName().getLocalPart());
-
-        return name.toString();
     }
 
     /**

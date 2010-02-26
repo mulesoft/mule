@@ -18,7 +18,7 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
 {
 
     private static String SERVICE_NAME = "echoService";
-    private static String PROTOCOL_SERVICE_NAME = "_cxfServiceComponent{http|//localhost|63081/services/Echo}EchoComponent";
+    private static String PROTOCOL_SERVICE_NAME = "echoService_cxfComponent";
 
     @Override
     protected String getConfigResources()
