@@ -122,6 +122,12 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                 {
                     throw iex;
                 }
+
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(queue.getName(), iex);
+                }
+
                 // if stopping, ignore
                 return null;
             }

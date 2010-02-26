@@ -320,6 +320,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 {
                     throw e;
                 }
+
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(queue.getName(), e);
+                }
+
                 // if disposing, ignore
                 return null;
             }
