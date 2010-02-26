@@ -300,7 +300,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         else
         {
             filterEndpoint = receiverEndpointBuilder;  
-            protocolEndpointBuilder.setFilter(null);  
         }
         filterEndpoint.setFilter(originalEndpoint.getFilter());
 
