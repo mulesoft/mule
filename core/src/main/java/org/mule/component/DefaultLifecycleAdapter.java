@@ -184,7 +184,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
                 //make sure we haven't lost the reference to the object
                 Object o = componentObject.get();
-                if(o!=null)
+                if (o!=null)
                 {
                     ((Disposable) o).dispose();
                 }
