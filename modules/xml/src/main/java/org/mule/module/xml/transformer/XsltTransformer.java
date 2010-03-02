@@ -129,13 +129,19 @@ public class XsltTransformer extends AbstractXmlTransformer
     public XsltTransformer(String xslFile)
     {
         this();
-        this.xslFile = xslFile;
+        this.setXslFile(xslFile);
     }
 
     public void initialise() throws InitialisationException
     {
+
         try
         {
+            //Only load the file once at initialize time
+            if(xslFile!=null)
+            {
+                this.xslt = IOUtils.getResourceAsString(xslFile, getClass());
+            }
             transformerPool.addObject();
         }
         catch (Throwable te)
