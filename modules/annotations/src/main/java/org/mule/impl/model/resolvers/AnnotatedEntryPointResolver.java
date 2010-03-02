@@ -78,7 +78,8 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
 
         Object[] payload;
         Method method;
-        String methodName = (String) context.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        //We remove the property here as a workaround to MULE-4769
+        String methodName = (String) context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
         //If a method param is set use that over anything else. This is used by the @Reply Callbacks and where annotations are set
         //on the method
         if (methodName != null)
