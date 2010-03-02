@@ -19,7 +19,7 @@
 	
     <!-- Send customer info. to credit agency -->
 	<mule name="sendToCreditAgency" 
-		  payloadSource="customerRequest.customer" endpoint="CreditAgency" synchronous="false">
+		  expr="#{customerRequest.customer}" endpoint="CreditAgency" synchronous="false">
 		<transition to="waitForCreditAgency" />
 	</mule>	
 	
@@ -60,25 +60,25 @@
     </decision>
 
 	<mule name="sendToBigBank" 
-		  payloadSource="loanRequest" endpoint="BigBank" 
+		  expr="#{loanRequest}" endpoint="BigBank" 
 		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
 		<transition to="sendCustomerResponse" />
 	</mule>	
 
 	<mule name="sendToMediumBank" 
-		  payloadSource="loanRequest" endpoint="MediumBank" 
+		  expr="#{loanRequest}" endpoint="MediumBank" 
 		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
 		<transition to="sendCustomerResponse" />
 	</mule>	
 
 	<mule name="sendToSmallBank" 
-		  payloadSource="loanRequest" endpoint="SmallBank" 
+		  expr="#{loanRequest}" endpoint="SmallBank" 
 		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
 		<transition to="sendCustomerResponse" />
 	</mule>	
 
 	<mule name="sendCustomerResponse" 
-		  payloadSource="loanQuote" endpoint="CustomerResponses">
+		  expr="#{loanQuote}" endpoint="CustomerResponses">
 		<transition to="loanApproved" />
 	</mule>	
 

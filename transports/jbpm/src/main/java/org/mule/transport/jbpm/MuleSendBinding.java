@@ -30,10 +30,9 @@ public class MuleSendBinding extends JpdlBinding
         // Note: The last method argument is the default value.
         activity.setSynchronous(XmlUtil.attributeBoolean(element, "synchronous", false, parse, true));
         activity.setEndpoint(XmlUtil.attribute(element, "endpoint", true, parse));
-        activity.setPayload(XmlUtil.attribute(element, "payload", false, parse, null));
-        activity.setPayloadSource(XmlUtil.attribute(element, "payloadSource", false, parse, null));
-        activity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));
-        activity.setPayloadClass(XmlUtil.attribute(element, "type", false, parse, null));
+        activity.setPayloadExpression(XmlUtil.attribute(element, "expr", false, parse, null));
+        activity.setResponseVariableName(XmlUtil.attribute(element, "var", false, parse, null));
+        activity.setResponsePayloadClass(XmlUtil.attribute(element, "type", false, parse, null));
 
         return activity;
     }

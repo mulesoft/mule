@@ -14,12 +14,10 @@ import org.mule.api.MuleMessage;
 import org.mule.transport.bpm.MessageService;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.jbpm.api.JbpmException;
 import org.jbpm.api.activity.ActivityExecution;
 import org.jbpm.api.listener.EventListener;
@@ -29,23 +27,22 @@ import org.jbpm.internal.log.Log;
 import org.jbpm.jpdl.internal.activity.JpdlActivity;
 import org.jbpm.pvm.internal.env.EnvironmentImpl;
 import org.jbpm.pvm.internal.model.ExecutionImpl;
+import org.jbpm.pvm.internal.script.ScriptManager;
 
 public class MuleSendActivity extends JpdlActivity implements EventListener
 {
     private boolean synchronous;
     private String endpoint;
 
-    // Use "payload" to easily specify the payload as a string directly in the jPDL.
-    // Use "payloadSource" to get the payload from a process variable.
-    private String payload;
-    private String payloadSource;
-
     // Expected response type in the case of a synchronous call; if the response payload is not assignable to this class, an exception will be thrown.
     private Class responsePayloadClass;
 
     // Variable into which the synchronous response will be stored.  If null, the response will not be stored at all.
-    private String variableName;
+    private String responseVariableName;
     
+    // payloadSource may be a literal value or it may be an expression which references process variables.
+    private String payloadExpression;
+
     // The actual payload (as an object) will be stored here.
     private Object payloadObject;
     
@@ -70,38 +67,25 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
             throw new JbpmException("The Mule MessageService is not available from the ProcessEngine, you may need to add it to your jbpm.cfg.xml file");
         }
 
-        if (payload == null)
+        if (payloadExpression == null)
         {
-            if (payloadSource == null)
+            payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_DATA);
+            if (payloadObject == null)
             {
-                payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_DATA);
-                if (payloadObject == null)
-                {
-                    payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING);
-                }
-            }
-            else
-            {
-                // The payloadSource may be specified using JavaBean notation (e.g.,
-                // "myObject.myStuff.myField" would first retrieve the process
-                // variable "myObject" and then call .getMyStuff().getMyField()
-                String[] tokens = StringUtils.split(payloadSource, ".", 2);
-                payloadObject = execution.getVariable(tokens[0]);
-                if (tokens.length > 1)
-                {
-                    JXPathContext context = JXPathContext.newContext(payloadObject);
-                    payloadObject = context.getValue(tokens[1].replaceAll("\\.", "/"));
-                }
+                payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING);
             }
         }
         else
         {
-            payloadObject = payload;
+            // The payloadSource may be specified using an expression (e.g.,
+            // #{myObject.myStuff.myField} would first retrieve the process
+            // variable "myObject" and then call .getMyStuff().getMyField()
+            payloadObject = ScriptManager.getScriptManager().evaluateExpression(payloadExpression, null);
         }
         if (payloadObject == null)
         {
             throw new IllegalArgumentException("Payload for message is null.  Payload source is \""
-                                               + payloadSource + "\"");
+                                               + payloadExpression + "\"");
         }
 
         Map props = new HashMap();
@@ -126,11 +110,11 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
                 }
             }
             
-            if (variableName != null)
+            if (responseVariableName != null)
             {
                 if (responsePayload != null)
                 {
-                    execution.setVariable(variableName, responsePayload);
+                    execution.setVariable(responseVariableName, responsePayload);
                 }
                 else
                 {
@@ -160,37 +144,27 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         this.endpoint = endpoint;
     }
 
-    public String getPayload()
+    public String getPayloadExpression()
     {
-        return payload;
+        return payloadExpression;
     }
 
-    public void setPayload(String payload)
+    public void setPayloadExpression(String payloadExpression)
     {
-        this.payload = payload;
+        this.payloadExpression = payloadExpression;
     }
 
-    public String getPayloadSource()
+    public String getResponseVariableName()
     {
-        return payloadSource;
+        return responseVariableName;
     }
 
-    public void setPayloadSource(String payloadSource)
+    public void setResponseVariableName(String responseVariableName)
     {
-        this.payloadSource = payloadSource;
+        this.responseVariableName = responseVariableName;
     }
 
-    public String getVariableName()
-    {
-        return variableName;
-    }
-
-    public void setVariableName(String variableName)
-    {
-        this.variableName = variableName;
-    }
-
-    public void setPayloadClass(String className)
+    public void setResponsePayloadClass(String className)
     {
         if (className != null)
         {
@@ -205,7 +179,7 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         }
     }
 
-    public Class getPayloadClass()
+    public Class getResponsePayloadClass()
     {
         return responsePayloadClass;
     }
