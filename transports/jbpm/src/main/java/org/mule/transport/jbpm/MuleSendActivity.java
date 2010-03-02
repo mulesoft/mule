@@ -13,6 +13,7 @@ package org.mule.transport.jbpm;
 import org.mule.api.MuleMessage;
 import org.mule.transport.bpm.MessageService;
 import org.mule.transport.bpm.ProcessConnector;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
@@ -29,17 +30,18 @@ import org.jbpm.jpdl.internal.activity.JpdlActivity;
 import org.jbpm.pvm.internal.env.EnvironmentImpl;
 import org.jbpm.pvm.internal.model.ExecutionImpl;
 
-public class MuleActivity extends JpdlActivity implements EventListener
+public class MuleSendActivity extends JpdlActivity implements EventListener
 {
     private boolean synchronous;
     private String endpoint;
-    private String transformers;
-    private Map properties;
 
     // Use "payload" to easily specify the payload as a string directly in the jPDL.
     // Use "payloadSource" to get the payload from a process variable.
     private String payload;
     private String payloadSource;
+
+    // Expected response type in the case of a synchronous call; if the response payload is not assignable to this class, an exception will be thrown.
+    private Class responsePayloadClass;
 
     // Variable into which the synchronous response will be stored.  If null, the response will not be stored at all.
     private String variableName;
@@ -47,7 +49,7 @@ public class MuleActivity extends JpdlActivity implements EventListener
     // The actual payload (as an object) will be stored here.
     private Object payloadObject;
     
-    private static final Log log = Log.getLog(MuleActivity.class.getName());
+    private static final Log log = Log.getLog(MuleSendActivity.class.getName());
 
     public void execute(ActivityExecution execution) throws Exception
     {
@@ -66,11 +68,6 @@ public class MuleActivity extends JpdlActivity implements EventListener
         if (mule == null)
         {
             throw new JbpmException("The Mule MessageService is not available from the ProcessEngine, you may need to add it to your jbpm.cfg.xml file");
-        }
-
-        if (transformers != null)
-        {
-            endpoint += "?transformers=" + transformers;
         }
 
         if (payload == null)
@@ -114,22 +111,31 @@ public class MuleActivity extends JpdlActivity implements EventListener
         props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
         props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getId());
 
-        if (properties != null)
-        {
-            props.putAll(properties);
-        }
-
         MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, synchronous);
-        if (synchronous && variableName != null)
+        if (synchronous && response != null)
         {
-            if (response != null)
+            Object responsePayload = response.getPayload();
+    
+            // Validate expected response type
+            if (responsePayloadClass != null)
             {
-                execution.setVariable(variableName, response.getPayload());
+                log.debug("Validating response type = " + responsePayload.getClass() + ", expected = " + responsePayloadClass);
+                if (!responsePayloadClass.isAssignableFrom(responsePayload.getClass()))
+                {
+                    throw new JbpmException("Response message is of type " + responsePayload.getClass() + " but expected type is " + responsePayloadClass);
+                }
             }
-            else
+            
+            if (variableName != null)
             {
-                log.info("Synchronous message was sent to endpoint " + endpoint
-                         + ", but no response was returned.");
+                if (responsePayload != null)
+                {
+                    execution.setVariable(variableName, responsePayload);
+                }
+                else
+                {
+                    log.info("Synchronous message was sent to endpoint " + endpoint + ", but no response was returned.");
+                }
             }
         }
     }
@@ -152,26 +158,6 @@ public class MuleActivity extends JpdlActivity implements EventListener
     public void setEndpoint(String endpoint)
     {
         this.endpoint = endpoint;
-    }
-
-    public String getTransformers()
-    {
-        return transformers;
-    }
-
-    public void setTransformers(String transformers)
-    {
-        this.transformers = transformers;
-    }
-
-    public Map getProperties()
-    {
-        return properties;
-    }
-
-    public void setProperties(Map properties)
-    {
-        this.properties = properties;
     }
 
     public String getPayload()
@@ -202,5 +188,25 @@ public class MuleActivity extends JpdlActivity implements EventListener
     public void setVariableName(String variableName)
     {
         this.variableName = variableName;
+    }
+
+    public void setPayloadClass(String className)
+    {
+        if (className != null)
+        {
+            try
+            {
+                responsePayloadClass = ClassUtils.loadClass(className, this.getClass());
+            }
+            catch (ClassNotFoundException e)
+            {
+                log.error("Expected message type not valid: " + e.getMessage());
+            }
+        }
+    }
+
+    public Class getPayloadClass()
+    {
+        return responsePayloadClass;
     }
 }

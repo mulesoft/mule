@@ -9,19 +9,20 @@
 	</start>
 
 	<mule name="sendSynchronousMessage" 
-		endpoint="vm://echo" payload="Message in a bottle."
-		synchronous="true" var="echoResponse">
+		endpoint="vm://echo" payload="Message in a bottle." 
+		var="echoResponse" type="java.lang.String">
 		<transition to="sendAsynchronousMessage" />
 	</mule>
 
-	<mule name="sendAsynchronousMessage" endpoint="test://queue" payloadSource="echoResponse"
-		synchronous="false">
+	<mule name="sendAsynchronousMessage" 
+		endpoint="test://queue" payloadSource="echoResponse" synchronous="false">
 		<transition to="waitForResponse" />
 	</mule>
 
-	<state name="waitForResponse">
+	<mule-receive name="waitForResponse"
+		type="java.lang.String" var="asynchResponse">
 		<transition to="end" />
-	</state>
+	</mule-receive>
 
 	<end name="end" />
 

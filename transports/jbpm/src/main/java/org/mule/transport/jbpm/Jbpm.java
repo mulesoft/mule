@@ -183,7 +183,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * @param processVariables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
-    public synchronized Object advanceProcess(Object executionId, Object signalName, Map parameters) throws Exception
+    public synchronized Object advanceProcess(Object executionId, Object signalName, Map variables) throws Exception
     {
         // Get Process ID
         String processId;
@@ -197,7 +197,13 @@ public class Jbpm implements BPMS, Initialisable, Disposable
             processId = execution.getId();
         }
 
-        processEngine.getExecutionService().signalExecutionById((String) executionId, (String) signalName, parameters);
+        // Set any process variables.
+        if (variables != null && !variables.isEmpty())
+        {
+            processEngine.getExecutionService().setVariables((String) executionId, variables);
+        }
+
+        processEngine.getExecutionService().signalExecutionById((String) executionId, (String) signalName, variables);
 
         // Refresh process info. from the DB
         ProcessInstance process = processEngine.getExecutionService().findProcessInstanceById(processId);

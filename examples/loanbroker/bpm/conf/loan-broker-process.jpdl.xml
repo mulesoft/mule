@@ -7,7 +7,7 @@
          ******************************************************************* -->
 
     <!-- Request received from customer -->
-    <start name="customerRequest">
+    <start>
         <transition to="validateCustomerRequest" />
     </start>
 
@@ -24,14 +24,10 @@
 	</mule>	
 	
     <!-- Wait for the customer's credit profile to arrive. -->
-    <state name="waitForCreditAgency">
+    <mule-receive name="waitForCreditAgency" endpoint="CreditProfiles" var="creditProfile">
         <timer duedate="4 hours" />
-        <transition to="validateCreditProfile" />
-    </state>
-
-	<script name="validateCreditProfile" expr="#{incoming}" var="creditProfile">
         <transition to="prepareLoanQuoteRequest" />
-    </script>
+    </mule-receive>
 
     <!-- Prepare a quote request to send to the banks which includes the customer's credit info. -->
     <java name="prepareLoanQuoteRequest" 
@@ -64,26 +60,25 @@
     </decision>
 
 	<mule name="sendToBigBank" 
-		  payloadSource="loanRequest" endpoint="BigBank" synchronous="true">
-		<transition to="validateLoanQuote" />
+		  payloadSource="loanRequest" endpoint="BigBank" 
+		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+		<transition to="sendCustomerResponse" />
 	</mule>	
 
 	<mule name="sendToMediumBank" 
-		  payloadSource="loanRequest" endpoint="MediumBank" synchronous="true">
-		<transition to="validateLoanQuote" />
+		  payloadSource="loanRequest" endpoint="MediumBank" 
+		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+		<transition to="sendCustomerResponse" />
 	</mule>	
 
 	<mule name="sendToSmallBank" 
-		  payloadSource="loanRequest" endpoint="SmallBank" synchronous="true">
-		<transition to="validateLoanQuote" />
+		  payloadSource="loanRequest" endpoint="SmallBank" 
+		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+		<transition to="sendCustomerResponse" />
 	</mule>	
 
-	<script name="validateLoanQuote" expr="#{incoming}" var="loanQuote">
-        <transition to="sendCustomerResponse" />
-    </script>
-	
 	<mule name="sendCustomerResponse" 
-		  payloadSource="loanQuote" endpoint="CustomerResponses" synchronous="false">
+		  payloadSource="loanQuote" endpoint="CustomerResponses">
 		<transition to="loanApproved" />
 	</mule>	
 

@@ -16,26 +16,25 @@ import org.jbpm.pvm.internal.util.XmlUtil;
 import org.jbpm.pvm.internal.xml.Parse;
 import org.w3c.dom.Element;
 
-public class MuleBinding extends JpdlBinding
+public class MuleSendBinding extends JpdlBinding
 {
-    public MuleBinding()
+    public MuleSendBinding()
     {
         super("mule");
     }
 
     public Object parseJpdl(Element element, Parse parse, JpdlParser parser)
     {
-        MuleActivity muleActivity = new MuleActivity();
+        MuleSendActivity activity = new MuleSendActivity();
 
         // Note: The last method argument is the default value.
-        muleActivity.setSynchronous(XmlUtil.attributeBoolean(element, "synchronous", false, parse, true));
-        muleActivity.setEndpoint(XmlUtil.attribute(element, "endpoint", true, parse));
-        muleActivity.setTransformers(XmlUtil.attribute(element, "transformers", false, parse, null));
-        // TODO: Map properties
-        muleActivity.setPayload(XmlUtil.attribute(element, "payload", false, parse, null));
-        muleActivity.setPayloadSource(XmlUtil.attribute(element, "payloadSource", false, parse, null));
-        muleActivity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));
+        activity.setSynchronous(XmlUtil.attributeBoolean(element, "synchronous", false, parse, true));
+        activity.setEndpoint(XmlUtil.attribute(element, "endpoint", true, parse));
+        activity.setPayload(XmlUtil.attribute(element, "payload", false, parse, null));
+        activity.setPayloadSource(XmlUtil.attribute(element, "payloadSource", false, parse, null));
+        activity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));
+        activity.setPayloadClass(XmlUtil.attribute(element, "type", false, parse, null));
 
-        return muleActivity;
+        return activity;
     }
 }
