@@ -58,10 +58,32 @@ public class TransformerWeighting implements Comparable
 
     }
 
-    // TODO Document this algorithm!
+    /**
+     * THis is a very basic algorithm for creating a match rating for two classes.  An offset weighting
+     * can also be passed in. Where w is weighting,
+     * if the classes match exactly, w+1 is returned,
+     * if the classes are assignable and there is a direct equality to an interface on the class, w+2  is returned,
+     * if the classes are assignable but no direct interface match, w+3 is returned
+     * If the dest type is Object.class then w+4is returned. This is because matching on object will yeild a lot of options
+     * putting those that use the Object.class generic type should get pushed down the list
+     * If there a super class, that will get matched using the above criteria
+     * If there is no match -1 is returned
+     *
+     * @param weighting an offset weighting, by defualt -1 should be used
+     * @param src the src class being matched
+     * @param dest the destination class to match to
+     * @return a weighting where 0 would be an exact match, -1 would be no match and a positive integer that defines how close the match is
+     */
     protected int getWeighting(int weighting, Class src, Class dest)
     {
         int x = weighting + 1;
+        //If we are getting a match for object.class, we need to put it at the bottom of
+        //the matching list
+        if(dest.equals(Object.class))
+        {
+            return x + 3;
+        }
+
         if (dest.equals(src))
         {
             return x;
@@ -87,7 +109,7 @@ public class TransformerWeighting implements Comparable
             return getWeighting(x, src.getSuperclass(), dest);
 
         }
-        return x;
+        return -1;
     }
 
     public Class getInputClass()
