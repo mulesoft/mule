@@ -125,6 +125,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
             assertEquals(ClassNotFoundException.class, iex.getCause().getClass());
         }
 
+        t = new XsltTransformer();
+        t.setXslFile("cdcatalog.xsl");
         // try again with JDK default
         t.setXslTransformerFactory(null);
         t.initialise();

@@ -57,4 +57,14 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 8, converter);
     }
+
+    public static Message canOnlySetFileOrXslt()
+    {
+        return factory.createMessage(BUNDLE_PATH, 9);
+    }
+
+    public static Message canOnlySetFileOrXQuery()
+    {
+        return factory.createMessage(BUNDLE_PATH, 10);
+    }
 }

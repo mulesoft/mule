@@ -104,12 +104,22 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     public void initialise() throws InitialisationException
     {
 
-        if (configuration == null)
+        if (xquery != null && xqueryFile != null)
         {
-            configuration = new Configuration();
+            throw new InitialisationException(XmlMessages.canOnlySetFileOrXQuery(), this);
         }
+
         try
         {
+            if (xqueryFile != null)
+            {
+                xquery = IOUtils.getResourceAsString(xqueryFile, getClass());
+            }
+            if (configuration == null)
+            {
+                configuration = new Configuration();
+            }
+
             XQDataSource ds = new SaxonXQDataSource(configuration);
             if (commonHandler != null)
             {
@@ -401,11 +411,6 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     {
         public Object makeObject() throws Exception
         {
-            if (xqueryFile != null)
-            {
-                xquery = IOUtils.getResourceAsString(xqueryFile, getClass());
-            }
-
             return connection.prepareExpression(xquery);
         }
 
