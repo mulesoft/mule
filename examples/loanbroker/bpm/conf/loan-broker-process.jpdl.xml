@@ -7,16 +7,10 @@
          ******************************************************************* -->
 
     <!-- Request received from customer -->
-    <start>
-        <transition to="validateCustomerRequest" />
-    </start>
-
-	<!-- The payload which was received from Mule when starting the process is in the variable "incoming".
-		Here we store into the variable "customerRequest". -->
-	<script name="validateCustomerRequest" expr="#{incoming}" var="customerRequest">
+    <mule-receive name="waitForCustomerRequest" endpoint="CustomerRequests" var="customerRequest">
         <transition to="sendToCreditAgency" />
-    </script>
-	
+    </mule-receive>
+
     <!-- Send customer info. to credit agency -->
 	<mule name="sendToCreditAgency" 
 		  expr="#{customerRequest.customer}" endpoint="CreditAgency" synchronous="false">

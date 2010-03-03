@@ -11,7 +11,9 @@
 package org.mule.transport.jbpm;
 
 import org.jbpm.jpdl.internal.activity.JpdlBinding;
+import org.jbpm.jpdl.internal.model.JpdlProcessDefinition;
 import org.jbpm.jpdl.internal.xml.JpdlParser;
+import org.jbpm.pvm.internal.model.ActivityImpl;
 import org.jbpm.pvm.internal.util.XmlUtil;
 import org.jbpm.pvm.internal.xml.Parse;
 import org.w3c.dom.Element;
@@ -25,7 +27,18 @@ public class MuleReceiveBinding extends JpdlBinding
 
     public Object parseJpdl(Element element, Parse parse, JpdlParser parser)
     {
-        MuleReceiveActivity activity = new MuleReceiveActivity();
+        MuleReceiveActivity activity;
+        
+        JpdlProcessDefinition processDefinition = parse.contextStackFind(JpdlProcessDefinition.class);        
+        if (processDefinition.getInitial() == null) 
+        {
+            processDefinition.setInitial(parse.contextStackFind(ActivityImpl.class));          
+            activity = new MuleReceiveActivity(true);
+        } 
+        else
+        {
+            activity = new MuleReceiveActivity(false);
+        }
 
         // Note: The last method argument is the default value.
         activity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));

@@ -16,27 +16,59 @@ import org.mule.util.ClassUtils;
 import java.util.Map;
 
 import org.jbpm.api.JbpmException;
+import org.jbpm.api.activity.ActivityExecution;
 import org.jbpm.internal.log.Log;
 import org.jbpm.jpdl.internal.activity.StateActivity;
 import org.jbpm.pvm.internal.model.ExecutionImpl;
 
 public class MuleReceiveActivity extends StateActivity
 {
-    // Expected incoming endpoint; if a message was received from a different endpoint, an exception will be thrown.
+    /**
+     *  Expected incoming endpoint; if a message was received from a different endpoint, an exception will be thrown.
+     */
     private String endpoint;
 
-    // Expected incoming message type; if the payload received is not assignable to this class, an exception will be thrown.
+    /**
+     *  Expected incoming message type; if the payload received is not assignable to this class, an exception will be thrown.
+     */
     private Class payloadClass;
 
-    // Variable into which the incoming message payload will be stored. If null, the payload will not
-    // be stored at all.
+    /**
+     *  Variable into which the incoming message payload will be stored. If null, the payload will not be stored at all.
+     */
     private String variableName;
 
+    /** 
+     * Is this the first state in the process? 
+     */
+    private final boolean startState;
+    
     private static final Log log = Log.getLog(MuleReceiveActivity.class.getName());
 
+    public MuleReceiveActivity(boolean startState)
+    {
+        super();
+        this.startState = startState;
+    }
+    
     @Override
-    public void signal(ExecutionImpl execution, String signalName, Map<String, ?> parameters)
-        throws Exception
+    public void execute(ExecutionImpl execution)
+    {
+        execution.historyActivityStart();
+
+        if (startState)
+        {
+            execution.signal();
+        }
+        else
+        {
+            execution.waitForSignal();
+        }
+    }
+    
+    @Override
+    public void signal(ActivityExecution execution, String signalName, Map<String, ?> parameters)
+    throws Exception
     {
         Object payload = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING);
 
