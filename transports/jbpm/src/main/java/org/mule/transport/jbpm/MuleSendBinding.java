@@ -20,7 +20,7 @@ public class MuleSendBinding extends JpdlBinding
 {
     public MuleSendBinding()
     {
-        super("mule");
+        super("mule-send");
     }
 
     public Object parseJpdl(Element element, Parse parse, JpdlParser parser)

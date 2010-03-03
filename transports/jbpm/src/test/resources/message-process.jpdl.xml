@@ -8,16 +8,16 @@
 		<transition to="sendSynchronousMessage" />
 	</start>
 
-	<mule name="sendSynchronousMessage" 
+	<mule-send name="sendSynchronousMessage" 
 		endpoint="vm://echo" expr="Message in a bottle." 
 		var="echoResponse" type="java.lang.String">
 		<transition to="sendAsynchronousMessage" />
-	</mule>
+	</mule-send>
 
-	<mule name="sendAsynchronousMessage" 
+	<mule-send name="sendAsynchronousMessage" 
 		endpoint="test://queue" expr="#{echoResponse}" synchronous="false">
 		<transition to="waitForResponse" />
-	</mule>
+	</mule-send>
 
 	<mule-receive name="waitForResponse"
 		type="java.lang.String" var="asynchResponse">
