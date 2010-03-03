@@ -844,7 +844,7 @@ public abstract class AbstractService implements Service
     }
 
     // This method is used when the service invoked asynchronously. It should really
-    // be used independantly of if the service is invoked asynchronously when we are
+    // be used independently of if the service is invoked asynchronously when we are
     // using an out-in or out-optional-in outbound message exchange pattern
     protected void dispatchToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
     {
@@ -852,7 +852,7 @@ public abstract class AbstractService implements Service
         {
             logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
         }
-        if (!NullPayload.getInstance().equals(result.getPayload()) && !event.isStopFurtherProcessing())
+        if (result != null && !event.isStopFurtherProcessing())
         {
             if (getOutboundRouter().hasEndpoints())
             {

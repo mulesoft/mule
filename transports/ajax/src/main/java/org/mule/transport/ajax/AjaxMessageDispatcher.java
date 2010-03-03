@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
 
 import org.apache.commons.collections.Buffer;
@@ -78,6 +79,11 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
+        //We have no need for Null messages to be sent to the browser
+        if(NullPayload.getInstance().equals(event.getMessage().getPayload()))
+        {
+            return;
+        }
         if (!connector.isStarted())
         {
             //TODO MULE-4320
