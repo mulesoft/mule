@@ -117,7 +117,6 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(10, xslt.getMaxActiveTransformers());
         assertEquals(10, xslt.getMaxIdleTransformers());
         assertEquals(CustomXsltTransformerFactory.class.getName(), xslt.getXslTransformerFactory());
-        assertEquals("file", xslt.getXslFile());
         assertNotNull(xslt.getXslt());
         String transform = xslt.getXslt();
         assertTrue(transform.indexOf("test for this string in test") > -1);
