@@ -10,37 +10,23 @@
 
 package org.mule.transport.cxf.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-
-import java.net.SocketTimeoutException;
-import java.util.Date;
 
 /**
+ * See MULE-4491 "Http outbound endpoint does not use responseTimeout attribute"
+ * See MULE-4743 "MuleClient.send() timeout is not respected with http transport"
  * See MULE-4490 "Outbound CXF endpoint does not propagate any properties to "protocol" endpoint"
+ * See {@link org.mule.transport.http.functional.HttpResponseTimeoutTestCase}
  */
-public class HttpResponseTimeoutTestCase extends FunctionalTestCase
+public class HttpResponseTimeoutTestCase extends
+    org.mule.transport.http.functional.HttpResponseTimeoutTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    private static String PAYLOAD = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                                    + "<soap:Body><invoke><arg0>Eugene</arg0></invoke></soap:Body></soap:Envelope>";
+
+    protected String getPayload()
     {
-        return "http-response-timeout-config.xml";
-    }
-
-    public void testResponseTimeout() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        Date beforeCall = new Date();
-
-        MuleMessage message = client.send("vm://request", "<test/>", null);
-        assertNotNull(message);
-
-        Date afterCall = new Date();
-        // If everything is good the connection will timeout after 5s and throw an exception.
-        assertTrue(message.getExceptionPayload().getRootException() instanceof SocketTimeoutException);
-        assertTrue((afterCall.getTime() - beforeCall.getTime()) < 10000);
+        return HttpResponseTimeoutTestCase.PAYLOAD;
     }
 
 }

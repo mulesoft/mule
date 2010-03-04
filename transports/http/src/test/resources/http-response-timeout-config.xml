@@ -12,23 +12,38 @@
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
     
+    <configuration defaultResponseTimeout="2000"/>
+    
     <model name="responeTimeout">
-        <service name="TestTimeout">
+        
+        <service name="TestDecreaseTimeout">
             <inbound>
-                <vm:inbound-endpoint path="request" synchronous="true"/>
+                <vm:inbound-endpoint path="decreaseTimeoutRequest" synchronous="true"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60216/TimeoutWebservice" synchronous="true" responseTimeout="5000"/>
+                    <http:outbound-endpoint address="http://localhost:60216/DelayService" synchronous="true" responseTimeout="1000"/>
                 </pass-through-router>
             </outbound>
         </service>
         
-        <service name="SampleWebService">
+        <service name="TestIncreaseTimeout">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60216/TimeoutWebservice" synchronous="true"/>
+                <vm:inbound-endpoint path="increaseTimeoutRequest" synchronous="true"/>
             </inbound>
-            <test:component waitTime="30000"/>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint address="http://localhost:60216/DelayService" synchronous="true" responseTimeout="3000"/>
+                </pass-through-router>
+            </outbound>
         </service>
+        
+        <service name="DelayService">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:60216/DelayService" synchronous="true"/>
+            </inbound>
+            <test:component waitTime="2500" appendString=" processed"/>
+        </service>
+        
     </model>
 </mule>

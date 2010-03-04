@@ -11,24 +11,41 @@
             http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
             http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
+
+    <configuration defaultResponseTimeout="2000"/>
     
     <model name="responeTimeout">
-        <service name="TestTimeout">
+        
+        <service name="TestDecreaseTimeout">
             <inbound>
-                <vm:inbound-endpoint path="request" synchronous="true"/>
+                <vm:inbound-endpoint path="decreaseTimeoutRequest" synchronous="true"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="http://localhost:60216/TimeoutWebservice?onCall" synchronous="true" responseTimeout="5000" proxy="true"/>
+                    <cxf:outbound-endpoint address="http://localhost:60216/DelayService?onCall" synchronous="true" responseTimeout="1000" proxy="true"/>
                 </pass-through-router>
             </outbound>
         </service>
         
-        <service name="SampleWebService">
+        <service name="TestIncreaseTimeout">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:60216/TimeoutWebservice" synchronous="true" proxy="true"/>
+                <vm:inbound-endpoint path="increaseTimeoutRequest" synchronous="true"/>
             </inbound>
-            <test:component waitTime="30000"/>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="http://localhost:60216/DelayService?onCall" synchronous="true" responseTimeout="3000" proxy="true"/>
+                </pass-through-router>
+            </outbound>
         </service>
+        
+        <service name="ProxyDelayService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:60216/DelayService" synchronous="true" proxy="true" applyTransformersToProtocol="false">
+                    <custom-transformer class="org.mule.module.xml.transformer.DomDocumentToXml"/>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <test:component waitTime="2500" appendString=" processed"/>
+        </service>
+        
     </model>
 </mule>

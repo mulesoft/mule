@@ -11,6 +11,7 @@
 package org.mule.test.integration.client;
 
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
@@ -56,7 +57,8 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
         // Doubling timeout see MULE-3000
-        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, RECEIVE_TIMEOUT * 2);
+        // Use TIMEOUT_NOT_SET_VALUE as we need respective remoteDispatcherEndpoint to you timeout as defined on the endpoint.  
+        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint,MuleEvent.TIMEOUT_NOT_SET_VALUE);
         assertNull(message);
         // We do a send instead of a dispatch here so the operation is
         // synchronous thus eaiser to test

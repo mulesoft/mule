@@ -272,7 +272,10 @@ public class RemoteDispatcher implements Disposable
     {
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(null, RemoteDispatcherNotification.ACTION_RECEIVE, endpoint);
         action.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
-        action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
+        if (timeout != MuleEvent.TIMEOUT_NOT_SET_VALUE)
+        {
+            action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
+        }
         return dispatchAction(action, true, timeout);
     }
 
