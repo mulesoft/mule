@@ -280,24 +280,29 @@ public final class MuleTestUtils
     /** Supply service but no endpoint */
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestOutboundEndpoint("test1", context), context);
+        return getTestEvent(data, service, getTestOutboundEndpoint("test1", context), context, true);
     }
 
     public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1", context), context);
+        return getTestEvent(data, service, getTestInboundEndpoint("test1", context), context, true);
     }
 
     /** Supply endpoint but no service */
     public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestService(context), endpoint, context);
+        return getTestEvent(data, getTestService(context), endpoint, context, true);
+    }
+    
+    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context,  boolean synchronous) throws Exception
+    {
+        return getTestEvent(data, getTestService(context), endpoint, context, synchronous);
     }
 
-    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context, boolean synchronous) throws Exception
     {
         MuleSession session = getTestSession(service, context);
-        return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap(), context), endpoint, session, true);
+        return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap(), context), endpoint, session, synchronous);
     }
 
     public static MuleEventContext getTestEventContext(Object data, MuleContext context) throws Exception

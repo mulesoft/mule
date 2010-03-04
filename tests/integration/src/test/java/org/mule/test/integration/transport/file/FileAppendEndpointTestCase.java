@@ -42,6 +42,7 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 
             MuleClient client = new MuleClient();
             client.send("vm://fileappend", "Hello1", null);
+            // To ensure exception is thrown here outbound endpoint must be sync.
             fail("Expected exception: java.lang.IllegalArgumentException: Configuring 'outputAppend' on a file endpoint is no longer supported. You may configure it on a file connector instead.");
         }
         catch (Exception e)

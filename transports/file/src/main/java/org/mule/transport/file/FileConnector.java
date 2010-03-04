@@ -114,6 +114,19 @@ public class FileConnector extends AbstractConnector
     }
 
     @Override
+    protected void configureDispatcherPool()
+    {
+        if (isOutputAppend())
+        {
+            setMaxDispatchersActive(getDispatcherThreadingProfile().getMaxThreadsActive());
+        }
+        else
+        {
+            super.configureDispatcherPool();
+        }
+    }
+
+    @Override
     public void setMaxDispatchersActive(int value)
     {
         if (isOutputAppend() && value != 1)
