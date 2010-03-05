@@ -41,7 +41,6 @@ cxf-rt-ws-addr-2.1.9
 cxf-rt-ws-security-2.1.9
 cxf-tools-common-2.1.9
 dom4j-1.6.1-osgi
-FastInfoset-1.2.2
 geronimo-annotation_1.0_spec-1.1.1
 geronimo-ejb_2.1_spec-1.1-osgi
 geronimo-j2ee-connector_1.5_spec-1.1-osgi
