@@ -47,7 +47,6 @@
                 <!-- Incoming message = CreditProfile -->
                 <inbound-endpoint ref="CreditProfiles" />
             </inbound>
-            <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
                 <filtering-router>
                     <bpm:outbound-endpoint process="LoanBroker" />
@@ -60,7 +59,6 @@
             <inbound>
                 <bpm:inbound-endpoint process="LoanBroker" />
             </inbound>
-            <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
                 <bpm:outbound-router>
                     <!-- Outgoing message = Customer -->
