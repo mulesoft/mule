@@ -31,9 +31,6 @@ public class MessagingJbpmTestCase extends AbstractJbpmTestCase
 
     public void testSendMessageProcess() throws Exception
     {
-        // Deploy the process definition.
-        ((Jbpm) bpms).deployProcess("message-process.jpdl.xml");
-
         MuleMessage response;
         Object process;
         BPMS bpms = connector.getBpms();

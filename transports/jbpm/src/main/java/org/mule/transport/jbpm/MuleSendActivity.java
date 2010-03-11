@@ -11,6 +11,7 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.transport.bpm.MessageService;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.ClassUtils;
@@ -95,6 +96,14 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
         props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getId());
 
+        for (Map.Entry<String, Object> var : execution.getVariables().entrySet())
+        {
+            if (!var.getKey().startsWith(MuleProperties.PROPERTY_PREFIX))
+            {
+                props.put(var.getKey(), var.getValue());
+            }
+        }
+        
         MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, synchronous);
         if (synchronous && response != null)
         {

@@ -18,6 +18,7 @@
     	<bpm:process name="simple" resource="simple-process.jpdl.xml" />
     	<bpm:process name="message" resource="message-process.jpdl.xml" />
     	<bpm:process name="fork" resource="fork-process.jpdl.xml" />
+    	<bpm:process name="variables" resource="variables-process.jpdl.xml" />
     </bpm:jbpm-connector>
     
     <model name="processModel">
@@ -43,6 +44,19 @@
                 <bpm:outbound-router>
                     <vm:outbound-endpoint path="queueA"/>
                     <vm:outbound-endpoint path="echo"/>
+                    <vm:outbound-endpoint path="queueB"/>
+                </bpm:outbound-router>
+            </outbound>
+        </service>
+
+        <service name="fromVariablesProcess">
+            <inbound>
+                <bpm:inbound-endpoint process="variables"/>
+            </inbound>
+            <log-component />
+            <outbound>
+                <bpm:outbound-router>
+                    <vm:outbound-endpoint path="queueA"/>
                     <vm:outbound-endpoint path="queueB"/>
                 </bpm:outbound-router>
             </outbound>
