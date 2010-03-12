@@ -13,7 +13,6 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
@@ -128,7 +127,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     {
         private HttpServerConnection conn;
         private String cookieSpec;
-        private boolean enableCookies=true;
+        private boolean enableCookies = true;
         private String remoteClientAddress;
 
         public HttpWorker(Socket socket) throws IOException
@@ -468,7 +467,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                                 endpoint.getEndpointURI().getPort(),
                                 endpoint.getEndpointURI().getPath(),
                                 endpoint.getEndpointURI().getScheme().equalsIgnoreCase("https"),
-                                header); //CookieHelper.parseCookies(header, cookieSpec);
+                                header);
                         if (cookies.length > 0)
                         {
                             // yum!

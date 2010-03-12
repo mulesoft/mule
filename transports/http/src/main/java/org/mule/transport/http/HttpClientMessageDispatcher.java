@@ -105,6 +105,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         client = null;
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
@@ -180,21 +181,20 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             // cookies came in via a regular HTTP request
             Cookie[] cookies = (Cookie[]) cookieObject;
-            if (cookies != null && cookies.length > 0)
+            if (cookies.length > 0)
             {
                 client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(policy));
 
                 for (Cookie cookie : cookies)
                 {
                     cookie.setDomain(endpoint.getEndpointURI().getHost());
-                    if(StringUtils.isNotBlank(endpoint.getEndpointURI().getPath()))
+                    if (StringUtils.isNotBlank(endpoint.getEndpointURI().getPath()))
                     {
                         cookie.setPath(endpoint.getEndpointURI().getPath());
                     }
                     cookie.setSecure(endpoint.getEndpointURI().getScheme().equalsIgnoreCase("https"));
                     client.getState().addCookie(cookie);
                 }
-
             }
         }
         else if (cookieObject instanceof Map)
@@ -294,6 +294,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
