@@ -15,7 +15,7 @@ import org.mule.api.security.SecurityContext;
 
 public class PGPSecurityContext implements SecurityContext
 {
-    private volatile PGPAuthentication authentication;
+    private transient PGPAuthentication authentication;
 
     public PGPSecurityContext(PGPAuthentication authentication)
     {

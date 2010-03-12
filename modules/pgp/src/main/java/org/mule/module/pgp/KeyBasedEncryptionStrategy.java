@@ -25,6 +25,10 @@ import cryptix.message.Message;
 import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessageBuilder;
 import cryptix.openpgp.PGPArmouredMessage;
+import cryptix.openpgp.PGPDetachedSignatureMessage;
+import cryptix.openpgp.PGPSignedMessage;
+import cryptix.openpgp.packet.PGPSignaturePacket;
+import cryptix.openpgp.provider.PGPDetachedSignatureMessageImpl;
 import cryptix.pki.KeyBundle;
 
 import java.io.ByteArrayInputStream;
@@ -97,18 +101,19 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     {
         try
         {
-            MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-
             ByteArrayInputStream in = new ByteArrayInputStream(data);
-
-            Collection msgs = mf.generateMessages(in);
-
-            Message msg = (Message)msgs.iterator().next();
+            MessageFactory mf = MessageFactory.getInstance("OpenPGP");
+            Collection<?> msgs = mf.generateMessages(in);
+            Message msg = (Message) msgs.iterator().next();
 
             if (msg instanceof EncryptedMessage)
             {
-                msg = ((EncryptedMessage)msg).decrypt(keyManager.getSecretKeyBundle(),
-                    keyManager.getSecretPassphrase().toCharArray());
+                EncryptedMessage encryptedMessage = (EncryptedMessage) msg;
+                KeyBundle secretKeyBundle = keyManager.getSecretKeyBundle();
+                char[] passphrase = keyManager.getSecretPassphrase().toCharArray();
+                msg = encryptedMessage.decrypt(secretKeyBundle, passphrase);
+                
+                applyStrongEncryptionWorkaround(msg);
 
                 return new PGPArmouredMessage(msg).getEncoded();
             }
@@ -119,6 +124,28 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         }
 
         return data;
+    }
+
+    // cryptix seems to have trouble with some kinds of messsage encryption. Work around this
+    // by setting up the proper internal state first
+    private void applyStrongEncryptionWorkaround(Message msg) throws Exception
+    {
+        if (msg instanceof PGPSignedMessage)
+        {
+            PGPSignedMessage signedMessage = (PGPSignedMessage) msg;
+            
+            PGPDetachedSignatureMessage signature = signedMessage.getDetachedSignature();
+            if (signature instanceof PGPDetachedSignatureMessageImpl)
+            {
+                PGPDetachedSignatureMessageImpl signatureImpl = 
+                    (PGPDetachedSignatureMessageImpl) signature;
+                PGPSignaturePacket packet = signatureImpl.getPacket();
+                if (packet.getVersion() == 4)
+                {
+                    packet.parseSignatureSubPackets();
+                }
+            }
+        }
     }
 
     public void initialise() throws InitialisationException
