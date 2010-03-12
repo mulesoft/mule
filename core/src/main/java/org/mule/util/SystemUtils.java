@@ -250,15 +250,15 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      *         (Strings). If no valid key-value pairs can be parsed, the map is
      *         empty.
      */
-    public static Map parsePropertyDefinitions(String input)
+    public static Map<String, String> parsePropertyDefinitions(String input)
     {
         if (StringUtils.isEmpty(input))
         {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         // the result map of property key/value pairs
-        final Map result = new HashMap();
+        final Map<String, String> result = new HashMap<String, String>();
 
         // where to begin looking for key/value tokens
         int tokenStart = 0;

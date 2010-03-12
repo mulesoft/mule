@@ -125,8 +125,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
         if (StringUtils.isNotBlank(muleOpts))
         {
-            Map parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
-            String optVerbose = (String) parsedOpts.get("mule.verbose");
+            Map<String, String> parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
+            String optVerbose = parsedOpts.get("mule.verbose");
             verbose = Boolean.valueOf(optVerbose).booleanValue();
         }
         else
