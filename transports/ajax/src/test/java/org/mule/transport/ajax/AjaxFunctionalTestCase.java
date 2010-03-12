@@ -15,9 +15,12 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.MessageListener;
@@ -80,7 +83,12 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         latch.await(10, TimeUnit.SECONDS);
 
         assertNotNull(data.get());
-        assertEquals("{\"data\":\"Ross Received\",\"channel\":\"/test1\"}", data.get());
+        
+        // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
+        ObjectMapper mapper = new ObjectMapper();
+        Map result  = mapper.readValue((String)data.get(), Map.class);
+        assertEquals("/test1", result.get("channel"));       
+        assertEquals("Ross Received", result.get("data"));
     }
 
     public void testClientPublishWithString() throws Exception

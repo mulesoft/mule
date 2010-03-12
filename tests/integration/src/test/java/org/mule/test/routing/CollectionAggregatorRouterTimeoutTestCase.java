@@ -51,7 +51,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCas
         List list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         // no correlation timeout should ever fire
         assertEquals("Correlation timeout should not have happened.", 0, correlationTimeoutCount.intValue());
