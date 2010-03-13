@@ -10,27 +10,31 @@
 
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.lifecycle.ContainerManagedLifecyclePhase;
-import org.mule.lifecycle.GenericLifecycleManager;
+import org.mule.lifecycle.DefaultLifecyclePair;
+import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.lifecycle.phases.ContainerManagedDisposePhase;
+import org.mule.lifecycle.phases.ContainerManagedInitialisePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.util.StringUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpringRegistry extends AbstractRegistry
 {
@@ -46,38 +50,38 @@ public class SpringRegistry extends AbstractRegistry
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-    public SpringRegistry()
+    public SpringRegistry(MuleContext muleContext)
     {
-        super(REGISTRY_ID);
+        super(REGISTRY_ID, muleContext);
     }
 
-    public SpringRegistry(String id)
+    public SpringRegistry(String id, MuleContext muleContext)
     {
-        super(id);
+        super(id, muleContext);
     }
 
-    public SpringRegistry(ApplicationContext applicationContext)
+    public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext)
     {
-        super(REGISTRY_ID);
+        super(REGISTRY_ID, muleContext);
         this.applicationContext = applicationContext;
     }
 
-    public SpringRegistry(String id, ApplicationContext applicationContext)
+    public SpringRegistry(String id, ApplicationContext applicationContext, MuleContext muleContext)
     {
-        super(id);
+        super(id, muleContext);
         this.applicationContext = applicationContext;
     }
 
-    public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext)
+    public SpringRegistry(ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
-        super(REGISTRY_ID);
+        super(REGISTRY_ID, muleContext);
         applicationContext.setParent(parentContext);
         this.applicationContext = applicationContext;
     }
 
-    public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext)
+    public SpringRegistry(String id, ConfigurableApplicationContext applicationContext, ApplicationContext parentContext, MuleContext muleContext)
     {
-        super(id);
+        super(id, muleContext);
         applicationContext.setParent(parentContext);
         this.applicationContext = applicationContext;
     }
@@ -109,15 +113,25 @@ public class SpringRegistry extends AbstractRegistry
 
         this.initialised.set(false);
     }
-    
-    protected LifecycleManager createLifecycleManager()
+
+    @Override
+    protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
     {
-        GenericLifecycleManager lcm = new GenericLifecycleManager();
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME,
-                Initialisable.class, Disposable.PHASE_NAME));
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class,
-                Initialisable.PHASE_NAME));
-        return lcm;
+        LifecycleManager lifecycleManager = new RegistryLifecycleManager();
+
+        for (LifecyclePair pair : lifecyclePairs)
+        {
+            if(pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
+            {
+                lifecycleManager.registerLifecycle(new DefaultLifecyclePair(
+                        new ContainerManagedInitialisePhase(), new ContainerManagedDisposePhase()));
+            }
+            else
+            {
+                lifecycleManager.registerLifecycle(pair);
+            }
+        }
+        return lifecycleManager;
     }
 
     public Object lookupObject(String key)
@@ -150,11 +164,6 @@ public class SpringRegistry extends AbstractRegistry
 
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
-        // MULE-2762
-        //if (logger.isDebugEnabled())
-        //{
-        //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
-        //}
         return lookupByType(type).values();
     }
 

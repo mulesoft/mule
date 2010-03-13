@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.InjectProcessor;
@@ -49,74 +50,93 @@ public class TransientRegistry extends AbstractRegistry
     //@ThreadSafe synchronized(registry)
     private final Map<String, Object> registry = new HashMap<String, Object>();
 
-    private MuleContext context;
 
-    public TransientRegistry(MuleContext context)
+    public TransientRegistry(MuleContext muleContext)
     {
-        super(REGISTRY_ID);
-        this.context = context;
+        this(REGISTRY_ID, muleContext);
+    }
+
+    public TransientRegistry(String id, MuleContext muleContext)
+    {
+        super(id, muleContext);
         synchronized(registry)
         {
-            registry.put("_muleContextProcessor", new MuleContextProcessor(context));
-            registry.put("_muleNotificationProcessor", new NotificationListenersProcessor(context));
-            registry.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(context));
+            registry.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
+            registry.put("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
+            registry.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
         }
     }
 
     @java.lang.Override
     protected void doInitialise() throws InitialisationException
     {
-        applyProcessors(lookupObjects(Connector.class));
-        applyProcessors(lookupObjects(Transformer.class));
-        applyProcessors(lookupObjects(ImmutableEndpoint.class));
-        applyProcessors(lookupObjects(Agent.class));
-        applyProcessors(lookupObjects(Model.class));
-        applyProcessors(lookupObjects(Service.class));
-        applyProcessors(lookupObjects(Object.class));
+        applyProcessors(lookupObjects(Connector.class), null);
+        applyProcessors(lookupObjects(Transformer.class), null);
+        applyProcessors(lookupObjects(ImmutableEndpoint.class), null);
+        applyProcessors(lookupObjects(Agent.class), null);
+        applyProcessors(lookupObjects(Model.class), null);
+        applyProcessors(lookupObjects(Service.class), null);
+        applyProcessors(lookupObjects(Object.class), null);
 
-        synchronized(registry)
+        try
         {
-            Collection allObjects = lookupObjects(Object.class);
-            Object obj;
-            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
-            {
-                obj = iterator.next();
-                try
-                {
-                    applyLifecycle(obj);
-                }
-                catch (InitialisationException e)
-                {
-                    throw e;
-                } 
-                catch (MuleException e)
-                {
-                    throw new InitialisationException(e, this);
-                }
-            }
+            getLifecycleManager().fireLifecycle(this, Initialisable.PHASE_NAME);
         }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+//        synchronized(registry)
+//        {
+//            Collection allObjects = lookupObjects(Object.class);
+//            Object obj;
+//            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+//            {
+//                obj = iterator.next();
+//                try
+//                {
+//                    applyLifecycle(obj);
+//                }
+//                catch (InitialisationException e)
+//                {
+//                    throw e;
+//                }
+//                catch (MuleException e)
+//                {
+//                    throw new InitialisationException(e, this);
+//                }
+//            }
+//        }
     }
 
     @Override
     protected void doDispose()
     {
-        synchronized(registry)
+        try
         {
-            Collection allObjects = lookupObjects(Object.class);
-            Object obj;
-            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
-            {
-                obj = iterator.next();
-                try
-                {
-                    applyLifecycle(obj);
-                }
-                catch (MuleException e)
-                {
-                    logger.warn("Object '" + obj + "'disposed with error: " + e.getDetailedMessage());
-                }
-            }
+            getLifecycleManager().fireLifecycle(this, Disposable.PHASE_NAME);
         }
+        catch (MuleException e)
+        {
+            logger.warn("Failed to dipose the registry cleanly", e);
+        }
+//        synchronized(registry)
+//        {
+//            Collection allObjects = lookupObjects(Object.class);
+//            Object obj;
+//            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
+//            {
+//                obj = iterator.next();
+//                try
+//                {
+//                    applyLifecycle(obj);
+//                }
+//                catch (MuleException e)
+//                {
+//                    logger.warn("Object '" + obj + "'disposed with error: " + e.getDetailedMessage());
+//                }
+//            }
+//        }
     }
 
     protected Map applyProcessors(Map<String, Object> objects)
@@ -206,29 +226,37 @@ public class TransientRegistry extends AbstractRegistry
      */
     Object applyLifecycle(Object object) throws MuleException
     {
-        context.getLifecycleManager().applyCompletedPhases(object);
+        getLifecycleManager().applyCompletedPhases(object);
         return object;
     }
 
 
 
-    Object applyProcessors(Object object)
+    Object applyProcessors(Object object, Object metadata)
     {
         Object theObject = object;
-        //Process injectors first
-        Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
-        for (InjectProcessor processor : injectProcessors)
+
+        if(!hasFlag(metadata, MuleRegistry.INJECT_BYPASS_FLAG))
         {
-            theObject = processor.process(theObject);
-        }
-        //Then any other processors
-        Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
-        for (PreInitProcessor processor : processors)
-        {
-            theObject = processor.process(theObject);
-            if(theObject==null)
+            //Process injectors first
+            Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
+            for (InjectProcessor processor : injectProcessors)
             {
-                return null;
+                theObject = processor.process(theObject);
+            }
+        }
+
+        if(!hasFlag(metadata, MuleRegistry.PRE_INIT_BYPASS_FLAG))
+        {
+            //Then any other processors
+            Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
+            for (PreInitProcessor processor : processors)
+            {
+                theObject = processor.process(theObject);
+                if(theObject==null)
+                {
+                    return null;
+                }
             }
         }
         return theObject;
@@ -246,12 +274,13 @@ public class TransientRegistry extends AbstractRegistry
     }
 
     /**
-     * Allows for arbitary registration of transient objects
+     * Allows for arbitrary registration of transient objects
      *
      * @param key
      */
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
+        checkDisposed();
         if (StringUtils.isBlank(key))
         {
             throw new RegistrationException("Attempt to register object with no key");
@@ -261,18 +290,13 @@ public class TransientRegistry extends AbstractRegistry
         {
             logger.debug(String.format("registering key/object %s/%s", key, object));
         }
-        if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
+        
+        logger.debug("applying processors");
+        object = applyProcessors(object, metadata);
+        //Don't add the object if the processor returns null
+        if (object==null)
         {
-            if (context.isInitialised() || context.isInitialising())
-            {
-                logger.debug("applying processors");
-                object = applyProcessors(object);
-                //Don't add the object if the processor returns null
-                if (object==null)
-                {
-                    return;
-                }
-            }
+            return;
         }
 
         synchronized(registry)
@@ -289,19 +313,33 @@ public class TransientRegistry extends AbstractRegistry
 
         try
         {
-            if (!MuleRegistry.LIFECYCLE_BYPASS_FLAG.equals(metadata))
+            if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
             {
                 if(logger.isDebugEnabled())
                 {
                     logger.debug("applying lifecycle to object: " + object);
                 }
-                context.getLifecycleManager().applyCompletedPhases(object);
+                getLifecycleManager().applyCompletedPhases(object);
             }
         }
         catch (MuleException e)
         {
             throw new RegistrationException(e);
         }
+    }
+
+
+    protected void checkDisposed() throws RegistrationException
+    {
+        if(getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME))
+        {
+            throw new RegistrationException("Cannot register objects on the registry as the context is disposed");
+        }
+    }
+
+    protected boolean hasFlag(Object metaData, int flag)
+    {
+        return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
     }
 
     public void unregisterObject(String key, Object metadata) throws RegistrationException
@@ -314,8 +352,7 @@ public class TransientRegistry extends AbstractRegistry
 
         try
         {
-            context.getLifecycleManager().applyPhases(obj, Disposable.PHASE_NAME);
-
+            getLifecycleManager().applyPhase(obj, Disposable.PHASE_NAME);
         }
         catch (MuleException e)
         {

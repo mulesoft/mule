@@ -10,14 +10,20 @@
 
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.util.UUID;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,14 +36,21 @@ public abstract class AbstractRegistry implements Registry
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    protected MuleContext muleContext;
+
+    protected LifecycleManager lifecycleManager;
+
+
     /** Default Constructor */
-    protected AbstractRegistry(String id)
+    protected AbstractRegistry(String id, MuleContext muleContext)
     {
         if (id == null)
         {
             throw new MuleRuntimeException(CoreMessages.objectIsNull("RegistryID"));
         }
         this.id = id;
+        this.muleContext = muleContext;
+        lifecycleManager = createLifecycleManager(muleContext.getLifecycleManager().getLifecyclePairs());
     }
 
     public final synchronized void dispose()
@@ -50,6 +63,17 @@ public abstract class AbstractRegistry implements Registry
         {
             logger.error("Failed to cleanly dispose: " + e.getMessage(), e);
         }
+    }
+
+    protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
+    {
+        LifecycleManager lifecycleManager = new RegistryLifecycleManager();
+
+        for (LifecyclePair lifecyclePair : lifecyclePairs)
+        {
+            lifecycleManager.registerLifecycle(lifecyclePair);
+        }
+        return lifecycleManager;
     }
 
     abstract protected void doInitialise() throws InitialisationException;
@@ -75,6 +99,16 @@ public abstract class AbstractRegistry implements Registry
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    public LifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
+    }
+
+    public void fireLifecycle(String phase) throws MuleException
+    {
+        getLifecycleManager().fireLifecycle(this, phase);
     }
 
     @SuppressWarnings("unchecked")

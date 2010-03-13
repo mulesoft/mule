@@ -15,7 +15,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.lifecycle.GenericLifecycleManager;
+import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
@@ -35,17 +35,11 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
         // Assert
         assertNotNull(muleContext);
         assertEquals(DefaultMuleConfiguration.class, muleContext.getConfiguration().getClass());
-        assertEquals(GenericLifecycleManager.class, muleContext.getLifecycleManager().getClass());
-        assertEquals(MuleContextInitialisePhase.class, muleContext.getLifecycleManager()
-            .getLifecycles()
-            .toArray()[0].getClass());
-        assertEquals(MuleContextStartPhase.class,
-            muleContext.getLifecycleManager().getLifecycles().toArray()[1].getClass());
-        assertEquals(MuleContextStopPhase.class,
-            muleContext.getLifecycleManager().getLifecycles().toArray()[2].getClass());
-        assertEquals(MuleContextDisposePhase.class, muleContext.getLifecycleManager()
-            .getLifecycles()
-            .toArray()[3].getClass());
+        assertEquals(MuleContextLifecycleManager.class, muleContext.getLifecycleManager().getClass());
+        assertEquals(MuleContextInitialisePhase.class, muleContext.getLifecycleManager().getLifecyclePairs().get(0).getBegin().getClass());
+        assertEquals(MuleContextStartPhase.class, muleContext.getLifecycleManager().getLifecyclePairs().get(1).getBegin().getClass());
+        assertEquals(MuleContextStopPhase.class, muleContext.getLifecycleManager().getLifecyclePairs().get(1).getEnd().getClass());
+        assertEquals(MuleContextDisposePhase.class, muleContext.getLifecycleManager().getLifecyclePairs().get(0).getEnd().getClass());
 
         assertEquals(ServerNotificationManager.class, muleContext.getNotificationManager().getClass());
         assertEquals(MuleWorkManager.class, muleContext.getWorkManager().getClass());
@@ -77,7 +71,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
         return null;
     }
 
-    static class MyLifeCycleManager extends GenericLifecycleManager
+    static class MyLifeCycleManager extends MuleContextLifecycleManager
     {
     }
 

@@ -72,7 +72,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         this.muleContext = context;
     }
 
-    // TODO currentPhase is never used in the method, drop it?
     public void applyLifecycle(Registry registry) throws MuleException
     {
         if (logger.isDebugEnabled())
@@ -85,7 +84,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 
         for (LifecycleObject lo : orderedLifecycleObjects)
         {
-            // TODO Collecton -> List API refactoring
+            // TODO Collection -> List API refactoring
             Collection<?> targetsObj = registry.lookupObjects(lo.getType());
             List targets = new LinkedList(targetsObj);
             if (targets.size() == 0)
@@ -243,7 +242,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     {
         if (getSupportedPhases() == null)
         {
-            return true;
+            return false;
         }
         else
         {
@@ -278,6 +277,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
         }
     }

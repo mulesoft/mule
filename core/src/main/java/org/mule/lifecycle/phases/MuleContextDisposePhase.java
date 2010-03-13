@@ -9,9 +9,21 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.model.Model;
+import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.LifecycleObject;
+import org.mule.lifecycle.NotificationLifecycleObject;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects
@@ -24,5 +36,17 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
     public MuleContextDisposePhase()
     {
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
+
+        Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
+        // Stop in the opposite order to start
+        stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
+
+        //Can call dispose from all lifecycle Phases
+        registerSupportedPhase(LifecyclePhase.ALL_PHASES);
+        setOrderedLifecycleObjects(stopOrderedObjects);
     }
 }

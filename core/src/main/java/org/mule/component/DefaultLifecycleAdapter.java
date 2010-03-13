@@ -97,7 +97,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         if (r.lookupObjects(componentObject.getClass()).isEmpty())
         {
             // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
-            r.registerObject(key, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG);
+            r.registerObject(key, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_BYPASS_FLAG);
         }
     }
 

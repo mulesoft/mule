@@ -56,7 +56,9 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
 
         setIgnoredObjectTypes(ignorredObjects);
         setOrderedLifecycleObjects(stopOrderedObjects);
-        registerSupportedPhase(Startable.PHASE_NAME);
+        //Yuo can initialise and stop
         registerSupportedPhase(Initialisable.PHASE_NAME);
+        //Stop/Start/Stop
+        registerSupportedPhase(Startable.PHASE_NAME);
     }
 }

@@ -47,7 +47,7 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder
         {
             if (appContext instanceof ConfigurableApplicationContext)
             {
-                registry = new SpringRegistry((ConfigurableApplicationContext) appContext, parentContext);
+                registry = new SpringRegistry((ConfigurableApplicationContext) appContext, parentContext, muleContext);
             }
             else
             {
@@ -56,7 +56,7 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder
         }
         else
         {
-            registry = new SpringRegistry(appContext);
+            registry = new SpringRegistry(appContext, muleContext);
         }
 
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because

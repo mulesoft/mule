@@ -17,7 +17,6 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
@@ -25,6 +24,7 @@ import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -206,10 +206,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(muleContext.getConfiguration());
         assertEquals(DefaultMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertNotNull(muleContext.getLifecycleManager().getClass());
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[0]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[1]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[2]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[3]);
+        assertEquals(2, muleContext.getLifecycleManager().getLifecyclePairs().size());
+        assertNotNull(muleContext.getLifecycleManager().getLifecyclePairs().get(0));
+        assertNotNull(muleContext.getLifecycleManager().getLifecyclePairs().get(1));
         assertNotNull(muleContext.getNotificationManager());
         assertNotNull(muleContext.getWorkManager());
     }
@@ -222,10 +221,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(muleContext.getConfiguration());
         //assertEquals(TestMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertNotNull(muleContext.getLifecycleManager().getClass());
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[0]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[1]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[2]);
-        assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[3]);
+        assertEquals(2, muleContext.getLifecycleManager().getLifecyclePairs().size());
+        assertNotNull(muleContext.getLifecycleManager().getLifecyclePairs().get(0));
+        assertNotNull(muleContext.getLifecycleManager().getLifecyclePairs().get(1));
         assertNotNull(muleContext.getNotificationManager());
         assertNotNull(muleContext.getWorkManager());
     }
@@ -296,7 +294,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         public TestMuleContext(MuleConfiguration config,
                                   WorkManager workManager, 
                                   WorkListener workListener, 
-                                  LifecycleManager lifecycleManager, 
+                                  MuleContextLifecycleManager lifecycleManager, 
                                   ServerNotificationManager notificationManager)
         {
             super(config, workManager, workListener, lifecycleManager, notificationManager);

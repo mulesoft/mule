@@ -9,7 +9,7 @@
  */
 package org.mule.lifecycle.phases;
 
-import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.lifecycle.DefaultLifecyclePhase;
 
 /**
@@ -23,6 +23,6 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase
     public NotInLifecyclePhase()
     {
         super(PHASE_NAME, NotInLifecyclePhase.class, null);
-        registerSupportedPhase(LifecyclePhase.ALL_PHASES);
+        registerSupportedPhase(Initialisable.PHASE_NAME);
     }
 }

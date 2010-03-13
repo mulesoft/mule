@@ -43,14 +43,16 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
         assertFalse(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
 
-        // Double initialisation does not fail.
-        // MuleContext state stays the same
-        ctx.initialise();
-        assertTrue(ctx.isInitialised());
-        assertFalse(ctx.isInitialising());
-        assertFalse(ctx.isStarted());
-        assertFalse(ctx.isDisposed());
-        assertFalse(ctx.isDisposing());
+        // Can't call twice
+        try
+        {
+            ctx.initialise();
+            fail("context is already initialised");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
 
         new DefaultsConfigurationBuilder().configure(ctx);
         ctx.start();
@@ -60,7 +62,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
             ctx.initialise();
             fail();
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
         }
 
@@ -71,7 +73,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
             ctx.initialise();
             fail();
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
         }
 
@@ -110,14 +112,16 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
         assertFalse(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
 
-        // Double start does not fail.
-        // MuleContext state stays the same
-        ctx.start();
-        assertTrue(ctx.isInitialised());
-        assertFalse(ctx.isInitialising());
-        assertTrue(ctx.isStarted());
-        assertFalse(ctx.isDisposed());
-        assertFalse(ctx.isDisposing());
+        // Can't call twice
+        try
+        {
+            ctx.start();
+            fail("context is already start");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
 
         ctx.stop();
         ctx.start();
@@ -134,7 +138,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
             ctx.start();
             fail();
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
         }
     }
@@ -149,7 +153,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
             ctx.stop();
             fail();
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
         }
 
@@ -172,14 +176,15 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
 
         ctx.start();
         ctx.stop();
-        // Attempt to stop twice should fail!
+        // Can't call twice
         try
         {
             ctx.stop();
-            fail();
+            fail("context is already stopped");
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
+            //expected
         }
 
         ctx.dispose();
@@ -189,7 +194,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
             ctx.stop();
             fail();
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
         }
     }
@@ -198,7 +203,15 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
 
+        assertFalse(ctx.isInitialised());
+        assertFalse(ctx.isInitialising());
+        assertFalse(ctx.isStarted());
+        assertFalse(ctx.isDisposed());
+        assertFalse(ctx.isDisposing());
+
+        //Can dispose a newly created registry
         ctx.dispose();
+
         assertFalse(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertFalse(ctx.isStarted());
@@ -240,12 +253,15 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
         ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         ctx.dispose();
-        ctx.dispose();
-        assertFalse(ctx.isInitialised());
-        assertFalse(ctx.isInitialising());
-        assertFalse(ctx.isStarted());
-        assertTrue(ctx.isDisposed());
-        assertFalse(ctx.isDisposing());
+        // Attempt to start once disposed should fail!
+        try
+        {
+            ctx.dispose();
+            fail("context si already disposed");
+        }
+        catch (IllegalStateException e)
+        {
+        }
 
     }
 }

@@ -9,6 +9,7 @@
  */
 package org.mule.module.guice;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
@@ -43,15 +44,15 @@ public class GuiceRegistry extends AbstractRegistry
 {
     private Injector injector = null;
 
-    public GuiceRegistry()
+    public GuiceRegistry(MuleContext muleContext)
     {
-        super("guice");
+        super("guice", muleContext);
     }
 
 
-    GuiceRegistry(Injector injector)
+    GuiceRegistry(Injector injector, MuleContext muleContext)
     {
-        this();
+        this(muleContext);
         this.injector = injector;
     }
 

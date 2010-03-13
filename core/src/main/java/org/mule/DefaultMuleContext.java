@@ -37,6 +37,7 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.expression.DefaultExpressionManager;
+import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
@@ -83,7 +84,7 @@ public class DefaultMuleContext implements MuleContext
      * LifecycleManager for the MuleContext.  Note: this is NOT the same lifecycle manager
      * as the one in the Registry.
      */
-    protected LifecycleManager lifecycleManager;
+    protected MuleContextLifecycleManager lifecycleManager;
 
     protected ServerNotificationManager notificationManager;
 
@@ -104,7 +105,7 @@ public class DefaultMuleContext implements MuleContext
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
                               WorkListener workListener,
-                              LifecycleManager lifecycleManager,
+                              MuleContextLifecycleManager lifecycleManager,
                               ServerNotificationManager notificationManager)
     {
         this.config = config;
@@ -141,11 +142,6 @@ public class DefaultMuleContext implements MuleContext
 
     public void setSplash(SplashScreen startup, SplashScreen shutdown)
     {
-        if (isInitialised())
-        {
-            return;
-        }
-
         startupScreen = startup;
         shutdownScreen = shutdown;
     }
@@ -170,11 +166,6 @@ public class DefaultMuleContext implements MuleContext
 
     public synchronized void initialise() throws InitialisationException
     {
-        if (lifecycleManager.getCurrentPhase().equals(Initialisable.PHASE_NAME))
-        {
-            return;
-        }
-
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
         if (getNotificationManager() == null)
@@ -192,7 +183,6 @@ public class DefaultMuleContext implements MuleContext
 
 
             // Initialize internal registries
-            registryBroker.initialise();
             muleRegistryHelper.initialise();
 
             //We need to start the work manager straight away since we need it to fire notifications
@@ -204,10 +194,8 @@ public class DefaultMuleContext implements MuleContext
 
             workManager.start();
             getNotificationManager().start(workManager, workListener);
-
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
-
-            lifecycleManager.firePhase(this, Initialisable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(muleRegistryHelper, Initialisable.PHASE_NAME);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
 
@@ -221,11 +209,6 @@ public class DefaultMuleContext implements MuleContext
 
     public synchronized void start() throws MuleException
     {
-        if (isStarted())
-        {
-            return;
-        }
-
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
 
         if (getSecurityManager() == null)
@@ -240,8 +223,8 @@ public class DefaultMuleContext implements MuleContext
         startDate = System.currentTimeMillis();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
+        getLifecycleManager().fireLifecycle(muleRegistryHelper, Startable.PHASE_NAME);
 
-        lifecycleManager.firePhase(this, Startable.PHASE_NAME);
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
 
@@ -252,7 +235,7 @@ public class DefaultMuleContext implements MuleContext
     }
 
     /**
-     * Stops the <code>MuleManager</code> which stops all sessions and
+     * Stops the <code>MuleContext</code> which stops all sessions and
      * connectors
      *
      * @throws MuleException if either any of the sessions or connectors fail to stop
@@ -261,20 +244,14 @@ public class DefaultMuleContext implements MuleContext
     {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
-        lifecycleManager.firePhase(this, Stoppable.PHASE_NAME);
+        lifecycleManager.fireLifecycle(muleRegistryHelper, Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
     }
 
     public synchronized void dispose()
     {
-        if (isDisposed())
-        {
-            return;
-        }
-
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
 
-        ServerNotificationManager notificationManager = getNotificationManager();
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
 
         try
@@ -291,11 +268,9 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
-            //MULE-4690 dispose lifecycle is called twice, once here and once on the registryBroker.dispose
-            lifecycleManager.firePhase(this, Disposable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(muleRegistryHelper, Disposable.PHASE_NAME);
 
-            // Dispose internal registries
-            registryBroker.dispose();
+            // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much abstraction?
             muleRegistryHelper.dispose();
         }
         catch (Exception e)
@@ -326,7 +301,7 @@ public class DefaultMuleContext implements MuleContext
      */
     public boolean isInitialised()
     {
-        return lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME);
+        return lifecycleManager.getState().isInitialised();
     }
 
     /**
@@ -336,17 +311,17 @@ public class DefaultMuleContext implements MuleContext
      */
     public boolean isInitialising()
     {
-        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
+        return lifecycleManager.getState().isInitialising();
     }
 
     protected boolean isStopped()
     {
-        return lifecycleManager.isPhaseComplete(Stoppable.PHASE_NAME);
+        return lifecycleManager.getState().isStopped();
     }
 
     protected boolean isStopping()
     {
-        return Stoppable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
+        return lifecycleManager.getState().isStopping();
     }
 
     /**
@@ -361,17 +336,17 @@ public class DefaultMuleContext implements MuleContext
 
     protected boolean isStarting()
     {
-        return Startable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
+        return lifecycleManager.getState().isStarting();
     }
 
     public boolean isDisposed()
     {
-        return lifecycleManager.isPhaseComplete(Disposable.PHASE_NAME);
+        return lifecycleManager.getState().isDisposed();
     }
 
     public boolean isDisposing()
     {
-        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
+        return lifecycleManager.getState().isDisposing();
     }
 
     public LifecycleManager getLifecycleManager()

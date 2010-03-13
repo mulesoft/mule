@@ -19,22 +19,24 @@
     <model name="main">
 
         <!-- singleton for easier testing only -->
-        <custom-service name="Test" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <service name="Test" >
             <inbound>
                 <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
                                   address="http://localhost:60206/TestServer"/>
             </inbound>
-            <test:component/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </pass-through-router>
             </outbound>
-        </custom-service>
+        </service>
 
         <service name="TestServer">
             <inbound>
-                <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector" synchronous="true"/>
             </inbound>
             <test:component>
                 <test:return-data>Here's your content.</test:return-data>

@@ -11,13 +11,13 @@ package org.mule.registry;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.registry.InjectProcessor;
+import org.mule.api.registry.PreInitProcessor;
 
 /**
  * Will register any {@link org.mule.api.context.notification.ServerNotificationListener} instances with the MuleContext
  * to receive notifications
  */
-public class NotificationListenersProcessor implements InjectProcessor
+public class NotificationListenersProcessor implements PreInitProcessor
 {
     private MuleContext context;
 

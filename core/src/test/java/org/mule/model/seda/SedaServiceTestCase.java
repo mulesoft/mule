@@ -75,10 +75,19 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
         Mock mockTransactionalQueueManager = new Mock(QueueManager.class);
         mockTransactionalQueueManager.expect("toString");
-        mockTransactionalQueueManager.expect("toString");
         mockTransactionalQueueManager.expect("setQueueConfiguration", new FullConstraintMatcher(
             C.eq(queueName), C.eq(new QueueConfiguration(capacity, persistent))));
+         mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
         mockTransactionalQueueManager.expectAndReturn("getQueueSession", queueManager.getQueueSession());
+        mockTransactionalQueueManager.expectAndReturn("getQueueSession", queueManager.getQueueSession());
+        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
+        mockTransactionalQueueManager.expect("start");
+        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
+        mockTransactionalQueueManager.expect("stop");
+        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
+        mockTransactionalQueueManager.expect("dispose");
+        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
+        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
 
         // Replace queueManager instance with mock via registry as it cannot be set
         // once muleContext is initialized.

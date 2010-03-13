@@ -41,7 +41,8 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
-import org.mule.lifecycle.GenericLifecycleManager;
+import org.mule.lifecycle.DefaultLifecyclePair;
+import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
@@ -68,7 +69,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     
     protected MuleConfiguration config;
 
-    protected LifecycleManager lifecycleManager;
+    protected MuleContextLifecycleManager lifecycleManager;
 
     protected WorkManager workManager;
 
@@ -117,7 +118,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     public void setLifecycleManager(LifecycleManager lifecycleManager)
     {
-        this.lifecycleManager = lifecycleManager;
+        this.lifecycleManager = (MuleContextLifecycleManager)lifecycleManager;
     }
     
     protected MuleConfiguration getMuleConfiguration()
@@ -132,7 +133,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
     }
 
-    protected LifecycleManager getLifecycleManager()
+    protected MuleContextLifecycleManager getLifecycleManager()
     {
         if (lifecycleManager != null)
         {
@@ -140,11 +141,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            LifecycleManager lifecycleManager = new GenericLifecycleManager();
-            lifecycleManager.registerLifecycle(new MuleContextInitialisePhase());
-            lifecycleManager.registerLifecycle(new MuleContextStartPhase());
-            lifecycleManager.registerLifecycle(new MuleContextStopPhase());
-            lifecycleManager.registerLifecycle(new MuleContextDisposePhase());
+            MuleContextLifecycleManager lifecycleManager = new MuleContextLifecycleManager();
+            //lifecycleManager.registerLifecycle(new NotInLifecyclePhase(), "c");
+            lifecycleManager.registerLifecycle(new DefaultLifecyclePair(new MuleContextInitialisePhase(), new MuleContextDisposePhase()));
+            lifecycleManager.registerLifecycle(new DefaultLifecyclePair(new MuleContextStartPhase(), new MuleContextStopPhase()));
             return lifecycleManager;
         }
     }

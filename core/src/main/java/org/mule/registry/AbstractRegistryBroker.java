@@ -10,6 +10,9 @@
 
 package org.mule.registry;
 
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
@@ -25,19 +28,40 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 {
     public void initialise() throws InitialisationException
     {
-        Iterator it = getRegistries().iterator();
-        while (it.hasNext())
+        try
         {
-            ((Registry) it.next()).initialise();
+            fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (InitialisationException e)
+        {
+            throw e;
+        }
+        catch (MuleException me)
+        {
+            throw new InitialisationException(me, this);
         }
     }
 
     public void dispose()
     {
-        Iterator it = getRegistries().iterator();
-        while (it.hasNext())
+        for (Registry registry : getRegistries())
         {
-            ((Registry) it.next()).dispose();
+            try
+            {
+                registry.fireLifecycle(Disposable.PHASE_NAME);
+            }
+            catch (MuleException e)
+            {
+                //ignore
+            }
+        }
+    }
+
+    public void fireLifecycle(String phase) throws MuleException
+    {
+        for (Registry registry : getRegistries())
+        {
+            registry.fireLifecycle(phase);
         }
     }
 

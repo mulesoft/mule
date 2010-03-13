@@ -40,7 +40,11 @@ public interface MuleRegistry extends Registry
      *
      * @see Registry#registerObject(String, Object, Object)
      */
-    String LIFECYCLE_BYPASS_FLAG = "LIFECYCLE_BYPASS_FLAG";
+    public static final int LIFECYCLE_BYPASS_FLAG = 0x01;
+
+    public static final int INJECT_BYPASS_FLAG = 0x02;
+
+    public static final int PRE_INIT_BYPASS_FLAG = 0x04;
 
     // /////////////////////////////////////////////////////////////////////////
     // Lookup methods - these should NOT create a new object, only return existing ones

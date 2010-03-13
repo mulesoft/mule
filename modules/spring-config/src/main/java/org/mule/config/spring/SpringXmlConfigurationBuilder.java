@@ -92,7 +92,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         {
             if (applicationContext instanceof ConfigurableApplicationContext)
             {
-                registry = new SpringRegistry((ConfigurableApplicationContext) applicationContext, parentContext);
+                registry = new SpringRegistry((ConfigurableApplicationContext) applicationContext, parentContext, muleContext);
             }
             else
             {
@@ -101,7 +101,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         }
         else
         {
-            registry = new SpringRegistry(applicationContext);
+            registry = new SpringRegistry(applicationContext, muleContext);
         }
 
         // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
@@ -115,7 +115,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // If the MuleContext is started, start all objects in the new Registry.
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
         {
-            lifecycleManager.applyPhase(registry, Startable.PHASE_NAME);
+            lifecycleManager.fireLifecycle(registry, Startable.PHASE_NAME);
         }
     }
     

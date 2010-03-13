@@ -54,7 +54,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,6 +97,11 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public void dispose()
     {
         transformerListCache.clear();
+    }
+
+    public void fireLifecycle(String phase) throws MuleException
+    {
+        registry.fireLifecycle(phase);
     }
 
     /**
@@ -541,7 +545,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      */
     public Object applyProcessors(Object object) throws MuleException
     {
-        return registry.getTransientRegistry().applyProcessors(object);
+        return registry.getTransientRegistry().applyProcessors(object, null);
     }
 
     /**

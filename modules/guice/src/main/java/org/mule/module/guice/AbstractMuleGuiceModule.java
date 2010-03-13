@@ -135,7 +135,7 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
             }
             catch (Exception e)
             {
-                throw new MuleRuntimeException(GuiceMessages.failedToRegisterOBjectWithMule(o.getClass()));
+                throw new MuleRuntimeException(GuiceMessages.failedToRegisterOBjectWithMule(o.getClass()), e);
             }
         }
     }
