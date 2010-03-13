@@ -29,7 +29,7 @@ public class VersionWrapper implements WrapperListener
         catch (Exception e)
         {
             e.printStackTrace();
-            return new Integer(1);
+            return Integer.valueOf(1);
         }
         return null;
     }

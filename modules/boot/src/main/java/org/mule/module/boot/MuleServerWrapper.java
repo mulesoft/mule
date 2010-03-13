@@ -65,7 +65,7 @@ public class MuleServerWrapper implements WrapperListener
         catch (Exception e)
         {
             e.printStackTrace();
-            return 1;
+            return Integer.valueOf(1);
         }
     }
 
