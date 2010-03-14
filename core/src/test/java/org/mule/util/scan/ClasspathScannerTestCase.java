@@ -29,7 +29,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
 
     //This is slow
-    public void testInterfaceScanClasspathAndJars() throws Exception
+    public void testSearchInterfaceScanClasspathAndJars() throws Exception
     {
         ClasspathScanner s = new ClasspathScanner("org");
         Set<Class> set = s.scanFor(Fruit.class);
@@ -37,11 +37,25 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(Apple.class));
         assertTrue(set.contains(RedApple.class));
         assertTrue(set.contains(BloodOrange.class));
-        assertTrue(set.contains(OrangeInterface.class));
+        assertFalse(set.contains(OrangeInterface.class));
         assertTrue(set.contains(Orange.class));
         assertTrue(set.contains(Grape.class));
         assertTrue(set.contains(SeedlessGrape.class));
     }
+
+    public void testSearchInterfaceScanClasspathAndJarsWithInterfaceFlag() throws Exception
+        {
+            ClasspathScanner s = new ClasspathScanner("org/mule");
+            Set<Class> set = s.scanFor(Fruit.class, ClasspathScanner.INCLUDE_INTERFACE);
+
+            assertTrue(set.contains(Apple.class));
+            assertTrue(set.contains(RedApple.class));
+            assertTrue(set.contains(BloodOrange.class));
+            assertTrue(set.contains(OrangeInterface.class));
+            assertTrue(set.contains(Orange.class));
+            assertTrue(set.contains(Grape.class));
+            assertTrue(set.contains(SeedlessGrape.class));
+        }
 
     //This will be a lot more efficient
     public void testInterfaceScanClasspathAndJarsMultipleBasePaths() throws Exception
@@ -52,7 +66,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(Apple.class));
         assertTrue(set.contains(RedApple.class));
         assertTrue(set.contains(BloodOrange.class));
-        assertTrue(set.contains(OrangeInterface.class));
+        assertFalse(set.contains(OrangeInterface.class));
         assertTrue(set.contains(Orange.class));
         assertTrue(set.contains(Grape.class));
         assertTrue(set.contains(SeedlessGrape.class));

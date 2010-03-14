@@ -36,17 +36,19 @@ import java.util.Set;
  * classpath for any modules that implement {@link Module}. The basepath is a path on the classpath.
  * Note for better performance, any basepath set should be qualified to your application. For example, if your application
  * has a package com.mycompany.app, its better to set the base path to 'com/mycompany/app' over 'com/' or '/' since they will
- * seach everything on the classpath that matches the specified package.
+ * search everything on the classpath that matches the specified package.
  */
 public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    private String basepath = "";
+    public static final String DEFAULT_PACKAGE = "";
 
-    private Module[] modules = null;
+    protected String basepath = DEFAULT_PACKAGE;
 
-    private Stage stage;
+    protected Module[] modules = null;
 
-    private ClassLoader classLoader;
+    protected Stage stage;
+
+    protected ClassLoader classLoader;
 
     public GuiceConfigurationBuilder()
     {
@@ -95,9 +97,6 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             ClasspathScanner scanner = new ClasspathScanner(classLoader, new String[]{basepath});
             Set<Class> classes = scanner.scanFor(Module.class);
             Set<Class> factories = scanner.scanFor(GuiceModuleFactory.class);
-
-            //TODO add the ability to do excludes
-            classes.remove(AbstractMuleGuiceModule.class);
 
             if (classes.size() == 0 && factories.size() == 0)
             {

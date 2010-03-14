@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -45,11 +46,18 @@ import org.objectweb.asm.ClassReader;
  * <li>{@link ImplementationClassScanner} - will search for all classes that extend a base type</li>
  * <li>{@link AnnotationsScanner} - will searhc for classes with specific annotations, this can also seach for meta annotations</li>
  * </ul>
- * This scanner uses ASM to search class byte code rather than the classes themselves making orders of magnitude more performant and uses a lot less memory. ASM is the fasted of the
- * byte code manipulation libraries i.e. JavaAssist or BCEL
+ * This scanner uses ASM to search class byte code rather than the classes themselves making orders of magnitude better performance
+ *  and uses a lot less memory. ASM seems to be the fasted of the byte code manipulation libraries i.e. JavaAssist or BCEL
+ * Note that the scanner will not scan inner or anonymous classes.
  */
 public class ClasspathScanner
 {
+    public static final int INCLUDE_ABSTRACT = 0x01;
+    public static final int INCLUDE_INTERFACE = 0x02;
+    public static final int INCLUDE_INNER = 0x04;
+    public static final int INCLUDE_ANONYMOUS = 0x08;
+
+    public static final int DEFAULT_FLAGS = 0x0;
     /**
      * logger used by this class
      */
@@ -72,6 +80,11 @@ public class ClasspathScanner
 
     public Set<Class> scanFor(Class clazz) throws IOException
     {
+        return scanFor(clazz, DEFAULT_FLAGS);
+    }
+
+    public Set<Class> scanFor(Class clazz, int flags) throws IOException
+    {
         Set<Class> classes = new HashSet<Class>();
 
         for (int i = 0; i < basepaths.length; i++)
@@ -84,11 +97,11 @@ public class ClasspathScanner
                 URL url = urls.nextElement();
                 if (url.getProtocol().equalsIgnoreCase("file"))
                 {
-                    classes.addAll(processFileUrl(url, basepath, clazz));
+                    classes.addAll(processFileUrl(url, basepath, clazz, flags));
                 }
                 else if (url.getProtocol().equalsIgnoreCase("jar"))
                 {
-                    classes.addAll(processJarUrl(url, basepath, clazz));
+                    classes.addAll(processJarUrl(url, basepath, clazz, flags));
                 }
                 else
                 {
@@ -99,7 +112,7 @@ public class ClasspathScanner
         return classes;
     }
 
-    protected Set<Class> processJarUrl(URL url, String basepath, Class clazz) throws IOException
+    protected Set<Class> processJarUrl(URL url, String basepath, Class clazz, int flags) throws IOException
     {
         Set<Class> set = new HashSet<Class>();
         String path = url.getFile().substring(5, url.getFile().indexOf("!"));
@@ -115,8 +128,8 @@ public class ClasspathScanner
                 try
                 {
                     String name = entry.getName();
-                    //Ignore anonymous
-                    if (name.matches("\\$[1-9]"))
+                    //Ignore anonymous and inner classes
+                    if (name.contains("$") && !hasFlag(flags, INCLUDE_INNER))
                     {
                         continue;
                     }
@@ -129,11 +142,7 @@ public class ClasspathScanner
                     reader.accept(visitor, 0);
                     if (visitor.isMatch())
                     {
-                        Class c = loadClass(visitor.getClassName());
-                        if (c != null)
-                        {
-                            set.add(c);
-                        }
+                        addClassToSet(loadClass(visitor.getClassName()), set, flags);
                     }
                 }
                 catch (Exception e)
@@ -151,7 +160,12 @@ public class ClasspathScanner
         return set;
     }
 
-    protected Set<Class> processFileUrl(URL url, String basepath, Class clazz) throws IOException
+    protected boolean hasFlag(int flags, int flag)
+    {
+        return (flags & flag) != 0;
+    }
+
+    protected Set<Class> processFileUrl(URL url, String basepath, Class clazz, int flags) throws IOException
     {
         Set<Class> set = new HashSet<Class>();
         String urlBase = url.getFile();
@@ -169,6 +183,11 @@ public class ClasspathScanner
         {
             try
             {
+                //Ignore anonymous and inner classes
+                if (file.getName().contains("$") && !hasFlag(flags, INCLUDE_INNER))
+                {
+                    continue;
+                }
                 InputStream classStream = new FileInputStream(file);
                 ClassReader reader = new ClosableClassReader(classStream);
 
@@ -176,11 +195,7 @@ public class ClasspathScanner
                 reader.accept(visitor, 0);
                 if (visitor.isMatch())
                 {
-                    Class c = loadClass(visitor.getClassName());
-                    if (c != null)
-                    {
-                        set.add(c);
-                    }
+                    addClassToSet(loadClass(visitor.getClassName()), set, flags);
                 }
             }
             catch (IOException e)
@@ -193,6 +208,28 @@ public class ClasspathScanner
             }
         }
         return set;
+    }
+
+    protected void addClassToSet(Class c, Set<Class> set, int flags)
+    {
+        if (c != null)
+        {
+            synchronized (set)
+            {
+                if(c.isInterface())
+                {
+                    if(hasFlag(flags, INCLUDE_INTERFACE)) set.add(c);
+                }
+                else if(Modifier.isAbstract(c.getModifiers()))
+                {
+                    if(hasFlag(flags, INCLUDE_ABSTRACT)) set.add(c);
+                }
+                else
+                {
+                    set.add(c);
+                }
+            }
+        }
     }
 
     protected Class loadClass(String name)
