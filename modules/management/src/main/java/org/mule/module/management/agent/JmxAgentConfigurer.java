@@ -51,6 +51,7 @@ public class JmxAgentConfigurer implements MuleContextAware
     private MBeanServer mBeanServer;
     private Map connectorServerProperties = null;
     private boolean enableStatistics = true;
+    private boolean createRmiRegistry = true;
 
     /**
      * Username/password combinations for JMX Remoting authentication.
@@ -186,13 +187,23 @@ public class JmxAgentConfigurer implements MuleContextAware
         }
     }
 
+    public boolean isCreateRmiRegistry()
+    {
+        return createRmiRegistry;
+    }
+
+    public void setCreateRmiRegistry(boolean createRmiRegistry)
+    {
+        this.createRmiRegistry = createRmiRegistry;
+    }
+
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
         try
         {
-            // by the time mule contextis injected, other attributes will have been set already
-            JmxAgent agent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+            // by the time mule context is injected, other attributes will have been set already
+            JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
             // in case it is injected, otherwise will follow the init logic
             if (getMBeanServer() != null)
             {
@@ -210,6 +221,7 @@ public class JmxAgentConfigurer implements MuleContextAware
             agent.setCreateServer(isCreateServer());
             agent.setLocateServer(isLocateServer());
             agent.setEnableStatistics(isEnableStatistics());
+            agent.setCreateRmiRegistry(isCreateRmiRegistry());
         }
         catch (RegistrationException e)
         {

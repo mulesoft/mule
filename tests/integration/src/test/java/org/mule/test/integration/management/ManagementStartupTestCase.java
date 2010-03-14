@@ -24,7 +24,7 @@ public class ManagementStartupTestCase extends FunctionalTestCase
 
     public void testAgentConfiguration() throws MuleException
     {
-        JmxAgent agent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+        JmxAgent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
         assertNotNull(agent);
         assertNotNull(agent.getConnectorServerUrl());
         assertEquals("service:jmx:rmi:///jndi/rmi://0.0.0.0:1100/server", agent.getConnectorServerUrl());
