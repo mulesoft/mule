@@ -20,8 +20,6 @@ import org.mule.config.i18n.CoreMessages;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -90,28 +88,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
             if (targets.size() == 0)
             {
                 continue;
-            }
-            
-            // TODO MULE-3180: get the comparator from somewhere (the registry?) and only do the comparison here
-            if (lo.getType().getName().indexOf("Agent") > -1)
-            {
-                Collections.sort(targets, new Comparator()
-                {
-                    public int compare(Object o1, Object o2)
-                    {
-                        String name1 = o1.getClass().getName();
-                        String name2 = o2.getClass().getName();
-                        if (name1.indexOf("RmiRegistryAgent") > -1)
-                        {
-                            return -1;
-                        }
-                        else if (name2.indexOf("RmiRegistryAgent") > -1)
-                        {
-                            return 1;
-                        }
-                        return 0;
-                    }                    
-                });
             }
             
             lo.firePreNotification(muleContext);
@@ -277,7 +253,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
         }
     }

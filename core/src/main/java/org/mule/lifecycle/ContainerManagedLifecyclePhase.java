@@ -27,6 +27,7 @@ public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
     public void applyLifecycle(Registry registry) throws MuleException
     {
         //The container manages this lifecycle
+        //Initialise is usually handled when the registry is created by the configurationBuilder
         return;
     }
 }

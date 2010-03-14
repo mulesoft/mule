@@ -9,9 +9,11 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.registry.Registry;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 
 /**
@@ -25,5 +27,12 @@ public class ContainerManagedDisposePhase extends ContainerManagedLifecyclePhase
         registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
         //You can dispose from all phases
         registerSupportedPhase(LifecyclePhase.ALL_PHASES);
+    }
+
+    @Override
+    public void applyLifecycle(Registry registry) throws MuleException
+    {
+        //delegate to the container registry
+        registry.dispose();
     }
 }
