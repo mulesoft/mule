@@ -60,7 +60,7 @@ public class DirectBindAnnotationProcessor extends AbstractAnnotationProcessor
                 {
                     Bind binding = field.getAnnotation(Bind.class);
 
-                    AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.OutIn);
+                    AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.OutIn, binding);
                     epd.setConnectorName(binding.connector());
                     epd.setAddress(binding.uri());
 
@@ -79,7 +79,7 @@ public class DirectBindAnnotationProcessor extends AbstractAnnotationProcessor
                             }
                         }
                     }
-                    router.setEndpoint(builder.processEndpoint(epd));
+                    router.setEndpoint(helper.processEndpoint(epd));
 
                     field.setAccessible(true);
                     field.set(object, router.createProxy(object));

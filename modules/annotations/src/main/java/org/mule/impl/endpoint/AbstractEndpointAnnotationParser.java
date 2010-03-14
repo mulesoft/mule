@@ -38,24 +38,24 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
         this.muleContext = context;
     }
 
-    protected AnnotatedEndpointBuilder getEndpointBuilder() throws MuleException
+    protected AnnotatedEndpointHelper getEndpointHelper() throws MuleException
     {
-        AnnotatedEndpointBuilder builder = muleContext.getRegistry().lookupObject(AnnotatedEndpointBuilder.class);
-        if (builder == null)
+        AnnotatedEndpointHelper helper = muleContext.getRegistry().lookupObject(AnnotatedEndpointHelper.class);
+        if (helper == null)
         {
-            builder = new AnnotatedEndpointBuilder(muleContext);
+            helper = new AnnotatedEndpointHelper(muleContext);
         }
-        return builder;
+        return helper;
     }
 
     public OutboundEndpoint parseOutboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException
     {
-        return (OutboundEndpoint) getEndpointBuilder().processEndpoint(createEndpointData(annotation));
+        return (OutboundEndpoint) getEndpointHelper().processEndpoint(createEndpointData(annotation));
     }
 
     public InboundEndpoint parseInboundEndpoint(Annotation annotation, Map metaInfo) throws MuleException
     {
-        return (InboundEndpoint) getEndpointBuilder().processEndpoint(createEndpointData(annotation));
+        return (InboundEndpoint) getEndpointHelper().processEndpoint(createEndpointData(annotation));
     }
 
     public boolean supports(Annotation annotation, Class clazz, Member member)
@@ -89,7 +89,7 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
         {
             return null;
         }
-        Object o = muleContext.getRegistry().lookupObject(location + ".builder");
+        Object o = muleContext.getRegistry().lookupObject(location + ".helper");
         if (o == null)
         {
             o = muleContext.getRegistry().lookupObject(location);

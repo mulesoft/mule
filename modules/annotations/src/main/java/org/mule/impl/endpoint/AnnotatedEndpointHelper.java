@@ -30,12 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This is a wrapper builder that can process {@link AnnotatedEndpointData} objects (Annotaiton config data)
+ * This is a wrapper helper that can process {@link AnnotatedEndpointData} objects (Annotaiton config data)
  * and turn them into {@link org.mule.api.endpoint.EndpointBuilder} or {@link org.mule.api.endpoint.ImmutableEndpoint} objects.
  * <p/>
  * THis is an internal class that should only be used by the Annotation parser code.
  */
-public class AnnotatedEndpointBuilder
+public class AnnotatedEndpointHelper
 {
     protected TemplateParser parser = TemplateParser.createAntStyleParser();
 
@@ -43,7 +43,7 @@ public class AnnotatedEndpointBuilder
     protected MuleContext muleContext;
     protected TransportFactory transportFactory;
 
-    public AnnotatedEndpointBuilder(MuleContext muleContext) throws MuleException
+    public AnnotatedEndpointHelper(MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
         this.transportFactory = new ConfigurableTransportFactory(muleContext);

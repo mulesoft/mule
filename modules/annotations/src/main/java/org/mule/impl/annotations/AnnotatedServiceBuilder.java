@@ -34,8 +34,8 @@ import org.mule.config.annotations.endpoints.Reply;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.config.annotations.routing.Router;
 import org.mule.config.annotations.routing.RouterType;
-import org.mule.impl.endpoint.AnnotatedEndpointBuilder;
 import org.mule.impl.endpoint.AnnotatedEndpointData;
+import org.mule.impl.endpoint.AnnotatedEndpointHelper;
 import org.mule.impl.endpoint.MEP;
 import org.mule.impl.registry.RegistryMap;
 import org.mule.model.seda.SedaService;
@@ -70,7 +70,7 @@ public class AnnotatedServiceBuilder
     private Model model;
     private final TemplateParser parser = TemplateParser.createAntStyleParser();
     protected RegistryMap regProps;
-    protected AnnotatedEndpointBuilder builder;
+    protected AnnotatedEndpointHelper helper;
     protected AnnotationsParserFactory parserFactory;
 
     public Model getModel()
@@ -89,7 +89,7 @@ public class AnnotatedServiceBuilder
 
         this.context = context;
         this.regProps = new RegistryMap(context.getRegistry());
-        this.builder = new AnnotatedEndpointBuilder(context);
+        this.helper = new AnnotatedEndpointHelper(context);
         this.parserFactory = context.getRegistry().lookupObject(AnnotationsParserFactory.class);
         assert parserFactory != null;
     }
@@ -369,7 +369,7 @@ public class AnnotatedServiceBuilder
             {
                 Bind binding = field.getAnnotation(Bind.class);
 
-                AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.OutIn);
+                AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.OutIn, binding);
                 epd.setConnectorName(binding.connector());
                 epd.setAddress(binding.uri());
 
@@ -388,7 +388,7 @@ public class AnnotatedServiceBuilder
                         }
                     }
                 }
-                router.setEndpoint(builder.processEndpoint(epd));
+                router.setEndpoint(helper.processEndpoint(epd));
                 ((JavaComponent) service.getComponent()).getBindingCollection().addRouter(router);
             }
         }

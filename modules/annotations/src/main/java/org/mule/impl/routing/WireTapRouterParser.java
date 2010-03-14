@@ -17,8 +17,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.Router;
 import org.mule.config.annotations.converters.PropertiesConverter;
 import org.mule.config.annotations.routing.WireTap;
-import org.mule.impl.endpoint.AnnotatedEndpointBuilder;
 import org.mule.impl.endpoint.AnnotatedEndpointData;
+import org.mule.impl.endpoint.AnnotatedEndpointHelper;
 import org.mule.impl.endpoint.MEP;
 
 import java.lang.annotation.Annotation;
@@ -32,14 +32,14 @@ import java.util.Map;
 public class WireTapRouterParser implements RouterAnnotationParser, MuleContextAware
 {
     protected MuleContext muleContext;
-    private AnnotatedEndpointBuilder builder;
+    private AnnotatedEndpointHelper helper;
 
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
         try
         {
-            this.builder = new AnnotatedEndpointBuilder(muleContext);
+            this.helper = new AnnotatedEndpointHelper(muleContext);
         }
         catch (MuleException e)
         {
@@ -51,7 +51,7 @@ public class WireTapRouterParser implements RouterAnnotationParser, MuleContextA
     {
         WireTap wireTap = (WireTap) annotation;
 
-        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly);
+        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly, wireTap);
         epd.setEncoding(wireTap.encoding());
         epd.setProperties((Map) new PropertiesConverter().convert(wireTap.properties(), muleContext));
         epd.setConnectorName(wireTap.connectorName());
@@ -59,7 +59,7 @@ public class WireTapRouterParser implements RouterAnnotationParser, MuleContextA
         epd.setFilter(wireTap.filter());
         epd.setTransformers(wireTap.transformers());
         org.mule.routing.inbound.WireTap wireTapRouter = new org.mule.routing.inbound.WireTap();
-        OutboundEndpoint endpoint = (OutboundEndpoint) builder.processEndpoint(epd);
+        OutboundEndpoint endpoint = (OutboundEndpoint) helper.processEndpoint(epd);
         wireTapRouter.setEndpoint(endpoint);
         return wireTapRouter;
     }

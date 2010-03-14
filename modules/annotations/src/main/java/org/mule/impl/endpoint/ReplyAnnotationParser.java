@@ -29,7 +29,7 @@ public class ReplyAnnotationParser extends AbstractEndpointAnnotationParser impl
     protected AnnotatedEndpointData createEndpointData(Annotation annotation) throws MuleException
     {
         Reply reply = (Reply) annotation;
-        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly);
+        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly, reply);
         epd.setConnectorName(reply.connector());
         epd.setAddress(reply.uri());
         epd.setFilter(reply.filter());

@@ -21,6 +21,8 @@ import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.annotations.processors.AnnotatedServiceObjectProcessor;
 import org.mule.impl.annotations.processors.DirectBindAnnotationProcessor;
+import org.mule.impl.annotations.processors.InjectAnnotationProcessor;
+import org.mule.impl.annotations.processors.NamedAnnotationProcessor;
 import org.mule.impl.concept.SplitterRouterParser;
 import org.mule.impl.expression.parsers.BeanAnnotationParser;
 import org.mule.impl.expression.parsers.CustomEvaluatorAnnotationParser;
@@ -54,27 +56,16 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
 
     protected MuleContext muleContext;
 
-    protected List<EndpointAnnotationParser> endpointParsers = new ArrayList<EndpointAnnotationParser>();
-    protected List<ExpressionParser> expressionParsers = new ArrayList<ExpressionParser>();
-    protected List<RouterAnnotationParser> routerParsers = new ArrayList<RouterAnnotationParser>();
-    protected List<ObjectProcessor> processors = new ArrayList<ObjectProcessor>();
+    private List<EndpointAnnotationParser> endpointParsers = new ArrayList<EndpointAnnotationParser>();
+    private List<ExpressionParser> expressionParsers = new ArrayList<ExpressionParser>();
+    private List<RouterAnnotationParser> routerParsers = new ArrayList<RouterAnnotationParser>();
+    private List<ObjectProcessor> processors = new ArrayList<ObjectProcessor>();
 
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
         addDefaultParsers();
-
-        for (ObjectProcessor processor : getProcessors())
-        {
-            try
-            {
-                muleContext.getRegistry().registerObject("_" + processor.getClass().getSimpleName(), processor, ObjectProcessor.class);
-            }
-            catch (RegistrationException e)
-            {
-                logger.warn(e.getMessage(), e);
-            }
-        }
+        addDefaultProcessors();
     }
 
     protected void addDefaultParsers()
@@ -98,10 +89,15 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         registerExpressionParser(new BeanAnnotationParser());
         registerExpressionParser(new OgnlAnnotationParser());
         registerExpressionParser(new GroovyAnnotationParser());
+    }
 
+    protected void addDefaultProcessors()
+    {
         //Processors
-        processors.add(new AnnotatedServiceObjectProcessor());
-        processors.add(new DirectBindAnnotationProcessor());
+        registerObjectProcessor(new AnnotatedServiceObjectProcessor());
+        registerObjectProcessor(new DirectBindAnnotationProcessor());
+        registerObjectProcessor(new InjectAnnotationProcessor());//Add support for JSR-330
+        registerObjectProcessor(new NamedAnnotationProcessor());//Add support for JSR-330
     }
 
 
@@ -182,6 +178,19 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         catch (RegistrationException e)
         {
             throw new MuleRuntimeException(CoreMessages.failedToCreate(parser.getClass().getName()), e);
+        }
+    }
+
+    protected void registerObjectProcessor(ObjectProcessor processor)
+    {
+        try
+        {
+            muleContext.getRegistry().registerObject("_" + processor.getClass().getSimpleName(), processor);
+            processors.add(processor);
+        }
+        catch (RegistrationException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToCreate(processor.getClass().getName()), e);
         }
     }
 

@@ -13,6 +13,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.annotations.endpoints.ChannelType;
 import org.mule.util.StringUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,10 +37,12 @@ public class AnnotatedEndpointData
     private Connector connector;
     private MEP mep;
     private ChannelType type;
+    private Annotation annotation;
 
-    public AnnotatedEndpointData(MEP mep)
+    public AnnotatedEndpointData(MEP mep, Annotation annotation)
     {
         this.mep = mep;
+        this.annotation = annotation;
         this.type = (mep == MEP.InOnly || mep == MEP.InOptionalOut || mep == MEP.InOut ? ChannelType.Inbound : ChannelType.Outbound);
         if (this.type == ChannelType.Inbound)
         {
@@ -128,6 +131,11 @@ public class AnnotatedEndpointData
         this.encoding = emptyToNull(encoding);
     }
 
+    public Annotation getAnnotation()
+    {
+        return annotation;
+    }
+
     public void setProperties(Map properties)
     {
         if (properties == null)
@@ -175,6 +183,8 @@ public class AnnotatedEndpointData
     {
         return mep;
     }
+
+
 
     public void setMEPUsingMethod(Method method, boolean inbound)
     {

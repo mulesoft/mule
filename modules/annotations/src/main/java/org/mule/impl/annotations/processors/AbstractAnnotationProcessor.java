@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.PreInitProcessor;
-import org.mule.impl.endpoint.AnnotatedEndpointBuilder;
+import org.mule.impl.endpoint.AnnotatedEndpointHelper;
 import org.mule.impl.registry.RegistryMap;
 import org.mule.util.TemplateParser;
 
@@ -24,7 +24,7 @@ import org.mule.util.TemplateParser;
 public abstract class AbstractAnnotationProcessor implements PreInitProcessor, MuleContextAware
 {
     protected MuleContext context;
-    protected AnnotatedEndpointBuilder builder;
+    protected AnnotatedEndpointHelper helper;
     private final TemplateParser parser = TemplateParser.createAntStyleParser();
     protected RegistryMap regProps;
 
@@ -34,7 +34,7 @@ public abstract class AbstractAnnotationProcessor implements PreInitProcessor, M
         regProps = new RegistryMap(context.getRegistry());
         try
         {
-            builder = new AnnotatedEndpointBuilder(context);
+            helper = new AnnotatedEndpointHelper(context);
         }
         catch (MuleException e)
         {
