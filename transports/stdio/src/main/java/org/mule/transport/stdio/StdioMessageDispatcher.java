@@ -62,7 +62,6 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
                 event.getMessage(), event.getEndpoint());
         }
 
-        // TODO - remove this ugliness
         if (connector instanceof PromptStdioConnector)
         {
             PromptStdioConnector ssc = (PromptStdioConnector)connector;
@@ -72,16 +71,7 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        Object data = event.transformMessage();
-        if (data instanceof byte[])
-        {
-            out.write((byte[])data);
-        }
-        else
-        {
-            out.write(data.toString().getBytes());
-        }
-
+        out.write(event.getMessageAsBytes());
         out.flush();
     }
 
@@ -89,27 +79,6 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return event.getMessage();
+        return null;
     }
-
-    @Override
-    protected void doDispose()
-    {
-        // template method
-    }
-
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // template method
-    }
-
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // template method
-    }
-
-
-
 }
