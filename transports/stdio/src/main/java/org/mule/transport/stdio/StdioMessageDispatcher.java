@@ -71,7 +71,16 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        out.write(event.getMessageAsBytes());
+        Object data = event.transformMessage();
+        if (data instanceof byte[])
+        {
+            out.write((byte[])data);
+        }
+        else
+        {
+            out.write(data.toString().getBytes());
+        }
+
         out.flush();
     }
 
@@ -79,6 +88,6 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return null;
+        return event.getMessage();
     }
 }
