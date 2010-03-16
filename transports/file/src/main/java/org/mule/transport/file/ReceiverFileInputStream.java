@@ -45,7 +45,7 @@ class ReceiverFileInputStream extends FileInputStream
 
         if (moveToOnClose != null)
         {
-            FileUtils.moveFile(currentFile, moveToOnClose);
+            FileUtils.moveFileWithCopyFallback(currentFile, moveToOnClose);
         }
         else if (deleteOnClose)
         {
