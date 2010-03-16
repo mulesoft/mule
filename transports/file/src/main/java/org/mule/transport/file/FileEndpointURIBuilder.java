@@ -24,6 +24,7 @@ import java.util.Properties;
 
 public class FileEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
+    @Override
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         address = uri.getSchemeSpecificPart();
@@ -37,6 +38,5 @@ public class FileEndpointURIBuilder extends AbstractEndpointURIBuilder
         {
             address = address.substring(0, i);
         }
-
     }
 }

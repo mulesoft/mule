@@ -46,6 +46,7 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
         this.getPayload();
     }
 
+    @Override
     public Object getPayload()
     {
         if (contents == null)
@@ -74,6 +75,7 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
         return contents;
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new FileContentsMessageAdapter(this);

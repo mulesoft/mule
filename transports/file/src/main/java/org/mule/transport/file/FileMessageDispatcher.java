@@ -47,6 +47,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         Object data = event.transformMessage();
@@ -146,25 +147,28 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
         return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
     }
 
+    @Override
     protected void doDispose()
     {
         // no op
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // no op
     }
-
 }

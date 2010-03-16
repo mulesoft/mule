@@ -21,10 +21,9 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
  */
 public class FileMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-    /** {@inheritDoc} */
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new FileMessageDispatcher(endpoint);
     }
-
 }

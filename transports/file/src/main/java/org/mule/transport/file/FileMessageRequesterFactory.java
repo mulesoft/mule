@@ -20,10 +20,9 @@ import org.mule.transport.AbstractMessageRequesterFactory;
  */
 public class FileMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-    /** {@inheritDoc} */
+    @Override
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new FileMessageRequester(endpoint);
     }
-
 }

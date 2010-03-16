@@ -260,6 +260,7 @@ public class FileConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doDispose()
     {
         try
@@ -272,6 +273,7 @@ public class FileConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // MULE-1773: limit the number of dispatchers per endpoint to 1 until
@@ -283,21 +285,25 @@ public class FileConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         if (outputStream != null)
@@ -573,6 +579,7 @@ public class FileConnector extends AbstractConnector
         this.streaming = streaming;
     }
 
+    @Override
     public MessageAdapter getMessageAdapter(Object message) throws MuleException
     {
         if (isStreaming())

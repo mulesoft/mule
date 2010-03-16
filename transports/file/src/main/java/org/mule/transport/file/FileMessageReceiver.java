@@ -92,6 +92,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (readDir != null)
@@ -117,16 +118,19 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDispose()
     {
         // nothing to do
     }
 
+    @Override
     public void poll()
     {
         try
