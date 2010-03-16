@@ -46,10 +46,23 @@ public class PromptStdioConnector extends StdioConnector
         outputStream = System.out;
     }
 
-
     protected void doInitialise() throws InitialisationException
     {
-        // template method, nothing to do
+        // We need to use the same classloder that creates and initalizes this
+        // connector when looking for resources
+        StdioMessageFactory stdioMessageFactory = new StdioMessageFactory(Thread.currentThread()
+            .getContextClassLoader());
+
+        // Load messages from resource bundle if resourceBundle and
+        // promptMessageCode are both set
+        if (StringUtils.isNotBlank(resourceBundle) && StringUtils.isNotBlank(promptMessageCode))
+        {
+            promptMessage = stdioMessageFactory.getString(resourceBundle, promptMessageCode);
+        }
+        if (StringUtils.isNotBlank(resourceBundle) && StringUtils.isNotBlank(outputMessageCode))
+        {
+            outputMessage = stdioMessageFactory.getString(resourceBundle, outputMessageCode);
+        }
     }
 
     protected void doDispose()
@@ -102,11 +115,6 @@ public class PromptStdioConnector extends StdioConnector
      */
     public String getPromptMessage()
     {
-        if (StringUtils.isNotBlank(resourceBundle) && StringUtils.isNotBlank(promptMessageCode))
-        {
-            return StdioMessageFactory.getString(resourceBundle, promptMessageCode);
-        }
-
         return promptMessage;
     }
 
@@ -156,11 +164,6 @@ public class PromptStdioConnector extends StdioConnector
      */
     public String getOutputMessage()
     {
-        if (StringUtils.isNotBlank(resourceBundle) && StringUtils.isNotBlank(outputMessageCode))
-        {
-            return StdioMessageFactory.getString(resourceBundle, outputMessageCode);
-        }
-
         return outputMessage;
     }
 
@@ -243,18 +246,31 @@ public class PromptStdioConnector extends StdioConnector
     }
     
     /**
-     * {@link PromptStdioConnector} needs a way to access other modules' messages. The default
-     * way to access messages is by using {@link MessageFactory} which itself is not meant to be used 
-     * directly. In order not to soften this requiement this private subclass offers access to
-     * {@link MessageFactory}'s methods.
+     * {@link PromptStdioConnector} needs a way to access other modules' messages.
+     * The default way to access messages is by using {@link MessageFactory} which
+     * itself is not meant to be used directly. In order not to soften this
+     * requiement this private subclass offers access to {@link MessageFactory}'s
+     * methods.
      */
     private static class StdioMessageFactory extends MessageFactory
     {
-        private static final StdioMessageFactory factory = new StdioMessageFactory();
-        
-        protected static String getString(String bundlePath, String code)
+        private ClassLoader resourceClassLoader;
+
+        public StdioMessageFactory(ClassLoader classLoader)
         {
-            return factory.getString(bundlePath, Integer.parseInt(code));
+            super();
+            resourceClassLoader = classLoader;
+        }
+
+        protected String getString(String bundlePath, String code)
+        {
+            return super.getString(bundlePath, Integer.parseInt(code));
+        }
+
+        @Override
+        protected ClassLoader getClassLoader()
+        {
+            return resourceClassLoader;
         }
     }
 }
