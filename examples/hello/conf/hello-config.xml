@@ -62,11 +62,11 @@
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
         <service name="GreeterUMO">
-            
+
             <inbound>
                 <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"/>
             </inbound>
-            
+
             <component class="org.mule.example.hello.Greeter"/>
 
             <outbound>
@@ -74,7 +74,7 @@
                     <vm:outbound-endpoint path="chitchatter"/>
                     <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
                 </filtering-router>
-                
+
                 <filtering-router>
                     <vm:outbound-endpoint path="userErrorHandler"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
@@ -92,7 +92,7 @@
             <inbound>
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
             </inbound>
-                
+
             <component class="org.mule.example.hello.ChitChatter"/>
 
             <outbound>
@@ -102,34 +102,34 @@
             </outbound>
 
         </service>
-        
+
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound>
                 <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"/>
             </inbound>
-            
+
             <outbound>
                 <pass-through-router>
                     <stdio:outbound-endpoint system="OUT"/>
                 </pass-through-router>
             </outbound>
         </service>
-                
+
         <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
             <inbound>
                 <vm:inbound-endpoint path="systemErrorHandler"/>
             </inbound>
-                
+
             <outbound>
                 <pass-through-router>
                     <stdio:outbound-endpoint system="ERR"/>
                 </pass-through-router>
             </outbound>
-        </service>        
+        </service>
     </model>
 
 </mule>
