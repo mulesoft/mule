@@ -60,8 +60,7 @@
     
     <file:connector name="FileConnector" 
                     pollingFrequency="1000" 
-                    moveToDirectory="./test-data/out"
-                    outputPattern="[DATE].xml"/>
+                    moveToDirectory="./test-data/out"/>
 
     <!-- 
         All transformers must be declared here to be referenced by their names in the 
