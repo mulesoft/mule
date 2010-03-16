@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.builders.DeployableMuleXmlContextListener;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -107,6 +108,11 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 muleConfiguration.setSystemModelType(JcaModel.JCA_MODEL_TYPE);
                 contextBuilder.setMuleConfiguration(muleConfiguration);
                 muleContext = new DefaultMuleContextFactory().createMuleContext(configBuilder, contextBuilder);
+                
+                // Make single shared application server instance of mule context
+                // available to DeployableMuleXmlContextListener to support hot
+                // deployment of Mule configurations in web applications.
+                DeployableMuleXmlContextListener.setMuleContext(muleContext);
             }
             catch (MuleException e)
             {

@@ -35,7 +35,7 @@ public class DeployableMuleXmlContextListener implements ServletContextListener
     protected transient final Log logger = LogFactory.getLog(DeployableMuleXmlContextListener.class);
 
     private WebappMuleXmlConfigurationBuilder configurationBuilder;
-    private MuleContext muleContext;
+    private static MuleContext muleContext;
 
     public void contextInitialized(ServletContextEvent event)
     {
@@ -61,7 +61,6 @@ public class DeployableMuleXmlContextListener implements ServletContextListener
             }
         }
 
-        muleContext = getMuleContext(context);
         if (muleContext == null)
         {
             throw new RuntimeException("MuleContext is not available");
@@ -106,10 +105,16 @@ public class DeployableMuleXmlContextListener implements ServletContextListener
         }
     }
 
-    protected MuleContext getMuleContext(ServletContext servletContext)
+    /**
+     * This method is to be used only by application server or web container
+     * integrations that allow web applications to be hot-deployed.
+     * 
+     * @param context the single shared muleContext instance that will be used to
+     *            configure mule configurations hot-deployed as web application.
+     */
+    public static void setMuleContext(MuleContext context)
     {
-        // TODO Need to implement a mechanism to look this up from jndi or something;
-        return null;
+        muleContext = context;
     }
 
 }
