@@ -43,15 +43,21 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
 
     public void testContextClassLoaderResourceLookup() throws InitialisationException
     {
-        ClassLoader testClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         PromptStdioConnector connector = new PromptStdioConnector();
         connector.setMuleContext(muleContext);
         connector.setResourceBundle("dummy-messages");
         connector.setPromptMessageCode("1");
         connector.setOutputMessageCode("2");
-        Thread.currentThread().setContextClassLoader(new ContextClassLoaderTestClassLoader());
-        connector.doInitialise();
-        Thread.currentThread().setContextClassLoader(testClassLoader);
+        try
+        {
+            Thread.currentThread().setContextClassLoader(new ContextClassLoaderTestClassLoader());
+            connector.doInitialise();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+        }
 
         assertEquals("Test ContextClassLoader Prompt Message", connector.getPromptMessage());
         assertEquals("Test ContextClassLoader Output Message", connector.getOutputMessage());
