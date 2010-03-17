@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.components;
 
 import org.mule.example.geomail.dao.Sender;
@@ -17,7 +18,6 @@ import org.mule.example.geomail.dao.SenderDao;
  */
 public class SenderCache
 {
-
     private SenderDao senderDao;
 
     public Sender storeSender(Sender sender) throws Exception

@@ -29,7 +29,6 @@ import javax.mail.Message;
  */
 public class Mail implements Callable
 {
-
     public Object onCall(MuleEventContext eventContext) throws Exception {
 
         MuleMessage message = eventContext.getMessage();
@@ -39,32 +38,34 @@ public class Mail implements Callable
         String from = mail.getFrom()[0].toString();
         String[] received = mail.getHeader("Received");
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
 
-        for (int i = received.length - 1; i >= 0; i--) {
-
+        for (int i = received.length - 1; i >= 0; i--) 
+        {
             ReceivedHeader receivedHeader = ReceivedHeader.getInstance(received[i]);
-            if (receivedHeader != null && receivedHeader.getFrom() != null) {
-                if (!receivedHeader.getFrom().startsWith("localhost") && !receivedHeader.getFrom().startsWith("127.0.0.1")) { // Test
+            if (receivedHeader != null && receivedHeader.getFrom() != null) 
+            {
+                if (!receivedHeader.getFrom().startsWith("localhost") && !receivedHeader.getFrom().startsWith("127.0.0.1")) 
+                {
                     String ip = getFromIP(receivedHeader);
 
-                    if (ip != null) {
+                    if (ip != null) 
+                    {
                         list.add(ip);
                     }
                 }
             }
-
         }
 
-        if (list.isEmpty()) {
+        if (list.isEmpty()) 
+        {
             throw new DefaultMuleException("Received e-mail does not provide sender IP information.");
         }
 
-        Map properties = new HashMap();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("from.email.address", from);
 
         MuleMessage result = new DefaultMuleMessage(list, properties, eventContext.getMuleContext());
-
         return result;
     }
 
@@ -73,11 +74,11 @@ public class Mail implements Callable
         String result = null;
 
         Matcher matcher = Pattern.compile(".*\\(.*\\[(.*?)\\]\\)", Pattern.DOTALL).matcher(receivedHeader.getFrom());
-        if (matcher.matches()) {
+        if (matcher.matches()) 
+        {
             result = matcher.group(1);
         }
 
         return result;
     }
-
 }

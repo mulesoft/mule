@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.dao.impl;
 
 import org.mule.example.geomail.dao.Sender;
@@ -19,31 +20,34 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Transactional
 public class SenderDaoImpl implements SenderDao
 {
-
     private EntityManager entityManager;
 
-    public Collection getSenders() {
+    public Collection getSenders()
+    {
         return getEntityManager().createQuery("SELECT sender FROM Sender sender").getResultList();
     }
 
-    public Sender getSender(String senderId) {
+    public Sender getSender(String senderId)
+    {
         return getEntityManager().find(Sender.class, senderId);
     }
 
-    public void addSender(Sender sender) {
+    public void addSender(Sender sender)
+    {
         getEntityManager().persist(sender);
     }
 
-    public EntityManager getEntityManager() {
+    public EntityManager getEntityManager()
+    {
         return entityManager;
     }
 
     @PersistenceContext
-    public void setEntityManager(EntityManager entityManager) {
+    public void setEntityManager(EntityManager entityManager)
+    {
         this.entityManager = entityManager;
     }
 }

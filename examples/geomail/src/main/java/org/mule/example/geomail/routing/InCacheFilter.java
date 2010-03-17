@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.routing;
 
 import org.mule.api.MuleMessage;
@@ -18,30 +19,30 @@ import org.mule.example.geomail.dao.SenderDao;
  */
 public class InCacheFilter implements Filter
 {
-
     private SenderDao senderDao = null;
 
-    public boolean accept(MuleMessage message) {
-
+    public boolean accept(MuleMessage message)
+    {
         boolean result = false;
 
-        String ip = (String) message.getPayload();
+        String ip = (String)message.getPayload();
 
         // If 'ip' is found in DAO, accept it:
-        if (getSenderDao().getSender(ip) != null) {
+        if (getSenderDao().getSender(ip) != null)
+        {
             result = true;
         }
 
         return result;
     }
 
-
-    public SenderDao getSenderDao() {
+    public SenderDao getSenderDao()
+    {
         return senderDao;
     }
 
-    public void setSenderDao(SenderDao senderDao) {
+    public void setSenderDao(SenderDao senderDao)
+    {
         this.senderDao = senderDao;
     }
-
 }

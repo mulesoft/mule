@@ -7,11 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.transformers;
 
-import org.mule.example.geomail.dao.SenderDao;
-import org.mule.example.geomail.dao.Sender;
 import org.mule.api.transformer.TransformerException;
+import org.mule.example.geomail.dao.Sender;
+import org.mule.example.geomail.dao.SenderDao;
 import org.mule.transformer.AbstractTransformer;
 
 /**
@@ -19,7 +20,6 @@ import org.mule.transformer.AbstractTransformer;
  */
 public class IPToSender extends AbstractTransformer
 {
-
     private SenderDao senderDao = null;
 
     public IPToSender()
@@ -28,9 +28,10 @@ public class IPToSender extends AbstractTransformer
         setReturnClass(Sender.class);
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        return getSenderDao().getSender((String) src);
+        return getSenderDao().getSender((String)src);
     }
 
     public SenderDao getSenderDao()
@@ -42,5 +43,4 @@ public class IPToSender extends AbstractTransformer
     {
         this.senderDao = senderDao;
     }
-
 }

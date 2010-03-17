@@ -9,12 +9,12 @@
  */
 package org.mule.example.geomail.components;
 
-import org.mule.api.lifecycle.Callable;
 import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 
-import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * TODO
@@ -22,22 +22,22 @@ import java.util.List;
 public class DataGenerator implements Callable
 {
     private Random generator = new Random();
-
     private int batchSize = 10;
     
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
         eventContext.getMessage().setProperty("from.email.address", "testdatagenerator@geomail.com");
 
-        //Create 3 for each run since many addresses will not be valid
-        List ipAddresses = new ArrayList(batchSize);
+        // Create 3 for each run since many addresses will not be valid
+        List<String> ipAddresses = new ArrayList<String>(batchSize);
         for (int i = 0; i < batchSize; i++)
         {
-            String address = new StringBuffer().append(generator.nextInt(255)).append(".").append(generator.nextInt(255))
-                    .append(".").append(generator.nextInt(255)).append(".").append(generator.nextInt(255)).toString();
-              ipAddresses.add(address);
-
+            String address = new StringBuffer().append(generator.nextInt(255)).append(".")
+                .append(generator.nextInt(255)).append(".").append(generator.nextInt(255)).
+                append(".").append(generator.nextInt(255)).toString();
+            ipAddresses.add(address);
         }
+
         return ipAddresses;
     }
 

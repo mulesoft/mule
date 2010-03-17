@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.components;
 
 import org.mule.DefaultMuleMessage;
@@ -16,8 +17,6 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.example.geomail.dao.Sender;
 import org.mule.example.geomail.dao.SenderDao;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -25,12 +24,12 @@ import org.apache.log4j.Logger;
  */
 public class Storage implements Callable
 {
-
     private static final Logger log = Logger.getLogger(Storage.class.getName());
 
     private SenderDao senderDao;
 
-    public Object onCall(MuleEventContext context) throws Exception {
+    public Object onCall(MuleEventContext context) throws Exception
+    {
 
         MuleMessage message = context.getMessage();
 
@@ -38,29 +37,29 @@ public class Storage implements Callable
         System.err.println("Correlation ID: " + message.getCorrelationId());
         System.err.println("Sequence Number: " + message.getCorrelationSequence());
 
-        for (Iterator it = message.getPropertyNames().iterator(); it.hasNext();) {
-            String key = (String) it.next();
+        for (String key : message.getPropertyNames())
+        {
             System.err.println(key + " = " + message.getProperty(key));
         }
 
-        String ip = (String) message.getProperty("ip");
-        if (ip == null) {
-            throw new IllegalStateException("'ip' property should have been set on UMOMessage.");
+        String ip = (String)message.getProperty("ip");
+        if (ip == null)
+        {
+            throw new IllegalStateException("'ip' property should have been set on MuleMessage.");
         }
 
-        String from = (String) message.getProperty("from.email.address");
-        /*
-        if (from == null) {
-            throw new IllegalStateException("'from.email.address' property should have been set on UMOMessage.");
-        }*/
+        String from = (String)message.getProperty("from.email.address");
 
-        Sender sender = (Sender) message.getPayload();
+        Sender sender = (Sender)message.getPayload();
         sender.setIp(ip);
         sender.setEmail(from);
 
-        if (getSenderDao().getSender(sender.getIp()) != null) {
+        if (getSenderDao().getSender(sender.getIp()) != null)
+        {
             log.warn("Sender '" + sender + "' should not be in the Database.");
-        } else {
+        }
+        else
+        {
             getSenderDao().addSender(sender);
             log.warn("Sender '" + sender + "' successfully added to the Database.");
         }
@@ -73,11 +72,13 @@ public class Storage implements Callable
         return resultMessage;
     }
 
-    public SenderDao getSenderDao() {
+    public SenderDao getSenderDao()
+    {
         return senderDao;
     }
 
-    public void setSenderDao(SenderDao senderDao) {
+    public void setSenderDao(SenderDao senderDao)
+    {
         this.senderDao = senderDao;
     }
 }

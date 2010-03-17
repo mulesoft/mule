@@ -7,16 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.dao;
 
 import java.util.Collection;
 
-public interface SenderDao {
+public interface SenderDao
+{
+    Collection getSenders();
 
-    public Collection getSenders();
+    Sender getSender(String senderId);
 
-    public Sender getSender(String senderId);
-
-    public void addSender(Sender sender);
-
+    void addSender(Sender sender);
 }

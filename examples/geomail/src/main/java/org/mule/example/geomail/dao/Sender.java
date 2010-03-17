@@ -7,24 +7,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.geomail.dao;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Sender {
-
+public class Sender
+{
     @Id
     private String ip;
 
     private String email;
 
-    public String getEmail() {
+    public String getEmail()
+    {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(String email)
+    {
         this.email = email;
     }
 
@@ -34,52 +37,61 @@ public class Sender {
     private String latitude;
     private String longitude;
 
-    public String getLatitude() {
+    public String getLatitude()
+    {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(String latitude)
+    {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    public String getLongitude()
+    {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(String longitude)
+    {
         this.longitude = longitude;
     }
 
-    public String getLocationName() {
+    public String getLocationName()
+    {
         return locationName;
     }
 
-    public void setLocationName(String locationName) {
+    public void setLocationName(String locationName)
+    {
         this.locationName = locationName;
     }
 
-    public String getCountryName() {
+    public String getCountryName()
+    {
         return countryName;
     }
 
-    public void setCountryName(String countryName) {
+    public void setCountryName(String countryName)
+    {
         this.countryName = countryName;
     }
 
-    public String toString() {
-        return "Sender( ip=" + getIp() +
-                ", email=" + getEmail() +
-                ", latitude=" + getLatitude() +
-                ", longitude=" + getLongitude() +
-                ", location=" + getLocationName() +
-                ", country=" + getCountryName() + ")";
+    @Override
+    public String toString()
+    {
+        return "Sender( ip=" + getIp() + ", email=" + getEmail() + ", latitude=" + getLatitude()
+               + ", longitude=" + getLongitude() + ", location=" + getLocationName() + ", country="
+               + getCountryName() + ")";
     }
 
-    public String getIp() {
+    public String getIp()
+    {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public void setIp(String ip)
+    {
         this.ip = ip;
     }
 }
