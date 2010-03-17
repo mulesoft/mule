@@ -138,6 +138,26 @@
 
     <!--
     ============================
+        Mule Examples: Geomail
+    ============================
+    -->
+    <fileSet>
+        <directory>../../examples/geomail/dist</directory>
+        <outputDirectory>examples/geomail</outputDirectory>
+    </fileSet>
+
+    <!--
+    ============================
+        Mule Examples: GPS walker
+    ============================
+    -->
+    <fileSet>
+        <directory>../../examples/gpswalker/dist</directory>
+        <outputDirectory>examples/gpswalker</outputDirectory>
+    </fileSet>
+
+    <!--
+    ============================
         Mule Examples: Hello
     ============================
     -->
