@@ -7,26 +7,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.gpswalker;
 
 /**
  * A bean that holds Geo Coordinates
  */
-public class GpsCoord {
-
+public class GpsCoord
+{
     private float latitude;
     private float longitude;
 
-    public GpsCoord(float lat, float lng) {
+    public GpsCoord(float lat, float lng)
+    {
         latitude = lat;
         longitude = lng;
     }
 
-    public float getLatitude() {
+    public float getLatitude()
+    {
         return latitude;
     }
 
-    public float getLongitude() {
+    public float getLongitude()
+    {
         return longitude;
     }
 

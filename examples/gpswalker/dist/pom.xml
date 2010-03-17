@@ -25,7 +25,6 @@
                     <port>8888</port>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -35,12 +34,10 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
@@ -56,6 +53,5 @@
             <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-       
     </dependencies>
 </project>
