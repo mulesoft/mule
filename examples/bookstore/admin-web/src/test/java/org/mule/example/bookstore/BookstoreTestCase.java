@@ -18,6 +18,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 public class BookstoreTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "bookstore-config.xml";
