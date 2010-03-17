@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
@@ -41,6 +42,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         resultData = IOUtils.getResourceAsString("cdcatalog.html", getClass());
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
@@ -52,6 +54,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
@@ -63,6 +66,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
         Map props = new HashMap();
@@ -71,6 +75,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return new DefaultMuleMessage(srcData, props, muleContext);
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;
@@ -149,18 +154,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
                     "<subnode2>" + param + "</subnode2>" +
                 "</node1>";
 
-        String xsl =
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
-                     " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
-                     " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
-                     "<xsl:param name=\"param1\"/>" +
-                     "<xsl:template match=\"@*|node()\">" +
-                         "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
-                     "</xsl:template>" +
-                         "<xsl:template match=\"/node1/subnode2/text()\">" +
-                         "<xsl:value-of select=\"$param1\"/>" +
-                     "</xsl:template>" +
-                 "</xsl:stylesheet>";
+        String xsl = someXslText();
 
         XsltTransformer transformer = new XsltTransformer();
 
@@ -187,6 +181,21 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
     }
 
+    private String someXslText()
+    {
+        return "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
+             " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
+             " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
+             "<xsl:param name=\"param1\"/>" +
+             "<xsl:template match=\"@*|node()\">" +
+                 "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
+             "</xsl:template>" +
+                 "<xsl:template match=\"/node1/subnode2/text()\">" +
+                 "<xsl:value-of select=\"$param1\"/>" +
+             "</xsl:template>" +
+         "</xsl:stylesheet>";
+    }
+
     public void testTransformWithDynamicParam() throws Exception
     {
 
@@ -204,18 +213,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
                     "<subnode2>" + param + "</subnode2>" +
                 "</node1>";
 
-        String xsl =
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
-                    " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
-                    " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
-                    "<xsl:param name=\"param1\"/>" +
-                    "<xsl:template match=\"@*|node()\">" +
-                        "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
-                    "</xsl:template>" +
-                    "<xsl:template match=\"/node1/subnode2/text()\">" +
-                        "<xsl:value-of select=\"$param1\"/>" +
-                    "</xsl:template>" +
-                "</xsl:stylesheet>";
+        String xsl = someXslText();
 
         XsltTransformer transformer = new XsltTransformer();
 
@@ -242,6 +240,91 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
 
         assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+    }
+
+    public void testInitialiseMustLoadXsltFile_dontLoadIfThereIsXslText() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        xsltTransformer.setXslt(someXslText());
+        try
+        {
+            xsltTransformer.initialise();
+            assertEquals(someXslText(), xsltTransformer.getXslt());
+        }
+        catch (InitialisationException e)
+        {
+            fail("Should not have thrown an exception: " + e);
+        }
+    }
+
+    public void testInitialiseMustLoadXsltFile_ThrowExceptionIfNoXslTextNorFile() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        try
+        {
+            xsltTransformer.initialise();
+            fail("Should have thrown an exception because nor xslt-text nor xslt-file was set.");
+        }
+        catch (InitialisationException e)
+        {
+            assertTrue(e.getMessage().contains("xsl-file or xsl-text"));
+        }
+    }
+
+    public void testInitialiseMustLoadXsltFile_ThrowExceptionIfXslFileDoesNotExist() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        String someNonExistentFileName = "some nonexistent file";
+        xsltTransformer.setXslFile(someNonExistentFileName);
+        try
+        {
+            xsltTransformer.initialise();
+            fail("Should have thrown an exception because file '" + someNonExistentFileName
+                 + "' does not exist.");
+        }
+        catch (InitialisationException e)
+        {
+            assertTrue(e.getMessage().contains(someNonExistentFileName));
+        }
+    }
+
+    public void testInitialiseMustLoadXsltFile_MustNotSetXslTextAndXslFileAtTheSameTime() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        String someFileName = "some filename";
+        xsltTransformer.setXslFile(someFileName);
+        xsltTransformer.setXslt(someXslText());
+        try
+        {
+            xsltTransformer.initialise();
+            fail("Should have thrown an exception because you cannot set both xsl-text and xsl-file at the same time");
+        }
+        catch (InitialisationException e)
+        {
+            assertTrue(e.getMessage().contains(XmlMessages.canOnlySetFileOrXslt().getMessage()));
+        }
+    }
+
+    public void testInitialiseMustLoadXsltFile_LoadsFromXslFile() throws Exception
+    {
+        XsltTransformer xsltTransformer = new XsltTransformer();
+        String someExistentFileName = "cdcatalog.xsl";
+        xsltTransformer.setXslFile(someExistentFileName);
+        try
+        {
+            xsltTransformer.initialise();
+            assertNotNull(xsltTransformer.getXslt());
+            String someTextThatIsInTheXslFile = "My CD Collection";
+            assertTrue("Should contain the text '" + someTextThatIsInTheXslFile + "', because it is in the '"
+                       + someExistentFileName + "' file that we are setting.", xsltTransformer.getXslt()
+                .contains(
+                someTextThatIsInTheXslFile));
+        }
+        catch (InitialisationException e)
+        {
+            fail("Should NOT have thrown an exception because file '" + someExistentFileName
+                 + "' DOES exist.");
+        }
     }
 
 }
