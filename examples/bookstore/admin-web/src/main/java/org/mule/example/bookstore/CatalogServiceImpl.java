@@ -64,12 +64,12 @@ public class CatalogServiceImpl implements CatalogService, CatalogAdminService, 
         return id;
     }
 
-    public Collection <Long> addBooks(Collection <Book> books)
+    public Collection <Long> addBooks(Collection<Book> booksToAdd)
     {
         List <Long> ids = new ArrayList <Long> ();
-        if (books != null)
+        if (booksToAdd != null)
         {
-            for (Book book : books)
+            for (Book book : booksToAdd)
             {
                 ids.add(addBook(book));
             }
