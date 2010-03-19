@@ -62,6 +62,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         super.prepareBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
         beanFactory.addBeanPostProcessor(new ExpressionEvaluatorPostProcessor(muleContext));
+        beanFactory.addBeanPostProcessor(new NotificationListenerPostProcessor(muleContext));
     }
 
     private static Resource[] convert(ConfigResource[] resources)

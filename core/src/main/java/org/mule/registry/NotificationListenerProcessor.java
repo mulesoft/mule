@@ -17,11 +17,11 @@ import org.mule.api.registry.PreInitProcessor;
  * Will register any {@link org.mule.api.context.notification.ServerNotificationListener} instances with the MuleContext
  * to receive notifications
  */
-public class NotificationListenersProcessor implements PreInitProcessor
+public class NotificationListenerProcessor implements PreInitProcessor
 {
     private MuleContext context;
 
-    public NotificationListenersProcessor(MuleContext context)
+    public NotificationListenerProcessor(MuleContext context)
     {
         this.context = context;
     }

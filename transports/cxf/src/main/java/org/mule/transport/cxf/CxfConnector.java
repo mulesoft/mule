@@ -143,16 +143,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
-
-        // Registers the listener
-        try
-        {
-            muleContext.registerListener(this);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     @Override

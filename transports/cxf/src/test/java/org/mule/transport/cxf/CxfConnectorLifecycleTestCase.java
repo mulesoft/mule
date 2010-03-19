@@ -14,6 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.api.service.Service;
 import org.mule.tck.FunctionalTestCase;
 
+import java.beans.ExceptionListener;
+
 public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
 {
 
@@ -23,7 +25,7 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "basic-conf.xml";
+        return "lifecycle-conf.xml";
     }
 
     /**
@@ -79,5 +81,17 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
         service.start();
         assertNotNull(connector.getServer("http://localhost:63081/services/Echo"));
     }
-    
+
+    /*
+     * Use an an exception strategy to unable us to fail the test on exception that
+     * are otherwise just handled.
+     */
+    static class TestExceptionListener implements ExceptionListener
+    {
+        public void exceptionThrown(Exception arg0)
+        {
+            fail(arg0.getMessage());
+        }
+    }
+
 }
