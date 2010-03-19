@@ -43,7 +43,6 @@ cxf-tools-common-2.1.9
 dom4j-1.6.1-osgi
 geronimo-stax-api_1.0_spec-1.0.1
 groovy-all-1.5.6-osgi
-groovy-engine-1.1-osgi-jdk14
 hibernate-3.2.2.ga-osgi
 javassist-3.6.ga-osgi
 jaxb-api-2.1-osgi
