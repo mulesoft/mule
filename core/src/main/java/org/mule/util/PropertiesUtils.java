@@ -15,6 +15,7 @@ import org.mule.config.i18n.Message;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +118,28 @@ public final class PropertiesUtils
         if (is == null)
         {
             Message error = CoreMessages.cannotLoadFromClasspath(fileName);
+            throw new IOException(error.toString());
+        }
+        
+        return loadProperties(is);
+    }
+    
+    public static Properties loadProperties(URL url) throws IOException
+    {
+        if (url == null)
+        {
+            Message error = CoreMessages.objectIsNull("url");
+            throw new IOException(error.toString());
+        }
+        
+        return loadProperties(url.openStream());
+    }
+    
+    public static Properties loadProperties(InputStream is) throws IOException
+    {
+        if (is == null)
+        {
+            Message error = CoreMessages.objectIsNull("input stream");
             throw new IOException(error.toString());
         }
 
@@ -278,5 +301,4 @@ public final class PropertiesUtils
     {
         return MapUtils.toString(props, newline);
     }
-
 }

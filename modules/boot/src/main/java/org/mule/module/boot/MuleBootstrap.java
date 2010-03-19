@@ -10,6 +10,8 @@
 
 package org.mule.module.boot;
 
+import org.mule.util.PropertiesUtils;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Date;
@@ -132,8 +134,7 @@ public class MuleBootstrap
         try
         {
             URL mavenPropertiesUrl = MuleBootstrapUtils.getResource(MULE_MODULE_BOOT_POM_FILE_PATH, MuleServerWrapper.class);
-            Properties mavenProperties = new Properties();
-            mavenProperties.load(mavenPropertiesUrl.openStream());
+            Properties mavenProperties = PropertiesUtils.loadProperties(mavenPropertiesUrl);
             
             System.setProperty("mule.version", mavenProperties.getProperty("version"));
             System.setProperty("mule.reference.version", mavenProperties.getProperty("version") + '-' + (new Date()).getTime());
