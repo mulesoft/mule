@@ -77,6 +77,7 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageAware
         {
             ExpressionArgument argument = iterator.next();
             argument.setMuleContext(muleContext);
+            argument.setExpressionEvaluationClassLoader(Thread.currentThread().getContextClassLoader());
             try
             {
                 argument.validate();

@@ -18,6 +18,9 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 
 import java.util.Arrays;
 
+import groovyjarjarasm.asm.ClassWriter;
+import groovyjarjarasm.asm.Opcodes;
+
 public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
 
@@ -85,5 +88,46 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertEquals("Expressions didn't evaluate correctly",
                      "0 - TEST", result);
+    }
+
+    /**
+     * See: MULE-4797 GroovyExpressionEvaluator script is unable to load user classes
+     * when used with hot deployment See:
+     */
+    public void testUseContextClassLoaderToResolveClasses() throws ClassNotFoundException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
+            assertFalse((Boolean) muleContext.getExpressionManager().evaluate(
+                "groovy:payload instanceof MyClass", new DefaultMuleMessage("test", muleContext)));
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+        }
+    }
+
+    class MyClassClassLoader extends ClassLoader
+    {
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException
+        {
+            if (name.equals("MyClass"))
+            {
+                ClassWriter cw = new ClassWriter(true);
+                cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "MyClass", null, "java/lang/Object", null);
+                return defineClass(name, cw.toByteArray(), 0, cw.toByteArray().length);
+            }
+            else
+            {
+                return super.findClass(name);
+            }
+        }
     }
 }
