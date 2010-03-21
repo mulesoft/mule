@@ -14,11 +14,10 @@ import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.util.SpringXMLUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -29,75 +28,161 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class CheckExclusiveAttributes implements PreProcessor
 {
+    private Collection<AttributeSet> attributeSets;
 
-    public static final int NONE = -1;
-    private Map<String, Integer> knownAttributes = new HashMap<String, Integer>();
-
-    public CheckExclusiveAttributes(String[][] attributeSets)
+    public CheckExclusiveAttributes(String[][] attributeNames)
     {
-        for (int set = 0; set < attributeSets.length; set++)
+        super();
+        
+        attributeSets = new ArrayList<AttributeSet>();
+        for (int i = 0; i < attributeNames.length; i++)
         {
-            String[] attributes = attributeSets[set];
-            for (int attribute = 0; attribute < attributes.length; attribute++)
-            {
-                knownAttributes.put(attributes[attribute], new Integer(set));
-            }
-        }
+            String[] attributes = attributeNames[i];
+            attributeSets.add(new AttributeSet(attributes));
+        }            
     }
 
     public void preProcess(PropertyConfiguration config, Element element)
     {
-        List<String> foundAttributes = new LinkedList<String>();
-        int foundSetIndex = NONE;
+        Collection<AttributeSet> allMatchingSets = new ArrayList<AttributeSet>(attributeSets);
+        boolean atLeastOneAttributeDidMatch = false;
 
+        // itereate over all attribute names in 'element'
         NamedNodeMap attributes = element.getAttributes();
-        for (int i = 0; i < attributes.getLength(); i++)
+        int length = attributes.getLength();
+        for (int i = 0; i < length; i++)
         {
             String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-            // don't translate to alias because the error message is in terms of the attributes
-            // the user enters - we don't want to expose the details of translations
-//            String name = null == config ? alias : config.translateName(alias);
-            if (knownAttributes.containsKey(alias))
+            if (isOptionalAttribute(alias))
             {
-                int index = knownAttributes.get(alias).intValue();
-                if (foundSetIndex != NONE && foundSetIndex != index)
-                {
-                    StringBuffer message = new StringBuffer("The attribute '");
-                    message.append(alias);
-                    message.append("' cannot appear with the attribute");
-                    if (foundAttributes.size() > 1)
-                    {
-                        message.append("s");
-                    }
-                    Iterator<String> found = foundAttributes.iterator();
-                    while (found.hasNext())
-                    {
-                        message.append(" '");
-                        message.append(found.next());
-                        message.append("'");
-                    }
-                    message.append(" in element ");
-                    message.append(SpringXMLUtils.elementToString(element));
-                    message.append(".");
-                    throw new CheckExclusiveAttributesException(message.toString());
-                }
-                else
-                {
-                    foundSetIndex = index;
-                    foundAttributes.add(alias);
-                }
+                continue;
             }
+
+            allMatchingSets = filterMatchingSets(allMatchingSets, alias);
+            atLeastOneAttributeDidMatch = true;
+        }
+        
+        if (atLeastOneAttributeDidMatch && allMatchingSets.size() == 0)
+        {
+            CheckExclusiveAttributesException ex = 
+                CheckExclusiveAttributesException.createForDisjunctGroups(element, attributeSets);
+          throw ex;
+
+        }
+        else if (atLeastOneAttributeDidMatch && allMatchingSets.size() > 1)
+        {
+            CheckExclusiveAttributesException ex = 
+                CheckExclusiveAttributesException.createForInsufficientAttributes(element, allMatchingSets);
+            throw ex;
         }
     }
 
+    private Collection<AttributeSet> filterMatchingSets(Collection<AttributeSet> allMatchingSets, 
+        String attributeName)
+    {
+        Collection<AttributeSet> newMatchingSets = new ArrayList<AttributeSet>();
+        for (AttributeSet currentSet : allMatchingSets)
+        {
+            if (currentSet.containsAttribute(attributeName))
+            {
+                newMatchingSets.add(currentSet);
+            }
+        }
+        return newMatchingSets;
+    }
+
+    private boolean isOptionalAttribute(String name)
+    {
+        return findMatchingAttributeSets(name).size() == 0;
+    }
+
+    private Collection<AttributeSet> findMatchingAttributeSets(String alias)
+    {
+        List<AttributeSet> matchingSets = new ArrayList<AttributeSet>();
+        for (AttributeSet currentSet : attributeSets)
+        {
+            if (currentSet.containsAttribute(alias))
+            {
+                matchingSets.add(currentSet);
+            }
+        }
+        return matchingSets;
+    }
+
+    private static class AttributeSet
+    {
+        private String[] attributeNames;
+
+        public AttributeSet(String[] attributeNames)
+        {
+            super();
+            this.attributeNames = attributeNames;
+        }
+
+        public boolean containsAttribute(String name)
+        {
+            for (int i = 0; i < attributeNames.length; i++)
+            {
+                String element = attributeNames[i];
+                if (element.equals(name))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            return Arrays.toString(attributeNames);
+        }
+    }
+    
     public static class CheckExclusiveAttributesException extends IllegalStateException
     {
+        public static CheckExclusiveAttributesException createForDisjunctGroups(Element element,
+            Collection<AttributeSet> allMatchingSets)
+        {
+            String message = createMessage(element, allMatchingSets);
+            return new CheckExclusiveAttributesException(message);
+        }
 
+        private static String createMessage(Element element, Collection<AttributeSet> allMatchingSets)
+        {
+            StringBuilder buf = new StringBuilder("The attributes of Element ");
+            buf.append(SpringXMLUtils.elementToString(element));
+            buf.append(" do not match the exclusive groups");
+            
+            for (AttributeSet match : allMatchingSets)
+            {
+                buf.append(" ");
+                buf.append(match.toString());
+            }
+            
+            return buf.toString();
+        }
+        
+        public static CheckExclusiveAttributesException createForInsufficientAttributes(Element element,
+            Collection<AttributeSet> attributeSets)
+        {
+            StringBuilder buf = new StringBuilder("Attributes of Element ");
+            buf.append(SpringXMLUtils.elementToString(element));
+            buf.append(" do not satisfy the exclusive groups");
+            
+            for (AttributeSet attributeSet : attributeSets)
+            {
+                buf.append(" ");
+                buf.append(attributeSet);
+            }
+            buf.append(".");
+            
+            return new CheckExclusiveAttributesException(buf.toString());
+        }
+        
         private CheckExclusiveAttributesException(String message)
         {
             super(message);
         }
-
     }
-
 }

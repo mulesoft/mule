@@ -22,6 +22,7 @@ import java.util.Properties;
  * on the uri. The path is used as either the groupChat name or the recipient name of
  * a one on one chat.
  */
+// TODO xmpp: is this class still necessary?
 public class XmppEndpointURIBuilder extends UserInfoEndpointURIBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException

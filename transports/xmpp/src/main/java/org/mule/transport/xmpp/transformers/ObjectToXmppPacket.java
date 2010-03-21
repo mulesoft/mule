@@ -15,8 +15,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.xmpp.XmppConnector;
 
-import java.util.Iterator;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
 
@@ -32,9 +30,10 @@ public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
         setReturnClass(Message.class);
     }
 
-    public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
+    @Override
+    public Object transform(MuleMessage muleMessage, String outputEncoding) throws TransformerException
     {
-        Object src = msg.getPayload();
+        Object src = muleMessage.getPayload();
         
         // Make the transformer match its wiki documentation: we accept Messages and Strings.
         // No special treatment for Messages is needed
@@ -45,33 +44,34 @@ public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
         
         Message result = new Message();
 
-        if (msg.getExceptionPayload() != null)
+        if (muleMessage.getExceptionPayload() != null)
         {
-            result.setError(new XMPPError(503, msg.getExceptionPayload().getMessage()));
+            result.setError(
+                new XMPPError(XMPPError.Condition.service_unavailable, 
+                    muleMessage.getExceptionPayload().getMessage()));
         }
 
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        for (String propertyName : muleMessage.getPropertyNames())
         {
-            String name = (String) iterator.next();
-            if (name.equals(XmppConnector.XMPP_THREAD))
+            if (propertyName.equals(XmppConnector.XMPP_THREAD))
             {
-                result.setThread((String) msg.getProperty(name));
+                result.setThread((String) muleMessage.getProperty(propertyName));
             }
-            else if (name.equals(XmppConnector.XMPP_SUBJECT))
+            else if (propertyName.equals(XmppConnector.XMPP_SUBJECT))
             {
-                result.setSubject((String) msg.getProperty(name));
+                result.setSubject((String) muleMessage.getProperty(propertyName));
             }
-            else if (name.equals(XmppConnector.XMPP_FROM))
+            else if (propertyName.equals(XmppConnector.XMPP_FROM))
             {
-                result.setFrom((String) msg.getProperty(name));
+                result.setFrom((String) muleMessage.getProperty(propertyName));
             }
-            else if (name.equals(XmppConnector.XMPP_TO))
+            else if (propertyName.equals(XmppConnector.XMPP_TO))
             {
-                result.setTo((String) msg.getProperty(name));
+                result.setTo((String) muleMessage.getProperty(propertyName));
             }
             else
             {
-                result.setProperty(name, msg.getProperty(name));
+                result.setProperty(propertyName, muleMessage.getProperty(propertyName));
             }
         }
 

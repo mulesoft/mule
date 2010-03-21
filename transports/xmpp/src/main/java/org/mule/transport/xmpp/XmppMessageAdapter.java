@@ -17,8 +17,6 @@ import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.MessageAdapterSerialization;
 import org.mule.util.StringUtils;
 
-import java.util.Iterator;
-
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -35,23 +33,22 @@ public class XmppMessageAdapter extends AbstractMessageAdapter implements Messag
      */
     private static final long serialVersionUID = -4003299444661664762L;
 
-    private final Packet message;
+    private final Packet packet;
 
-    public XmppMessageAdapter(Object message) throws MuleException
+    public XmppMessageAdapter(Object payload) throws MuleException
     {
-        if (message instanceof Packet)
+        if (payload instanceof Packet)
         {
-            this.message = (Packet) message;
+            packet = (Packet) payload;
 
-            for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();)
+            for (String name : packet.getPropertyNames())
             {
-                String name = (String)iter.next();
-                this.setProperty(name, this.message.getProperty(name));
+                this.setProperty(name, packet.getProperty(name));
             }
 
-            if (this.message instanceof Message)
+            if (packet instanceof Message)
             {
-                Message msg = (Message) this.message;
+                Message msg = (Message) packet;
                 
                 this.setProperty("subject", StringUtils.defaultIfEmpty(msg.getSubject(), DEFAULT_SUBJECT));
                 this.setProperty("thread", StringUtils.defaultIfEmpty(msg.getThread(), DEFAULT_THREAD));
@@ -59,14 +56,14 @@ public class XmppMessageAdapter extends AbstractMessageAdapter implements Messag
         }
         else
         {
-            throw new MessageTypeNotSupportedException(message, getClass());
+            throw new MessageTypeNotSupportedException(payload, getClass());
         }
     }
 
     protected XmppMessageAdapter(XmppMessageAdapter template)
     {
         super(template);
-        message = template.message;
+        packet = template.packet;
     }
 
     /**
@@ -79,37 +76,37 @@ public class XmppMessageAdapter extends AbstractMessageAdapter implements Messag
      */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        if (message instanceof Message)
+        if (packet instanceof Message)
         {
-            return ((Message)message).getBody();
+            return ((Message)packet).getBody();
         }
         else
         {
-            return message.toString();
+            return packet.toString();
         }
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if (message instanceof Message)
+        if (packet instanceof Message)
         {
-            return ((Message)message).getBody().getBytes();
+            return ((Message)packet).getBody().getBytes();
         }
         else
         {
-            return message.toString().getBytes();
+            return packet.toString().getBytes();
         }
     }
 
     public Object getPayload()
     {
-        return message;
+        return packet;
     }
 
     @Override
     public String getUniqueId()
     {
-        return message.getPacketID();
+        return packet.getPacketID();
     }
 
     @Override

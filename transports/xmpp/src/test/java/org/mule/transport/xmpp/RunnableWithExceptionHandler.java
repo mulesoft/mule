@@ -10,12 +10,21 @@
 
 package org.mule.transport.xmpp;
 
-public class XmppsConnectorTestCase extends XmppConnectorTestCase
+public abstract class RunnableWithExceptionHandler implements Runnable
 {
-
-    protected String getProtocol()
+    public final void run()
     {
-        return "xmpps";
+        try
+        {
+            doRun();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-    
+
+    protected abstract void doRun() throws Exception;
 }
+
+

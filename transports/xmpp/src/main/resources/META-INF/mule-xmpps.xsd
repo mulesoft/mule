@@ -8,6 +8,8 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
+    <!-- TODO xmpp: remove this -->
+
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd" />

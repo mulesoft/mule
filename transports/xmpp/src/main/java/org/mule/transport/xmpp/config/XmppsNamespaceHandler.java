@@ -11,7 +11,6 @@
 package org.mule.transport.xmpp.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.endpoint.URIBuilder;
 import org.mule.transport.xmpp.XmppsConnector;
 
 /**
@@ -22,7 +21,7 @@ public class XmppsNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(XmppsConnector.XMPPS, XmppNamespaceHandler.REQUIRED_ADDRESS_ATTRIBUTES).addAlias(XmppNamespaceHandler.RECIPIENT, URIBuilder.PATH).registerPreProcessor(new XmppNamespaceHandler.RequireNickname());
+//        registerStandardTransportEndpoints(XmppsConnector.XMPPS, XmppNamespaceHandler.REQUIRED_ADDRESS_ATTRIBUTES).addAlias(XmppNamespaceHandler.RECIPIENT, URIBuilder.PATH).registerPreProcessor(new XmppNamespaceHandler.RequireNickname());
         this.registerConnectorDefinitionParser(XmppsConnector.class);
     }
 

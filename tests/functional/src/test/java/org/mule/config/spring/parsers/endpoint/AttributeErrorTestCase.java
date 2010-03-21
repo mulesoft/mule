@@ -22,7 +22,7 @@ public class AttributeErrorTestCase extends AbstractBadConfigTestCase
 
     public void testError() throws Exception
     {
-        assertErrorContains("The attribute 'ref' cannot appear with the attribute 'address'");
+        assertErrorContains("do not match the exclusive groups [address] [ref]");
     }
 
 }

@@ -15,6 +15,7 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 
 import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,10 +28,13 @@ public abstract class AbstractBadConfigTestCase extends TestCase
 
     public void assertErrorContains(String phrase) throws Exception
     {
-        try {
+        try 
+        {
             parseConfig();
             fail("expected error");
-        } catch (Exception e) {
+        } 
+        catch (Exception e) 
+        {
             logger.debug("Caught " + e);
             assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'",
                     e.toString().indexOf(phrase) > -1);
@@ -48,5 +52,4 @@ public abstract class AbstractBadConfigTestCase extends TestCase
     }
 
     protected abstract String getConfigResources();
-
 }

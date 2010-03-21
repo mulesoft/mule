@@ -12,43 +12,103 @@ package org.mule.config.spring.parsers.processors;
 
 import org.mule.config.spring.parsers.PreProcessor;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCase
 {
-
-    public void testAttributes() throws ParserConfigurationException
+    public void testDisjointSingleAttributeGroups() throws Exception
     {
-        String[][] a1b2 = new String[][]{new String[]{"a1"}, new String[]{"b1", "b2"}};
-        String text = "cannot appear with the attribute";
-        assertOk(a1b2, "");
-        assertOk(a1b2, "x");
-        assertOk(a1b2, "b2");
-        assertOk(a1b2, "x b1");
-        assertOk(a1b2, "a1");
-        assertOk(a1b2, "a1 x");
-        assertOk(a1b2, "b1 b2");
-        assertBad(a1b2, "a1 b1", text);
-        assertBad(a1b2, "a1 b2", text);
-        assertBad(a1b2, "a1 b1 b2", text);
-        assertBad(a1b2, "a1 b2 x", text); 
-        String[][] a1b0 = new String[][]{new String[]{"a1"}, new String[]{}};
-        assertOk(a1b0, "");
-        assertOk(a1b0, "x");
-        assertOk(a1b0, "b2");
-        assertOk(a1b0, "x b1");
-        assertOk(a1b0, "a1");
-        assertOk(a1b0, "a1 x");
-        assertOk(a1b0, "b1 b2");
-        assertOk(a1b0, "a1 b1");
-        assertOk(a1b0, "a1 b2");
-        assertOk(a1b0, "a1 b1 b2");
-        assertOk(a1b0, "a1 b2 x"); 
+        String[][] groups = new String[][] {
+            new String[] { "a" }, 
+            new String[] { "b" }
+        };
+     
+        assertOk(groups, "a");
+        assertOk(groups, "b");
+        assertOk(groups, "x");
+    }
+    
+    public void testDisjointMultipleAttributes() throws Exception
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1" }, 
+            new String[] { "b1", "b2" }
+        };
+        String text = "do not match the exclusive groups";
+        
+        assertOk(groups, "");
+        // optional attribute
+        assertOk(groups, "x");
+        // all attributes from first group
+        assertOk(groups, "a1");
+        // attribute from second group        
+        assertOk(groups, "b1");
+        assertOk(groups, "b2");
+        // attribute from first group and optional attribute
+        assertOk(groups, "a1 x");
+        // attribute from second group and optional attribute
+        assertOk(groups, "x b1");
+        assertOk(groups, "x b2");
+        // all attributes from second group
+        assertOk(groups, "b1 b2");
+        
+        assertBad(groups, "a1 b1", text);
+        assertBad(groups, "b1 a1", text);
+        assertBad(groups, "a1 b2", text);
+        assertBad(groups, "b2 a1", text);
+        assertBad(groups, "a1 b1 b2", text);
+        assertBad(groups, "a1 b2 x", text);
     }
 
+    public void testSecondGroupEmpty() throws Exception
+    {
+        String[][] groups = new String[][]{
+            new String[] { "a1" },
+            new String[] {}
+        };
+        
+        assertOk(groups, "");
+        // optional attribute
+        assertOk(groups, "x");
+        // only attribute from first group
+        assertOk(groups, "a1");
+        // attribute from first group plus optional attribute
+        assertOk(groups, "a1 x");
+    }
+    
+    public void testGroupsWithOverlappingAttributes() throws Exception
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1", "b1" },
+            new String[] { "a1", "b2" }
+        };
+        
+        // attribute from first group (can be in either group)
+        assertBad(groups, "a1", "do not satisfy");
+        // attribute from first group
+        assertOk(groups, "b1");
+        // attribute from second group
+        assertOk(groups, "b2");
+        // optional attribute
+        assertOk(groups, "a1 b1 x");
+        assertOk(groups, "a1 b2 x");
+        // complete first group
+        assertOk(groups, "a1 b1");
+        // complete second group
+        assertOk(groups, "a1 b2");
+    }
+    
+    public void testRealWorld() throws Exception
+    {
+        String[][] groups = new String[][] {
+            new String[] { "type", "recipient" },
+            new String[] { "type", "from" }
+        };
+        
+        assertOk(groups, "id name recipient subject type");
+    }
+    
+    @Override
     protected PreProcessor createCheck(String[][] constraint)
     {
         return new CheckExclusiveAttributes(constraint);
     }
-
 }

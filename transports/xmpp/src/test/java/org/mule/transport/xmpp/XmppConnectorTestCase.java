@@ -12,12 +12,17 @@ package org.mule.transport.xmpp;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.xmpp.XmppConnector;
 
 import org.jivesoftware.smack.packet.Message;
 
 public class XmppConnectorTestCase extends AbstractConnectorTestCase
 {
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return XmppEnableDisableTestCase.isTestDisabled();
+    }
+
     @Override
     public Connector createConnector() throws Exception
     {

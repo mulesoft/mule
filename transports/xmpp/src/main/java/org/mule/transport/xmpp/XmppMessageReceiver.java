@@ -17,71 +17,74 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.ConnectException;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
-/** <code>XmppMessageReceiver</code> is responsible for receiving Mule events over XMPP. */
+/** 
+ * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over XMPP. 
+ */
 public class XmppMessageReceiver extends AbstractMessageReceiver implements PacketListener
 {
-    private XMPPConnection xmppConnection = null;
+//    private XMPPConnection xmppConnection = null;
+    private XmppConversation xmppConversation;
 
     public XmppMessageReceiver(AbstractConnector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
-
         super(connector, service, endpoint);
+        XmppConnector xmppConnector = (XmppConnector) connector;
+        xmppConversation = xmppConnector.getConversationFactory().create(endpoint);
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
-        try
-        {
-            XmppConnector cnn = (XmppConnector) connector;
-            xmppConnection = cnn.createXmppConnection(endpoint.getEndpointURI());
-            if (endpoint.getFilter() instanceof PacketFilter)
-            {
-                xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
-            }
-            else
-            {
-                PacketFilter filter = new PacketTypeFilter(Message.class);
-                xmppConnection.addPacketListener(this, filter);
-            }
-        }
-        catch (XMPPException e)
-        {
-            throw new ConnectException(CoreMessages.failedToCreate("XMPP Connection"), e, this);
-        }
+        xmppConversation.connect();
+//        try
+//        {
+//            XmppConnector cnn = (XmppConnector) connector;
+//            xmppConnection = cnn.createXmppConnection(endpoint.getEndpointURI());
+//            if (endpoint.getFilter() instanceof PacketFilter)
+//            {
+//                xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
+//            }
+//            else
+//            {
+//                PacketFilter filter = new PacketTypeFilter(Message.class);
+//                xmppConnection.addPacketListener(this, filter);
+//            }
+//        }
+//        catch (XMPPException e)
+//        {
+//            throw new ConnectException(CoreMessages.failedToCreate("XMPP Connection"), e, this);
+//        }
     }
 
     protected void doDisconnect() throws Exception
     {
-        if (xmppConnection != null)
-        {
-            xmppConnection.removePacketListener(this);
-            xmppConnection.close();
-        }
+        xmppConversation.disconnect();
+//        if (xmppConnection != null)
+//        {
+//            xmppConnection.removePacketListener(this);
+//            xmppConnection.disconnect();
+//        }
     }
 
+    // TODO xmpp: consider lifecycle
     protected void doStart() throws MuleException
     {
         // nothing to do
     }
 
+    // TODO xmpp: consider lifecycle
     protected void doStop() throws MuleException
     {
         // nothing to do
@@ -89,7 +92,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
     protected void doDispose()
     {
-        // nothing to do
+        xmppConversation = null;
     }
 
     protected Work createWork(Packet message)
@@ -144,7 +147,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
                 {
                     returnMessage.applyTransformers(connector.getDefaultResponseTransformers());
                     Packet result = (Packet) returnMessage.getPayload();
-                    xmppConnection.sendPacket(result);
+//                    xmppConnection.sendPacket(result);
                 }
             }
             catch (Exception e)

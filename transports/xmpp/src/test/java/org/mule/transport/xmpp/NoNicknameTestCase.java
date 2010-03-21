@@ -11,9 +11,8 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.MuleContext;
-import org.mule.tck.FunctionalTestCase;
 
-public class NoNicknameTestCase extends FunctionalTestCase
+public class NoNicknameTestCase extends XmppEnableDisableTestCase
 {
 
     private boolean errorDuringStartup = false;

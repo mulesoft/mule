@@ -12,7 +12,6 @@ package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.EndpointURI;
 
-import org.jivesoftware.smack.SSLXMPPConnection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
@@ -36,11 +35,12 @@ public class XmppsConnector extends XmppConnector
         
         if (endpointURI.getPort() != -1)
         {
-            xmppConnection = new SSLXMPPConnection(endpointURI.getHost(), endpointURI.getPort());
+            // TODO xmpp: the XMPPConnection can handle SSL connections now
+//            xmppConnection = new SSLXMPPConnection(endpointURI.getHost(), endpointURI.getPort());
         }
         else
         {
-            xmppConnection = new SSLXMPPConnection(endpointURI.getHost());
+//            xmppConnection = new SSLXMPPConnection(endpointURI.getHost());
         }
         
         return xmppConnection;

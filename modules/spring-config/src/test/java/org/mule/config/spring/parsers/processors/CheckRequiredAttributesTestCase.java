@@ -16,70 +16,209 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCase
 {
-
-    public void testTwoSets() throws ParserConfigurationException
+    public void testSingleSetSingleAttribute() throws ParserConfigurationException
     {
-        String[][] a1b2 = new String[][]{new String[]{"a1"}, new String[]{"b1", "b2"}};
-        String text12 = "must have all attributes for one of the sets: a1; b1, b2";
-        assertBad(a1b2, "", text12);
-        assertBad(a1b2, "x", text12);
-        assertBad(a1b2, "b2", text12);
-        assertBad(a1b2, "x b1", text12);
-        assertOk(a1b2, "a1");
-        assertOk(a1b2, "a1 x");
-        assertOk(a1b2, "b1 b2");
-        assertOk(a1b2, "a1 b1");
-        assertOk(a1b2, "a1 b2");
-        assertOk(a1b2, "a1 b1 b2");
-        assertOk(a1b2, "a1 b2 x");
-        String[][] a1b0 = new String[][]{new String[]{"a1"}, new String[]{}};
-        String text10 = "must have all attributes for one of the sets: a1";
-        assertBad(a1b0, "", text10);
-        assertBad(a1b0, "x", text10);
-        assertBad(a1b0, "b2", text10);
-        assertBad(a1b0, "x b1", text10);
-        assertOk(a1b0, "a1");
-        assertOk(a1b0, "a1 x");
-        assertBad(a1b0, "b1 b2", text10);
-        assertOk(a1b0, "a1 b1");
-        assertOk(a1b0, "a1 b2");
-        assertOk(a1b0, "a1 b1 b2");
-        assertOk(a1b0, "a1 b2 x");
+        String[][] groups = new String[][] {
+            new String[]{ "a1" }
+        };
+        String text = "must have all attributes for one of the sets: [a1]";
+        
+        // no attributes
+        assertBad(groups, "", text);
+        
+        // optional attribute
+        assertBad(groups, "x", text);
+        
+        // required attribute
+        assertOk(groups, "a1");
+        assertOk(groups, "a1 x");
+        assertOk(groups, "x a1");
     }
 
-    public void testSingleSet() throws ParserConfigurationException
+    public void testSingleSetMultipleAttributes() throws ParserConfigurationException
     {
-        String[][] a1 = new String[][]{new String[]{"a1"}};
-        String text1 = "must have all attributes for one of the sets: a1";
-        assertBad(a1, "", text1);
-        assertBad(a1, "x", text1);
-        assertBad(a1, "b2", text1);
-        assertBad(a1, "x b1", text1);
-        assertOk(a1, "a1");
-        assertOk(a1, "a1 x");
-        assertBad(a1, "b1 b2", text1);
-        assertOk(a1, "a1 b1");
-        assertOk(a1, "a1 b2");
-        assertOk(a1, "a1 b1 b2");
-        assertOk(a1, "a1 b2 x");
-        String[][] b2 = new String[][]{new String[]{"b1", "b2"}};
-        String text2 = "must have all attributes for one of the sets: b1, b2";
-        assertBad(b2, "", text2);
-        assertBad(b2, "x", text2);
-        assertBad(b2, "b2", text2);
-        assertBad(b2, "x b1", text2);
-        assertBad(b2, "a1", text2);
-        assertBad(b2, "a1 x", text2);
-        assertOk(b2, "b1 b2");
-        assertBad(b2, "a1 b1", text2);
-        assertBad(b2, "a1 b2", text2);
-        assertOk(b2, "a1 b1 b2");
-        assertBad(b2, "a1 b2 x", text2);
+        String[][] groups = new String[][] {
+            new String[] { "b1", "b2" }
+        };
+        String text = "must have all attributes for one of the sets: [b1, b2]";
+
+        // no attributes
+        assertBad(groups, "", text);
+
+        // optional attribute
+        assertBad(groups, "x", text);
+        
+        // one of the required attributes
+        assertBad(groups, "b1", text);
+        assertBad(groups, "b2", text);
+        
+        // one of the required attributes and an optional attribute
+        assertBad(groups, "x b1", text);
+        assertBad(groups, "x b2", text);
+
+        // both required attributes
+        assertOk(groups, "b1 b2");
+        
+        // both required attributes and an optional attribute
+        assertOk(groups, "x b1 b2");
+    }
+
+    public void testTwoSetsSingleAttribute() throws ParserConfigurationException
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1" }, 
+            new String[] { "b1" }
+        };
+        String text = "must have all attributes for one of the sets: [a1] [b1]";
+        
+        // empty set
+        assertBad(groups, "", text);
+        
+        // only optional attributes
+        assertBad(groups, "x", text);
+        assertBad(groups, "x y", text);
+        
+        // one attribute from a required set
+        assertOk(groups, "a1");
+        assertOk(groups, "b1");
+        
+        // one attribute from a required set and optional attributes
+        assertOk(groups, "a1 x");
+        assertOk(groups, "x a1");
+        assertOk(groups, "b1 x");
+        assertOk(groups, "x b1");
+
+        // attributes from both sets, assuming this is OK, too as both groups are fully satisfied
+        assertOk(groups, "a1 b1");
+    }
+    
+    public void testTwoSetsEmptySecondSet() throws ParserConfigurationException
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1" },
+            new String[] {}
+        };
+        String text = "must have all attributes for one of the sets: [a1]";
+        
+        // no attributes
+        assertBad(groups, "", text);
+        
+        // only optional attributes
+        assertBad(groups, "x", text);
+        assertBad(groups, "x b1", text);
+
+        // required attribute
+        assertOk(groups, "a1");
+        assertOk(groups, "a1 x");
+        assertOk(groups, "x a1");
+    }
+    
+    public void testTwoSetsMultipleAttributes() throws ParserConfigurationException
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1", "a2" },
+            new String[] { "b1", "b2" }
+        };
+        String text = "must have all attributes for one of the sets: [a1, a2] [b1, b2]";
+        
+        // no attributes
+        assertBad(groups, "", text);
+        
+        // only optional attributes
+        assertBad(groups, "x", text);
+
+        // only one attribute from the required set
+        assertBad(groups, "a1", text);
+        assertBad(groups, "a2", text);
+        assertBad(groups, "b1", text);
+        assertBad(groups, "b2", text);
+        assertBad(groups, "a1 x", text);
+        assertBad(groups, "a2 x", text);
+        assertBad(groups, "b1 x", text);
+        assertBad(groups, "b2 x", text);
+        assertBad(groups, "x a1", text);
+        assertBad(groups, "x a2", text);
+        assertBad(groups, "x b1", text);
+        assertBad(groups, "x b2", text);
+        assertBad(groups, "a1 b1", text);
+        
+        // attributes from one required set
+        assertOk(groups, "a1 a2");
+        assertOk(groups, "x a1 a2");
+        assertOk(groups, "a1 x a2");
+        assertOk(groups, "a1 a2 x");
+        assertOk(groups, "b1 b2");
+        assertOk(groups, "x b1 b2");
+        assertOk(groups, "b1 x b2");
+        assertOk(groups, "b1 b2 x");
+        
+        // attributes from both required sets
+        assertOk(groups, "a1 a2 b1");
+        assertOk(groups, "x a1 a2 b1");
+        assertOk(groups, "a1 x a2 b1");
+        assertOk(groups, "a1 a2 x b1");
+        assertOk(groups, "a1 a2 b1 x");
+        assertOk(groups, "a1 a2 b2");
+        assertOk(groups, "x a1 a2 b2");
+        assertOk(groups, "a1 x a2 b2");
+        assertOk(groups, "a1 a2 x b2");
+        assertOk(groups, "a1 a2 b2 x");
+        assertOk(groups, "b1 b2 a1");
+        assertOk(groups, "x b1 b2 a1");
+        assertOk(groups, "b1 x b2 a1");
+        assertOk(groups, "b1 b2 x a1");
+        assertOk(groups, "b1 b2 a1 x");
+        assertOk(groups, "b1 b2 a2");
+        assertOk(groups, "x b1 b2 a2");
+        assertOk(groups, "b1 x b2 a2");
+        assertOk(groups, "b1 b2 x a2");
+        assertOk(groups, "b1 b2 a2 x");
+    }
+
+    public void testTwoSetsOverlappingAttributes() throws ParserConfigurationException
+    {
+        String[][] groups = new String[][] {
+            new String[] { "a1", "a2" },
+            new String[] { "a1", "b1" }
+        };
+        String text = "must have all attributes for one of the sets: [a1, a2] [a1, b1]";
+        
+        // no attributes
+        assertBad(groups, "", text);
+        
+        // only optional attributes
+        assertBad(groups, "x", text);
+
+        // attributes from first group
+        assertOk(groups, "a1 a2");
+        assertOk(groups, "x a1 a2");
+        assertOk(groups, "a1 x a2");
+        assertOk(groups, "a1 a2 x");
+        
+        // attributes from second group
+        assertOk(groups, "a1 b1");
+        assertOk(groups, "x a1 b1");
+        assertOk(groups, "a1 x b1");
+        assertOk(groups, "a1 b1 x");
+        
+        // attributes from both groups
+        assertOk(groups, "a1 a2 b1");
+    }
+    
+    public void testRealWorld() throws ParserConfigurationException
+    {
+        String[][] groups = new String[][] {
+            new String[] { "address" },
+            new String[] { "ref" },
+            new String[] { "type", "from" },
+            new String[] { "type", "recipient" }
+        };
+        
+        assertOk(groups, "from id name type");
     }
 
     protected PreProcessor createCheck(String[][] constraint)
     {
         return new CheckRequiredAttributes(constraint);
     }
-
 }

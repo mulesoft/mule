@@ -21,7 +21,16 @@
         <dependency>
             <groupId>jivesoftware</groupId>
             <artifactId>smack</artifactId>
-            <version>${smackVersion}-osgi</version>
+            <!--  TODO xmpp: osgify -->
+<!--            <version>${smackVersion}-osgi</version>-->
+            <version>${smackVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>jivesoftware</groupId>
+            <artifactId>smackx</artifactId>
+            <!--  TODO xmpp: osgify -->
+<!--            <version>${smackVersion}-osgi</version>-->
+            <version>${smackVersion}</version>
         </dependency>
 
         <dependency>
@@ -33,6 +42,18 @@
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

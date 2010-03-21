@@ -10,21 +10,26 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.transport.xmpp.XmppsConnector;
-
-public class XmppsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
+public class JabberSender extends RunnableWithExceptionHandler
 {
-
-    public XmppsNamespaceHandlerTestCase()
+    public interface Callback
     {
-        super(XmppsConnector.XMPPS);
+        void doit() throws Exception;
     }
 
-    public void testSubclassConfig() throws Exception
+    private Callback callback;
+    
+    public JabberSender(Callback callback)
     {
-        XmppsConnector connector = (XmppsConnector) muleContext.getRegistry().lookupConnector(
-            "xmppsConnector");
-        assertNotNull(connector);
+        super();
+        this.callback = callback;
     }
-
+    
+    @Override
+    protected void doRun() throws Exception
+    {
+        callback.doit();
+    }
 }
+
+

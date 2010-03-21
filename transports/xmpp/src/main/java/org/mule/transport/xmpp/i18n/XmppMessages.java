@@ -29,6 +29,11 @@ public class XmppMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 2);
     }
+
+    public static Message invalidConversationType(String conversationType)
+    {
+        return factory.createMessage(BUNDLE_PATH, 3, conversationType);
+    }
 }
 
 

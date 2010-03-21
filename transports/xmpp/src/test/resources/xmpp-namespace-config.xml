@@ -8,11 +8,21 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/xmpp http://www.mulesoft.org/schema/mule/xmpp/3.0/mule-xmpp.xsd">
 
-    <xmpp:connector name="xmppConnector"/>
+    <xmpp:connector name="xmppConnector"
+                    host="localhost" 
+                    port="1234" 
+                    user="mule" 
+                    password="secret"
+                    resource="MuleAtWork"
+                    createAccount="true"/>
 
-    <xmpp:endpoint name="simpleEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"/>
+    <!-- sending endpoint -->
+    <xmpp:endpoint name="sendingMessageEndpoint" type="MESSAGE" recipient="recipient@jabberhost" 
+        subject="TheSubject"/>
 
-    <xmpp:endpoint name="groupChatEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"
-        groupChat="true" nickname="bob"/>
-
+    <!-- receiving endpoint -->
+    <xmpp:endpoint name="receivingChatEndpoint" type="CHAT" from="sender@jabberhost"/>
+    
+    <xmpp:object-to-xmpp-transformer name="ObjectToXmpp"/>
+    <xmpp:xmpp-to-object-transformer name="XmppToObject"/>
 </mule>

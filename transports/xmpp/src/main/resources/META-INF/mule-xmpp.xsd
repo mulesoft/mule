@@ -15,7 +15,7 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            The XMPP transport connects Mule to an XMPP (Jabber) server. The XMPPS connector provides a secure implementation.
+            The XMPP transport connects Mule to an XMPP (Jabber) server.
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>XMPP</schemadoc:short-name>
@@ -38,14 +38,57 @@
     
     <xsd:complexType name="xmppConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType"/>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="host" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Host name or IP address of the Jabber server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="mule:substitutablePortNumber">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The port number to connect on. Default port is 5222.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="user" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The username used for authenitcation.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password for the user being authenticated.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="resource" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource portion of the address, such as user@host/resource or domain/resource.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="createAccount" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true, an attempt is made to create an account using the user and password while connecting. Default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
     
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                The endpoint on which this connector receives messages from the transport.
+                The endpoint on which this connector receives messages from the xmpp connection.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -94,76 +137,10 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="user" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The user name to use to connect to the XMPP server.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="password" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The password to use with the user name.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="host" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The host of the XMPP server, such as www.mulesource.com, localhost, or 127.0.0.1.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="port" type="mule:substitutablePortNumber">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The port number of the XMPP server, such as 5222.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="recipient" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The ID of the intended recipient of the messages, such as ross@myco.com.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="propertyAttributes">
-        <xsd:attribute name="groupChat" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Whether to start a group chat.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="nickname" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The user's nickname.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="resource" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The resource portion of the address, such as user@host/resource or domain/resource.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="thread" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The thread to which the message belongs.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="to" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The user to whom the message was sent.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -175,4 +152,86 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertyAttributes">
+        <xsd:attribute name="type" default="CHAT">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of the Jabber message to send: MESSAGE, CHAT or GROUPCHAT.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="MESSAGE"/>
+                    <xsd:enumeration value="CHAT"/>
+                    <xsd:enumeration value="GROUPCHAT"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+
+        <xsd:attributeGroup ref="messageAttributes"/>
+        <xsd:attributeGroup ref="chatAttributes"/>
+        <xsd:attributeGroup ref="multiUserChatAttributes"/>
+
+<!--        <xsd:attribute name="groupChat" type="mule:substitutableBoolean">-->
+<!--            <xsd:annotation>-->
+<!--                <xsd:documentation>-->
+<!--                    Whether to start a group chat.-->
+<!--                </xsd:documentation>-->
+<!--            </xsd:annotation>-->
+<!--        </xsd:attribute>-->
+<!--        <xsd:attribute name="resource" type="xsd:string">-->
+<!--            <xsd:annotation>-->
+<!--                <xsd:documentation>-->
+<!--                    The resource portion of the address, such as user@host/resource or domain/resource.-->
+<!--                </xsd:documentation>-->
+<!--            </xsd:annotation>-->
+<!--        </xsd:attribute>-->
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="messageAttributes">
+        <xsd:attribute name="subject" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The subject of the message.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="chatAttributes">
+        <!-- TODO xmpp: use the thread attribute in code (currently unimplemented) -->
+        <xsd:attribute name="thread" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The thread to which the message belongs.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="multiUserChatAttributes">
+        <xsd:attribute name="nickname" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The user's nickname.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:element name="xmpp-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                The xmpp-to-object-transformer element configures a transformer that converts an XMPP message into an object by extracting the message payload.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="object-to-xmpp-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                The object-to-xmpp-transformer element configures a transformer that converts an object into an XMPP message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>
