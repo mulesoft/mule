@@ -160,7 +160,8 @@ saxon-xqj-8.9.0.4
 servlet-api-2.5-20081211
 slf4j-api-1.5.0
 slf4j-log4j12-1.5.0
-smack-2.2.1-osgi
+smack-3.1.0
+smackx-3.1.0
 spring-aop-2.5.6
 spring-beans-2.5.6
 spring-context-2.5.6
