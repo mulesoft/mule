@@ -234,6 +234,16 @@
 
     <!--
     =============================
+        Mule Examples: Notifications
+    =============================
+    -->
+    <fileSet>
+        <directory>../../examples/notifications/dist</directory>
+        <outputDirectory>examples/notifications</outputDirectory>
+    </fileSet>
+
+    <!--
+    =============================
         Mule Examples: Scripting
     =============================
     -->
