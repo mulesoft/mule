@@ -81,7 +81,10 @@ class Configuration
     synchronized void addListenerSubscriptionPair(ListenerSubscriptionPair pair)
     {
         dirty = true;
-        listenerSubscriptionPairs.add(pair);
+        if (!listenerSubscriptionPairs.add(pair))
+        {
+            logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair));
+        }
     }
 
     synchronized void addAllListenerSubscriptionPairs(Collection pairs)

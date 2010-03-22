@@ -10,7 +10,10 @@
 
 package org.mule.context.notification;
 
+import static org.mule.util.ClassUtils.equal;
+
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.util.ClassUtils;
 
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).
@@ -69,5 +72,34 @@ public class ListenerSubscriptionPair
     {
         return nullSubscription;
     }
+
+    @Override
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{listener, subscription, nullSubscription});
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+
+        final ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
+        return equal(listener, other.listener) && equal(subscription, other.subscription)
+               && equal(nullSubscription, other.nullSubscription);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ListenerSubscriptionPair [listener=" + listener + ", subscription=" + subscription + "]";
+    } 
 
 }

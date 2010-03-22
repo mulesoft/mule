@@ -34,6 +34,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     private final AtomicBoolean managerStopped = new AtomicBoolean(false);
     private final AtomicInteger managerStoppedEvents = new AtomicInteger(0);
     private final AtomicBoolean modelStopped = new AtomicBoolean(false);
+    private final AtomicInteger modelStoppedEvents = new AtomicInteger(0);
     private final AtomicInteger componentStartedCount = new AtomicInteger(0);
     private final AtomicInteger customNotificationCount = new AtomicInteger(0);
 
@@ -63,9 +64,18 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         muleContext.registerListener(this);
         muleContext.stop();
         assertTrue(managerStopped.get());
-        assertEquals(2, managerStoppedEvents.get());
+        assertEquals(1, managerStoppedEvents.get());
     }
 
+    public void testMultipleRegistrationsDifferentSubscriptions() throws Exception
+    {
+        muleContext.registerListener(this, "_mule*");
+        muleContext.registerListener(this, "_mul*");
+        muleContext.stop();
+        assertTrue(modelStopped.get());
+        assertEquals(2, modelStoppedEvents.get());
+    }
+    
     public void testUnregistering() throws Exception
     {
         muleContext.registerListener(this);
@@ -200,6 +210,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         if (notification.getAction() == ModelNotification.MODEL_STOPPED)
         {
             modelStopped.set(true);
+            modelStoppedEvents.incrementAndGet();
         }
         else
         {

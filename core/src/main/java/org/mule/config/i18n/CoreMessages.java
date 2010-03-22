@@ -25,6 +25,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
+import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -1180,4 +1181,8 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 304);
     }
 
+    public static Message notificationListenerSubscriptionAlreadyRegistered(ListenerSubscriptionPair listenerPair)
+    {
+        return factory.createMessage(BUNDLE_PATH, 305, listenerPair);
+    }
 }
