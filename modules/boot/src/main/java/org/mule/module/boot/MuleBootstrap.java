@@ -10,9 +10,9 @@
 
 package org.mule.module.boot;
 
-import org.mule.util.PropertiesUtils;
-
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
@@ -34,12 +34,13 @@ import org.tanukisoftware.wrapper.WrapperSimpleApp;
  */
 public class MuleBootstrap
 {
-     private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
+    private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
  
-     public static final String CLI_OPTIONS[][] = {
-            {"main", "true", "Main Class"},
-             {"version", "false", "Show product and version information"}
-     };
+    public static final String CLI_OPTIONS[][] = {
+        {"main", "true", "Main Class"},
+        {"hotdeploy", "true", "Hot deployment classloading"},
+        {"version", "false", "Show product and version information"}
+    };
 
     public static void main(String[] args) throws Exception
     {
@@ -48,15 +49,15 @@ public class MuleBootstrap
         // Any unrecognized arguments get passed through to the next class (e.g., to the OSGi Framework).
         String[] remainingArgs = commandLine.getArgs();
 
+        prepareBootstrapPhase(commandLine);
+        
         String mainClassName = commandLine.getOptionValue("main");
         if (commandLine.hasOption("version"))
         {
-            prepareBootstrapPhase();
             WrapperManager.start(new VersionWrapper(), remainingArgs);
         }
         else if (mainClassName == null || mainClassName.equals(MuleServerWrapper.class.getName()))
         {
-            prepareBootstrapPhase();
             System.out.println("Starting the Mule Server...");
             WrapperManager.start(new MuleServerWrapper(), remainingArgs);
         }
@@ -66,30 +67,39 @@ public class MuleBootstrap
             String[] appArgs = new String[remainingArgs.length + 1];
             appArgs[0] = mainClassName;
             System.arraycopy(remainingArgs, 0, appArgs, 1, remainingArgs.length);
-            prepareBootstrapPhase();
             System.out.println("Starting class " + mainClassName + "...");
             WrapperSimpleApp.main(appArgs);
         }
     }
-    
-    private static void prepareBootstrapPhase() throws Exception
+
+    private static void prepareBootstrapPhase(CommandLine commandLine) throws Exception
     {
-        prepareBootstrapPhase(true);
+        boolean hotdeploy = true;
+        String hotdeployOption = commandLine.getOptionValue("hotdeploy");
+        if (hotdeployOption != null)
+        {
+            hotdeploy = Boolean.valueOf(hotdeployOption).booleanValue();
+        }
+                
+        prepareBootstrapPhase(hotdeploy);
     }
     
-    private static void prepareBootstrapPhase(boolean setupClassLoader) throws Exception
+    private static void prepareBootstrapPhase(boolean hotdeploy) throws Exception
     {
         File muleHome = lookupMuleHome();
         File muleBase = lookupMuleBase();
-
         if (muleBase == null)
         {
             muleBase = muleHome;
         }
 
+        if (!hotdeploy)
+        {            
+            MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleBase);
+        }
+        
         setSystemMuleVersion();
-        requestLicenseAcceptance();        
-
+        requestLicenseAcceptance();
     }
     
     public static File lookupMuleHome() throws Exception
@@ -131,10 +141,14 @@ public class MuleBootstrap
     
     private static void setSystemMuleVersion()
     {
+        InputStream propertiesStream = null;
         try
         {
             URL mavenPropertiesUrl = MuleBootstrapUtils.getResource(MULE_MODULE_BOOT_POM_FILE_PATH, MuleServerWrapper.class);
-            Properties mavenProperties = PropertiesUtils.loadProperties(mavenPropertiesUrl);
+            propertiesStream = mavenPropertiesUrl.openStream();
+            
+            Properties mavenProperties = new Properties();
+            mavenProperties.load(propertiesStream);
             
             System.setProperty("mule.version", mavenProperties.getProperty("version"));
             System.setProperty("mule.reference.version", mavenProperties.getProperty("version") + '-' + (new Date()).getTime());
@@ -142,6 +156,20 @@ public class MuleBootstrap
         catch (Exception ignore)
         {
             // ignore;
+        }
+        finally
+        {
+            if (propertiesStream != null)
+            {
+                try
+                {
+                    propertiesStream.close();
+                }
+                catch (IOException iox)
+                {
+                    // ignore
+                }
+            }
         }
     }
 

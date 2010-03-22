@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,14 +26,10 @@ public class DefaultMuleClassPathConfig
     protected static final String MULE_DIR = "/lib/mule";
     protected static final String USER_DIR = "/lib/user";
     protected static final String OPT_DIR = "/lib/opt";
+    protected static final String APPS_DIR = "/apps";
 
-    private List urls = new ArrayList();
+    private List<URL> urls = new ArrayList<URL>();
 
-    /**
-     * Constructs a new DefaultMuleClassPathConfig.
-     * @param muleHome Mule home directory
-     * @param muleBase Mule base directory
-     */
     public DefaultMuleClassPathConfig(File muleHome, File muleBase)
     {
         /**
@@ -48,8 +41,8 @@ public class DefaultMuleClassPathConfig
             if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile()))
             {
                 File userOverrideDir = new File(muleBase, USER_DIR);
-                this.addFile(userOverrideDir);
-                this.addFiles(this.listJars(userOverrideDir));
+                addFile(userOverrideDir);
+                addFiles(listJars(userOverrideDir));
             }
         }
         catch (IOException ioe)
@@ -58,64 +51,46 @@ public class DefaultMuleClassPathConfig
         }
 
         File userDir = new File(muleHome, USER_DIR);
-        this.addFile(userDir);
-        this.addFiles(this.listJars(userDir));
+        addFile(userDir);
+        addFiles(listJars(userDir));
 
         File muleDir = new File(muleHome, MULE_DIR);
-        this.addFile(muleDir);
-        this.addFiles(this.listJars(muleDir));
+        addFile(muleDir);
+        addFiles(listJars(muleDir));
 
         File optDir = new File(muleHome, OPT_DIR);
-        this.addFile(optDir);
-        this.addFiles(this.listJars(optDir));
+        addFile(optDir);
+        addFiles(listJars(optDir));
+        
+        addAppsDir(muleHome);
     }
 
-    /**
-     * Getter for property 'urls'.
-     *
-     * @return A copy of 'urls'. Items are java.net.URL
-     */
-    public List getURLs()
+    public List<URL> getURLs()
     {
-        return new ArrayList(this.urls);
+        return new ArrayList<URL>(this.urls);
     }
 
-    /**
-     * Setter for property 'urls'.
-     *
-     * @param urls Value to set for property 'urls'.
-     */
-    public void addURLs(List urls)
-    {
-        if (urls != null && !urls.isEmpty())
-        {
-            this.urls.addAll(urls);
-        }
-    }
-
-    /**
-     * Add a URL to Mule's classpath.
-     *
-     * @param url folder (should end with a slash) or jar path
-     */
-    public void addURL(URL url)
+    protected void addURL(URL url)
     {
         this.urls.add(url);
     }
 
-    public void addFiles(List files)
+    protected void addFiles(File[] files)
     {
-        for (Iterator i = files.iterator(); i.hasNext();)
+        if (files != null)
         {
-            this.addFile((File)i.next());
+            for (File f : files)
+            {
+                addFile(f);
+            }
         }
     }
 
     public void addFile(File jar)
     {
         try
-        {
-            this.addURL(jar.getAbsoluteFile().toURI().toURL());
+        {            
+            addURL(jar.getAbsoluteFile().toURI().toURL());
         }
         catch (MalformedURLException mux)
         {
@@ -128,24 +103,62 @@ public class DefaultMuleClassPathConfig
      *
      * @return a list of {@link File}s
      */
-    protected List listJars(File path)
+    protected File[] listJars(File path)
     {
         File[] jars = path.listFiles(new FileFilter()
         {
             public boolean accept(File pathname)
             {
-                try
-                {
-                    return pathname.getCanonicalPath().endsWith(".jar");
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e.getMessage());
-                }
+                return isJar(pathname);
             }
         });
 
-        return jars == null ? Collections.EMPTY_LIST : Arrays.asList(jars);
+        return jars;
+    }
+    
+    protected void addAppsDir(File muleHome)
+    {
+        File appsDir = new File(muleHome, APPS_DIR);
+        if (appsDir.exists() == false)
+        {
+            return;
+        }
+        
+        File[] apps = appsDir.listFiles(new FileFilter()
+        {
+            public boolean accept(File file)
+            {
+                return file.isDirectory();
+            }
+        });
+        
+        for (File app : apps)
+        {
+            addApp(app);
+        }
+    }
+        
+    protected void addApp(File app)
+    {
+        // add the app directory itself, it may contain configuration files
+        addFile(app);
+        
+        File libDir = new File(app, "lib");
+        if (libDir.exists())
+        {
+            addFiles(listJars(libDir));
+        }
     }
 
+    protected static boolean isJar(File file)
+    {
+        try
+        {
+            return file.getCanonicalPath().endsWith(".jar");
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }
