@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mule.examples</groupId>    
+    <groupId>org.mule.examples</groupId>
     <artifactId>mule-example-notifications</artifactId>
     <packaging>war</packaging>
     <name>Notifications Example</name>
     <version>1.0</version>
-    
+
     <properties>
         <muleVersion>3.0.0-M2-SNAPSHOT</muleVersion>
     </properties>
-    
+
     <description>Demonstrates capturing and firing notifications and uses AJAX to send notifications to the browser.</description>
 
     <build>
-        <defaultGoal>tomcat:run</defaultGoal>    
+        <defaultGoal>tomcat:run</defaultGoal>
         <plugins>
              <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -25,7 +25,6 @@
                     <port>8888</port>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -35,12 +34,10 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
@@ -61,6 +58,5 @@
             <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-       
     </dependencies>
 </project>

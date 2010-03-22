@@ -27,11 +27,13 @@ import java.util.Map;
  */
 public class DummySecurityFilter extends AbstractEndpointSecurityFilter
 {
+    @Override
     protected void authenticateInbound(MuleEvent event) throws org.mule.api.security.SecurityException, CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
         doAuthenticate(event);
     }
 
+    @Override
     protected void authenticateOutbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
         doAuthenticate(event);
@@ -59,8 +61,9 @@ public class DummySecurityFilter extends AbstractEndpointSecurityFilter
 
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
-
+        // nothing to do
     }
 }

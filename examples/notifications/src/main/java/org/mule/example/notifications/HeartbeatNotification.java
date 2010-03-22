@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.example.notifications;
 
 import org.mule.api.MuleContext;
@@ -17,18 +18,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * A simple notification that fires repeatedly to notify tha the Mule server is alive and well.
+ * A simple notification that fires repeatedly to notify tha the Mule server is alive
+ * and well.
  */
 public class HeartbeatNotification extends CustomNotification implements BlockingServerEvent
 {
-    /**
-     * Serial version
-     */
     private static final long serialVersionUID = -3246036188011581121L;
 
     public static final int HEARTBEAT = CUSTOM_EVENT_ACTION_START_RANGE + 1300;
 
-    static {
+    static
+    {
         registerAction("mule heartbeat", HEARTBEAT);
     }
 
@@ -36,7 +36,6 @@ public class HeartbeatNotification extends CustomNotification implements Blockin
     {
         super(getHostInfo(), HEARTBEAT, context.getConfiguration().getId());
     }
-
 
     protected static String getHostInfo()
     {
@@ -50,10 +49,11 @@ public class HeartbeatNotification extends CustomNotification implements Blockin
             return "unknown";
         }
     }
+
+    @Override
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-                + ", timestamp=" + timestamp + "}";
+               + ", timestamp=" + timestamp + "}";
     }
-
 }

@@ -16,4 +16,5 @@ import org.mule.api.context.notification.ServerNotificationListener;
  */
 public interface HeartbeatNotificationListener<T extends HeartbeatNotification> extends ServerNotificationListener<HeartbeatNotification>
 {
+    // no custom methods
 }

@@ -42,6 +42,7 @@ public class HeartbeatAgent extends AbstractAgent
         this.frequency = frequency;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         //No Op
@@ -83,7 +84,7 @@ public class HeartbeatAgent extends AbstractAgent
     {
         public void release()
         {
-
+            //No Op
         }
 
         public void run()
