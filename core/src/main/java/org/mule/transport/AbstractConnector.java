@@ -978,6 +978,17 @@ public abstract class AbstractConnector
     {
         return this.dispatchers.getMaxActive();
     }
+ 
+    /**
+     * Returns the maximum number of dispatchers that can be concurrently active for
+     * all endpoints.
+     *
+     * @return max. total number of active dispatchers
+     */
+    public int getMaxTotalDispatchers()
+    {
+        return this.dispatchers.getMaxTotal();
+    }
 
     /**
      * Configures the maximum number of dispatchers that can be concurrently active

@@ -58,7 +58,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         c.setSendBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
 
-        int maxDispatchers = c.getMaxDispatchersActive();
+        int maxDispatchers = c.getMaxTotalDispatchers();
         HttpConnectionManagerParams params = c.getClientConnectionManager().getParams();
         assertEquals(maxDispatchers, params.getDefaultMaxConnectionsPerHost());
         assertEquals(maxDispatchers, params.getMaxTotalConnections());
