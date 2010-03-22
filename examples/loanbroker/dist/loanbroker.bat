@@ -18,6 +18,6 @@ ECHO   2. Loan Broker ESN
 ECHO   3. Loan Broker BPM
 SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="%MULE_HOME_UNIX%"
-IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esn.LoanBrokerApp
-IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.bpm.LoanBrokerApp
+IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esb.LoanBrokerApp -hotdeploy false -M-Dmule.home.unix="%MULE_HOME_UNIX%"
+IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.esn.LoanBrokerApp -hotdeploy false
+IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -main org.mule.example.loanbroker.bpm.LoanBrokerApp -hotdeploy false

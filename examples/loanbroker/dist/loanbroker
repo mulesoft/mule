@@ -1,7 +1,7 @@
 #! /bin/sh
 
 if [ -z "$MULE_HOME" ] ; then
-  echo "You must set the environment variable MULE_HOME to the location of your Mule install in order to run this example." 
+  echo "You must set the environment variable MULE_HOME to the location of your Mule install in order to run this example."
   exit 1
 fi
 
@@ -15,7 +15,7 @@ if [ ! -d "$MULE_BASE/apps/mule-example-loanbroker-esn" ]
 then
     echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
     exit 1
-fi         
+fi
 
 echo "The Loan Broker example is available in three flavors:"
 echo "  1. Loan Broker ESB"
@@ -28,11 +28,11 @@ if [ 1 = $i ]
 then
     # MULE_HOME_UNIX must be set. This is a workaround for windows but since the config relies
     # on it we need to implement it here, too
-    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="$MULE_HOME"
+    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esb.LoanBrokerApp -hotdeploy false -M-Dmule.home.unix="$MULE_HOME"
 elif [ 2 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esn.LoanBrokerApp
+    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.esn.LoanBrokerApp -hotdeploy false
 elif [ 3 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.bpm.LoanBrokerApp
+    exec "$MULE_BASE/bin/mule" -main org.mule.example.loanbroker.bpm.LoanBrokerApp -hotdeploy false
 fi
