@@ -12,22 +12,31 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.context.notification.ServerNotificationManager;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public class ServerNotificationManagerConfigurator implements MuleContextAware, SmartFactoryBean
+public class ServerNotificationManagerConfigurator
+    implements MuleContextAware, SmartFactoryBean, ApplicationContextAware
 {
 
     private MuleContext muleContext;
+    private ApplicationContext applicationContext;
 
     private Boolean dynamic;
     private Map interfaceToEvents;
     private Collection interfaces;
-    private Collection pairs;
+    private Collection<ListenerSubscriptionPair> pairs;
 
     public void setMuleContext(MuleContext context)
     {
@@ -49,11 +58,66 @@ public class ServerNotificationManagerConfigurator implements MuleContextAware, 
         {
             notificationManager.setDisabledInterfaces(interfaces);
         }
+
+        // Merge:
+        // i) existing listeners,
+        // ii) explicitly configured notification listeners,
+        // iii) any singleton beans defined in spring that implement
+        // ServerNotificationListener.
+        notificationManager.setAllListenerSubscriptionPairs(getMergedListeners(notificationManager));
+
+        return notificationManager;
+    }
+
+    protected Set<ListenerSubscriptionPair> getMergedListeners(ServerNotificationManager notificationManager)
+    {
+        Set<ListenerSubscriptionPair> mergedListeners = new HashSet<ListenerSubscriptionPair>();
+
+        // Listeners already configured programatically or by other means via the
+        // mule context.
+        Set<ListenerSubscriptionPair> existingPairs = notificationManager.getListeners();
+
+        // Any singleton bean defined in spring that implements
+        // ServerNotificationListener or a subclass.
+        String[] listenerBeans = applicationContext.getBeanNamesForType(ServerNotificationListener.class,
+            false, true);
+        Set<ListenerSubscriptionPair> adhocListeners = new HashSet<ListenerSubscriptionPair>();
+        for (String name : listenerBeans)
+        {
+            adhocListeners.add(new ListenerSubscriptionPair(
+                (ServerNotificationListener<?>) applicationContext.getBean(name), null));
+        }
+
+        // First we must include all existing listeners
+        mergedListeners.addAll(existingPairs);
+
         if (pairs != null)
         {
-            notificationManager.setAllListenerSubscriptionPairs(pairs);
+            mergedListeners.addAll(pairs);
+
+            for (ListenerSubscriptionPair candidate : adhocListeners)
+            {
+                boolean explicityDefined = false;
+                for (ListenerSubscriptionPair explicitListener : pairs)
+                {
+                    if (candidate.getListener().equals(explicitListener.getListener()))
+                    {
+                        explicityDefined = true;
+                        break;
+                    }
+                }
+                if (!explicityDefined)
+                {
+                    mergedListeners.add(candidate);
+                }
+            }
         }
-        return notificationManager;
+        else
+        {
+            mergedListeners.addAll(adhocListeners);
+        }
+
+        return mergedListeners;
     }
 
     public Class getObjectType()
@@ -94,6 +158,12 @@ public class ServerNotificationManagerConfigurator implements MuleContextAware, 
     public boolean isPrototype()
     {
         return false;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.applicationContext = applicationContext;
+
     }
 
 }

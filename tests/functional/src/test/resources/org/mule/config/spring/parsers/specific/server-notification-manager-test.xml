@@ -27,6 +27,9 @@
         <notification-listener ref="listener2"/>
         <notification-listener ref="securityListener"/>
 
+        <notification-listener ref="listener3" subscription="*"/>
+            
+    
     </notifications>
 
     <spring:bean name="listener"
@@ -35,5 +38,17 @@
                  class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
     <spring:bean name="securityListener"
                  class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestSecurityListener"/>
+
+    <!-- This bean is a listener but will only be registered using explicit configuration above (with subscription)
+    <spring:bean name="listener3"
+                class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
+   
+    <!--
+         This bean is a listener and will be registered with null subscription automatically because the same listener
+         is not defined as a listener explicity above.
+    --->
+    <spring:bean name="listener4"
+                class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
+        
 
 </mule>

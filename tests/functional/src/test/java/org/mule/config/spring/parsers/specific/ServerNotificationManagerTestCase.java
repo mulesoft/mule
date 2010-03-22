@@ -17,6 +17,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.tck.FunctionalTestCase;
@@ -56,7 +57,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
-        assertEquals(3, listeners.size());
+        assertEquals(5, listeners.size());
         TestListener listener = (TestListener) muleContext.getRegistry().lookupObject("listener");
         assertNotNull(listener);
         assertFalse(listener.isCalled());
@@ -65,17 +66,49 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         assertTrue(listener.isCalled());
     }
 
+    public void testExplicitlyConiguredNotificationListenerRegistration() throws InterruptedException
+    {
+        ServerNotificationManager manager = muleContext.getNotificationManager();
+        assertTrue(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "listener"), null)));
+        assertTrue(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "listener2"), null)));
+        assertTrue(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "securityListener"), null)));
+        assertTrue(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "listener3"), "*")));
+    }
+
+    public void testAdhocNotificationListenerRegistrations() throws InterruptedException
+    {
+        ServerNotificationManager manager = muleContext.getNotificationManager();
+
+        // Not registered asad-hoc listener with null subscription as this is defined
+        // explicitly.
+        assertFalse(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "listener3"), null)));
+
+        // Registered as configured
+        assertTrue(manager.getListeners().contains(
+            new ListenerSubscriptionPair((ServerNotificationListener) muleContext.getRegistry().lookupObject(
+                "listener4"), null)));
+    }
+
     public void testDisabledNotification() throws InterruptedException
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
-        assertEquals(3, listeners.size());
-        TestListener2 listener2 =
-                (TestListener2) muleContext.getRegistry().lookupObject("listener2");
+        assertEquals(5, listeners.size());
+        TestListener2 listener2 = (TestListener2) muleContext.getRegistry().lookupObject("listener2");
         assertNotNull(listener2);
         assertFalse(listener2.isCalled());
-        TestSecurityListener adminListener =
-                (TestSecurityListener) muleContext.getRegistry().lookupObject("securityListener");
+        TestSecurityListener adminListener = (TestSecurityListener) muleContext.getRegistry().lookupObject(
+            "securityListener");
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
         manager.fireNotification(new TestSecurityEvent(muleContext));
@@ -110,8 +143,41 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         }
 
     }
-
     protected static class TestListener2 implements TestInterface2
+    {
+
+        private boolean called = false;
+
+        public boolean isCalled()
+        {
+            return called;
+        }
+
+        public void onNotification(ServerNotification notification)
+        {
+            called = true;
+        }
+
+    }
+
+    protected static class TestListener3 implements TestInterface2
+    {
+
+        private boolean called = false;
+
+        public boolean isCalled()
+        {
+            return called;
+        }
+
+        public void onNotification(ServerNotification notification)
+        {
+            called = true;
+        }
+
+    }
+
+    protected static class TestListener4 implements TestInterface2
     {
 
         private boolean called = false;
@@ -161,10 +227,9 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         public TestSecurityEvent(MuleContext muleContext)
         {
             super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext)), 0);
+                new DefaultMuleMessage(NullPayload.getInstance(), muleContext)), 0);
         }
 
     }
-
 
 }
