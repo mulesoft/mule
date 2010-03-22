@@ -28,9 +28,9 @@ public class NotificationListenerProcessor implements PreInitProcessor
 
     public Object process(Object object)
     {
-        if(object instanceof ServerNotificationListener)
+        if (object instanceof ServerNotificationListener)
         {
-            context.getNotificationManager().addListener((ServerNotificationListener)object);
+            context.getNotificationManager().addListener((ServerNotificationListener) object);
         }
         return object;
     }
