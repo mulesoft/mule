@@ -17,6 +17,7 @@ import org.mule.transport.jms.JmsTopicResolver;
 
 public class MuleMQJmsConnectorTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "mulemq-config.xml";
