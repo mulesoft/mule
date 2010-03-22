@@ -2462,6 +2462,44 @@ public abstract class AbstractConnector
         this.validateConnections = validateConnections;
     }
     
+    // MULE-4751 Expose some dispatcher and requester object pool configuration
+    
+    /**
+     * Allows an ExhaustedAction to be configured on the dispatcher object pool 
+     * See: {@link GenericKeyedObjectPool#setWhenExhaustedAction(byte)} 
+     */
+    public void setDispatcherPoolWhenExhaustedAction(byte whenExhaustedAction)
+    {
+        dispatchers.setWhenExhaustedAction(whenExhaustedAction);
+    }
+
+    /**
+     * Allows a maxWait timeout to be configured on the dispatcher object pool 
+     * See: {@link GenericKeyedObjectPool#setMaxWait(long)} 
+     */
+    public void setDispatcherPoolMaxWait(int maxWait)
+    {
+        dispatchers.setMaxWait(maxWait);
+    }
+
+    /**
+     * Allows an ExhaustedAction to be configured on the requester object pool 
+     * See: {@link GenericKeyedObjectPool#setWhenExhaustedAction(byte)} 
+     */
+    public void setRequesterPoolWhenExhaustedAction(byte whenExhaustedAction)
+    {
+        requesters.setWhenExhaustedAction(whenExhaustedAction);
+    }
+
+    /**
+     * Allows a maxWait timeout to be configured on the requester object pool 
+     * See: {@link GenericKeyedObjectPool#setMaxWait(long)} 
+     */
+    public void setRequesterPoolMaxWait(int maxWait)
+    {
+        requesters.setMaxWait(maxWait);
+    }
+    
     private class DispatchWorker extends AbstractMuleEventWork
     {
         private OutboundEndpoint endpoint;
