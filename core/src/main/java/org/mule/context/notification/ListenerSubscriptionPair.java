@@ -10,8 +10,6 @@
 
 package org.mule.context.notification;
 
-import static org.mule.util.ClassUtils.equal;
-
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.util.ClassUtils;
 
@@ -30,7 +28,7 @@ public class ListenerSubscriptionPair
      */
     public ListenerSubscriptionPair()
     {
-        // empty
+        super();
     }
 
     public ListenerSubscriptionPair(ServerNotificationListener listener)
@@ -91,9 +89,10 @@ public class ListenerSubscriptionPair
             return false;
         }
 
-        final ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
-        return equal(listener, other.listener) && equal(subscription, other.subscription)
-               && equal(nullSubscription, other.nullSubscription);
+        ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
+        return ClassUtils.equal(listener, other.listener) 
+            && ClassUtils.equal(subscription, other.subscription)
+            && (nullSubscription == other.nullSubscription);
     }
 
     @Override
