@@ -58,10 +58,10 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         c.setSendBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
 
-        int maxThreadsActive = c.getDispatcherThreadingProfile().getMaxThreadsActive();
+        int maxDispatchers = c.getMaxDispatchersActive();
         HttpConnectionManagerParams params = c.getClientConnectionManager().getParams();
-        assertEquals(maxThreadsActive, params.getDefaultMaxConnectionsPerHost());
-        assertEquals(maxThreadsActive, params.getMaxTotalConnections());
+        assertEquals(maxDispatchers, params.getDefaultMaxConnectionsPerHost());
+        assertEquals(maxDispatchers, params.getMaxTotalConnections());
 
         // all kinds of timeouts are now being tested in TcpConnectorTestCase
     }

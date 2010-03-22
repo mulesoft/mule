@@ -163,8 +163,8 @@ public class HttpConnector extends TcpConnector
             }
 
             params.setTcpNoDelay(isSendTcpNoDelay());
-            params.setMaxTotalConnections(getDispatcherThreadingProfile().getMaxThreadsActive());
-            params.setDefaultMaxConnectionsPerHost(getDispatcherThreadingProfile().getMaxThreadsActive());
+            params.setMaxTotalConnections(dispatchers.getMaxActive());
+            params.setDefaultMaxConnectionsPerHost(dispatchers.getMaxActive());
             clientConnectionManager.setParams(params);
         }
     }
