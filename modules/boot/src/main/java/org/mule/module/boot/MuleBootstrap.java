@@ -38,7 +38,7 @@ public class MuleBootstrap
  
     public static final String CLI_OPTIONS[][] = {
         {"main", "true", "Main Class"},
-        {"hotdeploy", "true", "Hot deployment classloading"},
+        {"production", "false", "Modify the system class loader for production use (as in Mule 2.x)"},
         {"version", "false", "Show product and version information"}
     };
 
@@ -74,17 +74,11 @@ public class MuleBootstrap
 
     private static void prepareBootstrapPhase(CommandLine commandLine) throws Exception
     {
-        boolean hotdeploy = true;
-        String hotdeployOption = commandLine.getOptionValue("hotdeploy");
-        if (hotdeployOption != null)
-        {
-            hotdeploy = Boolean.valueOf(hotdeployOption).booleanValue();
-        }
-                
-        prepareBootstrapPhase(hotdeploy);
+        boolean production = commandLine.hasOption("production");                
+        prepareBootstrapPhase(production);
     }
     
-    private static void prepareBootstrapPhase(boolean hotdeploy) throws Exception
+    private static void prepareBootstrapPhase(boolean production) throws Exception
     {
         File muleHome = lookupMuleHome();
         File muleBase = lookupMuleBase();
@@ -93,7 +87,7 @@ public class MuleBootstrap
             muleBase = muleHome;
         }
 
-        if (!hotdeploy)
+        if (production)
         {            
             MuleBootstrapUtils.addLocalJarFilesToClasspath(muleHome, muleBase);
         }
