@@ -346,10 +346,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="globalStoreCapacity" type="mule:substitutableInt" default="1000">
+                <xsd:attribute name="globalStoreCapacity" type="mule:substitutableInt" default="5000">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Sets that the default channel/queue capacity setting which will prevent publishing of further events once topic or queue is full, default is 1000, valid range is 1 to Integer.MAX_VALUE.
+                            Sets that the default channel/queue capacity setting which will prevent publishing of further events once topic or queue is full, default is 5000, valid range is 1 to Integer.MAX_VALUE.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -367,17 +367,17 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queueWindowSize" type="mule:substitutableInt" default="1000">
+                <xsd:attribute name="queueWindowSize" type="mule:substitutableInt" default="100">
                     <xsd:annotation>
                         <xsd:documentation>
-                            When using queues, this specifies the number of messages that the server will send in each block between acknowledgments, default is 1000, range is 1 to Integer.MAX_VALUE.
+                            When using queues, this specifies the number of messages that the server will send in each block between acknowledgments, default is 100, range is 1 to Integer.MAX_VALUE.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="autoAckCount" type="mule:substitutableInt" default="500">
+                <xsd:attribute name="autoAckCount" type="mule:substitutableInt" default="50">
                     <xsd:annotation>
                         <xsd:documentation>
-                            When auto acknowledgment mode is selected, rather than ack each event, each nth event will be acknowledged, default is 500, range is 1 to Integer.MAX_VALUE.
+                            When auto acknowledgment mode is selected, rather than ack each event, each nth event will be acknowledged, default is 50, range is 1 to Integer.MAX_VALUE.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -427,6 +427,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                           If a transacted session commit fails, if this is true, the commit will be retried until either it succeeds or fails with a transaction timeout, default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableMultiplexedConnections" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                          if this is true, the session will be multiplexed on a single connection else a new socket is created for each session, default is false.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
