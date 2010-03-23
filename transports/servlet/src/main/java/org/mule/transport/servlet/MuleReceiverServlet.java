@@ -261,11 +261,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         url.append(":");
         url.append(httpServletRequest.getServerPort());
         url.append(httpServletRequest.getServletPath());
-        url.append(httpServletRequest.getPathInfo());
-        if (httpServletRequest.getQueryString() != null)
+        
+        String pathInfo = httpServletRequest.getPathInfo();
+        if (pathInfo != null)
+        {
+            url.append(pathInfo);
+        }
+        
+        String queryString = httpServletRequest.getQueryString();
+        if (queryString != null)
         {
             url.append("?");
-            url.append(httpServletRequest.getQueryString());
+            url.append(queryString);
         }
         return url.toString();
     }
