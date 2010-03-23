@@ -12,6 +12,7 @@ package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.transport.MessageAdapter;
@@ -54,7 +55,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
     private final TemplateParser wigglyMuleParser = TemplateParser.createMuleStyleParser();
     private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
 
-    private MuleContext muleContext;
+    protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
     {
@@ -65,7 +66,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
     {
         if (expression == null)
         {
-            return expression = DEFAULT_EXPRESSION;
+            expression = DEFAULT_EXPRESSION;
         }
 
         if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1)
@@ -78,14 +79,14 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
         }
     }
 
-
     protected String getFilename(final MessageAdapter adapter, String expression, TemplateParser parser)
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
             public Object match(String token)
             {
-                return muleContext.getExpressionManager().evaluate(token, new DefaultMuleMessage(adapter, muleContext));
+                MuleMessage matchMessage = new DefaultMuleMessage(adapter, muleContext);
+                return muleContext.getExpressionManager().evaluate(token, matchMessage);
             }
         }, expression);
     }

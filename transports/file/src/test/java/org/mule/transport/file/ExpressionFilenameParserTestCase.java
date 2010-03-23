@@ -22,6 +22,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
     private ExpressionFilenameParser parser;
     private MessageAdapter adapter;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -73,7 +74,6 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         {
             //Expected
         }
-
     }
 
     public void testSquareStyleParsing()
