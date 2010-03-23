@@ -14,9 +14,7 @@
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
-    <property name="dir.common" value="../common"/>
     <property name="dir.common.tests" value="../common-tests"/>
-
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -24,7 +22,6 @@
     </target>
 
     <target name="init">
-
        <ant dir="${dir.common.tests}" antfile="build.xml" />   
            
         <!-- Create the build directory if it doesn't exist -->
@@ -45,15 +42,11 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
-            <fileset dir="${dir.common}/${dir.build}">
-                <include name="*.jar"/>
-            </fileset>
+            <!-- Include dependent test jar-->
             <fileset dir="${dir.common.tests}/${dir.build}">
                 <include name="*.jar"/>
             </fileset>
         </path>
-
-
     </target>
 
     <target name="compile"
@@ -86,30 +79,17 @@
             <fileset dir="${dir.conf}">
                 <include name="**/*"/>
             </fileset>
-
         </jar>
-
    </target>
 
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">
            
-            <copy file="${dir.build}/${app.name}.jar"
-                  todir="${dir.mule.home}/apps/${app.name}/lib"
-                  overwrite="true" verbose="true"/>
-           <copy todir="${dir.mule.home}/apps/${app.name}"
-                 overwrite="true" verbose="true">
-                <fileset dir="${dir.classes}">
-                    <include name="**/*.xml"/>
-                </fileset>
-           </copy>
-           <copy todir="${dir.mule.home}/apps/${app.name}/lib"
-                 overwrite="true" verbose="true">
-                <fileset dir="${dir.common}/${dir.build}">
-                    <include name="**/*.jar"/>
-                </fileset>
-           </copy>
+        <copy file="${dir.build}/${app.name}.jar" 
+              todir="${dir.user.lib}" 
+              overwrite="true"
+              verbose="true"/>
    </target>
 
    <target name="setup">
@@ -140,5 +120,4 @@
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
       <antcall target="deploy"/>
    </target>
-
 </project>

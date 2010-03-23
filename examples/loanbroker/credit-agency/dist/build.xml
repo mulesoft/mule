@@ -16,13 +16,14 @@
     <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
 
-
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
     <target name="init">
+       <ant dir="${dir.common.tests}" antfile="build.xml" />   
+           
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -41,6 +42,10 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
+            <!-- Include dependent test jar-->
+            <fileset dir="${dir.common.tests}/${dir.build}">
+                <include name="*.jar"/>
+            </fileset>
         </path>
     </target>
 
@@ -55,7 +60,6 @@
                target="1.5">
             <classpath refid="classpath.mule"/>
         </javac>
-        
     </target>
 
    <target name="package" 
@@ -70,6 +74,16 @@
                 <include name="**/*"/>
             </fileset>
         </jar>
+   </target>
+
+   <target name="deploy" 
+           depends="package" 
+           description="Deploy the application to the Mule server">
+           
+        <copy file="${dir.build}/${app.name}.jar" 
+              todir="${dir.user.lib}" 
+              overwrite="true"
+              verbose="true"/>
    </target>
 
    <target name="setup">
@@ -92,13 +106,12 @@
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="package"/>
+      <antcall target="deploy"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="package"/>
+      <antcall target="deploy"/>
    </target>
-
 </project>
