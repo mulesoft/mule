@@ -17,7 +17,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.Disposable;
@@ -58,6 +57,12 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
     protected SoftReference<?> componentObject;
+
+    /**
+     * name under which the componentObject is registered in the registry
+     */
+    private String componentObjectRegistryKey;
+
     protected JavaComponent component;
     protected EntryPointResolverSet entryPointResolver;
     
@@ -92,12 +97,13 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         this.muleContext = muleContext;
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
-        final String key = createRegistryHardRefName(component);
+        componentObjectRegistryKey = createRegistryHardRefName(componentObject);
         // register only if none registered yet
         if (r.lookupObjects(componentObject.getClass()).isEmpty())
         {
             // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
-            r.registerObject(key, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_BYPASS_FLAG);
+            r.registerObject(componentObjectRegistryKey, componentObject, 
+                MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_BYPASS_FLAG);
         }
     }
 
@@ -180,7 +186,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             try
             {
                 // unregister a hard ref to the component object
-                muleContext.getRegistry().unregisterObject(createRegistryHardRefName(component));
+                muleContext.getRegistry().unregisterObject(componentObjectRegistryKey);
 
                 //make sure we haven't lost the reference to the object
                 Object o = componentObject.get();
@@ -315,13 +321,11 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     }
 
     /**
-     * Generate a registry key name for this component. Used to bind component's hard reference to the Mule's
-     * lifecycle and prevent the garbage collector from kicking in too early.
-     * @param component component to generate the name for
-     * @return registry key name
+     * Generate a registry key name for this component. Used to bind component's hard reference to 
+     * the Mule's lifecycle and prevent the garbage collector from kicking in too early.
      */
-    protected String createRegistryHardRefName(Component component)
+    protected String createRegistryHardRefName(Object object)
     {
-        return "_component.hardref." + component.getService().getName();
+        return "_component.hardref." + component.getService().getName() + "." + System.identityHashCode(object);
     }
 }
