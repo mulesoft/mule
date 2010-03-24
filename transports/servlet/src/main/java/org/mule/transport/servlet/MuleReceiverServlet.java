@@ -154,9 +154,57 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         // template method
     }
+    
+    // We cannot override the service method and maintain MuleRESTServletReceiver
+    // functionality. See MULE-4806.
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+    
+    @Override
+    protected void doHead(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+    @Override
+    protected void doTrace(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        doAllMethods(req, resp);
+    }
+
+    protected void doAllMethods(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         try
         {
