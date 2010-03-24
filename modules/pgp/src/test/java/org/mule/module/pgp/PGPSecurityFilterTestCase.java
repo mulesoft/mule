@@ -54,6 +54,18 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
         
+        //poll for the output file; wait for a max of 5 seconds
+        File pollingFile = null;
+        for(int i = 0; i < 5; i++)
+        {
+            pollingFile = new File(DIRECTORY + TARGET);
+            if(!pollingFile.exists())
+            {
+                Thread.sleep(1000);
+            }
+        }
+        pollingFile = null;
+        
         try
         {
             // check if file exists
