@@ -98,13 +98,10 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
         componentObjectRegistryKey = createRegistryHardRefName(componentObject);
-        // register only if none registered yet
-        if (r.lookupObjects(componentObject.getClass()).isEmpty())
-        {
-            // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
-            r.registerObject(componentObjectRegistryKey, componentObject, 
-                MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_BYPASS_FLAG);
-        }
+        // don't mess up the current component's lifecycle, just put a direct ref
+        // without any callbacks executed
+        r.registerObject(componentObjectRegistryKey, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG
+                                                                      + MuleRegistry.PRE_INIT_BYPASS_FLAG);
     }
 
     public DefaultLifecycleAdapter(Object componentObject,
