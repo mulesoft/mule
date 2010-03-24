@@ -46,7 +46,7 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         assertNotNull(result);
         result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        result = client.request("vm://out", getSmallTimeout());
+        result = client.request("vm://out", getTimeout());
         assertNull(result);
 
         muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
