@@ -18,11 +18,9 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.transaction.TransactionCollection;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -322,7 +320,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            if (!sessionManaged && transacted && muleTx instanceof TransactionCollection) {
+            if (!sessionManaged && transacted) { 
                 handleMultiTx(session);
             }
 
