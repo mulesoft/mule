@@ -23,15 +23,15 @@ import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -50,7 +50,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private String encoding = "UTF-8";
 
     /**
-     * When running sychonously, return events can be received over transports that
+     * When running sychronously, return events can be received over transports that
      * support ack or replyTo This property determines how long to wait for a receive
      */
     private int responseTimeout = 10000;
