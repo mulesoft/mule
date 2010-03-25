@@ -5,9 +5,6 @@
 # MULE-1389
 org.mule.transport.http.issues.StreamingDownloadMule1389TestCase
 
-# MULE-2208
-org.mule.transport.http.functional.HttpsFunctionalTestCase
-
 # javax.xml.transform.TransformerConfigurationException: Could not compile stylesheet
 #   at com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.newTemplates(TransformerFactoryImpl.java:829)
 #

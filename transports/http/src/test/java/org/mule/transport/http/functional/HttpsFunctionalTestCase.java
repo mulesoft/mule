@@ -12,10 +12,10 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 
@@ -26,14 +26,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "https-functional-test.xml";
     }
 
+    @Override
     public void testSend() throws Exception
     {
-        final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
+        Service testSedaService = muleContext.getRegistry().lookupService("testComponent");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
         assertNotNull(testComponent);
 
@@ -47,17 +49,16 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
                 assertNotNull(msg.getProperty(HttpsConnector.LOCAL_CERTIFICATES));
             }
         };
-
         testComponent.setEventCallback(callback);
 
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+        
         assertNotNull(result);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         assertTrue("Callback never fired", callbackMade.get());
-
     }
-
 }
