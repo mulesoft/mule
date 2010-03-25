@@ -127,6 +127,12 @@ public interface MuleMessage extends MessageAdapter
      * {@link #applyTransformers(java.util.List, Class)} is called.
      * @return the original payload used to create this message
      */
+    Object getOriginalPayload();
+
+    /**
+     * @deprecated use {@link #getOriginalPayload()}
+     */
+    @Deprecated
     Object getOrginalPayload();
-    
+
 }

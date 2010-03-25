@@ -56,7 +56,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
                     logger.debug("woot - event received");
                     logger.debug("context: " + context);
                     logger.debug("component: " + component);
-                    assertMessageOk(context.getMessage().getOrginalPayload());
+                    assertMessageOk(context.getMessage().getOriginalPayload());
                     countDown.countDown();
                 } 
                 catch (Exception e) 
