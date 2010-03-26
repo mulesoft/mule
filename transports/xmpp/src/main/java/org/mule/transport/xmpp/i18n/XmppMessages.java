@@ -20,19 +20,9 @@ public class XmppMessages extends MessageFactory
     
     private static final String BUNDLE_PATH = getBundlePath(XmppConnector.XMPP);
 
-    public static Message noRecipientInUri()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
-
-    public static Message nicknameMustBeSet()
-    {
-        return factory.createMessage(BUNDLE_PATH, 2);
-    }
-
     public static Message invalidConversationType(String conversationType)
     {
-        return factory.createMessage(BUNDLE_PATH, 3, conversationType);
+        return factory.createMessage(BUNDLE_PATH, 1, conversationType);
     }
 }
 
