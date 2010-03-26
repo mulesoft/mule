@@ -20,14 +20,14 @@
         <xsd:appinfo>
             <schemadoc:short-name>XMPP</schemadoc:short-name>
             <schemadoc:page-title>XMPP Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
                                           requestEvents="true"
                                           transactions="false" streaming="false">
                 <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
                 <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
-    </xsd:annotation>        
+    </xsd:annotation>
     <xsd:element name="connector" type="xmppConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
@@ -140,14 +140,14 @@
         <xsd:attribute name="recipient" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The ID of the intended recipient of the messages, such as ross@myco.com.
+                    The Jabber ID of the intended recipient of the messages, such as ross@myco.com. For GROUPCHAT type endpoints, this is the address of the chat to join.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="from" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The user who sent the message.
+                    The user who sent the message. Ignored in GROUPCHAT type endpoints.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -172,28 +172,13 @@
         <xsd:attributeGroup ref="messageAttributes"/>
         <xsd:attributeGroup ref="chatAttributes"/>
         <xsd:attributeGroup ref="multiUserChatAttributes"/>
-
-<!--        <xsd:attribute name="groupChat" type="mule:substitutableBoolean">-->
-<!--            <xsd:annotation>-->
-<!--                <xsd:documentation>-->
-<!--                    Whether to start a group chat.-->
-<!--                </xsd:documentation>-->
-<!--            </xsd:annotation>-->
-<!--        </xsd:attribute>-->
-<!--        <xsd:attribute name="resource" type="xsd:string">-->
-<!--            <xsd:annotation>-->
-<!--                <xsd:documentation>-->
-<!--                    The resource portion of the address, such as user@host/resource or domain/resource.-->
-<!--                </xsd:documentation>-->
-<!--            </xsd:annotation>-->
-<!--        </xsd:attribute>-->
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="messageAttributes">
         <xsd:attribute name="subject" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The subject of the message.
+                    The subject of the message (applies to type=MESSAGE endpoints only).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -214,7 +199,7 @@
         <xsd:attribute name="nickname" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The user's nickname.
+                    The user's nickname in a groupchat.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
