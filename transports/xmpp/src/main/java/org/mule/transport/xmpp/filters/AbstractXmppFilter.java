@@ -41,5 +41,4 @@ public abstract class AbstractXmppFilter implements Filter, PacketFilter
     }
 
     protected abstract PacketFilter createFilter();
-
 }

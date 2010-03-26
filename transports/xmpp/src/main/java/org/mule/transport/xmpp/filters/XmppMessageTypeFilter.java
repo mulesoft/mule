@@ -10,6 +10,7 @@
 
 package org.mule.transport.xmpp.filters;
 
+import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 
@@ -28,8 +29,9 @@ public class XmppMessageTypeFilter extends XmppFromContainsFilter
         super(expression);
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
-        return new org.jivesoftware.smack.filter.MessageTypeFilter(Message.Type.fromString(pattern));
+        return new MessageTypeFilter(Message.Type.fromString(pattern));
     }
 }

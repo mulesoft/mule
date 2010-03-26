@@ -11,6 +11,7 @@
 package org.mule.transport.xmpp.filters;
 
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
 
 /**
  * <code>XmppPacketIDFilter</code> is an Xmpp PacketIDFilter adapter.
@@ -27,8 +28,9 @@ public class XmppPacketIDFilter extends XmppFromContainsFilter
         super(expression);
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
-        return new org.jivesoftware.smack.filter.PacketIDFilter(pattern);
+        return new PacketIDFilter(pattern);
     }
 }

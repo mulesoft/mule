@@ -10,14 +10,13 @@
 
 package org.mule.transport.xmpp.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import org.mule.util.ClassUtils;
 
 import org.jivesoftware.smack.filter.NotFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
- * <code>XmppAndFilter</code> an Xmpp AND filter
+ * <code>XmppNotFilter</code> an Xmpp NOT filter
  */
 public class XmppNotFilter extends AbstractXmppFilter
 {
@@ -43,22 +42,25 @@ public class XmppNotFilter extends AbstractXmppFilter
         return filter;
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
         return new NotFilter(filter);
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final XmppNotFilter other = (XmppNotFilter) obj;
-        return equal(filter, other.filter);
+        return ClassUtils.equal(filter, other.filter);
     }
 
+    @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), filter});
+        return ClassUtils.hash(new Object[]{this.getClass(), filter});
     }
 }

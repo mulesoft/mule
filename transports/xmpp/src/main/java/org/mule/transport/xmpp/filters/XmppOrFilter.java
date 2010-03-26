@@ -14,7 +14,7 @@ import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
- * <code>XmppAndFilter</code> an Xmpp OR filter
+ * <code>XmppOrFilter</code> an Xmpp OR filter
  */
 public class XmppOrFilter extends XmppAndFilter
 {
@@ -28,6 +28,7 @@ public class XmppOrFilter extends XmppAndFilter
         super(left, right);
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
         return new OrFilter(getLeftFilter(), getRightFilter());

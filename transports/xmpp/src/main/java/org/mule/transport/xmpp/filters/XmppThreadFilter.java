@@ -11,6 +11,7 @@
 package org.mule.transport.xmpp.filters;
 
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.ThreadFilter;
 
 /**
  * <code>XmppThreadFilter</code> is an Xmpp ThreadFilter adapter.
@@ -27,8 +28,9 @@ public class XmppThreadFilter extends XmppFromContainsFilter
         super(expression);
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
-        return new org.jivesoftware.smack.filter.ThreadFilter(pattern);
+        return new ThreadFilter(pattern);
     }
 }

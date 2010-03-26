@@ -10,8 +10,7 @@
 
 package org.mule.transport.xmpp.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import org.mule.util.ClassUtils;
 
 import org.jivesoftware.smack.filter.PacketFilter;
 
@@ -20,44 +19,47 @@ import org.jivesoftware.smack.filter.PacketFilter;
  */
 public class XmppPacketTypeFilter extends AbstractXmppFilter
 {
-    private volatile Class expectedType;
+    private volatile Class<?> expectedType;
 
     public XmppPacketTypeFilter()
     {
         super();
     }
 
-    public XmppPacketTypeFilter(Class expectedType)
+    public XmppPacketTypeFilter(Class<?> expectedType)
     {
         setExpectedType(expectedType);
     }
 
-    public Class getExpectedType()
+    public Class<?> getExpectedType()
     {
         return expectedType;
     }
 
-    public void setExpectedType(Class expectedType)
+    public void setExpectedType(Class<?> expectedType)
     {
         this.expectedType = expectedType;
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
         return new org.jivesoftware.smack.filter.PacketTypeFilter(expectedType);
     }
     
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        final XmppPacketTypeFilter other = (XmppPacketTypeFilter) obj;
-        return equal(expectedType, other.expectedType);
+        XmppPacketTypeFilter other = (XmppPacketTypeFilter) obj;
+        return ClassUtils.equal(expectedType, other.expectedType);
     }
 
+    @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), expectedType});
+        return ClassUtils.hash(new Object[]{this.getClass(), expectedType});
     }
 }

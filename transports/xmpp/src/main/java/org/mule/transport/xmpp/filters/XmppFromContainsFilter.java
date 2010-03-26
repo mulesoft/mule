@@ -10,8 +10,7 @@
 
 package org.mule.transport.xmpp.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import org.mule.util.ClassUtils;
 
 import org.jivesoftware.smack.filter.PacketFilter;
 
@@ -42,22 +41,25 @@ public class XmppFromContainsFilter extends AbstractXmppFilter
         this.pattern = pattern;
     }
 
+    @Override
     protected PacketFilter createFilter()
     {
         return new XmppFromContainsFilter(pattern);
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final XmppFromContainsFilter other = (XmppFromContainsFilter) obj;
-        return equal(pattern, other.pattern);
+        return ClassUtils.equal(pattern, other.pattern);
     }
 
+    @Override
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), pattern});
+        return ClassUtils.hash(new Object[]{ getClass(), pattern });
     }
 }
