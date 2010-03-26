@@ -21,23 +21,24 @@ public class XmppConversationFactory
 {
     public XmppConversation create(ImmutableEndpoint endpoint)
     {
-        String type = endpoint.getEndpointURI().getHost();
-        if (XmppConnector.CONVERSATION_TYPE_MESSAGE.equals(type))
+        String host = endpoint.getEndpointURI().getHost();
+        XmppMessageType type = XmppMessageType.valueOf(host);
+        
+        switch (type)
         {
-            return createMessageConversation(endpoint);
-        }
-        else if (XmppConnector.CONVERSATION_TYPE_CHAT.equals(type))
-        {
-            return createChatConversation(endpoint);
-        }
-        else if (XmppConnector.CONVERSATION_TYPE_GROUPCHAT.equals(type))
-        {
-            return createGroupchatConversation(endpoint);
-        }
-        else
-        {
-            throw new MuleRuntimeException(XmppMessages.invalidConversationType(type));
-        }
+            case MESSAGE:
+                return createMessageConversation(endpoint);
+            
+            case CHAT:
+                return createChatConversation(endpoint);
+
+            case GROUPCHAT:
+                return createGroupchatConversation(endpoint);
+        }                
+
+        // we should never get here as valueOf on the enum above will choke if you pass
+        // in an invalid string
+        throw new MuleRuntimeException(XmppMessages.invalidConversationType(type));
     }
 
     protected XmppConversation createMessageConversation(ImmutableEndpoint endpoint)

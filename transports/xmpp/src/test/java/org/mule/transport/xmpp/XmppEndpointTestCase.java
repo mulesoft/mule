@@ -16,74 +16,57 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class XmppEndpointTestCase extends AbstractMuleTestCase
 {
-    public void testMalformedXmppUrl() throws Exception
+    public void testEndpointWithoutMessageType() throws Exception
     {
         try
         {
             MuleEndpointURI uri = new MuleEndpointURI("xmpp://mule:secret@jabber.org", muleContext);
             uri.initialise();
-            fail("There is no path set on the endpoint");
+            fail("There is no message type set on the endpoint");
         }
         catch (InitialisationException e)
         {
             // expected
         }
     }
-
-    public void testXmppUrlWithPortAndToChat() throws Exception
+    
+    public void testValidMessageEndpoint() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI(
-            "xmpp://mule:secret@jabber.org:6666/ross@jabber.org", muleContext);
-        endpointUri.initialise();
+        doTest("xmpp://MESSAGE/mule@jabber.org", "MESSAGE");
+    }
         
-        assertEquals("xmpp", endpointUri.getScheme());
-        assertEquals("mule@jabber.org:6666", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
-        assertEquals(6666, endpointUri.getPort());
-        assertEquals("jabber.org", endpointUri.getHost());
-        assertEquals("mule:secret", endpointUri.getUserInfo());
-        assertEquals("xmpp://mule:****@jabber.org:6666/ross@jabber.org", endpointUri.toString());
-        assertEquals(0, endpointUri.getParams().size());
-        assertEquals("ross@jabber.org", endpointUri.getPath().substring(1));
+    public void testValidChatEndpoint() throws Exception
+    {
+        doTest("xmpp://CHAT/mule@jabber.org", "CHAT");
+    }
+    
+    public void testValidGroupchatEndpoint() throws Exception
+    {
+        doTest("xmpp://GROUPCHAT/mule@jabber.org", "GROUPCHAT");
+    }
+    
+    private void doTest(String uriInput, String expectedMessageType) throws Exception
+    {
+        MuleEndpointURI uri = new MuleEndpointURI(uriInput, muleContext);
+        uri.initialise();
+
+        assertEquals("xmpp", uri.getScheme());
+        assertEquals(expectedMessageType, uri.getHost());
+        assertEquals("/mule@jabber.org", uri.getPath());
     }
 
-    public void testXmppUrlWithPortAndToChatWithParam() throws Exception
-    {
-        MuleEndpointURI endpointUri = new MuleEndpointURI(
-            "xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true&nickname=ross", muleContext);
-        endpointUri.initialise();
-        
-        assertEquals("xmpp", endpointUri.getScheme());
-        assertEquals("mule@jabber.org:6666", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
-        assertEquals(6666, endpointUri.getPort());
-        assertEquals("jabber.org", endpointUri.getHost());
-        assertEquals("mule:secret", endpointUri.getUserInfo());
-        assertEquals("xmpp://mule:****@jabber.org:6666/ross@jabber.org?groupChat=true&nickname=ross",
-            endpointUri.toString());
-        assertEquals(2, endpointUri.getParams().size());
-        assertEquals("ross@jabber.org", endpointUri.getPath().substring(1));
-        assertEquals("true", endpointUri.getParams().get("groupChat"));
-        assertEquals("ross", endpointUri.getParams().get("nickname"));
-    }
-
-    public void testXmppBadGroupChatParams() throws Exception
+    public void testInvalidMessageTypeEndpoint() throws Exception
     {
         try
         {
-            MuleEndpointURI uri = 
-                new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true", muleContext);
+            MuleEndpointURI uri = new MuleEndpointURI("xmpp://INVALID/mule@jabber.org", muleContext);
             uri.initialise();
             
-            fail("if groupchat is set to true a nickname must be set");
+            fail("invalid message type not detected");
         }
         catch (InitialisationException e)
         {
             // expected
-        }                                             
-
-        MuleEndpointURI uri = 
-            new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false", muleContext);
-        uri.initialise();
+        }
     }
 }
