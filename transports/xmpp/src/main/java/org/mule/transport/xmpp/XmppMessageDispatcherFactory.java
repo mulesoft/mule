@@ -21,10 +21,9 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
 
 public class XmppMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new XmppMessageDispatcher(endpoint);
     }
-
 }

@@ -21,10 +21,9 @@ import org.mule.transport.AbstractMessageRequesterFactory;
 
 public class XmppMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-
+    @Override
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new XmppMessageRequester(endpoint);
     }
-
 }
