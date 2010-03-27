@@ -127,6 +127,15 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, subscription));
     }
 
+    public void addAllListenerSubscriptionPairs(Collection pairs)
+    {
+        configuration.addAllListenerSubscriptionPairs(pairs);
+    }
+    
+    /**
+     * @deprecated Use addAllListenerSubscriptionPairs which better describes the "add" operation that occurs.
+     * @param pairs
+     */
     public void setAllListenerSubscriptionPairs(Collection pairs)
     {
         configuration.addAllListenerSubscriptionPairs(pairs);

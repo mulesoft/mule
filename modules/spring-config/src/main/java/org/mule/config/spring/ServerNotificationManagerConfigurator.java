@@ -60,11 +60,10 @@ public class ServerNotificationManagerConfigurator
         }
 
         // Merge:
-        // i) existing listeners,
-        // ii) explicitly configured notification listeners,
-        // iii) any singleton beans defined in spring that implement
+        // i) explicitly configured notification listeners,
+        // ii) any singleton beans defined in spring that implement
         // ServerNotificationListener.
-        notificationManager.setAllListenerSubscriptionPairs(getMergedListeners(notificationManager));
+        notificationManager.addAllListenerSubscriptionPairs(getMergedListeners(notificationManager));
 
         return notificationManager;
     }
@@ -72,10 +71,6 @@ public class ServerNotificationManagerConfigurator
     protected Set<ListenerSubscriptionPair> getMergedListeners(ServerNotificationManager notificationManager)
     {
         Set<ListenerSubscriptionPair> mergedListeners = new HashSet<ListenerSubscriptionPair>();
-
-        // Listeners already configured programatically or by other means via the
-        // mule context.
-        Set<ListenerSubscriptionPair> existingPairs = notificationManager.getListeners();
 
         // Any singleton bean defined in spring that implements
         // ServerNotificationListener or a subclass.
@@ -87,9 +82,6 @@ public class ServerNotificationManagerConfigurator
             adhocListeners.add(new ListenerSubscriptionPair(
                 (ServerNotificationListener<?>) applicationContext.getBean(name), null));
         }
-
-        // First we must include all existing listeners
-        mergedListeners.addAll(existingPairs);
 
         if (pairs != null)
         {
