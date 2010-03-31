@@ -27,20 +27,10 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
     public void testProperties() throws Exception
     {
         //Will be treated as inbound properties
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("inbound-foo", "foo");
         DefaultMessageAdapter adapter = new DefaultMessageAdapter(TEST_MESSAGE, props, null);
         MuleMessage message =  new DefaultMuleMessage(adapter, muleContext);
-
-        try
-        {
-            message.setProperty("inbound-bar", "bar", PropertyScope.INBOUND);
-            fail("Inboiund scope should be read-only");
-        }
-        catch (Exception e)
-        {
-            //Expected
-        }
 
         message.setProperty("invocation-foo", "foo", PropertyScope.INVOCATION);
 
@@ -50,16 +40,6 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
 
         MuleEvent event = new DefaultMuleEvent(message, getTestInboundEndpoint("test1", "test://test1?foo=bar&coo=car"), session, true);
         message = event.getMessage();
-
-        try
-        {
-            message.getPropertyNames(new PropertyScope("XXX", 5));
-            fail("Should throw exception, XXX not a valid scope");
-        }
-        catch (Exception e)
-        {
-            //Exprected
-        }
 
         assertEquals(0, message.getPropertyNames(PropertyScope.OUTBOUND).size());
 
@@ -100,7 +80,7 @@ public class MuleMessageTestCase extends AbstractMuleTestCase
 
         DefaultMessageAdapter adapter = new DefaultMessageAdapter(payload);
 
-        message = new DefaultMuleMessage(adapter, new HashMap(), muleContext);
+        message = new DefaultMuleMessage(adapter, new HashMap<String, Object>(), muleContext);
         assertEquals(message.getPayload(), payload);
     }
 }

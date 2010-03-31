@@ -135,6 +135,21 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
+    @Test
+    public void testInboundScopeIsImmutable() throws Exception
+    {        
+        MessagePropertiesContext mpc = new MessagePropertiesContext();
+        try
+        {
+            mpc.setProperty("key", "value", PropertyScope.INBOUND);
+            fail("Inbound scope should be read-only");
+        }
+        catch (IllegalArgumentException iae)
+        {
+            // this exception was expectd
+        }
+    }
+        
     protected void doTest(MessagePropertiesContext mpc)
     {
         //Look in all scopes

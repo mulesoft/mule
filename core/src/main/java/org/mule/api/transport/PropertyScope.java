@@ -65,7 +65,7 @@ public final class PropertyScope implements Serializable
     private String scope;
     private int order;
 
-    public PropertyScope(String scope, int order)
+    private PropertyScope(String scope, int order)
     {
         this.scope = scope;
         this.order = order;
