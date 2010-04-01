@@ -21,19 +21,32 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCase
 {
-    
     private MuleMessage setupRequestContext(String url) throws Exception
     {
-        MuleEvent event = getTestEvent("test");
+        return setupRequestContext(url, "test");
+    }
+    
+    private MuleMessage setupRequestContext(String url, String payload) throws Exception
+    {
+        MuleEvent event = getTestEvent(payload);
         MuleMessage message = event.getMessage();
         message.setStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         message.setStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);
         RequestContext.setEvent(event);
         
         return message;
+    }
+    
+    private ObjectToHttpClientMethodRequest createTransformer() throws Exception
+    {
+        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
+        transformer.setMuleContext(muleContext);
+        transformer.initialise();
+        return transformer;
     }
 
     @Override
@@ -48,9 +61,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
 
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -65,9 +76,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
         
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -82,9 +91,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
         
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -99,9 +106,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload("test");
         
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);
         
         assertTrue(response instanceof HttpMethod);
@@ -118,9 +123,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setCorrelationId("1234");
         message.setProperty("fruit1", "apple");
         message.setProperty("fruit2", "orange");
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
+        
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);
 
         assertTrue(response instanceof HttpMethod);
@@ -134,13 +138,12 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         MuleMessage message = setupRequestContext("http://mycompany.com/test?param=#[foo:bar]}");
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
-        ObjectToHttpClientMethodRequest transformer = new ObjectToHttpClientMethodRequest();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
-        Object response = null;
+        
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
+        
         try
         {
-            response = transformer.transform(message);
+            transformer.transform(message);
             fail("unknown evaluator was used");
         }
         catch (TransformerException e)
@@ -154,7 +157,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         message.setPayload(NullPayload.getInstance());
         try
         {
-            response = transformer.transform(message);
+            transformer.transform(message);
             fail("Header 'bar' not set on the message");
         }
         catch (TransformerException e)
@@ -162,8 +165,21 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
             //Expected
             assertTrue(e.getMessage().contains("Expression Evaluator \"header\" with expression \"bar\" returned null but a value was required"));
         }
-
+    }
+    
+    public void testEncodingOfParamValueTriggeredByMessageProperty() throws Exception
+    {
+        // the payload is already encoded, switch off encoding it in the transformer
+        String encodedPayload = "encoded%20payload";
+        MuleMessage message = setupRequestContext("http://mycompany.com/", encodedPayload);
+        message.setBooleanProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, false);
+        
+        ObjectToHttpClientMethodRequest transformer = createTransformer();
+        Object result = transformer.transform(message);
+        
+        assertTrue(result instanceof GetMethod);
+        
+        String expected = "body=" + encodedPayload;
+        assertEquals(expected, ((GetMethod) result).getQueryString());
     }
 }
-
-

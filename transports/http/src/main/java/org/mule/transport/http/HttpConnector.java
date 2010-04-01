@@ -96,8 +96,8 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
-
     public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = HTTP_PREFIX + "disable.status.code.exception.check";
+    public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
     
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
     
@@ -113,6 +113,7 @@ public class HttpConnector extends TcpConnector
         props.add(HTTP_REQUEST_PATH_PROPERTY);
         props.add(HTTP_STATUS_PROPERTY);
         props.add(HTTP_VERSION_PROPERTY);
+        props.add(HTTP_ENCODE_PARAMVALUE);
         HTTP_INBOUND_PROPERTIES = props;
     }
     

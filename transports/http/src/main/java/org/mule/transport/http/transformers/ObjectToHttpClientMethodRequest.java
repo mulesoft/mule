@@ -120,6 +120,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         return parameterIndex + 1;
     }
 
+    @Override
     public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
@@ -146,7 +147,17 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 httpMethod = new GetMethod(uri.toString());
                 String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                                                                            HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
-                String paramValue = URLEncoder.encode(src.toString(), outputEncoding);
+
+                String paramValue = null;
+                boolean encode =  msg.getBooleanProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
+                if (encode)
+                {
+                    paramValue = URLEncoder.encode(src.toString(), outputEncoding);
+                }
+                else
+                {
+                    paramValue = src.toString();
+                }
 
                 String query = uri.getRawQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
