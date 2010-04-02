@@ -44,7 +44,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
 
         // Create, register, initialise and start JcaService
         String name = "JcaService#";
-        service = new JcaService();
+        service = new JcaService(muleContext);
         service.setName(name);
         service.setModel(jcaModel);
         service.setComponent(new JcaComponent(new TestMessageEndpointFactory(), new DefaultEntryPointResolverSet(),

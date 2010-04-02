@@ -33,7 +33,7 @@ import java.io.Serializable;
  * well as managing pooled resources.
  */
 
-public interface Service extends Serializable, Lifecycle, MuleContextAware, NamedObject
+public interface Service extends Serializable, Lifecycle, NamedObject
 {
     /**
      * Makes an asynchronous event call to the service.

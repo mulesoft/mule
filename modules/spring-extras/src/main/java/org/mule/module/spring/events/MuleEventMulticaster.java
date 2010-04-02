@@ -616,7 +616,7 @@ public class MuleEventMulticaster
             String newEndpoint = endpoint;
             int i = newEndpoint.indexOf(serviceName);
             newEndpoint = newEndpoint.substring(0, i - 1);
-            SedaService s = new SedaService();
+            SedaService s = new SedaService(muleContext);
             s.setName(serviceName);
             s.setModel(muleContext.getRegistry().lookupSystemModel());
             s.setQueueProfile(new QueueProfile());
@@ -696,8 +696,7 @@ public class MuleEventMulticaster
         {
             muleContext.getRegistry().unregisterService(service.getName());
         }
-        service = new SedaService();
-        service.setMuleContext(muleContext);
+        service = new SedaService(muleContext);
         service.setName(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         service.setModel(model);
         if (subscriptions == null)

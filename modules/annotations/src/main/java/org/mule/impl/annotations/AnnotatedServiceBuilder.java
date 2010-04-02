@@ -132,7 +132,7 @@ public class AnnotatedServiceBuilder
 
     protected org.mule.api.service.Service create(ObjectFactory componentFactory) throws InitialisationException
     {
-        org.mule.api.service.Service serviceDescriptor = new SedaService();
+        org.mule.api.service.Service serviceDescriptor = new SedaService(context);
         Service service = componentFactory.getObjectClass().getAnnotation(Service.class);
 
         serviceDescriptor.setName(getValue(service.name()));

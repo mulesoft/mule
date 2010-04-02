@@ -25,7 +25,7 @@ public class ServiceBuilder
     public ServiceBuilder(String name, MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        service = new SedaService();
+        service = new SedaService(muleContext);
         service.setName(name);
     }
 

@@ -11,6 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.ConfigResource;
 import org.mule.util.IOUtils;
 
@@ -62,6 +63,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         super.prepareBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
         beanFactory.addBeanPostProcessor(new ExpressionEvaluatorPostProcessor(muleContext));
+        beanFactory.registerSingleton(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
     }
 
     private static Resource[] convert(ConfigResource[] resources)

@@ -139,12 +139,9 @@ public abstract class AbstractService implements Service
     // events that are bridged but currently everything is an invocation.
     protected Component component = new PassThroughComponent();
     
-    /**
-     * For Spring only
-     */
-    public AbstractService()
+    public AbstractService(MuleContext muleContext)
     {
-        // nop
+        this.muleContext = muleContext;
     }
 
     /**
@@ -727,11 +724,6 @@ public abstract class AbstractService implements Service
             endpoints.addAll(responseRouter.getEndpoints());
         }
         return endpoints;
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////

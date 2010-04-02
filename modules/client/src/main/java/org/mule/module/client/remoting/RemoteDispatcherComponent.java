@@ -275,7 +275,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     {
         try
         {
-            Service service = new SedaService();
+            Service service = new SedaService(muleContext);
             service.setName(MANAGER_COMPONENT_NAME);
             service.setModel(muleContext.getRegistry().lookupSystemModel());
 
@@ -285,8 +285,6 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
             service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
 
-
-            service.setMuleContext(muleContext);
             service.getInboundRouter().addEndpoint(endpoint);
 
             return service;

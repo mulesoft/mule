@@ -46,7 +46,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
     // protected void doSetUp() throws Exception
     // {
-    // service = new SedaService();
+    // service = new SedaService(muleContext);
     // service.setName("seda");
     // service.setServiceFactory(new PrototypeObjectFactory(Object.class));
     // service.setMuleContext(muleContext);
@@ -94,8 +94,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, 
             mockTransactionalQueueManager.proxy());
 
-        SedaService service = new SedaService();
-        service.setMuleContext(muleContext);
+        SedaService service = new SedaService(muleContext);
         service.setName("test");
         Model model = new SedaModel();
         model.setMuleContext(muleContext);
@@ -125,11 +124,10 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
 
     public void testSedaModelEventTimeoutDefault() throws Exception
     {
-        SedaService service = new SedaService();
+        SedaService service = new SedaService(muleContext);
         service.setName("test");
         service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(Object.class)));
         service.setModel(new SedaModel());
-        service.setMuleContext(muleContext);
         service.getModel().setMuleContext(muleContext);
 
         service.getModel().initialise();
@@ -145,7 +143,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         {
             // getTestComponent() currently already returns a SedaService, but
             // here we are safe-guarding for any future changes
-            SedaService service = new SedaService();
+            SedaService service = new SedaService(muleContext);
             service.setName("test");
             service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(Object.class)));
             service.setModel(new SedaModel());
@@ -168,7 +166,6 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
     public void testDispatchToPausedService() throws Exception
     {
         Service service = getTestService();
-        service.setMuleContext(muleContext);
         service.start();
         service.pause();
         service.dispatchEvent(getTestInboundEvent("test"));
@@ -186,7 +183,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
     {
         final Latch latch = new Latch();
 
-        SedaService service = new SedaService();
+        SedaService service = new SedaService(muleContext);
         service.setName("testMaxActiveThreadsEqualsOne");
         service.setModel(muleContext.getRegistry().lookupSystemModel());
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
@@ -225,7 +222,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         final String serviceName = "testDoThreadingFalse";
         final String serviceThreadName = serviceName + ".1";
 
-        SedaService service = new SedaService();
+        SedaService service = new SedaService(muleContext);
         service.setName(serviceName);
         service.setModel(muleContext.getRegistry().lookupSystemModel());
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
@@ -261,7 +258,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
         final String serviceName = "testDoThreadingFalse";
         final String serviceThreadName = serviceName + ".1";
 
-        SedaService service = new SedaService();
+        SedaService service = new SedaService(muleContext);
         service.setName(serviceName);
         service.setModel(muleContext.getRegistry().lookupSystemModel());
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();

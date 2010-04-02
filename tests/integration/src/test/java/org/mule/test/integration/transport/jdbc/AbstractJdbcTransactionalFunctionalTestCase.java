@@ -103,7 +103,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
     public Service initialiseService(byte txBeginAction, EventCallback callback) throws Exception
     {
-        Service service = new SedaService();
+        Service service = new SedaService(muleContext);
         service.setExceptionListener(new DefaultExceptionStrategy());
         service.setName("testComponent");
         service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class)));

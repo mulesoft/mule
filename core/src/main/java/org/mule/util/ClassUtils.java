@@ -467,6 +467,15 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Constructor getConstructor(Class clazz, Class[] paramTypes)
     {
+        return getConstructor(clazz, paramTypes, false);
+    }
+    
+    /**
+    *  Returns available constructor in the target class that as the parameters specified.
+    * @param exactMatch should exact types be used (i.e. equals rather than isAssignableFrom.)
+    */
+    public static Constructor getConstructor(Class clazz, Class[] paramTypes, boolean exactMatch)
+    {
         Constructor[] ctors = clazz.getConstructors();
         for (int i = 0; i < ctors.length; i++)
         {
@@ -482,12 +491,22 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                     }
                     else
                     {
-                        if (paramTypes[x].isAssignableFrom(types[x]) || types[x].isAssignableFrom(paramTypes[x]))
+                        if (exactMatch)
                         {
-                            matchCount++;
+                            if (paramTypes[x].equals(types[x]) || types[x].equals(paramTypes[x]))
+                            {
+                                matchCount++;
+                            }
+                        }
+                        else
+                        {
+                            if (paramTypes[x].isAssignableFrom(types[x])
+                                || types[x].isAssignableFrom(paramTypes[x]))
+                            {
+                                matchCount++;
+                            }
                         }
                     }
-
                 }
                 if (matchCount == types.length)
                 {

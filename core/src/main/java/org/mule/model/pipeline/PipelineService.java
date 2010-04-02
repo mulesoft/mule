@@ -10,6 +10,7 @@
 
 package org.mule.model.pipeline;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -28,9 +29,9 @@ public class PipelineService extends DirectService
      */
     private static final long serialVersionUID = -2788210157354765190L;
 
-    public PipelineService()
+    public PipelineService(MuleContext muleContext)
     {
-        super();
+        super(muleContext);
     }
 
     protected MuleMessage doSend(MuleEvent event) throws MuleException

@@ -20,13 +20,12 @@ public class DirectServiceTestCase extends AbstractServiceTestCase
 
     protected void doSetUp() throws Exception
     {
-        service = new DirectService();
+        service = new DirectService(muleContext);
         service.setName("direct");
         final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(Object.class));
         component.setMuleContext(muleContext);
         service.setComponent(component);
         service.setModel(new DirectModel());
-        service.setMuleContext(muleContext);
     }
 
     protected void doTearDown() throws Exception

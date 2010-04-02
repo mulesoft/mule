@@ -28,12 +28,11 @@ public class ServiceServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        final SedaService service = new SedaService();
+        final SedaService service = new SedaService(muleContext);
         service.setName("TEST_SERVICE");
         final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(Object.class));
         component.setMuleContext(muleContext);
         service.setComponent(component);
-        service.setMuleContext(muleContext);
 
         service.setThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
         SedaModel model = new SedaModel();

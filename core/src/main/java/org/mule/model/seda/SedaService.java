@@ -17,13 +17,13 @@ import org.mule.FailedToQueueEventException;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -85,10 +85,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
     
     protected Queue queue;
 
-    /** For Spring only */
-    public SedaService()
+    public SedaService(MuleContext muleContext)
     {
-        super();
+        super(muleContext);
     }
     
     /**

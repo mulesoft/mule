@@ -442,7 +442,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         if (service == null)
         {
             // TODO MULE-2228 Simplify this API
-            service = new SedaService();
+            service = new SedaService(muleContext);
             service.setName(AXIS_SERVICE_PROPERTY + getName());
             service.setModel(muleContext.getRegistry().lookupSystemModel());
 

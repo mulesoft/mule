@@ -41,7 +41,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
         InboundEndpoint inboundEndpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://test2?connector=customTestConnector");
 
-        service = new SedaService();
+        service = new SedaService(muleContext);
         service.setName("testService");
         service.getInboundRouter().addEndpoint(inboundEndpoint1);
         service.getInboundRouter().addEndpoint(inboundEndpoint2);

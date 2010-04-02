@@ -10,6 +10,7 @@
 
 package org.mule.module.jca;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -30,6 +31,12 @@ public class JcaService extends AbstractService
      */
     private static final long serialVersionUID = -1510441245219710451L;
 
+    
+    public JcaService(MuleContext muleContext)
+    {
+        super(muleContext);
+    }
+    
     /**
      * This is the synchronous call method and not supported by components managed in
      * a JCA container

@@ -73,7 +73,6 @@ public class AnnotatedServiceFactoryBean extends AbstractFactoryBean implements 
     public void afterPropertiesSet() throws Exception
     {
         super.afterPropertiesSet();
-        service.setMuleContext(muleContext);
         service.initialise();
     }
 

@@ -10,6 +10,7 @@
 
 package org.mule.model.direct;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -27,9 +28,9 @@ public class DirectService extends AbstractService
      */
     private static final long serialVersionUID = -8590955440156945732L;
 
-    public DirectService()
+    public DirectService(MuleContext muleContext)
     {
-        super();
+        super(muleContext);
     }
 
     protected MuleMessage doSend(MuleEvent event) throws MuleException

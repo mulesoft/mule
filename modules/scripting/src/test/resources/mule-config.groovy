@@ -157,7 +157,7 @@ model.entryPointResolverSet = new TestEntryPointResolverSet()
 muleContext.registry.registerModel(model)
 
 // building service
-Service service = new SedaService();
+Service service = new SedaService(muleContext);
 service.model = model
 service.name = "orangeComponent"
 def component = new DefaultJavaComponent(new SingletonObjectFactory(Orange.class.name))

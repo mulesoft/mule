@@ -283,7 +283,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                                        InboundEndpoint endpoint) throws MuleException
     {
         String name = "JcaService#" + endpointFactory.hashCode();
-        Service service = new JcaService();
+        Service service = new JcaService(muleContext);
         service.setName(name);
         service.getInboundRouter().addEndpoint(endpoint);
 

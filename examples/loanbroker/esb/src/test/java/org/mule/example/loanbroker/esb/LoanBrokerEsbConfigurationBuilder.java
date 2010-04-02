@@ -144,7 +144,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerModel(model);
 
         // LoanBroker Service
-        Service loanBrokerService = new SedaService();
+        Service loanBrokerService = new SedaService(muleContext);
         loanBrokerService.setName("LoanBroker");
         loanBrokerService.setModel(model);
         loanBrokerService.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(AsynchronousLoanBroker.class)));
@@ -170,7 +170,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(loanBrokerService);
 
         // CreditAgencyGatewayService Service
-        Service creditAgencyGatewayService = new SedaService();
+        Service creditAgencyGatewayService = new SedaService(muleContext);
         creditAgencyGatewayService.setName("CreditAgencyGatewayService");
         creditAgencyGatewayService.setModel(model);
         PooledJavaComponent component = new PooledJavaComponent(new PrototypeObjectFactory(CreditAgencyGateway.class));
@@ -205,7 +205,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(creditAgencyGatewayService);
 
         // LenderGatewayService Service
-        Service lenderGatewayService = new SedaService();
+        Service lenderGatewayService = new SedaService(muleContext);
         lenderGatewayService.setName("CreditAgencyGatewayService");
         lenderGatewayService.setModel(model);
         // in
@@ -228,7 +228,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(lenderGatewayService);
 
         // LenderServiceService Service
-        Service lenderServiceService = new SedaService();
+        Service lenderServiceService = new SedaService(muleContext);
         lenderServiceService.setName("LenderServiceService");
         lenderServiceService.setModel(model);
         lenderGatewayService.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(DefaultLender.class)));
@@ -240,7 +240,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(lenderGatewayService);
 
         // BankingGatewayService Service
-        Service bankingGatewayService = new SedaService();
+        Service bankingGatewayService = new SedaService(muleContext);
         bankingGatewayService.setName("BankingGatewayService");
         bankingGatewayService.setModel(model);
         // in
@@ -256,7 +256,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(lenderGatewayService);
 
         // Bank 1 Service
-        Service bank1Service = new SedaService();
+        Service bank1Service = new SedaService(muleContext);
         bank1Service.setName("TheBank1");
         bank1Service.setModel(model);
         bank1Service.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(Bank.class)));
@@ -266,7 +266,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(bank1Service);
 
         // Bank 2 Service
-        Service bank2Service = new SedaService();
+        Service bank2Service = new SedaService(muleContext);
         bank2Service.setName("TheBank2");
         bank2Service.setModel(model);
         bank2Service.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(Bank.class)));
@@ -276,7 +276,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(bank2Service);
 
         // Bank 3 Service
-        Service bank3Service = new SedaService();
+        Service bank3Service = new SedaService(muleContext);
         bank3Service.setName("TheBank3");
         bank3Service.setModel(model);
         bank3Service.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(Bank.class)));
@@ -286,7 +286,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerService(bank3Service);
 
         // Bank 4 Service
-        Service bank4Service = new SedaService();
+        Service bank4Service = new SedaService(muleContext);
         bank4Service.setName("TheBank4");
         bank4Service.setModel(model);
         bank4Service.setComponent(new PooledJavaComponent(new PrototypeObjectFactory(Bank.class)));

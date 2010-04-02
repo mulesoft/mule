@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.model.seda.SedaService;
 
 
@@ -18,8 +19,8 @@ import org.mule.model.seda.SedaService;
  */
 public class TestSedaService extends SedaService
 {
-    public TestSedaService()
+    public TestSedaService(MuleContext muleContext)
     {
-        super();
+        super(muleContext);
     }
 }

@@ -9,6 +9,8 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
@@ -309,7 +311,13 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
-        return BeanDefinitionBuilder.rootBeanDefinition(beanClass);
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(beanClass);
+        // If a constructor with a single MuleContext argument is available then use it.
+        if (ClassUtils.getConstructor(beanClass, new Class[]{MuleContext.class}, true) != null)
+        {
+            builder.addConstructorArgReference(MuleProperties.OBJECT_MULE_CONTEXT);
+        }
+        return builder;
     }
 
     protected Class getClassInternal(Element element)
