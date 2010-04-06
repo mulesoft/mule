@@ -310,7 +310,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public Object getOrginalPayload()
     {
-        return getOrginalPayload();
+        return getOriginalPayload();
     }
     
     /**
