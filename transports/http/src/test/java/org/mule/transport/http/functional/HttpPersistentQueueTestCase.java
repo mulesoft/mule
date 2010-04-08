@@ -11,7 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.transport.MessageAdapter;
+import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -84,13 +84,27 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
         
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
-            MessageAdapter adapter = context.getMessage().getAdapter();
+            MuleMessage message = context.getMessage();
             
             // make sure that the message adapter that's deserialized is the right one
-            assertTrue(adapter instanceof DefaultMessageAdapter);
+            assertTrue(message.getAdapter() instanceof DefaultMessageAdapter);
+            
+            Object httpMethod = message.getProperty("http.method");
+            if (HttpConstants.METHOD_GET.equals(httpMethod))
+            {
+                assertEquals("/services/Echo?foo=bar", message.getPayloadAsString());
+            }
+            else if (HttpConstants.METHOD_POST.equals(httpMethod))
+            {
+                assertEquals("foo=bar", message.getPayloadAsString());
+            }
+            else
+            {
+                fail("invalid HTTP method : " + httpMethod);
+            }
 
-            assertEquals("true", adapter.getProperty(HttpConstants.HEADER_CONNECTION));
-            assertEquals("true", adapter.getProperty(HttpConstants.HEADER_KEEP_ALIVE));
+            assertEquals("true", message.getProperty(HttpConstants.HEADER_CONNECTION));
+            assertEquals("true", message.getProperty(HttpConstants.HEADER_KEEP_ALIVE));
             
             messageDidArrive.countDown();            
         }
