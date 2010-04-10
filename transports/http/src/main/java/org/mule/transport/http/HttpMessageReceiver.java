@@ -463,11 +463,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         CookieSpec cs = CookieHelper.getCookieSpec(cookieSpec);
 
-                        Cookie[] cookies = cs.parse(endpoint.getEndpointURI().getHost(),
-                                endpoint.getEndpointURI().getPort(),
-                                endpoint.getEndpointURI().getPath(),
-                                endpoint.getEndpointURI().getScheme().equalsIgnoreCase("https"),
-                                header);
+                        EndpointURI endpointURI = endpoint.getEndpointURI();
+                        Cookie[] cookies = cs.parse(endpointURI.getHost(), endpointURI.getPort(),
+                                endpointURI.getPath(), 
+                                endpointURI.getScheme().equalsIgnoreCase("https"), header);
                         if (cookies.length > 0)
                         {
                             // yum!
