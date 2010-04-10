@@ -13,17 +13,13 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.StringDataSource;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
@@ -266,38 +262,6 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         catch (ExpressionRuntimeException e)
         {
             //exprected
-        }
-    }
-
-    // silly little fake DataSource so that we don't need to use javamail
-    protected static class StringDataSource implements DataSource
-    {
-        protected String content;
-
-        public StringDataSource(String payload)
-        {
-            super();
-            content = payload;
-        }
-
-        public InputStream getInputStream() throws IOException
-        {
-            return new ByteArrayInputStream(content.getBytes());
-        }
-
-        public OutputStream getOutputStream()
-        {
-            throw new UnsupportedOperationException("Read-only javax.activation.DataSource");
-        }
-
-        public String getContentType()
-        {
-            return "text/plain";
-        }
-
-        public String getName()
-        {
-            return "StringDataSource";
         }
     }
 }

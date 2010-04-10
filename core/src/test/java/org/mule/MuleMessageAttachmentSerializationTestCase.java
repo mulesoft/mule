@@ -15,18 +15,12 @@ import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ObjectToByteArray;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.mule.util.StringDataSource;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 public class MuleMessageAttachmentSerializationTestCase extends AbstractMuleTestCase
 {
-
     public void testAttachmentPersistence() throws Exception
     {
         ObjectToByteArray transformer = new ObjectToByteArray();
@@ -45,37 +39,4 @@ public class MuleMessageAttachmentSerializationTestCase extends AbstractMuleTest
         assertEquals(deserialized.getPayload(), msg.getPayload());
         assertEquals(deserialized.getAttachmentNames(), msg.getAttachmentNames());
     }
-
-    // silly little fake DataSource so that we don't need to use javamail
-    protected static class StringDataSource implements DataSource
-    {
-        protected String content;
-
-        public StringDataSource(String payload)
-        {
-            super();
-            content = payload;
-        }
-
-        public InputStream getInputStream() throws IOException
-        {
-            return new ByteArrayInputStream(content.getBytes());
-        }
-
-        public OutputStream getOutputStream()
-        {
-            throw new UnsupportedOperationException("Read-only javax.activation.DataSource");
-        }
-
-        public String getContentType()
-        {
-            return "text/plain";
-        }
-
-        public String getName()
-        {
-            return "StringDataSource";
-        }
-    }
-
 }
