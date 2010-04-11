@@ -32,7 +32,7 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
     {
         super.doSetUp();
         
-        connector = new FileConnector();
+        connector = new FileConnector(muleContext);
         connector.setMoveToDirectory(CONNECTOR_MOVE_DIR);        
         connector.setMoveToPattern(CONNECTOR_MOVE_TO_PATTERN);
     }

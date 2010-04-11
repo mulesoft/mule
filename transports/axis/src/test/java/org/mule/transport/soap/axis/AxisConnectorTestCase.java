@@ -27,7 +27,7 @@ public class AxisConnectorTestCase extends AbstractConnectorTestCase
 
     public Connector createConnector() throws Exception
     {
-        AxisConnector c = new AxisConnector();
+        AxisConnector c = new AxisConnector(muleContext);
         c.setName("axisConnector");
         return c;
     }

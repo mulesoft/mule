@@ -12,6 +12,7 @@ package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
@@ -47,6 +48,11 @@ public class VMConnector extends AbstractConnector
     private Integer queueTimeout;
     /** The queue manager to use for vm queues only */
     private QueueManager queueManager;
+    
+    public VMConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     protected void doInitialise() throws InitialisationException
     {

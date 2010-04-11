@@ -161,7 +161,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
 
     public Connector createConnector() throws Exception
     {
-        JdbcConnector connector = new JdbcConnector();
+        JdbcConnector connector = new JdbcConnector(muleContext);
         connector.setDataSource(getDataSource());
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);

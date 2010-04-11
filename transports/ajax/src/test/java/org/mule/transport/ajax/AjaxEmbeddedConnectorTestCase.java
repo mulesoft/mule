@@ -17,7 +17,7 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 {
     public Connector createConnector() throws Exception
     {
-        AjaxConnector c = new AjaxConnector();
+        AjaxConnector c = new AjaxConnector(muleContext);
         c.setName("test");
         //By default the connector is not started until the servlet container is up.  We start it here because
         //this test looks at the connector lifecycle

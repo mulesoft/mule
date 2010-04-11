@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsIndirectKeyStore;
@@ -35,9 +36,9 @@ public abstract class AbstractTlsRetrieveMailConnector
     private String socketFactoryFallback = "false";
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
-    protected AbstractTlsRetrieveMailConnector(int defaultPort, String namespace, Class defaultSocketFactory)
+    protected AbstractTlsRetrieveMailConnector(int defaultPort, String namespace, Class defaultSocketFactory, MuleContext context)
     {
-        super(defaultPort);
+        super(defaultPort, context);
         this.namespace = namespace;
         socketFactory = defaultSocketFactory.getName();
 

@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -39,9 +40,9 @@ public class ServletConnector extends AbstractConnector
     // If this is not set the wsdl may not be generated correctly
     protected String servletUrl;
 
-    public ServletConnector()
+    public ServletConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerSupportedProtocol(HttpConnector.HTTP);
         registerSupportedProtocol(HttpsConnector.HTTPS);
     }

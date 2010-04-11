@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -68,9 +69,9 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     private Map<String, Server> uriToServer = new HashMap<String, Server>();
     private boolean initializeStaticBusInstance = true;
 
-    public CxfConnector()
+    public CxfConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerProtocols();
     }
 

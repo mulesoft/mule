@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
@@ -60,9 +61,9 @@ public class JettyHttpConnector extends AbstractConnector
 
     private boolean useContinuations = false;
 
-    public JettyHttpConnector()
+    public JettyHttpConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerSupportedProtocol("http");
         registerSupportedProtocol(JETTY);
         registerSupportedProtocol(REST);

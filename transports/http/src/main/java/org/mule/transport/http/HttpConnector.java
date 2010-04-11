@@ -10,6 +10,7 @@
 
 package org.mule.transport.http;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -138,6 +139,11 @@ public class HttpConnector extends TcpConnector
 
     protected HttpConnectionManager clientConnectionManager;
 
+    public HttpConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     @Override
     protected void doInitialise() throws InitialisationException
     {

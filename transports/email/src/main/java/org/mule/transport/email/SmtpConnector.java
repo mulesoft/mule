@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
@@ -61,14 +62,14 @@ public class SmtpConnector extends AbstractMailConnector
     private String contentType = DEFAULT_CONTENT_TYPE;
 
     
-    public SmtpConnector()
+    public SmtpConnector(MuleContext context)
     {
-        this(DEFAULT_SMTP_PORT);
+        this(DEFAULT_SMTP_PORT, context);
     }
     
-    SmtpConnector(int defaultPort)
+    SmtpConnector(int defaultPort, MuleContext context)
     {
-        super(defaultPort, null);
+        super(defaultPort, null, context);
     }
     
     public String getProtocol()

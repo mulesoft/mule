@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.activemq;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.xa.TargetInvocationHandler;
@@ -35,8 +36,9 @@ public class ActiveMQJmsConnector extends JmsConnector
     /**
      * Constructs a new ActiveMQJmsConnector.
      */
-    public ActiveMQJmsConnector()
+    public ActiveMQJmsConnector(MuleContext context)
     {
+        super(context);
         setEagerConsumer(false);
         // TODO MULE-1409 better support for ActiveMQ 4.x temp destinations
     }

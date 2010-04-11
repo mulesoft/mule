@@ -65,7 +65,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             servletConnector = (ServletConnector) new TransportFactory(muleContext).getConnectorByProtocol("servlet");
             if (servletConnector == null)
             {
-                servletConnector = new ServletConnector();
+                servletConnector = new ServletConnector(muleContext);
                 servletConnector.setName("_generatedServletConnector");
                 try
                 {

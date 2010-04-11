@@ -10,6 +10,7 @@
 
 package org.mule.transport.http;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsDirectKeyStore;
@@ -52,8 +53,9 @@ public class HttpsConnector extends HttpConnector
      */
     private long sslHandshakeTimeout = 30000;
 
-    public HttpsConnector()
+    public HttpsConnector(MuleContext context)
     {
+        super(context);
         setSocketFactory(new SslSocketFactory(tls));
         setServerSocketFactory(new SslServerSocketFactory(tls));
         // setting this true causes problems as socket closes before handshake finishes

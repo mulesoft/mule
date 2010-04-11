@@ -10,6 +10,8 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
+
 
 /**
  * <code>Pop3Connector</code> is used to connect and receive mail from a POP3
@@ -21,9 +23,9 @@ public class Pop3Connector extends AbstractRetrieveMailConnector
     public static final String POP3 = "pop3";
     public static final int DEFAULT_POP3_PORT = 110;
 
-    public Pop3Connector()
+    public Pop3Connector(MuleContext context)
     {
-        super(DEFAULT_POP3_PORT);
+        super(DEFAULT_POP3_PORT, context);
     }
     
     public String getProtocol()

@@ -20,7 +20,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        RmiConnector c = new RmiConnector();
+        RmiConnector c = new RmiConnector(muleContext);
         c.setName("RmiConnector");
         c.setSecurityManager(null);
         return c;

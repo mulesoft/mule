@@ -37,7 +37,7 @@ public class DummyInitialContextFactory implements ObjectFactory
     public Object getInstance() throws Exception
     {
         SimpleContext c = new SimpleContext();
-        c.bind("vmConnector", new VMConnector());
+        c.bind("vmConnector", new VMConnector(muleContext));
         c.bind("endpointRef", "vm://my.object");
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());

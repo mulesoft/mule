@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.mulemq;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
@@ -88,9 +89,9 @@ public class MuleMQJmsConnector extends JmsConnector
 
     public boolean supportJms102bSpec = false;
 
-    public MuleMQJmsConnector()
+    public MuleMQJmsConnector(MuleContext context)
     {
-        super();
+        super(context);
         super.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
     }
 

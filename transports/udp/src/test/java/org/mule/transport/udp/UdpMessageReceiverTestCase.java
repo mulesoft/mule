@@ -36,7 +36,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public InboundEndpoint getEndpoint() throws Exception
     {
         EndpointBuilder builder = new EndpointURIEndpointBuilder("udp://localhost:10100", muleContext);
-        builder.setConnector(new UdpConnector());
+        builder.setConnector(new UdpConnector(muleContext));
         return muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(builder);

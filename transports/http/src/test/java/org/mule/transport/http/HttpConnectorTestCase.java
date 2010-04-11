@@ -25,7 +25,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        HttpConnector c = new HttpConnector();
+        HttpConnector c = new HttpConnector(muleContext);
         c.setName("HttpConnector");
         return c;
     }

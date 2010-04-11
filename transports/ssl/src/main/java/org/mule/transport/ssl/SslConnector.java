@@ -10,6 +10,7 @@
 
 package org.mule.transport.ssl;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsDirectKeyStore;
@@ -51,8 +52,9 @@ public class SslConnector extends TcpConnector
      */
     private long sslHandshakeTimeout = 30000;
     
-    public SslConnector()
+    public SslConnector(MuleContext context)
     {
+        super(context);
         setSocketFactory(new SslSocketFactory(tls));
         setServerSocketFactory(new SslServerSocketFactory(tls));
         setTcpProtocol(new DirectProtocol());

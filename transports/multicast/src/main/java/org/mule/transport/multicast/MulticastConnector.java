@@ -10,6 +10,7 @@
 
 package org.mule.transport.multicast;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -30,6 +31,10 @@ public class MulticastConnector extends UdpConnector
         return MULTICAST;
     }
 
+    public MulticastConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     @Override
     protected void doInitialise() throws InitialisationException

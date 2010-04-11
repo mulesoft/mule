@@ -10,6 +10,7 @@
 
 package org.mule.transport.rmi;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -80,6 +81,11 @@ public class RmiConnector extends AbstractJndiConnector
     protected long pollingFrequency = 1000L;
 
     private SecurityManager securityManager = new RMISecurityManager();
+    
+    public RmiConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     protected void doInitialise() throws InitialisationException
     {

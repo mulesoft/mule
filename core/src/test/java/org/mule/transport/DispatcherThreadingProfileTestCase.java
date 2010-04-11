@@ -51,7 +51,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
 
     public void testDefaultThreadingProfileConfiguration() throws MuleException
     {
-        TestConnector connector = new TestConnector();
+        TestConnector connector = new TestConnector(muleContext);
         muleContext.getRegistry().registerConnector(connector);
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, connector.getDispatcherThreadingProfile()
             .getMaxThreadsActive());
@@ -177,7 +177,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
                                                                  long waitTimeout,
                                                                  int maxBufferSize) throws MuleException
     {
-        TestConnector connector = new TestConnector();
+        TestConnector connector = new TestConnector(muleContext);
         ThreadingProfile threadingProfile = new ImmutableThreadingProfile(threads, threads, maxBufferSize,
             ThreadingProfile.DEFAULT_MAX_THREAD_TTL, waitTimeout, exhaustedAction, true, null, null);
         threadingProfile.setMuleContext(muleContext);

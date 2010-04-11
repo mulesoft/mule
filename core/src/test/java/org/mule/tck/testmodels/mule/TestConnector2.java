@@ -9,12 +9,19 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
+
 /**
  * <code>TestConnector</code> use a mock connector
  */
 public class TestConnector2 extends TestConnector
 {
 
+    public TestConnector2(MuleContext context)
+    {
+        super(context);
+    }
+    
     public String getProtocol()
     {
         return "test2";

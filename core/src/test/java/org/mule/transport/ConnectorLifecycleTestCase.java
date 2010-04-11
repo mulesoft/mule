@@ -36,8 +36,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     @Override
     public void doSetUp() throws Exception
     {
-        connector = new TestConnector();
-        connector.setMuleContext(muleContext);
+        connector = new TestConnector(muleContext);
         connector.initialise();
     }
 

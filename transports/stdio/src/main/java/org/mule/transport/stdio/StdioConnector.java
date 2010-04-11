@@ -10,6 +10,7 @@
 
 package org.mule.transport.stdio;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
@@ -36,6 +37,11 @@ public abstract class StdioConnector extends AbstractConnector
     protected OutputStream outputStream;
     protected InputStream inputStream;
 
+    public StdioConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {

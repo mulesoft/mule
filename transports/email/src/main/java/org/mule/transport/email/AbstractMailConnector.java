@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -49,9 +50,9 @@ public abstract class AbstractMailConnector extends AbstractConnector
      */
     private Authenticator authenticator = null;
 
-    public AbstractMailConnector(int defaultPort, String mailboxFolder)
+    public AbstractMailConnector(int defaultPort, String mailboxFolder, MuleContext context)
     {
-        super();
+        super(context);
         this.defaultPort = defaultPort;
         this.mailboxFolder = mailboxFolder;
     }

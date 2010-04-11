@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.weblogic;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.jms.JmsConnector;
 
 /**
@@ -18,8 +19,9 @@ import org.mule.transport.jms.JmsConnector;
 public class WeblogicJmsConnector extends JmsConnector
 {
     /** Constructs a new WeblogicJmsConnector. */
-    public WeblogicJmsConnector()
+    public WeblogicJmsConnector(MuleContext context)
     {
+        super(context);
         setTopicResolver(new WeblogicJmsTopicResolver(this));
     }
 }

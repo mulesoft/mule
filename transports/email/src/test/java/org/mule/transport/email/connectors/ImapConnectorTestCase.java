@@ -34,7 +34,7 @@ public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCas
     @Override
     public Connector createConnector() throws Exception
     {
-        ImapConnector connector = new ImapConnector();
+        ImapConnector connector = new ImapConnector(muleContext);
         connector.setName("ImapConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());

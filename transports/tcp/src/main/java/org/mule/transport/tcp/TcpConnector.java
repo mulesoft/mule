@@ -11,6 +11,7 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -87,8 +88,9 @@ public class TcpConnector extends AbstractConnector
     //TODO MULE-2300 remove once fixed
     private TcpSocketKey lastSocketKey;
 
-    public TcpConnector()
+    public TcpConnector(MuleContext context)
     {
+        super(context);
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());

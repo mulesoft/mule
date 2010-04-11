@@ -67,7 +67,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         MuleRegistry registry = muleContext.getRegistry();
 
         // Connectors
-        EjbConnector ejbConnector = new EjbConnector();
+        EjbConnector ejbConnector = new EjbConnector(muleContext);
         ejbConnector.setName("ejbConnector");
         ejbConnector.setSecurityPolicy("security.policy");
         ejbConnector.setJndiInitialFactory("org.openejb.client.LocalInitialContextFactory");
@@ -78,7 +78,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         jndiProviderProperties.put("openejb.nobanner", "${openejb.nobanner}");
         ejbConnector.setJndiProviderProperties(jndiProviderProperties);
 
-        ActiveMQJmsConnector activeMQJmsConnector = new ActiveMQJmsConnector();
+        ActiveMQJmsConnector activeMQJmsConnector = new ActiveMQJmsConnector(muleContext);
         activeMQJmsConnector.setName("activeMQJmsConnector");
         registry.registerConnector(activeMQJmsConnector);
 

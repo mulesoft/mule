@@ -164,10 +164,10 @@ public final class MuleTestUtils
         props.put("connector", "testConnector");
         // need to build endpoint this way to avoid depenency to any endpoint jars
         AbstractConnector connector = (AbstractConnector) ClassUtils.loadClass(
-            "org.mule.tck.testmodels.mule.TestConnector", AbstractMuleTestCase.class).newInstance();
+            "org.mule.tck.testmodels.mule.TestConnector", AbstractMuleTestCase.class).getConstructor(
+            MuleContext.class).newInstance(context);
 
         connector.setName("testConnector");
-        connector.setMuleContext(context);
         context.getLifecycleManager().applyCompletedPhases(connector);
         
         String endpoingUri = uri == null ? "test://test" : uri;
@@ -256,7 +256,6 @@ public final class MuleTestUtils
                         AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
-        connector.setMuleContext(context);
         context.getLifecycleManager().applyCompletedPhases(connector);
         connector.registerSupportedProtocol(protocol);
 
@@ -338,9 +337,8 @@ public final class MuleTestUtils
 
     public static TestConnector getTestConnector(MuleContext context) throws Exception
     {
-        TestConnector testConnector = new TestConnector();
+        TestConnector testConnector = new TestConnector(context);
         testConnector.setName("testConnector");
-        testConnector.setMuleContext(context);
         context.getLifecycleManager().applyCompletedPhases(testConnector);
         return testConnector;
     }

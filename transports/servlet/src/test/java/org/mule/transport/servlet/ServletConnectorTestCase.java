@@ -19,7 +19,7 @@ public class ServletConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        ServletConnector c = new ServletConnector();
+        ServletConnector c = new ServletConnector(muleContext);
         c.setName("test");
         return c;
     }

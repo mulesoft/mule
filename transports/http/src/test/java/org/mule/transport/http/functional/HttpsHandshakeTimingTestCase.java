@@ -106,7 +106,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
 
     private MockHttpsMessageReceiver setupMockHttpsMessageReceiver() throws CreateException
     {
-        HttpsConnector httpsConnector = new HttpsConnector();
+        HttpsConnector httpsConnector = new HttpsConnector(muleContext);
         httpsConnector.setSslHandshakeTimeout(1000);
         
         Map properties = Collections.emptyMap();

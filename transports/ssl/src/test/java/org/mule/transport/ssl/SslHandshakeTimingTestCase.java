@@ -65,7 +65,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
 
     private SslMessageReceiver setupMockSslMessageReciever() throws Exception
     {
-        SslConnector connector = new SslConnector();
+        SslConnector connector = new SslConnector(muleContext);
         connector.setSslHandshakeTimeout(1000);
         
         Mock mockService = new Mock(Service.class);

@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsIndirectKeyStore;
@@ -36,9 +37,9 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
     public static final int DEFAULT_SMTPS_PORT = 465;
 
 
-    public SmtpsConnector()
+    public SmtpsConnector(MuleContext context)
     {
-        super(DEFAULT_SMTPS_PORT);
+        super(DEFAULT_SMTPS_PORT, context);
     }
 
     public String getProtocol()

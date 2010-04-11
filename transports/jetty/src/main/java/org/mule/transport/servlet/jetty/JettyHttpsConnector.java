@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.TlsDirectKeyStore;
@@ -44,9 +45,9 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
 
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
-    public JettyHttpsConnector()
+    public JettyHttpsConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerSupportedProtocol("https");
         registerSupportedProtocol("jetty-ssl");
     }

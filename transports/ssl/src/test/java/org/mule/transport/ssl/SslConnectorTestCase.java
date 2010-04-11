@@ -21,8 +21,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        SslConnector cnn = new SslConnector();
-        cnn.setMuleContext(muleContext);
+        SslConnector cnn = new SslConnector(muleContext);
         cnn.setName("SslConnector");
         cnn.setKeyStore("serverKeystore");
         cnn.setClientKeyStore("clientKeystore");
@@ -37,8 +36,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
 
     public void testClientConnector() throws Exception
     {
-        SslConnector cnn = new SslConnector();
-        cnn.setMuleContext(muleContext);
+        SslConnector cnn = new SslConnector(muleContext);
         cnn.setClientKeyStore("clientKeystore");
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);

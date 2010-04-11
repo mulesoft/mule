@@ -115,7 +115,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     protected FtpConnector internalGetConnector(boolean initialiseConnector) throws Exception
     {
-        FtpConnector connector = new FtpConnector();
+        FtpConnector connector = new FtpConnector(muleContext);
         connector.setName("testFTP");
         connector.setPollingFrequency(POLLING_FREQUENCY);
 

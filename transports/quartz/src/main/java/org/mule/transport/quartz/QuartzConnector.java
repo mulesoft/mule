@@ -10,6 +10,7 @@
 
 package org.mule.transport.quartz;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
@@ -58,6 +59,11 @@ public class QuartzConnector extends AbstractConnector
      */
     private Scheduler quartzScheduler = null;
 
+    public QuartzConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     protected void doInitialise() throws InitialisationException
     {
         if(factoryProperties==null)

@@ -10,6 +10,7 @@
 
 package org.mule.transport.jnp;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.rmi.RmiConnector;
 
 /**
@@ -21,6 +22,11 @@ public class JnpConnector extends RmiConnector
 
     public static final String JNP = "jnp";
 
+    public JnpConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     public String getProtocol()
     {
         return JNP;

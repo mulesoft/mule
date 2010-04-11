@@ -9,6 +9,7 @@
  */
 package org.mule.transport.http;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 
 import java.util.Properties;
@@ -36,8 +37,9 @@ public class HttpPollingConnector extends HttpConnector
      */
     private boolean checkEtag = true;
 
-    public HttpPollingConnector()
+    public HttpPollingConnector(MuleContext context)
     {
+        super(context);
         serviceOverrides = new Properties();
         serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, PollingHttpMessageReceiver.class.getName());
     }

@@ -20,7 +20,7 @@ public class JnpConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        JnpConnector c = new JnpConnector();
+        JnpConnector c = new JnpConnector(muleContext);
         c.setName("JnpConnector");
         c.setSecurityManager(null);
         return c;

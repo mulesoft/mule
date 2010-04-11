@@ -34,8 +34,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
     public static HttpsConnector createConnector(MuleContext context, boolean initialised)
         throws IOException, InitialisationException
     {
-        HttpsConnector cnn = new HttpsConnector();
-        cnn.setMuleContext(context);
+        HttpsConnector cnn = new HttpsConnector(muleContext);
         cnn.setName("HttpsConnector");
         cnn.setKeyStore("serverKeystore");
         cnn.setClientKeyStore("clientKeystore");

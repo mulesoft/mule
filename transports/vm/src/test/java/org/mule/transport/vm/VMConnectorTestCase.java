@@ -18,7 +18,7 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
 {
     public Connector createConnector() throws Exception
     {
-        VMConnector conn = new VMConnector();
+        VMConnector conn = new VMConnector(muleContext);
         conn.setName("TestVM");
         return conn;
     }

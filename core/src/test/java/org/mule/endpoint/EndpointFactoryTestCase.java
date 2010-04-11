@@ -167,9 +167,9 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateEndpointByCustomizingEndpointBuilder() throws MuleException
     {
         // Create and register two connectors
-        TestConnector testConnector1 = new TestConnector();
+        TestConnector testConnector1 = new TestConnector(muleContext);
         testConnector1.setName("testConnector1");
-        TestConnector testConnector2 = new TestConnector();
+        TestConnector testConnector2 = new TestConnector(muleContext);
         testConnector2.setName("testConnector2");
         muleContext.getRegistry().registerConnector(testConnector1);
         muleContext.getRegistry().registerConnector(testConnector2);

@@ -60,7 +60,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        FileConnector connector = new FileConnector();
+        FileConnector connector = new FileConnector(muleContext);
         connector.setName("testFile");
         connector.setOutputAppend(true);
         return connector;

@@ -9,6 +9,7 @@
  */
 package org.mule.transport.ajax.embedded;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -55,9 +56,9 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 
 
 
-    public AjaxConnector()
+    public AjaxConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerSupportedProtocol("ajax");
         setInitialStateStopped(true);
     }

@@ -46,10 +46,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             ServletConnector scon = (ServletConnector) new TransportFactory(connector.getMuleContext()).getConnectorByProtocol("servlet");
             if (scon == null)
             {
-                scon = new ServletConnector();
+                scon = new ServletConnector(connector.getMuleContext());
                 scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
                 scon.setServletUrl(endpoint.getEndpointURI().getAddress());
-                scon.setMuleContext(connector.getMuleContext());
                 try
                 {
                     connector.getMuleContext().getRegistry().registerConnector(scon);

@@ -10,6 +10,7 @@
 
 package org.mule.transport.bpm.jbpm;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.ClassUtils;
@@ -26,6 +27,11 @@ public class JBpmConnector extends ProcessConnector
     
     private Properties processDefinitions;
 
+    public JBpmConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     @Override
     protected BPMS createBpms() throws Exception
     {

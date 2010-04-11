@@ -10,6 +10,8 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
+
 /**
  * Receives messages from an IMAP mailbox
  */
@@ -19,9 +21,9 @@ public class ImapConnector extends AbstractRetrieveMailConnector
     public static final String IMAP = "imap";
     public static final int DEFAULT_IMAP_PORT = 143;
 
-    public ImapConnector()
+    public ImapConnector(MuleContext context)
     {
-        super(DEFAULT_IMAP_PORT);
+        super(DEFAULT_IMAP_PORT, context);
     }
     
     public String getProtocol()

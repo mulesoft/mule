@@ -70,7 +70,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
             connector = (AjaxServletConnector) new TransportFactory(muleContext).getConnectorByProtocol(getConnectorProtocol());
             if (connector == null)
             {
-                connector = new AjaxServletConnector();
+                connector = new AjaxServletConnector(muleContext);
                 connector.setName("ajax.servlet." + getServletContext().getServerInfo());
                 try
                 {

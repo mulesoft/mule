@@ -17,7 +17,7 @@ public class AjaxServletConnectorTestCase extends AbstractConnectorTestCase
 {
     public Connector createConnector() throws Exception
     {
-        AjaxServletConnector c = new AjaxServletConnector();
+        AjaxServletConnector c = new AjaxServletConnector(muleContext);
         c.setName("test");
         c.setInitialStateStopped(false);
         return c;

@@ -163,7 +163,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
 
     private TestConnector createConnectorWithSingleObjectDispatcherPool(int exhaustedAction) throws Exception
     {
-        TestConnector connector = new TestConnector();
+        TestConnector connector = new TestConnector(muleContext);
         ThreadingProfile threadingProfile = new ImmutableThreadingProfile(1, 1, 1, 1, 1, exhaustedAction,
             true, null, null);
         connector.setDispatcherThreadingProfile(threadingProfile);

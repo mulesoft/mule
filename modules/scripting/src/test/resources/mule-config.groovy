@@ -89,7 +89,7 @@ OutboundEndpoint createOutboundEndpoint(String url, String name)
 muleContext.transactionManager = new TestTransactionManagerFactory().create()
 
 //register connector
-TestConnector c = new TestConnector();
+TestConnector c = new TestConnector(muleContext);
 c.name = "dummyConnector"
 c.exceptionListener = new TestExceptionStrategy()
 muleContext.registry.registerConnector(c);

@@ -18,7 +18,7 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        QuartzConnector c = new QuartzConnector();
+        QuartzConnector c = new QuartzConnector(muleContext);
         c.setName("QuartzConnector");
         return c;
     }

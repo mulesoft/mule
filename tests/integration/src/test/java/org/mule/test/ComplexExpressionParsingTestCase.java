@@ -28,7 +28,7 @@ public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());
 
         List parsedParams = new ArrayList();
-        JdbcConnector c = new JdbcConnector();
+        JdbcConnector c = new JdbcConnector(muleContext);
         String result = c.parseStatement("#[groovy:payload[0]] - #[groovy:payload[1].toUpperCase()]", parsedParams);
 
         assertEquals("Wrong number of parsed parameters for a statement", 2, parsedParams.size());

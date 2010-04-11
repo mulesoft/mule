@@ -27,13 +27,12 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
 
     public Connector createConnector() throws Exception
     {
-        Pop3sConnector connector = new Pop3sConnector();
+        Pop3sConnector connector = new Pop3sConnector(muleContext);
         connector.setName("Pop3sConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStore("greenmail.jks");
         connector.setTrustStorePassword("changeit");
-        connector.setMuleContext(muleContext);
         return connector;
     }
 }

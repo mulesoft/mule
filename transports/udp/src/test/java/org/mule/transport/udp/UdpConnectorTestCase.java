@@ -24,7 +24,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        UdpConnector c = new UdpConnector();
+        UdpConnector c = new UdpConnector(muleContext);
         c.setName("UdpConnector");
         return c;
     }

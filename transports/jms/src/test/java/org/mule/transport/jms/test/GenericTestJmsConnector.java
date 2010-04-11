@@ -10,15 +10,16 @@
 
 package org.mule.transport.jms.test;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.jms.JmsConnector;
 
 public class GenericTestJmsConnector extends JmsConnector
 {
     private String providerProperty = "NOT_SET";
     
-    public GenericTestJmsConnector()
+    public GenericTestJmsConnector(MuleContext context)
     {
-        super();
+        super(context);
     }
 
     public String getProviderProperty()

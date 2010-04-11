@@ -10,6 +10,7 @@
 
 package org.mule.transport.bpm;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
@@ -82,6 +83,11 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
 
     private MuleClient muleClient = null;
 
+    public ProcessConnector(MuleContext context)
+    {
+        super(context);
+    }    
+    
     public String getProtocol()
     {
         return PROTOCOL;

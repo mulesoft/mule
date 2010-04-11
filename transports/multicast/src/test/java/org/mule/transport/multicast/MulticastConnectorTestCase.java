@@ -24,7 +24,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        MulticastConnector c = new MulticastConnector();
+        MulticastConnector c = new MulticastConnector(muleContext);
         c.setName("MulticastConnector");
         return c;
     }
@@ -62,7 +62,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        MulticastConnector c = new MulticastConnector();
+        MulticastConnector c = new MulticastConnector(muleContext);
         c.setReceiveBufferSize(1024);
         assertEquals(1024, c.getReceiveBufferSize());
         c.setReceiveBufferSize(0);

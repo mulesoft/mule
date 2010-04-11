@@ -279,9 +279,11 @@ public abstract class AbstractConnector
      */
     private boolean validateConnections = true;
 
-    public AbstractConnector()
+    public AbstractConnector(MuleContext context)
     {
+        muleContext = context;
         setDynamicNotification(false);
+        updateCachedNotificationHandler();
 
         // always add at least the default protocol
         supportedProtocols = new ArrayList();
@@ -2414,12 +2416,6 @@ public abstract class AbstractConnector
     public MuleContext getMuleContext()
     {
         return muleContext;
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-        updateCachedNotificationHandler();
     }
 
     @Override

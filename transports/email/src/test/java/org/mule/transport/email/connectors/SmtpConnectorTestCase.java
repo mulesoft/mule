@@ -50,7 +50,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
     public Connector createConnector() throws Exception
     {
-        SmtpConnector c = new SmtpConnector();
+        SmtpConnector c = new SmtpConnector(muleContext);
         c.setName("SmtpConnector");
         return c;
     }

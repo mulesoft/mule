@@ -82,7 +82,6 @@ public class TransportFactory
             connector = sd.createConnector();
             if (connector != null)
             {
-                connector.setMuleContext(muleContext);
                 if (connector instanceof AbstractConnector)
                 {
                     ((AbstractConnector) connector).initialiseFromUrl(url);
@@ -147,7 +146,6 @@ public class TransportFactory
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-                connector.setMuleContext(muleContext);
                 muleContext.getRegistry().registerConnector(connector);
             }
             catch (Exception e)

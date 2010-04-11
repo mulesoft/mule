@@ -10,6 +10,7 @@
 
 package org.mule.transport.udp.functional;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.udp.UdpConnector;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
@@ -19,6 +20,11 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class CustomUdpConnector extends UdpConnector
 {
+    public CustomUdpConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     public GenericKeyedObjectPool getDispatchers() 
     {
         return dispatchers;

@@ -25,7 +25,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        SmtpsConnector connector = new SmtpsConnector();
+        SmtpsConnector connector = new SmtpsConnector(muleContext);
         connector.setName("SmtpsConnector");
         connector.setTrustStore("greenmail.jks");
         connector.setTrustStorePassword("changeit");

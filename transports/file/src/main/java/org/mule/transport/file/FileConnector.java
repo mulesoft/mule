@@ -107,9 +107,9 @@ public class FileConnector extends AbstractConnector
 
     public FilenameParser filenameParser;
 
-    public FileConnector()
+    public FileConnector(MuleContext context)
     {
-        super();
+        super(context);
         filenameParser = new ExpressionFilenameParser();
     }
 
@@ -276,6 +276,11 @@ public class FileConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(muleContext);
+        }
+
         // MULE-1773: limit the number of dispatchers per endpoint to 1 until
         // there is a proper (Distributed)LockManager in place (MULE-2402).
         // We also override the setter to prevent "wrong" configuration for now.
@@ -592,17 +597,6 @@ public class FileConnector extends AbstractConnector
         else
         {
             return super.getMessageAdapter(message);
-        }
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        
-        if (filenameParser != null)
-        {
-            filenameParser.setMuleContext(context);
         }
     }
 

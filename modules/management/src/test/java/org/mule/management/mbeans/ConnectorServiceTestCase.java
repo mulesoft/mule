@@ -35,7 +35,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 
     public void testUndeploy() throws Exception
     {
-        final Connector connector = new TestConnector();
+        final Connector connector = new TestConnector(muleContext);
         connector.setName("TEST_CONNECTOR");
         muleContext.getRegistry().registerConnector(connector);
         muleContext.start();

@@ -10,10 +10,17 @@
 
 package org.mule.transport.jms.mulemq;
 
+import org.mule.api.MuleContext;
+
 
 public class MuleMQXAJmsConnector extends MuleMQJmsConnector
 {
     public static final String MULEMQ_XA_CONNECTION_FACTORY_CLASS = "com.pcbsys.nirvana.nJMS.XAConnectionFactoryImpl";
+
+    public MuleMQXAJmsConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     @Override
     protected String getMuleMQFactoryClass()

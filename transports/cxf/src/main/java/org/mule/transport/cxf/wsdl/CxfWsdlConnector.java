@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf.wsdl;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.cxf.CxfConnector;
 
 /**
@@ -17,6 +18,11 @@ import org.mule.transport.cxf.CxfConnector;
  */
 public class CxfWsdlConnector extends CxfConnector
 {
+    
+    public CxfWsdlConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     protected void registerProtocols()
     {

@@ -86,6 +86,11 @@ public class FtpConnector extends AbstractConnector
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
 
+    public FtpConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     public String getProtocol()
     {
         return FTP;
@@ -233,6 +238,11 @@ public class FtpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        if (filenameParser != null)
+        {
+            filenameParser.setMuleContext(muleContext);
+        }
+
         try
         {
             Class objectFactoryClass = ClassUtils.loadClass(this.connectionFactoryClass, getClass());
@@ -638,14 +648,4 @@ public class FtpConnector extends AbstractConnector
         this.streaming = streaming;
     }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        super.setMuleContext(context);
-        
-        if (filenameParser != null)
-        {
-            filenameParser.setMuleContext(context);
-        }
-    }
 }

@@ -10,13 +10,15 @@
 
 package org.mule.transport.jms.test;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.jms.JmsConnector;
 
 public class TestJmsConnector extends JmsConnector
 {
-    public TestJmsConnector() throws InitialisationException
+    public TestJmsConnector(MuleContext context) throws InitialisationException
     {
+        super(context);
         setConnectionFactory(new TestConnectionFactory());
     }
 }

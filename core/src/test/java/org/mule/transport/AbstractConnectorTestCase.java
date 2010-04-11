@@ -45,8 +45,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         Connector connector = createConnector();
         if(connector.getName()==null) connector.setName("test");
         connectorName = connector.getName();
-        
-        connector.setMuleContext(muleContext);
         muleContext.getRegistry().registerConnector(connector);
     }
 
@@ -107,7 +105,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         // simulate disposal as well we have to create an extra instance here.
 
         Connector localConnector = this.createConnector();
-        localConnector.setMuleContext(muleContext);
         localConnector.setName(connectorName+"-temp");
         // the connector did not come from the registry, so we need to initialise manually
         localConnector.initialise();

@@ -31,7 +31,7 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
 
     public Connector createConnector() throws Exception
     {
-        Connector cnn = new PromptStdioConnector();
+        Connector cnn = new PromptStdioConnector(muleContext);
         cnn.setName("TestStdio");
         return cnn;
     }
@@ -44,8 +44,7 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
     public void testContextClassLoaderResourceLookup() throws InitialisationException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        PromptStdioConnector connector = new PromptStdioConnector();
-        connector.setMuleContext(muleContext);
+        PromptStdioConnector connector = new PromptStdioConnector(muleContext);
         connector.setResourceBundle("dummy-messages");
         connector.setPromptMessageCode("1");
         connector.setOutputMessageCode("2");

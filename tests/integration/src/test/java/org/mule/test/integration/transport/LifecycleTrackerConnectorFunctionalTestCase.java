@@ -34,7 +34,7 @@ public class LifecycleTrackerConnectorFunctionalTestCase extends FunctionalTestC
     {
         testComponentLifecycle(
             "test1",
-            "[setProperty, setMuleContext, initialise, connect, start, stop, disconnect, dispose]");
+            "[setProperty, initialise, connect, start, stop, disconnect, dispose]");
     }
 
     private void testComponentLifecycle(final String connectorName, final String expectedLifeCycle)

@@ -93,9 +93,8 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     }
 
     public Connector getConnector() throws Exception {
-        Connector connector = new FileConnector();
+        Connector connector = new FileConnector(muleContext);
         connector.setName("FileConnector");
-        connector.setMuleContext(muleContext);
         muleContext.getRegistry().registerConnector(connector);
         return connector;
     }

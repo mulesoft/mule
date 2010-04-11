@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
@@ -49,9 +50,9 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
     private volatile boolean deleteReadMessages = true;
 
     
-    protected AbstractRetrieveMailConnector(int defaultPort)
+    protected AbstractRetrieveMailConnector(int defaultPort, MuleContext context)
     {
-        super(defaultPort, MAILBOX);
+        super(defaultPort, MAILBOX, context);
     }
 
     /**

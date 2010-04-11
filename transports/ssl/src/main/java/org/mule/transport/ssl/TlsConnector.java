@@ -10,6 +10,8 @@
 
 package org.mule.transport.ssl;
 
+import org.mule.api.MuleContext;
+
 /**
  * <code>TlsConnector</code> Provides TLS connections
  */
@@ -18,6 +20,11 @@ public class TlsConnector extends SslConnector
 
     public static final String TLS = "tls";
 
+    public TlsConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     public String getProtocol()
     {
         return TLS;

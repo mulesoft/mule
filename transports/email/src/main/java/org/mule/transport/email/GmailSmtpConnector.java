@@ -10,6 +10,8 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
+
 import java.util.Properties;
 
 import javax.mail.URLName;
@@ -19,6 +21,12 @@ import javax.mail.URLName;
  */
 public class GmailSmtpConnector extends SmtpConnector
 {
+
+    public GmailSmtpConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     @Override
     protected void extendPropertiesForSession(Properties global, Properties local, URLName url) 
     {

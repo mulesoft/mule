@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.websphere;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.transport.jms.JmsConnector;
 
@@ -25,8 +26,9 @@ public class WebsphereJmsConnector extends JmsConnector
     public static final String DEFAULT_XA_RECEIVER_CLASS = WebsphereTransactedJmsMessageReceiver.class.getName();
     
     /** Constructs a new WebsphereJmsConnector. */
-    public WebsphereJmsConnector()
+    public WebsphereJmsConnector(MuleContext context)
     {
+        super(context);
         if (serviceOverrides == null || serviceOverrides.isEmpty())
         {
             Map overrides = Collections.singletonMap(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS,

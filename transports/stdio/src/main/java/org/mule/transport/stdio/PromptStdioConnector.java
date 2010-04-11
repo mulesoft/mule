@@ -10,6 +10,7 @@
 
 package org.mule.transport.stdio;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -38,9 +39,9 @@ public class PromptStdioConnector extends StdioConnector
     private long messageDelayTime = 3000;
     private boolean firstTime = true;
 
-    public PromptStdioConnector()
+    public PromptStdioConnector(MuleContext context)
     {
-        super();
+        super(context);
         
         inputStream = System.in;
         outputStream = System.out;

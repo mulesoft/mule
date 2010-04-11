@@ -10,6 +10,7 @@
 
 package org.mule.transport.xmpp;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -45,6 +46,11 @@ public class XmppConnector extends AbstractConnector
     
     private XMPPConnection connection;
     private XmppConversationFactory conversationFactory = new XmppConversationFactory();
+    
+    public XmppConnector(MuleContext context)
+    {
+        super(context);
+    }
     
     protected static String getRecipient(ImmutableEndpoint endpoint)
     {

@@ -25,7 +25,7 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        ProcessConnector c = new ProcessConnector();
+        ProcessConnector c = new ProcessConnector(muleContext);
         c.setName("ProcessConnector");
         c.setBpms(new TestBpms());
 
@@ -39,7 +39,6 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase
         Mock bpms = new Mock(BPMS.class);
         bpms.expect("setMessageService", c);
         c.setBpms((BPMS) bpms.proxy());
-        c.setMuleContext(muleContext);
         c.initialise();
         bpms.verify();
     }

@@ -26,7 +26,7 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        XmppConnector cnn = new XmppConnector();
+        XmppConnector cnn = new XmppConnector(muleContext);
         cnn.setName("xmppConnector");
         return cnn;
     }

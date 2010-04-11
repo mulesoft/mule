@@ -10,6 +10,7 @@
 
 package org.mule.transport.soap.axis.wsdl;
 
+import org.mule.api.MuleContext;
 import org.mule.transport.soap.axis.AxisConnector;
 
 import java.util.ArrayList;
@@ -22,6 +23,11 @@ import java.util.List;
 public class AxisWsdlConnector extends AxisConnector
 {
 
+    public AxisWsdlConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     protected void registerProtocols()
     {
         // Default supported schemes, these can be restricted

@@ -32,7 +32,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
     {
         super.doSetUp();
 
-        testConnector = new TestConnector();
+        testConnector = new TestConnector(muleContext);
         testConnector.setName("customTestConnector");
         muleContext.getRegistry().registerConnector(testConnector);
 

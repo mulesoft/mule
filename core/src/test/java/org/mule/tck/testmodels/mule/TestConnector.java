@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -41,9 +42,9 @@ public class TestConnector extends AbstractConnector
     private int disconnectCount = 0;
     private int disposeCount = 0;
     
-    public TestConnector()
+    public TestConnector(MuleContext context)
     {
-        super();
+        super(context);
         setDispatcherFactory(new AbstractMessageDispatcherFactory()
         {
             public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException

@@ -23,7 +23,7 @@ public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctio
     protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete, Class messageAdaptor)
         throws Exception
     {
-        FileConnector fc = new FileConnector();
+        FileConnector fc = new FileConnector(muleContext);
         if (messageAdaptor != null)
         {
             Map overrides = new HashedMap();

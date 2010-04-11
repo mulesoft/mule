@@ -10,6 +10,7 @@
 
 package org.mule.transport.ejb;
 
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.rmi.RmiConnector;
 import org.mule.util.ClassUtils;
@@ -32,6 +33,11 @@ public class EjbConnector extends RmiConnector
     // Errorcodes
     public static final int EJB_SERVICECLASS_INVOCATION_FAILED = 2;
 
+    public EjbConnector(MuleContext context)
+    {
+        super(context);
+    }
+    
     public String getProtocol()
     {
         return EJB;

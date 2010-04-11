@@ -28,7 +28,7 @@ public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCas
 
     public Connector createConnector() throws Exception
     {
-        Pop3Connector connector = new Pop3Connector();
+        Pop3Connector connector = new Pop3Connector(muleContext);
         connector.setName("Pop3Connector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());

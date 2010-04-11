@@ -9,6 +9,7 @@
  */
 package org.mule.transport.ajax.container;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
@@ -93,9 +94,9 @@ public class AjaxServletConnector extends ServletConnector
 
     protected AbstractBayeux bayeux;
 
-    public AjaxServletConnector()
+    public AjaxServletConnector(MuleContext context)
     {
-        super();
+        super(context);
         registerSupportedProtocolWithoutPrefix("ajax");
         //Dont start until the servletContainer is up
         setInitialStateStopped(true);

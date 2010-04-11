@@ -41,7 +41,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        JdbcConnector c = new JdbcConnector();
+        JdbcConnector c = new JdbcConnector(muleContext);
         EmbeddedDataSource embeddedDS = new EmbeddedDataSource();
         embeddedDS.setDatabaseName(DATABASE_NAME);
         c.setName("JdbcConnector");

@@ -29,8 +29,7 @@ public class CxfConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public Connector createConnector() throws Exception
     {
-        CxfConnector c = new CxfConnector();
-        c.setMuleContext(muleContext);
+        CxfConnector c = new CxfConnector(muleContext);
         c.setName("cxfConnector");
         return c;
     }

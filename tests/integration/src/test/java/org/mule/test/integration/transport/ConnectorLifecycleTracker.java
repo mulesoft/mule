@@ -27,6 +27,12 @@ public class ConnectorLifecycleTracker extends AbstractConnector
     private String property1;
 
     boolean connected = false;
+    
+    public ConnectorLifecycleTracker(MuleContext context)
+    {
+        super(context);
+    }
+    
     public List<String> getTracker() {
         return tracker;
     }
@@ -52,11 +58,6 @@ public class ConnectorLifecycleTracker extends AbstractConnector
 
     public void setProperty(final String value) {
         tracker.add("setProperty");
-    }
-
-    public void setMuleContext(final MuleContext context) {
-        tracker.add("setMuleContext");
-        super.setMuleContext(context);
     }
 
     public void doInitialise() throws InitialisationException

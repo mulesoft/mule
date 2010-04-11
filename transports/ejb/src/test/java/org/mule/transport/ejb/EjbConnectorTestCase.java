@@ -19,7 +19,7 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
 
     public Connector createConnector() throws Exception
     {
-        EjbConnector c = new EjbConnector();
+        EjbConnector c = new EjbConnector(muleContext);
         c.setName("EjbConnector");
         c.setSecurityManager(null);
         return c;

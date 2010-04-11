@@ -10,6 +10,8 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.MuleContext;
+
 /**
  * Creates a secure IMAP connection
  */
@@ -19,9 +21,9 @@ public class ImapsConnector extends AbstractTlsRetrieveMailConnector
     public static final String IMAPS = "imaps";
     public static final int DEFAULT_IMAPS_PORT = 993;
 
-    public ImapsConnector()
+    public ImapsConnector(MuleContext context)
     {
-        super(DEFAULT_IMAPS_PORT, ImapsSocketFactory.MULE_IMAPS_NAMESPACE, ImapsSocketFactory.class);
+        super(DEFAULT_IMAPS_PORT, ImapsSocketFactory.MULE_IMAPS_NAMESPACE, ImapsSocketFactory.class, context);
     }
   
     public String getProtocol()

@@ -53,11 +53,9 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         registerRmi();
 
-        connector = new RmiConnector();
-        connector.setMuleContext(muleContext);
+        connector = new RmiConnector(muleContext);
         connector.setName("TestConnector:" + this.getClass());
         connector.setSecurityPolicy(ClassLoader.getSystemResource("rmi.policy").getPath());
-        connector.setMuleContext(muleContext);
         connector.setJndiInitialFactory("com.sun.jndi.rmi.registry.RegistryContextFactory");
         connector.setJndiProviderUrl("rmi://localhost:11099");
 

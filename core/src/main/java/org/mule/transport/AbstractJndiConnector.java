@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -35,6 +36,11 @@ public abstract class AbstractJndiConnector extends AbstractConnector
     protected Context jndiContext;
 
     protected Map jndiProviderProperties = null;
+
+    public AbstractJndiConnector(MuleContext context)
+    {
+        super(context);
+    }
 
     protected void initJndiContext() throws InitialisationException
     {
