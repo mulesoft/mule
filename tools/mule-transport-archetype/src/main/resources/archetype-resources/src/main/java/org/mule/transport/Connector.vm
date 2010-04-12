@@ -10,9 +10,10 @@
 
 package org.mule.transport.${ModuleNameLower};
 
-import org.mule.transport.AbstractConnector;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.transport.AbstractConnector;
 
 /**
  * <code>${ModuleName}Connector</code> TODO document
@@ -28,6 +29,12 @@ public class ${ModuleName}Connector extends AbstractConnector
     /* IMPLEMENTATION NOTE: All configuaration for the transport should be set
        on the Connector object, this is the object that gets configured in
        MuleXml */
+       
+    public ${ModuleName}Connector(MuleContext context)
+    {
+        super(context);
+    }
+       
 
     public void doInitialise() throws InitialisationException
     {

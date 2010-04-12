@@ -11,6 +11,7 @@
 #set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
 package org.mule.transport.${ModuleName.toLowerCase()};
 
+import org.mule.api.MuleContext;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -25,7 +26,7 @@ public class ${ModuleName}ConnectorTestCase extends AbstractConnectorTestCase
         /* IMPLEMENTATION NOTE: Create and initialise an instance of your
            connector here. Do not actually call the connect method. */
 
-        ${ModuleName}Connector c = new ${ModuleName}Connector();
+        ${ModuleName}Connector c = new ${ModuleName}Connector(muleContext);
         c.setName("Test");
         // TODO Set any additional properties on the connector here
         return c;
