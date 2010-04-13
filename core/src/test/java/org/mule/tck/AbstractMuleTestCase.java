@@ -174,6 +174,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     private boolean failOnTimeout = true;
 
+    /**
+     * This is just a reference to the main thread running the current thread. It is
+     * set in the {@link #setUp()} method.
+     */
+    private volatile Thread currentTestRunningThread;
+
     public AbstractMuleTestCase()
     {
         super();
@@ -350,16 +356,37 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public void handleTimeout(long timeout, TimeUnit unit)
     {
-        String msg = "Timeout of " + unit.toMillis(timeout) + "ms exceeded - exiting VM! (modify via -Dmule.test.timeoutSecs=XX)";
+        String msg = "Timeout of " + unit.toMillis(timeout) + "ms exceeded (modify via -Dmule.test.timeoutSecs=XX)";
 
         if (failOnTimeout)
         {
-            logger.fatal(msg);
-            Runtime.getRuntime().halt(1);
+            logger.fatal(msg + " - Attempting to interrupt thread for test " + this.getName());
+            if (currentTestRunningThread != null)
+            {
+                currentTestRunningThread.interrupt();
+            }
+            giveTheTestSomeTimeToCleanUpAndThenKillIt("Interrupting didn't work. Killing the VM!. Test "
+                                                      + this.getName() + " did not finish correctly.");
         }
         else
         {
             logger.warn(msg);
+        }
+    }
+
+    private void giveTheTestSomeTimeToCleanUpAndThenKillIt(String messageIfNeedToKill)
+    {
+        try
+        {
+            Thread.sleep(5000);
+            logger.fatal(messageIfNeedToKill);
+            Runtime.getRuntime().halt(1);
+        }
+        catch (InterruptedException e)
+        {
+            logger.info(
+                "someone interrupted the thread, probable the call to watchdog.cancel() in teardown method.",
+                e);
         }
     }
 
@@ -375,6 +402,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // start a watchdog thread
         watchdog = createWatchdog();
         watchdog.start();
+
+        currentTestRunningThread = Thread.currentThread();
 
         if (verbose)
         {
