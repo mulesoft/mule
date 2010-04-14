@@ -20,6 +20,8 @@ import org.mule.transport.NullPayload;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.activation.DataHandler;
+
 public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
 {
     //
@@ -175,13 +177,32 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertOutboundMessageProperty("payload", message);
         assertNull(message.getProperty("MessageAdapter"));
     }
-    
-    private void assertOutboundMessageProperty(String key, MuleMessage message)
-    {
-        // taking advantage of the fact here that key and value are the same
-        assertEquals(key, message.getProperty(key, PropertyScope.OUTBOUND));
-    }
 
+    //
+    // attachments
+    //
+    public void testAddingAttachment() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        
+        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
+        message.addAttachment("attachment", handler);
+        
+        assertTrue(message.getAttachmentNames().contains("attachment"));
+        assertEquals(handler, message.getAttachment("attachment"));
+    }
+    
+    public void testNewMuleMessageFromMessageAdapterWithAttachment() throws Exception
+    {
+        MessageAdapter previous = createMessageAdapter();
+        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
+        previous.addAttachment("attachment", handler);
+        
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous, muleContext);
+        assertTrue(message.getAttachmentNames().contains("attachment"));
+        assertEquals(handler, message.getAttachment("attachment"));
+    }
+    
     //
     // helpers
     //
@@ -204,5 +225,11 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         MuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", muleContext);
         previousMessage.setProperty("MuleMessage", "MuleMessage");
         return previousMessage;
+    }
+
+    private void assertOutboundMessageProperty(String key, MuleMessage message)
+    {
+        // taking advantage of the fact here that key and value are the same
+        assertEquals(key, message.getProperty(key, PropertyScope.OUTBOUND));
     }
 }
