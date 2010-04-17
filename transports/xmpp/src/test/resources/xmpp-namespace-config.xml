@@ -11,6 +11,7 @@
     <xmpp:connector name="xmppConnector"
                     host="localhost" 
                     port="1234" 
+                    serviceName="jabberService"
                     user="mule" 
                     password="secret"
                     resource="MuleAtWork"

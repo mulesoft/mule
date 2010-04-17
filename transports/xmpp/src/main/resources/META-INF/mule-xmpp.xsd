@@ -53,6 +53,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="serviceName" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The service name to use when connecting the Jabber server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="user" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>

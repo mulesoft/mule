@@ -40,6 +40,7 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(connector);
         assertEquals("localhost", connector.getHost());
         assertEquals(1234, connector.getPort());
+        assertEquals("jabberService", connector.getServiceName());
         assertEquals("mule", connector.getUser());
         assertEquals("secret", connector.getPassword());
         assertEquals("MuleAtWork", connector.getResource());
