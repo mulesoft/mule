@@ -15,9 +15,11 @@ import org.mule.transport.ConnectException;
 import org.mule.util.UUID;
 
 import org.jivesoftware.smack.PacketCollector;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.XMPPError;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 public class XmppMultiUserChatConversation extends AbstractXmppConversation
@@ -43,7 +45,7 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
     @Override
     protected void doConnect() throws ConnectException
     {
-        chat = new MultiUserChat(connection, recipient);        
+        chat = new MultiUserChat(connection, recipient);
         joinChat();
     }
 
@@ -68,7 +70,13 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
     
     protected void tryToJoinChat() throws XMPPException
     {
-        chat.join(nickname);
+        DiscussionHistory history = new DiscussionHistory();
+        history.setMaxStanzas(0);
+        
+        // use the same default value that the smack API uses internally
+        long joinTimeout = SmackConfiguration.getPacketReplyTimeout();
+        
+        chat.join(nickname, null, history, joinTimeout);
         if (logger.isDebugEnabled())
         {
             logger.debug("joined groupchat '" + recipient + "'");
