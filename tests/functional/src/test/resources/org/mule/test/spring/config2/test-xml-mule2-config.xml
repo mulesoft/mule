@@ -136,7 +136,7 @@
                         address="test://component.exceptions"/>
             </mule:custom-exception-strategy>
 
-            <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/ -->
+            <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/ -->
 
             <mule:service name="orangeComponent">
                 

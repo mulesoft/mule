@@ -16,7 +16,7 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.component.DefaultComponentLifecycleAdapter;
 
-/** <code>TestDefaultLifecycleAdapter</code> TODO document */
+/** <code>TestComponentLifecycleAdapter</code> TODO document */
 public class TestComponentLifecycleAdapter extends DefaultComponentLifecycleAdapter
 {
     public TestComponentLifecycleAdapter(Object pojoService, JavaComponent service, MuleContext muleContext) throws MuleException

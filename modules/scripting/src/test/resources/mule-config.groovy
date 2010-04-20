@@ -29,7 +29,7 @@ import org.mule.tck.testmodels.fruit.FruitCleaner
 import org.mule.tck.testmodels.fruit.Orange
 import org.mule.tck.testmodels.mule.TestCompressionTransformer
 import org.mule.tck.testmodels.mule.TestConnector
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory
+import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestResponseAggregator
@@ -150,7 +150,7 @@ Model model = new SedaModel();
 exceptionStrategy = new TestExceptionStrategy();
 exceptionStrategy.addEndpoint(createOutboundEndpoint("test://component.exceptions", null));
 model.exceptionListener = exceptionStrategy
-model.lifecycleAdapterFactory = new TestDefaultLifecycleAdapterFactory()
+model.lifecycleAdapterFactory = new TestComponentLifecycleAdapterFactory()
 model.entryPointResolverSet = new TestEntryPointResolverSet()
 muleContext.registry.registerModel(model)
 
