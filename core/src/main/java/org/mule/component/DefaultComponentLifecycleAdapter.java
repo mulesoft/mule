@@ -47,14 +47,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>DefaultLifecycleAdapter</code> provides lifecycle methods for all Mule
- * managed components. It's possible to plugin custom lifecycle adapters, this can
- * provide additional lifecycle methods triggered by an external source.
+ * <code>DefaultComponentLifecycleAdapter</code> is a default implementation of
+ * {@link LifecycleAdapter} for use with {@link JavaComponent} that expects component
+ * instances to implement Mule lifecycle interfaces in order to receive lifecycle.
+ * Custom implementations should be used in order to adapt Mule lifecycle to other
+ * custom lifecycle methods that are used by a component instance.
  */
-public class DefaultLifecycleAdapter implements LifecycleAdapter
+public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 {
     /** logger used by this class */
-    protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
+    protected static final Log logger = LogFactory.getLog(DefaultComponentLifecycleAdapter.class);
 
     protected SoftReference<?> componentObject;
 
@@ -75,7 +77,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     protected MuleContext muleContext;
 
-    public DefaultLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
+    public DefaultComponentLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
     {
         if (componentObject == null)
         {
@@ -104,7 +106,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
     }
 
-    public DefaultLifecycleAdapter(Object componentObject,
+    public DefaultComponentLifecycleAdapter(Object componentObject,
                                    JavaComponent component,
                                    EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
     {

@@ -19,7 +19,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
-import org.mule.component.DefaultLifecycleAdapterFactory;
+import org.mule.component.DefaultComponentLifecycleAdapterFactory;
 import org.mule.context.notification.ModelNotification;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -46,7 +46,7 @@ public abstract class AbstractModel implements Model
 
     private String name = DEFAULT_MODEL_NAME;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
-    private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
+    private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
     private AtomicBoolean initialised = new AtomicBoolean(false);
     private AtomicBoolean started = new AtomicBoolean(false);
     private ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();

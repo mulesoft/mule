@@ -22,7 +22,7 @@ import org.mule.api.model.EntryPointResolverSet;
  * This can be used when the service component implementation is looked up from a
  * container and therefore has it's own lifecycle management.
  */
-public class NullLifecycleAdapter extends DefaultLifecycleAdapter
+public class NullLifecycleAdapter extends DefaultComponentLifecycleAdapter
 {
 
     public NullLifecycleAdapter(Object componentObject,

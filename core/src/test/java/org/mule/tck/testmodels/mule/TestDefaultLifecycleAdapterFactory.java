@@ -27,7 +27,7 @@ public class TestDefaultLifecycleAdapterFactory implements LifecycleAdapterFacto
     public LifecycleAdapter create(Object pojoService, JavaComponent service, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {
-        return new TestDefaultLifecycleAdapter(pojoService, service, resolver, muleContext);
+        return new TestComponentLifecycleAdapter(pojoService, service, resolver, muleContext);
     }
 
 }
