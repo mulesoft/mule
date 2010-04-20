@@ -98,7 +98,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
         componentObjectRegistryKey = createRegistryHardRefName(componentObject);
-        // Use a holder object so that we don't mess up the current component's lifecycle
         if (r.lookupObject(componentObjectRegistryKey) == null)
         {
             r.registerObject(componentObjectRegistryKey, new ComponentObjectHolder(componentObject));
@@ -325,6 +324,10 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         return "_component.hardref." + component.getService().getName() + "." + System.identityHashCode(object);
     }
     
+    /**
+     * Holder class used only to crate reference to component instance from registry
+     * without if receiving muleContext injection or lifecycle for a second time.
+     */
     private class ComponentObjectHolder
     {
         Object componentObject;
