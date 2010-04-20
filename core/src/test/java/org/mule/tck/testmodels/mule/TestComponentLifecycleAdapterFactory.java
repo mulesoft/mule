@@ -17,9 +17,9 @@ import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.model.EntryPointResolverSet;
 
-public class TestDefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
+public class TestComponentLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
-    public TestDefaultLifecycleAdapterFactory()
+    public TestComponentLifecycleAdapterFactory()
     {
         super();
     }
