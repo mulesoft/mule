@@ -98,10 +98,11 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
         componentObjectRegistryKey = createRegistryHardRefName(componentObject);
-        // don't mess up the current component's lifecycle, just put a direct ref
-        // without any callbacks executed
-        r.registerObject(componentObjectRegistryKey, componentObject, MuleRegistry.LIFECYCLE_BYPASS_FLAG
-                                                                      + MuleRegistry.PRE_INIT_BYPASS_FLAG);
+        // Use a holder object so that we don't mess up the current component's lifecycle
+        if (r.lookupObject(componentObjectRegistryKey) == null)
+        {
+            r.registerObject(componentObjectRegistryKey, new ComponentObjectHolder(componentObject));
+        }
     }
 
     public DefaultLifecycleAdapter(Object componentObject,
@@ -178,30 +179,28 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
      */
     public void dispose()
     {
-        if (isDisposable)
+        try
         {
-            try
+            if (isDisposable)
             {
-                // unregister a hard ref to the component object
-                muleContext.getRegistry().unregisterObject(componentObjectRegistryKey);
-
-                //make sure we haven't lost the reference to the object
+                // make sure we haven't lost the reference to the object
                 Object o = componentObject.get();
-                if (o!=null)
+                if (o != null)
                 {
                     ((Disposable) o).dispose();
                 }
-                
-                componentObject.clear();
-                componentObject.enqueue();
+            }
 
-            }
-            catch (Exception e)
-            {
-                logger.error("failed to dispose: " + component.getService().getName(), e);
-            }
+            // unregister a hard ref to the component object
+            muleContext.getRegistry().unregisterObject(componentObjectRegistryKey);
+            componentObject.clear();
+            componentObject.enqueue();
+
         }
-
+        catch (Exception e)
+        {
+            logger.error("failed to dispose: " + component.getService().getName(), e);
+        }
         disposed = true;
     }
 
@@ -324,5 +323,15 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     protected String createRegistryHardRefName(Object object)
     {
         return "_component.hardref." + component.getService().getName() + "." + System.identityHashCode(object);
+    }
+    
+    private class ComponentObjectHolder
+    {
+        Object componentObject;
+
+        ComponentObjectHolder(Object componentObject)
+        {
+            this.componentObject = componentObject;
+        }
     }
 }

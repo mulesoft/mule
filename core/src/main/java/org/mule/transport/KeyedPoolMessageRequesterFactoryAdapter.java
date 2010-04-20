@@ -12,6 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -45,6 +46,10 @@ public class KeyedPoolMessageRequesterFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
+        InboundEndpoint endpoint = (InboundEndpoint)key;
+        //Ensure requester has the same lifecycle as the connector
+        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(obj);
+
         factory.activate((InboundEndpoint) key, (MessageRequester) obj);
     }
 

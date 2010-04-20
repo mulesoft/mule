@@ -10,7 +10,9 @@
 
 package org.mule.config.spring.util;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.object.AbstractObjectFactory;
 
@@ -80,9 +82,14 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
     }
 
     @Override
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         Object instance = applicationContext.getBean(bean);
+        if(instance instanceof ServiceAware)
+        {
+            //The servie cannot be autowired from within Spring, so we do it here
+            ((ServiceAware)instance).setService(service);
+        }
         fireInitialisationCallbacks(instance);
         return instance;
     }

@@ -125,7 +125,7 @@ public class AjaxServletConnector extends ServletConnector
             {
                 ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());
             }
-            this.start();
+            start();
         }
         catch (MuleException e)
         {

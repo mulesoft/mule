@@ -32,6 +32,11 @@ import java.util.Map;
 
 public class ChainingRouterTestCase extends AbstractMuleTestCase
 {
+    public ChainingRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     private Mock session;
     private ChainingRouter router;
     private List<OutboundEndpoint> endpoints;

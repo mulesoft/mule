@@ -105,5 +105,25 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
         {
             disposeLatch.countDown();
         }
+
+        public boolean isInitialised()
+        {
+            return false;
+        }
+
+        public boolean isStarted()
+        {
+            return false;
+        }
+
+        public boolean isStopped()
+        {
+            return false;
+        }
+
+        public boolean isDisposed()
+        {
+            return false;
+        }
     }
 }

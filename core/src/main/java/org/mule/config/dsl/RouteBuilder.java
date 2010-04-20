@@ -14,4 +14,13 @@ package org.mule.config.dsl;
  */
 public class RouteBuilder
 {
+    public RouteBuilder to(String uri)
+    {
+        return null;
+    }
+
+    public RouteBuilder thenTo(String uri)
+    {
+        return null;
+    }
 }

@@ -30,6 +30,11 @@ import java.util.Map;
 
 public class EventAggregatorTestCase extends AbstractMuleTestCase
 {
+    
+    public EventAggregatorTestCase()
+    {
+        setStartContext(true);
+    }
 
     public void testMessageAggregator() throws Exception
     {

@@ -62,8 +62,10 @@ public class TransientRegistry extends AbstractRegistry
         synchronized(registry)
         {
             registry.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
-            registry.put("_muleNotificationProcessor", new NotificationListenerProcessor(muleContext));
+            //registry.put("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
             registry.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
+            registry.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
+            registry.put("_muleLifecycleManager", getLifecycleManager());
         }
     }
 
@@ -80,33 +82,12 @@ public class TransientRegistry extends AbstractRegistry
 
         try
         {
-            getLifecycleManager().fireLifecycle(this, Initialisable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
         }
         catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
-//        synchronized(registry)
-//        {
-//            Collection allObjects = lookupObjects(Object.class);
-//            Object obj;
-//            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
-//            {
-//                obj = iterator.next();
-//                try
-//                {
-//                    applyLifecycle(obj);
-//                }
-//                catch (InitialisationException e)
-//                {
-//                    throw e;
-//                }
-//                catch (MuleException e)
-//                {
-//                    throw new InitialisationException(e, this);
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -114,29 +95,12 @@ public class TransientRegistry extends AbstractRegistry
     {
         try
         {
-            getLifecycleManager().fireLifecycle(this, Disposable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
         }
         catch (MuleException e)
         {
             logger.warn("Failed to dipose the registry cleanly", e);
         }
-//        synchronized(registry)
-//        {
-//            Collection allObjects = lookupObjects(Object.class);
-//            Object obj;
-//            for (Iterator iterator = allObjects.iterator(); iterator.hasNext();)
-//            {
-//                obj = iterator.next();
-//                try
-//                {
-//                    applyLifecycle(obj);
-//                }
-//                catch (MuleException e)
-//                {
-//                    logger.warn("Object '" + obj + "'disposed with error: " + e.getDetailedMessage());
-//                }
-//            }
-//        }
     }
 
     protected Map applyProcessors(Map<String, Object> objects)
@@ -236,7 +200,7 @@ public class TransientRegistry extends AbstractRegistry
     {
         Object theObject = object;
 
-        if(!hasFlag(metadata, MuleRegistry.INJECT_BYPASS_FLAG))
+        if(!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))
         {
             //Process injectors first
             Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
@@ -246,7 +210,7 @@ public class TransientRegistry extends AbstractRegistry
             }
         }
 
-        if(!hasFlag(metadata, MuleRegistry.PRE_INIT_BYPASS_FLAG))
+        if(!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG))
         {
             //Then any other processors
             Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);

@@ -112,24 +112,18 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public void testConnectorReinitialise() throws Exception
     {
         Connector c = getConnector();
-
-        c.start();
         assertTrue(c.isStarted());
 
         c.stop();
         assertFalse(c.isStarted());
 
-        // are these supposed to work?
-        // - initialise() without dispose()
-        // - initialise() after dispose()
+        c.dispose();
+        assertFalse(c.isStarted());
+        assertTrue(c.isDisposed());
 
-//        c.dispose();
-//        assertFalse(c.isStarted());
-//        assertTrue(c.isDisposed());
-//
-//        c.initialise();
-//        assertFalse(c.isDisposed());
-//        assertFalse(c.isStarted());
+        c.initialise();
+        assertFalse(c.isDisposed());
+        assertFalse(c.isStarted());
 
         c.start();
         assertFalse(c.isDisposed());

@@ -10,7 +10,10 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
 
@@ -59,11 +62,26 @@ public class GuiceRegistry extends AbstractRegistry
     protected void doInitialise() throws InitialisationException
     {
         //do nothing
+        try
+        {
+            getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     protected void doDispose()
     {
-        //nothing to do
+        try
+        {
+            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            logger.error("Failed to shut down Guice registry cleanly: " + getRegistryId(), e);
+        }
     }
 
     public <T> T lookupObject(String key)

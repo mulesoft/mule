@@ -12,6 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -45,6 +46,10 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
+        OutboundEndpoint endpoint = (OutboundEndpoint)key;
+        //Ensure dispatcher has the same lifecycle as the connector
+        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(obj);
+
         factory.activate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
 
@@ -55,7 +60,10 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     public Object makeObject(Object key) throws Exception
     {
-        return factory.create((OutboundEndpoint) key);
+        OutboundEndpoint endpoint = (OutboundEndpoint) key;
+        MessageDispatcher dispatcher = factory.create(endpoint);
+        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(dispatcher);
+        return dispatcher;
     }
 
     public void passivateObject(Object key, Object obj) throws Exception
@@ -80,6 +88,8 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     public void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
     {
+        //Ensure dispatcher has the same lifecycle as the connector
+        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(dispatcher);
         factory.activate(endpoint, dispatcher);
     }
 

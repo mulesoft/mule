@@ -22,6 +22,7 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
@@ -134,6 +135,11 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public String getMessageAsString() throws MuleException
         {
             return null;  
+        }
+
+        public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+        {
+            return null;
         }
 
         public String getTransformedMessageAsString(String encoding) throws TransformerException

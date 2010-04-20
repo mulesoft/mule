@@ -28,6 +28,6 @@ public class TestMuleProxy extends DefaultJavaComponent
     /** Returns the underlying POJO service object for unit testing. */
     public Object getPojoService() throws Exception
     {
-        return objectFactory.getInstance();
+        return objectFactory.getInstance(muleContext);
     }
 }

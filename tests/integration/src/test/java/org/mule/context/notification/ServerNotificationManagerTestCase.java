@@ -42,53 +42,83 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
                 .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STARTED, SERVICE))
                 .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_PAUSED, SERVICE))
                 .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_RESUMED, SERVICE))
-                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STOPPING, SERVICE))
                 .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STOPPED, SERVICE))
                 .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_DISPOSED, SERVICE))
                 // synchronous events start here
                 .parallel(new Node()
                         // parallel because we don't know which model
-                        .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MULE_SYSTEM_MODEL)
-                                .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MULE_SYSTEM_MODEL)))
-                        .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MODEL)
-                                .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MODEL)))
+                        .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MULE_SYSTEM_MODEL))
+                                .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MODEL))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTING))
                         .serial(new Node()
                                 // parallel because we don't know which model
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MODEL)
-                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MODEL)))
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MULE_SYSTEM_MODEL)
-                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MULE_SYSTEM_MODEL))))
+                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MODEL))
+                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MULE_SYSTEM_MODEL))
+                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MULE_SYSTEM_MODEL)))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTED))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSING))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPING))
                         .serial(new Node()
                                 // parallel because we don't know which model
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MODEL)
+                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MULE_SYSTEM_MODEL))
                                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MODEL)))
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MULE_SYSTEM_MODEL)
-                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MULE_SYSTEM_MODEL))))
                         .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED)
                                 // parallel because we don't know which model
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MODEL)
-                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL)))
-                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MULE_SYSTEM_MODEL)
-                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL))))
+                                        .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL))
+                                        .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL)))
                           .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSED)));
     }
 
+//Before
+//    public RestrictedNode getSpecificationx()
+//    {
+//        return new Node()
+//                // all service events are asynchronous, so place parallel to rest
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_INITIALISED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STARTED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_PAUSED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_RESUMED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STOPPED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STOPPED, SERVICE))
+//                .parallel(new Node(ServiceNotification.class, ServiceNotification.SERVICE_DISPOSED, SERVICE))
+//                // synchronous events start here
+//                .parallel(new Node()
+//                        // parallel because we don't know which model
+//                        .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MULE_SYSTEM_MODEL)
+//                                .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MULE_SYSTEM_MODEL)))
+//                        .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MODEL)
+//                                .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MODEL)))
+//                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTING))
+//                        .serial(new Node()
+//                                // parallel because we don't know which model
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MODEL)))
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STARTING, MULE_SYSTEM_MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STARTED, MULE_SYSTEM_MODEL))))
+//                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STARTED))
+//                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSING))
+//                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPING))
+//                        .serial(new Node()
+//                                // parallel because we don't know which model
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MODEL)))
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPING, MULE_SYSTEM_MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_STOPPED, MULE_SYSTEM_MODEL))))
+//                        .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_STOPPED)
+//                                // parallel because we don't know which model
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL)))
+//                                .parallelSynch(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MULE_SYSTEM_MODEL)
+//                                        .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL))))
+//                          .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSED)));
+//    }
+
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
-        verifyAllNotifications(spec, ModelNotification.class,
-                ModelNotification.MODEL_INITIALISING, ModelNotification.MODEL_INITIALISED);
-        // no model/listener notifications
-        verifyAllNotifications(spec, ModelNotification.class,
-                ModelNotification.MODEL_STARTING, ModelNotification.MODEL_DISPOSED);
-        verifyAllNotifications(spec, ServiceNotification.class,
-                ServiceNotification.SERVICE_INITIALISED, ServiceNotification.SERVICE_STOPPING);
-        // no manager initialising or initialised
-        verifyAllNotifications(spec, MuleContextNotification.class,
-                MuleContextNotification.CONTEXT_STARTING, MuleContextNotification.CONTEXT_STOPPED);
+        verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_INITIALISED);
+        verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_STARTED);
+        verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_STOPPED);
+        verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_DISPOSED);
     }
 
 }

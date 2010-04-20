@@ -13,6 +13,7 @@ package org.mule.api.registry;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -73,7 +74,8 @@ public interface Registry extends Initialisable, Disposable
 
     String getRegistryId();
 
-    void fireLifecycle(String phase) throws MuleException;
+    //TODO should this really be here
+    void fireLifecycle(String phase) throws LifecycleException;
 
     boolean isReadOnly();
 

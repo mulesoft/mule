@@ -73,6 +73,7 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
         Element parent = (Element) element.getParentNode();
         String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
         builder.addPropertyReference("service", serviceName);
+        builder.addDependsOn(serviceName);
 
         // Create a BeanDefinition for the nested object factory and set it a
         // property value for the component
@@ -88,6 +89,8 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
         objectFactoryBeanDefinition.getPropertyValues()
             .addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS, componentInstanceClass);
         objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", properties);
+
+        //Marker for MULE-4813
         objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
         objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
         return objectFactoryBeanDefinition;

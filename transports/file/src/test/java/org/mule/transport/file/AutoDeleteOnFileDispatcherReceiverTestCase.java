@@ -82,6 +82,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         validMessage = File.createTempFile("hello", ".txt", tempDir);
         assertNotNull(validMessage);
         connector = getConnector();
+        connector.start();
     }
 
     protected void doTearDown() throws Exception

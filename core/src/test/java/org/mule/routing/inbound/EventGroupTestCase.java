@@ -25,6 +25,11 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class EventGroupTestCase extends AbstractMuleTestCase
 {
+    public EventGroupTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testConcurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());

@@ -10,6 +10,7 @@
 package org.mule.lifecycle.phases;
 
 import org.mule.api.agent.Agent;
+import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.model.Model;
@@ -40,5 +41,6 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
         setOrderedLifecycleObjects(startOrderedObjects);
+        setIgnoredObjectTypes(new Class[]{Component.class});
     }
 }

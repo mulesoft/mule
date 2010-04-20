@@ -13,9 +13,15 @@ package org.mule.api.lifecycle;
 /**
  * <code>DefaultLifecyclePhase</code> adds lifecycle methods <code>start</code>,
  * <code>stop</code> and <code>dispose</code>.
- * TODO MULE-2113
  */
 public interface Lifecycle extends Initialisable, Startable, Stoppable, Disposable
 {
-    // no additional methods - see super interfaces
+    //MULE-3969
+//    boolean isInitialised();
+//
+//    boolean isStarted();
+//
+//    boolean isStopped();
+//
+//    boolean isDisposed();
 }

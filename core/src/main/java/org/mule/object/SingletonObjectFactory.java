@@ -10,8 +10,8 @@
 
 package org.mule.object;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.MessageFactory;
 
 import java.lang.ref.SoftReference;
 import java.util.Map;
@@ -23,7 +23,9 @@ public class SingletonObjectFactory extends AbstractObjectFactory
 {
     private SoftReference instance;
 
-    /** For Spring only */
+    /**
+     * For Spring only
+     */
     public SingletonObjectFactory()
     {
         super();
@@ -59,45 +61,35 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     }
 
     @Override
-    public void initialise() throws InitialisationException
+    public void dispose()
     {
-        super.initialise();
+        if (instance != null)
+        {
+            instance.clear();
+            instance.enqueue();
+        }
+        super.dispose();
+    }
+
+    /**
+     * Always returns the same instance of the object.
+     * @param muleContext
+     */
+    @Override
+    public Object getInstance(MuleContext muleContext) throws Exception
+    {
         if (instance == null || instance.get() == null)
         {
             try
             {
-                instance = new SoftReference<Object>(super.getInstance());
+                instance = new SoftReference<Object>(super.getInstance(muleContext));
             }
             catch (Exception e)
             {
                 throw new InitialisationException(e, this);
             }
         }
-    }
-
-    @Override
-    public void dispose()
-    {
-        instance.clear();
-        instance.enqueue();
-        super.dispose();
-    }
-
-    /**
-     * Always returns the same instance of the object.
-     */
-    @Override
-    public Object getInstance() throws Exception
-    {
-        if (instance != null && instance.get() != null)
-        {
-            return instance.get();
-        }
-        else
-        {
-            throw new InitialisationException(
-                MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
-        }
+        return instance.get();
     }
 
     @Override
@@ -115,11 +107,6 @@ public class SingletonObjectFactory extends AbstractObjectFactory
 
     @Override
     public boolean isSingleton()
-    {
-        return true;
-    }
-
-    public boolean isAutoWireObject()
     {
         return true;
     }

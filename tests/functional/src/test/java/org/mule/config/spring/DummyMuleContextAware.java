@@ -83,6 +83,11 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         // empty
     }
 
+    public void dispose()
+    {
+        // empty
+    }
+
     public void setName(String name)
     {
         // empty

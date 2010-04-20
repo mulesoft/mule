@@ -259,6 +259,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         builder.setScope(isSingleton() ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 
         List interfaces = ClassUtils.getAllInterfaces(beanClass);
+        
+        //Marker for MULE-4813
         if(interfaces!=null)
         {
             if(interfaces.contains(Initialisable.class))

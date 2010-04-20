@@ -21,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.MuleRegistry;
@@ -99,7 +100,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         transformerListCache.clear();
     }
 
-    public void fireLifecycle(String phase) throws MuleException
+    public void fireLifecycle(String phase) throws LifecycleException
     {
         registry.fireLifecycle(phase);
     }
@@ -546,6 +547,14 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public Object applyProcessors(Object object) throws MuleException
     {
         return registry.getTransientRegistry().applyProcessors(object, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object applyProcessors(Object object, int flags) throws MuleException
+    {
+        return registry.getTransientRegistry().applyProcessors(object, flags);
     }
 
     /**

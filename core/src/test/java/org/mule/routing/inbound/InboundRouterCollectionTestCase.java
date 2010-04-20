@@ -18,6 +18,11 @@ import java.util.List;
 
 public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
 {
+    public InboundRouterCollectionTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testAddGoodEndpoint() throws Exception
     {
         DefaultInboundRouterCollection router = new DefaultInboundRouterCollection();

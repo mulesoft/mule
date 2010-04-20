@@ -10,6 +10,7 @@
 
 package org.mule.util.pool;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
@@ -25,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -50,12 +50,13 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
     /**
      * @param objectFactory The object factory that should be used to create new
-     *            {@link LifecycleAdapter} instance for the pool
+     *            {@link org.mule.api.component.LifecycleAdapter} instance for the pool
      * @param poolingProfile The pooling progile ot be used to configure pool
+     * @param muleContext
      */
-    public DefaultLifecycleEnabledObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile)
+    public DefaultLifecycleEnabledObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile, MuleContext muleContext)
     {
-        super(objectFactory, poolingProfile);
+        super(objectFactory, poolingProfile, muleContext);
     }
 
     protected PoolableObjectFactory getPooledObjectFactory()
@@ -117,7 +118,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
         public Object makeObject() throws Exception
         {
-            Object object = objectFactory.getInstance();
+            Object object = objectFactory.getInstance(muleContext);
             // Only start newly created objects if pool is started
             if (started.get() && object instanceof Startable)
             {

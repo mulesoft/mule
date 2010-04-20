@@ -17,14 +17,13 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 {
-
-    protected Service service;
-
+    protected abstract Service getService();
+    
     public void testStart() throws MuleException
     {
         try
         {
-            service.start();
+            getService().start();
             fail("Exception expected: Cannot start an uninitialised service");
         }
         catch (Exception e)
@@ -32,114 +31,189 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
             // expected
         }
 
-        service.initialise();
-        service.start();
+        getService().initialise();
+        getService().start();
 
         try
         {
-            service.initialise();
+            getService().initialise();
             fail("Exception expected: Cannot initialise an already initialised service");
         }
-        catch (InitialisationException e)
+        catch (IllegalStateException e)
         {
             // expected
         }
-        service.dispose();
+        getService().dispose();
 
     }
 
     public void testPause() throws MuleException
     {
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
 
-        service.initialise();
+        getService().initialise();
 
         // Pausing a service that is not started does not throw an exception
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
-        service.resume();
-        assertFalse(service.isPaused());
-        service.start();
-        assertTrue(service.isStarted());
-        assertFalse(service.isPaused());
-        service.pause();
-        assertTrue(service.isPaused());
-        service.pause();
-        assertTrue(service.isPaused());
-        service.dispose();
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
+        try
+        {
+            getService().resume();
+            fail("cannot resume a service that is not paused");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
+        assertFalse(getService().isPaused());
+        getService().start();
+        assertTrue(getService().isStarted());
+        assertFalse(getService().isPaused());
+        getService().pause();
+        assertTrue(getService().isPaused());
+        try
+        {
+            getService().pause();
+            fail("cannot pause a service that is already paused");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
+        assertTrue(getService().isPaused());
+        getService().dispose();
 
     }
 
     public void testResume() throws MuleException
     {
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
 
-        service.initialise();
+        getService().initialise();
 
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
-        service.resume();
-        assertFalse(service.isPaused());
-        service.start();
-        assertTrue(service.isStarted());
-        assertFalse(service.isPaused());
-        service.resume();
-        assertFalse(service.isPaused());
-        service.pause();
-        assertTrue(service.isPaused());
-        service.resume();
-        assertFalse(service.isPaused());
-        service.resume();
-        assertFalse(service.isPaused());
-        service.dispose();
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
+        try
+        {
+            getService().resume();
+            fail("cannot resume a service that is not paused");            
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
+        assertFalse(getService().isPaused());
+        getService().start();
+        assertTrue(getService().isStarted());
+        assertFalse(getService().isPaused());
+        try
+        {
+            getService().resume();
+            fail("cannot resume a service that is not paused");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
+        assertFalse(getService().isPaused());
+        getService().pause();
+        assertTrue(getService().isPaused());
+        getService().resume();
+        assertFalse(getService().isPaused());
+        //Resume is a meta phase, so after pause, we go back to started
+        assertTrue(getService().isStarted());
+        try
+        {
+            getService().resume();
+            fail("cannot resume a service that is not paused");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
+        assertFalse(getService().isPaused());
+        getService().dispose();
 
     }
 
     public void testStop() throws MuleException
     {
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
-        service.stop();
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
 
         try
         {
-            service.resume();
+            getService().stop();
             fail("Exception expected: Cannot stop an uninitialised service");
         }
-        catch (MuleException e)
+        catch (IllegalStateException e)
         {
             // expected
         }
 
-        service.initialise();
-        assertFalse(service.isStarted());
+        try
+        {
+            getService().resume();
+            fail("Exception expected: Cannot resume an uninitialised service");
+        }
+        catch (IllegalStateException e)
+        {
+            // expected
+        }
 
-        service.stop();
-        assertFalse(service.isStarted());
-        service.start();
-        assertTrue(service.isStarted());
-        service.stop();
-        assertFalse(service.isStarted());
-        service.stop();
-        assertFalse(service.isStarted());
-        service.dispose();
+        getService().initialise();
+        assertFalse(getService().isStarted());
+
+        try
+        {
+            getService().stop();
+            fail("Exception expected: Cannot stop a service that is not started");
+        }
+        catch (IllegalStateException e)
+        {
+            // expected
+        }
+        assertFalse(getService().isStarted());
+        getService().start();
+        assertTrue(getService().isStarted());
+        getService().stop();
+        assertFalse(getService().isStarted());
+        try
+        {
+            getService().stop();
+            fail("Exception expected: Cannot stop a service that is not started");
+        }
+        catch (IllegalStateException e)
+        {
+            // expected
+        }
+        assertFalse(getService().isStarted());
+        getService().dispose();
 
     }
 
     public void testDispose() throws MuleException
     {
-        assertFalse(service.isStarted());
-        assertFalse(service.isPaused());
-        service.dispose();
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isPaused());
+        getService().dispose();
 
-        service.initialise();
-        assertFalse(service.isStarted());
+        getService().initialise();
+        assertFalse(getService().isStarted());
 
-        service.dispose();
-        assertFalse(service.isStarted());
-        service.dispose();
+        getService().dispose();
+        assertFalse(getService().isStarted());
+        try
+        {
+            getService().dispose();
+            fail("Exception expected: Cannot dispose a service that is already disposed");
+        }
+        catch (IllegalStateException e)
+        {
+            // expected
+        }
     }
 
 }

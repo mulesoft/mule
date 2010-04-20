@@ -11,9 +11,9 @@
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.registry.RegistrationException;
@@ -67,7 +67,7 @@ public abstract class AbstractRegistry implements Registry
 
     protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
     {
-        LifecycleManager lifecycleManager = new RegistryLifecycleManager();
+        LifecycleManager lifecycleManager = new RegistryLifecycleManager(this);
 
         for (LifecyclePair lifecyclePair : lifecyclePairs)
         {
@@ -106,9 +106,9 @@ public abstract class AbstractRegistry implements Registry
         return lifecycleManager;
     }
 
-    public void fireLifecycle(String phase) throws MuleException
+    public void fireLifecycle(String phase) throws LifecycleException
     {
-        getLifecycleManager().fireLifecycle(this, phase);
+        getLifecycleManager().fireLifecycle(phase);
     }
 
     @SuppressWarnings("unchecked")

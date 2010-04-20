@@ -27,6 +27,11 @@ import java.util.StringTokenizer;
 
 public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
+    public MessageSplitterRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

@@ -12,7 +12,7 @@ package org.mule.context.notification;
 
 import org.mule.tck.AbstractMuleTestCase;
 
-public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
+public class NotificationManagerTestCase extends AbstractMuleTestCase
 {
 
     protected Listener1 listener1;

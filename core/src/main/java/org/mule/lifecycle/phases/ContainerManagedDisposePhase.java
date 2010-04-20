@@ -9,9 +9,9 @@
  */
 package org.mule.lifecycle.phases;
 
-import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
@@ -30,9 +30,9 @@ public class ContainerManagedDisposePhase extends ContainerManagedLifecyclePhase
     }
 
     @Override
-    public void applyLifecycle(Registry registry) throws MuleException
+    public void applyLifecycle(Object o) throws LifecycleException
     {
         //delegate to the container registry
-        registry.dispose();
+        ((Registry)o).dispose();
     }
 }

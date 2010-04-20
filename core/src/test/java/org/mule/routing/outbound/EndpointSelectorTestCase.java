@@ -28,6 +28,11 @@ import java.util.Map;
 
 public class EndpointSelectorTestCase extends AbstractMuleTestCase
 {
+    public EndpointSelectorTestCase()
+    {
+        setStartContext(true);
+    }
+
     Mock session;
     ImmutableEndpoint dest1;
     ImmutableEndpoint dest2;

@@ -13,6 +13,7 @@ package org.mule.api;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -68,9 +69,20 @@ public interface MuleEvent
      * @param outputType The requested output type.
      * @return the message transformed into it's recognised or expected format.
      * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.api.transformer.Transformer
+     * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
      */
-    Object transformMessage(Class outputType) throws TransformerException;
+    <T> T transformMessage(Class<T> outputType) throws TransformerException;
+
+     /**
+     * Transforms the message into the requested format. The transformer used is
+     * the one configured on the endpoint through which this event was received.
+     *
+     * @param outputType The requested output type.
+     * @return the message transformed into it's recognised or expected format.
+     * @throws TransformerException if a failure occurs in the transformer
+     * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
+     */
+    <T> T transformMessage(DataType<T> outputType) throws TransformerException;
 
     /**
      * Transforms the message into it's recognised or expected format and then 

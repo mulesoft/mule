@@ -32,7 +32,7 @@ public class WireTapCxfTestCase extends FunctionalTestCase
         {
             public void onNotification(ServerNotification notification)
             {
-                tapLatch.countDown();
+                tapLatch.release();
             }
         });
     }

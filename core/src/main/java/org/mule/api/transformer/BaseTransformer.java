@@ -11,6 +11,7 @@ package org.mule.api.transformer;
 
 import org.mule.api.NamedObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 
 /**
@@ -18,7 +19,7 @@ import org.mule.api.lifecycle.Initialisable;
  * object type to another.
 
  */
-public interface BaseTransformer extends Initialisable, NamedObject
+public interface BaseTransformer extends Initialisable, Disposable, NamedObject
 {
     /**
      * The endpoint that this transformer is attached to

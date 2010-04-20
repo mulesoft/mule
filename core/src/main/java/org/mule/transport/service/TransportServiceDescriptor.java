@@ -18,6 +18,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageDispatcherFactory;
@@ -64,11 +65,11 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
 
     public Connector createConnector() throws TransportServiceException;
 
-    public List createInboundTransformers() throws TransportFactoryException;
+    public List<Transformer> createInboundTransformers() throws TransportFactoryException;
 
-    public List createOutboundTransformers() throws TransportFactoryException;
+    public List<Transformer> createOutboundTransformers() throws TransportFactoryException;
 
-    public List createResponseTransformers() throws TransportFactoryException;
+    public List<Transformer> createResponseTransformers() throws TransportFactoryException;
 
     public EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 

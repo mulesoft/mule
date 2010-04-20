@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:annotations="http://www.mulesoft.org/schema/mule/annotations"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+       http://www.mulesoft.org/schema/mule/annotations http://www.mulesoft.org/schema/mule/annotations/3.0/mule-annotations.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <description>
+        This is a very "Mule" way of doing things and overly verbose. I implemented this code very early on and now
+        think it is largely redundant since you can now just configure the annotated services as spring objects and
+        they will get discovered.
+
+        I have kept this here because it works and we may find a use for it.
+    </description>
+
+    <model name="main">
+
+        <annotations:service name="hello">
+            <annotations:component class="org.mule.ibeans.example.hello.AnnotatedHelloComponent">
+                <properties>
+                    <spring:entry key="messageLocale">
+                        <util:constant static-field="java.util.Locale.ENGLISH"/>
+                    </spring:entry>
+                </properties>
+            </annotations:component>
+        </annotations:service>
+
+        <annotations:service name="greeter">
+            <annotations:component class="org.mule.ibeans.example.hello.AnnotatedGreetingComponent"/>
+        </annotations:service>
+
+    </model>
+
+</mule>

@@ -49,7 +49,6 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));
         ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED));
         ignoredNotifications.add(new Integer(ModelNotification.MODEL_STOPPED));
-        ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSING));
         ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSED));
     }
 

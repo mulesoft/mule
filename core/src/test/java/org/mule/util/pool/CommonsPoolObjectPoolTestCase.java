@@ -10,6 +10,7 @@
 
 package org.mule.util.pool;
 
+import org.mule.api.MuleContext;
 import org.mule.api.object.ObjectFactory;
 import org.mule.config.PoolingProfile;
 import org.mule.tck.testmodels.fruit.BananaFactory;
@@ -111,7 +112,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
     
     private ObjectPool createPool(PoolingProfile poolingProfile, ObjectFactory objectFactory) throws Exception
     {        
-        CommonsPoolObjectPool pool = new CommonsPoolObjectPool(objectFactory, poolingProfile);
+        CommonsPoolObjectPool pool = new CommonsPoolObjectPool(objectFactory, poolingProfile, muleContext);
         pool.initialise();
         return pool;
     }
@@ -130,10 +131,10 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         private int instanceCount = 0;
         
         @Override
-        public Object getInstance() throws Exception
+        public Object getInstance(MuleContext muleContext) throws Exception
         {
             instanceCount++;
-            return super.getInstance();
+            return super.getInstance(muleContext);
         }
 
         public int getInstanceCount()

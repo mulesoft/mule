@@ -57,7 +57,4 @@ public abstract class AbstractAgent implements Agent, MuleContextAware
     {
         this.muleContext = context;
     }
-
-    public abstract void initialise() throws InitialisationException;
-
 }

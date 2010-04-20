@@ -22,6 +22,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.SpringRegistry;
+import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
@@ -113,6 +114,15 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         if (!initializeStaticBusInstance)
         {
             BusFactory.setDefaultBus(null);
+        }
+
+        try
+        {
+            muleContext.registerListener(this);
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(e, this);
         }
 
         MuleUniversalTransport transport = new MuleUniversalTransport(this);
@@ -377,7 +387,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         }
         // We need to stop the outer services first if they are not already stopped
         // to avoid request failures.
-        else if (event.getAction() == ServiceNotification.SERVICE_STOPPING
+         else if (event.getAction() == ServiceNotification.SERVICE_STOPPED
                 && serviceToProtocolServices.get(event.getSource()) != null)
         {
             try

@@ -9,42 +9,57 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.api.MuleException;
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.registry.Registry;
+import org.mule.util.StringMessageUtils;
 
 /**
  * This is a specialized class that extends {@link org.mule.lifecycle.RegistryLifecycleManager} and will
  * invoke lifecycle on the registry instance for the MuleContext.  This class must only be used by the MuleContext.
  */
-public class MuleContextLifecycleManager extends RegistryLifecycleManager
+public class MuleContextLifecycleManager extends AbstractLifecycleManager implements MuleContextAware
 {
-    public void fireLifecycle(Registry registry, String phase) throws MuleException
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
     {
-        int current = getPhaseIndex(currentPhase);
-        int end = getPhaseIndex(phase);
-        LifecyclePhase li;
+        this.muleContext = context;
+    }
 
-        if(end < current)
-        {
-            li = getPhaseForIndex(end);
-            setExecutingPhase(li.getName());
-            registry.fireLifecycle(li.getName());
-            setCurrentPhase(li);
-            setExecutingPhase(null);
-            return;
-        }
+//    public void fireLifecycle(String phase) throws LifecycleException
+//    {
+//        int current = getPhaseIndex(currentPhase);
+//        int end = getPhaseIndex(phase);
+//        LifecyclePhase li;
+//
+//        if(end < current)
+//        {
+//            li = getPhaseForIndex(end);
+//            setExecutingPhase(li.getName());
+//            muleContext.getRegistry().fireLifecycle(li.getName());
+//            setCurrentPhase(li);
+//            setExecutingPhase(null);
+//            return;
+//        }
+//
+//        //we want to start at the next one from current
+//        current++;
+//        while(current <= end)
+//        {
+//            li = getPhaseForIndex(current);
+//            setExecutingPhase(li.getName());
+//            muleContext.getRegistry().fireLifecycle(li.getName());
+//            setCurrentPhase(li);
+//            setExecutingPhase(null);
+//            current++;
+//        }
+//    }
 
-        //we want to start at the next one from current
-        current++;
-        while(current <= end)
-        {
-            li = getPhaseForIndex(current);
-            setExecutingPhase(li.getName());
-            registry.fireLifecycle(li.getName());
-            setCurrentPhase(li);
-            setExecutingPhase(null);            
-            current++;
-        }
+    protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
+    {
+        //phase.applyLifecycle(muleContext.getRegistry());
+        muleContext.getRegistry().fireLifecycle(phase.getName());
     }
 }

@@ -11,6 +11,8 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.registry.Registry;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 
 /**
@@ -22,5 +24,11 @@ public class ContainerManagedInitialisePhase extends ContainerManagedLifecyclePh
     {
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
         registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
+    }
+
+    @Override
+    public void applyLifecycle(Object o) throws LifecycleException
+    {
+        //Most DI containers start initialised, do nothing here
     }
 }

@@ -37,7 +37,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testSpringBeanServiceLifecycle() throws Exception
     {
         testComponentLifecycle("SpringBeanService",
-        "[setProperty, setMuleContext, springInitialize, setService, setMuleContext, start, stop, stop, dispose, springDestroy]"); 
+            "[setProperty, setMuleContext, springInitialize, setService, start, stop, springDestroy]");
     }
 
     /**
@@ -51,7 +51,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testSpringBeanService2Lifecycle() throws Exception
     {
         testComponentLifecycle("SpringBeanService2",
-        "[setProperty, setMuleContext, setService, setMuleContext, start, stop, stop, dispose]");
+            "[setProperty, setMuleContext, setService, start, stop]");
     }
 
     /**
@@ -62,7 +62,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MuleSingletonService",
-        "[setProperty, setService, setMuleContext, setMuleContext, initialise, start, stop, stop, dispose, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
@@ -73,7 +73,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePrototypeService",
-        "[setProperty, setService, setMuleContext, setMuleContext, initialise, start, stop, stop, dispose, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
@@ -84,7 +84,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledPrototypeService", 
-            "[setProperty, setService, setMuleContext, setMuleContext, initialise, start, stop, stop, dispose, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
     }
 
     /**
@@ -95,7 +95,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledSingletonService", 
-            "[setProperty, setService, setMuleContext, setMuleContext, initialise, setMuleContext, initialise, setMuleContext, initialise, start, start, start, stop, stop, stop, stop, dispose, dispose, dispose, dispose]");
+            "[setProperty, setService, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]");
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)

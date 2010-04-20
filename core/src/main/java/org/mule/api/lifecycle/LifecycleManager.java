@@ -9,9 +9,6 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.MuleException;
-import org.mule.api.registry.Registry;
-
 import java.util.List;
 
 /**
@@ -52,15 +49,19 @@ public interface LifecycleManager
 
     /**
      * Applies lifecycle phase to a collection of objects.
+     * @param phase that phase to execute next
+     * @throws LifecycleException if the phase is not a valid transition of does not exist on this lifecycle manager
      */
-    void fireLifecycle(Registry registry, String phase) throws MuleException;
+    void fireLifecycle(String phase) throws LifecycleException;
 
     /**
      * Applies lifecycle phase to an object independent of the current lifecycle phase. All phases between the current
      * phase and the 'endPhase' will be executed.
-     * @param endPhase the final phase to execute on the object.  All phases inbetween current and end will be executed
+     * @param object the object to apply lifecycle to
+     * @param phase the lifecycle phase to execute
+     * @throws LifecycleException if there is an exection while invoking lifecycle on the object
      */
-    void applyPhase(Object object, String phase) throws MuleException;
+    void applyPhase(Object object, String phase) throws LifecycleException;
 
 
     /**
@@ -81,13 +82,29 @@ public interface LifecycleManager
      */
     void reset();
 
+    /**
+     * Checks that a phase has completed
+     * @param phaseName the name of the pahse to check for
+     * @return true if that phase has completed, false if the phase has not completed, or currently processing or does not exist
+     */
     boolean isPhaseComplete(String phaseName);
 
     /**
      * Successively applies all completed lifecycle phase to an object.
+     *
+     * @param object the object to which the lifecycle should be applied
+     * @throws LifecycleException if there is an error while applying lifecycle to the object
      */
-    void applyCompletedPhases(Object object) throws MuleException;
+    void applyCompletedPhases(Object object) throws LifecycleException;
 
+
+    /**
+     * Will check that the phase passed in is a valid next phase for this lifecycle manager.  If the phase is not a valid next
+     * transition an exception will be thrown
+     *
+     * @param name The name of the lifecycle to validate as a valid next transition
+     * @throws IllegalStateException if the lifecycle name is not recognised or the phase is not valid for the current lifecycle state
+     */
     void checkPhase(String name) throws IllegalStateException;
 
     /**

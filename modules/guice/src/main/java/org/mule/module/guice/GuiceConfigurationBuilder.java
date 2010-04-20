@@ -10,8 +10,13 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.registry.InjectProcessor;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.builders.AbstractConfigurationBuilder;
@@ -26,7 +31,10 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 
@@ -149,7 +157,14 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         for (Iterator<Key<?>> iterator = injector.getBindings().keySet().iterator(); iterator.hasNext();)
         {
             Key key = iterator.next();
-            if (Connector.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
+            if (key.getAnnotation() instanceof AnnotatedService)
+            {
+                Object obj = injector.getInstance(key);
+                //This will cause the annotations on the object to be processed and a service object created and registered
+                //we bypass inject processors since Guice has already done that for us
+                applyProcessors(obj, key, injector, muleContext);
+            }
+            else if (Connector.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
             {
                 Connector c = (Connector) injector.getInstance(key);
                 c.setName(new ObjectNameHelper(muleContext).getConnectorName(c));
@@ -170,5 +185,10 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
         }
         registry.initialise();
+    }
+
+    protected void applyProcessors(Object o, Key key, Injector injector, MuleContext muleContext) throws MuleException
+    {
+        muleContext.getRegistry().applyProcessors(o);
     }
 }

@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.factories;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.PoolingProfile;
 import org.mule.config.i18n.CoreMessages;
@@ -145,17 +146,12 @@ public class ScopedObjectFactory extends AbstractObjectFactory
     }
 
     @Override
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         if(objectInstance!=null)
         {
             return objectInstance;
         }
-        return super.getInstance();
-    }
-
-    public boolean isAutoWireObject()
-    {
-        return true;
+        return super.getInstance(muleContext);
     }
 }

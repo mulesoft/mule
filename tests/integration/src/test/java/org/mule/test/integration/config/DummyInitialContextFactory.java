@@ -34,14 +34,14 @@ public class DummyInitialContextFactory implements ObjectFactory
         this.muleContext = muleContext;
     }
 
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         SimpleContext c = new SimpleContext();
         c.bind("vmConnector", new VMConnector(muleContext));
         c.bind("endpointRef", "vm://my.object");
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());
-        Service d = MuleTestUtils.getTestService("EchoUMO", EchoComponent.class, muleContext);
+        Service d = MuleTestUtils.getTestService("EchoUMO", EchoComponent.class, this.muleContext);
         c.bind("EchoUMO", d);
         return c;
     }

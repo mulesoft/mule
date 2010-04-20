@@ -11,6 +11,7 @@
 package org.mule.registry;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.Registry;
 
 import java.util.ArrayList;

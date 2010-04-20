@@ -1,0 +1,25 @@
+?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd"
+       default-init-method="initialise" default-destroy-method="dispose">
+
+    <description>
+        A Test using spring beans only and have them discovered by Mule
+    </description>
+
+    <bean class="org.mule.impl.annotations.processors.spring.ServiceAndEndpointAnnotationBeanPostProcessor"/>
+    <bean class="org.mule.impl.annotations.processors.spring.BindAnnotationBeanPostProcessor"/>
+
+    <bean class="org.mule.ibeans.example.hello.AnnotatedHelloComponent" name="foo">
+        <property name="messageLocale">
+            <util:constant static-field="java.util.Locale.ENGLISH"/>
+        </property>
+    </bean>
+
+    <bean class="org.mule.ibeans.example.hello.AnnotatedGreetingComponent"/>
+
+</beans>

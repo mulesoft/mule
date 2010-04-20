@@ -16,8 +16,8 @@ import org.mule.config.QueueProfile;
 import org.mule.model.AbstractModel;
 
 /**
- * A mule service service model that uses Seda principals to achieve high
- * throughput by Quing events for compoonents and processing them concurrently.
+ * A mule service service model that uses SEDA principals to achieve high
+ * throughput by Queuing events for components and processing them concurrently.
  */
 public class SedaModel extends AbstractModel
 {

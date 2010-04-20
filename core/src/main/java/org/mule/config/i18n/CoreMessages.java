@@ -132,9 +132,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 30, endpoint);
     }
 
-    public static Message cannotUseDisposedConnector()
+    public static Message lifecycleErrorCannotUseConnector(String name, String lifecyclePhase)
     {
-        return factory.createMessage(BUNDLE_PATH, 32);
+        return factory.createMessage(BUNDLE_PATH, 32, name, lifecyclePhase);
     }
 
     public static Message connectorCausedError()
@@ -1181,8 +1181,13 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 304);
     }
 
+    public static Message lifecyclePhaseNotRecognised(String phase)
+    {
+        return factory.createMessage(BUNDLE_PATH, 305, phase);
+    }
+
     public static Message notificationListenerSubscriptionAlreadyRegistered(ListenerSubscriptionPair listenerPair)
     {
-        return factory.createMessage(BUNDLE_PATH, 305, listenerPair);
+        return factory.createMessage(BUNDLE_PATH, 306, listenerPair);
     }
 }

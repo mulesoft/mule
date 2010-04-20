@@ -158,7 +158,15 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase
         }
 
         ctx.initialise();
-        ctx.stop();
+        try
+        {
+            ctx.stop();
+            fail("Can't stop if not started");
+        }
+        catch (IllegalStateException e)
+        {
+            //expected
+        }
         assertTrue(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertFalse(ctx.isStarted());

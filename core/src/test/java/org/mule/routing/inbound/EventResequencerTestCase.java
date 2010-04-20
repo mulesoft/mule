@@ -28,6 +28,11 @@ import java.util.Comparator;
 public class EventResequencerTestCase extends AbstractMuleTestCase
 {
 
+    public EventResequencerTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testMessageResequencer() throws Exception
     {
         MuleSession session = getTestSession(getTestService(), muleContext);

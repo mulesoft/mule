@@ -164,7 +164,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 
                 if (service.getComponent() instanceof JavaComponent)
                 {
-                    sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance());
+                    sfb.setServiceBean(((JavaComponent) service.getComponent()).getObjectFactory().getInstance(connector.getMuleContext()));
                 }
             }
             else

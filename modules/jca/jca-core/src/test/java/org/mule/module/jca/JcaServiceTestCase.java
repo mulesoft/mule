@@ -14,45 +14,43 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
+import org.mule.model.AbstractServiceTestCase;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.tck.AbstractMuleTestCase;
 
 import java.lang.reflect.Method;
 
-import javax.resource.ResourceException;
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
-public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
+public class JcaServiceTestCase extends AbstractServiceTestCase
 {
-
-    // Cannot extend AbstractServiceTestCase because of inconsistent behaviour. See
-    // MULE-2843
-
     private Service service;
-
-    private TestJCAWorkManager workManager;
 
     protected void doSetUp() throws Exception
     {
-        // Create and register JcaModel
+        // Create and initialise JcaModel
         workManager = new TestJCAWorkManager();
         JcaModel jcaModel = new JcaModel();
-        muleContext.getRegistry().registerModel(jcaModel);
+        jcaModel.setMuleContext(muleContext);
+        jcaModel.initialise();
 
-        // Create, register, initialise and start JcaService
         String name = "JcaService#";
         service = new JcaService(muleContext);
         service.setName(name);
         service.setModel(jcaModel);
         service.setComponent(new JcaComponent(new TestMessageEndpointFactory(), new DefaultEntryPointResolverSet(),
-            service, workManager));
-        muleContext.getRegistry().registerService(service);
-
-        assertNotNull(service);
+                service, workManager));
     }
+
+    @Override
+    protected Service getService()
+    {
+        return service;
+    }
+
+    private TestJCAWorkManager workManager;
 
     protected void doTearDown() throws Exception
     {
@@ -62,7 +60,8 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
 
     public void testSendEvent() throws Exception
     {
-        service.start();
+        getService().initialise();
+        getService().start();
         ImmutableEndpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
         MuleEvent event = getTestEvent("Message", endpoint);
 
@@ -79,42 +78,44 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
 
     public void testDispatchEvent() throws Exception
     {
-        service.start();
+        getService().initialise();
+        getService().start();
         ImmutableEndpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
         MuleEvent event = getTestEvent("Message", endpoint);
 
-        service.dispatchEvent(event);
+        getService().dispatchEvent(event);
         assertEquals(1, workManager.getScheduledWorkList().size());
         assertEquals(0, workManager.getStartWorkList().size());
         assertEquals(0, workManager.getDoWorkList().size());
     }
 
-    public void testPause()
+    public void testPause() throws MuleException
     {
         try
         {
-            service.pause();
+            getService().pause();
             fail("Exception expected, JcaService does not support pause()");
         }
-        catch (MuleException e)
+        catch (IllegalStateException e)
         {
             // expected
         }
+
     }
 
-    public void testResume()
+    public void testResume() throws MuleException
     {
         try
         {
             service.resume();
             fail("Exception expected, JcaService does not support resume()");
         }
-        catch (MuleException e)
+        catch (IllegalStateException e)
         {
             // expected
         }
     }
-    
+
     class TestMessageEndpointFactory implements MessageEndpointFactory
     {
 
@@ -127,30 +128,5 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         {
             return false;
         }
-
     }
-
-    class TestMessageEndoint implements MessageEndpoint
-    {
-
-        public void afterDelivery() throws ResourceException
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void beforeDelivery(Method method) throws NoSuchMethodException, ResourceException
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void release()
-        {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
-
 }

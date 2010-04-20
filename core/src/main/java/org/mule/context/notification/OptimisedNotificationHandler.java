@@ -12,6 +12,7 @@ package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationHandler;
+import org.mule.api.context.notification.ServerNotificationListener;
 
 /**
  * Optimized to make a quick decision on a particular class of messages.
@@ -35,6 +36,11 @@ public class OptimisedNotificationHandler implements ServerNotificationHandler
     public boolean isNotificationDynamic()
     {
         return dynamic;
+    }
+
+    public boolean isListenerRegistered(ServerNotificationListener listener)
+    {
+        return delegate.isListenerRegistered(listener);
     }
 
     /**

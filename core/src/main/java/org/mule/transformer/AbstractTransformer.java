@@ -13,6 +13,7 @@ package org.mule.transformer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
@@ -20,7 +21,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.types.CollectionDataType;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
@@ -30,14 +32,12 @@ import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,10 +46,10 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer
+public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
 {
-    public static final DataType MULE_MESSAGE_DATA_TYPE = new SimpleDataType(MuleMessage.class);
-    public static final DataType MULE_MESSAGE_ADAPTER_DATA_TYPE = new SimpleDataType(MessageAdapter.class);
+    public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
+    public static final DataType<MessageAdapter> MULE_MESSAGE_ADAPTER_DATA_TYPE = new SimpleDataType<MessageAdapter>(MessageAdapter.class);
 
     protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
@@ -61,7 +61,7 @@ public abstract class AbstractTransformer implements Transformer
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected DataType returnType = new SimpleDataType(Object.class);
+    protected DataType returnType = new SimpleDataType<Object>(Object.class);
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -88,6 +88,11 @@ public abstract class AbstractTransformer implements Transformer
     private boolean ignoreBadInput = false;
 
     /**
+     * Used to create Data Types
+     */
+    private DataTypeFactory dataTypeFactory = new DataTypeFactory();
+
+    /**
      * default constructor required for discovery
      */
     public AbstractTransformer()
@@ -99,15 +104,7 @@ public abstract class AbstractTransformer implements Transformer
     {
         if (returnType != null)
         {
-            DataType dt;
-            if (object instanceof Collection)
-            {
-                dt = new CollectionDataType((Class<? extends Collection>) object.getClass(), DataType.ANY_MIME_TYPE);
-            }
-            else
-            {
-                dt = new SimpleDataType(object.getClass(), DataType.ANY_MIME_TYPE);
-            }
+            DataType dt = dataTypeFactory.create(object.getClass());
             if (!returnType.isCompatibleWith(dt))
             {
                 throw new TransformerException(
@@ -241,9 +238,9 @@ public abstract class AbstractTransformer implements Transformer
      * @deprecated use {@link #isSourceDataTypeSupported(org.mule.api.transformer.DataType, boolean)}
      */
     @Deprecated
-    public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
+    public boolean isSourceTypeSupported(Class<MuleMessage> aClass, boolean exactMatch)
     {
-        return isSourceDataTypeSupported(new SimpleDataType(aClass), exactMatch);
+        return isSourceDataTypeSupported(new SimpleDataType<MuleMessage>(aClass), exactMatch);
     }
 
     /**
@@ -402,6 +399,15 @@ public abstract class AbstractTransformer implements Transformer
         // do nothing, subclasses may override
     }
 
+    /**
+     * Template method where deriving classes can do any clean up any resources or state
+     * before the object is disposed.
+     */
+    public void dispose()
+    {
+        // do nothing, subclasses may override
+    }
+
     protected String generateTransformerName()
     {
         String name = ClassUtils.getSimpleName(this.getClass());
@@ -466,5 +472,21 @@ public abstract class AbstractTransformer implements Transformer
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+        try
+        {
+            muleContext.registerListener(this);
+        }
+        catch (NotificationException e)
+        {
+            logger.error("failed to register context listener", e);
+        }
+    }
+
+    public void onNotification(MuleContextNotification notification)
+    {
+        if (notification.getAction() == MuleContextNotification.CONTEXT_DISPOSING)
+        {
+            this.dispose();
+        }
     }
 }

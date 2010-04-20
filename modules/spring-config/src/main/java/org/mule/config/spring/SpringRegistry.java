@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.registry.RegistrationException;
@@ -93,7 +94,17 @@ public class SpringRegistry extends AbstractRegistry
         {
             ((ConfigurableApplicationContext) applicationContext).refresh();
         }
-        this.initialised.set(true);
+
+         try
+        {
+            //Spring starts initialised, we just transition to the next phase on the lifecycle manager here
+            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        initialised.set(true);
     }
 
     protected void doDispose()
@@ -117,10 +128,11 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
     {
-        LifecycleManager lifecycleManager = new RegistryLifecycleManager();
+        LifecycleManager lifecycleManager = new RegistryLifecycleManager(this);
 
         for (LifecyclePair pair : lifecyclePairs)
         {
+            //Marker: MULE-4813
             if(pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
             {
                 lifecycleManager.registerLifecycle(new DefaultLifecyclePair(
@@ -131,6 +143,7 @@ public class SpringRegistry extends AbstractRegistry
                 lifecycleManager.registerLifecycle(pair);
             }
         }
+
         return lifecycleManager;
     }
 

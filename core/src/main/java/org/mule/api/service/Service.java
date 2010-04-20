@@ -18,6 +18,7 @@ import org.mule.api.NamedObject;
 import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -206,5 +207,7 @@ public interface Service extends Serializable, Lifecycle, NamedObject
     ServiceStatistics getStatistics();
     
     MuleContext getMuleContext();
+
+    LifecycleManager getLifecycleManager();
 
 }

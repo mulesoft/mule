@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.NamedObject;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.module.guice.i18n.GuiceMessages;
@@ -100,13 +101,29 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
      */
     protected void initialiseObject(Object o) throws RegistrationException
     {
+        //bypass any injection provided by Mule
+        int flags = MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG + MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG;
+
+        String name;
         if (o instanceof NamedObject)
         {
-            muleContext.getRegistry().registerObject(((NamedObject) o).getName(), o);
+            name = ((NamedObject) o).getName();
         }
         else
         {
-            muleContext.getRegistry().registerObject(String.valueOf(o.getClass().getSimpleName() + "#" + o.hashCode()), o);
+            name = String.valueOf(o.getClass().getSimpleName() + "#" + o.hashCode());
+        }
+        try
+        {
+            Object result = muleContext.getRegistry().applyProcessors(o, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
+            if(result!=null)
+            {
+                muleContext.getRegistry().registerObject(name, result, flags);
+            }
+        }
+        catch (MuleException e)
+        {
+            throw new RegistrationException(e);
         }
     }
 

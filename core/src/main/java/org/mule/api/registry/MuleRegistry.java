@@ -42,9 +42,18 @@ public interface MuleRegistry extends Registry
      */
     public static final int LIFECYCLE_BYPASS_FLAG = 0x01;
 
-    public static final int INJECT_BYPASS_FLAG = 0x02;
+    /**
+     * Determines whether Inject processors should get executed on an object added to the registry
+     * Inject processors are responsible for processing inject interfaces such as {@link org.mule.api.context.MuleContextAware}
+     */
+    public static final int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
 
-    public static final int PRE_INIT_BYPASS_FLAG = 0x04;
+    /**
+     * Determines whether pre-init processors should get executed on an object added to the registry.
+     * Pre init processors are basically object processors that do not inject members into objects.  These
+     * processors happen after the inject processors
+     */
+    public static final int PRE_INIT_PROCESSORS_BYPASS_FLAG = 0x04;
 
     // /////////////////////////////////////////////////////////////////////////
     // Lookup methods - these should NOT create a new object, only return existing ones
@@ -203,6 +212,21 @@ public interface MuleRegistry extends Registry
      * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
      */
     Object applyProcessors(Object object) throws MuleException;
+
+    /**
+     * Will execute any processors on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would
+     * clutter the registry with single use objects.  Not that this will only be applied to Mule registies.  Thrid party registries
+     * such as Guice support wiring, but you need to get a reference to the container/context to call the method.  This is so that
+     * wiring mechanisms dont trip over each other.
+     *
+     * @param object the object to process
+     * @param flags {@link org.mule.api.registry.MuleRegistry} flags which control which injectors will be applied
+     * @return the same object with any processors called
+     * @throws org.mule.api.MuleException if the registry fails to process object processors for the object.
+     *
+     * @since 3.0
+     */
+    Object applyProcessors(Object object, int flags) throws MuleException;
 
     /**
      * Will execute any lifecycle phases on an object without actually registering the object in the registry.  This is useful for prototype objects that are created per request and would

@@ -18,6 +18,11 @@ import java.util.List;
 
 public class AbstractOutboundRouterTestCase extends AbstractMuleTestCase
 {
+    public AbstractOutboundRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testAddGoodEndpoint() throws Exception
     {
         AbstractOutboundRouter router=new TransformerRouter();

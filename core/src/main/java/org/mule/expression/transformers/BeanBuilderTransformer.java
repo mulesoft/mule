@@ -88,7 +88,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         Object bean;
         try
         {
-            bean = getBeanFactory().getInstance();
+            bean = getBeanFactory().getInstance(muleContext);
         }
         catch (Exception e)
         {

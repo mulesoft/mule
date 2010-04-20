@@ -71,7 +71,7 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
         for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
-            switch (spec.match(notification))
+                switch (spec.match(notification))
             {
             case Node.SUCCESS:
                 break;
@@ -96,6 +96,14 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
             {
                 fail("Specification missed action " + action + " for class " + clazz);
             }
+        }
+    }
+
+    protected void verifyNotification(RestrictedNode spec, Class clazz, int action)
+    {
+        if (!spec.contains(clazz, action))
+        {
+            fail("Specification missed action " + action + " for class " + clazz);
         }
     }
 

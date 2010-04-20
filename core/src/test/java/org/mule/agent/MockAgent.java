@@ -85,6 +85,25 @@ public class MockAgent extends Object implements Agent
         this.name = name;
     }
 
+    public boolean isInitialised()
+    {
+        return false;
+    }
+
+    public boolean isStarted()
+    {
+        return false;
+    }
+
+    public boolean isStopped()
+    {
+        return false;
+    }
+
+    public boolean isDisposed()
+    {
+        return false;
+    }
 }
 
 

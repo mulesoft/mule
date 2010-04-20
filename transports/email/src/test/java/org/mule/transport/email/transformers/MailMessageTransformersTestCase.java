@@ -13,7 +13,6 @@ package org.mule.transport.email.transformers;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.lifecycle.AlreadyInitialisedException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 
@@ -45,7 +44,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         {
             endpoint.getConnector().initialise();
         }
-        catch (AlreadyInitialisedException e)
+        catch (IllegalStateException e)
         {
             assertNotNull(e);
         }

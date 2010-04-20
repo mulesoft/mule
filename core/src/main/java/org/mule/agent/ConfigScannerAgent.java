@@ -13,20 +13,18 @@ package org.mule.agent;
 import org.mule.AbstractAgent;
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * EXPERIMENTAL!!!
@@ -108,7 +106,6 @@ public class ConfigScannerAgent extends AbstractAgent
         // do nothing
     }
 
-    @Override
     public void initialise() throws InitialisationException
     {
         if (configDirName == null)

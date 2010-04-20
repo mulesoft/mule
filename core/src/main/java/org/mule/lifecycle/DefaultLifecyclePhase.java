@@ -10,7 +10,6 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
@@ -68,51 +67,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    public void applyLifecycle(Registry registry) throws MuleException
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Applying lifecycle phase: " + getName());
-        }
-
-        // overlapping interfaces can cause duplicates
-        Set duplicates = new HashSet();
-
-        for (LifecycleObject lo : orderedLifecycleObjects)
-        {
-            // TODO Collection -> List API refactoring
-            Collection<?> targetsObj = registry.lookupObjects(lo.getType());
-            List targets = new LinkedList(targetsObj);
-            if (targets.size() == 0)
-            {
-                continue;
-            }
-            
-            lo.firePreNotification(muleContext);
-
-            for (Iterator target = targets.iterator(); target.hasNext();)
-            {
-                Object o = target.next();
-                if (duplicates.contains(o))
-                {
-                    target.remove();
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("lifecycle phase: " + getName() + " for object: " + o);
-                    }
-                    this.applyLifecycle(o);
-                    target.remove();
-                    duplicates.add(o);
-                }
-            }
-            
-            lo.firePostNotification(muleContext);
-        }
     }
 
     /**

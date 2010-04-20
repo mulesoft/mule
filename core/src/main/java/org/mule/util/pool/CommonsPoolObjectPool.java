@@ -10,6 +10,7 @@
 
 package org.mule.util.pool;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -51,13 +52,16 @@ public class CommonsPoolObjectPool implements ObjectPool
      */
     protected PoolingProfile poolingProfile;
 
+    protected MuleContext muleContext;
+
     /**
      * Creates a new pool and an Object factory with the ServiceDescriptor
      */
-    public CommonsPoolObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile)
+    public CommonsPoolObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile, MuleContext muleContext)
     {
         this.objectFactory = objectFactory;
         this.poolingProfile = poolingProfile;
+        this.muleContext = muleContext;
     }
 
     public void initialise() throws InitialisationException
@@ -246,7 +250,7 @@ public class CommonsPoolObjectPool implements ObjectPool
 
         public Object makeObject() throws Exception
         {
-            return objectFactory.getInstance();
+            return objectFactory.getInstance(muleContext);
         }
 
         public void passivateObject(Object obj) throws Exception

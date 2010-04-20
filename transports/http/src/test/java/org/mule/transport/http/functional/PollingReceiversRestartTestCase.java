@@ -17,7 +17,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class PollingReceiversRestartTestCase extends FunctionalTestCase
 {
-    private static final int WAIT_TIME = 2500;
+    private static final int WAIT_TIME = 3000;
 
     public PollingReceiversRestartTestCase()
     {

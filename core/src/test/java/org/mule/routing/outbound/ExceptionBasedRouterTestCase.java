@@ -33,6 +33,11 @@ import java.util.List;
 
 public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 {
+    public ExceptionBasedRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     /**
      * Multiple endpoints, no failures. MuleEvent dispatched asynchronously, but forced
      * into sync mode. Test case ends here.

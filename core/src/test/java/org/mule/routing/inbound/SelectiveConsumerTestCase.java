@@ -37,6 +37,10 @@ import java.util.List;
 
 public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 {
+    public SelectiveConsumerTestCase()
+    {
+        setStartContext(true);
+    }
 
     public void testSelectiveConsumer() throws Exception
     {
@@ -151,7 +155,6 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
         testService.setInboundRouter(messageRouter);
 
-        testService.start();
         List<Transformer> transformers = new ArrayList<Transformer>();
         transformers.add(new StringAppendTransformer(" TRANSFORMED"));
 

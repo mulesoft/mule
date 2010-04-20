@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
 
@@ -34,14 +35,14 @@ public class TransformerUtils
 
     private static Log logger = LogFactory.getLog(AbstractTransformer.class);
 
-    public static void initialiseAllTransformers(List transformers) throws InitialisationException
+    public static void initialiseAllTransformers(List<Transformer> transformers) throws InitialisationException
     {
         if (transformers != null)
         {
-            Iterator transformer = transformers.iterator();
+            Iterator<Transformer> transformer = transformers.iterator();
             while (transformer.hasNext())
             {
-                ((Transformer) transformer.next()).initialise();
+                (transformer.next()).initialise();
             }
         }
     }
@@ -73,22 +74,22 @@ public class TransformerUtils
         }
     }
 
-    public static boolean isSourceTypeSupportedByFirst(List transformers, Class clazz)
+    public static boolean isSourceTypeSupportedByFirst(List<Transformer> transformers, Class clazz)
     {
         Transformer transformer = firstOrNull(transformers);
-        return null != transformer && transformer.isSourceTypeSupported(clazz);
+        return null != transformer && transformer.isSourceDataTypeSupported(new DataTypeFactory().create(clazz));
     }
 
     protected static interface TransformerSource
     {
-        public List getTransformers() throws TransportFactoryException;
+        public List<Transformer> getTransformers() throws TransportFactoryException;
     }
 
-    protected static List getTransformersFromSource(TransformerSource source)
+    protected static List<Transformer> getTransformersFromSource(TransformerSource source)
     {
         try
         {
-            List transformers = source.getTransformers();
+            List<Transformer> transformers = source.getTransformers();
             TransformerUtils.initialiseAllTransformers(transformers);
             return transformers;
         }
@@ -99,33 +100,33 @@ public class TransformerUtils
         }
     }
 
-    public static List getDefaultInboundTransformers(final TransportServiceDescriptor serviceDescriptor)
+    public static List<Transformer> getDefaultInboundTransformers(final TransportServiceDescriptor serviceDescriptor)
     {
         return getTransformersFromSource(new TransformerSource()
         {
-            public List getTransformers() throws TransportFactoryException
+            public List<Transformer> getTransformers() throws TransportFactoryException
             {
                 return serviceDescriptor.createInboundTransformers();
             }
         });
     }
 
-    public static List getDefaultResponseTransformers(final TransportServiceDescriptor serviceDescriptor)
+    public static List<Transformer> getDefaultResponseTransformers(final TransportServiceDescriptor serviceDescriptor)
     {
         return getTransformersFromSource(new TransformerSource()
         {
-            public List getTransformers() throws TransportFactoryException
+            public List<Transformer> getTransformers() throws TransportFactoryException
             {
                 return serviceDescriptor.createResponseTransformers();
             }
         });
     }
 
-    public static List getDefaultOutboundTransformers(final TransportServiceDescriptor serviceDescriptor)
+    public static List<Transformer> getDefaultOutboundTransformers(final TransportServiceDescriptor serviceDescriptor)
     {
         return getTransformersFromSource(new TransformerSource()
         {
-            public List getTransformers() throws TransportFactoryException
+            public List<Transformer> getTransformers() throws TransportFactoryException
             {
                 return serviceDescriptor.createOutboundTransformers();
             }
@@ -136,15 +137,15 @@ public class TransformerUtils
      * Builds a list of Transformers.
      *
      * @param names - a list of transformers separated by commans
-     * @param muleContext
+     * @param muleContext the current muleContext. This is used to look up transformers in the registry
      * @return a list (possibly empty) of transformers or
-     * @throws org.mule.api.DefaultMuleException
+     * @throws org.mule.api.DefaultMuleException if any of the transformers cannot be found
      */
-    public static List getTransformers(String names, MuleContext muleContext) throws DefaultMuleException
+    public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws DefaultMuleException
     {
         if (null != names)
         {
-            List transformers = new LinkedList();
+            List<Transformer> transformers = new LinkedList<Transformer>();
             StringTokenizer st = new StringTokenizer(names, COMMA);
             while (st.hasMoreTokens())
             {

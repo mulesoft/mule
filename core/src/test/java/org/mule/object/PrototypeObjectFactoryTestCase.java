@@ -36,7 +36,7 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
         factory.setObjectClass(Object.class);
         muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
         
-        assertNotSame(factory.getInstance(), factory.getInstance());
+        assertNotSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
     }
 
 }

@@ -53,6 +53,7 @@ public abstract class AbstractEchoTestCase extends FunctionalTestCase
 
     public void testPostEcho() throws Exception
     {
+        Thread.sleep(2000);
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);

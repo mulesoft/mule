@@ -31,13 +31,17 @@ import java.util.List;
 
 public class ListMessageSplitterTestCase extends AbstractMuleTestCase
 {
+    public ListMessageSplitterTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
         Service testService = getTestService("test", Apple.class);
         MuleSession session = getTestSession(testService, muleContext);
 
         OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint", "test://endpoint?synchronous=true");
-
         ListMessageSplitter router = new ListMessageSplitter();
         router.setFilter(null);
         router.addEndpoint(endpoint);

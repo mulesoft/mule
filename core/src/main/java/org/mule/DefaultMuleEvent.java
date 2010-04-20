@@ -25,6 +25,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -32,6 +33,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -327,20 +329,23 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public Object transformMessage() throws TransformerException
     {
-        return transformMessage(null);
+        message.applyTransformers(endpoint.getTransformers());
+        return message.getPayload();
     }
 
-    public Object transformMessage(Class outputType) throws TransformerException
+    public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        message.applyTransformers(endpoint.getTransformers());
+        return (T)transformMessage(new DataTypeFactory().create(outputType));
+    }
+
+    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+    {
         if (outputType == null)
         {
-            return message.getPayload();
+            throw new TransformerException(CoreMessages.objectIsNull("outputType"));
         }
-        else
-        {
-            return message.getPayload(outputType);
-        }
+        message.applyTransformers(endpoint.getTransformers());
+        return message.getPayload(outputType);
     }
 
     /**

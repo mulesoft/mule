@@ -10,32 +10,29 @@
 
 package org.mule.model.direct;
 
-import org.mule.api.MuleException;
+import org.mule.api.service.Service;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.model.AbstractServiceTestCase;
 import org.mule.object.SingletonObjectFactory;
 
 public class DirectServiceTestCase extends AbstractServiceTestCase
 {
+    private DirectService service;
 
     protected void doSetUp() throws Exception
     {
         service = new DirectService(muleContext);
         service.setName("direct");
-        final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(Object.class));
+        SingletonObjectFactory factory = new SingletonObjectFactory(Object.class);
+        final DefaultJavaComponent component = new DefaultJavaComponent(factory);
         component.setMuleContext(muleContext);
         service.setComponent(component);
         service.setModel(new DirectModel());
     }
 
-    protected void doTearDown() throws Exception
+    @Override
+    protected Service getService()
     {
-        service = null;
+        return service;
     }
-
-    public void testStop() throws MuleException
-    {
-        // TODO Remove this overridden empty implementation once MULE-2844 is resolved
-    }
-
 }

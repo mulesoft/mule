@@ -29,6 +29,10 @@ import java.util.List;
 
 public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
+    public FilterListMessageSplitterRouterTestCase()
+    {
+        setStartContext(true);        
+    }
 
     public void testMessageSplitterRouter() throws Exception
     {

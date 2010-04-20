@@ -174,6 +174,18 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.disableAllTypes(types);
     }
 
+    public boolean isListenerRegistered(ServerNotificationListener listener)
+    {
+        for (ListenerSubscriptionPair pair : configuration.getListeners())
+        {
+            if(pair.getListener().getClass().equals(listener.getClass()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void fireNotification(ServerNotification notification)
     {
         if (!disposed.get())

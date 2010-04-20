@@ -18,6 +18,7 @@ import org.mule.api.registry.PreInitProcessor;
 import org.mule.config.annotations.Service;
 import org.mule.impl.annotations.AnnotatedServiceBuilder;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
+import org.mule.model.resolvers.CallableEntryPointResolver;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.seda.SedaModel;
 
@@ -70,6 +71,8 @@ public class AnnotatedServiceObjectProcessor implements PreInitProcessor, MuleCo
     protected Model getOrCreateModel()
     {
         DefaultEntryPointResolverSet resolverSet = new DefaultEntryPointResolverSet();
+        //Always support the callable interface
+        resolverSet.addEntryPointResolver(new CallableEntryPointResolver());
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         resolver.setMuleContext(context);
         resolverSet.addEntryPointResolver(resolver);

@@ -31,6 +31,11 @@ import java.util.List;
 
 public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 {
+    public OutboundMessageRouterTestCase()
+    {
+        setStartContext(true);        
+    }
+
     public void testOutboundMessageRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

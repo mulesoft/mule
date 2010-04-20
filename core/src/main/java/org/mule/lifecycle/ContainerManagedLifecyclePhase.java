@@ -9,7 +9,7 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.api.MuleException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.Registry;
 
 /**
@@ -21,13 +21,5 @@ public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase
     public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass, String oppositePhaseName)
     {
         super(name, lifecycleClass, oppositePhaseName);
-    }
-
-    @java.lang.Override
-    public void applyLifecycle(Registry registry) throws MuleException
-    {
-        //The container manages this lifecycle
-        //Initialise is usually handled when the registry is created by the configurationBuilder
-        return;
     }
 }

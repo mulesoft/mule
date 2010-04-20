@@ -24,6 +24,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -650,6 +651,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
+    }
+
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties, Connector connector) throws Exception
+    {
+        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
     public static MuleEvent getTestEvent(Object data, Service service) throws Exception

@@ -34,6 +34,10 @@ import org.apache.commons.collections.map.HashedMap;
 
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
+    public IdempotentReceiverTestCase()
+    {
+        setStartContext(true);
+    }
 
     public void testIdempotentReceiverDefaultInMemoryObjectStore() throws Exception
     {

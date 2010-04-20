@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
@@ -57,7 +58,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         }
     }
 
-    public void fireLifecycle(String phase) throws MuleException
+    public void fireLifecycle(String phase) throws LifecycleException
     {
         for (Registry registry : getRegistries())
         {

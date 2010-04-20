@@ -190,13 +190,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return getPayload(outputType, getEncoding());
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public <T> T getPayload(DataType<T> outputType) throws TransformerException
+    {
+        return getPayload(outputType, getEncoding());
+    }
+
+    MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will
      * try and resolve a transformer that can do this transformation. If a transformer cannot be 
      * found an exception is thrown. Any transformers added to the registry will be checked for 
      * compatability.
      *
-     * @param outputType the desired return type
+     * @param resultType the desired return type
      * @param encoding the encoding to use if required
      * @return The converted payload of this message. Note that this method will not alter the 
      *          payload of this message <b>unless</b> the payload is an {@link InputStream} in which
@@ -204,6 +218,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * @throws TransformerException if a transformer cannot be found or there is an error during 
      *          transformation of the payload.
      * @since 3.0.0
+     *
+     * TODO make this public, roll encoding into the datatype object
      */
     @SuppressWarnings("unchecked")
     protected <T> T getPayload(DataType<T> resultType, String encoding) throws TransformerException

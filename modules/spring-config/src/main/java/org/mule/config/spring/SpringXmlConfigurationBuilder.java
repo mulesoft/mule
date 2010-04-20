@@ -12,6 +12,7 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.registry.Registry;
@@ -115,7 +116,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         // If the MuleContext is started, start all objects in the new Registry.
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
         {
-            lifecycleManager.fireLifecycle(registry, Startable.PHASE_NAME);
+            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
         }
     }
     

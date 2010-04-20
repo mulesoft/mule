@@ -26,6 +26,11 @@ import java.util.List;
 
 public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 {
+    public StaticRecipientListRouterTestCase()
+    {
+        setStartContext(true);        
+    }
+
     public void testRecipientListRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

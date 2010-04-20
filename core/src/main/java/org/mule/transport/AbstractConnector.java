@@ -29,9 +29,12 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.DisposeException;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
@@ -57,7 +60,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
-import org.mule.lifecycle.AlreadyInitialisedException;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
@@ -130,8 +132,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * <li>Dispose Receivers
  * </ol>
  */
-public abstract class AbstractConnector
-        implements Connector, ExceptionListener, Connectable, WorkListener
+public abstract class AbstractConnector implements Connector, ExceptionListener, Connectable, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
@@ -214,7 +215,7 @@ public abstract class AbstractConnector
     private boolean dynamicNotification = false;
     private ServerNotificationHandler cachedNotificationHandler;
 
-    private final List supportedProtocols;
+    private final List<String> supportedProtocols;
 
     /**
      * A shared work manager for all receivers registered with this connector.
@@ -255,10 +256,10 @@ public abstract class AbstractConnector
 
     protected MuleContext muleContext;
 
-    protected final AtomicBoolean initialised = new AtomicBoolean(false);
-    protected final AtomicBoolean connected = new AtomicBoolean(false);
-    protected final AtomicBoolean started = new AtomicBoolean(false);
-    protected final AtomicBoolean disposed = new AtomicBoolean(false);
+    protected ConnectorLifecycleManager lifecycleManager;
+
+    //TODO connect and disconnect are not part of lifecycle management right now
+    protected AtomicBoolean connected = new AtomicBoolean(false);
 
     /**
      * Indicates whether the connector should start upon connecting.  This is necessary
@@ -282,11 +283,19 @@ public abstract class AbstractConnector
     public AbstractConnector(MuleContext context)
     {
         muleContext = context;
+        try
+        {
+            lifecycleManager = new ConnectorLifecycleManager(this, muleContext.getLifecycleManager());
+        }
+        catch (MuleException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToCreate("Connector Lifecycle Manager"), e);
+        }
         setDynamicNotification(false);
         updateCachedNotificationHandler();
 
         // always add at least the default protocol
-        supportedProtocols = new ArrayList();
+        supportedProtocols = new ArrayList<String>();
         supportedProtocols.add(getProtocol().toLowerCase());
 
         // TODO dispatcher pool configuration should be extracted, maybe even
@@ -322,18 +331,7 @@ public abstract class AbstractConnector
 
     public final synchronized void initialise() throws InitialisationException
     {
-        if (initialised.get())
-        {
-            InitialisationException e = new AlreadyInitialisedException("Connector '" + getProtocol() + "." + getName() + "'", this);
-            throw e;
-            // Just log a warning since initializing twice is bad but might not be the end of the world.
-            //logger.warn(e);
-        }
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Initialising: " + this);
-        }
+        lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
         if (retryPolicyTemplate == null)
         {
@@ -351,7 +349,14 @@ public abstract class AbstractConnector
         configureDispatcherPool();
         setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
 
-        this.doInitialise();
+        try
+        {
+            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
 
         // We do the management context injection here just in case we're using a default ExceptionStrategy
         //We always create a default just in case anything goes wrong before
@@ -362,7 +367,16 @@ public abstract class AbstractConnector
             ((DefaultExceptionStrategy) exceptionListener).initialise();
         }
 
-        initialised.set(true);
+    }
+
+    public ConnectorLifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
+    }
+
+    public void setLifecycleManager(ConnectorLifecycleManager lifecycleManager)
+    {
+        this.lifecycleManager = lifecycleManager;
     }
 
     protected void configureDispatcherPool()
@@ -382,19 +396,13 @@ public abstract class AbstractConnector
 
     public final synchronized void start() throws MuleException
     {
+        lifecycleManager.checkPhase(Startable.PHASE_NAME);
+
         if (isInitialStateStopped())
         {
             logger.info("Connector not started because 'initialStateStopped' is true");
             return;
         }
-
-        if (this.isStarted())
-        {
-            logger.warn("Attempting to start a connector which is already started");
-            return;
-        }
-
-        this.checkDisposed();
 
         if (!this.isConnected())
         {
@@ -429,8 +437,7 @@ public abstract class AbstractConnector
 
         initWorkManagers();
 
-        this.doStart();
-        started.set(true);
+        lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
 
         if (receivers != null)
         {
@@ -463,16 +470,22 @@ public abstract class AbstractConnector
                 }
             }
         }
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Started: " + this);
-        }
+        
     }
 
     public final boolean isStarted()
     {
-        return started.get();
+        return lifecycleManager.getState().isStarted();
+    }
+
+    public boolean isInitialised()
+    {
+        return lifecycleManager.getState().isInitialised();
+    }
+
+    public boolean isStopped()
+    {
+        return lifecycleManager.getState().isStopped();
     }
 
     public final synchronized void stop() throws MuleException
@@ -487,21 +500,7 @@ public abstract class AbstractConnector
      */
     private final synchronized void stop(boolean disposeWorkManagers) throws MuleException
     {
-        if (!this.isStarted())
-        {
-            logger.warn("Attempting to stop a connector which is not started: " + getName());
-            return;
-        }
-
-        if (this.isDisposed())
-        {
-            return;
-        }
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Stopping: " + this);
-        }
+        lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
 
         // shutdown our scheduler service
         shutdownScheduler();
@@ -514,8 +513,7 @@ public abstract class AbstractConnector
             disposeWorkManagers();
         }
 
-        this.doStop();
-        started.set(false);
+        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
 
         // Stop all the receivers on this connector (this will cause them to
         // disconnect too)
@@ -532,8 +530,8 @@ public abstract class AbstractConnector
         }
 
         // Workaround for MULE-4553
-        this.disposeDispatchers();
-        this.disposeRequesters();
+        this.clearDispatchers();
+        this.clearRequesters();
 
         if (this.isConnected())
         {
@@ -553,12 +551,6 @@ public abstract class AbstractConnector
 
         // we do not need to stop the work managers because they do no harm (will just be idle)
         // and will be reused on restart without problems.
-
-        // started=false already issued above right after doStop()
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Stopped: " + this);
-        }
     }
 
     protected void shutdownScheduler()
@@ -612,40 +604,33 @@ public abstract class AbstractConnector
 
     public final synchronized void dispose()
     {
-        if (this.isDisposed())
+        try
         {
-            logger.warn("Attempting to dispose a connector which is already disposed");
-            return;
+            lifecycleManager.fireLifecycle(Disposable.PHASE_NAME);
         }
-
-        if (logger.isInfoEnabled())
+        catch (LifecycleException e)
         {
-            logger.info("Disposing: " + this);
+            logger.warn("Failed to dispose connector: " + name, e);
         }
-
-        if (this.isStarted())
-        {
-            try
-            {
-                this.stop();
-            }
-            catch (MuleException e)
-            {
-                // TODO MULE-863: What should we really do?
-                logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
-            }
-        }
+//
+//        if (this.isStarted())
+//        {
+//            try
+//            {
+//                this.stop();
+//            }
+//            catch (MuleException e)
+//            {
+//                // when disposing just log errors so that we get a clean shutdown
+//                logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
+//            }
+//        }
 
         this.disposeReceivers();
 
-        this.doDispose();
-        disposed.set(true);
-        initialised.set(false);
 
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Disposed: " + this);
-        }
+
+
     }
 
     protected void initWorkManagers() throws MuleException
@@ -725,7 +710,7 @@ public abstract class AbstractConnector
                 }
                 catch (Throwable e)
                 {
-                    // TODO MULE-863: What should we really do?
+                    // Just log when disposing
                     logger.error("Failed to destroy receiver: " + receiver, e);
                 }
             }
@@ -735,32 +720,32 @@ public abstract class AbstractConnector
         }
     }
 
-    protected void disposeDispatchers()
+    protected void clearDispatchers()
     {
         if (dispatchers != null)
         {
-            logger.debug("Disposing Dispatchers");
+            logger.debug("Clearing Dispatcher pool");
             synchronized (dispatchers)
             {
                 dispatchers.clear();
             }
-            logger.debug("Dispatchers Disposed");
+            logger.debug("Dispatcher pool cleared");
         }
     }
 
-    protected void disposeRequesters()
+    protected void clearRequesters()
     {
         if (requesters != null)
         {
-            logger.debug("Disposing Requesters");
+            logger.debug("Clearing Requester pool");
             requesters.clear();
-            logger.debug("Requesters Disposed");
+            logger.debug("Requester pool cleared");
         }
     }
 
     public boolean isDisposed()
     {
-        return disposed.get();
+        return lifecycleManager.getState().isDisposed();
     }
 
     public void handleException(Exception exception)
@@ -1010,7 +995,10 @@ public abstract class AbstractConnector
 
     private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
-        this.checkDisposed();
+        if(!isStarted())
+        {
+            throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(), lifecycleManager.getCurrentPhase()), this);
+        }
 
         if (endpoint == null)
         {
@@ -1067,35 +1055,23 @@ public abstract class AbstractConnector
     {
         if (endpoint != null && dispatcher != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = " + dispatcher.toString());
+            }
+
             try
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
-                            + dispatcher.toString());
-                }
+                dispatchers.returnObject(endpoint, dispatcher);
+            }
+            catch (Exception e)
+            {
+                // ignore - if the dispatcher is broken, it will likely get cleaned
+                // up by the factory
+                logger.error("Failed to dispose dispatcher for endpoint: " + endpoint +
+                        ". This will cause a memory leak. Please report to", e);
+            }
 
-            }
-            catch (Exception ex)
-            {
-                //Logging failed
-            }
-            finally
-            {
-                try
-                {
-                    dispatchers.returnObject(endpoint, dispatcher);
-                }
-                catch (Exception e)
-                {
-                    // TODO MULE-863: What should we really do?
-                    // ignore - if the dispatcher is broken, it will likely get cleaned
-                    // up by the factory
-                    //RM* I think we should at least log this error so give some indication of what is failing
-                    logger.error("Failed to dispose dispatcher for endpoint: " + endpoint +
-                            ". This will cause a memory leak. Please report to", e);
-                }
-            }
         }
     }
 
@@ -1128,7 +1104,10 @@ public abstract class AbstractConnector
 
     private MessageRequester getRequester(InboundEndpoint endpoint) throws MuleException
     {
-        this.checkDisposed();
+        if(!isStarted())
+        {
+            throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(), lifecycleManager.getCurrentPhase()), this);
+        }
 
         if (endpoint == null)
         {
@@ -1185,44 +1164,24 @@ public abstract class AbstractConnector
     {
         if (endpoint != null && requester != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Returning requester for endpoint: " + endpoint.getEndpointURI() + " = " + requester.toString());
+            }
+
             try
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Returning requester for endpoint: " + endpoint.getEndpointURI() + " = "
-                            + requester.toString());
-                }
-
+                requesters.returnObject(endpoint, requester);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                //Logging failed
-            }
-            finally
-            {
-                try
-                {
-                    requesters.returnObject(endpoint, requester);
-                }
-                catch (Exception e)
-                {
-                    // TODO MULE-863: What should we really do?
-                    // ignore - if the requester is broken, it will likely get cleaned
-                    // up by the factory
-                    //RM* I think we should at least log this error so give some indication of what is failing
-                    logger.error("Failed to dispose requester for endpoint: " + endpoint +
-                            ". This will cause a memory leak. Please report to", e);
-                }
+                // ignore - if the requester is broken, it will likely get cleaned
+                // up by the factory
+                logger.error("Failed to dispose requester for endpoint: " + endpoint +
+                        ". This will cause a memory leak. Please report to", e);
             }
         }
-    }
 
-    protected void checkDisposed() throws DisposeException
-    {
-        if (this.isDisposed())
-        {
-            throw new DisposeException(CoreMessages.cannotUseDisposedConnector(), this);
-        }
     }
 
     public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
@@ -1282,8 +1241,7 @@ public abstract class AbstractConnector
     {
         if (service == null)
         {
-            throw new IllegalArgumentException(
-                    "The service must not be null when you unregister a listener");
+            throw new IllegalArgumentException("The service must not be null when you unregister a listener");
         }
 
         if (endpoint == null)
@@ -1294,8 +1252,7 @@ public abstract class AbstractConnector
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
         {
-            throw new IllegalArgumentException(
-                    "The endpointUri must not be null when you unregister a listener");
+            throw new IllegalArgumentException("The endpointUri must not be null when you unregister a listener");
         }
 
         if (logger.isInfoEnabled())
@@ -1534,13 +1491,16 @@ public abstract class AbstractConnector
             }
         }
 
-        return (MessageReceiver[]) CollectionUtils.toArrayOfComponentType(found,
+        return CollectionUtils.toArrayOfComponentType(found,
                 MessageReceiver.class);
     }
 
     public void connect() throws Exception
     {
-        this.checkDisposed();
+        if(lifecycleManager.getState().isDisposed())
+        {
+            throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(), lifecycleManager.getCurrentPhase()), this);
+        }
 
         if (isConnected())
         {
@@ -1662,6 +1622,7 @@ public abstract class AbstractConnector
                 ConnectionNotification.CONNECTION_DISCONNECTED));
         // TODO Shouldn't this come at the end of the method, after the receivers have been disconnected?
         connected.set(false);
+
 
         try
         {
@@ -2423,11 +2384,9 @@ public abstract class AbstractConnector
     {
         final StringBuffer sb = new StringBuffer(120);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
-        sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(", started=").append(started);
-        sb.append(", initialised=").append(initialised);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", disposed=").append(disposed);
+        sb.append("{name=").append(name);
+        sb.append(", lifecycle=").append(lifecycleManager==null? "not in lifecycle" : lifecycleManager.getCurrentPhase());
+        sb.append(", this=").append(Integer.toHexString(System.identityHashCode(this)));        
         sb.append(", numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
         sb.append(", createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
         sb.append(", connected=").append(connected);
@@ -2538,5 +2497,5 @@ public abstract class AbstractConnector
                 returnDispatcher(endpoint, dispatcher);
             }
         }
-    };
+    }
 }

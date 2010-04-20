@@ -87,11 +87,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
+        MuleContextLifecycleManager lifecycleManager = getLifecycleManager();
         DefaultMuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
                                                          getWorkManager(),
                                                          getWorkListener(),
-                                                         getLifecycleManager(),
+                                                         lifecycleManager,
                                                          getNotificationManager());
+        lifecycleManager.setMuleContext(muleContext);
         muleContext.setSplash(startupScreen, shutdownScreen);
         return muleContext;
     }

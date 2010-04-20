@@ -280,11 +280,14 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     {
         public MuleContext buildMuleContext()
         {
+            MuleContextLifecycleManager lifecycleManager = getLifecycleManager();
+
             MuleContext muleContext = new TestMuleContext(getMuleConfiguration(),
                                                              getWorkManager(),
                                                              getWorkListener(),
-                                                             getLifecycleManager(),
+                                                             lifecycleManager,
                                                              getNotificationManager());
+            lifecycleManager.setMuleContext(muleContext);
             return muleContext;
         }
     }

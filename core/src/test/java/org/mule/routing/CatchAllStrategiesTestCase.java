@@ -37,6 +37,11 @@ import java.util.HashMap;
 public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 {
 
+    public CatchAllStrategiesTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testLoggingOnlyStrategy() throws Exception
     {
         //Just test it works without failure

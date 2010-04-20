@@ -28,6 +28,11 @@ import java.util.List;
 
 public class MulticastingRouterTestCase extends AbstractMuleTestCase
 {
+    public MulticastingRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testMulticastingRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

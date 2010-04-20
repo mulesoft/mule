@@ -97,7 +97,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         {
             try
             {
-                ((Startable) objectFactory.getInstance()).start();
+                ((Startable) objectFactory.getInstance(muleContext)).start();
             }
             catch (Exception e)
             {
@@ -114,7 +114,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         {
             try
             {
-                ((Stoppable) objectFactory.getInstance()).stop();
+                ((Stoppable) objectFactory.getInstance(muleContext)).stop();
             }
             catch (Exception e)
             {
@@ -131,7 +131,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         {
             try
             {
-                ((Disposable) objectFactory.getInstance()).dispose();
+                ((Disposable) objectFactory.getInstance(muleContext)).dispose();
             }
             catch (Exception e)
             {
@@ -169,7 +169,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
     @Override
     protected Object invokeComponentInstance(MuleEvent event) throws Exception
     {
-        Object result = ((Callable) objectFactory.getInstance()).onCall(new DefaultMuleEventContext(event));
+        Object result = ((Callable) objectFactory.getInstance(muleContext)).onCall(new DefaultMuleEventContext(event));
         if (result instanceof VoidResult)
         {
             // This will rewire the current message

@@ -9,6 +9,7 @@
  */
 package org.mule.module.guice;
 
+import org.mule.api.MuleContext;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 
@@ -22,8 +23,11 @@ public class BananaInjectionService implements BananaServiceInterface
     @Inject
     private BananaFactory factory;
 
+    @Inject
+    private MuleContext muleContext;
+
     public Banana doSomething(Object data) throws Exception
     {
-        return (Banana)factory.getInstance();
+        return (Banana)factory.getInstance(muleContext);
     }
 }

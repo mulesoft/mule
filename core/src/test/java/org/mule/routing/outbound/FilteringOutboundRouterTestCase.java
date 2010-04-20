@@ -31,6 +31,11 @@ import java.util.Map;
 
 public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 {
+    public FilteringOutboundRouterTestCase()
+    {
+        setStartContext(true);
+    }
+
     public void testFilteringOutboundRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

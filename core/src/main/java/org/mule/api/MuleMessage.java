@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageAdapter;
@@ -86,12 +87,26 @@ public interface MuleMessage extends MessageAdapter
      * an exception is thrown.  Any transformers added to the registry will be checked for compatibility
      * @param outputType the desired return type
      * @return The converted payload of this message. Note that this method will not alter the payload of this
-     * message *unless* the payload is an inputstream in which case the stream will be read and the payload will become
+     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
      * the fully read stream.
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
      */
-    <T extends Object> T getPayload(Class<T> outputType) throws TransformerException;
+    <T> T getPayload(Class<T> outputType) throws TransformerException;
+
+/**
+     * Will attempt to obtain the payload of this message with the desired Class type. This will
+     * try and resolve a transformer that can do this transformation. If a transformer cannot be found
+     * an exception is thrown.  Any transformers added to the registry will be checked for compatability
+     * @param outputType the desired return type
+     * @return The converted payload of this message. Note that this method will not alter the payload of this
+     * message *unless* the payload is an InputStream in which case the stream will be read and the payload will become
+     * the fully read stream.
+     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
+     * payload
+     */
+    <T> T getPayload(DataType<T> outputType) throws TransformerException;
+
 
     /**
      * Converts the message implementation into a String representation

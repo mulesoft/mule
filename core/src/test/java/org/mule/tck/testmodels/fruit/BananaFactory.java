@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -29,7 +30,7 @@ public class BananaFactory implements ObjectFactory
         // nothing to do
     }
 
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         return new Banana();
     }

@@ -60,7 +60,7 @@ public class GuiceLookupObjectFactory extends AbstractObjectFactory implements M
         return injector.getInstance(classBinding).getClass();
     }
 
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         Object instance = null;
         instance = injector.getInstance(classBinding);

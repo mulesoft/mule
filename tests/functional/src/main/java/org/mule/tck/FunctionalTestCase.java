@@ -74,7 +74,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     {
         if (service.getComponent() instanceof JavaComponent)
         {
-            return ((AbstractJavaComponent) service.getComponent()).getObjectFactory().getInstance();
+            return ((AbstractJavaComponent) service.getComponent()).getObjectFactory().getInstance(muleContext);
         }
         else
         {

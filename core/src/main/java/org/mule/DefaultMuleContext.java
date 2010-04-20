@@ -195,7 +195,7 @@ public class DefaultMuleContext implements MuleContext
             workManager.start();
             getNotificationManager().start(workManager, workListener);
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
-            getLifecycleManager().fireLifecycle(muleRegistryHelper, Initialisable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
 
@@ -223,7 +223,7 @@ public class DefaultMuleContext implements MuleContext
         startDate = System.currentTimeMillis();
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
-        getLifecycleManager().fireLifecycle(muleRegistryHelper, Startable.PHASE_NAME);
+        getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
 
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
@@ -244,7 +244,7 @@ public class DefaultMuleContext implements MuleContext
     {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
-        lifecycleManager.fireLifecycle(muleRegistryHelper, Stoppable.PHASE_NAME);
+        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
     }
 
@@ -256,19 +256,7 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
-            if (isStarted())
-            {
-                stop();
-            }
-        }
-        catch (MuleException e)
-        {
-            logger.error("Failed to stop manager: " + e.getMessage(), e);
-        }
-
-        try
-        {
-            getLifecycleManager().fireLifecycle(muleRegistryHelper, Disposable.PHASE_NAME);
+            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
 
             // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much abstraction?
             muleRegistryHelper.dispose();

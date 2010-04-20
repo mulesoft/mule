@@ -57,7 +57,8 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
-        assertEquals(5, listeners.size());
+        //Now all transformers are registered as listeners in order to get a context disposing notification
+        assertTrue(listeners.size() > 5);
         TestListener listener = (TestListener) muleContext.getRegistry().lookupObject("listener");
         assertNotNull(listener);
         assertFalse(listener.isCalled());
@@ -103,7 +104,8 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
-        assertEquals(5, listeners.size());
+        //Now all transformers are registered as listeners in order to get a context disposing notification
+        assertTrue(listeners.size() > 5);
         TestListener2 listener2 = (TestListener2) muleContext.getRegistry().lookupObject("listener2");
         assertNotNull(listener2);
         assertFalse(listener2.isCalled());

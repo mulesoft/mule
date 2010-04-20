@@ -31,12 +31,10 @@ public class ServiceNotification extends ServerNotification implements BlockingS
     public static final int SERVICE_PAUSED = SERVICE_EVENT_ACTION_START_RANGE + 4;
     public static final int SERVICE_RESUMED = SERVICE_EVENT_ACTION_START_RANGE + 5;
     public static final int SERVICE_DISPOSED = SERVICE_EVENT_ACTION_START_RANGE + 6;
-    public static final int SERVICE_STOPPING = SERVICE_EVENT_ACTION_START_RANGE + 7;
 
     static {
         registerAction("service initialised", SERVICE_INITIALISED);
         registerAction("service started", SERVICE_STARTED);
-        registerAction("service stopping", SERVICE_STOPPING);
         registerAction("service stopped", SERVICE_STOPPED);
         registerAction("service paused", SERVICE_PAUSED);
         registerAction("service resumed", SERVICE_RESUMED);

@@ -11,8 +11,6 @@ import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.endpoint.EndpointURIEndpointBuilder
 import org.mule.interceptor.InterceptorStack
-import org.mule.interceptor.LoggingInterceptor
-import org.mule.interceptor.TimerInterceptor
 import org.mule.model.seda.SedaModel
 import org.mule.model.seda.SedaService
 import org.mule.object.SingletonObjectFactory

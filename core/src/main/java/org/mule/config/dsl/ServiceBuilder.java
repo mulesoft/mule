@@ -32,25 +32,30 @@ public class ServiceBuilder
     public ComponentBuilder toComponent(Class clazz)
     {
         ComponentBuilder builder = new ComponentBuilder(ComponentBuilder.Scope.Prototype, clazz, muleContext);
-        service.setComponent(builder.getComponent());
+        service.setComponent(builder.create());
         return builder;
     }
 
     public ComponentBuilder toPooledComponent(Class clazz)
     {
         ComponentBuilder builder = new ComponentBuilder(ComponentBuilder.Scope.Pooled, clazz, muleContext);
-        service.setComponent(builder.getComponent());
+        service.setComponent(builder.create());
         return builder;
     }
 
     public ComponentBuilder toComponent(Object instance)
     {
         ComponentBuilder builder = new ComponentBuilder(instance, muleContext);
-        service.setComponent(builder.getComponent());
+        service.setComponent(builder.create());
         return builder;
     }
 
-    Service getService()
+    public RouteBuilder to(String uri)
+    {
+        return null;
+    }
+
+    Service create()
     {
         return service;
     }

@@ -31,7 +31,7 @@ public class ModelBuilder
     public ServiceBuilder service(String name)
     {
         ServiceBuilder builder = new ServiceBuilder(name, muleContext);
-        builder.getService().setModel(model);
+        builder.create().setModel(model);
         return builder;
     }
 }

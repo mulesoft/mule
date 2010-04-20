@@ -130,15 +130,15 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     public void testParentContext() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
-        
+
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
 
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
         builder.setParentContext(appContext);
-        builder.configure(muleContext); 
+        builder.configure(muleContext);
 
         muleContext.start();
-        
+
         Object orange = muleContext.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
@@ -151,12 +151,12 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     public void testAppContextTogetherWithMuleConfig() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
-        
+
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("application-context.xml, mule-config.xml");
-        builder.configure(muleContext); 
+        builder.configure(muleContext);
 
         muleContext.start();
-        
+
         Object orange = muleContext.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);

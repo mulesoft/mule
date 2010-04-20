@@ -665,7 +665,7 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-    protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
+        protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
     {
 
         public void onNotification(MuleContextNotification notification)

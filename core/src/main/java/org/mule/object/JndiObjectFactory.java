@@ -10,6 +10,7 @@
 
 package org.mule.object;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -121,7 +122,7 @@ public class JndiObjectFactory implements ObjectFactory
         }
     }
     
-    public Object getInstance() throws Exception
+    public Object getInstance(MuleContext muleContext) throws Exception
     {
         if (_object == null || lookupOnEachCall == true)
         {

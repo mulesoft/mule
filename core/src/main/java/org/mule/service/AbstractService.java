@@ -17,12 +17,19 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
 import org.mule.api.routing.InboundRouterCollection;
@@ -36,7 +43,6 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -46,13 +52,13 @@ import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
-import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,33 +74,14 @@ public abstract class AbstractService implements Service
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected ServiceStatistics stats;
-
-    /**
-     * Determines if the service has been stopped
-     */
-    protected AtomicBoolean stopped = new AtomicBoolean(true);
-
-    /**
-     * Determines whether stop has been called and is still in progress
-     */
-    protected WaitableBoolean stopping = new WaitableBoolean(false);
-
-    /**
-     * Determines if the service has been initilised
-     */
-    protected AtomicBoolean initialised = new AtomicBoolean(false);
-
     /**
      * The model in which this service is registered
      */
     protected Model model;
 
-    /**
-     * Determines if the service has been paused
-     */
-    protected WaitableBoolean paused = new WaitableBoolean(false);
-
     protected MuleContext muleContext;
+
+    protected ServiceLifecycleManager lifecycleManager;
 
     /**
      * The initial states that the service can be started in
@@ -142,6 +129,15 @@ public abstract class AbstractService implements Service
     public AbstractService(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        try
+        {
+            lifecycleManager = new ServiceLifecycleManager(this, muleContext.getLifecycleManager());
+        }
+        catch (MuleException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToCreate("Service Lifecycle Manager"), e);
+        }
+        
     }
 
     /**
@@ -156,18 +152,6 @@ public abstract class AbstractService implements Service
      */
     public final synchronized void initialise() throws InitialisationException
     {
-        if (initialised.get())
-        {
-            throw new InitialisationException(CoreMessages.objectAlreadyInitialised("Service '" + name + "'"), this);
-        }
-        // Ensure Component has service instance and is initialised. If the component
-        // was configured with spring and is therefore in the registry it will get
-        // started automatically, if it was set on the service directly then it won't
-        // be started automatically. So to be sure we start it here.
-        component.setService(this);
-        component.initialise();
-
-
         if (inboundRouter == null)
         {
             // Create Default routes that route to the default inbound and
@@ -197,7 +181,20 @@ public abstract class AbstractService implements Service
 //            ((Initialisable) exceptionListener).initialise();
         }
 
-        doInitialise();
+        try
+        {
+            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        // Ensure Component has service instance and is initialised. If the component
+        // was configured with spring and is therefore in the registry it will get
+        // started automatically, if it was set on the service directly then it won't
+        // be started automatically. So to be sure we start it here.
+        component.setService(this);
+        component.initialise();
 
         // initialise statistics
         stats = createStatistics();
@@ -207,9 +204,6 @@ public abstract class AbstractService implements Service
         stats.setOutboundRouterStat(outboundRouter.getStatistics());
         stats.setInboundRouterStat(inboundRouter.getStatistics());
         stats.setComponentStat(component.getStatistics());
-
-        initialised.set(true);
-        fireServiceNotification(ServiceNotification.SERVICE_INITIALISED);
     }
 
     protected ServiceStatistics createStatistics()
@@ -217,90 +211,45 @@ public abstract class AbstractService implements Service
         return new ServiceStatistics(name);
     }
 
-    protected void fireServiceNotification(int action)
-    {
-        muleContext.fireNotification(new ServiceNotification(this, action));
-    }
-
     public void forceStop() throws MuleException
     {
-        if (!stopped.get())
-        {
-            logger.debug("Stopping Service");
-            stopping.set(true);
-            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
-            doForceStop();
-            stopped.set(true);
-            stopping.set(false);
-            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
-        }
+        //Kepping this here since I don't understand why this method exists.  AFAICS this just says the service is stopped
+        //without actually stopping it
+//        if (!stopped.get())
+//        {
+//            logger.debug("Stopping Service");
+//            stopping.set(true);
+//            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
+//            doForceStop();
+//            stopped.set(true);
+//            stopping.set(false);
+//            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
+//        }
+        doForceStop();
+        stop();
     }
 
     public void stop() throws MuleException
     {
-        if (!stopped.get())
-        {
-            logger.debug("Stopping Service");
-            stopping.set(true);
-            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
+        //TODO this wasn't being called stopListeners();
+        // Unregister Listeners for the service
+        unregisterListeners();
 
-            // Unregister Listeners for the service
-            unregisterListeners();
-
-            doStop();
-            
-            // Stop component.  We do this here in case there are any queues that need to be consumed first.
-            component.stop();
-            
-            stopped.set(true);
-            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
-            logger.info("Mule Service " + name + " has been stopped successfully");
-        }
+        // Stop component.  We do this here in case there are any queues that need to be consumed first.
+        component.stop();
+        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
     }
 
     public void start() throws MuleException
     {
-        // or throw an exception?
-        if (!initialised.get())
-        {
-            throw new IllegalStateException("Cannot start an uninitialised service.");
-        }
-        if (isStarted())
-        {
-            logger.info("Service is already started: " + name);
-        }
-        else
-        {
-            if (initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
-            {
-                logger.info("stopped");
-            }
-            if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
-            {
-                logger.info("Service " + name + " has not been started (initial state = 'stopped')");
-            }
-            else if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
-            {
-                start(/*startPaused*/true);
-                logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
-            }
-            else
-            {
-                start(/*startPaused*/false);
-                logger.info("Service " + name + " has been started successfully");
-            }
-            beyondInitialState.set(true);
-        }
-    }
+        lifecycleManager.checkPhase(Startable.PHASE_NAME);
 
-    /**
-     * Starts a Mule Service.
-     *
-     * @param startPaused - Start service in a "paused" state (messages are
-     *                    received but not processed).
-     */
-    protected void start(boolean startPaused) throws MuleException
-    {
+        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
+        {
+            logger.info("Service " + name + " has not been started (initial state = 'stopped')");
+            beyondInitialState.set(true);
+            return;
+        }
 
         // Ensure Component is started. If component was configured with spring and
         // is therefore in the registry it will get started automatically, if it was
@@ -319,18 +268,19 @@ public abstract class AbstractService implements Service
         // InitialisationCallbacks within its doConnect() method (see MULE-804).
         connectListeners();
 
-        // Start (and pause) the service.
-        if (stopped.get())
+
+        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
         {
-            stopped.set(false);
-            paused.set(false);
-            doStart();
+            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
+            lifecycleManager.fireLifecycle(Pausable.PHASE_NAME);
+            logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
         }
-        fireServiceNotification(ServiceNotification.SERVICE_STARTED);
-        if (startPaused)
+        else
         {
-            pause();
+            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
+            logger.info("Service " + name + " has been started successfully");
         }
+        beyondInitialState.set(true);
 
         // We start the receivers _after_ starting the service because if a message
         // gets routed to the service before it is started,
@@ -339,6 +289,7 @@ public abstract class AbstractService implements Service
         startListeners();
     }
 
+
     /**
      * Pauses event processing for a single Mule Service. Unlike stop(), a paused
      * service will still consume messages from the underlying transport, but those
@@ -346,10 +297,7 @@ public abstract class AbstractService implements Service
      */
     public final void pause() throws MuleException
     {
-        doPause();
-        paused.set(true);
-        fireServiceNotification(ServiceNotification.SERVICE_PAUSED);
-        logger.info("Mule Service " + name + " has been paused successfully");
+        lifecycleManager.fireLifecycle(Pausable.PHASE_NAME);
     }
 
     /**
@@ -358,10 +306,7 @@ public abstract class AbstractService implements Service
      */
     public final void resume() throws MuleException
     {
-        doResume();
-        paused.set(false);
-        fireServiceNotification(ServiceNotification.SERVICE_RESUMED);
-        logger.info("Mule Service " + name + " has been resumed successfully");
+        lifecycleManager.fireLifecycle(Resumable.PHASE_NAME);
     }
 
     /**
@@ -371,7 +316,7 @@ public abstract class AbstractService implements Service
      */
     public boolean isPaused()
     {
-        return paused.get();
+        return lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME);
     }
 
     /**
@@ -402,19 +347,13 @@ public abstract class AbstractService implements Service
     {
         try
         {
-            if (!stopped.get())
-            {
-                stop();
-            }
+            lifecycleManager.fireLifecycle(Disposable.PHASE_NAME);
         }
         catch (MuleException e)
         {
             logger.error("Failed to stop service: " + name, e);
         }
-        doDispose();
         component.dispose();
-        initialised.set(false);
-        fireServiceNotification(ServiceNotification.SERVICE_DISPOSED);
         muleContext.getStatistics().remove(stats);
     }
 
@@ -425,11 +364,9 @@ public abstract class AbstractService implements Service
 
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
-        if (stopping.get() || stopped.get())
+        if (!isStarted() && !isPaused())
         {
-            throw new ServiceException(
-                    CoreMessages.componentIsStopped(name),
-                    event.getMessage(), this);
+            throw new ServiceException( CoreMessages.componentIsStopped(name), event.getMessage(), this);
         }
 
         // Dispatching event to an inbound endpoint
@@ -466,11 +403,9 @@ public abstract class AbstractService implements Service
 
     public MuleMessage sendEvent(MuleEvent event) throws MuleException
     {
-        if (stopping.get() || stopped.get())
+        if (!isStarted() && !isPaused())
         {
-            throw new ServiceException(
-                    CoreMessages.componentIsStopped(name),
-                    event.getMessage(), this);
+            throw new ServiceException( CoreMessages.componentIsStopped(name), event.getMessage(), this);
         }
 
         try
@@ -505,12 +440,14 @@ public abstract class AbstractService implements Service
      */
     protected void waitIfPaused(MuleEvent event) throws InterruptedException
     {
-        if (logger.isDebugEnabled() && paused.get())
+        if (logger.isDebugEnabled() && lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME))
         {
-            logger.debug("Service: " + name
-                    + " is paused. Blocking call until resume is called");
+            logger.debug("Service: " + name + " is paused. Blocking call until resume is called");
         }
-        paused.whenFalse(null);
+        while(lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME))
+        {
+            Thread.sleep(500);
+        }
     }
 
     /**
@@ -529,12 +466,12 @@ public abstract class AbstractService implements Service
 
     public boolean isStopped()
     {
-        return stopped.get();
+        return lifecycleManager.getState().isStopped();
     }
 
     public boolean isStopping()
     {
-        return stopping.get();
+        return lifecycleManager.getState().isStopping();
     }
 
     protected void handleException(Exception e)
@@ -569,7 +506,7 @@ public abstract class AbstractService implements Service
 
     public boolean isStarted()
     {
-        return !stopped.get();
+        return lifecycleManager.getState().isStarted();
     }
 
     protected abstract MuleMessage doSend(MuleEvent event) throws MuleException;
@@ -918,4 +855,8 @@ public abstract class AbstractService implements Service
         return muleContext;
     }
 
+    public LifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
+    }
 }

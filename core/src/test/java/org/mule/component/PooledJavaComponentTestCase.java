@@ -209,8 +209,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
 
     public void testObjectUniqueness() throws Exception
     {
-        ObjectFactory objectFactory = new PrototypeObjectFactory(UniqueComponent.class);
-        
+        PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(UniqueComponent.class);
         PooledJavaComponent component = createPooledComponent(objectFactory);
         assertEquals(0, component.lifecycleAdapterPool.getNumActive());
 
@@ -225,11 +224,12 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
     
     public void testDisposingFactoryDisposesObject() throws Exception
     {
-        ObjectFactory objectFactory = new PrototypeObjectFactory(WaterMelon.class);
+        PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(WaterMelon.class);
         PooledJavaComponent component = createPooledComponent(objectFactory);
 
         DefaultLifecycleAdapter lifecycleAdapter = (DefaultLifecycleAdapter) component.borrowComponentLifecycleAdaptor();
         component.returnComponentLifecycleAdaptor(lifecycleAdapter);
+        component.stop();
         component.dispose();
 
         assertNull(lifecycleAdapter.componentObject.get());
