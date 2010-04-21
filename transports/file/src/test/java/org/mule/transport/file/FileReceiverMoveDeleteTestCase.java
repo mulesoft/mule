@@ -164,7 +164,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
     protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception
     {
-
         Service service = new SedaService(muleContext);
         service.setName("moveDeleteBridgeService");
         String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
@@ -203,6 +202,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();
+        testComponent.setMuleContext(muleContext);
         testComponent.setEventCallback(new EventCallback()
         {
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
@@ -238,6 +238,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
             this.expectedPayload = expectedPayload;
         }
 
+        @Override
         public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
         {
             assertEquals(expectedMessageAdaptor, message.getAdapter().getClass());
