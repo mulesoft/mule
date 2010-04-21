@@ -27,7 +27,6 @@ import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.binding.DefaultBindingCollection;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Abstract implementation of JavaComponent adds JavaComponent specific's:
@@ -200,15 +199,16 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
      * 
      * @param entryPointResolvers Resolvers to add
      */
-    public void setEntryPointResolvers(Collection entryPointResolvers)
+    public void setEntryPointResolvers(Collection<EntryPointResolver> entryPointResolvers)
     {
         if (null == entryPointResolverSet)
         {
             entryPointResolverSet = new DefaultEntryPointResolverSet();
         }
-        for (Iterator resolvers = entryPointResolvers.iterator(); resolvers.hasNext();)
+        
+        for (EntryPointResolver resolver : entryPointResolvers)
         {
-            entryPointResolverSet.addEntryPointResolver((EntryPointResolver) resolvers.next());
+            entryPointResolverSet.addEntryPointResolver(resolver);
         }
     }
 
