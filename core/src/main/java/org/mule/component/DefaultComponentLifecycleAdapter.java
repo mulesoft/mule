@@ -79,10 +79,15 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     public DefaultComponentLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
     {
+        if (muleContext == null)
+        {
+            throw new IllegalStateException("No muleContext provided");
+        }
         if (componentObject == null)
         {
             throw new IllegalArgumentException("POJO Service cannot be null");
         }
+
         if (entryPointResolver == null)
         {
             entryPointResolver = new LegacyEntryPointResolverSet();
@@ -90,10 +95,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
 
-        if (muleContext == null)
-        {
-            throw new IllegalStateException("No muleContext provided");
-        }
 
         // save a ref for later disposal call
         this.muleContext = muleContext;

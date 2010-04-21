@@ -66,7 +66,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
             {
                 if (singletonComponentLifecycleAdapter == null)
                 {
-                    singletonComponentLifecycleAdapter = createLifeCycleAdaptor();
+                    singletonComponentLifecycleAdapter = createLifecycleAdaptor();
                 }
             }
             catch (Exception e)
@@ -131,7 +131,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
         }
         else
         {
-            componentLifecycleAdapter = createLifeCycleAdaptor();
+            componentLifecycleAdapter = createLifecycleAdaptor();
             componentLifecycleAdapter.start();
         }
         return componentLifecycleAdapter;

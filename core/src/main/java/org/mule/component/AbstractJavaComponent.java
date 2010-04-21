@@ -47,10 +47,11 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     protected LifecycleAdapterFactory lifecycleAdapterFactory;
 
-
+    /**
+     * For Spring only
+     */
     public AbstractJavaComponent()
     {
-        // For Spring only
         super();
     }
 
@@ -95,7 +96,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         }
     }
 
-    public Class getObjectType()
+    public Class<?> getObjectType()
     {
         return objectFactory.getObjectClass();
     }
@@ -107,23 +108,25 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
      * @throws MuleException
      * @throws Exception
      */
-    protected LifecycleAdapter createLifeCycleAdaptor() throws Exception
+    protected LifecycleAdapter createLifecycleAdaptor() throws Exception
     {
-        LifecycleAdapter lifecycleAdapter;
         //Todo this could be moved to the LCAFactory potentially
         Object object = objectFactory.getInstance(muleContext);
 
+        LifecycleAdapter lifecycleAdapter;
         if (lifecycleAdapterFactory != null)
         {
             // Custom lifecycleAdapterFactory set on component
-            lifecycleAdapter = lifecycleAdapterFactory.create(object, this, entryPointResolverSet, muleContext);
+            lifecycleAdapter = 
+                lifecycleAdapterFactory.create(object, this, entryPointResolverSet, muleContext);
         }
         else if (objectFactory.isExternallyManagedLifecycle())
         {
-            // If no lifecycleAdapterFactory is configured explicitly and object factory returns externally managed instance then 
-            // use NullLifecycleAdapter so that lifecycle is not propagated
-            lifecycleAdapter = new NullLifecycleAdapter(object, this,
-                entryPointResolverSet, muleContext);
+            // If no lifecycleAdapterFactory is configured explicitly and object factory returns 
+            // externally managed instance then use NullLifecycleAdapter so that lifecycle 
+            // is not propagated
+            lifecycleAdapter = 
+                new NullLifecycleAdapter(object, this, entryPointResolverSet, muleContext);
         }
         else
         {
@@ -146,12 +149,6 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         {
             throw new InitialisationException(CoreMessages.objectIsNull("object factory"), this);
         }
-
-//        if(isAutoWireObject())
-//        {
-//            muleContext.getRegistry().applyProcessors(object);
-//        }
-
         objectFactory.initialise();
     }
 
@@ -171,7 +168,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     @Override
     protected void doDispose()
     {
-        if(objectFactory!=null)
+        if (objectFactory!=null)
         {
             objectFactory.dispose();
         }

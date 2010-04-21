@@ -127,7 +127,7 @@ public class PooledJavaComponent extends AbstractJavaComponent
 
         public Object getInstance(MuleContext muleContext) throws Exception
         {
-            return createLifeCycleAdaptor();
+            return createLifecycleAdaptor();
         }
 
         public Class<?> getObjectClass()
