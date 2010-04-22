@@ -198,8 +198,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         MuleEvent event = createOutboundEvent(message, endpoint, null);
 
         dispatchEvent(event);
-
-        processResponse(event.getMessage());
     }
 
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
@@ -220,11 +218,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                     CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
         MuleMessage result = router.route(message, this);
-        if (result != null)
-        {
-            processResponse(result);
-        }
-
         return result;
     }
 
@@ -250,12 +243,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             result.applyTransformers(endpoint.getResponseTransformers());
         }
-
-        if (result != null)
-        {
-            processResponse(result);
-        }
-
         return result;
     }
 
@@ -299,7 +286,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                         + ", event is: " + event);
             }
             service.dispatchEvent(event);
-            processResponse(event.getMessage());
         }
         else
         {
@@ -353,9 +339,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                 // message I think this could be done without the performance hit.
                 //Or we could provide a way to set the request message as the OriginalAdapter on the message
                 //And provide access to the request properties that way
-                response = OptimizedRequestContext.unsafeRewriteEvent(response);
-                processResponse(response);
-                return response;
+                return OptimizedRequestContext.unsafeRewriteEvent(response);
             }
             catch (MuleException e)
             {
@@ -381,20 +365,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
                     event.getEndpoint());
-        }
-    }
-
-    /**
-     * Once an event has been processed we need to romove certain properties so that
-     * they not propagated to the next request
-     *
-     * @param response The response from the previous request
-     */
-    protected void processResponse(MuleMessage response)
-    {
-        if (response == null)
-        {
-            return;
         }
     }
 
