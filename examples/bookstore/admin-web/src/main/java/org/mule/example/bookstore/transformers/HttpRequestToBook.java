@@ -10,10 +10,10 @@
 
 package org.mule.example.bookstore.transformers;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.example.bookstore.Book;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.example.bookstore.Book;
+import org.mule.example.bookstore.BookstoreAdminMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.servlet.HttpRequestMessageAdapter;
 import org.mule.util.StringUtils;
@@ -46,15 +46,15 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
 
         if (StringUtils.isBlank(author))
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Missing author field"));
+            throw new TransformerException(BookstoreAdminMessages.missingAuthor());
         }
         if (StringUtils.isBlank(title))
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Missing title field"));
+            throw new TransformerException(BookstoreAdminMessages.missingTitle());
         }
         if (StringUtils.isBlank(price))
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Missing price field"));
+            throw new TransformerException(BookstoreAdminMessages.missingPrice());
         }
 
         return new Book(author, title, Double.parseDouble(price));
