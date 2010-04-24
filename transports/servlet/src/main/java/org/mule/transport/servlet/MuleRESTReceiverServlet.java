@@ -48,6 +48,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
      */
     private static final long serialVersionUID = -2395763805839859649L;
 
+    @Override
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
     {
@@ -89,6 +90,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
     {
@@ -108,6 +110,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         }
     }
 
+    @Override
     protected void doPut(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
     {
@@ -132,6 +135,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         }
     }
 
+    @Override
     protected void doDelete(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
     {
@@ -188,7 +192,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         {
             // if we dont find an endpoint for the given name, lets check the
             // servlet receivers
-            MessageReceiver receiver = (MessageReceiver)getReceivers().get(endpointName);
+            MessageReceiver receiver = getReceivers().get(endpointName);
             
             if (receiver != null)
             {
