@@ -143,6 +143,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         return MuleEndpointURI.isMuleUri(resourceIdentifier);
     }
 
+    @Override
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
