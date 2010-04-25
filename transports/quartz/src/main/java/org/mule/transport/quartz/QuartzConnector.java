@@ -30,7 +30,6 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class QuartzConnector extends AbstractConnector
 {
-
     public static final String QUARTZ = "quartz";
 
     public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
@@ -49,7 +48,7 @@ public class QuartzConnector extends AbstractConnector
 
     /**
      * Properties to be used for creating the scheduler.  If no properties are given, the
-     * scheduler will be created by StdSchedulerFactory.getDefaultScheduler()
+     * scheduler will be created by <code>StdSchedulerFactory.getDefaultScheduler()</code>
      */
     private Properties factoryProperties = null;
 
@@ -64,9 +63,10 @@ public class QuartzConnector extends AbstractConnector
         super(context);
     }
     
+    @Override
     protected void doInitialise() throws InitialisationException
     {
-        if(factoryProperties==null)
+        if (factoryProperties == null)
         {
             factoryProperties = new Properties();
         }
@@ -91,21 +91,25 @@ public class QuartzConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -118,6 +122,7 @@ public class QuartzConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         try
