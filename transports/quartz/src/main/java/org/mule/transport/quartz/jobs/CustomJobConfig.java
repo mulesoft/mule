@@ -29,6 +29,7 @@ public class CustomJobConfig extends AbstractJobConfig
     public void setJob(Job job)
     {
         this.job = job;
+        setStateful(job instanceof StatefulJob);
     }
 
     @Override

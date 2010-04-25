@@ -20,7 +20,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.quartz.config.JobConfig;
 import org.mule.transport.quartz.i18n.QuartzMessages;
-import org.mule.transport.quartz.jobs.CustomJob;
 import org.mule.transport.quartz.jobs.CustomJobConfig;
 import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 
@@ -81,22 +80,22 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             jobDataMap.put(QUARTZ_CONNECTOR_PROPERTY, this.connector.getName());
             jobDataMap.putAll(endpoint.getProperties());
 
-            if(jobConfig instanceof EventGeneratorJobConfig)
+            if (jobConfig instanceof EventGeneratorJobConfig)
             {
                 jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, ((EventGeneratorJobConfig) jobConfig).getPayload());
             }
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
             
             Job job = null;
-            if(jobConfig instanceof CustomJobConfig)
+            if (jobConfig instanceof CustomJobConfig)
             {
                 job = ((CustomJobConfig) jobConfig).getJob();
             }
-            // If there has been a job created or found then we default to a customJob configuration
+            // If there has been a job created or found then we default to a custom Job configuration
             if (job != null)
             {
                 jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
-                jobDetail.setJobClass(CustomJob.class);
+                jobDetail.setJobClass(jobConfig.getJobClass());
             }
 
             jobDetail.setJobDataMap(jobDataMap);
