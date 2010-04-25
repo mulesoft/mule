@@ -11,13 +11,18 @@ package org.mule.transport.quartz.jobs;
 
 import org.mule.transport.quartz.config.AbstractJobConfig;
 
+import org.quartz.Job;
+import org.quartz.StatefulJob;
+
 /**
- * The configuration for the {@link org.mule.transport.quartz.jobs.ScheduledDispatchJob} job.
+ * The configuration for the {@link ScheduledDispatchJob} job.
  */
 public class ScheduledDispatchJobConfig extends AbstractJobConfig
 {
-    /** The endpoint ref has t be a string and not a reference to the actual endpoint because
-     * jobs can get stored in a database */
+    /** 
+     * The endpoint ref has to be a string and not a reference to the actual endpoint because
+     * jobs can get stored in a database 
+     */
     private String endpointRef;
 
     public String getEndpointRef()
@@ -30,12 +35,14 @@ public class ScheduledDispatchJobConfig extends AbstractJobConfig
         this.endpointRef = endpointRef;
     }
 
-    protected Class getStatefulJobClass()
+    @Override
+    protected Class<? extends StatefulJob> getStatefulJobClass()
     {
         return StatefulScheduledDispatchJob.class;
     }
 
-    protected Class getStatelessJobClass()
+    @Override
+    protected Class<? extends Job> getStatelessJobClass()
     {
         return ScheduledDispatchJob.class;
     }

@@ -12,6 +12,7 @@ package org.mule.transport.quartz.jobs;
 import org.mule.transport.quartz.config.AbstractJobConfig;
 
 import org.quartz.Job;
+import org.quartz.StatefulJob;
 
 /**
  * This configuration simply holds a reference to a user defined job to execute.
@@ -30,12 +31,14 @@ public class CustomJobConfig extends AbstractJobConfig
         this.job = job;
     }
 
-    protected Class getStatefulJobClass()
+    @Override
+    protected Class<? extends StatefulJob> getStatefulJobClass()
     {
         return StatefulCustomJob.class;
     }
 
-    protected Class getStatelessJobClass()
+    @Override
+    protected Class<? extends Job> getStatelessJobClass()
     {
         return CustomJob.class;
     }

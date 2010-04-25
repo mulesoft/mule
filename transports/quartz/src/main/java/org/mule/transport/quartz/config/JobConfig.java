@@ -7,16 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.quartz.config;
 
 import java.io.Serializable;
 
+import org.quartz.Job;
+
 /**
- * The generic interface for Job Configuration endpoints that are described on Quartz endpoints
+ * The generic interface for Job Configuration endpoints that are described on Quartz
+ * endpoints
  */
 public interface JobConfig extends Serializable
 {
-    public Class getJobClass();
+    public Class<? extends Job> getJobClass();
 
     public String getGroupName();
 

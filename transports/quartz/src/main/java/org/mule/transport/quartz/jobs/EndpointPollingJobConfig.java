@@ -11,6 +11,9 @@ package org.mule.transport.quartz.jobs;
 
 import org.mule.transport.quartz.config.AbstractJobConfig;
 
+import org.quartz.Job;
+import org.quartz.StatefulJob;
+
 /**
  * Configuration for the {@link EndpointPollingJob} job.
  */
@@ -41,12 +44,14 @@ public class EndpointPollingJobConfig extends AbstractJobConfig
         this.timeout = timeout;
     }
 
-    protected Class getStatefulJobClass()
+    @Override
+    protected Class<? extends StatefulJob> getStatefulJobClass()
     {
         return StatefulEndpointPollingJob.class;
     }
 
-    protected Class getStatelessJobClass()
+    @Override
+    protected Class<? extends Job> getStatelessJobClass()
     {
         return EndpointPollingJob.class;
     }

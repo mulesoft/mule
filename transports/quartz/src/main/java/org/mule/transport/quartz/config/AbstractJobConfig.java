@@ -13,8 +13,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.transport.quartz.QuartzConnector;
 
+import org.quartz.Job;
+import org.quartz.StatefulJob;
+
 /**
- * Base implementation of {@link org.mule.transport.quartz.config.JobConfig}.
+ * Base implementation of {@link JobConfig}.
  */
 public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
 {
@@ -66,13 +69,12 @@ public abstract class AbstractJobConfig implements JobConfig, MuleContextAware
         this.stateful = stateful;
     }
 
-    public final Class getJobClass()
+    public final Class<? extends Job> getJobClass()
     {
-
         return (isStateful() ? getStatefulJobClass() : getStatelessJobClass());
     }
 
-    protected abstract Class getStatefulJobClass();
+    protected abstract Class<? extends StatefulJob> getStatefulJobClass();
     
-    protected abstract Class getStatelessJobClass();
+    protected abstract Class<? extends Job> getStatelessJobClass();
 }

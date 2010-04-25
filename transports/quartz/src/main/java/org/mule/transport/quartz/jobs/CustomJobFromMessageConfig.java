@@ -18,6 +18,7 @@ import org.mule.util.ClassUtils;
 import java.lang.reflect.InvocationTargetException;
 
 import org.quartz.Job;
+import org.quartz.StatefulJob;
 
 /**
  * This configuration simply holds a reference to a user defined job to execute.
@@ -36,7 +37,7 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
         }
 
         Object result = getMuleContext().getExpressionManager().evaluate(expression, evaluator, message, true);
-        Class clazz;
+        Class<? extends Job> clazz;
         if (result instanceof Job)
         {
             return (Job) result;
@@ -109,14 +110,15 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
         this.expression = expression;
     }
 
-    protected Class getStatefulJobClass()
+    @Override
+    protected Class<? extends StatefulJob> getStatefulJobClass()
     {
         return StatefulCustomJob.class;
     }
 
-    protected Class getStatelessJobClass()
+    @Override
+    protected Class<? extends Job> getStatelessJobClass()
     {
         return CustomJob.class;
     }
-
 }
