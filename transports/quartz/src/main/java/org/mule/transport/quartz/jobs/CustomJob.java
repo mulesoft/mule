@@ -19,6 +19,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 
 /**
@@ -34,15 +35,8 @@ public class CustomJob implements Job
 {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        MuleContext muleContext;
-        try
-        {
-            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
-        }
-        catch (SchedulerException e)
-        {
-            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
-        }
+        MuleContext muleContext = lookupMuleContext(jobExecutionContext);
+        
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
         if (tempJob == null)
@@ -55,7 +49,7 @@ public class CustomJob implements Job
             else
             {
                 tempJob = muleContext.getRegistry().lookupObject((String) tempJob);
-                if(tempJob==null)
+                if (tempJob == null)
                 {
                     throw new JobExecutionException("Job not found: " + tempJob);
                 }
@@ -70,5 +64,18 @@ public class CustomJob implements Job
             throw new JobExecutionException(QuartzMessages.invalidJobObject().toString());
         }
         ((Job)tempJob).execute(jobExecutionContext);
+    }
+
+    private MuleContext lookupMuleContext(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    {
+        try
+        {
+            SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
+            return (MuleContext) schedulerContext.get(MuleProperties.MULE_CONTEXT_PROPERTY);
+        }
+        catch (SchedulerException e)
+        {
+            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
+        }
     }
 }
