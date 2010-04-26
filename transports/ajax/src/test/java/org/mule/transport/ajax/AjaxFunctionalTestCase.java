@@ -32,7 +32,8 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
 {
     public static final int SERVER_PORT = 58080;
     
-    private BayeuxClient client;
+    private HttpClient httpClient;
+    private BayeuxClient bayeuxClient;
 
     @Override
     protected String getConfigResources()
@@ -43,20 +44,22 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        HttpClient http = new HttpClient();
-        http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
+        httpClient = new HttpClient();
+        httpClient.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
+        httpClient.start();
 
-        client = new BayeuxClient(http, new Address("localhost", SERVER_PORT), "/ajax/cometd");
-        http.start();
-        //need to start the client before you can add subscriptions
-        client.start();
+        bayeuxClient = new BayeuxClient(httpClient, new Address("localhost", SERVER_PORT), "/ajax/cometd");
+        // need to start the client before you can add subscriptions
+        bayeuxClient.start();
     }
 
     @Override
     protected void doTearDown() throws Exception
     {
-        //9 times out of 10 this throws a "ava.lang.IllegalStateException: Not running" exception, it can be ignored
-        //client.stop();
+        if (httpClient.isRunning())
+        {
+            httpClient.stop();
+        }
     }
 
     public void testClientSubscribeWithString() throws Exception
@@ -64,19 +67,19 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         final Latch latch = new Latch();
 
         final AtomicReference<Object> data = new AtomicReference<Object>();
-        client.addListener(new MessageListener()
+        bayeuxClient.addListener(new MessageListener()
         {
-            public void deliver(Client client, Client client1, Message message)
+            public void deliver(Client fromClient, Client toClient, Message message)
             {
                 if (message.getData() != null)
                 {
-                    //This simulate what the browser would receive
-                    data.set((message.toString()));
+                    // This simulates what the browser would receive
+                    data.set(message.toString());
                     latch.release();
                 }
             }
         });
-        client.subscribe("/test1");
+        bayeuxClient.subscribe("/test1");
 
         MuleClient muleClient = new MuleClient();
         muleClient.dispatch("vm://in1", "Ross", null);
@@ -86,20 +89,18 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         
         // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
         ObjectMapper mapper = new ObjectMapper();
-        Map result  = mapper.readValue((String)data.get(), Map.class);
+        Map result  = mapper.readValue((String) data.get(), Map.class);
         assertEquals("/test1", result.get("channel"));       
         assertEquals("Ross Received", result.get("data"));
     }
 
     public void testClientPublishWithString() throws Exception
     {
-        client.publish("/test2", "Ross", null);
+        bayeuxClient.publish("/test2", "Ross", null);
         MuleClient muleClient = new MuleClient();
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);
         assertEquals("Ross Received", msg.getPayloadAsString());
     }
-
-
 }
