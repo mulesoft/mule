@@ -26,9 +26,8 @@ import org.codehaus.jackson.map.ObjectMapper;
  * allows for nested object keys i.e. user/name will return the name property on
  * the user object.
  * <p/>
- * There is no 'xpath' for JSON yet (though I expect Jackson to do implement this at some point).  This class provides
- * a simple way to navigate a Json data structure.
- * To select a child entry use -
+ * There is no 'xpath' for JSON yet (though I expect Jackson to do implement this at some point).  
+ * This class provides a simple way to navigate a Json data structure. To select a child entry use -
  * <code>
  * person/name
  * </code>
@@ -82,17 +81,10 @@ public class JsonData implements Serializable
         this(new StringReader(node));
     }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        return node.equals(obj);
-    }
-
     public JsonNode get(int index)
     {
         return node.get(index);
     }
-
 
     public boolean isArray()
     {
@@ -207,6 +199,18 @@ public class JsonData implements Serializable
             }
         }
         return tokens;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return node.equals(obj);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return node.hashCode();
     }
 
     @Override

@@ -19,8 +19,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
 {
     public void testReadingArrayData() throws Exception
     {
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        JsonData jsonData = new JsonData(json);
+        JsonData jsonData = readJsonData("test-data.json");
         assertTrue(jsonData.isArray());
         assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.get("[0]/text"));
         assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.get("[0]/'text'"));
@@ -61,8 +60,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
 
     public void testReadingComplexData() throws Exception
     {
-        String json = IOUtils.getResourceAsString("filters.json", getClass());
-        JsonData jsonData = new JsonData(json);
+        JsonData jsonData = readJsonData("filters.json");
         assertFalse(jsonData.isArray());
 
         //assertEquals("/**", jsonData.get("filters[0]/channels"));
@@ -74,16 +72,13 @@ public class JsonDataTestCase extends AbstractMuleTestCase
 
     public void testReadingWithQuotedString() throws Exception
     {
-        String json = IOUtils.getResourceAsString("bitly-response.json", getClass());
-        JsonData jsonData = new JsonData(json);
-
+        JsonData jsonData = readJsonData("bitly-response.json");
         assertEquals("NfeyS", jsonData.get("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
     }
 
-    public void testReadinArray() throws Exception
+    public void testReadingArray() throws Exception
     {
-        String json = IOUtils.getResourceAsString("flickr-response.json", getClass());
-        JsonData jsonData = new JsonData(json);
+        JsonData jsonData = readJsonData("flickr-response.json");
 
         assertEquals("4136507840", jsonData.get("photos/photo[0]/id"));
 
@@ -94,5 +89,11 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         Object o = jsonData.get("photos");
         assertNotNull(o);
         assertTrue(o instanceof ObjectNode);
+    }
+        
+    private JsonData readJsonData(String filename) throws Exception
+    {
+        String json = IOUtils.getResourceAsString(filename, getClass());
+        return new JsonData(json);
     }
 }
