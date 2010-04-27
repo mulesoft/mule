@@ -448,7 +448,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
         if (connection != null)
         {
-            if (clientId != null)
+            // EE-1901: only sets the clientID if it was not already set
+            if (clientId != null && !clientId.equals(connection.getClientID()))
             {
                 connection.setClientID(getClientId());
             }
