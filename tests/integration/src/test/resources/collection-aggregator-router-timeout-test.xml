@@ -10,6 +10,8 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
+	<vm:connector name="queue"/>
+	
     <model>
         <!--
             Split the message and set correlation group ids and sizes
@@ -54,6 +56,11 @@
                 <collection-aggregator-router timeout="2000" failOnTimeout="false"/>
             </inbound>
             <test:component/>
+            <outbound>
+	            <pass-through-router>
+                    <vm:outbound-endpoint path="out" connector-ref="queue"/>
+                </pass-through-router>
+            </outbound>
         </service>
     </model>
 </mule>

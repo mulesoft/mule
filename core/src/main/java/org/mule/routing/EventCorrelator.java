@@ -24,6 +24,8 @@ import org.mule.routing.inbound.EventGroup;
 import org.mule.util.MapUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.monitor.Expirable;
+import org.mule.util.monitor.ExpiryMonitor;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -123,83 +125,7 @@ public class EventCorrelator
             return;
         }
 
-        this.context.getWorkManager().scheduleWork(new Work()
-        {
-            public void release()
-            {
-                //no op
-            }
-
-            public void run()
-            {
-                while (true)
-                {
-                    List<EventGroup> expired = new ArrayList<EventGroup>(1);
-                    for (Object o : eventGroups.values())
-                    {
-                        EventGroup group = (EventGroup) o;
-                        if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
-                        {
-                            expired.add(group);
-                        }
-                    }
-                    if (expired.size() > 0)
-                    {
-                        for (Object anExpired : expired)
-                        {
-                            EventGroup group = (EventGroup) anExpired;
-                            eventGroups.remove(group.getGroupId());
-                            locks.remove(group.getGroupId());
-
-                            final Service service = group.toArray()[0].getService();
-
-                            if (isFailOnTimeout())
-                            {
-                                context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
-                                                                                 RoutingNotification.CORRELATION_TIMEOUT));
-                                service.getExceptionListener().exceptionThrown(
-                                        new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                                        group.toMessageCollection()));
-                            }
-                            else
-                            {
-                                if (logger.isDebugEnabled())
-                                {
-                                    logger.debug(MessageFormat.format(
-                                            "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} " +
-                                            "total for group ID: {2}", group.size(), group.expectedSize(), group.getGroupId()
-                                    ));
-                                }
-
-                                try
-                                {
-                                    MuleMessage msg = callback.aggregateEvents(group);
-                                    MuleEvent newEvent = new DefaultMuleEvent(msg, group.toArray()[0].getEndpoint(),
-                                                                              new DefaultMuleSession(service, context), false);
-
-                                    // TODO which use cases would need a sync reply event returned? 
-                                    service.getComponent().invoke(newEvent);
-                                }
-                                catch (Exception e)
-                                {
-                                    service.getExceptionListener().exceptionThrown(e);
-                                }
-                            }
-                        }
-                    }
-                    try
-                    {
-                        Thread.sleep(100);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        );
+        this.context.getWorkManager().scheduleWork(new ExpiringGroupWork());
     }
 
     /**
@@ -582,5 +508,124 @@ public class EventCorrelator
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
+    }
+    
+    private final class ExpiringGroupWork implements Work, Expirable
+    {
+        private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
+        protected long groupTimeToLive = ONE_DAY_IN_MILLI;
+        private ExpiryMonitor expiryMonitor;
+        
+        /**
+         * A map with keys = group id and values = group creation time
+         */
+        private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
+
+        public ExpiringGroupWork()
+        {
+            this.expiryMonitor = new ExpiryMonitor("EventCorrelator", 1000 * 60);
+            //clean up every 30 minutes
+            this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
+        }
+
+        /**
+         * Removes the elements in expiredAndDispatchedGroups when groupLife is reached
+         */
+        public void expired()
+        {
+            for (Object o : expiredAndDispatchedGroups.keySet())
+            {
+                Long time = (Long) expiredAndDispatchedGroups.get(o);
+                if (time + groupTimeToLive < System.currentTimeMillis())
+                {
+                    expiredAndDispatchedGroups.remove(o);
+                    logger.warn(MessageFormat.format("Discarding group {0}", o));
+                }
+            }
+        }
+
+        public void release()
+        {
+            //no op
+        }
+
+        public void run()
+        {
+            while (true)
+            {
+                List<EventGroup> expired = new ArrayList<EventGroup>(1);
+                for (Object o : eventGroups.values())
+                {
+                    EventGroup group = (EventGroup) o;
+                    if ((group.getCreated() + getTimeout() * MILLI_TO_NANO_MULTIPLIER) < System.nanoTime())
+                    {
+                        expired.add(group);
+                    }
+                }
+                if (expired.size() > 0)
+                {
+                    for (Object anExpired : expired)
+                    {
+                        EventGroup group = (EventGroup) anExpired;
+                        eventGroups.remove(group.getGroupId());
+                        locks.remove(group.getGroupId());
+
+                        final Service service = group.toArray()[0].getService();
+
+                        if (isFailOnTimeout())
+                        {
+                            context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
+                                                                             RoutingNotification.CORRELATION_TIMEOUT));
+                            service.getExceptionListener().exceptionThrown(
+                                    new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
+                                                                    group.toMessageCollection()));
+                        }
+                        else
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(MessageFormat.format(
+                                        "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} " +
+                                        "total for group ID: {2}", group.size(), group.expectedSize(), group.getGroupId()
+                                ));
+                            }
+
+                            try
+                            {
+                                if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis()))
+                                {
+                                    MuleMessage msg = callback.aggregateEvents(group);
+                                    MuleEvent newEvent = new DefaultMuleEvent(msg, group.toArray()[0].getEndpoint(),
+                                                                              new DefaultMuleSession(service, context), false);
+
+                                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
+                                    {
+                                        // TODO which use cases would need a sync reply event returned?
+                                        service.dispatchEvent(newEvent);
+                                        expiredAndDispatchedGroups.put(group.getGroupId(), group.getCreated());
+                                    }
+                                    else
+                                    {
+                                        logger.warn(MessageFormat.format("Discarding group {0}", group.getGroupId()));
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                service.getExceptionListener().exceptionThrown(e);
+                            }
+                        }
+                    }
+                }
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException e)
+                {
+                    break;
+                }
+            }
+        }
     }
 }
