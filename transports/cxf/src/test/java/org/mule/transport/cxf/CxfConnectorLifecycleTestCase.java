@@ -18,7 +18,6 @@ import java.beans.ExceptionListener;
 
 public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
 {
-
     private static String SERVICE_NAME = "echoService";
     private static String PROTOCOL_SERVICE_NAME = "echoService_cxfComponent";
 
@@ -73,7 +72,7 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
     public void testRegisterUnregisterListender() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService(SERVICE_NAME);
-        CxfConnector connector = (CxfConnector) muleContext.getRegistry().lookupObject(CxfConnector.class);
+        CxfConnector connector = muleContext.getRegistry().lookupObject(CxfConnector.class);
 
         assertNotNull(connector.getServer("http://localhost:63081/services/Echo"));
         service.stop();
@@ -83,15 +82,14 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
     }
 
     /*
-     * Use an an exception strategy to unable us to fail the test on exception that
+     * Use an an exception strategy to enable us to fail the test on exception that
      * are otherwise just handled.
      */
     static class TestExceptionListener implements ExceptionListener
     {
-        public void exceptionThrown(Exception arg0)
+        public void exceptionThrown(Exception exception)
         {
-            fail(arg0.getMessage());
+            fail(exception.getMessage());
         }
     }
-
 }
