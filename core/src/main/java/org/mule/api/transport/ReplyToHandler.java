@@ -10,9 +10,10 @@
 
 package org.mule.api.transport;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.Transformer;
 
 import java.util.List;
 
@@ -23,11 +24,9 @@ import java.util.List;
 
 public interface ReplyToHandler
 {
-
     void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
 
-    void setTransformers(List transformers);
+    void setTransformers(List<Transformer> transformers);
 
-    List getTransformers();
-    
+    List<Transformer> getTransformers();
 }

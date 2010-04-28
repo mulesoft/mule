@@ -29,6 +29,7 @@ import org.mortbay.cometd.AbstractBayeux;
 public class AjaxReplyToHandler extends DefaultReplyToHandler
 {
     private AjaxServletConnector connector;
+    
     public AjaxReplyToHandler(List<Transformer> transformers, AjaxServletConnector connector)
     {
         super(transformers, connector.getMuleContext());

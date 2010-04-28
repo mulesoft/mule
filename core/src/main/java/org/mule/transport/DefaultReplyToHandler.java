@@ -20,6 +20,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
@@ -44,11 +45,11 @@ public class DefaultReplyToHandler implements ReplyToHandler
      */
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    private volatile List transformers;
+    private volatile List<Transformer> transformers;
     private final Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();
     protected MuleContext muleContext;
 
-    public DefaultReplyToHandler(List transformers, MuleContext muleContext)
+    public DefaultReplyToHandler(List<Transformer> transformers, MuleContext muleContext)
     {
         this.transformers = transformers;
         this.muleContext = muleContext;
@@ -113,14 +114,13 @@ public class DefaultReplyToHandler implements ReplyToHandler
         return endpoint;
     }
 
-    public List getTransformers()
+    public List<Transformer> getTransformers()
     {
         return transformers;
     }
 
-    public void setTransformers(List transformers)
+    public void setTransformers(List<Transformer> transformers)
     {
         this.transformers = transformers;
     }
-
 }

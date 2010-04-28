@@ -23,7 +23,6 @@ import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.jms.Destination;
@@ -48,7 +47,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 {
     private final JmsConnector connector;
 
-    public JmsReplyToHandler(JmsConnector connector, List transformers)
+    public JmsReplyToHandler(JmsConnector connector, List<Transformer> transformers)
     {
         super(transformers, connector.getMuleContext());
         this.connector = connector;
@@ -76,9 +75,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This is a work around for JmsTransformers where the current endpoint needs
             //to be set on the transformer so that a JMSMessage can be created correctly (the transformer needs a Session)
             Class srcType = returnMessage.getPayload().getClass();
-            for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
+            for (Transformer t : getTransformers())
             {
-                Transformer t = (Transformer) iterator.next();
                 if (t.isSourceTypeSupported(srcType))
                 {
                     if (t.getEndpoint() == null)
@@ -107,7 +105,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             processMessage(replyToMessage, event);
             if (logger.isDebugEnabled())
             {
-                logger.debug("Sending jms reply to: " + replyToDestination + "("
+                logger.debug("Sending jms reply to: " + replyToDestination + " ("
                              + replyToDestination.getClass().getName() + ")");
             }
             replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination, topic);
