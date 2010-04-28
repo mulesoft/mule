@@ -32,7 +32,6 @@ public class TestMtomImpl implements TestMtom
 
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo)
     {
-        // TODO Auto-generated method stub
         name.value = "return detail + " + name.value;
 
         try
@@ -42,7 +41,6 @@ public class TestMtomImpl implements TestMtom
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

@@ -22,24 +22,27 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuietExceptionStrategy extends AbstractExceptionListener
 {
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    @Override
     public void handleMessagingException(MuleMessage message, Throwable e)
     {
         logger.debug("Ignoring", e);
     }
 
+    @Override
     public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable e)
     {
         logger.debug("Ignoring", e);
     }
 
+    @Override
     public void handleLifecycleException(Object component, Throwable e)
     {
         logger.debug("Ignoring", e);
     }
 
+    @Override
     public void handleStandardException(Throwable e)
     {
         logger.debug("Ignoring", e);
@@ -50,5 +53,4 @@ public class QuietExceptionStrategy extends AbstractExceptionListener
     {
         logger.debug("Ignoring", t);
     }
-
 }
