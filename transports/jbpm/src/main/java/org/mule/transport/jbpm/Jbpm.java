@@ -274,7 +274,11 @@ public class Jbpm implements BPMS, Initialisable, Disposable
 
     public Object getState(Object process) throws Exception
     {
-        ProcessInstance processInstance = (ProcessInstance) process;
+        return getState((ProcessInstance) process);
+    }
+    
+    public static String getState(ProcessInstance processInstance) throws Exception
+    {
         if (processInstance == null || processInstance.isEnded())
         {
             return ProcessInstance.STATE_ENDED;

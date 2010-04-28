@@ -82,7 +82,11 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
             for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
             {
                 propertyName = (String)iterator.next();
-                processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
+                // The session property can become rather large and causes problems with DB persistence.
+                if (!propertyName.equals(MuleProperties.MULE_SESSION_PROPERTY))
+                {
+                	processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
+	            }
             }
 
             Object payload = event.transformMessage();

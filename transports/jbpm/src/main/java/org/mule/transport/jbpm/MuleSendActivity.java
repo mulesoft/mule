@@ -95,16 +95,23 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         // the only way I could see to get the name of the process definition
         props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
         props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getId());
+        String state = Jbpm.getState(execution.getProcessInstance());
+        props.put("MULE_BPM_PROCESS_STATE", state);
+        log.debug("process state: " + state);        
 
         for (Map.Entry<String, Object> var : execution.getVariables().entrySet())
         {
             if (!var.getKey().startsWith(MuleProperties.PROPERTY_PREFIX))
             {
+                log.debug("process var: " + var.getKey() + " = " + var.getValue());
                 props.put(var.getKey(), var.getValue());
             }
         }
-        
+
+        // Just in case the endpoint itself is an expression
+        endpoint = (String) ScriptManager.getScriptManager().evaluateExpression(endpoint, null);
         MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, synchronous);
+
         if (synchronous && response != null)
         {
             Object responsePayload = response.getPayload();
