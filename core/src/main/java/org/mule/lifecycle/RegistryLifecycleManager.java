@@ -9,12 +9,9 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
-import org.mule.util.StringMessageUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,6 +38,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
         this.registry = registry;
     }
 
+    @Override
     protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
     {
         if (logger.isDebugEnabled())
@@ -55,7 +53,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
         }
 
         // overlapping interfaces can cause duplicates
-        Set duplicates = new HashSet();
+        Set<Object> duplicates = new HashSet<Object>();
 
         for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
         {
@@ -90,6 +88,5 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
 
             lo.firePostNotification(muleContext);
         }
-
     }
 }

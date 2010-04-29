@@ -22,8 +22,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.lifecycle.AbstractLifecycleManager;
 import org.mule.lifecycle.DefaultLifecyclePair;
-import org.mule.lifecycle.DefaultLifecyclePhase;
-import org.mule.util.StringMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

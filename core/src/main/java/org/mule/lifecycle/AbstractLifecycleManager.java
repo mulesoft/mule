@@ -10,7 +10,6 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.LifecycleException;
@@ -48,7 +47,7 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
     protected String currentPhase = notInLifecyclePhase.getName();
     protected String executingPhase = null;
     protected Set<String> completedPhases = new LinkedHashSet<String>(6);
-    protected Set transitions = new LinkedHashSet(6);
+    protected Set<String> transitions = new LinkedHashSet<String>(6);
     protected List<LifecyclePair> lifecyclePairs = new ArrayList<LifecyclePair>(3);
     protected LifecycleState state;
     protected MuleContext muleContext;
@@ -244,7 +243,7 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
         LifecyclePhase lcp;
         String phase;
-        Integer phaseIndex;
+        int phaseIndex;
         for (Object completedPhase : completedPhases)
         {
             phase = (String) completedPhase;
@@ -299,8 +298,8 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
         }
 
 
-        Integer phaseIndex = getPhaseIndex(name);
-        if (phaseIndex == null)
+        int phaseIndex = getPhaseIndex(name);
+        if (phaseIndex == -1)
         {
             throw new IllegalStateException("Phase does not exist: " + name);
         }
@@ -331,8 +330,8 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
     protected LifecyclePhase lookupPhase(String phase) throws IllegalArgumentException
     {
-        Integer phaseIndex = getPhaseIndex(phase);
-        if (phaseIndex == null)
+        int phaseIndex = getPhaseIndex(phase);
+        if (phaseIndex == -1)
         {
             throw new IllegalArgumentException("No lifecycle phase registered with name: " + phase);
         }
