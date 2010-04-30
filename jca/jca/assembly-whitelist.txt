@@ -80,7 +80,7 @@ juel-2.1.0
 juel-engine-2.1.0
 juel-impl-2.1.0
 livetribe-jsr223-2.0.5
-mail-1.4-osgi
+mail-1.4.3
 mule-core
 mule-module-acegi
 mule-module-annotations
