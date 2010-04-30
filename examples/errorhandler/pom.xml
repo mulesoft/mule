@@ -50,7 +50,6 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>${javaMailVersion}</version>    
         </dependency>
 
         <!-- test dependencies -->
