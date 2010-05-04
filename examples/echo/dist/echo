@@ -22,9 +22,7 @@ fi
 
 echo "The Echo example is available in three variations:"
 echo "  1. Echo from the Command Line"
-echo "  2. Echo using the Axis Transport"
-echo "     (surf to http://localhost:65081/services/EchoUMO?method=echo&param=hello)"
-echo "  3. Echo using the CXF Transport"
+echo "  2. Echo using the CXF Transport"
 echo "     (surf to http://localhost:65082/services/EchoUMO/echo/text/hello)"
 echo "Select the one you wish to execute and press Enter..."
 read i
@@ -33,9 +31,6 @@ if [ 1 = $i ]
 then
     exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-echo/echo-config.xml
 elif [ 2 = $i ]
-then
-    exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-echo/echo-axis-config.xml
-elif [ 3 = $i ]
 then
     exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-echo/echo-cxf-config.xml
 fi

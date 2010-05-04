@@ -114,28 +114,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         System.out.println(StringMessageUtils.getBoilerPlate(LocaleMessage.welcome()));
                     
         int response = 0;
-        String provider = "axis";
-
-        while (response != 'a' && response != 'c')
-        {
-            System.out.println("\n" + LocaleMessage.menuOptionSoap());
-            response = readCharacter();
-            switch (response)
-            {
-                case 'a' :
-                {
-                    provider = "axis";
-                    break;
-                }
-                case 'c' :
-                {
-                    provider = "cxf";
-                    break;
-                }
-            }
-        }
-
-        response = 0;
+        String mode = null;
         while (response != 'a' && response != 's')
         {
             System.out.println("\n" + LocaleMessage.menuOptionMode());
@@ -145,21 +124,20 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
                 case 'a' :
                 {
                     System.out.println(LocaleMessage.loadingAsync());
-                    synchronous = false;
+                    mode = "async";
                     break;
                 }
 
                 case 's' :
                 {
                     System.out.println(LocaleMessage.loadingSync());
-                    synchronous = true;
+                    mode = "sync";
                     break;
                 }
             }
         }
 
-        String config = "loan-broker-" + (synchronous ? "sync" : "async") + "-config.xml";
-        config += ",loan-broker-" + provider + "-endpoints-config.xml";
+        String config = "loan-broker-" + mode + "-config.xml, loan-broker-cxf-endpoints-config.xml";
         return config;
     }
 }
