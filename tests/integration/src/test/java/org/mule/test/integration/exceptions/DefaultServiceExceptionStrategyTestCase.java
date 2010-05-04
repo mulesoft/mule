@@ -24,7 +24,6 @@ import java.util.Map;
 
 public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -33,24 +32,18 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 
     public void testDefaultExceptionStrategySingleEndpoint() throws MuleException
     {
-        Service service1 = muleContext.getRegistry().lookupService("testService1");
-        assertNotNull(service1);
-        assertNotNull(service1.getExceptionListener());
-        assertTrue(service1.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
-        assertEquals(1, ((DefaultServiceExceptionStrategy) service1.getExceptionListener()).getEndpoints().size());
+        assertExceptionStrategyHasNumberOfEndpoints("testService1", 1);
 
         MuleClient mc = new MuleClient();
         mc.dispatch("vm://in1", "test", null);
-        assertExceptionMessage(mc.request("vm://out1", FunctionalTestCase.RECEIVE_TIMEOUT));
+        assertExceptionMessage(mc.request("vm://out1", RECEIVE_TIMEOUT));
+        // request one more time to ensure that only one exception message was sent per exception
+        assertNull(mc.request("vm://out1", RECEIVE_TIMEOUT));
     }
 
     public void testDefaultExceptionStrategyMultipleEndpoints() throws MuleException
     {
-        Service service2 = muleContext.getRegistry().lookupService("testService2");
-        assertNotNull(service2);
-        assertNotNull(service2.getExceptionListener());
-        assertTrue(service2.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
-        assertEquals(2, ((DefaultServiceExceptionStrategy) service2.getExceptionListener()).getEndpoints().size());
+        assertExceptionStrategyHasNumberOfEndpoints("testService2", 2);
 
         MuleClient mc = new MuleClient();
         mc.dispatch("vm://in2", "test", null);
@@ -74,17 +67,29 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 
         assertTrue(message.getPayload() instanceof ExceptionMessage);
         Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
-        assertTrue("payload shoud be a HashMap, but is " + payload.getClass().getName(), payload instanceof Map);
-        assertEquals("value1", ((Map) payload).get("key1"));
-        assertEquals("value2", ((Map) payload).get("key2"));
+        assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(), 
+            payload instanceof Map<?, ?>);
+        Map<?, ?> payloadMap = (Map<?, ?>) payload;
+        assertEquals("value1", payloadMap.get("key1"));
+        assertEquals("value2", payloadMap.get("key2"));
     }
 
     private void assertExceptionMessage(MuleMessage out)
     {
         assertTrue(out.getPayload() instanceof ExceptionMessage);
-        assertEquals(FunctionalTestException.class, ((ExceptionMessage) out.getPayload()).getException()
-            .getCause()
-            .getClass());
-        assertEquals("test", ((ExceptionMessage) out.getPayload()).getPayload());
+        ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
+        assertEquals(FunctionalTestException.class, exceptionMessage.getException().getCause().getClass());
+        assertEquals("test", exceptionMessage.getPayload());
+    }
+    
+    private void assertExceptionStrategyHasNumberOfEndpoints(String serviceName, int numberOfEndpoints)
+    {
+        Service service = muleContext.getRegistry().lookupService(serviceName);
+        assertNotNull(service);
+        assertNotNull(service.getExceptionListener());
+        assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
+        DefaultServiceExceptionStrategy exceptionListener = 
+            (DefaultServiceExceptionStrategy) service.getExceptionListener();
+        assertEquals(numberOfEndpoints, exceptionListener.getEndpoints().size());
     }
 }

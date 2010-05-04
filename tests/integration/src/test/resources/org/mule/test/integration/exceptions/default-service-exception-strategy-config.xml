@@ -14,7 +14,6 @@
     <vm:connector name="vmConnector"/>
 
     <model>
-
         <service name="testService1">
             <inbound>
                 <vm:inbound-endpoint path="in1" />
@@ -35,7 +34,5 @@
                 <vm:outbound-endpoint path="out3" connector-ref="vmConnector"/> 
             </default-service-exception-strategy>
         </service>
-
-
     </model>
 </mule>
