@@ -11,8 +11,8 @@
 package org.mule.config.spring.hotdeploy;
 
 import org.mule.api.MuleContext;
-import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.ConfigResource;
 import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -24,8 +24,10 @@ import org.mule.module.boot.MuleBootstrapUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Date;
-import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,6 +51,8 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
     protected File monitoredResource;
 
     protected static final int RELOAD_INTERVAL_MS = 3000;
+
+    protected ScheduledExecutorService watchTimer;
 
     public ReloadableBuilder(ConfigResource[] configResources)
     {
@@ -147,7 +151,8 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
     {
         final int reloadIntervalMs = RELOAD_INTERVAL_MS;
         // time cancellation handled in the watcher's onChange() callback
-        new Timer().schedule(watcher, new Date(System.currentTimeMillis() + reloadIntervalMs), reloadIntervalMs);
+        watchTimer = Executors.newSingleThreadScheduledExecutor();
+        watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
 
         if (logger.isInfoEnabled())
         {
@@ -179,7 +184,6 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
     protected class ConfigFileWatcher extends FileWatcher
     {
 
-        private volatile boolean cancelled;
         private final MuleContext muleContext;
 
         public ConfigFileWatcher(MuleContext muleContext)
@@ -190,17 +194,6 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
         protected synchronized void onChange(File file)
         {
-            if (!this.cancelled)
-            {
-                this.cancel();
-                this.cancelled = true;
-            }
-            else
-            {
-                // duplicate timer event
-                return;
-            }
-
             if (logger.isInfoEnabled())
             {
                 logger.info("================== Reloading " + file);
