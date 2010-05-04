@@ -2,3 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
+# MULE-4864
+org.mule.transport.jbpm.MessagingExceptionTestCase

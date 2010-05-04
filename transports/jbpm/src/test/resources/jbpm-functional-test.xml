@@ -19,6 +19,7 @@
     	<bpm:process name="message" resource="message-process.jpdl.xml" />
     	<bpm:process name="fork" resource="fork-process.jpdl.xml" />
     	<bpm:process name="variables" resource="variables-process.jpdl.xml" />
+    	<bpm:process name="exception" resource="message-exception-process.jpdl.xml" />
     </bpm:jbpm-connector>
     
     <model name="processModel">
@@ -32,6 +33,19 @@
                 <pass-through-router>
                     <vm:outbound-endpoint path="echo"/>
                 </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="fromMessageExceptionProcess">
+            <inbound>
+                <bpm:inbound-endpoint process="exception"/>
+            </inbound>
+            <log-component />
+            <outbound>
+                <bpm:outbound-router>
+                    <vm:outbound-endpoint path="queueC"/>
+                    <vm:outbound-endpoint path="queueD"/>
+                </bpm:outbound-router>
             </outbound>
         </service>
 
@@ -93,6 +107,23 @@
         <service name="echoService">
             <inbound>
                 <vm:inbound-endpoint path="echo"/>
+            </inbound>
+            <echo-component />
+        </service>
+        
+        <service name="exceptionService">
+            <inbound>
+                <vm:inbound-endpoint path="exceptionService" />
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+        
+        <service name="exceptionTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="exceptionTransformer">
+                	<!-- Throw an exception -->
+                	<custom-transformer class="org.mule.tck.transformer.ValidateResponse" />
+                </vm:inbound-endpoint>
             </inbound>
             <echo-component />
         </service>

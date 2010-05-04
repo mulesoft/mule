@@ -84,24 +84,34 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
         message.addProperties(messageProperties);
 
+        MuleMessage response = null;
         if (connector.isAllowGlobalDispatcher())
         {
-            // TODO MULE-1221 This should use the "dynamic://" endpoint and not depend on the MuleClient.
             if (synchronous)
             {
-                return connector.getMuleClient().send(endpoint, message);
+                response = connector.getMuleClient().send(endpoint, message);
             }
             else
             {
                 connector.getMuleClient().dispatch(endpoint, message);
-                return null;
             }
         }
         else
         {
             message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
-            return routeMessage(message, synchronous);
+            response = routeMessage(message, synchronous);
         }
+        
+        // TODO MULE-4864 Exceptions are not always caught here
+        if (response != null && response.getExceptionPayload() != null)
+        {
+             throw new ConnectorException(
+                 MessageFactory.createStaticMessage("Unable to send or route message"), getConnector(), response.getExceptionPayload().getRootException());
+        }
+        else
+        {
+            return response;
+        }        
     }
 
     private class Worker implements Work

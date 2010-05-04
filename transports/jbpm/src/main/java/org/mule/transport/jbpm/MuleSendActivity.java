@@ -99,6 +99,7 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         props.put("MULE_BPM_PROCESS_STATE", state);
         log.debug("process state: " + state);        
 
+        // Set process vars as properties on outgoing Mule messages.
         for (Map.Entry<String, Object> var : execution.getVariables().entrySet())
         {
             if (!var.getKey().startsWith(MuleProperties.PROPERTY_PREFIX))
