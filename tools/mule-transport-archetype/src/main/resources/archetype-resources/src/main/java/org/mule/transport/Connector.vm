@@ -68,9 +68,8 @@ public class ${ModuleName}Connector extends AbstractConnector
         // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: If there is a single server instance or
-           connection associated with the connector i.e.  AxisServer or a Jms
-           Connection or Jdbc Connection, this method should put the resource
-           in a started state here. */
+           connection associated with the connector i.e. Jms Connection or Jdbc Connection, 
+           this method should put the resource in a started state here. */
     }
 
     public void doStop() throws MuleException

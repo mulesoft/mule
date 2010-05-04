@@ -21,7 +21,7 @@
             <name>transports</name>
             <description>Which Mule transports do you want to include in this project?
 
-(options: axis, cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+(options: cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
           jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
           smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
 

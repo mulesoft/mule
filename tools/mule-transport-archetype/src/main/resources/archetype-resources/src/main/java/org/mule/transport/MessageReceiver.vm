@@ -90,8 +90,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            doConnect() method which actually makes a connection to the
            transport, but leaves the MessageReceiver in a stopped state. For
            polling-based MessageReceivers the start() method simply starts the
-           polling thread, for the Axis Message receiver the start method on
-           the SOAPService is called. What action is performed here depends on
+           polling thread. What action is performed here depends on
            the transport being used. Most of the time a custom provider
            doesn't need to override this method. */
     }
