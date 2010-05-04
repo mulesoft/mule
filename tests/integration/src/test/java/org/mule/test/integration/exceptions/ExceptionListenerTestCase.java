@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.exceptions;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
@@ -17,63 +18,38 @@ import org.mule.tck.FunctionalTestCase;
 
 public class ExceptionListenerTestCase extends FunctionalTestCase
 {
+    private MuleClient client;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/exception-listener-config.xml";
     }
 
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        client = new MuleClient();
+    }
+
     public void testExceptionStrategyFromComponent() throws Exception
     {
-        MuleClient client = new MuleClient();
-
-        MuleMessage message = client.request("vm://error.queue", 2000);
-        assertNull(message);
+        assertQueueIsEmpty("vm://error.queue");
 
         client.send("vm://component.in", "test", null);
+        
+        assertQueueIsEmpty("vm://component.out");
 
-        message = client.request("vm://component.out", 2000);
-        assertNull(message);
-
-        message = client.request("vm://error.queue", 2000);
+        MuleMessage message = client.request("vm://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);
     }
 
-    public void testExceptionStrategyForTransformerException() throws Exception
+    private void assertQueueIsEmpty(String queueName) throws MuleException
     {
-        MuleClient client = new MuleClient();
-
-        MuleMessage message = client.request("vm://error.queue", 2000);
+        MuleMessage message = client.request(queueName, 2000);
         assertNull(message);
-
-        client.send("vm://component.in", "test", null);
-
-        message = client.request("vm://component.out", 2000);
-        assertNull(message);
-
-        message = client.request("vm://error.queue", 2000);
-        assertNotNull(message);
-        Object payload = message.getPayload();
-        assertTrue(payload instanceof ExceptionMessage);
-    }
-
-    public void testExceptionStrategyForTransformerExceptionAsync() throws Exception
-    {
-        MuleClient client = new MuleClient();
-
-        MuleMessage message = client.request("vm://error.queue", 2000);
-        assertNull(message);
-
-        client.dispatch("vm://component.in", "test", null);
-
-        message = client.request("vm://service.out", 2000);
-        assertNull(message);
-
-        message = client.request("vm://error.queue", 2000);
-        assertNotNull(message);
-        Object payload = message.getPayload();
-        assertTrue(payload instanceof ExceptionMessage);
     }
 }
