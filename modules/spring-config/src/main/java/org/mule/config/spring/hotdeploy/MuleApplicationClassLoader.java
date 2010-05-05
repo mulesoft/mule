@@ -59,6 +59,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
 
             if (libDir.exists() && libDir.canRead())
             {
+                @SuppressWarnings("unchecked")
                 Collection<File> jars = FileUtils.listFiles(libDir, new String[] {"jar"}, false);
 
                 if (!jars.isEmpty() && logger.isInfoEnabled())
