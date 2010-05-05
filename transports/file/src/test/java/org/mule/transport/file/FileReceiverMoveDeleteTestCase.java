@@ -169,18 +169,18 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
             }
             else
             {
-                transformer = new FileMessageAdaptorAssertingTransformer(ReceiverFileInputStream.class);
+                transformer = new FileMessageFactoryAssertingTransformer(ReceiverFileInputStream.class);
             }
         }
         else
         {
             if (filePayload)
             {
-                transformer = new FileMessageAdaptorAssertingTransformer(File.class);
+                transformer = new FileMessageFactoryAssertingTransformer(File.class);
             }
             else
             {
-                transformer = new FileMessageAdaptorAssertingTransformer(byte[].class);
+                transformer = new FileMessageFactoryAssertingTransformer(byte[].class);
             }
         }
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
@@ -220,11 +220,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
     }
 
-    private class FileMessageAdaptorAssertingTransformer extends AbstractMessageAwareTransformer
+    private class FileMessageFactoryAssertingTransformer extends AbstractMessageAwareTransformer
     {
         private Class<?> expectedPayload;
 
-        public FileMessageAdaptorAssertingTransformer(Class<?> expectedPayload)
+        public FileMessageFactoryAssertingTransformer(Class<?> expectedPayload)
         {
             this.expectedPayload = expectedPayload;
         }

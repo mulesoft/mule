@@ -1,5 +1,5 @@
 /*
- * $$Id$$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -23,7 +23,6 @@ import org.mule.transport.AbstractConnector;
 
 public class ServiceTestCase extends AbstractMuleTestCase
 {
-
     private Connector testConnector;
     private Service service;
 
@@ -66,7 +65,6 @@ public class ServiceTestCase extends AbstractMuleTestCase
 
         // Assert that connector has no receivers registered after service disposal
         assertEquals(0, ((AbstractConnector) testConnector).getReceivers().size());
-
     }
 
     public void testUnregisterListenersOnServiceStop() throws Exception
@@ -82,7 +80,5 @@ public class ServiceTestCase extends AbstractMuleTestCase
 
         // Assert that connector has no receivers registered after service disposal
         assertEquals(0, ((AbstractConnector) testConnector).getReceivers().size());
-
     }
-
 }
