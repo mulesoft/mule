@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -122,9 +121,18 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
                     public void onNotification(MuleContextNotification notification)
                     {
-                        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                        final int action = notification.getAction();
+                        switch (action)
                         {
-                            scheduleConfigMonitor(watcher);
+                            case MuleContextNotification.CONTEXT_STARTED:
+                                System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STARTED");
+                                scheduleConfigMonitor(watcher);
+                                break;
+                            case MuleContextNotification.CONTEXT_STOPPING:
+                                System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STOPPING");
+                                watchTimer.shutdownNow();
+                                muleContext.unregisterListener(this);
+                                break;
                         }
                     }
                 });
@@ -202,6 +210,8 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
             try
             {
+                // stop shouldn't be needed, see http://www.mulesoft.org/jira/browse/MULE-4867
+                muleContext.stop();
                 muleContext.dispose();
                 Thread.currentThread().setContextClassLoader(null);
                 // TODO this is really a job of a deployer and deployment descriptor info
