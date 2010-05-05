@@ -2,7 +2,7 @@
 | Echo Example |
 +--------------+
 This example demonstrates how to expose a Mule component over multiple 
-transports, in this case as an Axis web sevice and via System.in (request) and 
+transports, in this case as a CXF web sevice and via System.in (request) and 
 System.out (response).
 
 For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples

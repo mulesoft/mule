@@ -34,9 +34,10 @@ public class MockTestCase extends AbstractWebappTestCase
                "servlet-config.xml," +
                "stockquote-rest-config.xml," +
                "loan-broker-sync-config.xml," +
-               "loan-broker-axis-endpoints-config.xml";
+               "loan-broker-cxf-endpoints-config.xml";
     }
 
+    @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         Mock context = new Mock(ServletContext.class);
