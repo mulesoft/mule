@@ -36,7 +36,7 @@ import javax.mail.URLName;
  */
 public abstract class AbstractMailConnector extends AbstractConnector
 {
-
+    public static final String ATTACHMENT_HEADERS_PROPERTY_POSTFIX = "Headers";
     public static final String MAILBOX = "INBOX";
 
     private Map<ImmutableEndpoint, SessionDetails> sessions = new HashMap<ImmutableEndpoint, SessionDetails>();
@@ -228,31 +228,37 @@ public abstract class AbstractMailConnector extends AbstractConnector
     
     // supply these here because sub-classes are very simple
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doDispose()
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method, nothing to do

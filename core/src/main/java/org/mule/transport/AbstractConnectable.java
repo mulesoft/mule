@@ -11,8 +11,11 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.retry.RetryCallback;
@@ -20,6 +23,10 @@ import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.MuleMessageFactory;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
@@ -41,6 +48,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     protected ImmutableEndpoint endpoint;
     protected final AbstractConnector connector;
     protected RetryPolicyTemplate retryTemplate;
+    protected MuleMessageFactory muleMessageFactory = null;
 
     protected final WaitableBoolean connected = new WaitableBoolean(false);
     protected final WaitableBoolean connecting = new WaitableBoolean(false);
@@ -107,6 +115,12 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     
     public void initialise() throws InitialisationException
     {
+        initializeRetryPolicy();
+        initializeMessageFactory();
+    }
+
+    protected void initializeRetryPolicy()
+    {
         if (endpoint.getRetryPolicyTemplate() != null)
         {
             retryTemplate = endpoint.getRetryPolicyTemplate();
@@ -114,6 +128,19 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         else
         {
             retryTemplate = connector.getRetryPolicyTemplate();
+        }
+    }
+
+    protected void initializeMessageFactory() throws InitialisationException
+    {
+        try
+        {
+            muleMessageFactory = createMuleMessageFactory();
+        }
+        catch (CreateException ce)
+        {
+            Message message = MessageFactory.createStaticMessage(ce.getMessage());
+            throw new InitialisationException(message, ce, this);
         }
     }
 
@@ -388,5 +415,71 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     public boolean isStarted()
     {
         return started.get();
+    }
+    
+    /**
+     * This method uses the connector's <code>createMuleMessageFactory</code> method to create
+     * a new {@link MuleMessageFactory}. Subclasses may need to override this method in order to 
+     * perform additional initialization on the message factory before it's actually used.
+     */
+    protected MuleMessageFactory createMuleMessageFactory() throws CreateException
+    {
+        return connector.createMuleMessageFactory();
+    }
+    
+    /**
+     * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
+     * The payload of the new message will be taken from <code>transportMessage</code>, all
+     * message properties will be copied from <code>previousMessage</code>.
+     */
+    public MuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage,
+        String encoding) throws MuleException
+    {
+        try
+        {
+            return muleMessageFactory.create(transportMessage, previousMessage, encoding);
+        }
+        catch (Exception e)
+        {
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e);
+        }
+    }
+ 
+    /**
+     * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
+     * This is the designated way to build {@link MuleMessage}s from the transport specific message. 
+     */
+    public MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException
+    {
+        try
+        {
+            return muleMessageFactory.create(transportMessage, encoding);
+        }
+        catch (Exception e)
+        {
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e);
+        }
+    }
+
+    /**
+     * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
+     * Uses the default encoding.
+     * 
+     * @see MuleConfiguration#getDefaultEncoding()
+     */
+    public MuleMessage createMuleMessage(Object transportMessage) throws MuleException
+    {
+        String encoding = endpoint.getMuleContext().getConfiguration().getDefaultEncoding();
+        return createMuleMessage(transportMessage, encoding);
+    }
+    
+    /**
+     * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
+     * Rather than passing in a transport message instance, {@link NullPayload} is used instead.
+     * Uses the default encoding.
+     */
+    protected MuleMessage createNullMuleMessage() throws MuleException
+    {
+        return createMuleMessage(null);
     }
 }

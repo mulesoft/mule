@@ -73,7 +73,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
         mockService.expectAndReturn("getResponseRouter", null);
         Service service = (Service) mockService.proxy();
         
-        Map properties = Collections.emptyMap();
+        Map<String, Object> properties = Collections.emptyMap();
 
         Mock mockEndpoint = new Mock(InboundEndpoint.class);
         mockEndpoint.expectAndReturn("getConnector", connector);
@@ -87,13 +87,10 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
 
     private void callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception
     {
-        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", DefaultMuleMessage.class);
+        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleMessage.class);
         assertNotNull(preRouteMessage);
         preRouteMessage.setAccessible(true);
                 
         preRouteMessage.invoke(receiver, new Object[] { message });
     }
-
 }
-
-

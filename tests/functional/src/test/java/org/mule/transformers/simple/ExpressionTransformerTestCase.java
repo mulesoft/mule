@@ -22,12 +22,13 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class ExpressionTransformerTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/transformers/expression-transformers-test.xml";
@@ -74,9 +75,9 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
     public void testExecutionWithCorrectMessage() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
-        Properties props = new Properties();
-        props.setProperty("foo", "moo");
-        props.setProperty("bar", "mar");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
+        props.put("bar", "mar");
 
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
@@ -87,17 +88,18 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         assertTrue(o1 instanceof FruitBasket);
 
         Object o2 = ((Object[]) result)[1];
-        assertTrue(o2 instanceof Map);
-        assertEquals(2, ((Map) o2).size());
-        assertEquals("moo", ((Map) o2).get("foo"));
-        assertEquals("mar", ((Map) o2).get("bar"));
+        assertTrue(o2 instanceof Map<?, ?>);
+        Map<?, ?> map = (Map<?, ?>) o2;
+        assertEquals(2, map.size());
+        assertEquals("moo", map.get("foo"));
+        assertEquals("mar", map.get("bar"));
     }
 
     public void testExecutionWithPartialMissingOptionalParams() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
-        Properties props = new Properties();
-        props.setProperty("foo", "moo");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
 
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
@@ -108,18 +110,17 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         assertTrue(o1 instanceof FruitBasket);
 
         Object o2 = ((Object[]) result)[1];
-        assertTrue(o2 instanceof Map);
-        assertEquals(1, ((Map) o2).size());
-        assertEquals("moo", ((Map) o2).get("foo"));
-
+        assertTrue(o2 instanceof Map<?, ?>);
+        Map<?, ?> map = (Map<?, ?>) o2;
+        assertEquals(1, map.size());
+        assertEquals("moo", map.get("foo"));
     }
 
     public void testExecutionWithAllMissingOptionalParams() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");
-        Properties props = new Properties();
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -133,26 +134,26 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
     public void testTransformerConfigWithSingleArgument() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer2");
-        Properties props = new Properties();
-        props.setProperty("foo", "moo");
-        props.setProperty("bar", "mar");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
+        props.put("bar", "mar");
 
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
         Object result = transformer.transform(message);
         assertNotNull(result);
         assertFalse(result.getClass().isArray());
-        assertTrue(result instanceof List);
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("mar"));
+        assertTrue(result instanceof List<?>);
+        List<?> list = (List<?>) result;
+        assertTrue(list.contains("moo"));
+        assertTrue(list.contains("mar"));
     }
-
 
     public void testExecutionWithInCorrectMessage() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer2");
-        Properties props = new Properties();
-        props.setProperty("foo", "moo");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
 
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
 
@@ -165,6 +166,5 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         {
             //exprected
         }
-
     }
 }

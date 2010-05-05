@@ -15,10 +15,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.BookstoreAdminMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.transport.servlet.HttpRequestMessageAdapter;
 import org.mule.util.StringUtils;
-
-import java.util.Map;
 
 /**
  * Transforms a Map of HttpRequest parameters into a Book object.  
@@ -37,12 +34,9 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
     @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
-        Map <String, String> parameters = messageAdapter.getRequestParameters();
-
-        String author = parameters.get("author");
-        String title = parameters.get("title");
-        String price = parameters.get("price");
+        String author = message.getStringProperty("author", null);
+        String title = message.getStringProperty("title", null);
+        String price = message.getStringProperty("price", null);
 
         if (StringUtils.isBlank(author))
         {

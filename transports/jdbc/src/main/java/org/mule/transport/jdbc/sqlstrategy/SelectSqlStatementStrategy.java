@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
@@ -134,16 +133,15 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
             }
             
             // Package up result
-            MessageAdapter msgAdapter = null;
+            MuleMessage message = null;
             if (event != null)
             {
-                msgAdapter = connector.getMessageAdapter(result,  event.getMessage().getAdapter());
+                message = new DefaultMuleMessage(result, event.getMessage(), connector.getMuleContext());
             }
             else
             {
-                msgAdapter = connector.getMessageAdapter(result);
+                message = new DefaultMuleMessage(result, connector.getMuleContext());
             }
-            MuleMessage message = new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
             
             //Close or return connection if not in a transaction
             if (tx == null)

@@ -62,7 +62,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointDefaultProperty() throws Exception
     {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("apple", "red");
         props.put(EndpointSelector.DEFAULT_SELECTOR_EXPRESSION, "dest3");
         props.put("banana", "yellow");
@@ -80,7 +80,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         router.setExpression("wayOut");
         router.setEvaluator("header");
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("apple", "red");
         props.put("wayOut", "dest2");
         props.put("banana", "yellow");
@@ -94,7 +94,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
     public void testSelectEndpointNoMatch() throws Exception
     {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(EndpointSelector.DEFAULT_SELECTOR_EXPRESSION, "dest5");
 
         try

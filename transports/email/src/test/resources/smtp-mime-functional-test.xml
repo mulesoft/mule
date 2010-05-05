@@ -11,12 +11,10 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <smtp:connector name="smtpConnector">
-        <service-overrides messageAdapter="org.mule.transport.email.SimpleMailMessageAdapter"
-                           outboundTransformer="org.mule.transformer.NoActionTransformer"/>
+        <service-overrides outboundTransformer="org.mule.transformer.NoActionTransformer"/>
     </smtp:connector>
 
     <model name="test">
-
         <service name="relay">
             <inbound>
                 <vm:inbound-endpoint path="send"/>
@@ -27,7 +25,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

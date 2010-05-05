@@ -10,7 +10,6 @@
 
 package org.mule.transport.vm;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -30,7 +29,6 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return new DefaultMuleMessage("TestMessage", muleContext);
+        return TEST_MESSAGE;
     }
-
 }

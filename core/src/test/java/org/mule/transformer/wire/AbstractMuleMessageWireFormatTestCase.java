@@ -14,15 +14,18 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWireFormatTestCase
 {
 
+    @Override
     public void testWriteReadMessage() throws Exception
     {
         // Create message to send over wire
-        Properties messageProerties = new Properties();
+        Map<String, Object> messageProerties = new HashMap<String, Object>();
         messageProerties.put("key1", "val1");
         MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
 
@@ -37,6 +40,7 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
         assertEquals("val1", ((MuleMessage) outMessage).getProperty("key1"));
     }
 
+    @Override
     public void testWriteReadPayload() throws Exception
     {
         // Create orange to send over the wire

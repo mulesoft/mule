@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleException;
@@ -21,7 +20,6 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.service.Service;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.ExceptionHelper;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.soap.SoapConstants;
@@ -71,17 +69,18 @@ public class AxisServiceProxy
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            MessageAdapter messageAdapter = receiver.getConnector().getMessageAdapter(args);
-            messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
+            MuleMessage messageToRoute = receiver.createMuleMessage(args, 
+                receiver.getEndpoint().getEncoding());
+            messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
             
             // add all custom headers, filter out all mule headers (such as
             // MULE_SESSION) except
             // for MULE_USER header. Filter out other headers like "soapMethods" and
             // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
             // and also filter out any http related header
-            messageAdapter.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
+            messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
                                    
-            MuleMessage message = receiver.routeMessage(new DefaultMuleMessage(messageAdapter, receiver.getConnector().getMuleContext()), synchronous);
+            MuleMessage message = receiver.routeMessage(messageToRoute, synchronous);
             
             if (message != null)
             {

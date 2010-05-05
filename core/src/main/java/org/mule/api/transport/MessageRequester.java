@@ -10,6 +10,8 @@
 
 package org.mule.api.transport;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 
@@ -20,7 +22,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
  */
 public interface MessageRequester extends Connectable, MessageRequesting
 {
-
     /**
      * This method can perform necessary state updates before any of the
      * {@link org.mule.api.transport.MessageDispatching} methods are invoked.
@@ -55,9 +56,12 @@ public interface MessageRequester extends Connectable, MessageRequesting
      */
     Connector getConnector();
 
-
     /**
      * @return the endpoint used for requesting events 
      */
     InboundEndpoint getEndpoint();
+    
+    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+
+    MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

@@ -22,7 +22,6 @@ import org.mule.api.lifecycle.StopException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -195,7 +194,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     @Override
     protected void doInitialise() throws InitialisationException
-    {
+    {        
         try
         {
             connectionFactory = this.createConnectionFactory();
@@ -557,14 +556,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             // connectionFactory = null;
             connection = null;
         }
-    }
-
-    @Override
-    public MessageAdapter getMessageAdapter(Object message) throws MuleException
-    {
-        JmsMessageAdapter adapter = (JmsMessageAdapter) super.getMessageAdapter(message);
-        adapter.setSpecification(this.getSpecification());
-        return adapter;
     }
 
     @Override
@@ -1005,7 +996,17 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public void setSpecification(String specification)
     {
-        this.specification = specification;
+        if (JmsConstants.JMS_SPECIFICATION_11.equals(specification)
+            || (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)))
+        {
+            this.specification = specification;
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "JMS specification needs to be one of the defined values in JmsConstants but was: "
+                                + specification);
+        }
     }
 
     public String getUsername()

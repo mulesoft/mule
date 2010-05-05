@@ -14,14 +14,12 @@ import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Map;
 
 public class ExpressionManagerTestCase extends AbstractMuleTestCase
 {
     public void testManager() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("test", (Map) null, muleContext);
+        MuleMessage message = new DefaultMuleMessage("test", muleContext);
         Object o = muleContext.getExpressionManager().evaluate("function:uuid", message);
         assertNotNull(o);
         o = muleContext.getExpressionManager().evaluate("function:now", message);
@@ -73,7 +71,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
 
     public void testParsing()
     {
-        MuleMessage msg = new DefaultMuleMessage("test", Collections.emptyMap(), muleContext);
+        MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setProperty("user", "vasya");
         msg.setProperty("password", "pupkin");
         msg.setProperty("host", "example.com");

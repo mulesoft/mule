@@ -10,21 +10,18 @@
 
 package org.mule.transport.ftp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
-import org.mule.transport.file.FileConnector;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +67,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
     public void poll() throws Exception
     {
         FTPFile[] files = listFiles();
@@ -151,7 +149,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 return;
             }
-            
+
             try
             {
                 client = connector.createFtpClient(endpoint);
@@ -161,41 +159,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 throw new ConnectException(e, this);
             }
 
-            MuleMessage message;
-            if (connector.isStreaming())
-            {
-                InputStream stream = client.retrieveFileStream(file.getName());
-                if (stream == null)
-                {
-                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                                                               file.getName(), client.getReplyCode()));
-                }
-                message = new DefaultMuleMessage(connector.getMessageAdapter(stream), connector.getMuleContext());
-            }
-            else
-            {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                if (!client.retrieveFile(file.getName(), baos))
-                {
-                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                                                               file.getName(), client.getReplyCode()));
-                }
-                byte[] bytes = baos.toByteArray();
-                if (bytes.length > 0)
-                {
-                    message = new DefaultMuleMessage(connector.getMessageAdapter(bytes), connector.getMuleContext());            
-                }
-                else
-                {
-                    throw new IOException("File " + file.getName() + " is empty (zero bytes)");
-                }
-            }
+            FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(client);
+            MuleMessage message = muleMessageFactory.create(file, endpoint.getEncoding());
 
-            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
-            message.setProperty(FileConnector.PROPERTY_FILE_SIZE, file.getSize());
-            message.setProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.getTimestamp());
             routeMessage(message);
-
             postProcess(client, file, message);
         }
         finally
@@ -205,6 +172,23 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 connector.releaseFtp(endpoint.getEndpointURI(), client);
             }
         }
+    }
+
+    @Override
+    protected void initializeMessageFactory() throws InitialisationException
+    {
+        // Do not initialize the muleMessageFactory instance variable of our super class as 
+        // we're creating MuleMessageFactory instances per request. 
+        // See createMuleMessageFactory(FTPClient) below.
+    }
+    
+    protected FtpMuleMessageFactory createMuleMessageFactory(FTPClient client) throws CreateException
+    {
+        FtpMuleMessageFactory factory = (FtpMuleMessageFactory) createMuleMessageFactory();
+        factory.setStreaming(connector.isStreaming());
+        factory.setFtpClient(client);    
+        
+        return factory;
     }
 
     protected void postProcess(FTPClient client, FTPFile file, MuleMessage message) throws Exception
@@ -229,6 +213,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
     
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
@@ -272,11 +257,13 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         return retryContext;
     }
         
+    @Override
     protected void doDisconnect() throws Exception
     {
         // no op
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

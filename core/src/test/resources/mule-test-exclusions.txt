@@ -27,3 +27,7 @@ org.mule.context.DefaultMuleContextTestCase
 
 #Fails on CE CI server MULE-4008
 org.mule.util.TimedSocketTestCase
+
+# MULE-4204 Remove MessageAdapters
+# This tests tests a message adaptor that will eventually be removed, so disable for now
+org.mule.transport.WriterMessageAdapterSerializationTestCase

@@ -10,7 +10,6 @@
 
 package org.mule.transport.servlet;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -77,9 +76,10 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             else
             {
                 MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+            
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-                MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector().getMessageAdapter(
-                    httpServletRequest), muleContext);
+                
+                MuleMessage message = receiver.createMuleMessage(httpServletRequest);
                 MuleMessage returnMessage = receiver.routeMessage(message, true);
                 writeResponse(httpServletResponse, returnMessage);
             }
@@ -97,12 +97,14 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         try
         {
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
-                .getMessageAdapter(httpServletRequest), muleContext);
+
+            MuleMessage message = receiver.createMuleMessage(httpServletRequest, 
+                receiver.getEndpoint().getEncoding());
+            
             MuleMessage returnMessage = receiver.routeMessage(message, true);
             writeResponse(httpServletResponse, returnMessage);
-
         }
         catch (Exception e)
         {
@@ -117,9 +119,11 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         try
         {
             MessageReceiver receiver = getReceiverForURI(httpServletRequest);
+
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
-            MuleMessage message = new DefaultMuleMessage(receiver.getEndpoint().getConnector()
-                .getMessageAdapter(httpServletRequest), muleContext);
+
+            MuleMessage message = receiver.createMuleMessage(httpServletRequest, 
+                receiver.getEndpoint().getEncoding());
             receiver.routeMessage(message, muleContext.getConfiguration().isDefaultSynchronousEndpoints());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);

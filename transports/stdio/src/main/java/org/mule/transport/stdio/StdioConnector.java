@@ -46,7 +46,7 @@ public abstract class StdioConnector extends AbstractConnector
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         return serviceDescriptor.createMessageReceiver(this, service, endpoint,
-            new Object[]{new Long(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY)});
+            new Object[]{ Long.valueOf(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY) });
     }
 
     @Override

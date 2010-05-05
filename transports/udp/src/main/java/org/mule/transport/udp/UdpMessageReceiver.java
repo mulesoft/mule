@@ -10,7 +10,6 @@
 
 package org.mule.transport.udp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -19,7 +18,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -77,6 +75,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         responseTransformers = getResponseTransformers();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         try
@@ -98,6 +97,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // this will cause the server thread to quit
@@ -109,11 +109,13 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // nothing to do
@@ -207,6 +209,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         dispose();
     }
 
+    @Override
     protected void doDispose()
     {
         if (socket != null && !socket.isClosed())
@@ -260,13 +263,13 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             MuleMessage returnMessage = null;
             try
             {
-                MessageAdapter adapter = connector.getMessageAdapter(packet);
+                MuleMessage message = createMuleMessage(packet, endpoint.getEncoding());
                 final SocketAddress clientAddress = socket.getRemoteSocketAddress();
                 if (clientAddress != null)
                 {
-                    adapter.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
+                    message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
                 }
-                returnMessage = routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
+                returnMessage = routeMessage(message, endpoint.isSynchronous());
 
                 if (returnMessage != null)
                 {

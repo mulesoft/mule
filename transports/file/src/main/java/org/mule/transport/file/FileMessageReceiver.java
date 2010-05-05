@@ -13,15 +13,14 @@ package org.mule.transport.file;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 
@@ -202,10 +201,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
         }
 
-        // This isn't nice but is needed as MessageAdaptor is required to resolve
-        // destination file name, and StreamingReceiverFileInputStream is
-        // required to create MessageAdaptor
-        DefaultMessageAdapter fileParserMsgAdaptor = new DefaultMessageAdapter(null);
+        // This isn't nice but is needed as MuleMessage is required to resolve
+        // destination file name
+        DefaultMuleMessage fileParserMsgAdaptor = new DefaultMuleMessage(null, connector.getMuleContext());
         fileParserMsgAdaptor.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         
         File workFile = null;
@@ -237,17 +235,19 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
-        MessageAdapter msgAdapter;
+        MuleMessage message = null;
+        String encoding = endpoint.getEncoding();
         try
         {
             if (fileConnector.isStreaming())
             {
-                msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(sourceFile, 
-                    fileConnector.isAutoDelete(), destinationFile));
+                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile, 
+                    fileConnector.isAutoDelete(), destinationFile);
+                message = createMuleMessage(payload, encoding);
             }
             else
             {
-                msgAdapter = connector.getMessageAdapter(sourceFile);
+                message = createMuleMessage(sourceFile, encoding);
             }
         }
         catch (FileNotFoundException e)
@@ -257,25 +257,23 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             return;
         }
 
-        msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         if (!fileConnector.isStreaming())
         {
-            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, msgAdapter);
+            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, message);
         }
         else
         {
             // If we are streaming no need to move/delete now, that will be done when
             // stream is closed
-            msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-            this.routeMessage(new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint.isSynchronous());
+            message.setProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+            this.routeMessage(message, endpoint.isSynchronous());
         }
     }
 
-    private void moveAndDelete(final File sourceFile,
-                               File destinationFile,
-                               String sourceFileOriginalName,
-                               MessageAdapter msgAdapter)
+    private void moveAndDelete(final File sourceFile, File destinationFile, 
+        String sourceFileOriginalName, MuleMessage message)
     {
 
         boolean fileWasMoved = false;
@@ -299,15 +297,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
                 }
 
-                // create new MessageAdapter for destinationFile
-                msgAdapter = connector.getMessageAdapter(destinationFile);
-
-                msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-                msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                // create new Message for destinationFile
+                message = createMuleMessage(destinationFile, endpoint.getEncoding());
+                message.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
+                message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
 
             // finally deliver the file message
-            this.routeMessage(new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint.isSynchronous());
+            this.routeMessage(message, endpoint.isSynchronous());
 
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.
@@ -349,7 +346,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             // wrap exception & handle it
             Exception ex = new RoutingException(FileMessages.exceptionWhileProcessing(sourceFile.getName(),
-                (fileWasRolledBack ? "successful" : "unsuccessful")), new DefaultMuleMessage(msgAdapter, connector.getMuleContext()), endpoint, e);
+                (fileWasRolledBack ? "successful" : "unsuccessful")), new DefaultMuleMessage(message, connector.getMuleContext()), endpoint, e);
             this.handleException(ex);
         }
     }
@@ -443,8 +440,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             {
                 todoFiles = readDirectory.listFiles(filenameFilter);
             }
-            // logger.trace("Reading directory " + readDirectory.getAbsolutePath() +
-            // " -> " + TODOFiles.length + " file(s)");
+
             return (todoFiles == null ? NO_FILES : todoFiles);
         }
         catch (Exception e)

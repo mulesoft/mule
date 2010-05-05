@@ -22,13 +22,13 @@ public class MessageRedeliveredException extends MessagingException
      */
     private static final long serialVersionUID = 9013890402770563931L;
 
-    public MessageRedeliveredException(MuleMessage jmsMessage)
+    public MessageRedeliveredException(MuleMessage muleMessage)
     {
-        super(JmsMessages.messageMarkedForRedelivery((JmsMessageAdapter)jmsMessage.getAdapter()), jmsMessage);
+        super(JmsMessages.messageMarkedForRedelivery(muleMessage), muleMessage);
     }
 
-    public MessageRedeliveredException(Message message, MuleMessage jmsMessage)
+    public MessageRedeliveredException(Message message, MuleMessage muleMessage)
     {
-        super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery((JmsMessageAdapter)jmsMessage.getAdapter())), jmsMessage);
+        super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery(muleMessage)), muleMessage);
     }
 }

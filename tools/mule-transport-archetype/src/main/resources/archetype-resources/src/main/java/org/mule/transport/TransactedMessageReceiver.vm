@@ -16,7 +16,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
 
@@ -60,8 +59,8 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
 
         // Here is how to pass the message to Mule.  Most MessageReceivers
         // will need to do nothing more than this
-        MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
+        MuleMessage muleMessage = createMuleMessage(message);
+        routeMessage(muleMessage, endpoint.isSynchronous());
     }
 
     public void doConnect() throws ConnectException

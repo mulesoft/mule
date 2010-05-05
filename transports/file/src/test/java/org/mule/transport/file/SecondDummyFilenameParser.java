@@ -10,14 +10,13 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.transport.MessageAdapter;
+import org.mule.api.MuleMessage;
 
 public class SecondDummyFilenameParser extends DummyFilenameParser
 {
-
-    public String getFilename(MessageAdapter adapter, String pattern)
+    @Override
+    public String getFilename(MuleMessage message, String pattern)
     {
         return null;
     }
-
 }

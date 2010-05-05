@@ -16,7 +16,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.transport.DefaultMessageAdapter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -82,9 +81,8 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         long timeStart = System.currentTimeMillis();
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
-        DefaultMessageAdapter adapter = new DefaultMessageAdapter(stream);
         MuleClient client = new MuleClient();
-        client.dispatch(endpoint, new DefaultMuleMessage(adapter, muleContext));
+        client.dispatch(endpoint, new DefaultMuleMessage(stream, muleContext));
         
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;

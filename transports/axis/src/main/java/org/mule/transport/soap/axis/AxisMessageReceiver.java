@@ -335,6 +335,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         soapService.stop();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // Tell the axis configuration about our new service.
@@ -342,6 +343,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         try
@@ -358,6 +360,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         connector.unregisterReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         if (soapService != null)
@@ -366,6 +369,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         if (soapService != null)
@@ -374,6 +378,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // nothing to do               

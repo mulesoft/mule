@@ -19,6 +19,8 @@ import org.mule.transformer.simple.ObjectToString;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
@@ -27,7 +29,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
     public void testWriteReadMessage() throws Exception
     {
         // Create message to send over wire
-        Properties messageProerties = new Properties();
+        Map<String, Object> messageProerties = new HashMap<String, Object>();
         messageProerties.put("key1", "val1");
         MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
 

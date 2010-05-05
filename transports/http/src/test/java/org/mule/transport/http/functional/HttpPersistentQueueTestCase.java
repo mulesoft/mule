@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.http.HttpConstants;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -85,10 +84,7 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
             MuleMessage message = context.getMessage();
-            
-            // make sure that the message adapter that's deserialized is the right one
-            assertTrue(message.getAdapter() instanceof DefaultMessageAdapter);
-            
+                        
             Object httpMethod = message.getProperty("http.method");
             if (HttpConstants.METHOD_GET.equals(httpMethod))
             {
@@ -102,12 +98,11 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
             {
                 fail("invalid HTTP method : " + httpMethod);
             }
-
+            
             assertEquals("true", message.getProperty(HttpConstants.HEADER_CONNECTION));
             assertEquals("true", message.getProperty(HttpConstants.HEADER_KEEP_ALIVE));
             
             messageDidArrive.countDown();            
         }
-    }
-    
+    } 
 }

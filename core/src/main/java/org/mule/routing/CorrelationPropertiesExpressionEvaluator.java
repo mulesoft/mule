@@ -12,7 +12,6 @@ package org.mule.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 
 /**
@@ -25,23 +24,19 @@ import org.mule.expression.MessageHeaderExpressionEvaluator;
  */
 public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpressionEvaluator
 {
+    @Override
     public final Object evaluate(String name, MuleMessage message)
     {
-        Object result;
-        MessageAdapter msg = null;
-        if (message instanceof MessageAdapter)
-        {
-            msg = message;
-        }
-        if (msg != null)
+        Object result = null;
+        if (message != null)
         {
             if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name))
             {
-                result = getCorrelationId(msg);
+                result = getCorrelationId(message);
             }
             else if (MuleProperties.MULE_MESSAGE_ID_PROPERTY.equals(name))
             {
-                result = getMessageId(msg);
+                result = getMessageId(message);
             }
             else
             {
@@ -61,12 +56,12 @@ public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpre
         return result;
     }
 
-    public String getMessageId(MessageAdapter message)
+    public String getMessageId(MuleMessage message)
     {
         return message.getUniqueId();
     }
 
-    public String getCorrelationId(MessageAdapter message)
+    public String getCorrelationId(MuleMessage message)
     {
         String id = message.getCorrelationId();
         if (id == null)

@@ -10,14 +10,12 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
 import org.jivesoftware.smack.packet.Message;
@@ -73,9 +71,7 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void processMessage(Message xmppMessage) throws MuleException
     {
-        MessageAdapter messageAdapter = connector.getMessageAdapter(xmppMessage);
-        MuleMessage muleMessage = new DefaultMuleMessage(messageAdapter, connector.getMuleContext());
-        
+        MuleMessage muleMessage = createMuleMessage(xmppMessage);        
         routeMessage(muleMessage, endpoint.isSynchronous());
     }
 }    

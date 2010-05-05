@@ -10,7 +10,6 @@
 
 package org.mule.transport.servlet;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
@@ -209,8 +208,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         try
         {
             MessageReceiver receiver = getReceiverForURI(request);
-
-            MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
+            
+            MuleMessage requestMessage = receiver.createMuleMessage(request);
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
 
             setupRequestMessage(request, requestMessage, receiver);

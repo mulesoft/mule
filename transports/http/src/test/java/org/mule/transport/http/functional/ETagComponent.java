@@ -13,32 +13,28 @@ package org.mule.transport.http.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 public class ETagComponent implements org.mule.api.lifecycle.Callable
 {
-    String ETAG_VALUE = "0123456789";
+    private static String ETAG_VALUE = "0123456789";
     
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        MuleMessage msg = eventContext.getMessage();
+        MuleMessage message = eventContext.getMessage();
         
-        String etag = msg.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
-        if (etag != null && etag.equals(ETAG_VALUE))
+        String etag = message.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
+        if ((etag != null) && etag.equals(ETAG_VALUE))
         {
-           DefaultMessageAdapter res = new DefaultMessageAdapter(StringUtils.EMPTY);
-           res.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 304);
-           msg = new DefaultMuleMessage(res, eventContext.getMuleContext());
+            message = new DefaultMuleMessage(StringUtils.EMPTY, eventContext.getMuleContext());
+            message.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_MODIFIED);
         }
         
-        msg.setProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);
-        
-        return msg;
+        message.setProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);        
+        return message;
     }
-
 }
 
 

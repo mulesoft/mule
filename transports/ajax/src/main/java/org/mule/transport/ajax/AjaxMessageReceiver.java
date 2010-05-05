@@ -9,7 +9,6 @@
  */
 package org.mule.transport.ajax;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -18,12 +17,12 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 
 import org.cometd.Bayeux;
 import org.cometd.Client;
+
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.BayeuxService;
 
@@ -59,15 +58,16 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
 
         public Object route(Client client, Object data) throws Exception
         {
-            MessageAdapter adapter = getConnector().getMessageAdapter(data);
+            AbstractConnector connector = (AbstractConnector) getConnector();
+            MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
 
-            Object replyTo = adapter.getReplyTo();
-            MuleMessage message = AjaxMessageReceiver.this.routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
+            Object replyTo = messageToRoute.getReplyTo();
+            MuleMessage message = AjaxMessageReceiver.this.routeMessage(messageToRoute);
             //If a replyTo channel is set the client is expecting a response.
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            if((message!=null && message.getExceptionPayload()==null) && replyTo!=null)
+            if ((message != null && message.getExceptionPayload() == null) && replyTo != null)
             {
-                ((AbstractConnector)getConnector()).getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
+                connector.getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
             return null;
         }

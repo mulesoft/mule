@@ -10,8 +10,8 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.StartException;
@@ -20,7 +20,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.AbstractMessageReceiver;
@@ -76,11 +75,13 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         try
@@ -134,6 +135,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -158,6 +160,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         try
@@ -173,6 +176,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         closeConsumer();
@@ -213,6 +217,8 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             {
                 TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
                         connector.getExceptionListener(), connector.getMuleContext());
+
+                final String encoding = endpoint.getEncoding();
 
                 if (receiveMessagesInTransaction)
                 {
@@ -260,8 +266,8 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                                 redeliveryHandler.handleRedelivery(message);
                             }
 
-                            MessageAdapter adapter = connector.getMessageAdapter(message);
-                            routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
+                            MuleMessage messageToRoute = createMuleMessage(message, encoding);
+                            routeMessage(messageToRoute);
                             return null;
                         }
                     };
@@ -269,23 +275,19 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                 }
                 else
                 {
-                    MessageAdapter adapter = connector.getMessageAdapter(message);
-                    routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()));
+                    MuleMessage messageToRoute = createMuleMessage(message, encoding);
+                    routeMessage(messageToRoute);
                 }
-
             }
             catch (Exception e)
             {
                 getConnector().handleException(e);
             }
-
         }
 
         public void release()
         {
             // Nothing to release.
         }
-
     }
-
 }

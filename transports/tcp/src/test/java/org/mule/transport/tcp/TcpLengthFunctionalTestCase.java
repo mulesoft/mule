@@ -14,9 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TcpLengthFunctionalTestCase extends FunctionalTestCase
 {
 
@@ -36,16 +33,14 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     public void testDispatchAndReplyViaStream() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, props);
+        client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, null);
         // MULE-2754
         Thread.sleep(200);
         MuleMessage result =  client.request("asyncClientEndpoint1", timeout);
@@ -56,8 +51,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
     public void testDispatchAndReply() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
-        client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, props);
+        client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, null);
         // MULE-2754
         Thread.sleep(200);
         MuleMessage result =  client.request("asyncClientEndpoint2", timeout);

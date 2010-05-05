@@ -21,6 +21,7 @@ import java.util.Map;
 public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/property-scribbling-mule-893-test.xml";
@@ -29,15 +30,16 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
     public void testSingleMessage() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map properties = new HashMap();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
+        
         client.dispatch("dispatch", "Message", properties);
         MuleMessage response = client.request("receive", 3000L);
         assertNotNull("Response is null", response);
         assertEquals("Message Received", response.getPayload());
     }
 
-    public void testManyMessage() throws Exception
+    public void testManyMessages() throws Exception
     {
         for (int i = 0; i < 1000; i++)
         {

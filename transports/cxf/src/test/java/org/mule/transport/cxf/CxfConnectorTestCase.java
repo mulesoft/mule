@@ -10,20 +10,22 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.DefaultMessageAdapter;
 
 public class CxfConnectorTestCase extends AbstractConnectorTestCase
 {
+    @Override
     public String getTestEndpointURI()
     {
         return "cxf:http://localhost:38009/cxf";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
-        return new DefaultMessageAdapter("");
+        return new DefaultMuleMessage("", muleContext);
     }
 
     @Override

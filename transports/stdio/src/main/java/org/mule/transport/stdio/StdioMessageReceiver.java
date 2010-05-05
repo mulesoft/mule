@@ -10,7 +10,6 @@
 
 package org.mule.transport.stdio;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -99,6 +98,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     @Override
     public void poll()
     {
+        String encoding = endpoint.getEncoding();
         try
         {
             if (sendStream)
@@ -109,7 +109,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 int i = in.read();
                 //Roll back our read
                 in.unread(i);
-                MuleMessage message = new DefaultMuleMessage(connector.getMessageAdapter(in), connector.getMuleContext());
+                MuleMessage message = createMuleMessage(in, encoding);
                 routeMessage(message, endpoint.isSynchronous());
             }
             else
@@ -137,8 +137,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 String[] lines = fullBuffer.toString().split(SystemUtils.LINE_SEPARATOR);
                 for (int i = 0; i < lines.length; ++i)
                 {                
-                    routeMessage(new DefaultMuleMessage(connector.getMessageAdapter(lines[i]), connector.getMuleContext()), 
-                                 endpoint.isSynchronous());
+                    MuleMessage message = createMuleMessage(lines[i], encoding);
+                    routeMessage(message, endpoint.isSynchronous());
                 }
             }
 

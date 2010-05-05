@@ -31,7 +31,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
    public void testTcpTcpRemoteSync() throws Exception
    {
        MuleClient client = new MuleClient();
-       Map props = new HashMap();
+       Map<String, Object> props = new HashMap<String, Object>();
        
        //must notify the client to wait for a response from the server
        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
@@ -40,13 +40,12 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
        assertNotNull(reply);
        assertNotNull(reply.getPayload());
        assertEquals("Received: " + message, reply.getPayloadAsString());
-       
    }
     
     public void testTcpVmRemoteSync() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         
         //must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);

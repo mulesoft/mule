@@ -49,18 +49,23 @@ public class MuleInvoker implements Invoker
 
     public Object invoke(Exchange exchange, Object o)
     {
-        
         MuleMessage message = null;
         try
         {
+            // this is the original request. Keep it to copy all the message properties from it
             MuleMessage reqMsg = (MuleMessage) exchange.getInMessage().get(CxfConstants.MULE_MESSAGE);
-            CxfMessageAdapter messageAdapter = (CxfMessageAdapter) receiver.getConnector().getMessageAdapter(
-                reqMsg);
-            messageAdapter.setPayload(exchange.getInMessage());
-
+            
+            // create a temporary MuleMessage using the MuleMessageFactory to make sure that
+            // the payload is properly handled
+            MuleMessage cxfMessage = receiver.createMuleMessage(exchange.getInMessage());
+            
+            // create the request message from the properly converted payload in cxfMessage and
+            // all the message properties in the original request
+            MuleMessage muleReq = new DefaultMuleMessage(cxfMessage.getPayload(), reqMsg, 
+                receiver.getConnector().getMuleContext());
+            
             BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
             Service svc = exchange.get(Service.class);
-            
             if (!receiver.isProxy())
             {
                 MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
@@ -70,11 +75,9 @@ public class MuleInvoker implements Invoker
                     m = matchMethod(m, targetClass);
                 }
             
-                messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
+                muleReq.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
             }
-            
-            DefaultMuleMessage muleReq = new DefaultMuleMessage(messageAdapter, receiver.getConnector().getMuleContext());
-            
+
             if (bop != null)
             {
                 muleReq.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);

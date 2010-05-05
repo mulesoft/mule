@@ -11,7 +11,6 @@
 package org.mule;
 
 import org.mule.api.ThreadSafeAccess;
-import org.mule.transport.DefaultMessageAdapter;
 
 import java.util.Map;
 
@@ -25,16 +24,10 @@ public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 
     public void testMessage() throws InterruptedException
     {
-        basicPattern(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
-        newCopy(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
-        resetAccessControl(new DefaultMuleMessage(new Object(), (Map)null, muleContext));
-    }
-
-    public void testAdapter() throws InterruptedException
-    {
-        basicPattern(new DefaultMessageAdapter(new Object()));
-        newCopy(new DefaultMessageAdapter(new Object()));
-        resetAccessControl(new DefaultMessageAdapter(new Object()));
+        Map<String, Object> nullMap = null;
+        basicPattern(new DefaultMuleMessage(new Object(), nullMap, muleContext));
+        newCopy(new DefaultMuleMessage(new Object(), nullMap, muleContext));
+        resetAccessControl(new DefaultMuleMessage(new Object(), nullMap, muleContext));
     }
 
     public void testEvent() throws Exception

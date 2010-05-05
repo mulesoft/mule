@@ -15,8 +15,6 @@ import org.mule.transport.AbstractConnectorTestCase;
 
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
-
-    @Override
     public Connector createConnector() throws Exception
     {
         TcpConnector c = new TcpConnector(muleContext);
@@ -34,14 +32,9 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
-    public void testValidListener() throws Exception
-    {
-        // TODO Implement
-    }
-
     public void testProperties() throws Exception
     {
-        TcpConnector c = (TcpConnector)getConnector();
+        TcpConnector c = (TcpConnector) getConnector();
 
         c.setSendBufferSize(1024);
         assertEquals(1024, c.getSendBufferSize());

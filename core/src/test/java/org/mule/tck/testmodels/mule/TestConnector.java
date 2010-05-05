@@ -12,16 +12,13 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -47,6 +44,7 @@ public class TestConnector extends AbstractConnector
         super(context);
         setDispatcherFactory(new AbstractMessageDispatcherFactory()
         {
+            @Override
             public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
             {
                 return new TestMessageDispatcher(endpoint);
@@ -59,39 +57,40 @@ public class TestConnector extends AbstractConnector
         return TEST;
     }
 
+    @Override
     protected void doInitialise() 
     {
         initialiseCount++;
     }
 
+    @Override
     protected void doConnect() 
     {
         connectCount++;
     }
 
+    @Override
     protected void doStart() 
     {
         startCount++;
     }
 
+    @Override
     protected void doStop() 
     {
         stopCount++;
     }
 
+    @Override
     protected void doDisconnect() 
     {
         disconnectCount++;
     }
 
+    @Override
     protected void doDispose() 
     {
         disposeCount++;
-    }
-
-    public MessageAdapter getMessageAdapter(Object message) throws MuleException
-    {
-        return new DummyMessageAdapter(message);
     }
 
     public String getSomeProperty()
@@ -104,36 +103,43 @@ public class TestConnector extends AbstractConnector
         this.someProperty = someProperty;
     }
 
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         MessageReceiver receiver = new AbstractMessageReceiver(this, service, endpoint)
         {
 
+            @Override
             protected void doInitialise() throws InitialisationException
             {
                 //nothing to do
             }
 
+            @Override
             protected void doConnect() throws Exception
             {
                 // nothing to do
             }
 
+            @Override
             protected void doDisconnect() throws Exception
             {
                 // nothing to do
             }
 
+            @Override
             protected void doStart() throws MuleException
             {
                 // nothing to do
             }
 
+            @Override
             protected void doStop() throws MuleException
             {
                 // nothing to do
             }
 
+            @Override
             protected void doDispose()
             {
                 // nothing to do               
@@ -145,6 +151,7 @@ public class TestConnector extends AbstractConnector
     /**
      * Open up the access to the service descriptor for testing purposes.
      */
+    @Override
     public TransportServiceDescriptor getServiceDescriptor()
     {
         return super.getServiceDescriptor();
@@ -153,47 +160,6 @@ public class TestConnector extends AbstractConnector
     public void destroyReceiver(MessageReceiver receiver, InboundEndpoint endpoint) throws Exception
     {
         // nothing to do
-    }
-
-    public class DummyMessageAdapter extends AbstractMessageAdapter
-    {
-        /**
-         * Serial version
-         */
-        private static final long serialVersionUID = -2304322766342059136L;
-
-        private Object message = new String("DummyMessage");
-
-        public DummyMessageAdapter(Object message)
-        {
-            this.message = message;
-        }
-
-        public Object getPayload()
-        {
-            return message;
-        }
-
-        public byte[] getPayloadAsBytes() throws Exception
-        {
-
-            return message.toString().getBytes();
-        }
-
-        public String getPayloadAsString(String encoding) throws Exception
-        {
-            return message.toString();
-        }
-
-        public void setPayload(Object payload)
-        {
-            this.message = payload;
-        }
-
-        public ThreadSafeAccess newThreadCopy()
-        {
-            return this;
-        }
     }
 
     public int getInitialiseCount() 

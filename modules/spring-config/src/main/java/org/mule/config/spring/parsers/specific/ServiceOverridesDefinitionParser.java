@@ -25,20 +25,20 @@ import org.w3c.dom.Element;
  */
 public class ServiceOverridesDefinitionParser extends ChildDefinitionParser
 {
-
     public ServiceOverridesDefinitionParser()
     {
         super("serviceOverrides", HashMap.class);
     }
 
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        Map overrides = new HashMap();
+        Map<String, String> overrides = new HashMap<String, String>();
         addOverride(overrides, element, "messageReceiver", MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "transactedMessageReceiver", MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "xaTransactedMessageReceiver", MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "dispatcherFactory", MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
-        addOverride(overrides, element, "messageAdapter", MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
+        addOverride(overrides, element, "messageFactory", MuleProperties.CONNECTOR_MESSAGE_FACTORY);
         addOverride(overrides, element, "inboundTransformer", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
         addOverride(overrides, element, "outboundTransformer", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
         addOverride(overrides, element, "responseTransformer", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
@@ -50,7 +50,7 @@ public class ServiceOverridesDefinitionParser extends ChildDefinitionParser
         getBeanAssembler(element, builder).extendTarget(getPropertyName(element), overrides, false);
     }
 
-    protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)
+    protected void addOverride(Map<String, String> overrides, Element e, String attributeName, String overrideName)
     {
         String value = e.getAttribute(attributeName);
         if (!StringUtils.isBlank(value))

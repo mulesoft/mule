@@ -11,10 +11,8 @@
 package org.mule;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
@@ -54,15 +52,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         assertEquals(TEST_MESSAGE, message.getPayload());
     }
-        
-    public void testOneArgConstructorWithMessageAdapterAsPayload()
-    {
-        MessageAdapter adapter = createMessageAdapter();
-        
-        MuleMessage message = new DefaultMuleMessage(adapter, muleContext);        
-        assertEquals("MESSAGE_ADAPTER", message.getPayload());
-        assertOutboundMessageProperty("MessageAdapter", message);
-    }
 
     public void testOneArgConstructorWithMuleMessageAsPayload()
     {
@@ -84,17 +73,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(TEST_MESSAGE, message.getPayload());
         assertOutboundMessageProperty("MessageProperties", message);
     }
-
-    public void testMessagePropertiesConstructorWithMessageAdapterAsPayload()
-    {
-        Map<String, Object> properties = createMessageProperties();
-        MessageAdapter messageAdapter = createMessageAdapter();
-        
-        MuleMessage message = new DefaultMuleMessage(messageAdapter, properties, muleContext);
-        assertEquals("MESSAGE_ADAPTER", message.getPayload());
-        assertOutboundMessageProperty("MessageProperties", message);
-        assertOutboundMessageProperty("MessageAdapter", message);
-    }
     
     public void testMessagePropertiesConstructorWithMuleMessageAsPayload()
     {
@@ -111,16 +89,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // ctor with previous message
     //
-    public void testPreviousMessageConstructorWithRegularPayloadAndMessageAdapterAsPrevious()
-    {
-        MessageAdapter previous = createMessageAdapter();
-        
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous, muleContext);
-        assertEquals(TEST_MESSAGE, message.getPayload());
-        assertOutboundMessageProperty("MessageAdapter", message);
-        assertEquals(previous.getUniqueId(), message.getUniqueId());
-    }
-    
     public void testPreviousMessageConstructorWithRegularPayloadAndMuleMessageAsPrevious()
     {
         MuleMessage previous = createMuleMessage();
@@ -129,43 +97,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(TEST_MESSAGE, message.getPayload());
         assertOutboundMessageProperty("MuleMessage", message);
         assertEquals(previous.getUniqueId(), message.getUniqueId());
-    }
-    
-    public void testPreviousMessageConstructorWithMessageAdapterAsPayloadAndMessageAdapterAsPrevious()
-    {
-        MessageAdapter payload = createMessageAdapter();
-        
-        MessageAdapter previous = createMessageAdapter();
-        previous.setProperty("previous", "previous");
-        
-        MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
-        assertEquals("MESSAGE_ADAPTER", message.getPayload());
-        assertOutboundMessageProperty("MessageAdapter", message);
-        assertFalse(previous.getUniqueId().equals(message.getUniqueId()));
-    }
-
-    public void testPreviousMessageConstructorWithMessageAdapterAsPayloadAndMuleMessageAsPrevious()
-    {
-        MessageAdapter payload = createMessageAdapter();
-        MuleMessage previous = createMuleMessage();
-        
-        MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
-        assertEquals("MESSAGE_ADAPTER", message.getPayload());
-        assertOutboundMessageProperty("MessageAdapter", message);
-        assertNull(message.getProperty("MuleMessage"));
-        assertFalse(previous.getUniqueId().equals(message.getUniqueId()));
-    }
-
-    public void testPreviousMessageConstructorWithMuleMessageAsPayloadAndMessageAdapterAsPrevious()
-    {
-        MuleMessage payload = createMuleMessage();
-        MessageAdapter previous = createMessageAdapter();
-        
-        MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
-        assertEquals("MULE_MESSAGE", message.getPayload());
-        assertOutboundMessageProperty("MuleMessage", message);
-        assertNull(message.getProperty("MessageAdapter"));
-        assertFalse(previous.getUniqueId().equals(message.getUniqueId()));
     }
     
     public void testPreviousMessageConstructorWithMuleMessageAsPayloadAndMuleMessageAsPrevious()
@@ -181,7 +112,27 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertOutboundMessageProperty("MuleMessage", message);
         assertOutboundMessageProperty("payload", message);
         assertNull(message.getProperty("MessageAdapter"));
-        assertFalse(previous.getUniqueId().equals(message.getUniqueId()));
+        assertEquals(previous.getUniqueId(), message.getUniqueId());
+    }
+    
+    //
+    // copy ctor
+    //
+    public void testCopyConstructor() throws Exception
+    {
+        DefaultMuleMessage original = (DefaultMuleMessage) createMuleMessage();
+        Map<String, Object> properties = createMessageProperties();
+        original.addInboundProperties(properties);
+        assertInboundAndOutboundMessageProperties(original);
+        
+        MuleMessage copy = DefaultMuleMessage.copy(original);        
+        assertInboundAndOutboundMessageProperties(copy);
+    }
+
+    private void assertInboundAndOutboundMessageProperties(MuleMessage original)
+    {
+        assertOutboundMessageProperty("MuleMessage", original);
+        assertEquals("MessageProperties", original.getProperty("MessageProperties", PropertyScope.INBOUND));
     }
 
     //
@@ -198,9 +149,9 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(handler, message.getAttachment("attachment"));
     }
     
-    public void testNewMuleMessageFromMessageAdapterWithAttachment() throws Exception
+    public void testNewMuleMessageFromMuleMessageWithAttachment() throws Exception
     {
-        MessageAdapter previous = createMessageAdapter();
+        MuleMessage previous = createMuleMessage();
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
         previous.addAttachment("attachment", handler);
         
@@ -217,13 +168,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         HashMap<String,Object> map = new HashMap<String, Object>();
         map.put("MessageProperties", "MessageProperties");
         return map;
-    }
-
-    private MessageAdapter createMessageAdapter()
-    {
-        MessageAdapter adapter = new DefaultMessageAdapter("MESSAGE_ADAPTER");
-        adapter.setProperty("MessageAdapter", "MessageAdapter");
-        return adapter;
     }
     
     private MuleMessage createMuleMessage()

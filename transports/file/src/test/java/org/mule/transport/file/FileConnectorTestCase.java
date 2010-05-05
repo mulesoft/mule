@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -23,12 +24,14 @@ import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
-    static final long POLLING_FREQUENCY = 1234;
-    static final long POLLING_FREQUENCY_OVERRIDE = 4321;
-
+    private static final long POLLING_FREQUENCY = 1234;
+    private static final long POLLING_FREQUENCY_OVERRIDE = 4321;
+    private static final String VALID_MESSAGE = "validMessage";
+    
     private File validMessage;
 
     @Override
@@ -45,7 +48,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         validMessage = File.createTempFile("simple", ".mule", tempDir);
         assertNotNull(validMessage);
-        FileUtils.writeStringToFile(validMessage, "validMessage");
+        FileUtils.writeStringToFile(validMessage, VALID_MESSAGE);
     }
 
     @Override
@@ -113,7 +116,6 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
                 ((FileMessageReceiver) receiver).getFrequency());
     }
 
-
     public void testOutputAppendEndpointOverride() throws Exception
     {
         FileConnector connector = (FileConnector) getConnector();
@@ -147,5 +149,21 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 //        // value must be unchanged
 //        assertEquals(1, connector.getMaxDispatchersActive());
     }
+    
+    /**
+     * If the connector is configured not to do streaming it converts to byte[] so the original
+     * input payload is not the same as the payload in the MuleMessage
+     */
+    public void testConnectorMessageFactoryNonStreaming() throws Exception
+    {
+        Connector connector = getConnectorAndAssert();
+        ((FileConnector) connector).setStreaming(false);
 
+        Object payload = getValidMessage();
+        MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding);
+        assertNotNull(message);
+        
+        byte[] messagePayload = (byte[]) message.getPayload();
+        assertTrue(Arrays.equals(VALID_MESSAGE.getBytes(), messagePayload));
+    }
 }

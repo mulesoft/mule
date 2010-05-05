@@ -68,7 +68,7 @@ public class JmsTransformerTestCase extends AbstractMuleTestCase
         mockMessage.expect("setObjectProperty", setPropertyMatcher);
 
         Message mockTextMessage = (Message)mockMessage.proxy();
-        MuleMessage msg = new DefaultMuleMessage(new JmsMessageAdapter(mockTextMessage), muleContext);
+        MuleMessage msg = new DefaultMuleMessage(mockTextMessage, muleContext);
 
         // Now we set a custom "JMS-like" property on the MuleMessage
         msg.setProperty("JMS_CUSTOM_PROPERTY", "customValue");

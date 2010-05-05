@@ -25,10 +25,12 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.transport.ajax.AjaxMessageReceiver;
+import org.mule.transport.ajax.AjaxMuleMessageFactory;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -51,11 +53,15 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 {
     public static final String PROTOCOL = "ajax";
 
+    /**
+     * This is the key that's used to retrieve the reply to destination from a {@link Map} that's
+     * passed into {@link AjaxMuleMessageFactory}.
+     */
+    public static final String REPLYTO_PARAM = "replyTo";
+
     private Server httpServer;
 
     private HashMap<String, BayeuxHolder> connectors = new HashMap<String, BayeuxHolder>();
-
-
 
     public AjaxConnector(MuleContext context)
     {
@@ -64,6 +70,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         setInitialStateStopped(true);
     }
 
+    @Override
     public String getProtocol()
     {
         return PROTOCOL;
@@ -135,6 +142,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
      * Template method to dispose any resources associated with this receiver. There
      * is not need to dispose the connector as this is already done by the framework
      */
+    @Override
     protected void doDispose()
     {
         try
@@ -148,6 +156,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         connectors.clear();
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
        try
@@ -160,6 +169,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         try
@@ -182,6 +192,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     /**
      * Template method where any connections should be made for the connector
      */
+    @Override
     protected void doConnect() throws Exception
     {
         //do nothing
@@ -191,6 +202,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
      * Template method where any connected resources used by the connector should be
      * disconnected
      */
+    @Override
     protected void doDisconnect() throws Exception
     {
         //do nothing

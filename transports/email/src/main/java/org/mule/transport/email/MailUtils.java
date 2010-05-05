@@ -28,7 +28,6 @@ import javax.mail.internet.InternetAddress;
  */
 public class MailUtils
 {
-
     public static String internetAddressesToString(InternetAddress[] addresses)
     {
         if (addresses == null || addresses.length == 0)
@@ -129,6 +128,39 @@ public class MailUtils
                 }
                 attachments.put(key, p);
             }
+        }
+    }
+
+    /**
+     * Check whether a property name has the format associated with a list
+     * of header values
+     *
+     * @param name A property name
+     * @return true if the name is associated with a list of header values
+     *         (more exactly, if it starts with HEADER_LIST_PREFIX, which gives an
+     *         invalid header name according to RFC822).
+     */
+    public static boolean isListHeader(String name)
+    {
+        return null != name && name.startsWith(MailMuleMessageFactory.HEADER_LIST_PREFIX);
+    }
+
+    /**
+     * Convert a header name to the property name associated with a list of
+     * header values (ie prepend the prefix)
+     *
+     * @param header A header name
+     * @return The associated list property name (ie with HEADER_LIST_PREFIX prepended)
+     */
+    public static String toListHeader(String header)
+    {
+        if (isListHeader(header))
+        {
+            return header;
+        }
+        else
+        {
+            return MailMuleMessageFactory.HEADER_LIST_PREFIX + header;
         }
     }
 }

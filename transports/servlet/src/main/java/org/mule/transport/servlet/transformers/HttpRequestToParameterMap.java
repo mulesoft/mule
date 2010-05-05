@@ -13,7 +13,7 @@ package org.mule.transport.servlet.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.transport.servlet.HttpRequestMessageAdapter;
+import org.mule.transport.servlet.ServletConnector;
 
 import java.util.Map;
 
@@ -29,9 +29,9 @@ public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
         setReturnClass(Map.class);
     }
 
+    @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
-        return messageAdapter.getRequestParameters();
+        return message.getProperty(ServletConnector.PARAMETER_MAP_PROPERTY_KEY);
     }
 }

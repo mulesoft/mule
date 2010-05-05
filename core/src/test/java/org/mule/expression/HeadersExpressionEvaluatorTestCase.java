@@ -11,8 +11,11 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.UUID;
 
 import java.util.HashMap;
 import java.util.List;
@@ -60,8 +63,6 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //Expected
         }
-
-
     }
 
     public void testMapHeaders() throws Exception
@@ -282,6 +283,69 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         catch (ExpressionRuntimeException e)
         {
             //expected
+        }
+    }
+    
+    public void testCorrelationManagerCorrelationId()
+    {
+        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
+        String correlationId = UUID.getUUID();
+        
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        message.setCorrelationId(correlationId);
+        
+        Object result = evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+        assertNotNull(result);
+        assertEquals(correlationId, result);
+    }
+    
+    public void testCorrelationManagerNullResult()
+    {
+        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
+        
+        DefaultMuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        message.setUniqueId(null);
+        
+        try
+        {
+            evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            fail("Null result on CorrelationPropertiesExpressionEvaluator must throw");
+        }
+        catch (IllegalArgumentException iae)
+        {
+            // this one was expected
+        }
+    }    
+    
+    public void testCorrelationManagerUniqueId()
+    {
+        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
+        
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);        
+        Object result = evaluator.evaluate(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
+        assertNotNull(result);
+        assertEquals(message.getUniqueId(), result);
+    }
+    
+//    public void testCorrelationManagerNullInput()
+//    {
+//        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
+//        evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, null);
+//    }
+    
+    public void testCorrelationManagerInvalidKey()
+    {
+        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
+
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        try
+        {
+            evaluator.evaluate("invalid-key", message);
+            fail("invalid key on CorrelationPropertiesExpressionEvaluator must fail");
+        }
+        catch (IllegalArgumentException iax)
+        {
+            // this one was expected
         }
     }
 }

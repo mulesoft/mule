@@ -21,7 +21,6 @@ import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transport.DefaultMessageAdapter;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -178,7 +177,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     {
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
         MuleSession session = getTestSession(getTestService(), muleContext);
-        MuleMessage message = new DefaultMuleMessage(new DefaultMessageAdapter(new StringBuffer()), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new StringBuffer(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
         filterRouter.setMessageProperties(session, message, endpoint);
         assertNotNull(message.getCorrelationId());

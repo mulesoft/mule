@@ -11,16 +11,16 @@
 package org.mule.module.scripting.component;
 
 import org.mule.DefaultMuleEventContext;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -166,8 +166,6 @@ public class Scriptable implements Initialisable, MuleContextAware
                 throw new InitialisationException(e, this);
             }
         }
-
-
     }
 
     public void populateDefaultBindings(Bindings bindings)
@@ -193,12 +191,12 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("src", payload);
     }
     
-    public void populateBindings(Bindings bindings, MessageAdapter message)
+    public void populateBindings(Bindings bindings, MuleMessage message)
     {
         populateDefaultBindings(bindings);
         if (message == null)
         {
-            message = new DefaultMessageAdapter(NullPayload.getInstance());
+            message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
         bindings.put("message", message);
         //This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called

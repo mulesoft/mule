@@ -10,7 +10,6 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -66,7 +65,7 @@ public class XmppMessageRequester extends AbstractMessageRequester
         
         if (message != null)
         {
-            return new DefaultMuleMessage(connector.getMessageAdapter(message), connector.getMuleContext());
+            return createMuleMessage(message, endpoint.getEncoding());
         }
         else
         {

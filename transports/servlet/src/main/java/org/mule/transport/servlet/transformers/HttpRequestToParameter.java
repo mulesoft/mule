@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.servlet.AbstractReceiverServlet;
-import org.mule.transport.servlet.HttpRequestMessageAdapter;
+import org.mule.transport.servlet.ServletConnector;
 import org.mule.util.SystemUtils;
 
 import java.io.BufferedReader;
@@ -25,39 +25,43 @@ import java.util.Properties;
 
 public class HttpRequestToParameter extends AbstractMessageAwareTransformer
 {
-
     public HttpRequestToParameter()
     {
         registerSourceType(Object.class);
         setReturnClass(String.class);
     }
 
+    @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        HttpRequestMessageAdapter messageAdapter = (HttpRequestMessageAdapter) message.getAdapter();
-
-        String payloadParam = messageAdapter.getStringProperty(
+        String payloadParam = message.getStringProperty(
             AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME, 
             AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
         
-        String payload = messageAdapter.getStringProperty(payloadParam, null);
+        String payload = message.getStringProperty(payloadParam, null);
         if (payload == null)
         {
             // Plain text
-            if (messageAdapter.getContentType() == null || messageAdapter.getContentType().startsWith("text/"))
+            String contentType = 
+                message.getStringProperty(ServletConnector.CONTENT_TYPE_PROPERTY_KEY, null);
+            if ((contentType == null) || contentType.startsWith("text/"))
             {
                 try
                 {
                     InputStream is = (InputStream) message.getPayload();
+                    
+                    String characterEncoding = 
+                        message.getStringProperty(ServletConnector.CHARACTER_ENCODING_PROPERTY_KEY, null);
                     BufferedReader reader;
-                    if (messageAdapter.getCharacterEncoding() != null)
+                    if (characterEncoding != null)
                     {
-                        reader = new BufferedReader(new InputStreamReader(is, messageAdapter.getCharacterEncoding()));
+                        reader = new BufferedReader(new InputStreamReader(is, characterEncoding));
                     }
                     else
                     {
                         reader = new BufferedReader(new InputStreamReader(is));
                     }
+                    
                     StringBuffer buffer = new StringBuffer(8192);
                     String line = reader.readLine();
                     while (line != null)
@@ -73,9 +77,8 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                     throw new TransformerException(this, e);
                 }
             }
-            
             // HTTP Form
-            else if (messageAdapter.getContentType().equals("application/x-www-form-urlencoded"))
+            else if (contentType.equals("application/x-www-form-urlencoded"))
             {
                 InputStream is = (InputStream) message.getPayload();
                 Properties props = new Properties();

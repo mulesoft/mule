@@ -10,7 +10,6 @@
 
 package org.mule.transport.bpm;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
@@ -80,7 +79,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
         else
         {
-            message = new DefaultMuleMessage(connector.getMessageAdapter(payload), connector.getMuleContext());
+            message = createMuleMessage(payload, this.endpoint.getEncoding());
         }
         message.addProperties(messageProperties);
 

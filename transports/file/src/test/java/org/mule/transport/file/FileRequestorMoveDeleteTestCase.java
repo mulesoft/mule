@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -103,7 +102,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+        File moveToDir = configureConnector(inFile, false, true, false, FileMuleMessageFactory.class);
 
         // TODO MULE-3198
         // assertRequested(request(inFile), inFile, false);
@@ -114,7 +113,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, true, false, FileMessageAdapter.class);
+        File moveToDir = configureConnector(inFile, false, true, false, FileMuleMessageFactory.class);
 
         // TODO MULE-3198
         // assertRequested(request(inFile), inFile, false);
@@ -125,7 +124,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, false, true, FileMessageAdapter.class);
+        File moveToDir = configureConnector(inFile, false, false, true, FileMuleMessageFactory.class);
 
         // TODO MULE-3198
         // assertRequested(request(inFile), inFile, false);
@@ -136,7 +135,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     {
         File inFile = initForRequest();
 
-        File moveToDir = configureConnector(inFile, false, false, false, FileMessageAdapter.class);
+        File moveToDir = configureConnector(inFile, false, false, false, FileMuleMessageFactory.class);
 
         // TODO MULE-3198
         // assertRequested(request(inFile), inFile, false);
@@ -152,19 +151,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         Thread.sleep(2000);
 
         assertNotNull(message);
-
-        assertNotNull(message.getAdapter());
-        assertEquals(inFile.getName(), message.getAdapter().getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
-        if (streaming)
-        {
-            // Adaptor gets wrapped by requester because FileMessageAdaptor does not
-            // implement MutableMessageAdaptor
-            assertEquals(DefaultMessageAdapter.class, message.getAdapter().getClass());
-        }
-        else
-        {
-            assertEquals(FileContentsMessageAdapter.class, message.getAdapter().getClass());
-        }
+        assertEquals(inFile.getName(), message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
 
         assertNotNull(message.getPayload());
         if (streaming)

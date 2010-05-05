@@ -27,11 +27,9 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
@@ -211,14 +209,14 @@ public class MuleUniversalConduit extends AbstractConduit
 
         MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
         
-        DefaultMessageAdapter req;
+        MuleMessage req;
         if (event == null) 
         {
-            req = new DefaultMessageAdapter(handler);
+            req = new DefaultMuleMessage(handler, connector.getMuleContext());
         }
         else 
         {
-            req = new DefaultMessageAdapter(handler, event.getMessage());
+            req = new DefaultMuleMessage(handler, event.getMessage(), connector.getMuleContext());
         }
         
         message.getExchange().put(CxfConstants.MULE_MESSAGE, req);
@@ -232,7 +230,7 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             OutboundEndpoint protocolEndpoint = getProtocolEndpoint(uri);
 
-            MessageAdapter req = (MessageAdapter) m.getExchange().get(CxfConstants.MULE_MESSAGE);
+            MuleMessage req = (MuleMessage) m.getExchange().get(CxfConstants.MULE_MESSAGE);
             req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
             req.setProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
             
@@ -388,9 +386,10 @@ public class MuleUniversalConduit extends AbstractConduit
 
     public void onClose(final Message m) throws IOException
     {
+        // template method
     }
     
-    protected MuleMessage sendStream(MessageAdapter sa, 
+    protected MuleMessage sendStream(MuleMessage sendMessage, 
                                      OutboundEndpoint protocolEndpoint,
                                      Exchange exchange) throws MuleException
     {
@@ -401,7 +400,7 @@ public class MuleUniversalConduit extends AbstractConduit
             session = eventContext.getSession();
         }
 
-        MuleMessage message = new DefaultMuleMessage(sa, connector.getMuleContext());
+        MuleMessage message = new DefaultMuleMessage(sendMessage, connector.getMuleContext());
         if (session == null)
         {
             session = new DefaultMuleSession(message, connector.getSessionHandler(), connector.getMuleContext());

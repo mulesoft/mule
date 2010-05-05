@@ -11,6 +11,8 @@
 package org.mule.transport.http;
 
 
+import org.mule.util.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -21,8 +23,6 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HeaderGroup;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  * A http request wrapper
@@ -145,7 +145,7 @@ public class HttpRequest
         addHeader(header);
     }
 
-    public Iterator getHeaderIterator()
+    public Iterator<?> getHeaderIterator()
     {
         return this.headers.getIterator();
     }
@@ -219,9 +219,7 @@ public class HttpRequest
         InputStream in = getBody();
         if (in != null)
         {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            IOUtils.copy(in, buffer);
-            return buffer.toByteArray();
+            return IOUtils.toByteArray(in);
         }
         else
         {

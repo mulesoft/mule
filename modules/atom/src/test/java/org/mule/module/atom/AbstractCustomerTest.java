@@ -56,8 +56,6 @@ public abstract class AbstractCustomerTest extends FunctionalTestCase
         ClientResponse res = client.post(colUri.toString(), entry, opts);
         assertEquals(201, res.getStatus());
 
-        prettyPrint(abdera, res.getDocument());
-
         IRI location = res.getLocation();
         assertEquals(basePath + "/customers/1001-Dan_Diephouse", location.toString());
 
@@ -65,13 +63,11 @@ public abstract class AbstractCustomerTest extends FunctionalTestCase
         res = client.get(colUri.resolve(location.toString()).toString());
         assertEquals(200, res.getStatus());
 
-        prettyPrint(abdera, res.getDocument());
         org.apache.abdera.model.Document<Entry> entry_doc = res.getDocument();
         entry = entry_doc.getRoot();
-
     }
 
-    private void prettyPrint(Abdera abdera, Base doc) throws IOException
+    protected void prettyPrint(Abdera abdera, Base doc) throws IOException
     {
         Writer writer = abdera.getWriterFactory().getWriter("prettyxml");
         writer.writeTo(doc, System.out);

@@ -26,7 +26,6 @@ import org.mule.context.notification.MuleContextNotification;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <code>EndpointAbstractEventLoggerAgent</code> will forward server notifications
@@ -89,7 +88,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 // is being used for notifications then ignore.
                 return;
             }
-            MuleMessage msg = new DefaultMuleMessage(e, (Map<?, ?>) null, muleContext);
+            MuleMessage msg = new DefaultMuleMessage(e, muleContext);
             try
             {
                 //TODO: Filters should really be applied by the endpoint

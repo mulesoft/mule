@@ -10,7 +10,7 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
@@ -55,7 +55,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
         return new SslWorker(socket, this);
     }
 
-    private void preRoute(DefaultMuleMessage message) throws Exception
+    private void preRoute(MuleMessage message) throws Exception
     {
         long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
         boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
@@ -103,7 +103,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
         }
 
         @Override
-        protected void preRouteMuleMessage(DefaultMuleMessage message) throws Exception
+        protected void preRouteMuleMessage(MuleMessage message) throws Exception
         {
             super.preRouteMuleMessage(message);
 

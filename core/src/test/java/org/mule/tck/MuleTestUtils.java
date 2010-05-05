@@ -12,13 +12,13 @@ package org.mule.tck;
 
 import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -35,6 +35,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
+import org.mule.api.transport.MuleMessageFactory;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
@@ -319,7 +320,11 @@ public final class MuleTestUtils
     public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context, boolean synchronous) throws Exception
     {
         MuleSession session = getTestSession(service, context);
-        return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap(), context), endpoint, session, synchronous);
+        
+        MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
+        MuleMessage message = factory.create(data, endpoint.getEncoding());
+        
+        return new DefaultMuleEvent(message, endpoint, session, synchronous);
     }
 
     public static MuleEventContext getTestEventContext(Object data, MuleContext context) throws Exception

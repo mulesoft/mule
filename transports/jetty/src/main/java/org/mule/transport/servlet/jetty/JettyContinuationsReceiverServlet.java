@@ -10,13 +10,11 @@
 
 package org.mule.transport.servlet.jetty;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.http.HttpConnector;
-import org.mule.transport.servlet.HttpRequestMessageAdapter;
 
 import java.io.IOException;
 
@@ -41,7 +39,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
             {
                 MessageReceiver receiver = getReceiverForURI(request);
 
-                MuleMessage requestMessage = new DefaultMuleMessage(new HttpRequestMessageAdapter(request), muleContext);
+                MuleMessage requestMessage = receiver.createMuleMessage(request);
                 requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
                 //Need to remove this if set, we'll be returning a result but we need to make the request async
                 requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
@@ -63,6 +61,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
         }
     }
 
+    @Override
     protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
             throws MuleException
     {

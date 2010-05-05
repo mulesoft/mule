@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -20,10 +19,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
-import org.mule.transport.NullPayload;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.NumberUtils;
@@ -74,6 +71,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         if (connector.getConnection() == null)
@@ -83,11 +81,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         dispatchMessage(event, false);
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
@@ -259,13 +259,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     if (result == null)
                     {
                         logger.debug("No message was returned via replyTo destination");
-                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                        return createNullMuleMessage();
                     }
                     else
                     {
-                        MessageAdapter adapter = connector.getMessageAdapter(result);
-                        return new DefaultMuleMessage(JmsMessageUtils.toObject(result, connector.getSpecification(), endpoint.getEncoding()),
-                                adapter, connector.getMuleContext());
+                        return createMessageWithJmsMessagePayload(result);
                     }
                 }
                 else
@@ -281,14 +279,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     if (result == null)
                     {
                         logger.debug("No message was returned via replyTo destination " + replyTo);
-                        return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                        return createNullMuleMessage();
                     }
                     else
                     {
-                        MessageAdapter adapter = connector.getMessageAdapter(result);
-                        return new DefaultMuleMessage(
-                                JmsMessageUtils.toObject(result, connector.getSpecification(),
-                                        endpoint.getEncoding()), adapter, connector.getMuleContext());
+                        return createMessageWithJmsMessagePayload(result);
                     }
                 }
             }
@@ -297,7 +292,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // In this case a response was never expected so we return null and not NullPayload.
                 // This generally happens when dispatch is used for an asynchronous endpoint but can also occur when send() is used 
                 // and disableTempDestinations is set.
-                return returnOriginalMessageAsReply ? new DefaultMuleMessage(msg, connector.getMuleContext()) : null;
+                return returnOriginalMessageAsReply ? createMuleMessage(msg) : null;
             }
         }
         finally
@@ -334,6 +329,15 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception
+    {
+        MuleMessage muleMessage = createMuleMessage(jmsMessage);
+        Object payload = JmsMessageUtils.toObject(jmsMessage, connector.getSpecification(),
+            endpoint.getEncoding());
+        muleMessage.setPayload(payload);
+        return muleMessage;
+    }
+    
     /**
      * This method is called before the current message is transformed.  It can be used to do any message body or
      * header processing before the transformer is called.
@@ -351,11 +355,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         logger.debug("Multi-transaction support is not available in Mule Community Edition.");
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         return dispatchMessage(event, true);
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

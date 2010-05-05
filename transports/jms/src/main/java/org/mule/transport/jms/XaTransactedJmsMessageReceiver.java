@@ -10,14 +10,13 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
@@ -29,7 +28,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -70,6 +68,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             return (JmsThreadContext)get();
         }
 
+        @Override
         protected Object initialValue()
         {
             return new JmsThreadContext();
@@ -160,6 +159,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     /**
      * The poll method is overriden from the {@link TransactedPollingMessageReceiver}
      */
+    @Override
     public void poll() throws Exception
     {
         logger.debug("Polling...");
@@ -209,6 +209,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         tt.execute(cb);
     }
 
+    @Override
     protected List getMessages() throws Exception
     {
         Session session = this.connector.getSessionFromTransaction();
@@ -272,11 +273,12 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             redeliveryHandler.handleRedelivery(message);
         }
 
-        MessageAdapter adapter = connector.getMessageAdapter(message);
-        routeMessage(new DefaultMuleMessage(adapter, (Map)null, connector.getMuleContext()));
+        MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
+        routeMessage(messageToRoute);
         return null;
     }
 
+    @Override
     protected void processMessage(Object msg) throws Exception
     {
         // This method is never called as the

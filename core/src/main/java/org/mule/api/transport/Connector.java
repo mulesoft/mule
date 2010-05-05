@@ -18,6 +18,7 @@ import org.mule.api.NamedObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.service.Service;
@@ -68,17 +69,11 @@ public interface Connector extends Lifecycle, NamedObject
     boolean isDisposed();
 
     /**
-     * Gets a {@link MessageAdapter} from the connector for the given message
-     * (data)
-     * 
-     * @param message the data with which to initialise the {@link org.mule.api.transport.MessageAdapter}
-     * @return the {@link MessageAdapter} for the endpoint
-     * @throws MessageTypeNotSupportedException if the message parameter is not supported
-     * @throws MuleException if there is a problem creating the Adapter
-     * @see MessageAdapter
+     * Creates a new {@link MuleMessageFactory} using what's defined in the connector's 
+     * transport service descriptor. 
      */
-    MessageAdapter getMessageAdapter(Object message) throws MuleException;
-
+    MuleMessageFactory createMuleMessageFactory() throws CreateException;
+    
     /**
      * @return the primary protocol name for endpoints of this connector
      */
@@ -196,7 +191,6 @@ public interface Connector extends Lifecycle, NamedObject
      * @throws DispatchException if the event fails to be dispatched
      */
     MuleMessage send(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException;
-
 
     /**
      * Will get the output stream for this type of transport. Typically this

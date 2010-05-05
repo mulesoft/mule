@@ -18,6 +18,7 @@ import org.mule.transport.http.HttpConstants;
 public class HttpHeadersTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "http-headers-config.xml";
@@ -29,12 +30,12 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         MuleMessage result = client.send("clientEndpoint", null, null);
         
         String contentTypeProperty = 
-            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
         assertNotNull(contentTypeProperty); 
         assertEquals("application/x-download", contentTypeProperty); 
         
         String contentDispositionProperty = 
-            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
     }
@@ -47,17 +48,17 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         MuleMessage result = client.request("vm://out", 5000);
         
         String contentTypeProperty = 
-            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
         assertNotNull(contentTypeProperty);
         assertEquals("application/xml", contentTypeProperty);
         
         String contentDispositionProperty =
-            result.getAdapter().getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
 
-        assertNotNull(result.getAdapter().getProperty("X-Test"));
-        assertEquals("foo", result.getAdapter().getProperty("X-Test"));
+        assertNotNull(result.getProperty("X-Test"));
+        assertEquals("foo", result.getProperty("X-Test"));
     }
     
 }

@@ -45,7 +45,8 @@ import org.mule.tck.testmodels.mule.TestMessageReceiver;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.util.concurrent.Latch;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -284,7 +285,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
 
     protected MuleMessage createTestRequestMessage()
     {
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }

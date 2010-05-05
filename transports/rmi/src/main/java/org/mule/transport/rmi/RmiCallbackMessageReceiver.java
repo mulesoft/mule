@@ -10,14 +10,13 @@
 
 package org.mule.transport.rmi;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.rmi.i18n.RmiMessages;
@@ -74,6 +73,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         logger.debug("Initialized successfully");
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
@@ -86,6 +86,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
      * @throws org.mule.transport.ConnectException
      *
      */
+    @Override
     protected void doConnect() throws ConnectException
     {
         try
@@ -128,6 +129,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     }
 
     /** Unbinds Rmi class from registry */
+    @Override
     protected void doDisconnect()
     {
         logger.debug("Disconnecting...");
@@ -144,11 +146,13 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         logger.debug("Disconnected successfully.");
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // nothing to do
@@ -183,16 +187,9 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         return (remote);
     }
 
-    /**
-     * Routes message forward
-     *
-     * @param message
-     * @throws org.mule.api.MuleException
-     */
-    public Object routeMessage(Object message) throws MuleException
+    public Object routeMessage(Object payload) throws MuleException
     {
-        MessageAdapter adapter = connector.getMessageAdapter(message);
-
-        return (routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext())));
+        MuleMessage messageToRoute = createMuleMessage(payload, endpoint.getEncoding());
+        return routeMessage(messageToRoute);
     }
 }

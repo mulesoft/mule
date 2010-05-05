@@ -66,11 +66,11 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         });
 
         PostMethod request = new PostMethod("http://localhost:60217");
-        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
-            .getDefaultEncoding());
+        RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", 
+            muleContext.getConfiguration().getDefaultEncoding());
         request.setRequestEntity(entity);
-
         httpClient.executeMethod(request);
+        
         MuleMessage message = muleClient.request("vm://out", 1000);
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayloadAsString());

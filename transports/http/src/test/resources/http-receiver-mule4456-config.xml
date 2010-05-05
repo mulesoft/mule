@@ -14,7 +14,7 @@
     <vm:connector name="vm"/>
     
     <model>
-        <service name="AsyncPersistentQueueService">
+        <service name="AsyncService">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="60217" synchronous="false"/>
             </inbound>
@@ -26,7 +26,7 @@
             </outbound>
         </service>
         
-        <service name="AsyncService">
+        <service name="AsyncPersistentQueueService">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="60218" synchronous="false"/>
             </inbound>

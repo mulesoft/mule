@@ -5,3 +5,5 @@
 # MULE-2931
 org.mule.transport.vm.functional.VmXATransactionTestCase
 
+# MULE-4204 this test will be deleted as part of the message adapter removal
+org.mule.transport.vm.VMMessageAdapterTestCase

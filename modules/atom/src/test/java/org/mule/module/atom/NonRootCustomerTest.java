@@ -11,7 +11,6 @@ package org.mule.module.atom;
 
 public class NonRootCustomerTest extends AbstractCustomerTest
 {
-
     @Override
     protected String getConfigResources()
     {

@@ -26,6 +26,7 @@ public class MessageTypeNotSupportedException extends MuleException
      */
     private static final long serialVersionUID = -3954838511333933643L;
 
+    // TODO MessageAdapterRemoval: rewrite the messge
     public MessageTypeNotSupportedException(Object message, Class<?> adapterClass)
     {
         super(CoreMessages.messageNotSupportedByAdapter(
@@ -33,6 +34,7 @@ public class MessageTypeNotSupportedException extends MuleException
             (adapterClass != null ? adapterClass.getName() : "null class")));
     }
 
+    // TODO MessageAdapterRemoval: rewrite the messge
     public MessageTypeNotSupportedException(Object message, Class<?> adapterClass, Throwable cause)
     {
         super(CoreMessages.messageNotSupportedByAdapter(

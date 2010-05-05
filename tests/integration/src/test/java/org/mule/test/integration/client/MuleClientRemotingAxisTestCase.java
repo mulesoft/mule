@@ -20,6 +20,7 @@ import org.mule.tck.testmodels.services.Person;
 public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/axis-client-test-mule-config.xml";
@@ -42,7 +43,8 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
         }
     }
 
-    public void testRequestResponseComplex() throws Exception
+    // this test is disabled because of MULE-4844
+    public void _testRequestResponseComplex() throws Exception
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
@@ -53,7 +55,6 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
             MuleMessage result = dispatcher.sendRemote(
                 "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
             assertNotNull(result);
-            logger.debug(result.getPayload());
             assertTrue(result.getPayload() instanceof Person);
             assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
             assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
@@ -64,7 +65,8 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
         }
     }
 
-    public void testRequestResponseComplex2() throws Exception
+    // this test is disabled because of MULE-4844
+    public void _testRequestResponseComplex2() throws Exception
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");

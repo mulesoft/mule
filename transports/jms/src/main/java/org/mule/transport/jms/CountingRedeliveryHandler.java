@@ -10,8 +10,8 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.transport.jms.i18n.JmsMessages;
 
 import java.text.MessageFormat;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for
  * providers not implementing the {@code JMSXDeliveryCount} property support.
  */
-public class CountingRedeliveryHandler implements RedeliveryHandler
+public class CountingRedeliveryHandler extends AbstractRedeliveryHandler
 {
     /**
      * logger used by this class
@@ -38,23 +38,11 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
 
     private Map<String, Integer> messages = null;
 
-    protected JmsConnector connector;
-
     @SuppressWarnings("unchecked")
     public CountingRedeliveryHandler()
     {
+        super();
         messages = Collections.synchronizedMap(new LRUMap(256));
-    }
-
-    /**
-     * The connector associated with this handler is set before
-     * <code>handleRedelivery()</code> is called
-     * 
-     * @param connector the connector associated with this handler
-     */
-    public void setConnector(JmsConnector connector)
-    {
-        this.connector = connector;
     }
 
     /**
@@ -64,6 +52,7 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
      * be handled by the connector Exception Handler.
      * 
      */
+    @Override
     public void handleRedelivery(Message message) throws JMSException, MuleException
     {
         final int connectorRedelivery = connector.getMaxRedelivery();
@@ -110,12 +99,11 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
 
             if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
             {
-                JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
+                MuleMessage msg = createMuleMessage(message);
                 throw new MessageRedeliveredException(
-                        JmsMessages.tooManyRedeliveries(id, String.valueOf(redeliveryCount),
-                                                        connectorRedelivery, connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
+                    JmsMessages.tooManyRedeliveries(id, String.valueOf(redeliveryCount), 
+                        connectorRedelivery, connector.getName()), msg);
             }
-
         }
         else if (redeliveryCount > connectorRedelivery)
         {
@@ -125,12 +113,10 @@ public class CountingRedeliveryHandler implements RedeliveryHandler
                         "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
                         "of {2} on the connector {3}", id, redeliveryCount, connectorRedelivery, connector.getName()));
             }
-            JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
-
+            MuleMessage msg = createMuleMessage(message);
             throw new MessageRedeliveredException(
-                    JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connectorRedelivery,
-                            connector.getName()), new DefaultMuleMessage(adapter, connector.getMuleContext()));
-
+                JmsMessages.tooManyRedeliveries(id, "" + redeliveryCount, connectorRedelivery,
+                    connector.getName()), msg);
         }
         else
         {

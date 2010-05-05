@@ -10,7 +10,6 @@
 
 package org.mule.transport.rmi;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -125,8 +124,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
 
             if (null != result)
             {
-                final Object payload = connector.getMessageAdapter(result).getPayload();
-                routeMessage(new DefaultMuleMessage(payload, connector.getMuleContext()), endpoint.isSynchronous());
+                routeMessage(createMuleMessage(result));
             }
         }
         catch (Exception e)

@@ -22,16 +22,15 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequesterFactory;
+import org.mule.api.transport.MuleMessageFactory;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.UrlEndpointURIBuilder;
 import org.mule.transaction.XaTransactionFactory;
-import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 
@@ -48,7 +47,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String dispatcherFactory;
     private String requesterFactory;
     private String transactionFactory;
-    private String messageAdapter;
+    private String messageFactory;
     private String messageReceiver;
     private String transactedMessageReceiver;
     private String xaTransactedMessageReceiver;
@@ -84,7 +83,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, props);
         transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, props);
         xaTransactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, props);
-        messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, props);
+        messageFactory = removeProperty(MuleProperties.CONNECTOR_MESSAGE_FACTORY, props);
         defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, props);
         defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, props);
         defaultResponseTransformer = removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, props);
@@ -92,7 +91,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointUriBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
     }
-
 
     public void setOverrides(Properties props)
     {
@@ -109,9 +107,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
         xaTransactedMessageReceiver = props.getProperty(
                 MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, xaTransactedMessageReceiver);
-        messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
+        messageFactory = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_FACTORY, messageFactory);
         endpointBuilder = props.getProperty(MuleProperties.CONNECTOR_META_ENDPOINT_BUILDER, endpointBuilder);
-
 
         String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
         if (temp != null)
@@ -146,47 +143,21 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         this.muleContext = context;
     }
 
-    public MessageAdapter createMessageAdapter(Object message) throws TransportServiceException
+    public MuleMessageFactory createMuleMessageFactory() throws TransportServiceException
     {
-        return createMessageAdapter(message, null, messageAdapter);
-    }
-
-    public MessageAdapter createMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
-            throws TransportServiceException
-    {
-        return createMessageAdapter(message, originalMessageAdapter, messageAdapter);
-    }
-
-    protected MessageAdapter createMessageAdapter(Object message, MessageAdapter originalMessageAdapter,
-                                                  String clazz) throws TransportServiceException
-    {
-        if (message == null)
+        if (messageFactory == null)
         {
-            message = NullPayload.getInstance();
+            throw new TransportServiceException(CoreMessages.objectNotSetInService("Message Factory",
+                getService()));
         }
-        if (messageAdapter != null)
+
+        try
         {
-            try
-            {
-                if (originalMessageAdapter != null)
-                {
-                    return (MessageAdapter) ClassUtils.instanciateClass(clazz,
-                            new Object[]{message, originalMessageAdapter}, classLoader);
-                }
-                else
-                {
-                    return (MessageAdapter)
-                            ClassUtils.instanciateClass(clazz, new Object[]{message}, classLoader);
-                }
-            }
-            catch (Exception e)
-            {
-                throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Adapter", clazz), e);
-            }
+            return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, muleContext);
         }
-        else
+        catch (Exception e)
         {
-            throw new TransportServiceException(CoreMessages.objectNotSetInService("Message Adapter", getService()));
+            throw new TransportServiceException(CoreMessages.failedToCreate("Message Factory"));
         }
     }
 

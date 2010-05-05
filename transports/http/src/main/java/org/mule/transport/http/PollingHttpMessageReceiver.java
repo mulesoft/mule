@@ -25,7 +25,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;
 
@@ -72,30 +71,37 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         discardEmptyContent = MapUtils.getBooleanValue(endpoint.getProperties(), "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
     }
 
+    @Override
     protected void doDispose()
     {
         // nothing to do
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // nothing to do
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         // nothing to do
     }
 
+    @Override
     public void poll() throws Exception
     {
-        MuleMessage req = new DefaultMuleMessage(new DefaultMessageAdapter(""), connector.getMuleContext());
+        MuleContext muleContext = connector.getMuleContext();
+
+        MuleMessage request = new DefaultMuleMessage("", muleContext);
         if (etag != null && checkEtag)
         {
-            Map customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
-            req.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
+            Map<String, String> customHeaders = 
+                Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+            request.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
-        req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        request.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 
         MuleSession session = new DefaultMuleSession(service, connector.getMuleContext());
 
@@ -103,20 +109,13 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         {
             // We need to create an outbound endpoint to do the polled request using
             // send() as thats the only way we can customize headers and use eTags
-            MuleContext muleContext = endpoint.getMuleContext();
-            //TODO
-//            TransportServiceDescriptor tsd = (TransportServiceDescriptor)muleContext.getRegistry()
-//                .lookupServiceDescriptor(ServiceType.TRANSPORT, endpoint.getEndpointURI().getFullScheme(), null);
-//
-//            EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(endpoint.getEndpointURI().toString());
-
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
-            //Must not use inbound transformers for the outbound request
+            // Must not use inbound transformers for the outbound request
             endpointBuilder.setTransformers(Collections.EMPTY_LIST);
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }
-        MuleEvent event = new DefaultMuleEvent(req, outboundEndpoint, session, true);
+        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint, session, true);
 
         MuleMessage message = connector.send(outboundEndpoint, event);
 
@@ -131,7 +130,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         etag = message.getStringProperty(HttpConstants.HEADER_ETAG, null);
 
-        if ((status != 304 || !checkEtag))
+        if ((status != HttpConstants.SC_NOT_MODIFIED || !checkEtag))
         {
             routeMessage(message, endpoint.isSynchronous());
         }

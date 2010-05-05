@@ -9,13 +9,12 @@
  */
 package org.mule.message;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transport.DefaultMessageAdapter;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 /**
  * A data transfer object representation of a {@link org.mule.api.MuleMessage}. THis object is used when ecoding Mule messages
@@ -37,7 +36,7 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
 
     public DefaultMuleMessageDTO(MuleMessage message)
     {
-        super((Serializable) message.getPayload());
+        super(message.getPayload());
         encodePropertiesForScope(PropertyScope.INBOUND, message);
         encodePropertiesForScope(PropertyScope.OUTBOUND, message);
         encodePropertiesForScope(PropertyScope.INVOCATION, message);
@@ -50,9 +49,8 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
 
     protected void encodePropertiesForScope(PropertyScope scope, MuleMessage message)
     {
-        for (Iterator iterator = message.getPropertyNames(scope).iterator(); iterator.hasNext();)
+        for (String key : message.getPropertyNames(scope))
         {
-            String key = (String)iterator.next();
             setProperty(scope.getScopeName() + "#" + key, message.getProperty(key));
         }
     }
@@ -77,37 +75,31 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
         this.setPayload(data);
     }
 
-    public void addPropertiesTo(MessageAdapter message)
+    public void addPropertiesTo(MuleMessage message)
     {
-        String prefix;
-        int i;
         for (String s : properties.keySet())
         {
-            i = s.indexOf("#");
-            prefix = s.substring(0, i);
-            if(prefix.equals(PropertyScope.INBOUND.getScopeName()))
+            int i = s.indexOf("#");
+            String prefix = s.substring(0, i);
+            if (prefix.equals(PropertyScope.OUTBOUND.getScopeName()))
             {
-                message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.INBOUND);
+                message.setProperty(s.substring(i + 1), getProperty(s), PropertyScope.OUTBOUND);
             }
-            else if(prefix.equals(PropertyScope.OUTBOUND.getScopeName()))
+            else if (prefix.equals(PropertyScope.SESSION.getScopeName()))
             {
-                message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.OUTBOUND);
-            }
-            else if(prefix.equals(PropertyScope.SESSION.getScopeName()))
-            {
-                message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.SESSION);
+                message.setProperty(s.substring(i + 1), getProperty(s), PropertyScope.SESSION);
             }
             else
             {
-                message.setProperty(s.substring(i+1), getProperty(s), PropertyScope.INVOCATION);
+                message.setProperty(s.substring(i + 1), getProperty(s), PropertyScope.INVOCATION);
             }
         }
         message.setReplyTo(getReplyTo());
     }
-
-    public MessageAdapter toMessageAdapter()
+    
+    public MuleMessage toMuleMessage(MuleContext context)
     {
-        MessageAdapter message = new DefaultMessageAdapter(getPayload());
+        MuleMessage message = new DefaultMuleMessage(getPayload(), context);
         addPropertiesTo(message);
         return message;
     }

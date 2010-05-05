@@ -26,7 +26,7 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
 {
     protected RemoteDispatcherNotification getNotification()
     {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("key1", "value1");
         
         Apple apple = new Apple();

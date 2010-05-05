@@ -16,11 +16,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.MuleMessageFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.SerializableToByteArray;
@@ -583,21 +584,18 @@ public class FileConnector extends AbstractConnector
     {
         this.streaming = streaming;
     }
-
+        
     @Override
-    public MessageAdapter getMessageAdapter(Object message) throws MuleException
+    public MuleMessageFactory createMuleMessageFactory() throws CreateException
     {
+        // See MULE-3209, MULE-3199
         if (isStreaming())
         {
-            // TODO Shouldn't we have a way to specify MessageAdaptor for streaming
-            // in service descriptor
-            // See MULE-3209, MULE-3199
-            return new FileMessageAdapter(message);
+            return new FileMuleMessageFactory(muleContext);
         }
         else
         {
-            return super.getMessageAdapter(message);
+            return super.createMuleMessageFactory();
         }
     }
-
 }

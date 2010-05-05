@@ -10,13 +10,11 @@
 
 package org.mule.transport.xmpp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 
@@ -68,6 +66,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 //        }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         xmppConversation.disconnect();
@@ -79,17 +78,20 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     }
 
     // TODO xmpp: consider lifecycle
+    @Override
     protected void doStart() throws MuleException
     {
         // nothing to do
     }
 
     // TODO xmpp: consider lifecycle
+    @Override
     protected void doStop() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     protected void doDispose()
     {
         xmppConversation = null;
@@ -133,15 +135,13 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         {
             try
             {
-                MessageAdapter adapter = connector.getMessageAdapter(packet);
-
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Processing XMPP packet from: " + packet.getFrom());
-                    logger.debug("MessageAdapter is a: " + adapter.getClass().getName());
                 }
 
-                MuleMessage returnMessage = routeMessage(new DefaultMuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
+                MuleMessage message = createMuleMessage(packet, endpoint.getEncoding());
+                MuleMessage returnMessage = routeMessage(message, endpoint.isSynchronous());
 
                 if (returnMessage != null && packet instanceof Message)
                 {

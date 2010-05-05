@@ -46,7 +46,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
 
         msg = (MuleMessage) result;
 
-        assertEquals("test", msg.getPayload());
+        assertEquals("test", msg.getPayloadAsString());
         assertEquals(new Apple(), msg.getProperty("object", PropertyScope.OUTBOUND));
         //with different case
         assertEquals(new Apple(), msg.getProperty("oBjeCt", PropertyScope.OUTBOUND));

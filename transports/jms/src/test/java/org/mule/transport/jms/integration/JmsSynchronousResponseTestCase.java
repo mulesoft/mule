@@ -13,6 +13,7 @@ package org.mule.transport.jms.integration;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
+import org.mule.transport.jms.JmsConstants;
 import org.mule.util.StringUtils;
 
 import org.junit.Test;
@@ -42,8 +43,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
         MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
         assertNotNull(response);
         assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
-        String messageId = ((javax.jms.Message) response.getPayload()).getJMSMessageID();
-        assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
+        assertJmsMessageIdPresent(response);
     }
 
     @Test
@@ -54,8 +54,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
         MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
         assertNotNull(response);
         assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
-        String messageId = ((javax.jms.Message) response.getPayload()).getJMSMessageID();
-        assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
+        assertJmsMessageIdPresent(response);
     }
 
     @Test
@@ -66,5 +65,11 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
         MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
         assertNotNull(response);
         assertTrue("Response should be NullPayload", response.getPayload() instanceof NullPayload);
+    }
+
+    private void assertJmsMessageIdPresent(MuleMessage message)
+    {
+        String messageId = message.getStringProperty(JmsConstants.JMS_MESSAGE_ID, null);
+        assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
     }
 }

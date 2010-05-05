@@ -130,6 +130,12 @@ public class JsonData implements Serializable
             return o;
         }
     }
+    
+    public boolean hasNode(String key)
+    {
+        JsonNode result = node.path(key);
+        return result.isMissingNode() == false;
+    }
 
     protected List<String> parseTokens(String expresion)
     {

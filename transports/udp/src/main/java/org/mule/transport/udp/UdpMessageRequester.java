@@ -10,7 +10,6 @@
 
 package org.mule.transport.udp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.retry.RetryContext;
@@ -19,7 +18,6 @@ import org.mule.transport.AbstractMessageRequester;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.Map;
 
 /**
  * Responsible for requesting MuleEvents as UDP packets on the network
@@ -36,6 +34,7 @@ public class UdpMessageRequester extends AbstractMessageRequester
         this.connector = (UdpConnector)endpoint.getConnector();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // nothing, there is an optional validation in validateConnection()
@@ -77,6 +76,7 @@ public class UdpMessageRequester extends AbstractMessageRequester
 
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // nothing to do
@@ -117,6 +117,7 @@ public class UdpMessageRequester extends AbstractMessageRequester
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
+    @Override
     protected MuleMessage doRequest(long timeout) throws Exception
     {
         DatagramSocket socket = connector.getSocket(endpoint);
@@ -125,9 +126,10 @@ public class UdpMessageRequester extends AbstractMessageRequester
         {
             return null;
         }
-        return new DefaultMuleMessage(connector.getMessageAdapter(result), (Map)null, connector.getMuleContext());
+        return createMuleMessage(result, endpoint.getEncoding());
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

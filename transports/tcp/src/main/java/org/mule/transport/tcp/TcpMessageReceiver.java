@@ -9,8 +9,8 @@
  */
 package org.mule.transport.tcp;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -419,7 +419,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
 
         @Override
-        protected void preRouteMuleMessage(final DefaultMuleMessage message) throws Exception
+        protected void preRouteMuleMessage(final MuleMessage message) throws Exception
         {
             super.preRouteMuleMessage(message);
 

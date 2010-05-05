@@ -12,6 +12,8 @@ package org.mule.transport.servlet;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -23,6 +25,8 @@ import org.mule.transport.http.HttpsConnector;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet
  * engine. It allows the MuleReceiverServlet to look up components interested in
@@ -33,8 +37,31 @@ import java.util.Map;
 
 public class ServletConnector extends AbstractConnector
 {
-
     public static final String SERVLET = "servlet";
+
+    /**
+     * This property name is used to store the character encoding of the {@link HttpServletRequest} to
+     * the {@link MuleMessage}
+     */
+    public static final String CHARACTER_ENCODING_PROPERTY_KEY = MuleProperties.PROPERTY_PREFIX + "CHARACTER_ENCODING";
+
+    /**
+     * This property name is used to store the content type of the {@link HttpServletRequest} to
+     * the {@link MuleMessage}
+     */
+    public static final String CONTENT_TYPE_PROPERTY_KEY = MuleProperties.PROPERTY_PREFIX + "CONTENT_TYPE";
+
+    /**
+     * This prefix is used to store parameters from the incoming {@link HttpServletRequest} to
+     * the {@link MuleMessage}.
+     */
+    public static final String PARAMETER_PROPERTY_PREFIX = "REQUEST_PARAMETER_";
+    
+    /**
+     * This property name is used to store a {@link Map} containing all request parameters to the
+     * {@link MuleMessage}.
+     */
+    public static final String PARAMETER_MAP_PROPERTY_KEY = "request.parameters";
 
     // The real URL that the servlet container is bound on.
     // If this is not set the wsdl may not be generated correctly
@@ -48,31 +75,37 @@ public class ServletConnector extends AbstractConnector
     }
 
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // template method, nothing to do
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
@@ -83,6 +116,7 @@ public class ServletConnector extends AbstractConnector
         return SERVLET;
     }
 
+    @Override
     public Map<Object, MessageReceiver> getReceivers()
     {
         return receivers;
@@ -98,6 +132,7 @@ public class ServletConnector extends AbstractConnector
         this.servletUrl = servletUrl;
     }
 
+    @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         EndpointURI uri = endpoint.getEndpointURI();

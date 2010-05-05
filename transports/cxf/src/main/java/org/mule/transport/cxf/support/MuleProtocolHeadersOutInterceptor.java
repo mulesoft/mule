@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf.support;
 
-import org.mule.api.transport.MessageAdapter;
+import org.mule.api.MuleMessage;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -37,7 +37,7 @@ public class MuleProtocolHeadersOutInterceptor
 
     public void handleMessage(Message message) throws Fault
     {
-        MessageAdapter muleMsg = (MessageAdapter) message.getExchange().get(CxfConstants.MULE_MESSAGE);
+        MuleMessage muleMsg = (MuleMessage) message.getExchange().get(CxfConstants.MULE_MESSAGE);
         
         if (muleMsg == null)
         {
@@ -69,7 +69,7 @@ public class MuleProtocolHeadersOutInterceptor
         }
     }
 
-    private void extractAndSet(Message message, MessageAdapter muleMsg, String cxfHeader, String muleHeader)
+    private void extractAndSet(Message message, MuleMessage muleMsg, String cxfHeader, String muleHeader)
     {
         Object val = message.get(cxfHeader);
         if (val != null)

@@ -10,7 +10,6 @@
 
 package org.mule.transport.jms;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -44,11 +43,13 @@ public class JmsMessageRequester extends AbstractMessageRequester
         this.connector = (JmsConnector) endpoint.getConnector();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
@@ -65,6 +66,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
+    @Override
     protected MuleMessage doRequest(long timeout) throws Exception
     {
         Session session = null;
@@ -170,8 +172,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
                 }
 
                 message = connector.preProcessMessage(message, session);
-
-                return new DefaultMuleMessage(connector.getMessageAdapter(message), connector.getMuleContext());
+                return createMuleMessage(message, endpoint.getEncoding());
             }
             catch (Exception e)
             {
@@ -189,6 +190,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

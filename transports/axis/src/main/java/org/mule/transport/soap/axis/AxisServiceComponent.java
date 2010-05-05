@@ -25,7 +25,7 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.WriterMessageAdapter;
+import org.mule.transport.AxisStringWriter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
@@ -38,7 +38,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -118,7 +117,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     public Object onCall(MuleEventContext context) throws Exception
     {
-        WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter(4096));
+        AxisStringWriter response = new AxisStringWriter();
         String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
             HttpConstants.METHOD_POST);
         if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
@@ -129,8 +128,11 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             doPost(context, response);
         }
-        response.getWriter().close();
-        return new DefaultMuleMessage(response, context.getMuleContext());
+        response.close();
+        
+        String payload = response.getWriter().toString();
+        Map<String, Object> properties = response.getProperties();
+        return new DefaultMuleMessage(payload, properties, context.getMuleContext());
     }
 
     public void initialise() throws InitialisationException
@@ -141,7 +143,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    public void doGet(MuleEventContext context, WriterMessageAdapter response)
+    public void doGet(MuleEventContext context, AxisStringWriter response)
         throws MuleException, IOException
     {
         try
@@ -224,7 +226,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    protected void doPost(MuleEventContext context, WriterMessageAdapter response)
+    protected void doPost(MuleEventContext context, AxisStringWriter response)
         throws Exception
     {
         String soapAction;
@@ -335,7 +337,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    private void reportTroubleInGet(Exception exception, WriterMessageAdapter response)
+    private void reportTroubleInGet(Exception exception, AxisStringWriter response)
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
@@ -371,7 +373,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     }
 
-    private void writeFault(WriterMessageAdapter response, AxisFault axisFault)
+    private void writeFault(AxisStringWriter response, AxisFault axisFault)
     {
         String localizedMessage = XMLUtils.xmlEncodeString(axisFault.getLocalizedMessage());
         response.write("<pre>Fault - " + localizedMessage + "<br>");
@@ -381,7 +383,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     protected void processMethodRequest(MessageContext msgContext,
                                         MuleEventContext context,
-                                        WriterMessageAdapter response,
+                                        AxisStringWriter response,
                                         EndpointURI endpointUri) throws AxisFault
     {
         Properties params = endpointUri.getUserParams();
@@ -416,7 +418,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    protected void processWsdlRequest(MessageContext msgContext, WriterMessageAdapter response)
+    protected void processWsdlRequest(MessageContext msgContext, AxisStringWriter response)
         throws AxisFault
     {
         AxisEngine engine = getAxis();
@@ -454,7 +456,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     }
 
     protected void invokeEndpointFromGet(MessageContext msgContext,
-                                         WriterMessageAdapter response,
+                                         AxisStringWriter response,
                                          String method,
                                          String args) throws AxisFault
     {
@@ -493,7 +495,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write(responseMsg.getSOAPPartAsString());
     }
 
-    protected void reportServiceInfo(WriterMessageAdapter response, SOAPService service, String serviceName)
+    protected void reportServiceInfo(AxisStringWriter response, SOAPService service, String serviceName)
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h1>" + service.getName() + "</h1>");
@@ -501,7 +503,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<i>" + Messages.getMessage("perhaps00") + "</i>");
     }
 
-    protected void processListRequest(WriterMessageAdapter response) throws AxisFault
+    protected void processListRequest(AxisStringWriter response) throws AxisFault
     {
         AxisEngine engine = getAxis();
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
@@ -527,7 +529,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    private void reportNoWSDL(WriterMessageAdapter response, String moreDetailCode, AxisFault axisFault)
+    private void reportNoWSDL(AxisStringWriter response, String moreDetailCode, AxisFault axisFault)
     {
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
@@ -540,7 +542,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     }
 
-    protected void reportAvailableServices(MuleEventContext context, WriterMessageAdapter response)
+    protected void reportAvailableServices(MuleEventContext context, AxisStringWriter response)
         throws ConfigurationException, AxisFault
     {
         AxisEngine engine = getAxis();
@@ -579,7 +581,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     }
 
-    private void listServices(Iterator i, WriterMessageAdapter response)
+    private void listServices(Iterator i, AxisStringWriter response)
     {
         response.write("<ul>");
         while (i.hasNext())
@@ -621,7 +623,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("</ul>");
     }
 
-    protected void reportCantGetAxisService(MuleEventContext context, WriterMessageAdapter response)
+    protected void reportCantGetAxisService(MuleEventContext context, AxisStringWriter response)
     {
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
@@ -629,7 +631,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<p>" + Messages.getMessage("noService06") + "</p>");
     }
 
-    private void configureResponseFromAxisFault(WriterMessageAdapter response, AxisFault fault)
+    private void configureResponseFromAxisFault(AxisStringWriter response, AxisFault fault)
     {
         int status = getHttpResponseStatus(fault);
         if (status == 401)
@@ -657,7 +659,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     }
 
     private void sendResponse(String contentType,
-                              WriterMessageAdapter response,
+                              AxisStringWriter response,
                               Message responseMsg) throws Exception
     {
         if (responseMsg == null)

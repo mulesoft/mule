@@ -30,12 +30,12 @@ public class MockEngineConfiguration extends Object implements EngineConfigurati
         // don't do it
     }
 
-    public Iterator getDeployedServices() throws ConfigurationException
+    public Iterator<?> getDeployedServices() throws ConfigurationException
     {
         return null;
     }
 
-    public Hashtable getGlobalOptions() throws ConfigurationException
+    public Hashtable<?, ?> getGlobalOptions() throws ConfigurationException
     {
         return null;
     }
@@ -55,7 +55,7 @@ public class MockEngineConfiguration extends Object implements EngineConfigurati
         return null;
     }
 
-    public List getRoles()
+    public List<?> getRoles()
     {
         return null;
     }

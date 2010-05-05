@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -38,6 +37,7 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +49,6 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
-    public static final DataType<MessageAdapter> MULE_MESSAGE_ADAPTER_DATA_TYPE = new SimpleDataType<MessageAdapter>(MessageAdapter.class);
 
     protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
@@ -288,18 +287,14 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     public Object transform(Object src, String encoding) throws TransformerException
     {
         Object payload = src;
-        MessageAdapter adapter;
-        if (src instanceof MessageAdapter)
+        if (src instanceof MuleMessage)
         {
-
-            adapter = (MessageAdapter) src;
-            if ((!isSourceDataTypeSupported(MULE_MESSAGE_ADAPTER_DATA_TYPE, true)
-                    && !isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true)
-                    && !(this instanceof AbstractMessageAwareTransformer))
-                    )
+            MuleMessage message = (MuleMessage) src;
+            if ((!isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true) && 
+                 !(this instanceof AbstractMessageAwareTransformer)))
             {
-                src = ((MessageAdapter) src).getPayload();
-                payload = adapter.getPayload();
+                src = ((MuleMessage) src).getPayload();
+                payload = message.getPayload();
             }
         }
 
@@ -355,9 +350,9 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     protected String getEncoding(Object src)
     {
         String encoding = null;
-        if (src instanceof MessageAdapter)
+        if (src instanceof MuleMessage)
         {
-            encoding = ((MessageAdapter) src).getEncoding();
+            encoding = ((MuleMessage) src).getEncoding();
         }
 
         if (encoding == null && endpoint != null)

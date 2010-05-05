@@ -10,11 +10,12 @@
 
 package org.mule.work;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.AbstractMessageAdapter;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -52,7 +53,7 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
             // Ensure that even after Work has been created, scheduled and executed
             // the original event instance is still owned by this thread and still
             // mutable.
-            ((AbstractMessageAdapter) originalEvent.getMessage().getAdapter()).assertAccess(AbstractMessageAdapter.WRITE);
+            ((DefaultMuleMessage) originalEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
         }
         catch (Exception e)
         {
@@ -77,7 +78,7 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
             // Ensure that even after Work has been created, scheduled and executed
             // the original event instance is still owned by this thread and still
             // mutable.
-            ((AbstractMessageAdapter) originalEvent.getMessage().getAdapter()).assertAccess(AbstractMessageAdapter.WRITE);
+            ((DefaultMuleMessage) originalEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
         }
         catch (Exception e)
         {
@@ -104,7 +105,7 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
             {
                 // Ensure that the new event copied for this event is owned by the
                 // thread that is executing this work and is mutable
-                ((AbstractMessageAdapter) event.getMessage().getAdapter()).assertAccess(AbstractMessageAdapter.WRITE);
+                ((DefaultMuleMessage) event.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
             }
             catch (Exception e)
             {

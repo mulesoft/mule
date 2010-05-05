@@ -33,7 +33,9 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return new Message("Hello");
+        Message message = new Message("ross@jabber.org");
+        message.setBody("Hello");
+        return message;
     }
 
     protected String getProtocol()
@@ -45,5 +47,4 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         return this.getProtocol() + "://mule1:mule@jabber.org.au/ross@jabber.org";
     }
-
 }

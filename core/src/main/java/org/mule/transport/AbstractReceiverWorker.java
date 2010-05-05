@@ -9,14 +9,12 @@
  */
 package org.mule.transport;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 
@@ -92,30 +90,20 @@ public abstract class AbstractReceiverWorker implements Work
 
                 for (Iterator iterator = messages.iterator(); iterator.hasNext();)
                 {
-                    Object o = iterator.next();
+                    Object payload = iterator.next();
 
-                    o = preProcessMessage(o);
-                    if (o != null)
+                    payload = preProcessMessage(payload);
+                    if (payload != null)
                     {
-                        MessageAdapter adapter;
-                        if (o instanceof MessageAdapter)
-                        {
-                            adapter = (MessageAdapter) o;
-                        }
-                        else
-                        {
-                            adapter = endpoint.getConnector().getMessageAdapter(o);
-                        }
-
-                        DefaultMuleMessage muleMessage = new DefaultMuleMessage(adapter, muleContext);
+                        MuleMessage muleMessage = receiver.createMuleMessage(payload, endpoint.getEncoding());
                         preRouteMuleMessage(muleMessage);
                         MuleMessage result = receiver.routeMessage(muleMessage, tx,  tx != null || endpoint.isSynchronous(), out);
                         if (result != null)
                         {
-                            o = postProcessMessage(result);
-                            if (o != null)
+                            payload = postProcessMessage(result);
+                            if (payload != null)
                             {
-                                results.add(o);
+                                results.add(payload);
                             }
                         }
                     }
@@ -146,7 +134,7 @@ public abstract class AbstractReceiverWorker implements Work
      * @param message the next message to be processed
      * @throws Exception
      */
-    protected void preRouteMuleMessage(DefaultMuleMessage message) throws Exception
+    protected void preRouteMuleMessage(MuleMessage message) throws Exception
     {
         //no op
     }

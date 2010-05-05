@@ -59,7 +59,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
-     * {@link org.mule.api.transport.MessageAdapter#getCorrelationGroupSize()}.
+     * {@link MuleMessage#getCorrelationGroupSize()}.
      */
     public EventGroup createEventGroup(MuleEvent event, Object groupId)
     {

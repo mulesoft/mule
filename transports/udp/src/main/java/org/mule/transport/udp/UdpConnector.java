@@ -27,11 +27,12 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class UdpConnector extends AbstractConnector
 {
-
     public static final String UDP = "udp";
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 16;
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
+    public static final String ADDRESS_PROPERTY = "packet.address";
+    public static final String PORT_PROPERTY = "packet.port";
 
     protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
     protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
@@ -47,6 +48,7 @@ public class UdpConnector extends AbstractConnector
         super(context);
     }
     
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         socketFactory = new UdpSocketFactory();
@@ -57,6 +59,7 @@ public class UdpConnector extends AbstractConnector
         dispatcherSocketsPool.setMaxActive(1);
     }
 
+    @Override
     protected void doDispose()
     {
         try
@@ -69,21 +72,25 @@ public class UdpConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         dispatcherSocketsPool.clear();
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
@@ -201,6 +208,7 @@ public class UdpConnector extends AbstractConnector
     }
 
 
+    @Override
     protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         return endpoint.getEndpointURI().getAddress() + "/" + service.getName();

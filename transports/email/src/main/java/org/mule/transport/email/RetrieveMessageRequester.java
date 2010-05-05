@@ -10,7 +10,6 @@
 
 package org.mule.transport.email;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
@@ -50,6 +49,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         return (AbstractRetrieveMailConnector) getConnector();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (folder == null || !folder.isOpen())
@@ -100,6 +100,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // close and expunge deleted messages
@@ -175,6 +176,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal causes an exception
      */
+    @Override
     protected MuleMessage doRequest(long timeout) throws Exception
     {
         long t0 = System.currentTimeMillis();
@@ -209,7 +211,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
                             folder.copyMessages(new Message[]{message}, moveToFolder);
                             message = newMessage;
                         }
-                        return new DefaultMuleMessage(castConnector().getMessageAdapter(message), connector.getMuleContext());
+                        return createMuleMessage(message, endpoint.getEncoding());
                     }
                 }
                 else if (count == -1)
@@ -301,6 +303,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         return getMessageCount(folder) > 0;
     }
 
+    @Override
     protected void doDispose()
     {
         if (null != folder && folder.isOpen())

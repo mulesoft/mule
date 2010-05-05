@@ -74,4 +74,8 @@ public interface MessageReceiver extends Connectable
                             Transaction trans,
                             boolean synchronous,
                             OutputStream outputStream) throws MuleException;
+    
+    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+
+    MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

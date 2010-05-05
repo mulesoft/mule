@@ -10,12 +10,10 @@
 
 package org.mule.transport.file;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.util.TemplateParser;
 
 import java.text.MessageFormat;
@@ -62,7 +60,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
         this.muleContext = context;
     }
 
-    public String getFilename(MessageAdapter adapter, String expression)
+    public String getFilename(MuleMessage message, String expression)
     {
         if (expression == null)
         {
@@ -71,22 +69,21 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
 
         if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1)
         {
-            return getFilename(adapter, expression, wigglyMuleParser);
+            return getFilename(message, expression, wigglyMuleParser);
         }
         else
         {
-            return getFilename(adapter, expression, squareParser);
+            return getFilename(message, expression, squareParser);
         }
     }
 
-    protected String getFilename(final MessageAdapter adapter, String expression, TemplateParser parser)
+    protected String getFilename(final MuleMessage message, String expression, TemplateParser parser)
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
             public Object match(String token)
             {
-                MuleMessage matchMessage = new DefaultMuleMessage(adapter, muleContext);
-                return muleContext.getExpressionManager().evaluate(token, matchMessage);
+                return muleContext.getExpressionManager().evaluate(token, message);
             }
         }, expression);
     }

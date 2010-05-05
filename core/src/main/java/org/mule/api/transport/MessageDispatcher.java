@@ -10,6 +10,8 @@
 
 package org.mule.api.transport;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 
@@ -19,7 +21,6 @@ import org.mule.api.lifecycle.Disposable;
  */
 public interface MessageDispatcher extends Connectable, MessageDispatching
 {
-
     /**
      * This method can perform necessary state updates before any of the
      * {@link MessageDispatching} methods are invoked.
@@ -58,4 +59,8 @@ public interface MessageDispatcher extends Connectable, MessageDispatching
      * @return the endpoint which we are dispatching events to
      */
     OutboundEndpoint getEndpoint();
+    
+    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+
+    MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

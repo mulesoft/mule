@@ -10,8 +10,6 @@
 
 package org.mule.transport.vm;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
@@ -21,10 +19,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.QueueProfile;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
@@ -54,6 +50,7 @@ public class VMConnector extends AbstractConnector
         super(context);
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (queueTimeout == null)
@@ -75,31 +72,37 @@ public class VMConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
     }
 
+    @Override
     public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (!endpoint.isSynchronous())
@@ -107,26 +110,6 @@ public class VMConnector extends AbstractConnector
             queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }
         return serviceDescriptor.createMessageReceiver(this, service, endpoint);
-    }
-
-    public MessageAdapter getMessageAdapter(Object message) throws MuleException
-    {
-        if (message == null)
-        {
-            throw new NullPointerException(CoreMessages.objectIsNull("message").getMessage());
-        }
-        else if (message instanceof DefaultMuleMessage)
-        {
-            return ((DefaultMuleMessage)message).getAdapter();
-        }
-        else if (message instanceof MessageAdapter)
-        {
-            return (MessageAdapter)message;
-        }
-        else
-        {
-            throw new MessagingException(CoreMessages.objectNotOfCorrectType(message.getClass(), MessageAdapter.class), null);
-        }
     }
 
     public String getProtocol()
@@ -198,7 +181,7 @@ public class VMConnector extends AbstractConnector
 
         MessageReceiver receiver;
         // If we have an exact match, use it
-        receiver = (MessageReceiver)receivers.get(endpointUri.getAddress());
+        receiver = receivers.get(endpointUri.getAddress());
         if (receiver != null)
         {
             if (logger.isDebugEnabled())

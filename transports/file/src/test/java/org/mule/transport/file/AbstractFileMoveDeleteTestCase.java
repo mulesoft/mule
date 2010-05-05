@@ -10,24 +10,25 @@
 
 package org.mule.transport.file;
 
+import org.mule.transport.AbstractMuleMessageFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
 
 public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctionalTestCase
 {
 
-    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete, Class messageAdaptor)
-        throws Exception
+    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete, 
+        Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
     {
         FileConnector fc = new FileConnector(muleContext);
-        if (messageAdaptor != null)
+        if (messageFactoryClass != null)
         {
-            Map overrides = new HashedMap();
-            overrides.put("message.adapter", messageAdaptor.getName());
+            Map<String, String> overrides = new HashMap<String, String>();
+            overrides.put("message.factory", messageFactoryClass.getName());
             fc.setServiceOverrides(overrides);
         }
         fc.setName("moveDeleteConnector");

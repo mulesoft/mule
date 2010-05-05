@@ -11,9 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultExceptionStrategy;
-import org.mule.DefaultMuleMessage;
 import org.mule.MuleSessionHandler;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -29,6 +27,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -47,12 +46,12 @@ import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
+import org.mule.api.transport.MuleMessageFactory;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
@@ -367,6 +366,29 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             ((DefaultExceptionStrategy) exceptionListener).initialise();
         }
 
+    }
+
+    /**
+     * <p>Create a {@link MuleMessageFactory} from this connector's configuration, typically through the
+     * transport descriptor.</p>
+     * <p><b>Attention!</b> This method is not meant to be used by client code directly. It is only
+     * publicly available to service message receivers which should be used as <em>real</em> 
+     * factories to create {@link MuleMessage} instances.
+     * 
+     * @see MessageReceiver#createMuleMessage(Object)
+     * @see MessageReceiver#createMuleMessage(Object, String)
+     */
+    public MuleMessageFactory createMuleMessageFactory() throws CreateException
+    {
+        try
+        {
+            return serviceDescriptor.createMuleMessageFactory();
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessageFactory"), 
+                tse, this);
+        }
     }
 
     public ConnectorLifecycleManager getLifecycleManager()
@@ -2249,7 +2271,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             {
                 logger.debug("Transport '" + getProtocol() + "' will not support requests: ");
             }
-
+            
             sessionHandler = serviceDescriptor.createSessionHandler();
         }
         catch (Exception e)
@@ -2293,46 +2315,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     {
         return getServiceDescriptor().createMessageReceiver(this, service, endpoint);
     }
-
-    /**
-     * Gets a <code>MessageAdapter</code> for the endpoint for the given message
-     * (data)
-     *
-     * @param message the data with which to initialise the
-     *                <code>MessageAdapter</code>
-     * @return the <code>MessageAdapter</code> for the endpoint
-     * @throws org.mule.api.MessagingException
-     *          if the message parameter is not
-     *          supported
-     * @see org.mule.api.transport.MessageAdapter
-     */
-    public MessageAdapter getMessageAdapter(Object message) throws MuleException
-    {
-        try
-        {
-            return serviceDescriptor.createMessageAdapter(message);
-        }
-        catch (TransportServiceException e)
-        {
-            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                    new DefaultMuleMessage(message, muleContext), e);
-        }
-    }
-
-    public MessageAdapter getMessageAdapter(Object message, MessageAdapter originalMessageAdapter)
-            throws MessagingException
-    {
-        try
-        {
-            return serviceDescriptor.createMessageAdapter(message, originalMessageAdapter);
-        }
-        catch (TransportServiceException tse)
-        {
-            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
-                    new DefaultMuleMessage(message, muleContext), tse);
-        }
-    }
-
+    
     /**
      * A map of fully qualified class names that should override those in the
      * connectors' service descriptor This map will be null if there are no overrides

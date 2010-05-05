@@ -57,8 +57,7 @@ public class WireTap extends SelectiveConsumer
             
             // send a copy of the message as it may get processed by a different thread.
             MuleMessage originalMessage = event.getMessage();
-            MuleMessage tapMessage = new DefaultMuleMessage(originalMessage.getPayload(),
-                originalMessage.getAdapter(), muleContext);
+            MuleMessage tapMessage = DefaultMuleMessage.copy(originalMessage);
             
             tap.dispatch(new DefaultMuleEvent(tapMessage, tap, session, false));
         }

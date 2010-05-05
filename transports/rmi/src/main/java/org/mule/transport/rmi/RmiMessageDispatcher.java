@@ -10,7 +10,6 @@
 
 package org.mule.transport.rmi;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -21,7 +20,6 @@ import org.mule.transport.NullPayload;
 import java.lang.reflect.Method;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
-import java.util.Collections;
 
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
@@ -98,12 +96,11 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
         if (result == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+            return createMuleMessage(NullPayload.getInstance());
         }
         else
         {
-            return new DefaultMuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP,
-                    connector.getMuleContext());
+            return createMuleMessage(result);
         }
     }
 

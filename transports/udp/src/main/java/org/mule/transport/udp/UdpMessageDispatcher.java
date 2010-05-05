@@ -75,18 +75,21 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // nothing, there is an optional validation in validateConnection()
         
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // nothing to do
     }
 
 
+    @Override
     protected synchronized void doDispatch(MuleEvent event) throws Exception
     {
         ImmutableEndpoint ep = event.getEndpoint();
@@ -127,6 +130,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         socket.send(packet);
     }
 
+    @Override
     protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
@@ -137,9 +141,9 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
             DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
             {
-                return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+                return createNullMuleMessage();
             }
-            return new DefaultMuleMessage(connector.getMessageAdapter(result), event.getMessage(), connector.getMuleContext());
+            return createMuleMessage(result, event.getMessage(), endpoint.getEncoding());
         }
         else
         {
@@ -171,6 +175,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

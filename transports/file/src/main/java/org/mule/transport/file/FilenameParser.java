@@ -10,8 +10,8 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.transport.MessageAdapter;
 
 /**
  * <code>FilenameParser</code> is a simple expression parser interface for
@@ -19,5 +19,5 @@ import org.mule.api.transport.MessageAdapter;
  */
 public interface FilenameParser extends MuleContextAware
 {
-    public String getFilename(MessageAdapter adapter, String pattern);
+    public String getFilename(MuleMessage message, String pattern);
 }

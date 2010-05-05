@@ -17,7 +17,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -90,21 +89,25 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // noop
     }
 
+    @Override
     public void processMessage(Object message) throws Exception
     {
         Connection con = null;
@@ -112,8 +115,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         try
         {
             con = this.connector.getConnection();
-            MessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
-            MuleMessage muleMessage = new DefaultMuleMessage(msgAdapter, connector.getMuleContext());
+            MuleMessage muleMessage = createMuleMessage(message, endpoint.getEncoding());
             if (this.ackStmt != null)
             {
                 if (aggregateResult)
@@ -186,6 +188,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
+    @Override
     public List getMessages() throws Exception
     {
         Connection con = null;

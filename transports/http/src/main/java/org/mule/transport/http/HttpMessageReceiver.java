@@ -27,36 +27,27 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.MuleMessageFactory;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.TcpMessageReceiver;
-import org.mule.util.IOUtils;
 import org.mule.util.MapUtils;
-import org.mule.util.ObjectUtils;
 import org.mule.util.monitor.Expirable;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.httpclient.cookie.CookieSpec;
-import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -126,8 +117,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected class HttpWorker implements Work, Expirable
     {
         private HttpServerConnection conn;
-        private String cookieSpec;
-        private boolean enableCookies = true;
         private String remoteClientAddress;
 
         public HttpWorker(Socket socket) throws IOException
@@ -139,13 +128,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
 
             conn = new HttpServerConnection(socket, encoding, (HttpConnector) connector);
-
-            cookieSpec =
-                    MapUtils.getString(endpoint.getProperties(), HttpConnector.HTTP_COOKIE_SPEC_PROPERTY,
-                            ((HttpConnector) connector).getCookieSpec());
-            enableCookies =
-                    MapUtils.getBooleanValue(endpoint.getProperties(), HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY,
-                            ((HttpConnector) connector).isEnableCookies());
 
             final SocketAddress clientAddress = socket.getRemoteSocketAddress();
             if (clientAddress != null)
@@ -230,7 +212,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     || method.equals(HttpConstants.METHOD_TRACE)
                     || method.equals(HttpConstants.METHOD_CONNECT))
             {
-                return doRequest(request, requestLine);
+                return doRequest(request);
             }
             else
             {
@@ -239,15 +221,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
 
 
-        protected HttpResponse doRequest(HttpRequest request,
-                                         RequestLine requestLine) throws IOException, MuleException
+        protected HttpResponse doRequest(HttpRequest request) throws IOException, MuleException
         {
-            Map headers = parseHeaders(request);
+            sendExpect100(request);
 
-            // TODO Mule 2.0 generic way to set stream message adapter
-            MessageAdapter adapter = buildStandardAdapter(request, headers);
-
-            MuleMessage message = new DefaultMuleMessage(adapter, connector.getMuleContext());
+            MuleMessage message = createMuleMessage(request);
 
             String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             int i = path.indexOf('?');
@@ -324,7 +302,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             else
             {
-                response = buildFailureResponse(requestLine, message);
+                response = buildFailureResponse(request.getRequestLine(), message);
             }
             return response;
         }
@@ -345,7 +323,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
-            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+            MuleMessage message = createMuleMessage((Object) null);
             MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
@@ -356,7 +334,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
         {
-            MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
+            MuleMessage message = createMuleMessage((Object) null);
             MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
@@ -365,57 +343,31 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected MessageAdapter buildStandardAdapter(final HttpRequest request,
-                                                         final Map headers) throws MuleException, TransformerException, IOException
+        private void sendExpect100(HttpRequest request) throws TransformerException, IOException
         {
-            final RequestLine requestLine = request.getRequestLine();
-
-            sendExpect100(headers, requestLine);
-
-            Object body = request.getBody();
+            RequestLine requestLine = request.getRequestLine();
             
-            // If http method is GET we use the request uri as the payload.
-            if (body == null)
-            {
-                body = requestLine.getUri();
-            }
-            else
-            {
-                // If we are running async we need to read stream into a byte[].
-                // Passing along the InputStream doesn't work because the
-                // HttpConnection gets closed and closes the InputStream, often
-                // before it can be read.
-                if (!endpoint.isSynchronous())
-                {
-                    logger.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
-                    body = new ByteArrayInputStream(IOUtils.toByteArray((InputStream) body));
-                }
-            }
-
-            return connector.getMessageAdapter(new Object[]{body, headers});
-        }
-
-        private void sendExpect100(Map headers, RequestLine requestLine)
-            throws TransformerException, IOException
-        {
             // respond with status code 100, for Expect handshake
             // according to rfc 2616 and http 1.1
             // the processing will continue and the request will be fully
             // read immediately after
-            if (HttpConstants.HTTP11.equals(headers.get(HttpConnector.HTTP_VERSION_PROPERTY)))
+            HttpVersion requestVersion = requestLine.getHttpVersion();
+            if (HttpVersion.HTTP_1_1.equals(requestVersion))
             {
-                // just in case we have something other than String in
-                // the headers map
-                String expectHeaderValue = ObjectUtils.toString(
-                        headers.get(HttpConstants.HEADER_EXPECT)).toLowerCase();
-                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                Header expectHeader = request.getFirstHeader(HttpConstants.HEADER_EXPECT);
+                if (expectHeader != null)
                 {
-                    HttpResponse expected = new HttpResponse();
-                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
-                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected, connector.getMuleContext()), endpoint,
-                            new DefaultMuleSession(service, connector.getMuleContext()), true);
-                    RequestContext.setEvent(event);
-                    conn.writeResponse(transformResponse(expected));
+                    String expectHeaderValue = expectHeader.getValue();
+                    if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                    {
+                        HttpResponse expected = new HttpResponse();
+                        expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
+                            connector.getMuleContext()), endpoint, new DefaultMuleSession(service,
+                            connector.getMuleContext()), true);
+                        RequestContext.setEvent(event);
+                        conn.writeResponse(transformResponse(expected));
+                    }
                 }
             }
         }
@@ -438,62 +390,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     new DefaultMuleSession(service, connector.getMuleContext()), true));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
-        }
-
-        protected Map parseHeaders(HttpRequest request) throws MalformedCookieException
-        {
-            RequestLine requestLine = request.getRequestLine();
-            Map<String, Object> headers = new HashMap<String, Object>();
-
-            for (Iterator rhi = request.getHeaderIterator(); rhi.hasNext();)
-            {
-                Header header = (Header) rhi.next();
-                String headerName = header.getName();
-                Object headerValue = header.getValue();
-
-                // fix Mule headers?
-                if (headerName.startsWith("X-MULE"))
-                {
-                    headerName = headerName.substring(2);
-                }
-                // Parse cookies?
-                else if (headerName.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
-                {
-                    if (enableCookies)
-                    {
-                        CookieSpec cs = CookieHelper.getCookieSpec(cookieSpec);
-
-                        EndpointURI endpointURI = endpoint.getEndpointURI();
-                        Cookie[] cookies = cs.parse(endpointURI.getHost(), endpointURI.getPort(),
-                                endpointURI.getPath(), 
-                                endpointURI.getScheme().equalsIgnoreCase("https"), header);
-                        if (cookies.length > 0)
-                        {
-                            // yum!
-                            headerValue = cookies;
-                        }
-                        else
-                        {
-                            // bad cookies?!
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        // no cookies for you!
-                        continue;
-                    }
-                }
-
-                // accept header & value
-                headers.put(headerName, headerValue);
-            }
-
-            headers.put(HttpConnector.HTTP_METHOD_PROPERTY, requestLine.getMethod());
-            headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, requestLine.getUri());
-            headers.put(HttpConnector.HTTP_VERSION_PROPERTY, requestLine.getHttpVersion().toString());
-            headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
-            return headers;
         }
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
@@ -584,15 +480,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return (HttpResponse) message.getPayload();
     }
 
-    public static MessageReceiver findReceiverByStem(Map receivers, String uriStr)
+    public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)
     {
         int match = 0;
         MessageReceiver receiver = null;
-        for (Iterator itr = receivers.entrySet().iterator(); itr.hasNext();)
+        for (Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
         {
-            Map.Entry e = (Map.Entry) itr.next();
             String key = (String) e.getKey();
-            MessageReceiver candidate = (MessageReceiver) e.getValue();
+            MessageReceiver candidate = e.getValue();
             if (uriStr.startsWith(key) && match < key.length())
             {
                 match = key.length();
@@ -601,5 +496,22 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         return receiver;
     }
+    
+    @Override
+    protected MuleMessageFactory createMuleMessageFactory() throws CreateException
+    {
+        HttpMuleMessageFactory muleMessageFactory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
 
+        boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
+            HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
+        muleMessageFactory.setEnableCookies(enableCookies);
+
+        String cookieSpec = MapUtils.getString(endpoint.getProperties(),
+            HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
+        muleMessageFactory.setCookieSpec(cookieSpec);
+        
+        muleMessageFactory.setSynchronous(endpoint.isSynchronous());
+
+        return muleMessageFactory;
+    }
 }

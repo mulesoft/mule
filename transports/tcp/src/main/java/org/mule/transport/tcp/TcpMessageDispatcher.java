@@ -41,6 +41,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (TcpConnector) endpoint.getConnector();
     }
 
+    @Override
     protected synchronized void doDispatch(MuleEvent event) throws Exception
     {
         Socket socket = connector.getSocket(event.getEndpoint());
@@ -54,6 +55,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
         Socket socket = connector.getSocket(event.getEndpoint());
@@ -76,7 +78,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                         return (MuleMessage) result;
                     }
                     
-                    return new DefaultMuleMessage(connector.getMessageAdapter(result), connector.getMuleContext());
+                    return createMuleMessage(result, endpoint.getEncoding());
                 }
                 catch (SocketTimeoutException e)
                 {
