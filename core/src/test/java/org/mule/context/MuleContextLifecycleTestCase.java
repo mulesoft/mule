@@ -139,12 +139,32 @@ public class MuleContextLifecycleTestCase
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
+        final AtomicBoolean startingNotifFired = new AtomicBoolean(false);
+        final AtomicBoolean startedNotifFired = new AtomicBoolean(false);
+        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            public void onNotification(MuleContextNotification notification)
+            {
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
+                {
+                    startingNotifFired.set(true);
+                }
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                {
+                    startedNotifFired.set(true);
+                }
+            }
+        });
         ctx.start();
         assertTrue(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertTrue(ctx.isStarted());
         assertFalse(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
+
+        assertTrue("CONTEXT_STARTING notification never fired", startingNotifFired.get());
+        assertTrue("CONTEXT_STARTED notification never fired", startedNotifFired.get());
+
     }
 
     @Test(expected=IllegalStateException.class)
@@ -153,8 +173,27 @@ public class MuleContextLifecycleTestCase
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
+        final AtomicBoolean startingNotifFired = new AtomicBoolean(false);
+        final AtomicBoolean startedNotifFired = new AtomicBoolean(false);
+        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            public void onNotification(MuleContextNotification notification)
+            {
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
+                {
+                    startingNotifFired.set(true);
+                }
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                {
+                    startedNotifFired.set(true);
+                }
+            }
+        });
         ctx.start();
 
+        assertTrue("CONTEXT_STARTING notification never fired", startingNotifFired.get());
+        assertTrue("CONTEXT_STARTED notification never fired", startedNotifFired.get());
+        
         // Can't call twice
         ctx.start();
     }
