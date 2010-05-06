@@ -210,8 +210,6 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
             try
             {
-                // stop shouldn't be needed, see http://www.mulesoft.org/jira/browse/MULE-4867
-                muleContext.stop();
                 muleContext.dispose();
                 Thread.currentThread().setContextClassLoader(null);
                 // TODO this is really a job of a deployer and deployment descriptor info
