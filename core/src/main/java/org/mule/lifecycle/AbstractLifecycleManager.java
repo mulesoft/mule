@@ -12,6 +12,7 @@ package org.mule.lifecycle;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePair;
@@ -21,6 +22,8 @@ import org.mule.api.lifecycle.ReverseLifecyclePhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,9 +34,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Provides a base implementation of a lifecycle manager that will manage all state and transitions
  *
- * Note that {@link org.mule.api.lifecycle.Disposable.PHASE_NAME} can be called from any phase, so if you are customising
- * the lifecycle states you need to handle any transitions before dispose, but invoking those lifecycles on the object being
- * managed.
+ * Note that {@link org.mule.api.lifecycle.Disposable.PHASE_NAME} can be called from any phase, so 
+ * if you are customising the lifecycle states you need to handle any transitions before dispose, 
+ * but invoking those lifecycles on the object being managed.
  */
 public abstract class AbstractLifecycleManager implements LifecycleManager, MuleContextAware
 {
@@ -44,6 +47,14 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
     protected static final NotInLifecyclePhase notInLifecyclePhase = new NotInLifecyclePhase();
 
+    /**
+     * These transitions do not have to go through the full lifecycle - we can jump directy to
+     * the target phase.
+     * <p/>
+     * Format: &lt;current phase&gt;-&lt;target phase&gt;
+     */
+    protected static final Set<String> DIRECT_TRANSITIONS;
+    
     protected String currentPhase = notInLifecyclePhase.getName();
     protected String executingPhase = null;
     protected Set<String> completedPhases = new LinkedHashSet<String>(6);
@@ -55,6 +66,15 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
     //this is an internal list to track indexes
     private List<LifecyclePhase> index;
 
+    static
+    {
+        Set<String> directTransitions = new HashSet<String>();
+        directTransitions.add(NotInLifecyclePhase.PHASE_NAME + "-" + Disposable.PHASE_NAME);
+        directTransitions.add(Initialisable.PHASE_NAME + "-" + Disposable.PHASE_NAME);
+        
+        DIRECT_TRANSITIONS = Collections.unmodifiableSet(directTransitions);
+    }
+    
     public AbstractLifecycleManager()
     {
         state = createLifecycleState();
@@ -87,24 +107,24 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
     protected List<LifecyclePhase> getPhasesIndex()
     {
-        if(index==null)
+        if (index == null)
         {
-             index = new ArrayList<LifecyclePhase>(lifecyclePairs.size() * 2 + 1);
+            index = new ArrayList<LifecyclePhase>(lifecyclePairs.size() * 2 + 1);
             index.add(notInLifecyclePhase);
             for (LifecyclePair pair : lifecyclePairs)
             {
                 index.add(pair.getBegin());
             }
 
-            //loop backwards to add the end phases in order
-            for (int i = lifecyclePairs.size()-1; i>=0; i--)
+            // loop backwards to add the end phases in order
+            for (int i = lifecyclePairs.size() - 1; i >= 0; i--)
             {
-               index.add(lifecyclePairs.get(i).getEnd());
+                index.add(lifecyclePairs.get(i).getEnd());
             }
         }
         return index;
-
     }
+
     protected synchronized int getPhaseIndex(String phase)
     {
         int i = 0;
@@ -128,7 +148,6 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
     protected void invokePhase(LifecyclePhase phase) throws LifecycleException
     {
-
         try
         {
             setExecutingPhase(phase.getName());
@@ -161,30 +180,43 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
         }
     }
 
-    public void fireLifecycle(String phase) throws LifecycleException
+    public void fireLifecycle(String destinationPhase) throws LifecycleException
     {
-        checkPhase(phase);
-        
-        int current = getPhaseIndex(currentPhase);
-        int end = getPhaseIndex(phase);
-        LifecyclePhase li;
+        checkPhase(destinationPhase);
 
-        if(end < current)
+        if (isDirectTransition(destinationPhase))
         {
-            li = getPhaseForIndex(end);
-            invokePhase(li);
-            //logger.warn("Phase: " + phase + " has already been fired for Registry: " + registry.getRegistryId());
-            return;
+            // transition to phase without going through other phases first
+            LifecyclePhase phase = lookupPhase(destinationPhase);
+            invokePhase(phase);
         }
-
-        //we want to start at the next one from current
-        current++;
-        while(current <= end)
+        else
         {
-            li = getPhaseForIndex(current);
-            invokePhase(li);
+            int current = getPhaseIndex(currentPhase);
+            int end = getPhaseIndex(destinationPhase);
+
+            if (end < current)
+            {
+                LifecyclePhase phase = getPhaseForIndex(end);
+                invokePhase(phase);
+                return;
+            }
+
+            // we want to start at the next one from current
             current++;
+            while (current <= end)
+            {
+                LifecyclePhase phase = getPhaseForIndex(current);
+                invokePhase(phase);
+                current++;
+            }
         }
+    }
+
+    protected boolean isDirectTransition(String destinationPhase)
+    {
+        String key = getCurrentPhase() + "-" + destinationPhase;
+        return DIRECT_TRANSITIONS.contains(key);
     }
 
     public String getCurrentPhase()
@@ -238,8 +270,10 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
 
     public void applyCompletedPhases(Object object) throws LifecycleException
     {
-        
-        logger.debug("applying lifecycle to " + object);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("applying lifecycle to " + object);
+        }
 
         LifecyclePhase lcp;
         String phase;

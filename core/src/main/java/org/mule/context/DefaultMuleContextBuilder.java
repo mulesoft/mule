@@ -12,6 +12,7 @@ package org.mule.context;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextBuilder;
@@ -28,7 +29,10 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
@@ -87,13 +91,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     public MuleContext buildMuleContext()
     {
         logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
-        MuleContextLifecycleManager lifecycleManager = getLifecycleManager();
+        MuleContextLifecycleManager manager = getLifecycleManager();
         DefaultMuleContext muleContext = new DefaultMuleContext(getMuleConfiguration(),
                                                          getWorkManager(),
                                                          getWorkListener(),
-                                                         lifecycleManager,
+                                                         manager,
                                                          getNotificationManager());
-        lifecycleManager.setMuleContext(muleContext);
+        manager.setMuleContext(muleContext);
         muleContext.setSplash(startupScreen, shutdownScreen);
         return muleContext;
     }
@@ -117,11 +121,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
     {
         this.notificationManager = notificationManager;
     }
-
-    public void setLifecycleManager(LifecycleManager lifecycleManager)
-    {
-        this.lifecycleManager = (MuleContextLifecycleManager)lifecycleManager;
-    }
     
     protected MuleConfiguration getMuleConfiguration()
     {
@@ -143,12 +142,65 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            MuleContextLifecycleManager lifecycleManager = new MuleContextLifecycleManager();
-            //lifecycleManager.registerLifecycle(new NotInLifecyclePhase(), "c");
-            lifecycleManager.registerLifecycle(new DefaultLifecyclePair(new MuleContextInitialisePhase(), new MuleContextDisposePhase()));
-            lifecycleManager.registerLifecycle(new DefaultLifecyclePair(new MuleContextStartPhase(), new MuleContextStopPhase()));
-            return lifecycleManager;
+            MuleContextLifecycleManager manager = new MuleContextLifecycleManager();
+            addRequiredLifecyclePairs(manager);
+            return manager;
         }
+    }
+
+    public void setLifecycleManager(LifecycleManager manager)
+    {
+        if ((manager instanceof MuleContextLifecycleManager) == false)
+        {
+            Message msg = MessageFactory.createStaticMessage(
+                "lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
+            throw new MuleRuntimeException(msg);
+        }
+        
+        MuleContextLifecycleManager contextManager = (MuleContextLifecycleManager) manager;
+        addRequiredLifecyclePairs(contextManager);
+        
+        lifecycleManager = contextManager;
+    }
+
+    protected void addRequiredLifecyclePairs(MuleContextLifecycleManager contextManager)
+    {
+        boolean initializeDisposePairPresent = false;
+        boolean startStopPairPresent = false;
+        for (LifecyclePair pair : contextManager.getLifecyclePairs())
+        {
+            if ((pair.getBegin() instanceof MuleContextInitialisePhase) && 
+                (pair.getEnd() instanceof MuleContextDisposePhase))
+            {
+                initializeDisposePairPresent = true;
+            }
+            
+            if ((pair.getBegin() instanceof MuleContextStartPhase) &&
+                (pair.getEnd() instanceof MuleContextStopPhase))
+            {
+                startStopPairPresent = true;
+            }
+        }
+        
+        if (initializeDisposePairPresent == false)
+        {
+            registerInitializeDisposeLifecyclePair(contextManager);
+        }
+        if (startStopPairPresent == false)
+        {
+            registerStartStopLifecyclePair(contextManager);
+        }
+    }
+
+    protected void registerInitializeDisposeLifecyclePair(MuleContextLifecycleManager manager)
+    {
+        DefaultLifecyclePair pair = new DefaultLifecyclePair(new MuleContextInitialisePhase(), new MuleContextDisposePhase());
+        manager.registerLifecycle(pair);
+    }
+
+    private void registerStartStopLifecyclePair(MuleContextLifecycleManager manager)
+    {
+        manager.registerLifecycle(new DefaultLifecyclePair(new MuleContextStartPhase(), new MuleContextStopPhase()));
     }
 
     protected WorkManager getWorkManager()
@@ -183,27 +235,27 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            ServerNotificationManager notificationManager = new ServerNotificationManager();
-            notificationManager.addInterfaceToType(MuleContextNotificationListener.class,
+            ServerNotificationManager manager = new ServerNotificationManager();
+            manager.addInterfaceToType(MuleContextNotificationListener.class,
                 MuleContextNotification.class);
-            notificationManager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
-            notificationManager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
-            notificationManager.addInterfaceToType(ServiceNotificationListener.class,
+            manager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
+            manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
+            manager.addInterfaceToType(ServiceNotificationListener.class,
                 ServiceNotification.class);
-            notificationManager.addInterfaceToType(SecurityNotificationListener.class,
+            manager.addInterfaceToType(SecurityNotificationListener.class,
                 SecurityNotification.class);
-            notificationManager.addInterfaceToType(ManagementNotificationListener.class,
+            manager.addInterfaceToType(ManagementNotificationListener.class,
                 ManagementNotification.class);
-            notificationManager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-            notificationManager.addInterfaceToType(ConnectionNotificationListener.class,
+            manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+            manager.addInterfaceToType(ConnectionNotificationListener.class,
                 ConnectionNotification.class);
-            notificationManager.addInterfaceToType(RegistryNotificationListener.class,
+            manager.addInterfaceToType(RegistryNotificationListener.class,
                 RegistryNotification.class);
-            notificationManager.addInterfaceToType(ExceptionNotificationListener.class,
+            manager.addInterfaceToType(ExceptionNotificationListener.class,
                 ExceptionNotification.class);
-            notificationManager.addInterfaceToType(TransactionNotificationListener.class,
+            manager.addInterfaceToType(TransactionNotificationListener.class,
                 TransactionNotification.class);
-            return notificationManager;
+            return manager;
         }
     }
 
@@ -227,6 +279,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         this.shutdownScreen = shutdownScreen;
     }
 
+    @Override
     public String toString()
     {
         return ClassUtils.getClassName(getClass()) + 
