@@ -10,6 +10,9 @@
 
 package org.mule.model.seda;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
@@ -25,12 +28,7 @@ import org.mule.model.AbstractServiceTestCase;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
-import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
-
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.FullConstraintMatcher;
-import com.mockobjects.dynamic.Mock;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
@@ -44,7 +42,8 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 {
     private SedaService service;
 
-     protected void doSetUp() throws Exception
+     @Override
+    protected void doSetUp() throws Exception
      {
          service = new SedaService(muleContext);
          service.setName("test");
@@ -74,27 +73,13 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 
         QueueManager queueManager = muleContext.getQueueManager();
 
-        Mock mockTransactionalQueueManager = new Mock(QueueManager.class);
-        mockTransactionalQueueManager.expect("toString");
-        mockTransactionalQueueManager.expect("setQueueConfiguration", new FullConstraintMatcher(
-            C.eq(queueName), C.eq(new QueueConfiguration(capacity, persistent))));
-         mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-        mockTransactionalQueueManager.expectAndReturn("getQueueSession", queueManager.getQueueSession());
-        mockTransactionalQueueManager.expectAndReturn("getQueueSession", queueManager.getQueueSession());
-        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-        mockTransactionalQueueManager.expect("start");
-        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-        mockTransactionalQueueManager.expect("stop");
-        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-        mockTransactionalQueueManager.expect("dispose");
-        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-        mockTransactionalQueueManager.expectAndReturn("hashCode", 3456);
-
+        QueueManager mockTransactionalQueueManager = mock(QueueManager.class);
+        when(mockTransactionalQueueManager.getQueueSession()).thenReturn(queueManager.getQueueSession());
+        
         // Replace queueManager instance with mock via registry as it cannot be set
         // once muleContext is initialized.
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, 
-            mockTransactionalQueueManager.proxy());
-
+            mockTransactionalQueueManager);
         
         service.setQueueProfile(new QueueProfile(capacity, persistent));
 
@@ -115,7 +100,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         }
 
         assertEquals(queueName, service.queue.getName());
-
     }
 
     public void testSedaModelEventTimeoutDefault() throws Exception

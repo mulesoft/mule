@@ -13,17 +13,19 @@ package org.mule.transaction;
 import org.mule.api.transaction.Transaction;
 import org.mule.tck.AbstractMuleTestCase;
 
-import com.mockobjects.dynamic.Mock;
+import org.mockito.Mockito;
 
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
-    volatile TransactionCoordination tc;
+    private TransactionCoordination tc;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         tc = TransactionCoordination.getInstance();
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         tc.unbindTransaction(tc.getTransaction());
@@ -32,8 +34,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testBindTransaction() throws Exception
     {
         assertNull(tc.getTransaction());
-        Mock mockTx = new Mock(Transaction.class, "trans");
-        Transaction tx = (Transaction)mockTx.proxy();
+        Transaction tx = Mockito.mock(Transaction.class);
 
         tc.bindTransaction(tx);
         assertEquals(tx, tc.getTransaction());
@@ -43,15 +44,14 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testBindTransactionWithAlreadyBound() throws Exception
     {
         assertNull(tc.getTransaction());
-        Mock mockTx = new Mock(Transaction.class, "trans");
-        Transaction tx = (Transaction)mockTx.proxy();
+        Transaction tx = Mockito.mock(Transaction.class);
 
         tc.bindTransaction(tx);
         assertEquals(tx, tc.getTransaction());
 
         try
         {
-            Transaction tx2 = (Transaction)new Mock(Transaction.class, "trans").proxy();
+            Transaction tx2 = Mockito.mock(Transaction.class);
             tc.bindTransaction(tx2);
             fail();
         }
@@ -66,20 +66,18 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     public void testUnbindTransactionWithoutBound() throws Exception
     {
         assertNull(tc.getTransaction());
-        Mock mockTx = new Mock(Transaction.class, "trans");
-        Transaction tx = (Transaction)mockTx.proxy();
+        Transaction tx = Mockito.mock(Transaction.class);
+
         tc.unbindTransaction(tx);
     }
 
     public void testSetInstanceWithBound() throws Exception
     {
         assertNull(tc.getTransaction());
-        Mock mockTx = new Mock(Transaction.class, "trans");
-        Transaction tx = (Transaction)mockTx.proxy();
+        Transaction tx = Mockito.mock(Transaction.class);
 
         tc.bindTransaction(tx);
 
         tc.unbindTransaction(tx);
     }
-
 }

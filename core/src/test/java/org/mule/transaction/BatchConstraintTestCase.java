@@ -15,14 +15,13 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.transaction.constraints.ConstraintFilter;
 
-import com.mockobjects.dynamic.Mock;
+import org.mockito.Mockito;
 
 public class BatchConstraintTestCase extends AbstractMuleTestCase
 {
-
     public void testConstraintFilter() throws Exception
     {
-        MuleEvent testEvent = (MuleEvent)new Mock(MuleEvent.class).proxy();
+        MuleEvent testEvent = Mockito.mock(MuleEvent.class);
         BatchConstraint filter = new BatchConstraint();
         filter.setBatchSize(3);
         assertEquals(3, filter.getBatchSize());
@@ -35,5 +34,4 @@ public class BatchConstraintTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(testEvent));
         assertTrue(filter.accept(testEvent));
     }
-
 }
