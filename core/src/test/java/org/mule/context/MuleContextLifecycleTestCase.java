@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextBuilder;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -25,6 +26,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.security.SecurityManager;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.util.UUID;
 import org.mule.util.queue.QueueManager;
@@ -32,6 +34,7 @@ import org.mule.util.queue.QueueManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -278,6 +281,17 @@ public class MuleContextLifecycleTestCase
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
+        final AtomicBoolean stopNotificationFired = new AtomicBoolean(false);
+        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            public void onNotification(MuleContextNotification notification)
+            {
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPING)
+                {
+                    stopNotificationFired.set(true);
+                }
+            }
+        });
         ctx.start();
         ctx.dispose();
         assertFalse(ctx.isInitialised());
@@ -285,9 +299,11 @@ public class MuleContextLifecycleTestCase
         assertFalse(ctx.isStarted());
         assertTrue(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
-        
+
         // disposing started must go through stop
         assertLifecycleManagerDidApplyAllPhases();
+
+        assertTrue("CONTEXT_STOPPING notification never fired", stopNotificationFired.get());
     }
     
     @Test
