@@ -250,6 +250,18 @@ public class DefaultMuleContext implements MuleContext
 
     public synchronized void dispose()
     {
+        if (isStarted() && !isStopped())
+        {
+            try
+            {
+                stop();
+            }
+            catch (MuleException e)
+            {
+                logger.error("Failed to stop Mule context", e);
+            }
+        }
+
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));

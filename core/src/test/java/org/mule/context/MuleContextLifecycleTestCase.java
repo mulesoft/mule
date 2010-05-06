@@ -10,9 +10,6 @@
 
 package org.mule.context;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextBuilder;
@@ -39,6 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MuleContextLifecycleTestCase 
 {
@@ -281,14 +281,19 @@ public class MuleContextLifecycleTestCase
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
-        final AtomicBoolean stopNotificationFired = new AtomicBoolean(false);
+        final AtomicBoolean stoppingNotifFired = new AtomicBoolean(false);
+        final AtomicBoolean stoppedNotifFired = new AtomicBoolean(false);
         ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
         {
             public void onNotification(MuleContextNotification notification)
             {
                 if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPING)
                 {
-                    stopNotificationFired.set(true);
+                    stoppingNotifFired.set(true);
+                }
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
+                {
+                    stoppedNotifFired.set(true);
                 }
             }
         });
@@ -303,7 +308,8 @@ public class MuleContextLifecycleTestCase
         // disposing started must go through stop
         assertLifecycleManagerDidApplyAllPhases();
 
-        assertTrue("CONTEXT_STOPPING notification never fired", stopNotificationFired.get());
+        assertTrue("CONTEXT_STOPPING notification never fired", stoppingNotifFired.get());
+        assertTrue("CONTEXT_STOPPED notification never fired", stoppedNotifFired.get());
     }
     
     @Test
