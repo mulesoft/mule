@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a prototype in Spring, so spring
- * does not manage the object.
+ * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a 
+ * prototype in Spring, so spring does not manage the object.
  */
 public class TransformerLifecycleTestCase extends FunctionalTestCase
 {
@@ -32,18 +32,20 @@ public class TransformerLifecycleTestCase extends FunctionalTestCase
 
     public void testLifecycleInSpring() throws Exception
     {
-        TransformerLifecycleTracker transformer = (TransformerLifecycleTracker)muleContext.getRegistry().lookupTransformer("lifecycle");
+        TransformerLifecycleTracker transformer = 
+            (TransformerLifecycleTracker) muleContext.getRegistry().lookupTransformer("lifecycle");
         assertNotNull(transformer);
+        
         muleContext.dispose();
         assertLifecycle(transformer);
     }
-
 
     public void testLifecycleInTransientRegistry() throws Exception
     {
         TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
         transformer.setProperty("foo");
         muleContext.getRegistry().registerTransformer(transformer);
+        
         muleContext.dispose();
         assertLifecycle(transformer);
     }
@@ -52,8 +54,6 @@ public class TransformerLifecycleTestCase extends FunctionalTestCase
     {
         assertEquals("[setProperty, initialise, dispose]", transformer.getTracker().toString());
     }
-
-
 
     public static class TransformerLifecycleTracker extends AbstractTransformer implements Disposable
     {
@@ -70,7 +70,7 @@ public class TransformerLifecycleTestCase extends FunctionalTestCase
 
         public String getProperty()
         {
-            return null;
+            return property;
         }
 
         public void setProperty(String property)
@@ -89,6 +89,7 @@ public class TransformerLifecycleTestCase extends FunctionalTestCase
             tracker.add("initialise");
         }
 
+        @Override
         public void dispose()
         {
             tracker.add("dispose");
