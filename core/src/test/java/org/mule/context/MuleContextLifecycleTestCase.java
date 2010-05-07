@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleAssert.assertTrue;
 
 public class MuleContextLifecycleTestCase 
 {
@@ -138,33 +139,20 @@ public class MuleContextLifecycleTestCase
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
+        
         new DefaultsConfigurationBuilder().configure(ctx);
-        final AtomicBoolean startingNotifFired = new AtomicBoolean(false);
-        final AtomicBoolean startedNotifFired = new AtomicBoolean(false);
-        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            public void onNotification(MuleContextNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
-                {
-                    startingNotifFired.set(true);
-                }
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    startedNotifFired.set(true);
-                }
-            }
-        });
+        NotificationListener listener = new NotificationListener();
+        ctx.registerListener(listener);
         ctx.start();
+        
         assertTrue(ctx.isInitialised());
         assertFalse(ctx.isInitialising());
         assertTrue(ctx.isStarted());
         assertFalse(ctx.isDisposed());
         assertFalse(ctx.isDisposing());
 
-        assertTrue("CONTEXT_STARTING notification never fired", startingNotifFired.get());
-        assertTrue("CONTEXT_STARTED notification never fired", startedNotifFired.get());
-
+        assertTrue("CONTEXT_STARTING notification never fired", listener.startingNotificationFired);
+        assertTrue("CONTEXT_STARTED notification never fired", listener.startedNotificationFired);
     }
 
     @Test(expected=IllegalStateException.class)
@@ -172,27 +160,14 @@ public class MuleContextLifecycleTestCase
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
+        
         new DefaultsConfigurationBuilder().configure(ctx);
-        final AtomicBoolean startingNotifFired = new AtomicBoolean(false);
-        final AtomicBoolean startedNotifFired = new AtomicBoolean(false);
-        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            public void onNotification(MuleContextNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
-                {
-                    startingNotifFired.set(true);
-                }
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    startedNotifFired.set(true);
-                }
-            }
-        });
+        NotificationListener listener = new NotificationListener();
+        ctx.registerListener(listener);
         ctx.start();
 
-        assertTrue("CONTEXT_STARTING notification never fired", startingNotifFired.get());
-        assertTrue("CONTEXT_STARTED notification never fired", startedNotifFired.get());
+        assertTrue("CONTEXT_STARTING notification never fired", listener.startingNotificationFired);
+        assertTrue("CONTEXT_STARTED notification never fired", listener.startedNotificationFired);
         
         // Can't call twice
         ctx.start();
@@ -431,6 +406,24 @@ public class MuleContextLifecycleTestCase
         {
             appliedLifecyclePhases.add(phase.getName());
             super.doApplyPhase(phase);
+        }
+    }
+    
+    static class NotificationListener implements MuleContextNotificationListener<MuleContextNotification>
+    {
+        final AtomicBoolean startingNotificationFired = new AtomicBoolean(false);
+        final AtomicBoolean startedNotificationFired = new AtomicBoolean(false);
+        
+        public void onNotification(MuleContextNotification notification)
+        {
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
+            {
+                startingNotificationFired.set(true);
+            }
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+            {
+                startedNotificationFired.set(true);
+            }
         }
     }
 }
