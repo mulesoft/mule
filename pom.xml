@@ -125,6 +125,8 @@
         <jettyVersion>6.1.22</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
         <log4jVersion>1.2.14</log4jVersion>
+        <mockitoVersion>1.8.0</mockitoVersion>
+        <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
@@ -549,6 +551,17 @@
                 <groupId>mockobjects</groupId>
                 <artifactId>mockobjects-core</artifactId>
                 <version>0.09</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockitoVersion}</version>
+            </dependency>
+            <dependency>
+                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
+                <groupId>com.googlecode.multithreadedtc</groupId>
+                <artifactId>multithreadedtc</artifactId>
+                <version>${multithreadedtcVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -1375,6 +1388,8 @@
                         <exclude>**/Abstract*.*</exclude>
                         <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
                         <exclude>**/Test*.java</exclude>
+                        <!-- exclude inner classes -->
+                        <exclude>**/*$*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
