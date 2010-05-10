@@ -24,6 +24,10 @@
     <tcp:connector name="connectorWithProtocolClass">
         <tcp:custom-protocol class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
     </tcp:connector>
+                   
+    <tcp:polling-connector name="pollingConnector"
+                   clientSoTimeout="3000"
+                   pollingFrequency="4000"/>
 
     <spring:bean name="tcpProtocol" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
     <tcp:connector name="connectorWithProtocolRef">

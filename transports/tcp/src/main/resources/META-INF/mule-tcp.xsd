@@ -28,6 +28,7 @@
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
+    
     <xsd:element name="connector" type="tcpConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
@@ -36,6 +37,35 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="polling-connector" type="pollingTcpConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Connects Mule to a TCP socket to send or receive data via the network.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+	<xsd:complexType name="pollingTcpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="tcpConnectorType">
+                <xsd:attribute name="timeout" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The timeout to wait in milliseconds for data to come from the server
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        	The time in milliseconds to wait between each request to the TCP server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
     <xsd:complexType name="noProtocolTcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">

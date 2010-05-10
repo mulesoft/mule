@@ -12,8 +12,11 @@ package org.mule.transport.tcp.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.tcp.TcpConnector;
+import org.mule.transport.tcp.PollingTcpConnector;
+import org.mule.transport.tcp.TcpProtocol;
 import org.mule.transport.tcp.protocols.DirectProtocol;
 import org.mule.transport.tcp.protocols.EOFProtocol;
 import org.mule.transport.tcp.protocols.LengthProtocol;
@@ -37,6 +40,9 @@ public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(TcpConnector.class);
+
+        registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(PollingTcpConnector.class, true));
+        registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
         registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));
         registerBeanDefinitionParser("xml-eof-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageEOFProtocol.class));
         registerBeanDefinitionParser("safe-protocol", new ByteOrMessageProtocolDefinitionParser(SafeProtocol.class, MuleMessageSafeProtocol.class));

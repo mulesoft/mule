@@ -53,7 +53,6 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3000, c.getClientSoTimeout());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
-
     }
     
     public void testTcpProtocolWithClass()
@@ -91,5 +90,15 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         {
             throw new UnsupportedOperationException("write");
         }
+    }
+    
+    public void testPollingConnector()
+    {
+        PollingTcpConnector c = (PollingTcpConnector)muleContext.getRegistry().lookupConnector("pollingConnector");
+        assertNotNull(c);
+        assertEquals(4000, c.getPollingFrequency());
+        assertEquals(3000, c.getClientSoTimeout());
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
     }
 }

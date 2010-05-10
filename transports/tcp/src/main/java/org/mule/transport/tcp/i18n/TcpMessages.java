@@ -41,6 +41,11 @@ public class TcpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 4, c.getName());
     }
+
+    public static Message pollingReceiverCannotbeUsed()
+    {
+        return factory.createMessage(BUNDLE_PATH, 5);
+    }
 }
 
 
