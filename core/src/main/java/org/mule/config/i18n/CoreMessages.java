@@ -260,9 +260,12 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 58, string);
     }
 
-    public static Message messageNotSupportedByAdapter(String string, String string2)
+    public static Message messageNotSupportedByMuleMessageFactory(Object message, Class<?> creator)
     {
-        return factory.createMessage(BUNDLE_PATH, 59, string, string2);
+        String messageClass = (message != null ? message.getClass().getName() : "null");
+        String creatorClass = (creator != null ? creator.getName() : "null class");
+        
+        return factory.createMessage(BUNDLE_PATH, 59, messageClass, creatorClass);
     }
 
     public static Message tooManyAcceptableMethodsOnObjectForTypes(Object object, Object types)

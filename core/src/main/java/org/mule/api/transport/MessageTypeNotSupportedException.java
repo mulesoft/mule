@@ -24,21 +24,15 @@ public class MessageTypeNotSupportedException extends MuleException
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -3954838511333933643L;
+    private static final long serialVersionUID = -3954838511333933644L;
 
-    // TODO MessageAdapterRemoval: rewrite the messge
-    public MessageTypeNotSupportedException(Object message, Class<?> adapterClass)
+    public MessageTypeNotSupportedException(Object message, Class<?> creatorClass)
     {
-        super(CoreMessages.messageNotSupportedByAdapter(
-            (message != null ? message.getClass().getName() : "null"),
-            (adapterClass != null ? adapterClass.getName() : "null class")));
+        super(CoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass));
     }
 
-    // TODO MessageAdapterRemoval: rewrite the messge
-    public MessageTypeNotSupportedException(Object message, Class<?> adapterClass, Throwable cause)
+    public MessageTypeNotSupportedException(Object message, Class<?> creatorClass, Throwable cause)
     {
-        super(CoreMessages.messageNotSupportedByAdapter(
-            (message != null ? message.getClass().getName() : "null"), 
-            (adapterClass != null ? adapterClass.getName() : "null class")), cause);
+        super(CoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass), cause);
     }
 }
