@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 {
-    protected static String TEST_MESSAGE = "Test Http Request";
+    protected static String TEST_REQUEST = "Test Http Request";
 
     protected String getConfigResources()
     {
@@ -30,21 +30,21 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     public void testErrorExpressionOnRegexFilterFail() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("restServiceEndpoint", TEST_MESSAGE, null);
+        MuleMessage result = client.send("restServiceEndpoint", TEST_REQUEST, null);
         assertTrue(result.getPayload() instanceof NullPayload);
     }
 
     public void testErrorExpressionOnRegexFilterPass() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleMessage result = client.send("restServiceEndpoint2", TEST_MESSAGE, null);
-        assertEquals("echo=" + TEST_MESSAGE,result.getPayloadAsString());
+        MuleMessage result = client.send("restServiceEndpoint2", TEST_REQUEST, null);
+        assertEquals("echo=" + TEST_REQUEST,result.getPayloadAsString());
     }
 
     public void testRequiredParameters() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
         props.put("bar-optional-header", "bar");
         MuleMessage result = client.send("restServiceEndpoint3", null, props);
@@ -54,7 +54,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     public void testOptionalParametersMissing() throws Exception
     {
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
         MuleMessage result = client.send("restServiceEndpoint3", null, props);
         assertEquals("foo=boo&faz=baz",result.getPayloadAsString());

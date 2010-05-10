@@ -12,7 +12,7 @@
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
-    <http:endpoint name="serverEndpoint" host="localhost" port="60203" synchronous="true" 
+    <http:endpoint name="serverEndpoint" host="localhost" port="60226" synchronous="true" 
         transformer-refs="ByteArrayToString"/>
 
     <vm:endpoint name="restServiceEndpoint" path="restservice" />
@@ -20,11 +20,14 @@
     <vm:endpoint name="restServiceEndpoint3" path="restservice3" />
 
     <model name="Sample">
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+
         <service name="HTTPPostSample">
             <inbound>
                 <inbound-endpoint ref="restServiceEndpoint"/>
             </inbound>
-            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:error-filter>
                     <regex-filter pattern="echo(.*)"/>
                 </http:error-filter>
@@ -36,7 +39,7 @@
             <inbound>
                 <inbound-endpoint ref="restServiceEndpoint2"/>
             </inbound>
-            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:error-filter>
                     <regex-filter pattern="test(.*)"/>
                 </http:error-filter>
@@ -49,7 +52,7 @@
                 <inbound-endpoint ref="restServiceEndpoint3"/>
             </inbound>
             <!-- Testusing expressions and literal values -->
-            <http:rest-service-component serviceUrl="http://localhost:60203" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:requiredParameter key="foo" value="boo"/>
                 <http:requiredParameter key="faz" value="#[header:baz-header]"/>
                 <http:optionalParameter key="far" value="#[header:bar-optional-header]"/>
