@@ -9,18 +9,15 @@
  */
 package org.mule.message;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.MessagePropertiesContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.junit.Test;
 
 public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
 {
@@ -30,7 +27,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         RequestContext.clear();
     }
     
-    @Test
     public void testPropertiesCase() throws Exception
     {
         //Default scope
@@ -41,7 +37,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
-    @Test
     public void testSessionScope() throws Exception
     {
         MuleEvent e = getTestEvent("testing");
@@ -56,7 +51,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("SESSION_X", PropertyScope.SESSION));
     }
 
-    @Test
     public void testPropertyScopeOrder() throws Exception
     {
         MuleEvent e = getTestEvent("testing");
@@ -80,46 +74,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
     }
 
-    @Test
-    public void testPropertiesCaseWithMessageCopy() throws Exception
-    {
-        //Creates a MPC implicitly
-        MuleMessage msg = new DefaultMuleMessage("test", muleContext);
-
-        msg.setProperty("FOO", "BAR");
-        assertEquals("BAR", msg.getProperty("foo"));
-
-        msg.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
-
-        //Look in all scopes
-        assertEquals("DAR", msg.getProperty("doo"));
-
-        //Look in specific scope
-        assertEquals("DAR", msg.getProperty("doO", PropertyScope.INVOCATION));
-
-        //Not found using other specific scopes
-        assertNull(msg.getProperty("doo", PropertyScope.INBOUND));
-        assertNull(msg.getProperty("doo", PropertyScope.OUTBOUND));
-        assertNull(msg.getProperty("doo", PropertyScope.SESSION));
-
-        //This will invoke the copy method on the MPC, want to make sure the copy function behaves as expected
-        MuleMessage copy = new DefaultMuleMessage("test copy", msg, muleContext);
-
-        assertEquals("BAR", copy.getProperty("foo"));
-
-        //Look in all scopes
-        assertEquals("DAR", copy.getProperty("doo"));
-
-        //Look in specific scope
-        assertEquals("DAR", copy.getProperty("doO", PropertyScope.INVOCATION));
-
-        //Not found using other specific scopes
-        assertNull(copy.getProperty("doo", PropertyScope.INBOUND));
-        assertNull(copy.getProperty("doo", PropertyScope.OUTBOUND));
-        assertNull(copy.getProperty("doo", PropertyScope.SESSION));
-    }
-
-    @Test
     public void testPropertiesCaseAfterSerialization() throws Exception
     {
         //Default scope
@@ -135,7 +89,6 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
-    @Test
     public void testInboundScopeIsImmutable() throws Exception
     {        
         MessagePropertiesContext mpc = new MessagePropertiesContext();

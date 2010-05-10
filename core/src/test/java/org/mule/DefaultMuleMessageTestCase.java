@@ -128,7 +128,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         MuleMessage copy = DefaultMuleMessage.copy(original);        
         assertInboundAndOutboundMessageProperties(copy);
     }
-
+    
     private void assertInboundAndOutboundMessageProperties(MuleMessage original)
     {
         assertOutboundMessageProperty("MuleMessage", original);
