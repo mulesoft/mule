@@ -7,9 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport;
+package org.mule;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleSession;
 import org.mule.api.transport.PropertyScope;
@@ -112,13 +111,11 @@ public class MessagePropertiesContext implements Serializable
         this.defaultScope = defaultScope;
     }
 
-    // TODO MessageAdapterRemoval: this method was protected before. Probably move this class up to the org.mule package
-    public Map<String, Object> getScopedProperties(PropertyScope scope)
+    protected Map<String, Object> getScopedProperties(PropertyScope scope)
     {
         Map<String, Object> map = scopedMap.get(scope);
         if (map == null)
         {
-            map = null;
             throw new IllegalArgumentException("Scope not registered: " + scope);
         }
         return map;
@@ -129,12 +126,11 @@ public class MessagePropertiesContext implements Serializable
         return defaultScope;
     }
 
-    // TODO MessageAdapterRemoval: this was protected before (as was MessageAdapter). Move this class to the org.mule package where DefaultMuleMessage resides?
-    public void addInboundProperties(Map<String, Object> properties)
+    protected void addInboundProperties(Map<String, Object> properties)
     {
         if (properties != null)
         {
-            Map props = new HashMap(properties.size());
+            Map<String, Object> props = new HashMap<String, Object>(properties.size());
             for (String key : properties.keySet())
             {
                 props.put(key, properties.get(key));

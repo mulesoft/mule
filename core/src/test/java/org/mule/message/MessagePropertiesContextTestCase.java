@@ -10,12 +10,12 @@
 package org.mule.message;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessagePropertiesContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.MessagePropertiesContext;
 
 import java.util.Set;
 

@@ -26,7 +26,6 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
-import org.mule.transport.MessagePropertiesContext;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
