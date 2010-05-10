@@ -67,7 +67,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         HttpServletRequest request = (HttpServletRequest) transportMessage;
 

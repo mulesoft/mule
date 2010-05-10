@@ -10,8 +10,8 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.soap.MuleSoapHeaders;
 import org.mule.util.StringUtils;
@@ -47,7 +47,7 @@ public class AxisMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         MessageContext ctx = MessageContext.getCurrentContext();
         if (ctx != null)
@@ -75,7 +75,7 @@ public class AxisMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addAttachments(MuleMessage message, Object transportMessage) throws Exception
+    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         MessageContext ctx = MessageContext.getCurrentContext();
         if (ctx == null)

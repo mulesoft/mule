@@ -45,7 +45,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage muleMessage, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {        
         Message jmsMessage = (Message) transportMessage;
         
@@ -63,7 +63,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
 
         propagateJMSProperties(jmsMessage, messageProperties);
         
-        ((DefaultMuleMessage) muleMessage).addInboundProperties(messageProperties);
+        muleMessage.addInboundProperties(messageProperties);
     }
 
     protected void propagateJMSProperties(Message jmsMessage, Map<String, Object> messageProperties)

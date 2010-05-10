@@ -10,6 +10,7 @@
 
 package org.mule.transport.email;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
@@ -56,7 +57,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     }
     
     @Override
-    protected void addProperties(MuleMessage muleMessage, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {
         super.addProperties(muleMessage, transportMessage);
 
@@ -127,7 +128,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addAttachments(MuleMessage muleMessage, Object transportMessage) throws Exception
+    protected void addAttachments(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {
         super.addAttachments(muleMessage, transportMessage);
 

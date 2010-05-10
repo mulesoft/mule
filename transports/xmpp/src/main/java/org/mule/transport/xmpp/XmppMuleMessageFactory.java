@@ -12,7 +12,6 @@ package org.mule.transport.xmpp;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.util.HashMap;
@@ -41,11 +40,13 @@ public class XmppMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
+        super.addProperties(message, transportMessage);
+        
         Packet packet = (Packet) transportMessage;
 
-        ((DefaultMuleMessage) message).setUniqueId(packet.getPacketID());
+        message.setUniqueId(packet.getPacketID());
         
         Map<String, Object> properties = new HashMap<String, Object>();
         addXmppPacketProperties(packet, properties);
@@ -56,7 +57,7 @@ public class XmppMuleMessageFactory extends AbstractMuleMessageFactory
             addXmppMessageProperties(xmppMessage, properties);
         }
         
-        ((DefaultMuleMessage) message).addInboundProperties(properties);
+        message.addInboundProperties(properties);
     }
 
     private void addXmppPacketProperties(Packet packet, Map<String, Object> properties)

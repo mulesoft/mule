@@ -10,8 +10,8 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 import org.mule.transport.file.FileConnector;
 
@@ -75,7 +75,7 @@ public class FtpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         super.addProperties(message, transportMessage);
         

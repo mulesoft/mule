@@ -10,8 +10,8 @@
 
 package org.mule.transport.udp;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.net.DatagramPacket;
@@ -43,7 +43,7 @@ public class UdpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         super.addProperties(message, transportMessage);
 

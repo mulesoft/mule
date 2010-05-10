@@ -110,7 +110,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         String method;
         HttpVersion httpVersion;
@@ -166,7 +166,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         // the INBOUND scope, no matter where they come from.
         if (transportMessage instanceof HttpRequest)
         {
-            ((DefaultMuleMessage) message).addInboundProperties(headers);
+            message.addInboundProperties(headers);
         }
         else
         {

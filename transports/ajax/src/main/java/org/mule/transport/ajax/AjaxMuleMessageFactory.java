@@ -13,7 +13,6 @@ package org.mule.transport.ajax;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.json.JsonData;
@@ -69,7 +68,7 @@ public class AjaxMuleMessageFactory extends AbstractMuleMessageFactory
     }
     
     @Override
-    protected void addProperties(MuleMessage muleMessage, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {
         if (transportMessage instanceof Map<?, ?>)
         {
@@ -113,7 +112,7 @@ public class AjaxMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @SuppressWarnings("unchecked")
-    private void addPropertiesFromMap(MuleMessage muleMessage, Map<?, ?> map)
+    private void addPropertiesFromMap(DefaultMuleMessage muleMessage, Map<?, ?> map)
     {
         Object replyTo = map.remove(AjaxConnector.REPLYTO_PARAM);
         muleMessage.setReplyTo(replyTo);
@@ -123,10 +122,10 @@ public class AjaxMuleMessageFactory extends AbstractMuleMessageFactory
         
         // the remainder of the map is used as message properties
         Map<String, Object> messageProperties = (Map<String, Object>) map;
-        ((DefaultMuleMessage) muleMessage).addProperties(messageProperties, PropertyScope.INVOCATION);
+        muleMessage.addProperties(messageProperties, PropertyScope.INVOCATION);
     }
     
-    private void addPropertiesToFromJsonData(MuleMessage muleMessage, Object transportMessage) throws IOException
+    private void addPropertiesToFromJsonData(DefaultMuleMessage muleMessage, Object transportMessage) throws IOException
     {
         JsonData data = new JsonData(transportMessage.toString());
         if (data.hasNode(AjaxConnector.REPLYTO_PARAM))

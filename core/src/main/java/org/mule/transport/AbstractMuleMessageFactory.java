@@ -45,7 +45,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         Object payload = extractPayload(transportMessage, encoding);
-        MuleMessage message;
+        DefaultMuleMessage message;
         if (previousMessage != null)
         {
             message = new DefaultMuleMessage(payload, previousMessage, muleContext);
@@ -63,12 +63,12 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 
     protected abstract Object extractPayload(Object transportMessage, String encoding) throws Exception;
 
-    protected void addProperties(MuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         // Template method
     }
 
-    protected void addAttachments(MuleMessage message, Object transportMessage) throws Exception
+    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
     {
         // Template method
     }
