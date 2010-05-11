@@ -18,15 +18,21 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpVersion;
+import org.apache.commons.httpclient.StatusLine;
+import org.apache.commons.httpclient.URI;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
-    private static final String REQUEST_LINE = "GET /services/Echo HTTP/1.1";
     private static final Header[] HEADERS = new Header[] { new Header("foo-header", "foo-value") };
+    private static final String REQUEST_LINE = "GET /services/Echo HTTP/1.1";
 
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()
@@ -57,6 +63,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         assertEquals("/services/Echo", message.getPayload());
+        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
         assertEquals("foo-value", message.getProperty("foo-header", PropertyScope.INBOUND));
     }
     
@@ -95,13 +102,44 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return new HttpRequest(requestLine, HEADERS, stream, encoding);
     }
     
-    public void _testHttpMethodGet() throws Exception
+    public void testHttpMethodGet() throws Exception
     {
-        // TODO MessageAdapterRemoval: implement me
+        InputStream body = new ByteArrayInputStream("/services/Echo".getBytes());
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body);
+        
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage message = factory.create(method, encoding);
+        assertNotNull(message);
+        assertEquals("/services/Echo", message.getPayloadAsString());
+        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getProperty(HttpConnector.HTTP_VERSION_PROPERTY));
+        assertEquals("200", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
     
-    public void _testHttpMethodPost() throws Exception
+    public void testHttpMethodPost() throws Exception
     {
-        // TODO MessageAdapterRemoval: implement me
+        InputStream body = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
+        HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_POST, body);
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage message = factory.create(method, encoding);
+        assertNotNull(message);
+        assertEquals(TEST_MESSAGE, message.getPayloadAsString());
+        assertEquals(HttpConstants.METHOD_POST, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getProperty(HttpConnector.HTTP_VERSION_PROPERTY));
+        assertEquals("200", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+    }
+    
+    private HttpMethod createMockHttpMethod(String method, InputStream body) throws Exception
+    {
+        HttpMethod httpMethod = mock(HttpMethod.class);
+        when(httpMethod.getName()).thenReturn(method);
+        when(httpMethod.getStatusLine()).thenReturn(new StatusLine("HTTP/1.1 200 OK"));
+        when(httpMethod.getStatusCode()).thenReturn(HttpConstants.SC_OK);
+        when(httpMethod.getURI()).thenReturn(new URI("http://localhost/services/Echo", false));
+        when(httpMethod.getResponseHeaders()).thenReturn(HEADERS);
+        when(httpMethod.getResponseBodyAsStream()).thenReturn(body);
+        
+        return httpMethod;
     }
 }
