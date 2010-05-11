@@ -15,10 +15,13 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.types.SimpleDataType;
+import org.mule.util.StringDataSource;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -65,6 +68,21 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
         assertEquals(byte[].class, deserializedMessage.getPayload().getClass());
         byte[] payload = (byte[]) deserializedMessage.getPayload();
         assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
+    }
+    
+    // disabled, see MULE-2964
+    public void _testAttachments() throws Exception
+    {
+        String attachmentName = "the-attachment";
+        
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        DataHandler dataHandler = new DataHandler(new StringDataSource("attachment content"));
+        message.addAttachment(attachmentName, dataHandler);
+        
+        MuleMessage deserializedMessage = serializationRoundtrip(message);
+        
+        assertEquals(1, deserializedMessage.getAttachmentNames().size());
+        assertTrue(deserializedMessage.getAttachmentNames().contains(attachmentName));
     }
 
     private MuleMessage serializationRoundtrip(MuleMessage message) throws Exception
