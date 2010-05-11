@@ -24,31 +24,32 @@ import org.apache.commons.lang.time.StopWatch;
 
 public class HttpContinueFunctionalTestCase extends FunctionalTestCase
 {
+    /**
+     * HttpClient has default 3 seconds wait for Expect-Continue calls.
+     */
+    private static final int DEFAULT_HTTP_CLIENT_CONTINUE_WAIT = 3000;
 
-    public static final String TEST_MESSAGE = "Foo Bar";
+    protected StopWatch stopWatch;
 
+    @Override
     protected String getConfigResources()
     {
         return "http-functional-test.xml";
     }
 
-    /**
-     * HttpClient has default 3 seconds wait for Expect-Continue calls.
-     */
-    public static final int DEFAULT_HTTP_CLIENT_CONTINUE_WAIT = 3000;
-
-    protected StopWatch stopWatch;
-
     public void testSendWithContinue() throws Exception
     {
+        stopWatch = new StopWatch();
         MuleClient client = new MuleClient();
-        Map props = new HashMap();
+        
         //Need to use Http1.1 for Expect: Continue
         HttpClientParams params = new HttpClientParams();
         params.setVersion(HttpVersion.HTTP_1_1);
         params.setBooleanParameter(HttpClientParams.USE_EXPECT_CONTINUE, true);
+
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_PARAMS_PROPERTY, params);
-        stopWatch = new StopWatch();
+
         stopWatch.start();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         stopWatch.stop();
