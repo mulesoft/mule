@@ -940,14 +940,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    protected void applyAllTransformers(List transformers) throws TransformerException
+    protected void applyAllTransformers(List<? extends Transformer> transformers) throws TransformerException
     {
         if (!transformers.isEmpty())
         {
-            for (Object transformer1 : transformers)
+            for (Transformer transformer : transformers)
             {
-                Transformer transformer = (Transformer) transformer1;
-
                 if (getPayload() == null)
                 {
                     if (transformer.isAcceptNull())
@@ -965,7 +963,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     }
                 }
 
-                Class srcCls = getPayload().getClass();
+                Class<?> srcCls = getPayload().getClass();
                 if (transformer.isSourceTypeSupported(srcCls))
                 {
                     Object result = transformer.transform(this);
@@ -981,8 +979,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                         {
                             MuleMessage resultMessage = (MuleMessage) result;
                             setPayload(resultMessage.getPayload());
-                            originalPayload = resultMessage.getOrginalPayload();
-                            // TODO MessageAdapterRemoval: copy attachments, properties here?
+                            originalPayload = resultMessage.getOriginalPayload();
+                            copyMessageProperties(resultMessage);
+                            copyAttachments(resultMessage);
                         }
                     }
                     else
