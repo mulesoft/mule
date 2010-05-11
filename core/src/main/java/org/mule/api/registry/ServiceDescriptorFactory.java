@@ -23,16 +23,12 @@ import org.mule.util.SpiUtils;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Factory used to create a new service descriptor.
  */
 public class ServiceDescriptorFactory
 {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     /**
      * Factory method to create a new service descriptor.
      *
@@ -62,9 +58,9 @@ public class ServiceDescriptorFactory
             metaScheme = name.substring(0, i);
         }
         //TODO we currently need to filter out transports that implement the meta scheme the old way
-        if ("axis".equals(metaScheme) || "wsdl-axis".equals(metaScheme) || "cxf".equals(metaScheme) || "wsdl-cxf".equals(metaScheme) || "jms".equals(metaScheme) || "wmq".equals(metaScheme) || "ajax".equals(metaScheme))
+        if (isFilteredMetaScheme(metaScheme))
         {
-            //handle things the old wy for now
+            //handle things the old way for now
             metaScheme = null;
         }
         else if (name.startsWith("jetty:http"))
@@ -133,6 +129,21 @@ public class ServiceDescriptorFactory
             }
         }
         return sd;
+    }
+
+    protected static boolean isFilteredMetaScheme(String metaScheme)
+    {
+        if ("axis".equals(metaScheme) ||
+            "wsdl-axis".equals(metaScheme) || 
+            "cxf".equals(metaScheme) || 
+            "wsdl-cxf".equals(metaScheme) || 
+            "jms".equals(metaScheme) || 
+            "wmq".equals(metaScheme) || 
+            "ajax".equals(metaScheme))
+        {
+            return true;
+        }
+        return false;
     }
 }
 

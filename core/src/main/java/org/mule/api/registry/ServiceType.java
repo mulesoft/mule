@@ -21,7 +21,6 @@ public enum ServiceType
     private String name;
     private String path;
 
-
     ServiceType(String name, String path)
     {
         this.name = name;
