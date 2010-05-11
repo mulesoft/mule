@@ -1,0 +1,1 @@
+Java client was auto-generated based on stockquote.wsdl using CXF's wsdl2java tool. 
