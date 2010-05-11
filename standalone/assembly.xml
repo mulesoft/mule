@@ -377,7 +377,6 @@
         <!-- Core -->
         <include>org.mule:mule-core</include>
         <!-- Transports -->
-        <include>org.mule.transports:mule-transport-axis</include>
         <include>org.mule.transports:mule-transport-ajax</include>
         <include>org.mule.transports:mule-transport-bpm</include>
         <include>org.mule.transports:mule-transport-cxf</include>
@@ -437,7 +436,6 @@
         <!-- lib/mule -->
         <exclude>org.mule:mule-core</exclude>
         <exclude>org.mule.transports:mule-transports-all</exclude>
-        <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-ajax</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
         <exclude>org.mule.transports:mule-transport-cxf</exclude>
