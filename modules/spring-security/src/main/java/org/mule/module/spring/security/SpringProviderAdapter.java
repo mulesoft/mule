@@ -1,5 +1,5 @@
 /*
- * $Id: AcegiProviderAdapter.java 13181 2008-10-30 13:21:11Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -20,7 +20,6 @@ import java.util.Map;
 import org.springframework.security.AuthenticationException;
 import org.springframework.security.AuthenticationManager;
 import org.springframework.security.providers.AuthenticationProvider;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 
 /**
  * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
@@ -30,6 +29,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
 {
     private AuthenticationManager delegate;
     private Map securityProperties;
+    private SpringAuthenticationProvider authenticationProvider;
 
     /** For Spring IoC only */
     public SpringProviderAdapter()
@@ -62,8 +62,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
         }
         else
         {
-            auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
-                authentication.getCredentials());
+            auth = this.getAuthenticationProvider().getAuthentication(authentication);
 
         }
         auth = delegate.authenticate(auth);
@@ -93,5 +92,18 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
     public void setSecurityProperties(Map securityProperties)
     {
         this.securityProperties = securityProperties;
+    }
+
+    public SpringAuthenticationProvider getAuthenticationProvider()
+    {
+        if (this.authenticationProvider == null) {
+            this.authenticationProvider = new UserAndPasswordAuthenticationProvider();
+        }
+        return authenticationProvider;
+    }
+
+    public void setAuthenticationProvider(SpringAuthenticationProvider authenticationProvider)
+    {
+        this.authenticationProvider = authenticationProvider;
     }
 }

@@ -14,9 +14,13 @@
 
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+        <mule-ss:delegate-security-provider name="memory-dao-with-provider" delegate-ref="authenticationManager" 
+            authenticationProvider-ref="authenticationProvider"  />
     </mule-ss:security-manager>
     
     <spring:beans>
+        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+        
         <ss:authentication-manager alias="authenticationManager"/>
 
         <ss:authentication-provider>

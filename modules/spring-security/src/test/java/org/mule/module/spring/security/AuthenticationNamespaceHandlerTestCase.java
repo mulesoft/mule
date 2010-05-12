@@ -20,6 +20,7 @@ import org.mule.security.MuleSecurityManager;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -36,9 +37,16 @@ public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(securityManager);
         
         Collection providers = securityManager.getProviders();
-        assertEquals(1, providers.size());
-        SecurityProvider provider = (SecurityProvider) providers.iterator().next();
+        assertEquals(2, providers.size());
+
+        Iterator providersIterator = providers.iterator();
+        SecurityProvider provider = (SecurityProvider) providersIterator.next();
         assertEquals(SpringProviderAdapter.class, provider.getClass());
+        assertEquals(UserAndPasswordAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
+
+        provider = (SecurityProvider) providersIterator.next();
+        assertEquals(SpringProviderAdapter.class, provider.getClass());
+        assertEquals(PreAuthenticatedAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
     }
     
     public void testEndpointConfiguration()

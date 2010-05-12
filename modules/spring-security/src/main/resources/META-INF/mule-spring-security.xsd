@@ -19,7 +19,7 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:abstractSecurityManagerType">
-                <xsd:sequence>
+                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                     <xsd:element ref="delegate-security-provider"/>
                 </xsd:sequence>
             </xsd:extension>
@@ -47,6 +47,7 @@
                     <xsd:element name="security-property" type="securityProperty" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="delegate-ref" type="xsd:string" use="required"/>
+                <xsd:attribute name="authenticationProvider-ref" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
