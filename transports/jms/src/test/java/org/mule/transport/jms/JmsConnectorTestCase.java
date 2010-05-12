@@ -22,7 +22,7 @@ import javax.jms.ConnectionFactory;
 
 import org.mockito.Matchers;
 
-public class JmsConnectorTest extends AbstractMuleTestCase
+public class JmsConnectorTestCase extends AbstractMuleTestCase
 {
     private static final String CLIENT_ID1 = "client1";
     private static final String CLIENT_ID2 = "client2";
