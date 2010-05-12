@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+	<spring:bean id="testBean"
+		class="org.mule.test.integration.resolvers.MethodEntryPointWithTransformerTestCase" />
+
+	<model name="testModel">
+		<service name="testService">
+			<inbound>
+				<vm:inbound-endpoint path="in" synchronous="true">
+					<transformers>
+						<message-properties-transformer>
+							<add-message-property key="method" value="transformMessage" />
+						</message-properties-transformer>
+					</transformers>
+				</vm:inbound-endpoint>
+			</inbound>
+
+			<component>
+				<spring-object bean="testBean"></spring-object>
+			</component>
+		</service>
+	</model>
+</mule>

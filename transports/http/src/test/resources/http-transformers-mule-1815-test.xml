@@ -79,7 +79,11 @@
     <!-- now we add transformers to the adapted model - they should have no effect -->
 
     <model name="ignoredModel">
-
+        <!-- Specifies an explicit entry-point-resolver because the default one (property-entry-point-resolver)
+             will make the test fail because it applies the transformation before reaching the component.
+             Behavior changed after fixing MULE-4874.
+        -->
+        <callable-entry-point-resolver/>
         <service name="ignoredService1">
             <inbound>
                 <http:inbound-endpoint ref="ignored" transformer-refs="appendString"/>

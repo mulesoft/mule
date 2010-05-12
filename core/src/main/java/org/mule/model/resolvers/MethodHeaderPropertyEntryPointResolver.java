@@ -54,6 +54,9 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
             return result;
         }
 
+        // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
+        Object[] payload = getPayloadFromMessage(context);
+
         //TODO: with scoped properties we wouldn't need to remove the property here
         Object methodProp = context.getMessage().removeProperty(getMethodProperty());
         if (methodProp == null)
@@ -81,8 +84,6 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         {
             return invokeMethod(component, method, ClassUtils.NO_ARGS_TYPE);
         }
-
-        Object[] payload = getPayloadFromMessage(context);
 
         if (method == null)
         {
