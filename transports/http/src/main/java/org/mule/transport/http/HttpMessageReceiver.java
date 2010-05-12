@@ -114,6 +114,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return message;
     }
 
+    @SuppressWarnings("synthetic-access")
     protected class HttpWorker implements Work, Expirable
     {
         private HttpServerConnection conn;
@@ -220,7 +221,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
         }
 
-
         protected HttpResponse doRequest(HttpRequest request) throws IOException, MuleException
         {
             sendExpect100(request);
@@ -311,9 +311,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
          * Check if endpoint has a keep-alive property configured. Note the translation from
          * keep-alive in the schema to keepAlive here.
          */
-        private boolean getEndpointKeepAliveValue(ImmutableEndpoint endpoint)
+        private boolean getEndpointKeepAliveValue(ImmutableEndpoint ep)
         {
-            String value = (String) endpoint.getProperty("keepAlive");
+            String value = (String) ep.getProperty("keepAlive");
             if (value != null)
             {
                 return Boolean.parseBoolean(value);
@@ -404,7 +404,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
     }
 
-    protected MessageReceiver getTargetReceiver(MuleMessage message, ImmutableEndpoint endpoint)
+    protected MessageReceiver getTargetReceiver(MuleMessage message, ImmutableEndpoint ep)
             throws ConnectException
     {
         String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
@@ -417,9 +417,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         StringBuffer requestUri = new StringBuffer(80);
         if (path.indexOf("://") == -1)
         {
-            requestUri.append(endpoint.getProtocol()).append("://");
-            requestUri.append(endpoint.getEndpointURI().getHost());
-            requestUri.append(':').append(endpoint.getEndpointURI().getPort());
+            requestUri.append(ep.getProtocol()).append("://");
+            requestUri.append(ep.getEndpointURI().getHost());
+            requestUri.append(':').append(ep.getEndpointURI().getPort());
             
             if (!"/".equals(path)) {
                 requestUri.append(path);
@@ -446,11 +446,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         + " with URI key: " + requestUri.toString());
             }
 
-            if (receiver == null)
-            {
-                receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-            }
-
+            receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+            
             if (receiver == null && logger.isWarnEnabled())
             {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName()
@@ -500,18 +497,18 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     @Override
     protected MuleMessageFactory createMuleMessageFactory() throws CreateException
     {
-        HttpMuleMessageFactory muleMessageFactory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
+        HttpMuleMessageFactory factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
 
         boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
             HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
-        muleMessageFactory.setEnableCookies(enableCookies);
+        factory.setEnableCookies(enableCookies);
 
         String cookieSpec = MapUtils.getString(endpoint.getProperties(),
             HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
-        muleMessageFactory.setCookieSpec(cookieSpec);
+        factory.setCookieSpec(cookieSpec);
         
-        muleMessageFactory.setSynchronous(endpoint.isSynchronous());
+        factory.setSynchronous(endpoint.isSynchronous());
 
-        return muleMessageFactory;
+        return factory;
     }
 }
