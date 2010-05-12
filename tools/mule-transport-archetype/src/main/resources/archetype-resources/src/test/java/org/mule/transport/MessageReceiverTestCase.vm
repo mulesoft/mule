@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -19,13 +19,12 @@ import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
-
 public class ${ModuleName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockService = new Mock(Service.class);
@@ -33,11 +32,11 @@ public class ${ModuleName}MessageReceiverTestCase extends AbstractMessageReceive
         return new ${ModuleName}MessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         // TODO return a valid endpoint i.e.
         // return new MuleEndpoint("tcp://localhost:1234", true)
         throw new UnsupportedOperationException("getEndpoint");
     }
-
 }

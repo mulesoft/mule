@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -13,8 +13,6 @@ package org.mule.transport.${ModuleNameLower}.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.transport.${ModuleNameLower}.${ModuleName}Connector;
 import org.mule.endpoint.URIBuilder;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Registers a Bean Definition Parser for handling <code><${ModuleNameLower}:connector></code> elements
@@ -32,7 +30,7 @@ public class ${ModuleName}NamespaceHandler extends AbstractMuleNamespaceHandler
 
         /* This will create the handler for your custom 'connector' element.  You will need to add handlers for any other
            xml elements you define.  For more information see:
-           http://www.mulesource.org/display/MULE2USER/Creating+a+Custom+XML+Namespace
+           ${NamespaceDocumentationUrl}
         */
         registerConnectorDefinitionParser(${ModuleName}Connector.class);
     }

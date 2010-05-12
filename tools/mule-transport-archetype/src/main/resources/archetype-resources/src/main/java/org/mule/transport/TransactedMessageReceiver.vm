@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -11,7 +11,6 @@
 
 package org.mule.transport.${ModuleNameLower};
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -30,7 +29,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
 {
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public ${ModuleName}TransactedMessageReceiver(Connector connector,
                                           Service service,
@@ -39,6 +38,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         super(connector, service, endpoint);
     }
 
+    @Override
     protected List<MuleMessage> getMessages() throws Exception
     {
         /* IMPLEMENTATION NOTE: You can just return a single message in a list
@@ -53,6 +53,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         throw new UnsupportedOperationException("getMessages");
     }
 
+    @Override
     protected void processMessage(Object message) throws Exception
     {
         // TODO Process the current message.  The object will be of the same
@@ -64,6 +65,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         routeMessage(muleMessage, endpoint.isSynchronous());
     }
 
+    @Override
     public void doConnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: Should make a connection to the underlying
@@ -95,6 +97,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         // TODO the code necessay to Connect to the underlying resource
     }
 
+    @Override
     public void doDisconnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: Disconnects and tidies up any rources allocted
@@ -105,6 +108,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         // TODO release any resources
     }
 
+    @Override
     public void doStart()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -119,6 +123,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
            override this method. */
     }
 
+    @Override
     public void doStop()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -127,6 +132,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
            the reciever from receiving events. */
     }
 
+    @Override
     public void doDispose()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -135,5 +141,4 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
            and should clean up any resources. The doStop() and doDisconnect()
            methods will be called implicitly when this method is called. */
     }
-
 }

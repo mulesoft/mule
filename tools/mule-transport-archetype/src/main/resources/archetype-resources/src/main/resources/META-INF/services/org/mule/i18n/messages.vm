@@ -13,4 +13,4 @@
 # <message id> is the id of the message in this file
 # <arg x> is a list of String arguments to pass to the message
 #
-# For more info see http://mule.mulesource.org/wiki/x/zQU
+# For more info see ${I18NDocumentationUrl}

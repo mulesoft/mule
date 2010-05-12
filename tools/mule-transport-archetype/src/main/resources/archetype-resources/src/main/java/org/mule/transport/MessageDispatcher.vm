@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -23,7 +23,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
 {
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public ${ModuleName}MessageDispatcher(OutboundEndpoint endpoint)
     {
@@ -35,6 +35,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
            ${ModuleName}Connector cnn = (${ModuleName}Connector)endpoint.getConnector(); */
     }
 
+    @Override
     public void doConnect() throws Exception
     {
         /* IMPLEMENTATION NOTE: Makes a connection to the underlying
@@ -45,6 +46,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
         // then this is the place to do it
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         /* IMPLEMENTATION NOTE: Disconnect any conections made in the connect
@@ -54,6 +56,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
         // shouldn't do anything either
     }
 
+    @Override
     public void doDispatch(MuleEvent event) throws Exception
     {
         /* IMPLEMENTATION NOTE: This is invoked when the endpoint is
@@ -74,6 +77,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
         throw new UnsupportedOperationException("doDispatch");
     }
 
+    @Override
     public MuleMessage doSend(MuleEvent event) throws Exception
     {
         /* IMPLEMENTATION NOTE: Should send the event payload over the
@@ -97,6 +101,7 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
         throw new UnsupportedOperationException("doSend");
     }
 
+    @Override
     public void doDispose()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -104,6 +109,5 @@ public class ${ModuleName}MessageDispatcher extends AbstractMessageDispatcher
         /* IMPLEMENTATION NOTE: Is called when the Dispatcher is being
            disposed and should clean up any open resources. */
     }
-
 }
 

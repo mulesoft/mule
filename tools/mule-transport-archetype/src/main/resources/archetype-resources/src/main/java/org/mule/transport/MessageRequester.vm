@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,7 +22,7 @@ public class ${ModuleName}MessageRequester extends AbstractMessageRequester
 {
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports
+       ${TransportDocumentationUrl}
 
         #if($newProject == "n")
         IMPORTANT TODO: Since you added this class to an existing transport, you need to add

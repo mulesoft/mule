@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -25,7 +25,7 @@ public class ${ModuleName}Connector extends AbstractConnector
     public static final String ${ModuleName.toUpperCase()} = "${ModuleNameLower}";
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     /* IMPLEMENTATION NOTE: All configuaration for the transport should be set
        on the Connector object, this is the object that gets configured in
@@ -36,7 +36,7 @@ public class ${ModuleName}Connector extends AbstractConnector
         super(context);
     }
        
-
+    @Override
     public void doInitialise() throws InitialisationException
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -46,6 +46,7 @@ public class ${ModuleName}Connector extends AbstractConnector
            connectors state. */
     }
 
+    @Override
     public void doConnect() throws Exception
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -55,6 +56,7 @@ public class ${ModuleName}Connector extends AbstractConnector
            level, this method may do nothing */
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -64,6 +66,7 @@ public class ${ModuleName}Connector extends AbstractConnector
            method shouldn't do anything either. */
     }
 
+    @Override
     public void doStart() throws MuleException
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -73,6 +76,7 @@ public class ${ModuleName}Connector extends AbstractConnector
            this method should put the resource in a started state here. */
     }
 
+    @Override
     public void doStop() throws MuleException
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -81,6 +85,7 @@ public class ${ModuleName}Connector extends AbstractConnector
            stopped state. Mule will automatically call the stop() method. */
     }
 
+    @Override
     public void doDispose()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -93,5 +98,4 @@ public class ${ModuleName}Connector extends AbstractConnector
     {
         return ${ModuleName.toUpperCase()};
     }
-
 }

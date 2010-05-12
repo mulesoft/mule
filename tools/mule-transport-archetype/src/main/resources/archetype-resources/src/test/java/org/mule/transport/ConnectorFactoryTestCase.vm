@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -15,12 +15,10 @@ package org.mule.transport.${ModuleName.toLowerCase()};
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 
-
 public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public void testCreateFromFactory() throws Exception
     {
@@ -38,5 +36,4 @@ public class ${ModuleName}ConnectorFactoryTestCase extends AbstractMuleTestCase
         // i.e. tcp://localhost:1234
         throw new UnsupportedOperationException("getEndpointURI");
     }
-
 }

@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,7 +22,7 @@ import java.util.Properties;
  */
 public class ${ModuleName}EndpointURIBuilder extends AbstractEndpointURIBuilder
 {
-
+    @Override
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         /* IMPLEMENTATION NOTE: This method should set the this.address
@@ -34,5 +34,4 @@ public class ${ModuleName}EndpointURIBuilder extends AbstractEndpointURIBuilder
 
         throw new UnsupportedOperationException("setEndpoint");
     }
-
 }

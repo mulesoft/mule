@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -24,13 +24,14 @@ import org.mule.transaction.AbstractSingleResourceTransaction;
 public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
 {
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public ${ModuleName}Transaction(MuleContext muleContext)
     {
         super(muleContext);
     }
 
+    @Override
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Validate as necessary, the resource here and
@@ -48,6 +49,7 @@ public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
         super.bindResource(key, resource);
     }
 
+    @Override
     protected void doBegin() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Sometimes the resource has already begun the
@@ -63,6 +65,7 @@ public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
         */
     }
 
+    @Override
     protected void doCommit() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Commit the transaction here.  Throw an
@@ -76,6 +79,7 @@ public class ${ModuleName}Transaction extends AbstractSingleResourceTransaction
         */
     }
 
+    @Override
     protected void doRollback() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Rollback the transaction here.  Throw an

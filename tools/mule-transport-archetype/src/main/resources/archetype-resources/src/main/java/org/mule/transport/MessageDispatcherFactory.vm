@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,13 +22,12 @@ import org.mule.api.transport.MessageDispatcher;
 
 public class ${ModuleName}MessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new ${ModuleName}MessageDispatcher(endpoint);
     }
-
 }

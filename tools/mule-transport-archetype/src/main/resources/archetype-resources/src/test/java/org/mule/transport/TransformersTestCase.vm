@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -17,53 +17,50 @@ import org.mule.api.transformer.Transformer;
 
 public class ${ModuleName}TransformersTestCase extends AbstractTransformerTestCase
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
+    @Override
     public Object getTestData()
     {
         // TODO create a test data object that will be passed into the
         // transformer
+        throw new UnsupportedOperationException("getTestData");
+    }
+
+    @Override
+    public Object getResultData()
+    {
+        // TODO Return the result data expected once the getTestData()
+        // value has been transformed
         throw new UnsupportedOperationException("getResultData");
     }
 
-    public Object getResultData()
-    {
-        try {
-            // TODO Return the result data expected once the getTestData()
-            // value has been transformed
-            throw new UnsupportedOperationException("getResultData");
-        }
-        catch (Exception ex) {
-            return null;
-        }
-    }
-
+    @Override
     public Transformer getTransformer()
     {
 #if( $inboundTransformer != "n")
-        Transformer t = new ${inboundTransformer}();
+        Transformer transformer = new ${inboundTransformer}();
         // Set the correct return class for this roundtrip test
-        t.setReturnClass(this.getResultData().getClass());
-        return t;
+        transformer.setReturnClass(this.getResultData().getClass());
+        return transformer;
 #else
         // No Inbound transformer was created for this Transport
         return null;
 #end
     }
 
+    @Override
     public Transformer getRoundTripTransformer()
     {
 #if( $outboundTransformer != "n")
-        Transformer t = new ${outboundTransformer}();
+        Transformer transformer = new ${outboundTransformer}();
         // Set the correct return class for this roundtrip test
-        t.setReturnClass(this.getTestData().getClass());
-        return t;
+        transformer.setReturnClass(this.getTestData().getClass());
+        return transformer;
 #else
         // No Outbound transformer was created for this Transport
         return null;
 #end
     }
-
 }

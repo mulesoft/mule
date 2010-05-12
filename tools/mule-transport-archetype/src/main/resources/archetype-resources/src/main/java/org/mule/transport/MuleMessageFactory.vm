@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -20,7 +20,7 @@ import org.mule.transport.AbstractMuleMessageFactory;
 public class ${ModuleName}MuleMessageFactory extends AbstractMuleMessageFactory
 {
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
     
     /* IMPLEMENTATION NOTE: The MuleMessageFactory is used to convert an underlying message 
        into a MuleMessage instance. It extracts the payload of the underlying message and

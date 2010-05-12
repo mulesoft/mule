@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,7 +22,7 @@ public class ${inboundTransformer} extends AbstractMessageAwareTransformer
 {
 
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public ${inboundTransformer}()
     {
@@ -43,6 +43,7 @@ public class ${inboundTransformer} extends AbstractMessageAwareTransformer
 
     }
 
+    @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         // TODO Transform the payload of message here. See comments in {@link AbstractMessageAwareTransformer}
@@ -52,5 +53,4 @@ public class ${inboundTransformer} extends AbstractMessageAwareTransformer
 
         throw new UnsupportedOperationException("transform");
     }
-
 }

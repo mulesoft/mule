@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -16,9 +16,8 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class ${ModuleName}EndpointTestCase extends AbstractMuleTestCase
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public void testValidEndpointURI() throws Exception
     {
@@ -37,5 +36,4 @@ public class ${ModuleName}EndpointTestCase extends AbstractMuleTestCase
 
         throw new UnsupportedOperationException("testValidEndpointURI");
     }
-
 }

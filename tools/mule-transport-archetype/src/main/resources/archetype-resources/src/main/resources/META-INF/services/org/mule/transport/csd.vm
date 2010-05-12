@@ -2,7 +2,7 @@
 # It ties all the implementation classes together so that Mule can
 # construct endpoints for your transport protocol at runtime
 # For a full list of properties that can be set here see -
-# http://mule.mulesource.org/x/FwKV
+# ${ServiceDescriptorDocumentationUrl}
 
 # The connector class for your transport. This is always required
 connector=org.mule.transport.${ModuleNameLower}.${ModuleName}Connector
@@ -64,4 +64,4 @@ endpoint.builder=org.mule.endpoint.SocketEndpointURIBuilder
 endpoint.builder=org.mule.transport.${ModuleNameLower}.${ModuleName}EndpointURIBuilder
 #end
 
-# For more information see - http://mule.mulesource.org/x/3YDR
+# For more information see - ${ServiceDescriptorDocumentationUrl}

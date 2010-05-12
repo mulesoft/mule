@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -18,7 +18,7 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 public class ${ModuleName}MuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     @Override
     protected MuleMessageFactory doCreateMuleMessageFactory()

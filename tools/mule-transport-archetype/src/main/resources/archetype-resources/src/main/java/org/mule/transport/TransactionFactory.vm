@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -24,9 +24,8 @@ import org.mule.api.MuleContext;
  */
 public class ${ModuleName}TransactionFactory implements TransactionFactory
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
@@ -39,5 +38,4 @@ public class ${ModuleName}TransactionFactory implements TransactionFactory
     {
         return true;
     }
-
 }

@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -17,6 +17,7 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class ${ModuleName}NamespaceHandlerTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         //TODO You'll need to edit this file to configure the properties specific to your transport
@@ -31,7 +32,5 @@ public class ${ModuleName}NamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
 
         //TODO Assert specific properties are configured correctly
-
-
     }
 }

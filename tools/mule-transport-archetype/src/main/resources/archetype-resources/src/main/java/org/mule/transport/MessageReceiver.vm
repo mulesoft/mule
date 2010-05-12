@@ -1,6 +1,6 @@
 #set($D = '$')
 /*
- * ${D}Id{D}$
+ * ${D}Id${D}
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -28,9 +28,8 @@ import org.mule.api.transport.Connector;
 public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y") AbstractPollingMessageReceiver #else AbstractMessageReceiver #end
 
 {
-
     /* For general guidelines on writing transports see
-       http://mule.mulesource.org/display/MULE/Writing+Transports */
+       ${TransportDocumentationUrl} */
 
     public ${ModuleName}MessageReceiver(Connector connector, Service service,
                               InboundEndpoint endpoint)
@@ -39,6 +38,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         super(connector, service, endpoint);
     }
 
+    @Override
     public void doConnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: This method should make a connection to the underlying
@@ -71,6 +71,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         // TODO the code necessary to connect to the underlying resource
     }
 
+    @Override
     public void doDisconnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: Disconnects and tidies up any rources allocted
@@ -81,7 +82,8 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         // TODO release any resources here
     }
 
-    #if( $isPollingReceiver == "n")
+#if( $isPollingReceiver == "n")
+    @Override
     public void doStart()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -96,6 +98,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            doesn't need to override this method. */
     }
 
+    @Override
     public void doStop()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -103,8 +106,9 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
         /* IMPLEMENTATION NOTE: Should perform any actions necessary to stop
            the reciever from receiving events. */
     }
-    #end
+#end
 
+    @Override
     public void doDispose()
     {
         // Optional; does not need to be implemented. Delete if not required
@@ -113,7 +117,6 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            and should clean up any resources. The doStop() and doDisconnect()
            methods will be called implicitly when this method is called. */
     }
-
 #if( $isPollingReceiver == "y")
     public void poll() throws Exception
     {
@@ -127,7 +130,6 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
 
         // TODO request a message from the underlying technology e.g. Read a file
     }
-
 #end
 }
 
