@@ -1,39 +1,40 @@
+#set($D = '$')
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>${groupId}</groupId>
-   <artifactId>${artifactId}</artifactId>
-   <packaging>jar</packaging>
-   <name>Mule ${ModuleName} ${ModuleType}</name>
-   <version>${version}</version>
-   <description>${description}</description>
-   <url>http://www.muleforge.org/projects/${shortId}</url>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule ${ModuleName} ${ModuleType}</name>
+    <version>${version}</version>
+    <description>${description}</description>
+    <url>http://www.muleforge.org/projects/YOUR_FORGE_PROJECT_ID</url>
 
-      <properties>
-           <mule.version>${MuleVersion}</mule.version>
-           #if($license.id)
+    <properties>
+        <mule.version>${MuleVersion}</mule.version>
+#if($license.id)
            <licenseId>${license.id}</licenseId>
            <licenseUrl>${license.url}</licenseUrl>
-           #end
+#end
            <!-- Tools properties -->
            <eclipsePluginVersion>2.5</eclipsePluginVersion>
            <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
            <jdk5Name>J2SE-1.5</jdk5Name>
            <jdk.version>1.5</jdk.version>
-       </properties>
+    </properties>
 
-       #if($license.id)
-       <licenses>
-           <license>
-               <name>${licenseId}</name>
-               <url>${licenseUrl}</url>
-               <distribution>repo</distribution>
-           </license>
-       </licenses>
-       #end
+#if($license.id)
+    <licenses>
+        <license>
+            <name>${licenseId}</name>
+            <url>${licenseUrl}</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+#end
 
     <build>
         <extensions>
@@ -54,7 +55,7 @@
                 </configuration>
             </plugin>
 
-    #if($forgeProject == "y")
+#if($forgeProject == "y")
             <!-- Responsible for creating the release distribution for this project -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -100,7 +101,7 @@
                     </execution>
                 </executions>
             </plugin>
-       #end
+#end
         </plugins>
     </build>
 
@@ -111,12 +112,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${eclipsePluginVersion}</version>
+                <version>${D}{eclipsePluginVersion}</version>
                 <configuration>
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdk5Name}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
@@ -126,15 +127,15 @@
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <jdkName>${jdk.version}</jdkName>
+                    <jdkName>${D}{jdk.version}</jdkName>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <source>${D}{jdk.version}</source>
+                    <target>${D}{jdk.version}</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
@@ -142,7 +143,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>${jdk.version}</source>
+                    <source>${D}{jdk.version}</source>
                 </configuration>
             </plugin>
             <plugin>
@@ -161,7 +162,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
-                    <targetJdk>${jdk.version}</targetJdk>
+                    <targetJdk>${D}{jdk.version}</targetJdk>
                 </configuration>
             </plugin>
             <plugin>
@@ -213,92 +214,89 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
         <!-- Xml configuration -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
 
         <!-- Mule Transports -->
-
-        #set($emailDepSet = false)
-        #set($sslDepSet = false)
-        #set($httpDepSet = false)
-        #set($jettyDepSet = false)
-        #set($rmiDepSet = false)
-        #foreach($item in $transportArray)
-          #if($item == 'smtp' || $item == 'smtps' || $item == 'pop3' || $item == 'pop3s' || $item == 'imap' || $item == 'imaps')
-            #if($emailDepSet == false)
+#set($emailDepSet = false)
+#set($sslDepSet = false)
+#set($httpDepSet = false)
+#set($jettyDepSet = false)
+#set($rmiDepSet = false)
+#foreach($item in $transportArray)
+#if($item == 'smtp' || $item == 'smtps' || $item == 'pop3' || $item == 'pop3s' || $item == 'imap' || $item == 'imaps')
+#if($emailDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-              #set($emailDepSet = true)
-            #end
-          #elseif($item == 'ssl' || $item == 'tls')
-            #if($sslDepSet == false)
+#set($emailDepSet = true)
+#end
+#elseif($item == 'ssl' || $item == 'tls')
+#if($sslDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-              #set($sslDepSet = true)
-            #end
-          #elseif($item == 'http' || $item == 'https')
-            #if($httpDepSet == false)
+#set($sslDepSet = true)
+#end
+#elseif($item == 'http' || $item == 'https')
+#if($httpDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-              #set($httpDepSet = true)
-            #end
-          #elseif($item == 'jetty' || $item == 'jetty-ssl')
-            #if($jettyDepSet == false)
+#set($httpDepSet = true)
+#end
+#elseif($item == 'jetty' || $item == 'jetty-ssl')
+#if($jettyDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-              #set($jettyDepSet = true)
-            #end
-          #elseif($item == 'rmi' || $item == 'jnp')
-            #if($rmiDepSet == false)
+#set($jettyDepSet = true)
+#end
+#elseif($item == 'rmi' || $item == 'jnp')
+#if($rmiDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-              #set($rmiDepSet = true)
-            #end
-          #else
+#set($rmiDepSet = true)
+#end
+#else
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-${item}</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-          #end
-        #end
+#end
+#end
         <!-- Mule Modules -->
-
-        #foreach($item in $moduleArray)
+#foreach($item in $moduleArray)
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-${item}</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
-
-        #end
+#end
 
         <!-- for testing -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -315,7 +313,7 @@
         </dependency>
     </dependencies>
 
-    #if($forgeProject == "y")
+#if($forgeProject == "y")
     <!-- Mule Forge Configuration -->
     <issueManagement>
         <system>Jira</system>
@@ -352,7 +350,7 @@
     </distributionManagement>
 
     <!-- End of MuleForge Configuration -->
-    #end
+#end
     <repositories>
         <repository>
             <id>muleforge-repo</id>
@@ -367,7 +365,7 @@
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
             <layout>default</layout>
         </repository>
-        #if($forgeProject == "y")
+#if($forgeProject == "y")
         <repository>
             <!-- local repository for this forge project. Users can upload dependencies here when the artifact
                  is not available on any other repository. Its the users' responsibility to make sure that no
@@ -380,7 +378,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        #end
+#end
     </repositories>
-
 </project>

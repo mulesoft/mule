@@ -1,5 +1,6 @@
+#set($D = '$')
 /*
- * $Id$
+ * ${D}Id{D}$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -11,25 +12,24 @@
 #set($ModuleName = "${ModuleName.substring(0,1).toUpperCase()}${ModuleName.substring(1)}")
 package org.mule.transport.${ModuleName.toLowerCase()};
 
-import org.mule.transport.AbstractMessageAdapterTestCase;
-import org.mule.api.transport.MessageAdapter;
-import org.mule.api.MessagingException;
+import org.mule.api.transport.MuleMessageFactory;
+import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
-public class ${ModuleName}MessageAdapterTestCase extends AbstractMessageAdapterTestCase
+public class ${ModuleName}MuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
-
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public Object getValidMessage() throws Exception
+    @Override
+    protected MuleMessageFactory doCreateMuleMessageFactory()
     {
-        // TODO Create a valid message for your transport
-        throw new UnsupportedOperationException("getValidMessage");
+        return new ${ModuleName}MuleMessageFactory(muleContext);
     }
 
-    public MessageAdapter createAdapter(Object payload) throws MessagingException
+    @Override
+    protected Object getValidTransportMessage() throws Exception
     {
-        return new ${ModuleName}MessageAdapter(payload);
+        // TODO create a transport message that can be used to test the extraction of payload
+        return null;
     }
-
 }

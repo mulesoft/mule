@@ -105,12 +105,13 @@ in the case of JMS this class would would convert a MuleMessage to a JMSMessage.
 does not have a specific message type you do not need this class.
 #end
 
-#if($hasCustomMessageAdapter == "y")
+#if($hasCustomMessageFactory == "y")
 -----------------------------------------------------------------
-./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapter.java
+./src/main/java/${package}/${ModuleNameLower}/${ModuleName}MuleMessageFactory.java
 
-This class is used to wrap inbound messages and access the data in the message in a unified way.  The MessageAdapter provides
-access to the payload, message headers and attachments.
+This class is used to convert a transport specific message (e.g. a JMS message object) into a 
+MuleMessage instance. This factory needs to extract the payload from the message as well as its
+message properties and attachments.
 #end
 
 #if($hasDispatcher == "y")
@@ -222,11 +223,11 @@ The unit test case for testing the connecotr object for this transport.
 
 The unit test case for testing the endpoint builder object for this transport.
 #end
-#if($hasCustomMessageAdapter == "y")
+#if($hasCustomMessageFactory == "y")
 -----------------------------------------------------------------
-./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
+./src/test/java/${package}/${ModuleNameLower}/${ModuleName}MuleMessageFactoryTestCase.java
 
-The test case for testing the custom message adapter for this transport.
+The test case for testing the custom message factory for this transport.
 #end
 
 #if($hasReceiver == "y")
@@ -293,7 +294,7 @@ hasCustomSchema=${hasCustomSchema}
 hasReceiver=${hasReceiver}
 hasDispatcher=${hasDispatcher}
 hasRequestor=${hasRequestor}
-hasCustomMessageAdapter=${hasCustomMessageAdapter}
+hasCustomMessageFactory=${hasCustomMessageFactory}
 hasBootstrap=${hasBootstrap}
 hasTransactions=${hasTransactions}
 hasCustomTransactions=${hasCustomTransactions}

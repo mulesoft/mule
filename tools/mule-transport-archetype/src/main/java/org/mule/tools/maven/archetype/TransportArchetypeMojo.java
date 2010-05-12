@@ -106,7 +106,7 @@ public class TransportArchetypeMojo extends AbstractMojo
      * @parameter expression="${project.remoteArtifactRepositories}"
      * @required
      */
-    private List remoteRepositories;
+    private List<?> remoteRepositories;
 
     public void execute()
             throws MojoExecutionException
@@ -132,9 +132,9 @@ public class TransportArchetypeMojo extends AbstractMojo
         }
 
         // TODO: context mojo more appropriate?
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
 
-        if(artifactId == null)
+        if (artifactId == null)
         {
             artifactId = transportId;
         }
@@ -172,6 +172,4 @@ public class TransportArchetypeMojo extends AbstractMojo
             throw new MojoExecutionException("Error creating from archetype", e);
         }
     }
-
-
 }

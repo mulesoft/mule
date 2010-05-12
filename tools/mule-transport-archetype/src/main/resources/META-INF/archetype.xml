@@ -73,8 +73,8 @@ transformer? (i.e. ObjectToJmsMessage)
                 </variable>
 
                 <variable>
-                    <name>hasCustomMessageAdapter</name>
-                    <description>Does the transport need a custom MessageAdapter? [y] or [n]
+                    <name>hasCustomMessageFactory</name>
+                    <description>Does the transport need a custom MuleMessageFactory? [y] or [n]
 (This is usually only required if the underlying transport has an API that has a message object
 i.e. JMSMessage or HttpServletRequest)</description>
                     <defvalue>n</defvalue>
@@ -239,11 +239,11 @@ method on the Dispatcher)
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
-            <file>src/main/java/org/mule/transport/MessageAdapter.vm</file>
+            <file>src/main/java/org/mule/transport/MuleMessageFactory.vm</file>
             <output>
-                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapter.java
+                src/main/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MuleMessageFactory.java
             </output>
-            <dependsOnVar>hasCustomMessageAdapter=y</dependsOnVar>
+            <dependsOnVar>hasCustomMessageFactory=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/transport/MessageDispatcher.vm</file>
@@ -347,11 +347,11 @@ method on the Dispatcher)
             <dependsOnVar>newProject=y</dependsOnVar>
         </template>
         <template>
-            <file>src/test/java/org/mule/transport/MessageAdapterTestCase.vm</file>
+            <file>src/test/java/org/mule/transport/MuleMessageFactoryTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MessageAdapterTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}MuleMessageFactoryTestCase.java
             </output>
-            <dependsOnVar>hasCustomMessageAdapter=y</dependsOnVar>
+            <dependsOnVar>hasCustomMessageFactory=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/transport/NamespaceHandlerTestCase.vm</file>

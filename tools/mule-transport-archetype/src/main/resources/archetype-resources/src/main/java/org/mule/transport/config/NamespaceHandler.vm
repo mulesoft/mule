@@ -1,5 +1,6 @@
+#set($D = '$')
 /*
- * $Id: NamespaceHandler.vm 10621 2008-01-30 12:15:16Z dirk.olmes $
+ * ${D}Id{D}$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

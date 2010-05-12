@@ -1,5 +1,6 @@
+#set($D = '$')
 /*
- * $Id: TransactedMessageReceiver.vm 11079 2008-02-27 15:52:01Z tcarlson $
+ * ${D}Id{D}$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

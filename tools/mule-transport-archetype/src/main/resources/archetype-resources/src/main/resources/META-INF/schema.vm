@@ -1,3 +1,4 @@
+#set($D = '$')
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -19,7 +20,7 @@
             <schemadoc:short-name>${ModuleName}</schemadoc:short-name>
             <schemadoc:page-title>${ModuleName} ${ModuleType}</schemadoc:page-title>
 #if($ModuleType == "Transport")
- #set($receive = "false")
+#set($receive = "false")
 #if($hasReceiver == "y")
   #set($receive = "true")
 #end
@@ -41,7 +42,7 @@
             receiveEvents="${receive}" dispatchEvents="${dispatch}" responseEvents="${response}"
                                           requestEvents="${request}"
                                           transactions="${transactions}" streaming="${streaming}">
-                <schemadoc:inboundMEPs in-only="${receiver}" in-optional-out="${response}" in-out="${response}"/>
+                <schemadoc:inboundMEPs in-only="${receive}" in-optional-out="${response}" in-out="${response}"/>
                 <schemadoc:outboundMEPs out-only="${dispatcher}" out-in="${response}" out-optional-in="${response}"/>
             </schemadoc:transport-features>
 #end
@@ -81,7 +82,7 @@
             these types allow property placeholders to be used instead of the actual value.
             The property can then be set according to the properties available to the MUle instance. i.e
 
-            <${ModuleNameLower}:connector name="smallTwizzler" swizzlerSize="${small.swizzle}"/>
+            <${ModuleNameLower}:connector name="smallTwizzler" swizzlerSize="${D}{small.swizzle}"/>
 
             where small.swizzle is set in a properties files or system property.  This makes it easy
             to use the same config file for differnet environments such as Developement, UAT and Production
