@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
@@ -50,7 +51,8 @@ public class MuleContainer
             {"mode", "true", "Run Mode"},
             {"props", "true", "Startup Properties"},
             {"production", "false", "Production Mode"},
-            {"debug", "false", "Configure Mule for JPDA remote debugging."}
+            {"debug", "false", "Configure Mule for JPDA remote debugging."},
+            {"app", "true", "Application to start"}
     };
 
     /**
@@ -166,16 +168,22 @@ public class MuleContainer
         // properties
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
-        String config = (String) commandlineOptions.get("config");
-        // Try default if no config file was given.
-        if (config == null && !commandlineOptions.containsKey("idle"))
+        String application = (String) commandlineOptions.get("app");
+        if (application == null)
         {
-            logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
+            application = "default";
+        }
+
+        // Try default if no config file was given.
+        if (!commandlineOptions.containsKey("idle"))
+        {
+            final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
             // try to load the config as a file as well
-            URL configUrl = IOUtils.getResourceAsUrl(DEFAULT_CONFIGURATION, MuleContainer.class, true, false);
+            final String configPath = String.format("%s/apps/%s/%s", muleHome, application, DEFAULT_CONFIGURATION);
+            URL configUrl = IOUtils.getResourceAsUrl(configPath, MuleContainer.class, true, false);
             if (configUrl != null)
             {
-                config = configUrl.toExternalForm();
+                application = configUrl.toExternalForm();
             }
             else
             {
@@ -184,9 +192,9 @@ public class MuleContainer
             }
         }
 
-        if (config != null)
+        if (application != null)
         {
-            setConfigurationResources(config);
+            setConfigurationResources(application);
         }
 
         // TODO old builders need to be retrofitted to understand the new app/lib

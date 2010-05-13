@@ -16,14 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
-import java.util.List;
 
 public final class MuleContainerBootstrapUtils
 {
@@ -66,48 +61,6 @@ public final class MuleContainerBootstrapUtils
     public static File getMuleLocalJarFile()
     {
         return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
-    }
-
-    public static void addLibrariesToClasspath(List urls) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        ClassLoader sys = ClassLoader.getSystemClassLoader();
-        if (!(sys instanceof URLClassLoader))
-        {
-            throw new IllegalArgumentException(
-                "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
-                                + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
-        }
-
-        // system classloader is in this case the one that launched the application,
-        // which is usually something like a JDK-vendor proprietary AppClassLoader
-        URLClassLoader sysCl = (URLClassLoader) sys;
-
-        /*
-         * IMPORTANT NOTE: The more 'natural' way would be to create a custom
-         * URLClassLoader and configure it, but then there's a chicken-and-egg
-         * problem, as all classes MuleBootstrap depends on would have been loaded by
-         * a parent classloader, and not ours. There's no straightforward way to
-         * change this, and is documented in a Sun's classloader guide. The solution
-         * would've involved overriding the ClassLoader.findClass() method and
-         * modifying the semantics to be child-first, but that way we are calling for
-         * trouble. Hacking the primordial classloader is a bit brutal, but works
-         * perfectly in case of running from the command-line as a standalone app.
-         * All Mule embedding options then delegate the classpath config to the
-         * embedder (a developer embedding Mule in the app), thus classloaders are
-         * not modified in those scenarios.
-         */
-
-        // get a Method ref from the normal class, but invoke on a proprietary parent
-        // object,
-        // as this method is usually protected in those classloaders
-        Class refClass = URLClassLoader.class;
-        Method methodAddUrl = refClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-        methodAddUrl.setAccessible(true);
-        for (Iterator it = urls.iterator(); it.hasNext();)
-        {
-            URL url = (URL) it.next();
-            methodAddUrl.invoke(sysCl, new Object[]{url});
-        }
     }
 
     public static class ProxyInfo
