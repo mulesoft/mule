@@ -177,6 +177,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Modules for standalone container -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-reboot</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-launcher</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <!-- Include all Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>
