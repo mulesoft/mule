@@ -18,7 +18,6 @@ import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
-import org.mule.module.boot.MuleBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,11 +97,11 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
             // end dup
 
             // TODO this is really a job of a deployer and deployment descriptor info
-            ClassLoader parent = MuleBootstrapUtils.isStandalone()
+            /*ClassLoader parent = MuleBootstrapUtils.isStandalone()
                                                         ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
                                                         : CLASSLOADER_ROOT;
             ClassLoader cl = new MuleApplicationClassLoader(this.monitoredResource, parent);
-            Thread.currentThread().setContextClassLoader(cl);
+            Thread.currentThread().setContextClassLoader(cl);*/
 
 
 
