@@ -11,9 +11,8 @@
 package org.mule.config.spring.hotdeploy;
 
 import java.io.File;
-import java.util.TimerTask;
 
-public abstract class FileWatcher extends TimerTask
+public abstract class FileWatcher implements Runnable
 {
 
     private long timeStamp;
