@@ -19,7 +19,7 @@ import org.tanukisoftware.wrapper.WrapperManager;
 public class MuleContainerWrapper implements WrapperListener
 {
 
-    protected static final String CLASSNAME_MULE_CONTAINER = "org.mule.modules.reboot.MuleContainer";
+    protected static final String CLASSNAME_MULE_CONTAINER = "org.mule.module.launcher.MuleContainer";
 
     /**
      * We can't reference MuleServer class literal here, as it will fail to resolve at runtime.

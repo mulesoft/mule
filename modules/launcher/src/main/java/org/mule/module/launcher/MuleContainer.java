@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.reboot;
+package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -407,7 +407,7 @@ public class MuleContainer
      */
     public void shutdown()
     {
-        logger.info("Mule server shutting down due to normal shutdown request");
+        logger.info("Mule container shutting down due to normal shutdown request");
 
         unregisterShutdownHook();
         doShutdown();
