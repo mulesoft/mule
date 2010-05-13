@@ -1,0 +1,16 @@
+/classes
+/.clover
+/.classpath
+/.project
+/target
+/*.iml
+/*.ipr
+/*.iws
+/build.properties
+/workspace
+/.mule
+/ActiveMQ
+/xdocs
+/*.log
+/svnmerge-commit-message.txt
+/activemq-data

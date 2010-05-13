@@ -1,0 +1,10 @@
+/target
+/.classpath
+/.project
+/.fbprefs
+/.fbwarnings
+/.settings
+/*.log
+/cobertura.ser
+/*.iml
+/.mule

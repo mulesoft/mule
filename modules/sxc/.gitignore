@@ -1,0 +1,8 @@
+/.settings
+/target
+/.checkstyle
+/.classpath
+/.project
+/cobertura.ser
+/*.iml
+/.mule

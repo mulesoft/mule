@@ -1,0 +1,12 @@
+/target
+/bin
+/.project
+/.classpath
+/.fbprefs
+/.fbwarnings
+/.settings
+/*.log
+/cobertura.ser
+/*.iml
+/.mule
+/output

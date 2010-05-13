@@ -1,0 +1,12 @@
+/.project
+/.classpath
+/target
+/bin
+/mule-rmi-provider.iml
+/.fbprefs
+/.fbwarnings
+/.settings
+/*.log
+/cobertura.ser
+/*.iml
+/.mule

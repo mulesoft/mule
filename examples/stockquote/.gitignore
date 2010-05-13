@@ -1,0 +1,10 @@
+/.classpath
+/.project
+/.mule
+/*.log
+/.clover
+/*.iml
+/target
+/.settings
+/classes
+/cobertura.ser

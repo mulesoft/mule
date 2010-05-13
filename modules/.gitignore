@@ -1,0 +1,7 @@
+/.classpath
+/.project
+/.mule
+/*.log
+/.clover
+/*.iml
+/target

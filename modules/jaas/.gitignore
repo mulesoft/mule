@@ -1,0 +1,8 @@
+/target
+/*.log
+/.settings
+/.classpath
+/.project
+/cobertura.ser
+/*.iml
+/.mule
