@@ -313,8 +313,8 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
     protected void scheduleConfigMonitor(FileWatcher watcher)
     {
         final int reloadIntervalMs = DEFAULT_RELOAD_CHECK_INTERVAL_MS;
-        // time cancellation handled in the watcher's onChange() callback
-        watchTimer = Executors.newSingleThreadScheduledExecutor();
+        watchTimer = Executors.newSingleThreadScheduledExecutor(new ConfigChangeMonitorThreadFactory(appName));
+
         watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
 
         if (logger.isInfoEnabled())
@@ -344,5 +344,5 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             Thread.currentThread().setContextClassLoader(cl);
             redeploy();
         }
-    }
+            }
 }
