@@ -54,11 +54,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -128,7 +126,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         {
             Map<String, String> parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
             String optVerbose = parsedOpts.get("mule.verbose");
-            verbose = Boolean.valueOf(optVerbose).booleanValue();
+            verbose = Boolean.valueOf(optVerbose);
         }
         else
         {
