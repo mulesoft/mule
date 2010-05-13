@@ -36,7 +36,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
      */
     protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
-    protected transient final Log logger = LogFactory.getLog(MuleContainer.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     private String appName;
     private Map<String, Object> metaData;
@@ -51,6 +51,11 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public void install()
     {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Installing application: " + appName);
+        }
+
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         // try to load the config as a file as well
         final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), MuleAppDeployer.DEFAULT_CONFIGURATION);
@@ -115,6 +120,11 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public void start()
     {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Starting application: " + appName);
+        }
+
         try
         {
             this.muleContext.start();
@@ -128,6 +138,11 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public void init()
     {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Initializing application: " + appName);
+        }
+
         try
         {
             // create a new ConfigurationBuilder that is disposed afterwards
@@ -175,16 +190,35 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public void dispose()
     {
+
         if (muleContext.isStarted() && !muleContext.isDisposed())
         {
             stop();
+        }
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Disposing application: " + appName);
         }
 
         muleContext.dispose();
     }
 
+    public void restart()
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Restarting application: " + appName);
+        }
+        stop();
+        start();
+    }
+
     public void stop()
     {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Stopping application: " + appName);
+        }
         try
         {
             this.muleContext.stop();
