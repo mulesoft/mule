@@ -218,7 +218,7 @@
         </dependency>
         <!-- Xml configuration -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${D}{mule.version}</version>
         </dependency>
@@ -286,7 +286,7 @@
         <!-- Mule Modules -->
 #foreach($item in $moduleArray)
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-${item}</artifactId>
             <version>${D}{mule.version}</version>
         </dependency>
