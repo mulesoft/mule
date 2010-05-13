@@ -261,9 +261,9 @@ public class MuleContainer
         }
         try
         {
-            logger.info("Mule Server initializing...");
+            logger.info("Mule Container initializing...");
             initialize();
-            logger.info("Mule Server starting...");
+            logger.info("Mule Container starting...");
             muleContext.start();
         }
         catch (Throwable e)

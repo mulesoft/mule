@@ -22,7 +22,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.tanukisoftware.wrapper.WrapperManager;
-import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
 /**
  * Determine which is the main class to run and delegate control to the Java Service
@@ -51,27 +50,13 @@ public class MuleContainerBootstrap
 
         prepareBootstrapPhase(commandLine);
         
-        String mainClassName = commandLine.getOptionValue("main");
-
-        if (mainClassName == null || mainClassName.equals(MuleContainerWrapper.class.getName()))
-        {
-            System.out.println("Starting the Mule Container...");
-            WrapperManager.start(new MuleContainerWrapper(), remainingArgs);
-        }
-        else
-        {
-            // Add the main class name as the first argument to the Wrapper.
-            String[] appArgs = new String[remainingArgs.length + 1];
-            appArgs[0] = mainClassName;
-            System.arraycopy(remainingArgs, 0, appArgs, 1, remainingArgs.length);
-            System.out.println("Starting class " + mainClassName + "...");
-            WrapperSimpleApp.main(appArgs);
-        }
+        System.out.println("Starting the Mule Container...");
+        WrapperManager.start(new MuleContainerWrapper(), remainingArgs);
     }
 
     private static void prepareBootstrapPhase(CommandLine commandLine) throws Exception
     {
-        boolean production = commandLine.hasOption("production");                
+        boolean production = commandLine.hasOption("production");
         prepareBootstrapPhase(production);
     }
     
