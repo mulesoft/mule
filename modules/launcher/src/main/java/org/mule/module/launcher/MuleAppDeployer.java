@@ -277,6 +277,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     protected void createDeploymentClassLoader()
     {
+        // TODO shared domain from deployment descriptor/config
         ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
         this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
     }
