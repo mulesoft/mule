@@ -14,6 +14,7 @@ import org.mule.context.notification.NotificationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -32,12 +33,10 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 {
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
-    /**
-     * Default dev-mode builder with hot-deployment.
-     */
-    public static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
 
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
+
+    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
 
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
@@ -80,23 +79,13 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             System.exit(-1);
         }
 
-        // TODO replace with a hotdeploy switch
-        final String productionMode = (String) metaData.get("production");
-        //if (productionMode == null)
-        //{
-        try
+
+        // Configuration builder
+        String builder = (String) metaData.get("builder");
+        if (StringUtils.isBlank(builder))
         {
-            this.configBuilderClassName = CLASSNAME_DEV_MODE_CONFIG_BUILDER;
+            builder = CLASSNAME_DEFAULT_CONFIG_BUILDER;
         }
-        catch (Exception e)
-        {
-            logger.fatal(e);
-            final Message message = CoreMessages.failedToLoad("Builder: " + CLASSNAME_DEV_MODE_CONFIG_BUILDER);
-            System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
-            // TODO replace with a deployment exception
-            System.exit(1);
-        }
-        //}
 
         // TODO discover it from app descriptor?
         // Configuration builder
@@ -106,9 +95,13 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         try
         {
             // Provide a shortcut for Spring: "-builder spring"
-            if (configBuilderClassName.equalsIgnoreCase("spring"))
+            if ("spring".equalsIgnoreCase(builder))
             {
                 this.configBuilderClassName = CLASSNAME_SPRING_CONFIG_BUILDER;
+            }
+            else
+            {
+                this.configBuilderClassName = builder;
             }
         }
         catch (Exception e)
@@ -306,11 +299,9 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
                 switch (action)
                 {
                     case MuleContextNotification.CONTEXT_STARTED:
-                        System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STARTED");
                         scheduleConfigMonitor(watcher);
                         break;
                     case MuleContextNotification.CONTEXT_STOPPING:
-                        System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STOPPING");
                         watchTimer.shutdownNow();
                         muleContext.unregisterListener(this);
                         break;

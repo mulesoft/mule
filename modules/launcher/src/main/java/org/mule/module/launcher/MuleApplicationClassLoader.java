@@ -40,7 +40,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
     private File monitoredResource;
     private String appName;
 
-    // TODO refactor to use an app name instead
+    // TODO refactor to use an app name instead and use convention for monitoredResource
     public MuleApplicationClassLoader(String appName, File monitoredResource, ClassLoader parentCl)
     {
         super(CLASSPATH_EMPTY, parentCl);
@@ -68,7 +68,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
                 if (!jars.isEmpty() && logger.isInfoEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("Updating the following jars:").append(SystemUtils.LINE_SEPARATOR);
+                    sb.append("Loading the following jars:").append(SystemUtils.LINE_SEPARATOR);
                     sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
                     for (File jar : jars)
