@@ -109,8 +109,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             System.exit(1);
         }
 
-        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
-        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
+        createDeploymentClassLoader();
     }
 
     public String getAppName()
@@ -150,9 +149,6 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
         try
         {
-            //Thread.currentThread().setContextClassLoader(null);|
-            //Thread.currentThread().setContextClassLoader(cl);
-
             // create a new ConfigurationBuilder that is disposed afterwards
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
                                                                                                  new Object[] {configUrl.toExternalForm()}, getDeploymentClassLoader());
@@ -224,13 +220,15 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         muleContext.dispose();
     }
 
-    public void restart()
+    public void redeploy()
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Restarting application: " + appName);
+            logger.info("Redeploying application: " + appName);
         }
         stop();
+        // discard the old classloader
+        createDeploymentClassLoader();
         start();
     }
 
@@ -272,7 +270,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
             try
             {
-                restart();
+                redeploy();
                 /*muleContext.dispose();
                 Thread.currentThread().setContextClassLoader(null);
                 // TODO this is really a job of a deployer and deployment descriptor info
@@ -299,4 +297,9 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         }
     }
 
+    protected void createDeploymentClassLoader()
+    {
+        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
+    }
 }

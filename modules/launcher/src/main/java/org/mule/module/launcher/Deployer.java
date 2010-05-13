@@ -18,7 +18,7 @@ public interface Deployer<M>
 
     void dispose();
 
-    void restart();
+    void redeploy();
 
     void setMetaData(M metaData);
 

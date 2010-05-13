@@ -44,7 +44,11 @@ public class DeployerWrapper<M> implements Deployer<M>
         try
         {
             ClassLoader appCl = getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(appCl);
+            // if not initialized yet, it can be null
+            if (appCl != null)
+            {
+                Thread.currentThread().setContextClassLoader(appCl);
+            }
             delegate.init();
         }
         finally
@@ -59,7 +63,11 @@ public class DeployerWrapper<M> implements Deployer<M>
         try
         {
             ClassLoader appCl = getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(appCl);
+            // if not initialized yet, it can be null
+            if (appCl != null)
+            {
+                Thread.currentThread().setContextClassLoader(appCl);
+            }
             delegate.install();
         }
         finally
@@ -68,9 +76,9 @@ public class DeployerWrapper<M> implements Deployer<M>
         }
     }
 
-    public void restart()
+    public void redeploy()
     {
-        delegate.restart();
+        delegate.redeploy();
     }
 
     public void setMetaData(M metaData)
@@ -84,7 +92,11 @@ public class DeployerWrapper<M> implements Deployer<M>
         try
         {
             ClassLoader appCl = getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(appCl);
+            // if not initialized yet, it can be null
+            if (appCl != null)
+            {
+                Thread.currentThread().setContextClassLoader(appCl);
+            }
             delegate.start();
         }
         finally
@@ -99,7 +111,11 @@ public class DeployerWrapper<M> implements Deployer<M>
         try
         {
             ClassLoader appCl = getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(appCl);
+            // if not initialized yet, it can be null
+            if (appCl != null)
+            {
+                Thread.currentThread().setContextClassLoader(appCl);
+            }
             delegate.stop();
         }
         finally
