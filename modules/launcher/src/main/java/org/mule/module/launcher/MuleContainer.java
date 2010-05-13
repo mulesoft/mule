@@ -11,28 +11,20 @@
 package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleProperties;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,11 +48,6 @@ public class MuleContainer
     };
 
     /**
-     * Default dev-mode builder with hot-deployment.
-     */
-    public static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
-
-    /**
      * Don't use a class object so the core doesn't depend on mule-module-spring-config.
      */
     protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
@@ -70,13 +57,6 @@ public class MuleContainer
      * doesn't do anything initially but is fed configuration during runtime
      */
     protected static final String CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER = "org.mule.config.builders.MuleIdleConfigurationBuilder";
-
-    /**
-     * Required to support the '-config spring' shortcut. Don't use a class object so
-     * the core doesn't depend on mule-module-spring. TODO this may not be a problem
-     * for Mule 2.x
-     */
-    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
     /**
      * If the annotations module is on the classpath, also enable annotations config builder
@@ -112,13 +92,7 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    /**
-     * The MuleContext should contain anything which does not belong in the Registry.
-     * There is one MuleContext per Mule instance. Assuming it has been created, a
-     * handle to the local MuleContext can be obtained from anywhere by calling
-     * MuleContainer.getMuleContext()
-     */
-    protected static MuleContext muleContext = null;
+    protected MuleAppDeployer deployer;
 
     /**
      * Application entry point.
@@ -174,77 +148,6 @@ public class MuleContainer
             application = "default";
         }
 
-        // Try default if no config file was given.
-        if (!commandlineOptions.containsKey("idle"))
-        {
-            final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-            // try to load the config as a file as well
-            final String configPath = String.format("%s/apps/%s/%s", muleHome, application, DEFAULT_CONFIGURATION);
-            URL configUrl = IOUtils.getResourceAsUrl(configPath, MuleContainer.class, true, false);
-            if (configUrl != null)
-            {
-                application = configUrl.toExternalForm();
-            }
-            else
-            {
-                System.out.println(CoreMessages.configNotFoundUsage());
-                System.exit(-1);
-            }
-        }
-
-        if (application != null)
-        {
-            setConfigurationResources(application);
-        }
-
-        // TODO old builders need to be retrofitted to understand the new app/lib
-        final String productionMode = (String) commandlineOptions.get("production");
-        //if (productionMode == null)
-        //{
-        try
-        {
-            setConfigBuilderClassName(CLASSNAME_DEV_MODE_CONFIG_BUILDER);
-        }
-        catch (Exception e)
-        {
-            logger.fatal(e);
-            final Message message = CoreMessages.failedToLoad("Builder: " + CLASSNAME_DEV_MODE_CONFIG_BUILDER);
-            System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
-            System.exit(1);
-        }
-        //}
-
-
-        // Configuration builder
-        String cfgBuilderClassName = (String) commandlineOptions.get("builder");
-
-        if (commandlineOptions.containsKey("idle"))
-        {
-            setConfigurationResources("IDLE");
-            cfgBuilderClassName = CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER;
-        }
-
-        // Configuration builder
-        if (cfgBuilderClassName != null)
-        {
-            try
-            {
-                // Provide a shortcut for Spring: "-builder spring"
-                if (cfgBuilderClassName.equalsIgnoreCase("spring"))
-                {
-                    cfgBuilderClassName = CLASSNAME_SPRING_CONFIG_BUILDER;
-                }
-                setConfigBuilderClassName(cfgBuilderClassName);
-            }
-            catch (Exception e)
-            {
-                logger.fatal(e);
-                final Message message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
-                System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
-                System.exit(1);
-            }
-        }
-
         // Startup properties
         String propertiesFile = (String) commandlineOptions.get("props");
         if (propertiesFile != null)
@@ -253,6 +156,11 @@ public class MuleContainer
         }
 
         StartupContext.get().setStartupOptions(commandlineOptions);
+
+        // TODO pluggable deployer
+        deployer = new MuleAppDeployer(application);
+        deployer.setMetaData(commandlineOptions);
+        deployer.install();
     }
 
     /**
@@ -270,9 +178,9 @@ public class MuleContainer
         try
         {
             logger.info("Mule Container initializing...");
-            initialize();
+            deployer.init();
             logger.info("Mule Container starting...");
-            muleContext.start();
+            deployer.start();
         }
         catch (Throwable e)
         {
@@ -330,57 +238,6 @@ public class MuleContainer
     }
 
     /**
-     * Initializes this daemon. Derived classes could add some extra behaviour if
-     * they wish.
-     *
-     * @throws Exception if failed to initialize
-     */
-    public void initialize() throws Exception
-    {
-        if (configurationResources == null)
-        {
-            logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-            configurationResources = DEFAULT_CONFIGURATION;
-        }
-
-        ConfigurationBuilder cfgBuilder;
-
-        try
-        {
-            // create a new ConfigurationBuilder that is disposed afterwards
-            cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
-                                                                            new Object[] {configurationResources}, MuleContainer.class);
-        }
-        catch (Exception e)
-        {
-            throw new ConfigurationException(CoreMessages.failedToLoad(getConfigBuilderClassName()), e);
-        }
-
-        if (!cfgBuilder.isConfigured())
-        {
-            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
-            builders.add(cfgBuilder);
-
-            // If the annotations module is on the classpath, add the annotations config builder to the list
-            // This will enable annotations config for this instance
-            if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-            {
-                Object configBuilder = ClassUtils.instanciateClass(
-                        CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-                builders.add((ConfigurationBuilder) configBuilder);
-            }
-
-            Properties startupProperties = null;
-            if (getStartupPropertiesFile() != null)
-            {
-                startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
-            }
-            DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContext = muleContextFactory.createMuleContext(cfgBuilder, startupProperties);
-        }
-    }
-
-    /**
      * Will shut down the server displaying the cause and time of the shutdown
      *
      * @param e the exception that caused the shutdown
@@ -423,10 +280,9 @@ public class MuleContainer
 
     protected void doShutdown()
     {
-        if (muleContext != null)
+        if (deployer != null)
         {
-            muleContext.dispose();
-            muleContext = null;
+            deployer.dispose();
         }
         System.exit(0);
     }
@@ -471,15 +327,6 @@ public class MuleContainer
         return configurationResources;
     }
 
-    /**
-     * Setter for property configurationResources.
-     *
-     * @param configurationResources New value of property configurationResources.
-     */
-    public void setConfigurationResources(String configurationResources)
-    {
-        this.configurationResources = configurationResources;
-    }
 
     public static String getStartupPropertiesFile()
     {
@@ -489,11 +336,6 @@ public class MuleContainer
     public static void setStartupPropertiesFile(String startupPropertiesFile)
     {
         MuleContainer.startupPropertiesFile = startupPropertiesFile;
-    }
-
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
     }
 
     /**
