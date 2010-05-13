@@ -16,7 +16,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformerTestCase;
 
 /**
- * For tis test I picked difficult beans in that they are not real beans, so I could test how to use
+ * For this test I picked difficult beans in that they are not real beans, so I could test how to use
  * mixins to decorate the objects
  * <p/>
  * FruitCleaner is ignored since there is no concrete implementation to construct

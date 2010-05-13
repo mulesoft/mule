@@ -56,7 +56,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         Object expectedResult = this.getResultData();
         assertNotNull(expectedResult);
 
-        assertTrue("Trasnformation result does not match expected result", this.compareResults(
+        assertTrue("Transformation result does not match expected result", this.compareResults(
             expectedResult, result));
     }
 
