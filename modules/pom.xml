@@ -20,6 +20,7 @@
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
+        <module>reboot</module>
         <module>client</module>
         <module>guice</module>
         <module>jaas</module>
