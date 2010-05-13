@@ -216,8 +216,9 @@ public abstract class MessageFactory
      */
     protected ClassLoader getClassLoader()
     {
-        // Assume the MessageFactory implementation class is in the same module as its resources.
-        return getClass().getClassLoader();
+        final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        // if there's a deployment classloader present, use it for finding resources
+        return ccl == null ? getClass().getClassLoader() : ccl;
     }
 }
 
