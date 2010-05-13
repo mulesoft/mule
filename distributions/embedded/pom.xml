@@ -144,72 +144,72 @@
                                 </artifactItem>
                                 <!-- Modules -->
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-acegi</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-boot</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-builders</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-client</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jaas</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jbossts</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-management</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-ognl</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-pgp</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-scripting</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-spring-config</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-spring-extras</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-sxc</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.module</groupId>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-xml</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
