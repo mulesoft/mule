@@ -75,6 +75,8 @@ public class WorkerContext implements Work
         }
     };
 
+    protected ClassLoader executionClassLoader;
+
     /**
      * Priority of the thread, which will execute this work.
      */
@@ -125,6 +127,10 @@ public class WorkerContext implements Work
      * A latch, which is released when the work is completed.
      */
     private final Latch endLatch = new Latch();
+
+    {
+        this.executionClassLoader = Thread.currentThread().getContextClassLoader();
+    }
 
     /**
      * Create a WorkWrapper.
@@ -296,12 +302,17 @@ public class WorkerContext implements Work
             {
                 // TODO currently unused, see below
                 // ExecutionContext context = new ExecutionContext();
+                final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
                 try
                 {
+                    // execute with the application-specific classloader in the context
+                    Thread.currentThread().setContextClassLoader(executionClassLoader);
                     worker.run();
                 }
                 finally
                 {
+                    Thread.currentThread().setContextClassLoader(originalCl);
+                    
                     // ExecutionContext returningContext = new
                     // ExecutionContext();
                     // if (context != returningContext) {
