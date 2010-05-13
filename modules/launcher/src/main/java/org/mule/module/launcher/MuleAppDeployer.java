@@ -44,6 +44,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
     private String configBuilderClassName;
     protected URL configUrl;
     private MuleContext muleContext;
+    private ClassLoader deploymentClassLoader;
 
     public MuleAppDeployer(String appName)
     {
@@ -107,6 +108,9 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             // TODO replace with a deployment exception
             System.exit(1);
         }
+
+        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
     }
 
     public String getAppName()
@@ -147,13 +151,11 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         try
         {
             //Thread.currentThread().setContextClassLoader(null);|
-            ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
-            ClassLoader cl = new MuleApplicationClassLoader(new File(configUrl.getFile()), parent);
             //Thread.currentThread().setContextClassLoader(cl);
 
             // create a new ConfigurationBuilder that is disposed afterwards
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                 new Object[] {configUrl.toExternalForm()}, cl);
+                                                                                                 new Object[] {configUrl.toExternalForm()}, getDeploymentClassLoader());
             if (!cfgBuilder.isConfigured())
             {
                 //List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
@@ -196,8 +198,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public ClassLoader getDeploymentClassLoader()
     {
-        // TODO this won't be the CCL probably in the future
-        return Thread.currentThread().getContextClassLoader();
+        return this.deploymentClassLoader;
     }
 
     public void dispose()
@@ -241,4 +242,53 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             throw new DeploymentStopException(MessageFactory.createStaticMessage(appName), e);
         }
     }
+
+    protected class ConfigFileWatcher extends FileWatcher
+    {
+
+        private final MuleContext muleContext;
+
+        public ConfigFileWatcher(MuleContext muleContext)
+        {
+            super(new File(configUrl.getFile()));
+            this.muleContext = muleContext;
+        }
+
+        protected synchronized void onChange(File file)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("================== Reloading " + file);
+            }
+
+
+            try
+            {
+                restart();
+                /*muleContext.dispose();
+                Thread.currentThread().setContextClassLoader(null);
+                // TODO this is really a job of a deployer and deployment descriptor info
+                // TODO I don't think shared domains can be safely redeployed, this will probably be removed
+                ClassLoader parent = MuleBootstrapUtils.isStandalone()
+                                     ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
+                                     : CLASSLOADER_ROOT;
+                ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, parent);
+                Thread.currentThread().setContextClassLoader(cl);
+
+                DefaultMuleContextFactory f = new DefaultMuleContextFactory();
+                MuleContext newContext = f.createMuleContext(ReloadableBuilder.this);
+                newContext.start();*/
+            }
+            catch (Exception ex)
+            {
+                throw new RuntimeException(ex);
+            }
+            //finally
+            //{
+            //    Thread.currentThread().setContextClassLoader(rootClassloader);
+            //}
+
+        }
+    }
+
 }

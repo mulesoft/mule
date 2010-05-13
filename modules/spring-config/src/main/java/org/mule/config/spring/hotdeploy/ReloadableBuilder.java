@@ -16,7 +16,6 @@ import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.ConfigResource;
 import org.mule.config.StartupContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.module.boot.MuleBootstrapUtils;
@@ -210,7 +209,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
             try
             {
-                muleContext.dispose();
+                /*muleContext.dispose();
                 Thread.currentThread().setContextClassLoader(null);
                 // TODO this is really a job of a deployer and deployment descriptor info
                 // TODO I don't think shared domains can be safely redeployed, this will probably be removed
@@ -222,7 +221,7 @@ public class ReloadableBuilder extends SpringXmlConfigurationBuilder
 
                 DefaultMuleContextFactory f = new DefaultMuleContextFactory();
                 MuleContext newContext = f.createMuleContext(ReloadableBuilder.this);
-                newContext.start();
+                newContext.start();*/
             }
             catch (Exception ex)
             {
