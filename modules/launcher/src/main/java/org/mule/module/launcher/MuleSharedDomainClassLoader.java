@@ -86,4 +86,13 @@ public class MuleSharedDomainClassLoader extends URLClassLoader
     {
         return domain;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[%s]@%s", getClass().getName(),
+                             domain,
+                             Integer.toHexString(System.identityHashCode(this)));
+    }
+
 }
