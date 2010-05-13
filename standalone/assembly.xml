@@ -361,6 +361,7 @@
       <outputDirectory>lib/boot</outputDirectory>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-reboot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
         <include>org.slf4j:slf4j-api</include>
@@ -401,6 +402,7 @@
         <include>org.mule.transports:mule-transport-vm</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
+        <include>org.mule.modules:mule-module-launcher</include>
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-annotations</include>
         <include>org.mule.modules:mule-module-atom</include>
@@ -460,6 +462,8 @@
         <exclude>org.mule.transports:mule-transport-vm</exclude>
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
+        <exclude>org.mule.modules:mule-module-launcher</exclude>
+        <exclude>org.mule.modules:mule-module-reboot</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-atom</exclude>
         <exclude>org.mule.modules:mule-module-annotations</exclude>

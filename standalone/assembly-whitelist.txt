@@ -105,9 +105,11 @@ mule-module-guice
 mule-module-jaas
 mule-module-jbossts
 mule-module-json
+mule-module-launcher
 mule-module-management
 mule-module-ognl
 mule-module-pgp
+mule-module-reboot
 mule-module-rss
 mule-module-scripting
 mule-module-spring-config
