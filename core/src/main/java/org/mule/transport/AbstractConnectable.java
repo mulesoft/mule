@@ -344,10 +344,6 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
                     throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
                 }
             }
-            else
-            {
-                logger.warn("Ignoring an attempt to start a connectable that is already started: " + this);
-            }
         }
     }
 
