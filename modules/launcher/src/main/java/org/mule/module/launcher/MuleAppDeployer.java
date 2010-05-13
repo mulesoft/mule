@@ -203,6 +203,14 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     public void dispose()
     {
+        if (muleContext == null)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("MuleContext not created, nothing to dispose of");
+            }
+            return;
+        }
 
         if (muleContext.isStarted() && !muleContext.isDisposed())
         {
