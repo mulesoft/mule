@@ -12,6 +12,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
@@ -145,9 +146,14 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
         try
         {
+            //Thread.currentThread().setContextClassLoader(null);|
+            ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+            ClassLoader cl = new MuleApplicationClassLoader(new File(configUrl.getFile()), parent);
+            //Thread.currentThread().setContextClassLoader(cl);
+
             // create a new ConfigurationBuilder that is disposed afterwards
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                 new Object[] {configUrl.toExternalForm()}, getClass());
+                                                                                                 new Object[] {configUrl.toExternalForm()}, cl);
             if (!cfgBuilder.isConfigured())
             {
                 //List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
@@ -186,6 +192,12 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public ClassLoader getDeploymentClassLoader()
+    {
+        // TODO this won't be the CCL probably in the future
+        return Thread.currentThread().getContextClassLoader();
     }
 
     public void dispose()

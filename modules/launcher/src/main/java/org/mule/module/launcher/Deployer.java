@@ -25,4 +25,9 @@ public interface Deployer<M>
     M getMetaData();
 
     MuleContext getMuleContext();
+
+    /**
+     * @return a classloader associated with this deployment 
+     */
+    ClassLoader getDeploymentClassLoader();
 }

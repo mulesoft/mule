@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.reboot;
+package org.mule.module.launcher;
 
 /**
  *

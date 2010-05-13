@@ -39,6 +39,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
     protected final transient Log logger = LogFactory.getLog(getClass());
     private File monitoredResource;
 
+    // TODO refactor to use an app name instead
     public MuleApplicationClassLoader(File monitoredResource, ClassLoader parentCl)
     {
         super(CLASSPATH_EMPTY, parentCl);
@@ -97,5 +98,14 @@ public class MuleApplicationClassLoader extends URLClassLoader
     public File getMonitoredResource()
     {
         return this.monitoredResource;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[%s]@%s", getClass().getName(),
+                             // TODO use app name instead
+                             monitoredResource.getAbsolutePath(),
+                             Integer.toHexString(System.identityHashCode(this)));
     }
 }

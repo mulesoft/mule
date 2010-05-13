@@ -8,8 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.reboot;
+package org.mule.module.launcher;
 
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
