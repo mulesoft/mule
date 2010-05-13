@@ -29,6 +29,7 @@ public abstract class MessageFactory
     private static final transient Object[] EMPTY_ARGS = new Object[]{};
 
     protected transient Log logger = LogFactory.getLog(getClass());
+    protected final ReloadControl control = new ReloadControl();
 
     /**
      * Computes the bundle's full path 
@@ -206,7 +207,7 @@ public abstract class MessageFactory
         {
             logger.trace("Loading resource bundle: " + bundlePath + " for locale " + locale);
         }
-        ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale, getClassLoader());
+        ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale, getClassLoader(), control);
         return bundle;
     }
 
@@ -219,6 +220,30 @@ public abstract class MessageFactory
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
         // if there's a deployment classloader present, use it for finding resources
         return ccl == null ? getClass().getClassLoader() : ccl;
+    }
+
+    static class ReloadControl extends ResourceBundle.Control
+    {
+        boolean needsReload = true;
+
+        @Override
+        public boolean needsReload(String baseName, Locale locale, String format, ClassLoader loader, ResourceBundle bundle, long loadTime)
+        {
+            // TODO always for now
+            return true;
+        }
+
+        @Override
+        public long getTimeToLive(String baseName, Locale locale)
+        {
+            if (needsReload)
+            {
+                // must be zero, as other 'DONT_CACHE' constant doesn't work here, and is -1
+                return 0;
+            }
+
+            return ResourceBundle.Control.TTL_NO_EXPIRATION_CONTROL;
+        }
     }
 }
 
