@@ -4,10 +4,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -15,6 +18,9 @@ import org.mule.util.StringMessageUtils;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +37,8 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
      */
     public static final String CLASSNAME_DEV_MODE_CONFIG_BUILDER = "org.mule.config.spring.hotdeploy.ReloadableBuilder";
 
+    protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
+
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
      * the core doesn't depend on mule-module-spring.
@@ -39,12 +47,15 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
+    protected ScheduledExecutorService watchTimer;
+
     private String appName;
     private Map<String, Object> metaData;
     private String configBuilderClassName;
     protected URL configUrl;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
+    private boolean redeploymentEnabled = true;
 
     public MuleAppDeployer(String appName)
     {
@@ -169,6 +180,11 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 // TODO properties for the app should come from the app descriptor
                 this.muleContext = muleContextFactory.createMuleContext(cfgBuilder);
+
+                if (redeploymentEnabled)
+                {
+                    createRedeployMonitor();
+                }
             }
         }
         catch (Exception e)
@@ -218,6 +234,8 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         }
 
         muleContext.dispose();
+        // kill any refs to the old classloader to avoid leaks
+        Thread.currentThread().setContextClassLoader(null);
     }
 
     public void redeploy()
@@ -226,9 +244,14 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         {
             logger.info("Redeploying application: " + appName);
         }
-        stop();
-        // discard the old classloader
-        createDeploymentClassLoader();
+        dispose();
+        install();
+
+        // update thread with the fresh new classloader just created during the install phase
+        final ClassLoader cl = getDeploymentClassLoader();
+        Thread.currentThread().setContextClassLoader(cl);
+
+        init();
         start();
     }
 
@@ -249,15 +272,73 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         }
     }
 
+    public boolean isRedeploymentEnabled()
+    {
+        return redeploymentEnabled;
+    }
+
+    public void setRedeploymentEnabled(boolean redeploymentEnabled)
+    {
+        this.redeploymentEnabled = redeploymentEnabled;
+    }
+
+    protected void createDeploymentClassLoader()
+    {
+        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
+    }
+
+    protected void createRedeployMonitor() throws NotificationException
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Monitoring for hot-deployment: " + configUrl.toExternalForm());
+        }
+
+        final FileWatcher watcher = new ConfigFileWatcher(new File(configUrl.getFile()));
+
+        // register a config monitor only after context has started, as it may take some time
+        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
+
+            public void onNotification(MuleContextNotification notification)
+            {
+                final int action = notification.getAction();
+                switch (action)
+                {
+                    case MuleContextNotification.CONTEXT_STARTED:
+                        System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STARTED");
+                        scheduleConfigMonitor(watcher);
+                        break;
+                    case MuleContextNotification.CONTEXT_STOPPING:
+                        System.out.println("ReloadableBuilder.onNotification:: CONTEXT_STOPPING");
+                        watchTimer.shutdownNow();
+                        muleContext.unregisterListener(this);
+                        break;
+                }
+            }
+        });
+    }
+
+    protected void scheduleConfigMonitor(FileWatcher watcher)
+    {
+        final int reloadIntervalMs = DEFAULT_RELOAD_CHECK_INTERVAL_MS;
+        // time cancellation handled in the watcher's onChange() callback
+        watchTimer = Executors.newSingleThreadScheduledExecutor();
+        watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
+
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Reload interval: " + reloadIntervalMs);
+        }
+    }
+
+
     protected class ConfigFileWatcher extends FileWatcher
     {
 
-        private final MuleContext muleContext;
-
-        public ConfigFileWatcher(MuleContext muleContext)
+        public ConfigFileWatcher(File watchedResource)
         {
-            super(new File(configUrl.getFile()));
-            this.muleContext = muleContext;
+            super(watchedResource);
         }
 
         protected synchronized void onChange(File file)
@@ -267,39 +348,10 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
                 logger.info("================== Reloading " + file);
             }
 
-
-            try
-            {
-                redeploy();
-                /*muleContext.dispose();
-                Thread.currentThread().setContextClassLoader(null);
-                // TODO this is really a job of a deployer and deployment descriptor info
-                // TODO I don't think shared domains can be safely redeployed, this will probably be removed
-                ClassLoader parent = MuleBootstrapUtils.isStandalone()
-                                     ? new DefaultMuleSharedDomainClassLoader(CLASSLOADER_ROOT)
-                                     : CLASSLOADER_ROOT;
-                ClassLoader cl = new MuleApplicationClassLoader(monitoredResource, parent);
-                Thread.currentThread().setContextClassLoader(cl);
-
-                DefaultMuleContextFactory f = new DefaultMuleContextFactory();
-                MuleContext newContext = f.createMuleContext(ReloadableBuilder.this);
-                newContext.start();*/
-            }
-            catch (Exception ex)
-            {
-                throw new RuntimeException(ex);
-            }
-            //finally
-            //{
-            //    Thread.currentThread().setContextClassLoader(rootClassloader);
-            //}
-
+            // grab the proper classloader for our context
+            final ClassLoader cl = getDeploymentClassLoader();
+            Thread.currentThread().setContextClassLoader(cl);
+            redeploy();
         }
-    }
-
-    protected void createDeploymentClassLoader()
-    {
-        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
-        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
     }
 }
