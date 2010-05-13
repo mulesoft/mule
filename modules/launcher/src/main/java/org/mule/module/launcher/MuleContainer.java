@@ -92,7 +92,7 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected MuleAppDeployer deployer;
+    protected Deployer<Map<String, Object>> deployer;
 
     /**
      * Application entry point.
@@ -158,7 +158,7 @@ public class MuleContainer
         StartupContext.get().setStartupOptions(commandlineOptions);
 
         // TODO pluggable deployer
-        deployer = new MuleAppDeployer(application);
+        deployer = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(application));
         deployer.setMetaData(commandlineOptions);
         deployer.install();
     }
@@ -175,12 +175,8 @@ public class MuleContainer
         {
             registerShutdownHook();
         }
-        final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try
         {
-            // TODO switch CCL for each app we deploy
-            ClassLoader appCl = deployer.getDeploymentClassLoader();
-            Thread.currentThread().setContextClassLoader(appCl);
             logger.info("Mule Container initializing...");
             deployer.init();
             logger.info("Mule Container starting...");
@@ -189,10 +185,6 @@ public class MuleContainer
         catch (Throwable e)
         {
             shutdown(e);
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
 
