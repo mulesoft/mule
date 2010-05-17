@@ -27,7 +27,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractConnectorTestCase
 {
-
     public static final String LOCALHOST = "127.0.0.1";
     public static final String USER = "bob";
     public static final String PROVIDER = "example.com";
@@ -75,8 +74,8 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
 
     private synchronized void storeEmail() throws Exception
     {
-        GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(),
-                EMAIL, USER, PASSWORD, (MimeMessage) getValidMessage());
+        GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(), EMAIL, USER, 
+            PASSWORD, (MimeMessage) getValidMessage());
         assertEquals(1, servers.getReceivedMessages().length);
     }
     
@@ -120,11 +119,12 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     {
         if (null == message)
         {
-            message = GreenMailUtilities.toMessage(MESSAGE, EMAIL);
+            message = GreenMailUtilities.toMessage(MESSAGE, EMAIL, null);
         }
         return message;
     }
     
+    @Override
     public String getTestEndpointURI()
     {
         return protocol + "://" + USER + ":" + PASSWORD + "@" + LOCALHOST + ":" + port +

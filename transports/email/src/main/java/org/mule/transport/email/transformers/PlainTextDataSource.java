@@ -43,6 +43,7 @@ public class PlainTextDataSource implements DataSource
     private byte[] data;
     private ByteArrayOutputStream os;
 
+    // FIXME: Doesn't work with non ascii string, but now it's ok. 
     public PlainTextDataSource(String name, String data)
     {
         this.name = name;

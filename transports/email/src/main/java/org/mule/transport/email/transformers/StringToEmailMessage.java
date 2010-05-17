@@ -102,14 +102,14 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
             StringBuffer buf = new StringBuffer();
             buf.append("Constructing email using:\n");
             buf.append("To: ").append(to);
-            buf.append("From: ").append(from);
-            buf.append("CC: ").append(cc);
-            buf.append("BCC: ").append(bcc);
-            buf.append("Subject: ").append(subject);
-            buf.append("ReplyTo: ").append(replyTo);
-            buf.append("Content type: ").append(contentType);
-            buf.append("Payload type: ").append(message.getPayload().getClass().getName());
-            buf.append("Custom Headers: ").append(MapUtils.toString(headers, false));
+            buf.append(", From: ").append(from);
+            buf.append(", CC: ").append(cc);
+            buf.append(", BCC: ").append(bcc);
+            buf.append(", Subject: ").append(subject);
+            buf.append(", ReplyTo: ").append(replyTo);
+            buf.append(", Content type: ").append(contentType);
+            buf.append(", Payload type: ").append(message.getPayload().getClass().getName());
+            buf.append(", Custom Headers: ").append(MapUtils.toString(headers, false));
             logger.debug(buf.toString());
         }
 

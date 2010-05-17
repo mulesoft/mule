@@ -1,1 +1,5 @@
-SimpleMailMessageAdapterTestCase.testGetPayloadAsString=????????????
+# Don't remove ASCII string at the end of lines to avoid JDK 1.5 or earlier bug. 
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6173388 for more details.
+Rfc822ByteArrayNonAsciiTestCase.newMimeMessage=これは日本語のテストメールです。This is to avoid JDK bug.
+MailMessageTransformersNonAsciiTestCase.getResultData=これは日本語のテストメールです。This is to avoid JDK bug.
+AbstractEmailFunctionalTestCase.getMessage=これは日本語のテストメールです。This is to avoid JDK bug.

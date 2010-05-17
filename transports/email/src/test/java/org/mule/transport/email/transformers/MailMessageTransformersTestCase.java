@@ -27,11 +27,13 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 {
     private Message message;
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         return createObject(EmailMessageToString.class);
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         StringToEmailMessage trans = createObject(StringToEmailMessage.class);
@@ -54,6 +56,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         return trans;
     }
 
+    @Override
     public Object getTestData()
     {
         if (message == null)
@@ -61,7 +64,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
             message = new MimeMessage(Session.getDefaultInstance(new Properties()));
             try
             {
-                message.setContent(getResultData(), "text/plain");
+                message.setContent(getResultData(), getContentType());
             }
             catch (MessagingException e)
             {
@@ -71,11 +74,19 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         return message;
     }
 
+    
+    protected String getContentType() 
+    {
+    	return "text/plain";
+    }
+    
+    @Override
     public Object getResultData()
     {
         return "Test Email Message";
     }
 
+    @Override
     public boolean compareResults(Object src, Object result)
     {
         if (src instanceof Message)
@@ -121,6 +132,6 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         trans.setIgnoreBadInput(true);
         Object result = trans.transform(getResultData());
         trans.setIgnoreBadInput(false);
-        assertSame(result, getResultData());
+        assertEquals(result, getResultData());
     }
 }

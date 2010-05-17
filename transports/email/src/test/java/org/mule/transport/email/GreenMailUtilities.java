@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class GreenMailUtilities
 {
-
     protected static Log logger = LogFactory.getLog(GreenMailUtilities.class);
 
     public static void storeEmail(UserManager userManager, String email, String user, String password,
@@ -47,10 +46,17 @@ public class GreenMailUtilities
         gmUser.deliver(message);
     }
 
-    public static MimeMessage toMessage(String text, String email) throws MessagingException
+    public static MimeMessage toMessage(String text, String email, String charset) throws MessagingException
     {
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
-        message.setContent(text, "text/plain");
+        if (charset != null) 
+        {
+            message.setContent(text, "text/plain; charset=" + charset);
+        } 
+        else 
+        {
+        	message.setContent(text, "text/plain");
+        }
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         return message;
     }
@@ -99,5 +105,4 @@ public class GreenMailUtilities
             Thread.sleep(wait);
         }
     }
-
 }

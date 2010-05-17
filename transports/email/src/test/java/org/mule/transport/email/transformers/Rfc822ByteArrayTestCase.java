@@ -14,8 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray;
-import org.mule.transport.email.transformers.Rfc822ByteArraytoMimeMessage;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -27,7 +25,7 @@ import javax.mail.internet.MimeMessage;
 
 public class Rfc822ByteArrayTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "rfc822-byte-array-test.xml";
@@ -43,6 +41,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
         MimeMessage first = newMimeMessage();
         byte[] bytes = mimeMessageToByteArray(first);
         MimeMessage second = byteArrayToMimeMessage(bytes);
+        assertEquals(first.getSubject(), second.getSubject());
         assertEquals(first.getContent(), second.getContent());
         assertEquals(1, second.getFrom().length);
         assertEquals(first.getFrom().length, second.getFrom().length);
@@ -71,6 +70,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     {
         MimeMessage message = new MimeMessage(newSession());
         message.setText("text");
+        message.setSubject("text");
         message.setFrom(new InternetAddress("bob@example.com"));
         return message;
     }
@@ -79,5 +79,4 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     {
         return Session.getDefaultInstance(new Properties(), null);
     }
-
 }

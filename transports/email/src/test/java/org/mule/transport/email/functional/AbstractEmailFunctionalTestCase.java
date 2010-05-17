@@ -11,16 +11,21 @@
 package org.mule.transport.email.functional;
 
 import org.mule.api.MuleMessage;
+import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
+import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.Pop3Connector;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.Message;
@@ -49,21 +54,31 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     private String user;
     private String message;
     private String password;
+    private String charset;
 
     protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol)
     {
-        this(port, isMimeMessage, protocol, protocol + CONFIG_BASE);
+        this(port, isMimeMessage, protocol, protocol + CONFIG_BASE, null, null);
+    }
+
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, Locale locale, String charset)
+    {
+        this(port, isMimeMessage, protocol, protocol + CONFIG_BASE, locale, charset);
     }
 
     protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, String configFile)
     {
-        this(port, isMimeMessage, protocol, configFile,
-                DEFAULT_EMAIL, DEFAULT_USER, DEFAULT_MESSAGE, DEFAULT_PASSWORD);
+        this(port, isMimeMessage, protocol, configFile, null, null);
     }
 
-    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, String configFile,
-                                              String email, String user, String message,
-                                              String password)
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, String configFile, Locale locale, String charset)
+    {
+        this(port, isMimeMessage, protocol, configFile,
+                DEFAULT_EMAIL, DEFAULT_USER, (locale == null ? DEFAULT_MESSAGE : getMessage(locale)), DEFAULT_PASSWORD, charset);
+    }
+
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, 
+        String configFile, String email, String user, String message, String password, String charset)
     {
         this.isMimeMessage = isMimeMessage;
         this.protocol = protocol;
@@ -73,8 +88,10 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         this.user = user;
         this.message = message;
         this.password = password;
+        this.charset = charset;
     }
 
+    @Override
     protected String getConfigResources()
     {
         return configFile;
@@ -85,7 +102,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     {
         startServer();
     }
-
 
     @Override
     protected void suitePostTearDown() throws Exception
@@ -98,7 +114,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         Object msg;
         if (isMimeMessage)
         {
-            msg = GreenMailUtilities.toMessage(message, email);
+            msg = GreenMailUtilities.toMessage(message, email, charset);
         }
         else
         {
@@ -106,7 +122,13 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         }
 
         MuleClient client = new MuleClient();
-        client.send("vm://send", msg, null);
+    	Map<String, Object> props = null;
+        if (charset != null)
+        {
+        	props = new HashMap<String, Object>();
+        	props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
+        } 
+        client.send("vm://send", msg, props);        	
 
         server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
 
@@ -166,7 +188,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         {
             GreenMailUtilities.storeEmail(server.getManagers().getUserManager(),
                     email, user, password,
-                    GreenMailUtilities.toMessage(message, email));
+                    GreenMailUtilities.toMessage(message, email, charset));
         }
         logger.debug("server started for protocol " + protocol);
     }
@@ -176,4 +198,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         server.stop();
     }
 
+    private static String getMessage(Locale locale) {
+    	return LocaleMessageHandler.getString("test-data", locale, "AbstractEmailFunctionalTestCase.getMessage", new Object[] {});    	
+    }
 }
