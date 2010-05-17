@@ -31,6 +31,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     //Note that Banana is null
     public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, new Double(3.45), "JuicyFruit"));
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         ObjectToJson trans = new ObjectToJson();
@@ -42,6 +43,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
         return trans;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         JsonToObject trans = new JsonToObject();
@@ -53,12 +55,14 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
         return trans;
     }
 
+    @Override
     public Object getTestData()
     {
         //Banana is null
         return JSON_OBJECT;
     }
 
+    @Override
     public Object getResultData()
     {
         //Note that Banana has been excluded

@@ -19,6 +19,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "json-namespace-config.xml";

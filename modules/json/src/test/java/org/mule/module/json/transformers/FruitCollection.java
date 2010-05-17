@@ -24,6 +24,7 @@ public class FruitCollection
 
     public FruitCollection()
     {
+        super();
     }
 
     public FruitCollection(Apple apple, Banana banana, Orange orange)

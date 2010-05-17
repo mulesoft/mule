@@ -25,6 +25,7 @@ public class TestBean
 
     public TestBean()
     {
+        super();
     }
 
     public TestBean(String name, int id, double doublev, String func1)
