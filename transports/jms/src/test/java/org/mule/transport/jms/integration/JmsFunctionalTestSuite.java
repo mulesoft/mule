@@ -24,7 +24,6 @@ import org.junit.runners.Suite.SuiteClasses;
               JmsConnectorJndiTestCase.class,
               JmsDurableTopicTestCase.class,
               JmsExceptionStrategyTestCase.class,
-              JmsHeaderTypeTestCase.class,
               JmsMessageAwareTransformersMule2685TestCase.class,
               JmsMuleSideDurableTopicTestCase.class,
               JmsMuleSideDurableTopicXATxTestCase.class,
