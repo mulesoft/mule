@@ -32,7 +32,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
                 latch.countDown();
             }
         });
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result);
         assertEquals("foo", result.getPayloadAsString());

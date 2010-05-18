@@ -32,7 +32,7 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 
     public void testJdbcNullParams() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         //check that db is still empty
         MuleMessage reply = client.request("jdbc://getTest", 1000);

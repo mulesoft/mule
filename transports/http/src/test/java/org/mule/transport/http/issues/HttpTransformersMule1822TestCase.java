@@ -28,7 +28,7 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 
     private MuleMessage sendTo(String uri) throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null);
         assertNotNull(message);
         return message;

@@ -34,7 +34,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
@@ -56,7 +56,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setEndpointRef("vm://quartz.in");

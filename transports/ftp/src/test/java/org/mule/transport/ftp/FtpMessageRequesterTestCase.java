@@ -32,7 +32,7 @@ public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
     {
         createFileOnFtpServer("test.txt");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.request(getMuleFtpEndpoint(), getTimeout());
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());

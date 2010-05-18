@@ -27,7 +27,7 @@ public class QuartzPersistentQueueEventGeneratorTestCase extends FunctionalTestC
     
     public void testReceiveEvent() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage result = client.request("vm://resultQueue", TIMEOUT);
         assertNotNull(result);

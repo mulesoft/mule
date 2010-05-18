@@ -44,7 +44,7 @@ public class XmppMessageAsyncTestCase extends AbstractXmppTestCase
 
     public void testDispatch() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", TEST_MESSAGE, null);
         
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

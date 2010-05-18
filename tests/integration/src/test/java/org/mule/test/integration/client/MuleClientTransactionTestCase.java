@@ -40,7 +40,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     
     public void testTransactionsWithSetRollbackOnly() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -89,7 +89,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
 
     public void testTransactionsWithExceptionThrown() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -143,7 +143,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
 
     public void testTransactionsWithCommit() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
@@ -196,7 +196,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
 
     protected void emptyReplyQueue() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);

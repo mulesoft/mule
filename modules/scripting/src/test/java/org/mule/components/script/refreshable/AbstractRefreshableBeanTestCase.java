@@ -47,7 +47,7 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
         // we overwrite the existing resource on the classpath...
         writeScript(script, nameToPath(name));
         Thread.sleep(WAIT_TIME); // wait for bean to refresh
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send(endpoint, payload, null);
         assertNotNull(m);
         assertEquals(payload + result, m.getPayloadAsString());

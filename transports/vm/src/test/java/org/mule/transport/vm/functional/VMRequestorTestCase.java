@@ -33,7 +33,7 @@ public class VMRequestorTestCase extends FunctionalTestCase
             makeClientRequest("test" + i);
         }
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         List results = new ArrayList();
         MuleMessage result = null;
         for (int i = 0; i < 10; i++)
@@ -51,7 +51,7 @@ public class VMRequestorTestCase extends FunctionalTestCase
 
     protected void makeClientRequest(final String message) throws MuleException
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         Thread t = new Thread(new Runnable()
         {
             public void run()

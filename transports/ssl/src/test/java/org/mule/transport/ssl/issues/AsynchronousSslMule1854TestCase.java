@@ -23,7 +23,7 @@ public class AsynchronousSslMule1854TestCase extends FunctionalTestCase
 
     public void testAsynchronous() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
         // MULE-2757
         Thread.sleep(100);

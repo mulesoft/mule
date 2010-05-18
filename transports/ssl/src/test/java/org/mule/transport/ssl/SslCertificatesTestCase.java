@@ -50,7 +50,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase
         SaveCertificatesCallback callback = (SaveCertificatesCallback) ftc.getEventCallback();
         callback.clear();
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         for (int i = 0; i < n; ++i)
         {
             String msg = TEST_MESSAGE + n;

@@ -21,7 +21,7 @@ import org.mule.transport.http.HttpsConnector;
 public class AxisConnectorHttpsTestCase extends FunctionalTestCase
 {
     public void testHttpsConnection() throws Exception{
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send("axis:https://localhost:62000/TestUMO?method=echo",new DefaultMuleMessage("hello", muleContext));
         assertNotNull(m);
         

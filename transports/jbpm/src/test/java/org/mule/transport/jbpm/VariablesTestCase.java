@@ -32,7 +32,7 @@ public class VariablesTestCase extends AbstractJbpmTestCase
     public void testVariables() throws Exception
     {
         BPMS bpms = connector.getBpms();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             Map props = new HashMap();

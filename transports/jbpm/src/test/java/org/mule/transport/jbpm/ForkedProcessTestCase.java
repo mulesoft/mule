@@ -31,7 +31,7 @@ public class ForkedProcessTestCase extends AbstractJbpmTestCase
         MuleMessage response;
         ProcessInstance process;
         BPMS bpms = connector.getBpms();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.

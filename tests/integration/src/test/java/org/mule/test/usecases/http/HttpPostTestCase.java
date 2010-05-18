@@ -24,7 +24,7 @@ public class HttpPostTestCase extends FunctionalTestCase
 
     public void testPost() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("httpRequest", "payload", null);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());

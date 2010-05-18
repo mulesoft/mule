@@ -31,7 +31,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
 
         try
         {
-            myClient = new MuleClient();
+            myClient = new MuleClient(muleContext);
             myClient.dispatch("vm://FromTestCase", myMessage);
             response = myClient.request("vm://ToTestCase", 5000);
         }
@@ -58,7 +58,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
 
         try
         {
-            myClient = new MuleClient();
+            myClient = new MuleClient(muleContext);
             myClient.dispatch("vm://FromTestCase", myMessage);
             response = myClient.request("vm://ToTestCase", 5000);
         }

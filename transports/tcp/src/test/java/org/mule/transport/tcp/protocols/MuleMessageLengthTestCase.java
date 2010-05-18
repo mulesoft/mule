@@ -29,7 +29,7 @@ public class MuleMessageLengthTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());

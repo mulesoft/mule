@@ -31,7 +31,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
 
     public void testClientTransformerException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:25551");
         MuleMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
         assertNotNull(result);
@@ -43,7 +43,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
 
     public void testClientMalformedEndpointException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:25551");
         MuleMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
         assertNotNull(result);
@@ -54,7 +54,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
 
     public void testClientComponentException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:25551");
         MuleMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
         assertNotNull(result);

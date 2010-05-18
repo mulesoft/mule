@@ -24,7 +24,7 @@ public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 
     public void testNormal() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in1", new DefaultMuleMessage("HELLO!", muleContext));
         MuleMessage msg = client.request("vm://catchall", 3000);
         assertNotNull(msg);

@@ -33,7 +33,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     protected MuleClient sendXml() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("xml-in", SIMPLE_XML, null);
         return client;
     }
@@ -45,7 +45,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     protected MuleClient sendObject(String endpoint) throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, new Parent(new Child()), null);
         return client;
     }

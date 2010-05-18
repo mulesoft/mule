@@ -27,13 +27,13 @@ public class SafeProtocolTestCase extends FunctionalTestCase
 
     public void testSafeToSafe() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         assertResponseOk(client.send("tcp://localhost:65432?connector=safe", TEST_MESSAGE, null));
     }
 
     public void testUnsafeToSafe() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         assertResponseBad(client.send("tcp://localhost:65432?connector=unsafe", TEST_MESSAGE, null));
     }
 

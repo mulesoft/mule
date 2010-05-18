@@ -44,7 +44,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         HttpClientParams params = new HttpClientParams();
         params.setVersion(HttpVersion.HTTP_1_1);
         httpClient = new HttpClient(params);
-        muleClient = new MuleClient();
+        muleClient = new MuleClient(muleContext);
     }
 
     @Override

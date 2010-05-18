@@ -45,7 +45,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
 
     public void testRecipientList() throws Exception
     {
-        client = new MuleClient();
+        client = new MuleClient(muleContext);
         client.dispatch("vm://distributor.queue", MESSAGE, null);
 
         readFromQueue("vm://service1.out", 2, "One");

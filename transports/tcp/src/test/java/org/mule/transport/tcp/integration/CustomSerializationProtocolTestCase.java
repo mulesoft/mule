@@ -24,7 +24,7 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 
     public void testCustomObject() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
 
         for (int i = 0; i < messages; i++)

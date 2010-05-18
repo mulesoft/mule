@@ -31,7 +31,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     @Override
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());

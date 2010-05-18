@@ -42,7 +42,7 @@ public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
         });
 
         String message = "test";
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://distributor.queue", message, null);
 
         assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));

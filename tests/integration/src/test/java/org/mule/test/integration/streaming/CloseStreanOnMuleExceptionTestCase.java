@@ -41,7 +41,7 @@ public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = new MuleClient();
+        client = new MuleClient(muleContext);
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
     }
 

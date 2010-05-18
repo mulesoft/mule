@@ -53,7 +53,7 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
         String componentName = "mycomponent";
         String fullPath = url + folder + componentName;
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");
         MuleMessage reply = client.send(fullPath + "?wsdl", folder + componentName + "?wsdl", props);

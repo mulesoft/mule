@@ -62,7 +62,7 @@ public class ProxyTestCase extends FunctionalTestCase
 
     public void testServerWithEcho() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/Echo", msg, null);
         String resString = result.getPayloadAsString();
 //        System.out.println(resString);
@@ -74,7 +74,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/proxy", msg, null);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
@@ -96,7 +96,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/proxyWithWsdl", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
@@ -118,7 +118,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/proxyWithWsdl2", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
@@ -130,7 +130,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/proxyWithTransform", msg, null);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
@@ -143,7 +143,7 @@ public class ProxyTestCase extends FunctionalTestCase
             + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></greetMe>" +
                     "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/greeter-databinding-proxy", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
@@ -155,7 +155,7 @@ public class ProxyTestCase extends FunctionalTestCase
             + "<soap:Body><invalid xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></invalid>" +
                     "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/greeter-proxy", msg, null);
         String resString = result.getPayloadAsString();
         
@@ -171,7 +171,7 @@ public class ProxyTestCase extends FunctionalTestCase
             + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_soap_http/types\"><requestType>Dan</requestType></greetMe>" +
                     "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/transform-proxy", msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("greetMeResponse") != -1);
@@ -187,8 +187,8 @@ public class ProxyTestCase extends FunctionalTestCase
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
         props.put("SOAPAction", "http://acme.com/transform");
-              
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/routeBasedOnSoapAction", msg, props);
         String resString = result.getPayloadAsString();
         System.out.println(resString);
@@ -197,7 +197,7 @@ public class ProxyTestCase extends FunctionalTestCase
 
     public void testOneWaySend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/oneway",
             prepareOneWayTestMessage(), prepareOneWayTestProperties());
         assertEquals("", result.getPayloadAsString());
@@ -208,7 +208,7 @@ public class ProxyTestCase extends FunctionalTestCase
 
     public void testOneWayDispatch() throws Exception
     {
-        new MuleClient().dispatch("http://localhost:63081/services/oneway", prepareOneWayTestMessage(),
+        new MuleClient(muleContext).dispatch("http://localhost:63081/services/oneway", prepareOneWayTestMessage(),
             prepareOneWayTestProperties());
 
         AsyncService component = (AsyncService) getComponent("asyncService");
@@ -221,7 +221,7 @@ public class ProxyTestCase extends FunctionalTestCase
      */
     public void testProxyWithCommentInRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/envelope-proxy", msgWithComment, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.contains(doGoogleSearch));

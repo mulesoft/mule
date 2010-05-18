@@ -40,7 +40,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
 
     public void testCaseGoodAuthenticationGoodAuthorisation() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
 
         EncryptionStrategy strategy = muleContext
@@ -56,7 +56,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
 
     public void testCaseGoodAuthenticationBadAuthorisation() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
 
         EncryptionStrategy strategy = muleContext
@@ -71,7 +71,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
 
     public void testCaseBadAuthentication() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
 
         EncryptionStrategy strategy = muleContext

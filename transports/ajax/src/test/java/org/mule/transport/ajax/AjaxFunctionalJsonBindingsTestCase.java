@@ -80,7 +80,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
         });
         client.subscribe("/test1");
 
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in1", "Ross", null);
         latch.await(10, TimeUnit.SECONDS);
 
@@ -96,7 +96,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
     public void testClientPublishWithJsonObject() throws Exception
     {
         client.publish("/test2", "{\"name\":\"Ross\"}", null);
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);

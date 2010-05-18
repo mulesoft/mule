@@ -155,7 +155,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
         {
 
             // Now try with the MuleClient
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
             Map props = new HashMap();
             if (useSoapMethod)
             {

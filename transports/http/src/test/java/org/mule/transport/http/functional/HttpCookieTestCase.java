@@ -45,7 +45,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("COOKIE_HEADER","MYCOOKIE");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://vm-in", "foobar", properties);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

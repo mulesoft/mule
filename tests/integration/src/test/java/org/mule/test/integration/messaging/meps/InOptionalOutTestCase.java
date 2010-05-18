@@ -29,7 +29,7 @@ public class InOptionalOutTestCase extends FunctionalTestCase
 
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);

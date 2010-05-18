@@ -25,7 +25,7 @@ public class BindingInOnlyInOutOutOnlyTestCase extends FunctionalTestCase
 
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
 
         client.dispatch("inboundEndpoint", new int[]{1,2,3,4,5}, null);

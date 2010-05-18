@@ -19,7 +19,7 @@ public class ProtocolTestCase extends FunctionalTestCase
     
     public void testEchoService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
             null);
         assertEquals("Hello Transformed!", result.getPayload());

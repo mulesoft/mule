@@ -51,7 +51,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
         };
         testComponent.setEventCallback(callback);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");

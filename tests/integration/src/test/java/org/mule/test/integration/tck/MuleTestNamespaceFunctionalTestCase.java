@@ -25,7 +25,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 
     public void testService1() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service1", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
@@ -35,7 +35,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
     public void testService2() throws Exception
     {
         String result = loadResourceAsString("org/mule/test/integration/tck/test-data.txt");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service2", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
@@ -44,7 +44,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 
     public void testService3() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service3", "foo", null);
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
@@ -53,7 +53,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 
     public void testService4() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service4", "foo", null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());
@@ -62,7 +62,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 
     public void testService5() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service5", "foo", null);
         assertNotNull(message);
         assertNotNull(message.getExceptionPayload());

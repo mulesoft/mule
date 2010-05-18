@@ -36,7 +36,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
 
     public void testJdbcXa() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in","test",null);
         
         for (int i = 0; i < 10; i++)
@@ -50,7 +50,7 @@ public class XAJdbcMule1479TestCase extends AbstractDerbyTestCase
 
     public void testJmsXa() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in1", "test", null);
         
         List results = null;

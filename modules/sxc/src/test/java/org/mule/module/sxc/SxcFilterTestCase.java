@@ -25,7 +25,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
 
     public void testBasicXPath() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
@@ -36,7 +36,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
 
     public void testAndFilter() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
@@ -48,7 +48,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
 
     public void testOrFilter() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
@@ -60,7 +60,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
 
     public void testNotFilter() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
@@ -72,7 +72,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
 
     public void xtestBenchmark() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);

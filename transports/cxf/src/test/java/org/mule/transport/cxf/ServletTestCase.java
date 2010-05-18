@@ -71,7 +71,7 @@ public class ServletTestCase extends FunctionalTestCase
                         "</soap:Body>" +
                         "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT
                 + getContextPath() + "/services/mycomponent", request, null);
         String res = result.getPayloadAsString();
@@ -81,7 +81,7 @@ public class ServletTestCase extends FunctionalTestCase
 
     public void testHttpGet() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleMessage result = client.send("http://localhost:" + HTTP_PORT

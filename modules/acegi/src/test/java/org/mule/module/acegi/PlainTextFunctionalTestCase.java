@@ -25,7 +25,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureNoContext() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send("http://localhost:4567/index.html", "", null);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);

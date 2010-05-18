@@ -48,7 +48,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient = new MuleClient();
+        muleClient = new MuleClient(muleContext);
     }
 
     public void testDecreaseOutboundEndpointResponseTimeout() throws Exception

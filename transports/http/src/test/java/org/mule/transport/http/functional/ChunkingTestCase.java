@@ -25,7 +25,7 @@ public class ChunkingTestCase extends FunctionalTestCase
 
     public void testPartiallyReadRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         byte[] msg = new byte[100*1024];
         

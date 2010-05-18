@@ -17,7 +17,7 @@ public class FilterTest extends FunctionalTestCase
 {
     public void testFilter() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("http://localhost:9002/bar/foo", "test", null);
         assertEquals("test received", result.getPayloadAsString());

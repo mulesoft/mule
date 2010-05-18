@@ -29,7 +29,7 @@ public class VmToAxisProxyTestCase extends FunctionalTestCase
             return;
         }
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://proxy", "ibm", null);
         assertNotNull(result);
     }

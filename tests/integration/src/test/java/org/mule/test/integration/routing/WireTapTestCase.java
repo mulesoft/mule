@@ -50,7 +50,7 @@ public class WireTapTestCase extends FunctionalTestCase
                 }
             }
         });
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://inbound.channel", "test", null);
         assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
         assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));

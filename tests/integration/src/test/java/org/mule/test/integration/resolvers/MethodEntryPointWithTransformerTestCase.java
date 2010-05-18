@@ -28,7 +28,7 @@ public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
      */
     public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://in", "payload", null);
         assertNotNull(response);
         assertNotNull(response.getPayload());

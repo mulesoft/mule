@@ -32,7 +32,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("queue", "Marco", null);
         MuleMessage response = client.request("queue", WAIT);
         assertNotNull("Response is null", response);
@@ -41,7 +41,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
     public void testMultipleMessages() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
         Iterator people = polos.iterator();
         while (people.hasNext())
@@ -61,7 +61,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
     public void testPassThrough() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
         Iterator people = polos.iterator();
         while (people.hasNext())
@@ -82,7 +82,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
     public void testNamedEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
         Iterator people = polos.iterator();
         while (people.hasNext())

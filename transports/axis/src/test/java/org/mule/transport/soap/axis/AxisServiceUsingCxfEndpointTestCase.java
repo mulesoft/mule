@@ -28,7 +28,7 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 
     public void testAxis() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://axis.in", new DefaultMuleMessage("Test String", muleContext));
 
         assertNotNull(reply);
@@ -39,7 +39,7 @@ public class AxisServiceUsingCxfEndpointTestCase extends FunctionalTestCase
 
     public void testRequestWsdl() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         props.put("http.method", "GET");
         MuleMessage reply = client.send("http://localhost:63381/services/AxisService?WSDL", "", props);

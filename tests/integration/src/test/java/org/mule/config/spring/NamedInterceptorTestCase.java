@@ -23,7 +23,7 @@ public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
 
     public void testInterceptor() throws MuleException, InterruptedException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in", MESSAGE, null);
         assertMessageIntercepted();
     }

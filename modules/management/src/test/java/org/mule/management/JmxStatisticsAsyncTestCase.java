@@ -28,7 +28,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     {
         super.doSetUp();
                 
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in", "Hello world", null);
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);

@@ -43,7 +43,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
             }
         }, "polledUMO");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request("vm://toclient", 50000);
         assertNotNull(result.getPayload());
         assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));

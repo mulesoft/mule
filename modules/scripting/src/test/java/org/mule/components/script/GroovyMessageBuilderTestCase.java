@@ -24,7 +24,7 @@ public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 
     public void testFunctionBehaviour() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send("groovy1.endpoint", "Test:", null);
         assertNotNull(m);
         assertEquals("Test: A B Received", m.getPayloadAsString());

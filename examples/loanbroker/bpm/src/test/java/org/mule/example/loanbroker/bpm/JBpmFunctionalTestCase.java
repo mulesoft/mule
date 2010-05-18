@@ -55,7 +55,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     @Override
     public void testLotsOfLoanRequests() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
 

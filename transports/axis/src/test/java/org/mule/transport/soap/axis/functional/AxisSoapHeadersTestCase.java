@@ -29,7 +29,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
     public void testSoapRequest() throws Exception
     {
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map properties = new HashMap();
         properties.put("http.method", "POST");
 

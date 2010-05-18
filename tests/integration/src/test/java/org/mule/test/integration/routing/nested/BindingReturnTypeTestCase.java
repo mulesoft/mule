@@ -28,7 +28,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
 
     public void testInvokeBinding() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://invoker.in", TEST_MESSAGE, null);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());

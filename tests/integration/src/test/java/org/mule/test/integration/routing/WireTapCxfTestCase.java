@@ -49,7 +49,7 @@ public class WireTapCxfTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send(url, msg, null);
         assertNotNull(response);
         

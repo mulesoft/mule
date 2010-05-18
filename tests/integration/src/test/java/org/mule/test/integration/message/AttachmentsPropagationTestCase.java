@@ -69,7 +69,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
     public void testSingleComponentKnowsAttachments() throws Exception
     {
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://Single", "", null);
         assertNotNull(result);
 
@@ -79,7 +79,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
 
     public void testChainedComponentKnowsAttachments() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://Chained", "", null);
         assertNotNull(result);
 
@@ -91,7 +91,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
     public void testClientReceivesAttachments() throws Exception
     {
         // a MuleClient should be able to receive attachments
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("vm://Single", "", null);
         assertNotNull(result);

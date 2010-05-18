@@ -33,7 +33,7 @@ public class ExpressionSplitterAsyncTestCase extends FunctionalTestCase
         FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
         fruitBowl.addFruit(new Orange());
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://distributor.queue", fruitBowl, null);
 
         List<Object> results = new ArrayList<Object>(3);

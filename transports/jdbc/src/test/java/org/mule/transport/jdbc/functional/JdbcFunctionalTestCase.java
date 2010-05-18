@@ -36,7 +36,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 
     public void testDirectSql() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.request("jdbc://?sql=SELECT * FROM TEST", 1000);
         assertResultSetEmpty(message);
         
@@ -49,7 +49,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(DEFAULT_MESSAGE, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
@@ -62,7 +62,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 
     public void testSendMap() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map map = new HashMap();
         map.put("data", DEFAULT_MESSAGE);
         client.send("jdbc://writeMap?type=2", new DefaultMuleMessage(map, muleContext));
@@ -77,7 +77,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 
     public void testReceive() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.request("jdbc://getTest?type=1", 1000);
         assertResultSetEmpty(message);
 

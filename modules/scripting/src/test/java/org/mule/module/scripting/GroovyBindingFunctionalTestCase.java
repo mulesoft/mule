@@ -25,7 +25,7 @@ public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
 
     public void testBindingCallout() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("client_request", "Important Message", null);
         MuleMessage response = client.request("client_response", 2000);
         assertNotNull(response);

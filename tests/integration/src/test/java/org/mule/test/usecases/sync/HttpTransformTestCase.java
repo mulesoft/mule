@@ -28,7 +28,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
 
     public void testTransform() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
@@ -40,7 +40,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
 
     public void testBinary() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Object payload = Arrays.asList(new Integer[]{new Integer(42)});
         MuleMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
@@ -52,7 +52,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
 
     public void testBinaryWithBridge() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Object payload = Arrays.asList(new Integer[]{new Integer(42)});
         MuleMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);

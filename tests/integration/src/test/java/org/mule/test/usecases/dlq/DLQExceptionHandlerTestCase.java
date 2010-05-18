@@ -26,7 +26,7 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 
     public void testDLQ() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("jms://request.queue", "testing 1 2 3", null);
 
         MuleMessage message = client.request("jms://out.queue", 3000);

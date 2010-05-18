@@ -22,7 +22,7 @@ public class Http10TestCase extends FunctionalTestCase
 {
     public void testHttp10TransformerNotOnProtocol() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String,String> props = new HashMap<String, String>();
         
         MuleMessage result = client.send("cxfOutbound", "Dan", props);
@@ -34,7 +34,7 @@ public class Http10TestCase extends FunctionalTestCase
 
     public void testHttp10TransformerOnProtocol() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String,String> props = new HashMap<String, String>();
         
         MuleMessage result = client.send("cxfOutbound2", "Dan", props);

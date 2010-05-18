@@ -68,7 +68,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
     {
 
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", MESSAGE, null);
 
         assertNotNull(result);

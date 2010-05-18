@@ -29,7 +29,7 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testNonRootUrls() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("anotherClientEndpoint", TEST_MESSAGE, props);

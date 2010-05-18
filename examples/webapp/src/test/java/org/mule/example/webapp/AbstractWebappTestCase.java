@@ -22,19 +22,19 @@ public abstract class AbstractWebappTestCase extends FunctionalTestCase
     
     public void testSanity() throws Exception
     {
-        new MuleClient();
+        new MuleClient(muleContext);
     }
     
     public void testEchoExample() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://echo", "Is anybody in there?", null);
         assertEquals("Is anybody in there?", response.getPayload());
     }
     
     public void testHelloExample() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://greeter", "Julius Caesar", null);
         // ATTENTION: thie message is localized, a full comparison cannot be done here
         assertTrue(response.getPayloadAsString().indexOf("Julius Caesar") > -1);
@@ -71,7 +71,7 @@ public abstract class AbstractWebappTestCase extends FunctionalTestCase
     */
     public void testLoanBrokerExample() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         CustomerQuoteRequest loanRequest = new CustomerQuoteRequest(new Customer("I.M. Broke", 1234), 50000, 60);
         MuleMessage response = client.send("CustomerRequests", loanRequest, null);
         assertNotNull("Result is null", response);

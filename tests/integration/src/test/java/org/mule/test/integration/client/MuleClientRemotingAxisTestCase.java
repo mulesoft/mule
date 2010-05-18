@@ -28,7 +28,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 
     public void testRequestResponse() throws Throwable
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         try
         {
@@ -46,7 +46,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     // this test is disabled because of MULE-4844
     public void _testRequestResponseComplex() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         dispatcher.setWireFormat(createObject(XStreamWireFormat.class));
 
@@ -68,7 +68,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     // this test is disabled because of MULE-4844
     public void _testRequestResponseComplex2() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         dispatcher.setWireFormat(createObject(XStreamWireFormat.class));
 

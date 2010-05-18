@@ -28,35 +28,35 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
 
     public void testComponentException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in1", "request", null);
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
     public void testOutboundRoutingException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in2", "request", null);
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
     public void testInboundTransformerException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in3", "request", null);
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
     public void testOutboundTransformerException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in4", "request", null);
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
     public void testResponseTransformerException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://in5", "request", null);
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }

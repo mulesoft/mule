@@ -24,7 +24,7 @@ public class MuleAdminTestCase extends FunctionalTestCase
 
     public void testMuleAdminChannelInSpring() throws Exception
     {
-        MuleClient mc = new MuleClient();
+        MuleClient mc = new MuleClient(muleContext);
         RemoteDispatcher rd = mc.getRemoteDispatcher("tcp://localhost:60504");
         MuleMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);

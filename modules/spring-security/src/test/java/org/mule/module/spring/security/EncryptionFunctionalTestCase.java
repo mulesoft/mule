@@ -35,7 +35,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureNoContext() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send("vm://my.queue", "foo", null);
         assertNotNull(m);
         assertNotNull(m.getExceptionPayload());
@@ -45,7 +45,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
             .getSecurityManager()
@@ -62,7 +62,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorised() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
@@ -78,7 +78,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureBadCredentialsHttp() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
             .getSecurityManager()
@@ -95,7 +95,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorisedHttp() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext

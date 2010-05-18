@@ -42,7 +42,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
 
     public void testEchoService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
             null);
         assertEquals("Hello!", result.getPayload());
@@ -50,7 +50,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
 
     public void testEchoServiceSynchronous() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:63083/services/Echo3?method=echo", "Hello!",
             null);
         assertEquals("Hello!", result.getPayload());
@@ -58,7 +58,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
 
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request("http://localhost:63081/services/Echo?wsdl", 5000);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());

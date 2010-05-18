@@ -49,7 +49,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
     public void testCustomObject() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         StringBuffer sBuffer = new StringBuffer();
         // send 50K of stuff;
         for (int i = 10000; i < 20000; i++)
@@ -77,7 +77,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
     private void sendString(String message) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         for (int i = 0; i < messages; i++)
         {

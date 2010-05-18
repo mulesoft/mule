@@ -46,7 +46,7 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
         });
 
         String message = "test";
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);

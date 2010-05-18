@@ -53,7 +53,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
 
     protected MuleMessage sendRequest(String url) throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         InputStream stream = getClass().getResourceAsStream(getMessageResource());
         assertNotNull(stream);

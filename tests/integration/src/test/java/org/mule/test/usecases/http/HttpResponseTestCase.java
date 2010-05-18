@@ -27,7 +27,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
     public void testNullPayloadUsingAsync() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("http://localhost:8990", new DefaultMuleMessage("test", muleContext));
 
         //TODO RM: What should really be returned when doing an async request?
@@ -38,7 +38,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -47,7 +47,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -60,7 +60,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
      */
     public void testChunkingContentLength() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("http://localhost:8988", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
@@ -70,7 +70,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
     public void testNoChunkingContentLength() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("http://localhost:8987", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);

@@ -53,7 +53,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testPropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
@@ -74,7 +74,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testPropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "TestID");
@@ -95,7 +95,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testNotPropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
@@ -117,7 +117,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testNotPropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");
@@ -137,7 +137,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testForcePropagatedPropertiesWithHttpTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("Content-Type", "application/x-www-form-urlencoded");
@@ -156,7 +156,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
      */
     public void testForcePropagatedPropertiesWithCxfTransport() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("some", "thing");

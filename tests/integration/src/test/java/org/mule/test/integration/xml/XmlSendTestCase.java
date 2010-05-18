@@ -26,7 +26,7 @@ public class XmlSendTestCase extends FunctionalTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:63081/xml-parse", xml, null);
@@ -44,7 +44,7 @@ public class XmlSendTestCase extends FunctionalTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:63081/xml-xslt-parse", xml, null);
@@ -57,7 +57,7 @@ public class XmlSendTestCase extends FunctionalTestCase
 
         assertNotNull(xml);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // this will submit the xml via a POST request
         MuleMessage message = client.send("http://localhost:63081/validate", xml, null);

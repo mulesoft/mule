@@ -29,7 +29,7 @@ public class WSProxyTestCase extends FunctionalTestCase
 
     public void testDirectRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6065/WebService?wsdl&method=echo", 
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -38,7 +38,7 @@ public class WSProxyTestCase extends FunctionalTestCase
 
     public void testWsdlProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
         MuleMessage replyMessage = client.send("http://localhost:6070/webServiceProxy?wsdl", 
@@ -54,7 +54,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     
     public void testProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6070/webServiceProxy?wsdl&method=echo", 
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());
@@ -62,7 +62,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     
     public void testWsdlFileRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
         MuleMessage replyMessage = client.send("http://localhost:6075/webServiceProxy?wsdl", 
@@ -78,7 +78,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     
     public void testWsdlFileProxyRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("wsdl-cxf:http://localhost:6075/webServiceProxy?wsdl&method=echo", 
             new DefaultMuleMessage("mule", muleContext));
         assertEquals ("mule", result.getPayloadAsString());

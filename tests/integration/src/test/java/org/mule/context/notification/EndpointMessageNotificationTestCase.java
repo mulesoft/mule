@@ -26,7 +26,7 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
 
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in-1?connector=direct", "hello sweet world", null));
         client.dispatch("vm://in-2?connector=direct", "goodbye cruel world", null);
         assertNotNull(client.request("vm://out-2?connector=queue", 5000));

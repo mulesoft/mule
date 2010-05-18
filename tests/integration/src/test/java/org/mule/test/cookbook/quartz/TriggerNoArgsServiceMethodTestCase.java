@@ -32,7 +32,7 @@ public class TriggerNoArgsServiceMethodTestCase extends FunctionalTestCase
 
     public void testTrigger() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         //Our method should have fired and we can pick up the result
         MuleMessage result = client.request("resultQueue", 2000);

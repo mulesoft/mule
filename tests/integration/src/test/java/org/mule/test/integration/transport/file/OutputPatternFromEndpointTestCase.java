@@ -65,7 +65,7 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
             assertFalse(FileUtils.newFile(myDir, myFileName1).exists());
             assertFalse(FileUtils.newFile(myDir2, myFileName2).exists());
 
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
             client.send("vm://filesend", "Hello", null);
 
             // the output file should exist now

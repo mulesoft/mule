@@ -22,7 +22,7 @@ public abstract class AbstractDollarsScriptingExampleTestCase extends AbstractSc
     
     public void testChangeAlgorithm() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://input", new Double(1.18), null);
         
         assertNotNull(reply);
@@ -32,7 +32,7 @@ public abstract class AbstractDollarsScriptingExampleTestCase extends AbstractSc
 
     public void testAccumulator() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://input", new Double(0.09), null);
         client.send("vm://input", new Double(0.09), null);
         MuleMessage reply = client.send("vm://input", new Double(1.00), null);

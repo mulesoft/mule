@@ -30,7 +30,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase
 
     private void internalTest(String prefix) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         String message = "Mule";
         client.dispatch(prefix + "invoker.in", message, null);
         MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);
@@ -41,7 +41,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase
 
     private void internalNullTest(String prefix) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Date message = new Date();
         client.dispatch(prefix + "invoker.in", message, null);
         MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);

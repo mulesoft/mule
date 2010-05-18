@@ -32,7 +32,7 @@ public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
 
     protected void doTest(String path) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://" + path, MESSAGE, null);
         MuleMessage response = client.request("vm://error", TIMEOUT);
         assertNotNull("exception null", response.getExceptionPayload());

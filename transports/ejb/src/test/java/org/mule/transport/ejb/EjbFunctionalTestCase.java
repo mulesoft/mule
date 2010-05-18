@@ -33,7 +33,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
 
     public void testCase() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://in", "1234567890", null);
         assertNotNull(result);
         assertEquals("0987654321", result.getPayloadAsString());

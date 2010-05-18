@@ -66,7 +66,7 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase
     
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Object ftc = getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);

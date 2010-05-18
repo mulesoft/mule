@@ -72,7 +72,7 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 
     private void sendHttpRequest(String endpoint, String expectedHttpMethod) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, TEST_MESSAGE, null);
         
         assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

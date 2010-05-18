@@ -28,7 +28,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     public void testSingleLoanRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         MuleMessage result = client.send("CustomerRequests", request, null);
@@ -42,7 +42,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     public void testLotsOfLoanRequests() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest[] requests = new CustomerQuoteRequest[3];
         requests[0] = new CustomerQuoteRequest(c, 100000, 48);

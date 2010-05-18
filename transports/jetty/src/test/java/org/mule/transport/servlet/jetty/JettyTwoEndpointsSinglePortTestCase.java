@@ -36,7 +36,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
     public void testSendToEachWithBadEndpoint() throws Exception
     {
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
         sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
@@ -54,7 +54,7 @@ public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
         throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)

@@ -10,6 +10,7 @@
 
 package org.mule.example.loanbroker;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
@@ -49,13 +50,14 @@ public abstract class AbstractLoanBrokerApp
 
     protected void init() throws Exception
     {
+        MuleContext muleContext = null;
         if (config != null)
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContextFactory.createMuleContext(getConfigBuilder());
+            muleContext = muleContextFactory.createMuleContext(getConfigBuilder());
         }
 
-        client = new MuleClient();
+        client = new MuleClient(muleContext);
 
         customers.add(new Customer("Jenson Button", 123));
         customers.add(new Customer("Michael Schumacker", 456));

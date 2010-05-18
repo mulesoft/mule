@@ -98,7 +98,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
             }
         }, "ChunkingObjectReceiver");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://inbound.object.channel", simpleSerializableObject, null);
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
@@ -140,7 +140,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
             }
         }, "ChunkingReceiver");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://inbound.channel", data, null);
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));

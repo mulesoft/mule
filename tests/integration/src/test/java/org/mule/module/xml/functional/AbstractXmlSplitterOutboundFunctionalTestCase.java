@@ -40,13 +40,13 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
     protected void doSend(String endpoint) throws IOException, MuleException
     {
         String xml = getConfigAsString();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, xml, null);
     }
 
     protected void assertService(String prefix, int index, String service) throws MuleException, IOException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.request(prefix + index, TIMEOUT);
         assertNotNull(response);
         assertNotNull(response.getPayload());
@@ -62,7 +62,7 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
         List remaining = new LinkedList(Arrays.asList(services)); // asList is immutable
         while (remaining.size() > 0)
         {
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
             MuleMessage response = client.request(prefix + index, TIMEOUT);
             assertNotNull(response);
             assertNotNull(response.getPayload());

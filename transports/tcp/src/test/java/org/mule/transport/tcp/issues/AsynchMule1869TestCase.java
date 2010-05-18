@@ -29,7 +29,7 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
 
     public void testDispatchAndReply() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
         // MULE-2754

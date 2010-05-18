@@ -25,8 +25,8 @@ public class HttpHeadersTestCase extends FunctionalTestCase
     }
 
     public void testJettyHeaders() throws Exception 
-    { 
-        MuleClient client = new MuleClient(); 
+    {
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("clientEndpoint", null, null);
         
         String contentTypeProperty = 
@@ -42,7 +42,7 @@ public class HttpHeadersTestCase extends FunctionalTestCase
 
     public void testClientHeaders() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("clientEndpoint2", null, null); 
 
         MuleMessage result = client.request("vm://out", 5000);

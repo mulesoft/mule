@@ -28,7 +28,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     protected MuleMessage send(Object payload) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         return client.send(endpointUri, payload, null);
     }
 

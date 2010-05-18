@@ -25,7 +25,7 @@ public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
 
     public void testAsynchronousDispatching() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://receiver1?connector=Connector1", "Test", null);
         MuleMessage result = client.request("vm://out?connector=Connector2", RECEIVE_TIMEOUT);
         assertNotNull(result);

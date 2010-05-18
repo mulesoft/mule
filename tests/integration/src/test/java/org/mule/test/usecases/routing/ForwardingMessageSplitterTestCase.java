@@ -26,7 +26,7 @@ public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
 
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         List payload = new ArrayList();
         payload.add("hello");

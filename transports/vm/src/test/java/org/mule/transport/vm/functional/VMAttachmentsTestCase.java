@@ -35,7 +35,7 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
                                                         + getConfigResources()).getAbsoluteFile());
         msg.addAttachment("test-attachment", new DataHandler(ds));
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm-in", msg);
 
         assertNotNull(reply);

@@ -50,7 +50,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         Map<String, String> props = new HashMap<String, String>();
         props.put("TARGET_FILE", TARGET);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
         
@@ -100,7 +100,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     // see MULE-3672
     public void _testAuthenticationNotAuthorised() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage reply = client.send("vm://echo", "An unsigned message", null);
         

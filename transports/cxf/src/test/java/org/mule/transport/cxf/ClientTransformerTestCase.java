@@ -21,7 +21,7 @@ public class ClientTransformerTestCase extends FunctionalTestCase
     
     public void testTransformersOnPayload() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("payloadTransformerClient", msg, null);
         
         MuleMessage result = client.request("vm://in", 3000);
@@ -33,7 +33,7 @@ public class ClientTransformerTestCase extends FunctionalTestCase
 
     public void testTransformersOnProtocol() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("protocolTransformerClient", msg, null);
         
         MuleMessage result = client.request("vm://in", 3000);

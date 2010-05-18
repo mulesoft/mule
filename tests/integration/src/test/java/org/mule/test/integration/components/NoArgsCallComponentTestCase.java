@@ -43,7 +43,7 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
 
     public void testDelegateClass() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(INPUT_DC_QUEUE_NAME, "test", null);
         MuleMessage message = client.request(OUTPUT_DC_QUEUE_NAME, TIMEOUT);
         assertNotNull(message);
@@ -54,7 +54,7 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
 
     public void testWithInjectedDelegate() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(INPUT_DI_QUEUE_NAME, DEFAULT_INPUT_MESSAGE, null);
         MuleMessage reply = client.request(OUTPUT_DI_QUEUE_NAME, TIMEOUT);
         assertNotNull(reply);

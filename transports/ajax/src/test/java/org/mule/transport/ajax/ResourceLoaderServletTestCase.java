@@ -53,7 +53,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
 
     public void testRetriveJSFromClasspath() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage m = client.request("http://localhost:8881/mule-resource/js/mule.js", 3000);
         assertFalse(m.getPayload() instanceof NullPayload);

@@ -37,7 +37,7 @@ public class MultiuserSecurityTestCase extends FunctionalTestCase
 
     public void testMultipleAuthentications() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         SessionHandler sessionHandler = new MuleSessionHandler();
         MuleMessage reply;
         Map props;

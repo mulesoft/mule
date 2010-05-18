@@ -26,7 +26,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://pojo1", message, null);
         MuleMessage result = client.request("jms://response", 10000);
         assertNotNull(result);

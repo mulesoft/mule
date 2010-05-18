@@ -45,7 +45,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 
     public void testSendComplexDOCLIT() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         props.put(AxisConnector.STYLE, "Document");
         props.put(AxisConnector.USE, "Literal");
@@ -68,7 +68,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 
     public void testSendComplexRPCENC() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send(uri, trade, null);
         assertNotNull(result);

@@ -28,7 +28,7 @@ public class InOnlyOutOnlyTestCase extends FunctionalTestCase
 
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         client.dispatch("inboundEndpoint", "some data", null);
         Map props = new HashMap();

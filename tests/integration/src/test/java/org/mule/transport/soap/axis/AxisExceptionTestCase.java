@@ -28,7 +28,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
 
     public void testSuccessCall() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("axis:http://localhost:63381/services/AxisService?method=receive",
             new DefaultMuleMessage("test", muleContext));
 
@@ -42,7 +42,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
     {
         try
         {
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
             client.send("axis:http://localhost:63381/services/AxisService?method=throwsException",
                 new DefaultMuleMessage("test", muleContext));
 
@@ -61,7 +61,7 @@ public class AxisExceptionTestCase extends FunctionalTestCase
 
     public void testExceptionBasedRoutingForAxis() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://localhost.test", new DefaultMuleMessage("test", muleContext));
 
         assertNotNull(reply);

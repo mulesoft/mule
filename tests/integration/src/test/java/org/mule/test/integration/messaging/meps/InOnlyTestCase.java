@@ -29,7 +29,7 @@ public class InOnlyTestCase extends FunctionalTestCase
 
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         final Latch latch = new Latch();
         client.getMuleContext().registerListener(new FunctionalTestNotificationListener()

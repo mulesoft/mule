@@ -29,7 +29,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase
 
     public void testExchange() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         //Almost any endpoint can be used here
         props.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "jms://client-reply");

@@ -45,7 +45,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
     {
         String input = "<test-bean><createDate>2009-05-19T07:40:00</createDate></test-bean>";
         
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://FromTest", input, null);
         
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

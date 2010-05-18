@@ -26,7 +26,7 @@ public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         String url = "tcp://localhost:61200";
         
         MuleMessage response = client.send(url, TEST_MESSAGE, null);

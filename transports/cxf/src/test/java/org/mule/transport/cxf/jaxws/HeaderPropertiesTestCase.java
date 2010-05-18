@@ -49,8 +49,8 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
             }
         };
         testComponent.setEventCallback(callback);
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("operation", "greetMe");
         props.put("FOO", "BAR");

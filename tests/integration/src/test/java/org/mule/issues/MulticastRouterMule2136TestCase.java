@@ -35,7 +35,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     protected MuleClient sendObject() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("object-in", new Parent(new Child()), null);
         return client;
     }
@@ -67,7 +67,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
             
             // Pull result from "xml-object-out" endpoint as queuing is enabled and otherwise we get
             // OutOfMemoryExceptions during stress tests when these results build up in queue.
-            request(new MuleClient(), "xml-object-out", Parent.class);
+            request(new MuleClient(muleContext), "xml-object-out", Parent.class);
             
             if (i % tenth == 0)
             {

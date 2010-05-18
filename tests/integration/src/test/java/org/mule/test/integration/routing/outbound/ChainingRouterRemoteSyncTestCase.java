@@ -29,7 +29,7 @@ public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
     public void testRemoteSync() throws Exception
     {
 
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage result = muleClient.send("vm://in", new DefaultMuleMessage("test", muleContext));
 
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());
@@ -43,7 +43,7 @@ public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
     public void testRemoteSyncLastEndpointDispatch() throws Exception
     {
 
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage result = muleClient.send("vm://in2", new DefaultMuleMessage("test", muleContext));
 
         assertNull("Shouldn't have any exceptions", result.getExceptionPayload());

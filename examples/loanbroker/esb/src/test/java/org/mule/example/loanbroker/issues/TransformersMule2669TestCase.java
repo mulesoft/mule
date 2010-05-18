@@ -30,7 +30,7 @@ public class TransformersMule2669TestCase extends FunctionalTestCase
 
     public void testTransformers() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         LoanBrokerQuoteRequest request = new LoanBrokerQuoteRequest();
         request.setLenders(new Bank[0]);
         MuleMessage response = client.send("jms://in?connector=default", request, null);

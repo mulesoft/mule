@@ -27,7 +27,7 @@ public class MulticasterAsyncTestCase extends FunctionalTestCase
 
     public void testSplitter() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://distributor.queue", new Apple(), null);
 
         List<Object> results = new ArrayList<Object>(3);

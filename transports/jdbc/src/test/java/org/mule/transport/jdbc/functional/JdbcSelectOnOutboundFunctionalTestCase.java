@@ -33,7 +33,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
 
     public void testSelectOnOutboundByExpression() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MyMessage payload = new MyMessage(2);
         MuleMessage reply = client.send("vm://terra", new DefaultMuleMessage(payload, muleContext));
         assertNotNull(reply.getPayload());
@@ -58,7 +58,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends AbstractJdbcFunction
     
     private void doSelectOnOutbound(String endpoint) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send(endpoint, new Object(), null);
         assertNotNull(reply.getPayload());
         assertTrue(reply.getPayload() instanceof List);

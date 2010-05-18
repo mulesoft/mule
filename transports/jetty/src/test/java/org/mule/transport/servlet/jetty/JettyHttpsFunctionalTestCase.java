@@ -51,8 +51,8 @@ public class JettyHttpsFunctionalTestCase extends HttpFunctionalTestCase
         };
 
         testComponent.setEventCallback(callback);
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);

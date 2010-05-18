@@ -30,7 +30,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 
     public void testRequestResponse() throws Throwable
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send(getSoapProvider()
                 + ":http://localhost:38104/mule/services/mycomponent2?method=echo",
@@ -41,7 +41,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 
     public void testRequestResponseComplex() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send(
                 getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
@@ -55,7 +55,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 
     public void testRequestResponseComplex2() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         String[] args = new String[]{"Betty", "Rubble"};
         MuleMessage result = client.send(

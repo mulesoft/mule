@@ -34,7 +34,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
     public void testLargeMessageWithEchoProxy() throws Exception
     {
         int length = 5000;
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         StringBuffer b = new StringBuffer();
         int counter = 1;

@@ -25,7 +25,7 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase
 
     public void testStreamMessage() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("http://localhost:38900/services", "test", null);
         assertNull(response.getExceptionPayload());
     }

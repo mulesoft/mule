@@ -20,7 +20,7 @@ public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFun
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // Send as bytes so that the StringRequestEntity isn't used. If it is used
         // it will throw an exception and stop us from testing the server side.

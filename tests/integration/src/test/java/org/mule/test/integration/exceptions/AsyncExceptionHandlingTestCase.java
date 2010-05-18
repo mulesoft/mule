@@ -29,7 +29,7 @@ public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
 
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
-        MuleClient client1 = new MuleClient();
+        MuleClient client1 = new MuleClient(muleContext);
         DefaultMuleMessage msg1 = new DefaultMuleMessage(request, (Map) null, muleContext);
         MuleMessage response1 = client1.send("search.inbound.endpoint", msg1, 300000);
         assertNotNull(response1);

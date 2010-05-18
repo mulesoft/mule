@@ -34,7 +34,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     public void testCase() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // send Echo String
         MuleMessage message = client.send("vm://testin", new Integer(12), null);
@@ -63,7 +63,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     private MuleMessage send(String uri, String message) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         return client.send(prefix + uri, message, new HashMap());
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
     {
         try
         {
-            new MuleClient().send("BadType", "hello", null);
+            new MuleClient(muleContext).send("BadType", "hello", null);
             fail("expected error");
         }
         catch (Exception e)
@@ -131,7 +131,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     public void testCorrectMethodType() throws Exception
     {
-        MuleMessage message = new MuleClient().send("GoodType", "hello", null);
+        MuleMessage message = new MuleClient(muleContext).send("GoodType", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
     }   

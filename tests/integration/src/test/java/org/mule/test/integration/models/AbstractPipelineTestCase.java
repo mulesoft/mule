@@ -28,7 +28,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 
     public void testPipelineSynchronous() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         List results = new ArrayList();
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
@@ -47,7 +47,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 
     public void testPipelineAsynchronous() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         List results = new ArrayList();
         for (int i = 0; i < getNumberOfMessages(); i++)

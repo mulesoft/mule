@@ -22,7 +22,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
 {
     public void testDefaultComponentExceptionStrategy() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         try
         {
@@ -42,7 +42,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
      */
     public void xtestHandledException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         try
         {
@@ -65,7 +65,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
 
     public void testUnhandledException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         try
         {

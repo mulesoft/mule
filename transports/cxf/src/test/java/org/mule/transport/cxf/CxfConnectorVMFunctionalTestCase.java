@@ -22,7 +22,7 @@ public class CxfConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpoi
 
     public void testWSDL() throws Throwable
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String,Object> props = new HashMap<String, Object>();
         props.put("http.method", "GET");

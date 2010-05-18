@@ -34,7 +34,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 
     public void testReference() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(REF_ENDPOINT, TEST_HTTP_MESSAGE, null);
 
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
@@ -42,7 +42,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 
     public void testHttpPost() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(HTTP_ENDPOINT, TEST_HTTP_MESSAGE, null);
 
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
@@ -52,8 +52,8 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.METHOD_GET, "true");
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(HTTP_ENDPOINT + "/" + "mulerulez", TEST_HTTP_MESSAGE, props);
 
         assertEquals(TEST_HTTP_MESSAGE, result.getPayloadAsString());
@@ -63,8 +63,8 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConstants.METHOD_GET, "true");
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(HTTP_ENDPOINT + "/" + TEST_BAD_MESSAGE, "mule", props);
         
         assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));

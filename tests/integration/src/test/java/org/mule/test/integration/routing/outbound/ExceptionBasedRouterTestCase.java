@@ -29,7 +29,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 
     public void testStaticEndpointsByName() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage reply = client.send("vm://in1", "request", null);
         assertNotNull(reply);
@@ -38,7 +38,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 
     public void testStaticEndpointsByURI() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage reply = client.send("vm://in2", "request", null);
         assertNotNull(reply);
@@ -47,7 +47,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 
     public void testDynamicEndpointsByName() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("recipients", "service1,service2,service3");
@@ -58,7 +58,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 
     public void testDynamicEndpointsByURI() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();
@@ -76,7 +76,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
      */
     public void testIllegalEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();

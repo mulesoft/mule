@@ -33,7 +33,7 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
     public void testOneGlobalTx() throws Exception
     {
         MuleMessage result;
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
         result = client.request("vm://out", getTimeout());
         assertNotNull(result);

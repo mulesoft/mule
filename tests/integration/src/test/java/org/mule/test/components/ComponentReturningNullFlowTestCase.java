@@ -25,7 +25,7 @@ public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
 
     public void testNullReturnStopsFlow() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage msg = client.send("vm://in", "test data", null);
         assertNotNull(msg);

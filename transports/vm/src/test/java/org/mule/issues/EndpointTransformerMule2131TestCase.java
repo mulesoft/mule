@@ -28,7 +28,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     protected MuleClient send() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("in", MESSAGE, null);
         return client;
     }

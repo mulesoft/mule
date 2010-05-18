@@ -30,7 +30,7 @@ public class MessageContextTestCase extends FunctionalTestCase
      */
     public void testAlternateExceptionStrategy() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         DefaultMuleMessage msg = new DefaultMuleMessage(request, client.getMuleContext());
         MuleMessage response = client.send("testin", msg, 200000);
         assertNotNull(response);

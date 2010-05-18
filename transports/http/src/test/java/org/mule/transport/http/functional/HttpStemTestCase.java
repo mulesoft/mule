@@ -28,7 +28,7 @@ public class HttpStemTestCase extends FunctionalTestCase
 
     public void testStemMatching() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         doTest(client, "http://localhost:60200/foo", "/foo", "/foo");
         doTest(client, "http://localhost:60200/foo/baz", "/foo", "/foo/baz");
         doTest(client, "http://localhost:60200/bar", "/bar", "/bar");

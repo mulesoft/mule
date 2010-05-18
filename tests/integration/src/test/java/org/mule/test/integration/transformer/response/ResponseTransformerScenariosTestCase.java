@@ -65,7 +65,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testVmSync() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://sync", "request", null);
         assertNotNull(message);
         assertEquals("request" + VM_OUT_IN_RESP, message.getPayloadAsString());
@@ -73,7 +73,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testVmSyncResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://syncResponseTransformer", "request", null);
         assertNotNull(message);
         assertEquals("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE, message.getPayloadAsString());
@@ -81,7 +81,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testHttpSync() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("http://localhost:4446", "request", null);
         assertNotNull(message);
         // Ensure MuleMessageToHttpResponse was used before sending response
@@ -99,7 +99,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testHttpSyncResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("http://localhost:4447", "request", null);
         assertNotNull(message);
 
@@ -119,7 +119,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testJmsSyncResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("jms://sync", "request", null);
         assertNotNull(message);
         assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
@@ -130,7 +130,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testVmSyncOutboundEndpointResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://syncOutboundEndpointResponseTransformer", "request", null);
         assertNotNull(message);
          assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + VM_RESPONSE,
@@ -139,7 +139,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testJmsRemoteSync() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://jmsSync", "request", null);
         assertNotNull(message);
 
@@ -148,7 +148,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testJmsSyncOutboundEndpointResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://jmsSyncOutboundEndpointResponseTransformer", "request", null);
         assertNotNull(message);
         assertEquals("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE + VM_RESPONSE, message.getPayloadAsString());
@@ -156,7 +156,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testChainedRouterOutboundEndpointResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://chainedRouterOutboundEndpointResponseTransformer", "request", null);
         assertNotNull(message);
         assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + VM_OUT_IN_RESP + CUSTOM_RESPONSE
@@ -165,7 +165,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     public void testNestedRouterOutboundEndpointResponseTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://nestedRouterOutboundEndpointResponseTransformer", "request", null);
         assertNotNull(message);
         assertEquals("request" + VM_OUTBOUND + VM_INBOUND + VM_OUT_IN_RESP + CUSTOM_RESPONSE + CUSTOM_RESPONSE

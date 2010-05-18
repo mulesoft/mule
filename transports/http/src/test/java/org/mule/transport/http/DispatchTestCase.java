@@ -24,7 +24,7 @@ public class DispatchTestCase extends FunctionalTestCase
 {
     public void testEchoService() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         
         final byte[] buf = new byte[8192];
         for (int b = 0; b < buf.length; b++) 

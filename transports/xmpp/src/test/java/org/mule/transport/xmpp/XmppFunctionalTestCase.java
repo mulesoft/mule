@@ -50,7 +50,7 @@ public class XmppFunctionalTestCase extends XmppEnableDisableTestCase
 
     public void testSendChat() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://in", TEST_MESSAGE, null);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);

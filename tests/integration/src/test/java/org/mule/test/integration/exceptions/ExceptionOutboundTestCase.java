@@ -23,7 +23,7 @@ public class ExceptionOutboundTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = new MuleClient();
+        client = new MuleClient(muleContext);
     }
     
     @Override

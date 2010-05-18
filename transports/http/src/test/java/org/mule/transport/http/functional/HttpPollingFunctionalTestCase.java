@@ -19,7 +19,7 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase
 
     public void testPollingHttpConnector() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result.getPayload());
         assertEquals("foo", result.getPayloadAsString());

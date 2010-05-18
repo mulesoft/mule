@@ -37,7 +37,7 @@ public class CustomFilterMule2437TestCase extends FunctionalTestCase
 
     protected void doTest(String message, String destination) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", new DefaultMuleMessage(message, muleContext));
         MuleMessage response = client.request(destination, TIMEOUT);
         assertNotNull(response);

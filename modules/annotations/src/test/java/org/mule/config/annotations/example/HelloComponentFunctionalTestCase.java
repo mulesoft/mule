@@ -45,7 +45,7 @@ public class HelloComponentFunctionalTestCase extends FunctionalTestCase
 
     public void testHelloComponent() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send("helloEndpoint", "Ross", null);
 

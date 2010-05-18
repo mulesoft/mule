@@ -28,7 +28,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
 
     public void testNoArgsCallWrapper() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://invoke", "test", null);
         MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
@@ -38,7 +38,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
 
     public void testWithInjectedDelegate() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://invokeWithInjected", "test", null);
         MuleMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
         assertNotNull(reply);

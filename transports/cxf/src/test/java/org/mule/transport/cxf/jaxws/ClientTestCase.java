@@ -39,7 +39,7 @@ public class ClientTestCase extends FunctionalTestCase
 
     public void testClientWithMuleClient() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("operation", "greetMe");
         MuleMessage result = client.send("clientEndpoint", "Dan", props);

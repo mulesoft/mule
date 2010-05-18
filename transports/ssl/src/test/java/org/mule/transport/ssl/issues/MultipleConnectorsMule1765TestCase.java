@@ -26,7 +26,7 @@ public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null);
         assertEquals(TEST_SSL_MESSAGE + " Received", result.getPayloadAsString());
     }

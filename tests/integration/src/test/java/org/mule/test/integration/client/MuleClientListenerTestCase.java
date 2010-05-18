@@ -28,7 +28,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
     public void doTestRegisterListener(String component, String endpoint, boolean canSendWithoutReceiver) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         if (!canSendWithoutReceiver)
         {

@@ -52,8 +52,8 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         assertTrue("FunctionalTestComponent expected", component instanceof FunctionalTestComponent);
         FunctionalTestComponent ftc = (FunctionalTestComponent) component;
         ftc.setEventCallback(new FunctionalEventCallback(latch, message));
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, null);
         
         // TODO DZ: need a reliable way to check the file once it's been written to

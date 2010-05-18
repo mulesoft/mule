@@ -30,14 +30,14 @@ public class SslFunctionalTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     public void testSendMany() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
             MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null);
@@ -58,7 +58,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
 
     public void testAsynchronous() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
         // MULE-2757
         Thread.sleep(100);

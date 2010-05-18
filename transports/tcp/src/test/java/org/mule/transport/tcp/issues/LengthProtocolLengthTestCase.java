@@ -43,7 +43,7 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase
         {
             message[i] = (byte)(i % 255);
         }
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         if (ok)
         {
             MuleMessage response = client.send(endpoint, message, null);

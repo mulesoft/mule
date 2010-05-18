@@ -74,7 +74,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
     {
         sendJabberMessageFromNewThread();
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage muleMessage = client.request(url, RECEIVE_TIMEOUT);
         assertNotNull(muleMessage);
 

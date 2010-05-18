@@ -24,7 +24,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
 
     public void testInlineScript() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in1", "Important Message", null);
         MuleMessage response = client.request("vm://out1", 1000);
         assertNotNull(response);
@@ -33,7 +33,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
     
     public void testFileBasedScript() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in2", "Important Message", null);
         MuleMessage response = client.request("vm://out2", 1000);
         assertNotNull(response);
@@ -42,7 +42,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
     
     public void testReferencedScript() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in3", "Important Message", null);
         MuleMessage response = client.request("vm://out3", 1000);
         assertNotNull(response);
@@ -51,7 +51,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
 
     public void testScriptVariables() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in4", "Important Message", null);
         MuleMessage response = client.request("vm://out4", 1000);
         assertNotNull(response);

@@ -28,7 +28,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
 
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("http://localhost:28081", "request", null);
         assertNotNull(message);
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));

@@ -22,7 +22,7 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in-1", "hello world", null));
     }
 

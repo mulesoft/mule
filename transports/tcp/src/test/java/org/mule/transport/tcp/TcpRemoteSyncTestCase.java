@@ -30,7 +30,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
    
    public void testTcpTcpRemoteSync() throws Exception
    {
-       MuleClient client = new MuleClient();
+       MuleClient client = new MuleClient(muleContext);
        Map<String, Object> props = new HashMap<String, Object>();
        
        //must notify the client to wait for a response from the server
@@ -44,7 +44,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
     
     public void testTcpVmRemoteSync() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         
         //must notify the client to wait for a response from the server

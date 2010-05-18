@@ -42,7 +42,7 @@ public class AtomEventTest extends FunctionalTestCase
     {
         repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         props.put("title", "Foo Bar");

@@ -36,7 +36,7 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         assertNotNull("Payload test file not found.", is);
         byte[] fileContents = IOUtils.toByteArray(is);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:8085", new DefaultMuleMessage(fileContents, muleContext));
 
         XsltTransformer trans = new XsltTransformer();

@@ -24,7 +24,7 @@ public class InboundTransformerMule3255TestCase extends FunctionalTestCase
 
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("cxf:http://localhost:4444/services/CXFService?method=echo", "request", null);
         assertNotNull(message);
         assertEquals("request transformed", message.getPayload());

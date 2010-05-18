@@ -37,7 +37,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         Map<String, String> props = new HashMap<String, String>();
         props.put(TARGET_FILE, target.getName());
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("send", TEST_MESSAGE, props);
         waitForFileSystem();
 
@@ -48,7 +48,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
     public void testDirectRequest() throws Exception
     {
         File target = initForRequest();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
         MuleMessage message = client.request(url, 100000);

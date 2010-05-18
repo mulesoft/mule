@@ -27,7 +27,7 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
 
     public void testMessagePropertiesCopying() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         // provide a valid type header so the JDBC query actually returns something

@@ -30,7 +30,7 @@ public class AutoTransformerTestCase extends FunctionalTestCase
     public void testInboundAutoTransform() throws Exception
     {
         latch = new Latch();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", new FruitBowl(new Apple(), new Banana()), null);
 
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));

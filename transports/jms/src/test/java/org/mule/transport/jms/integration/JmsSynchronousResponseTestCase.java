@@ -38,7 +38,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithoutReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
         assertNotNull(response);
@@ -49,7 +49,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithoutReplyToEndointProperties() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
         assertNotNull(response);
@@ -60,7 +60,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testResponseWithReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
         assertNotNull(response);

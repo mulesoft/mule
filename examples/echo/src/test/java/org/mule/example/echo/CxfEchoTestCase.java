@@ -53,7 +53,7 @@ public class CxfEchoTestCase extends FunctionalTestCase
         // CXF has built in support for understanding GET requests. They are of the form:
         // http://host/service/OPERATION/PARAM_NAME/PARAM_VALUE
         
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
         MuleMessage result = client.send("http://localhost:65082/services/EchoUMO/echo/text/hello", "", props);
@@ -64,7 +64,7 @@ public class CxfEchoTestCase extends FunctionalTestCase
 
     public void testSoapPostEcho() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:65082/services/EchoUMO?method=echo", 
             "hello", null);
         assertNotNull(result);

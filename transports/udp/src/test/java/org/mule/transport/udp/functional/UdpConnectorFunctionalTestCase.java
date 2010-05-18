@@ -60,7 +60,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
                 {
                     // ignore
                 }
-                MuleClient client = new MuleClient();
+                MuleClient client = new MuleClient(muleContext);
                 int dropped = 0;
                 while (null != client.request("vm://foo", MAX_PAUSE_PERIOD))
                 {
@@ -91,7 +91,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
     protected boolean doTestSome(int numberOfMessages, int burst) throws Exception
     {
         logger.info("Trying " + numberOfMessages + " messages in batches of " + burst);
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         int burstCount = 0;
         Set receivedMessages = new HashSet(numberOfMessages);

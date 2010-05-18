@@ -29,7 +29,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     public void testNotXml() throws Exception
     {
         logger.debug("not xml");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("in", STRING_MESSAGE, null);
         MuleMessage response = client.request("notxml", TIMEOUT);
         assertNotNull(response);
@@ -51,7 +51,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 
     public void doTestXml(String endpoint, String xml) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("in", xml, null);
         MuleMessage response = client.request(endpoint, TIMEOUT);
         assertNotNull(response);

@@ -25,7 +25,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
 
     public void testRequestResponse() throws Throwable
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent2?method=echo",
             "test", null);
@@ -35,7 +35,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
 
     public void testRequestResponseComplex() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send(
             "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
@@ -48,7 +48,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
 
     public void testRequestResponseComplex2() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         String[] args = new String[]{"Betty", "Rubble"};
         MuleMessage result = client.send(
@@ -70,7 +70,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
 
     public void testRequestWithComplexArg() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Person person = new Person("Joe", "Blow");
         String uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson";
         client.send(uri, person, null);

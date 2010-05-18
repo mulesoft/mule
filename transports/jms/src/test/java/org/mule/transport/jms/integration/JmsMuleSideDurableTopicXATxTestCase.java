@@ -40,7 +40,7 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         Thread.sleep(5000);
 
         MuleMessage result;
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
         result = client.request("vm://out", getTimeout());
         assertNotNull(result);

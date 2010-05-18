@@ -31,7 +31,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
 {
     public void testInputStream() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
         
@@ -40,7 +40,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
     
     public void testInputStreamWithXslt() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
@@ -61,7 +61,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
     
     public void testDom() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         Document dom = DOMUtils.readXml(xml);
         test(client, dom);
@@ -69,7 +69,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
 
     public void testDomSource() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         Document dom = DOMUtils.readXml(xml);
         test(client, new DOMSource(dom));
@@ -77,7 +77,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
 
     public void testSAXSource() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         SAXSource source = new SAXSource(new InputSource(xml));
         test(client, source);
@@ -85,7 +85,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
     
     public void testStaxSource() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);
@@ -94,7 +94,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
     
     public void testXMLStreamReader() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
 
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);

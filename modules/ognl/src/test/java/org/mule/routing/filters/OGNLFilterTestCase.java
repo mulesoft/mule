@@ -77,7 +77,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     public void testFunctionalTest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             client.dispatch(DEFAULT_INPUT_QUEUE, FIRST_MESSAGE, null);
@@ -110,7 +110,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     public void testFunctionalTestUsingExpressionFilter() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             client.dispatch("vm://in2", FIRST_MESSAGE, null);

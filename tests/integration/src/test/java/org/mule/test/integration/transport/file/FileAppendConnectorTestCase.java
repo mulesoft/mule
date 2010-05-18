@@ -46,7 +46,7 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase
         {
             assertFalse(FileUtils.newFile(myDir, myFileName).exists());
 
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
             client.send("vm://fileappend", "Hello1", null);
             client.send("vm://fileappend", "Hello2", null);
 

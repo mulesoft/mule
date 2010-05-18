@@ -26,7 +26,7 @@ public class GeneratedClientTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body>" + "<test> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/Echo", msg, null);
         byte[] res = (byte[]) result.getPayload();
         String resString = new String(res);

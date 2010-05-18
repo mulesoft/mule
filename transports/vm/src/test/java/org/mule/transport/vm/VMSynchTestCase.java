@@ -27,7 +27,7 @@ public class VMSynchTestCase extends FunctionalTestCase
 
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response =  client.send("vm://bridge", "Message", null);
         assertNotNull("Response is null", response);
         assertEquals("Message Received", response.getPayload());

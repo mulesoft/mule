@@ -85,8 +85,8 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         File xmlFile = new File(pollDirectory, XML_FILE);
         assertTrue(txtFile.exists());
         assertTrue(xmlFile.exists());
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         client.request("globalEP", 1000);
         
         assertTrue(txtFile.exists());

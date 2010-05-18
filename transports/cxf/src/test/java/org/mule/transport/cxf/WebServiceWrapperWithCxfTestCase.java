@@ -23,7 +23,7 @@ public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
     
     public void testWsCall() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://testin", new DefaultMuleMessage(testString, muleContext));
         assertNotNull(result.getPayload());
         assertEquals("Payload", testString, result.getPayloadAsString());
@@ -31,7 +31,7 @@ public class WebServiceWrapperWithCxfTestCase extends FunctionalTestCase
     
     public void testWsCallWithUrlFromMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Properties props = new Properties();
         props.setProperty("ws.service.url", "http://localhost:65081/services/TestUMO?method=onReceive");
         MuleMessage result = client.send("vm://testin2", testString, props);

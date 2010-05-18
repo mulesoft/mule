@@ -34,7 +34,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
 
     public void testCxfWsdlService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = new DefaultMuleMessage("test1", muleContext);
         MuleMessage reply = client.send(TEST_URL, message);

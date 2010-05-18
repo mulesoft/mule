@@ -81,7 +81,7 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
         });
         bayeuxClient.subscribe("/test1");
 
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in1", "Ross", null);
         latch.await(10, TimeUnit.SECONDS);
 
@@ -97,7 +97,7 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
     public void testClientPublishWithString() throws Exception
     {
         bayeuxClient.publish("/test2", "Ross", null);
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);

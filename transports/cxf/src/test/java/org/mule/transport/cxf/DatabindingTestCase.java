@@ -19,7 +19,7 @@ public class DatabindingTestCase extends FunctionalTestCase
 
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.request("http://localhost:63081/services/Echo?wsdl", 5000);
         assertNotNull(result.getPayload());
     }

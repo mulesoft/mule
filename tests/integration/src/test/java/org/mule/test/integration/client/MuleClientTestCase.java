@@ -25,7 +25,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
     public void testClientSendDirect() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
@@ -34,14 +34,14 @@ public class MuleClientTestCase extends FunctionalTestCase
 
     public void testClientDispatchDirect() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
 
     public void testClientSendGlobalEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send("vmEndpoint", "Test Client Send message", null);
         assertNotNull(message);
@@ -50,7 +50,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
     public void testClientSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
@@ -59,7 +59,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
     public void testClientMultiSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         for (int i = 0; i < 100; i++)
         {
@@ -71,7 +71,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
     public void testClientMultidispatch() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         int i = 0;
         // to init

@@ -33,7 +33,7 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
 
     public void testNamedParameters() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         // The service itself will throw an exception if the parameters in the
         // request SOAP message are not named
         MuleMessage result = client.send("vm://mycomponent1", "Hello Named", null);
@@ -42,7 +42,7 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
 
     public void testNamedParametersViaClient() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         // create the soap method passing in the method name and return type
         SoapMethod soapMethod = new SoapMethod(new QName("echo"), NamedParameter.XSD_STRING);

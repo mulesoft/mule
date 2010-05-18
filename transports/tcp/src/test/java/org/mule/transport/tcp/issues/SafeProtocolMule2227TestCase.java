@@ -33,7 +33,7 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 
     public void testSafeToUnsafe() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         // this may fail, but should not crash
         try
         {

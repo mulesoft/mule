@@ -24,7 +24,7 @@ public class EndpointBridgingTestCase extends FunctionalTestCase
 
     public void testSynchronousBridging() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://bridge.inbound", "test", null);
         assertNotNull(result);
         assertEquals("Received: test", result.getPayloadAsString());

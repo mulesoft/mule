@@ -29,7 +29,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
         

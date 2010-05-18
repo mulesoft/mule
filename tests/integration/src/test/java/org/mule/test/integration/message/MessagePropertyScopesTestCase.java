@@ -25,7 +25,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase {
 
     public void testSessionProperty() throws Exception {
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://in1", "Hello World", null);
         assertNotNull(response);
         String payload = response.getPayloadAsString();

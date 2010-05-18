@@ -69,7 +69,7 @@ public class GuiceRegistryTestCase extends FunctionalTestCase
 
     public void testRegisterTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send("vm://myservice2", new Orange(), null);
 
@@ -81,7 +81,7 @@ public class GuiceRegistryTestCase extends FunctionalTestCase
 
     public void testInjectForService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send("vm://myservice3", "foo", null);
 

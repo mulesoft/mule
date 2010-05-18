@@ -28,7 +28,7 @@ public class MessagePropertyInResponseTransformersTestCase extends FunctionalTes
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/ser",
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sim=\"http://simple.component.mule.org/\"><soapenv:Header/><soapenv:Body><sim:echo><sim:echo>aaa</sim:echo></sim:echo></soapenv:Body></soapenv:Envelope>", null);
         assertEquals(

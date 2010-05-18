@@ -110,7 +110,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Functi
 
     private AbstractLifecycleTracker exerciseComponent(final String serviceName) throws Exception
     {
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker) muleClient.send(
             "vm://" + serviceName + ".In", null, null).getPayload();
 

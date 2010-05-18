@@ -29,21 +29,21 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 
     public void testErrorExpressionOnRegexFilterFail() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("restServiceEndpoint", TEST_REQUEST, null);
         assertTrue(result.getPayload() instanceof NullPayload);
     }
 
     public void testErrorExpressionOnRegexFilterPass() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("restServiceEndpoint2", TEST_REQUEST, null);
         assertEquals("echo=" + TEST_REQUEST,result.getPayloadAsString());
     }
 
     public void testRequiredParameters() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
         props.put("bar-optional-header", "bar");
@@ -53,7 +53,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 
     public void testOptionalParametersMissing() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("baz-header", "baz");
         MuleMessage result = client.send("restServiceEndpoint3", null, props);
@@ -62,7 +62,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
 
     public void testRequiredParametersMissing() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
 
         MuleMessage result = client.send("restServiceEndpoint3", null, props);

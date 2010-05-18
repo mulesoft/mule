@@ -23,7 +23,7 @@ public class JaxenFilterTestCase extends FunctionalTestCase
 {
     public void testJaxen() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         InputStream po = getClass().getResourceAsStream("/org/mule/test/integration/xml/purchase-order.xml");
         
         assertNotNull(po);

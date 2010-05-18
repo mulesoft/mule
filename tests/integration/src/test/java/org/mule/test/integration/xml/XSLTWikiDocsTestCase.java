@@ -41,7 +41,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
                     "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
             //Create a new Mule Client
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(muleContext);
 
             //These are the message roperties that will get passed into the XQuery context
             Map props = new HashMap();

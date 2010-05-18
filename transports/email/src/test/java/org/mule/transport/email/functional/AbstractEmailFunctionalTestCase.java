@@ -121,7 +121,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
             msg = message;
         }
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
     	Map<String, Object> props = null;
         if (charset != null)
         {
@@ -161,7 +161,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     {
         assertEquals(1, server.getReceivedMessages().length);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.request("vm://receive", 5000);
         
         assertNotNull(reply);

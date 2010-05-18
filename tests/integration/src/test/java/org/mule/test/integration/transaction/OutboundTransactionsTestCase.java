@@ -24,7 +24,7 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
 
     public void testOutboundRouterTransactions() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         while (client.request("jms://my.queue1", TIMEOUT) != null)
         {
@@ -46,7 +46,7 @@ public class OutboundTransactionsTestCase extends FunctionalTestCase
 
     public void testOutboundRouterTransactions2() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         while (client.request("jms://my.queue3", TIMEOUT) != null)
         {

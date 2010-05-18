@@ -67,7 +67,7 @@ public class StreamingTestCase extends FunctionalTestCase
             }
         };
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         // this works only if singleton set in descriptor
         Object ftc = getComponent("testComponent");

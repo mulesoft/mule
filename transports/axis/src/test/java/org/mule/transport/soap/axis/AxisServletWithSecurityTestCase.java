@@ -72,7 +72,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     {
         Map props = new HashMap();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://ross:ross@localhost:" + HTTP_PORT
                                         + "/services/mycomponent?method=echo", "test", props);
         

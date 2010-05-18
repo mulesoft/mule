@@ -34,7 +34,7 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
         FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
         fruitBowl.addFruit(new Orange());
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", fruitBowl, null);
 
         assertNotNull(result);

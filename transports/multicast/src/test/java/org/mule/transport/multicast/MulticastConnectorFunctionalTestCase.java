@@ -30,7 +30,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
     public void testSendTestData() throws Exception
     {
         final int numberOfMessages = 2;
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         logger.debug("sending messages");
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)

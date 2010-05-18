@@ -34,7 +34,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
     {
         assertExceptionStrategyHasNumberOfEndpoints("testService1", 1);
 
-        MuleClient mc = new MuleClient();
+        MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in1", "test", null);
         assertExceptionMessage(mc.request("vm://out1", RECEIVE_TIMEOUT));
         // request one more time to ensure that only one exception message was sent per exception
@@ -45,7 +45,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
     {
         assertExceptionStrategyHasNumberOfEndpoints("testService2", 2);
 
-        MuleClient mc = new MuleClient();
+        MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in2", "test", null);
         MuleMessage out2 = mc.request("vm://out2", FunctionalTestCase.RECEIVE_TIMEOUT);
         MuleMessage out3 = mc.request("vm://out3", FunctionalTestCase.RECEIVE_TIMEOUT);
@@ -60,8 +60,8 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         Map<String, String> map = new HashMap<String, String>();
         map.put("key1", "value1");
         map.put("key2", "value2");
-        
-        MuleClient mc = new MuleClient();
+
+        MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in1", map, null);
         MuleMessage message = mc.request("vm://out1", FunctionalTestCase.RECEIVE_TIMEOUT);
 

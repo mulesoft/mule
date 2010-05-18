@@ -33,7 +33,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     public void testRest1ParamPost() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply  = client.send("vm://in1", new DefaultMuleMessage("IBM", muleContext));
         
         assertNotNull(reply);
@@ -43,7 +43,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     public void testRest2ParamsPost() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply  = client.send("vm://in2", new DefaultMuleMessage(new Object[]{"MTL","MTL"}, muleContext));
         
         assertNotNull(reply.getPayloadAsString());
@@ -52,7 +52,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     public void testRest1ParamGet() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply  = client.send("vm://in3", new DefaultMuleMessage(new Object[]{"IBM"}, muleContext));
         
         assertNotNull(reply);
@@ -63,7 +63,7 @@ public class RESTTestCase extends FunctionalTestCase
     
     public void testRest2ParamsGet() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply  = client.send("vm://in4", new DefaultMuleMessage(new Object[]{"MTL","MTL"}, muleContext));
         
         String replyStr = reply.getPayloadAsString();

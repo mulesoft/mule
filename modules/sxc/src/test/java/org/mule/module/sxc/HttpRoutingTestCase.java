@@ -24,7 +24,7 @@ public class HttpRoutingTestCase extends FunctionalTestCase
 
     public void testBasicXPath() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);

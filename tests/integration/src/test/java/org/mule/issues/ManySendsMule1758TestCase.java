@@ -25,7 +25,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
 
     public void testSingleSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://s-in", "Marco", null);
         assertNotNull("Response is null", response);
         assertEquals("Polo", response.getPayload());
@@ -34,7 +34,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
     public void testManySends() throws Exception
     {
         long then = System.currentTimeMillis();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
             logger.debug("Message " + i);

@@ -34,7 +34,7 @@ public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCas
     @Test
     public void testExplicitReplyToAsyncSet() throws MuleException
     {
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         Map props = new HashMap();
         props.put("customCorrelation", "abcdefghij");
         MuleMessage response = muleClient.send("vm://in4", TEST_MESSAGE, props);

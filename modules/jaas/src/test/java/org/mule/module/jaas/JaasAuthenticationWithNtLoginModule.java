@@ -31,7 +31,7 @@ public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
 
     public void testCaseAuthentication() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext

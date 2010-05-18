@@ -26,7 +26,7 @@ public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestC
 
     protected void doTest(String path, Object payload, String result, Map properties) throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://" + path, payload, properties);
         assertEquals(result, response.getPayloadAsString());
     }

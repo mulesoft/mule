@@ -26,14 +26,14 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     public void testDispatchAndReply() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, null);
         // MULE-2754
         Thread.sleep(100);
@@ -44,7 +44,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
 
     public void timeMultipleSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         long now = System.currentTimeMillis();
         int count = 1000;
         for (int i = 0; i < count; i++)

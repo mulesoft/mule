@@ -25,7 +25,7 @@ public class AsyncReplyNoTimeoutTestCase extends FunctionalTestCase
     public void testAggregatorWithNoTimeout() throws Exception
     {
         String message = "test";
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);

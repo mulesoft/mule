@@ -26,7 +26,7 @@ public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCa
     @Test
     public void testOutboundJmsTransaction() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in", new DefaultMuleMessage(DEFAULT_INPUT_MESSAGE, muleContext));
 
         MuleMessage response = client.request("vm://out", getTimeout());

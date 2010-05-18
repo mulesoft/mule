@@ -24,7 +24,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
 
     public void testExceptionMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage msg = client.send("vm://in", "Test Message", null);
 
         assertNotNull(msg);

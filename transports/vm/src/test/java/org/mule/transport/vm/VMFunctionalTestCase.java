@@ -26,7 +26,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
 
     public void testSingleMessage() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", "Marco", null);
         MuleMessage response = client.request("vm://out", WAIT);
         assertNotNull("Response is null", response);
@@ -35,7 +35,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
 
     public void testRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", "Marco", null);
         MuleMessage response = client.request("vm://out", WAIT);
         assertNotNull("Response is null", response);
@@ -44,7 +44,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
 
     public void testMultipleMessages() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", "Marco", null);
         client.dispatch("vm://in", "Marco", null);
         client.dispatch("vm://in", "Marco", null);

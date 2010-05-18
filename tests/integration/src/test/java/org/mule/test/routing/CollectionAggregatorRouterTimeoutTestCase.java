@@ -46,8 +46,8 @@ public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCas
 
         FunctionalTestComponent vortex = (FunctionalTestComponent) getComponent("vortex");
         FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
-        
-        MuleClient client = new MuleClient();
+
+        MuleClient client = new MuleClient(muleContext);
         List list = Arrays.asList("first", "second");
         client.dispatch("vm://splitter", list, null);
 

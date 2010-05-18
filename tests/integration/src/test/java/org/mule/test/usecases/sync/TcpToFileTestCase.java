@@ -24,7 +24,7 @@ public class TcpToFileTestCase extends FunctionalTestCase
 
     public void testSyncResponse() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         String payload = "payload";
 
         client.sendNoReceive("tcp://localhost:4444", payload, null);

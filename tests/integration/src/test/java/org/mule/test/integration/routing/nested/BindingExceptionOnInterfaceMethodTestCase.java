@@ -29,7 +29,7 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
     
     public void testExceptionOnBinding() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://invoker.in", TEST_MESSAGE, null);
         assertNotNull(reply);
         String payload = reply.getPayloadAsString();

@@ -97,7 +97,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
 
     public void testXATransactionUsingSpringDaoNoRollback() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Book book = new Book(1, "testBook", "testAuthor");
         client.sendNoReceive("jms://my.queue", book, null);
         MuleMessage result = client.request("vm://output", RECEIVE_TIMEOUT);
@@ -113,7 +113,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
 
     public void testXATransactionUsingSpringDaoWithRollback() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Book book = new Book(1, "testBook", "testAuthor");
         client.sendNoReceive("jms://my.queue", book, null);

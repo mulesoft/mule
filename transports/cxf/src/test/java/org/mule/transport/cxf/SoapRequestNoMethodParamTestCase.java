@@ -22,7 +22,7 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase
 
     public void testCXFSoapRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage msg = client.send("http://localhost:63381/services/TestComponent",
             new DefaultMuleMessage(request, muleContext));

@@ -31,7 +31,7 @@ public class ReplyToTestCase extends FunctionalTestCase
 
     public void testVm() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
@@ -52,7 +52,7 @@ public class ReplyToTestCase extends FunctionalTestCase
 
     public void testAxis() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");
@@ -73,7 +73,7 @@ public class ReplyToTestCase extends FunctionalTestCase
 
     public void testCxf() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
         msg.setReplyTo("ReplyTo");

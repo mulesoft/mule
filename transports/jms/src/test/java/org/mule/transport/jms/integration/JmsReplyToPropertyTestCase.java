@@ -34,7 +34,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("JMSReplyTo", "middle");
         client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);

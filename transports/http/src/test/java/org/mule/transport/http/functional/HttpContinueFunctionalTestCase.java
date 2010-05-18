@@ -40,7 +40,7 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase
     public void testSendWithContinue() throws Exception
     {
         stopWatch = new StopWatch();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         
         //Need to use Http1.1 for Expect: Continue
         HttpClientParams params = new HttpClientParams();

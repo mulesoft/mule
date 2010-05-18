@@ -27,7 +27,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTest
 
     public void testSendToCustomEventScheduler() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setEndpointRef("vm://resultQueue");

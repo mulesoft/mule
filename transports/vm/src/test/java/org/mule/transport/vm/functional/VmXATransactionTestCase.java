@@ -42,7 +42,7 @@ public class VmXATransactionTestCase extends FunctionalTestCase
     public void testTransactionQueueEventsTrue() throws Exception
     {
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in", "TEST", null);
         MuleMessage message = client.request("vm://out", 10000);
         assertNotNull(message);

@@ -33,7 +33,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
 
     public void testCxf() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("jms://TestComponent", new DefaultMuleMessage(req, muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
@@ -42,7 +42,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
 
     public void testCxfClientOverJMS() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("clientEndpoint", new DefaultMuleMessage("hello", muleContext));
         MuleMessage message = client.request("jms://testout", 10000);
         assertNotNull(message.getPayload());
@@ -52,7 +52,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
     // MULE-4677
     public void testCxfOverJMSSyncProxy() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/testBridge",
             new DefaultMuleMessage(req, muleContext));
         assertNotNull(result.getPayload());

@@ -27,7 +27,7 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
 
     public void testDownloadSpeed() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         long now = System.currentTimeMillis();
         MuleMessage result = client.send(endpoint, "request", null);
         assertNotNull(result);

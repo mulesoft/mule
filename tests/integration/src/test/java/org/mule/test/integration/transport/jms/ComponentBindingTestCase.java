@@ -24,7 +24,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase
 
     public void testBinding() throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         String message = "Mule";
         client.dispatch("jms://invoker.in", message, null);
         MuleMessage reply = client.request("jms://invoker.out", 10000);

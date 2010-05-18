@@ -29,7 +29,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
     public void testClientSendDirect() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
@@ -38,14 +38,14 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
     public void testClientDispatchDirect() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
 
     public void testClientSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
@@ -54,7 +54,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
     public void testClientMultiSend() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         for (int i = 0; i < INTERATIONS; i++)
         {
@@ -66,7 +66,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
     public void testClientMultiDispatch() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         int i = 0;
         // to init
@@ -83,7 +83,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");

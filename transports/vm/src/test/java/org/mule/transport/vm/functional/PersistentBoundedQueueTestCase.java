@@ -27,7 +27,7 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 
     public void testBoundedQueue() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://in", "Test1", null);
         Thread.sleep(SLEEP);
         client.send("vm://in", "Test2", null);

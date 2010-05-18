@@ -41,7 +41,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         relay.start();
 
         // then read from the queue that the polling receiver will write to
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.request("receive", 3000);
         checkReceivedMessage(message);
     }

@@ -55,14 +55,14 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 
     protected MuleClient send(String endpoint) throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send(endpoint, MESSAGE, null);
         return client;
     }
 
     protected MuleClient dispatch(String endpoint) throws MuleException
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, MESSAGE, null);
         return client;
     }

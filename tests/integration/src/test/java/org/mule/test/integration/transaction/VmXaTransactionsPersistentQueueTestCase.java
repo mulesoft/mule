@@ -28,7 +28,7 @@ public class VmXaTransactionsPersistentQueueTestCase extends FunctionalTestCase
 
     public void testOutboundRouterTransactions() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage msg = client.send("vm://in", TEST_MESSAGE, null, (int) timeout);
 
         assertNotNull(msg);

@@ -27,7 +27,7 @@ public class EndpointLookupRouterTestCase extends FunctionalTestCase
 
     public void testRouterSuccess() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://router", "GetID", null);
         assertNotNull(reply);
         assertTrue(reply.getPayloadAsString().contains("<ErrorStatus>Success</ErrorStatus>"));
@@ -35,7 +35,7 @@ public class EndpointLookupRouterTestCase extends FunctionalTestCase
 
     public void testRouterFailure() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://routerBad", "GetID", null);
         assertNotNull(reply);
         assertFalse(reply.getPayloadAsString().contains("<ErrorStatus>Success</ErrorStatus>"));

@@ -31,7 +31,7 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
         MuleMessage response;
         Object process;
         BPMS bpms = connector.getBpms();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.
@@ -61,7 +61,7 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
         MuleMessage response;
         Object process;
         BPMS bpms = connector.getBpms();
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.

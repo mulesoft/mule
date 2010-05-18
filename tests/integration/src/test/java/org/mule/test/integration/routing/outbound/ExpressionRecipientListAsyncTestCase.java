@@ -30,7 +30,7 @@ public class ExpressionRecipientListAsyncTestCase extends FunctionalTestCase
     public void testRecipientList() throws Exception
     {
         String message = "test";
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("recipient1", "vm://service1.queue");
         props.put("recipient2", "vm://service2.queue");

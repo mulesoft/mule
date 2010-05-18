@@ -24,7 +24,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
 
     public void testAxisOverJmsWithQueueNameSameAsComponentName() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("componentName", new DefaultMuleMessage("test1", muleContext));
         assertNotNull(result.getPayload());
         assertEquals("test1", result.getPayloadAsString());
@@ -32,7 +32,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     
     public void testAxisOverJmsWithQueueNameDifferentFromComponentName() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("soapActionDefined", new DefaultMuleMessage("test2", muleContext));
         assertNotNull(result.getPayload());
         assertEquals("test2", result.getPayloadAsString());
@@ -40,7 +40,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     
     public void testAxisOverJmsWithoutSettingMethodOnEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Exception exception = null;
         try
         {
@@ -57,7 +57,7 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     
     public void testAxisOverJmsWithoutSettingSoapAction() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Exception exception = null;
         try
         {

@@ -56,7 +56,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);
         Thread.sleep(1000);
@@ -70,7 +70,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 
     public void testReceiveAsWebService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         OrderManagerBean orderManager = (OrderManagerBean) muleContext.getRegistry().lookupObject("orderManagerBean");
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()

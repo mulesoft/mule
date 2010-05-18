@@ -43,7 +43,7 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
     {
         // first, check that the conversion happened - we should have a copy of
         // the message as rfc822 encoded bytes on vm://rfc822
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.request("vm://rfc822", WAIT_MS);
         assertTrue(message.getPayload() instanceof byte[]);
 

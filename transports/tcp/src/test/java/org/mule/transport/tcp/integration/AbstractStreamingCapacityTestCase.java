@@ -81,7 +81,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         long timeStart = System.currentTimeMillis();
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, new DefaultMuleMessage(stream, muleContext));
         
         // if we assume 1MB/sec then we need at least...

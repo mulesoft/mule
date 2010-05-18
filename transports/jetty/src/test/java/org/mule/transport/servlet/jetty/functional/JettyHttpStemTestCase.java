@@ -26,7 +26,7 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
 
     public void testStemMatchingHttp() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         doTest(client, "http://localhost:60200/foo", "Hello World");
         doTest(client, "http://localhost:60200/foo/bar", "Hello World");
         doTest(client, "http://localhost:60200/foo/bestmatch", "Hello World Best Match");

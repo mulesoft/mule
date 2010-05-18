@@ -30,7 +30,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testSendWithProperResponseContentType() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> messageProperties = new HashMap<String, String>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
@@ -46,7 +46,7 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
      */
     public void testSendWithInvalidResponseContentType() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map<String, String> messageProperties = new HashMap<String, String>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
         MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);

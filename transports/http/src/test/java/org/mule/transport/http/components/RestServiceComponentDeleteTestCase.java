@@ -41,7 +41,7 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
 
     public void testRestServiceComponentDelete() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://fromTest", TEST_MESSAGE, null);
         
         assertTrue(serverRequestCompleteLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

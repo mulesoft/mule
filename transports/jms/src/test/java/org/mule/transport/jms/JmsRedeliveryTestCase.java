@@ -34,7 +34,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
     public void testRedelivery() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         // required if broker is not restarted with the test - it tries to deliver those messages to the client
         // purge the queue
         while (client.request(DESTINATION, 1000) != null)

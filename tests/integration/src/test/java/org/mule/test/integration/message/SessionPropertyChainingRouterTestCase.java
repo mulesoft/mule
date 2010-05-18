@@ -27,7 +27,7 @@ public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
 
     public void testRouter() throws Exception
     {
-    	MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
     	MuleMessage response = client.send("vm://in", "test message", null);
     	assertNotNull(response);
     	assertTrue("Reponse is " + response.getPayload(), response.getPayload() instanceof NonSerializableObject);

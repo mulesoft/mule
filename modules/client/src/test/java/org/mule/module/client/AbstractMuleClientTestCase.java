@@ -20,7 +20,7 @@ public abstract class AbstractMuleClientTestCase extends AbstractMuleTestCase
 
     public void testInboundEndpointCache() throws MuleException
     {
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         InboundEndpoint endpointa = muleClient.getInboundEndpoint("test://test1");
         InboundEndpoint endpointd = muleClient.getInboundEndpoint("test://test2");
         InboundEndpoint endpointb = muleClient.getInboundEndpoint("test://test1");
@@ -32,7 +32,7 @@ public abstract class AbstractMuleClientTestCase extends AbstractMuleTestCase
 
     public void testOutboundEndpointCache() throws MuleException
     {
-        MuleClient muleClient = new MuleClient();
+        MuleClient muleClient = new MuleClient(muleContext);
         OutboundEndpoint endpointa = muleClient.getOutboundEndpoint("test://test1", true, null);
         OutboundEndpoint endpointb = muleClient.getOutboundEndpoint("test://test1", true, null);
         OutboundEndpoint endpointd = muleClient.getOutboundEndpoint("test://test2", true, null);

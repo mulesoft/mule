@@ -33,7 +33,7 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
 
-        new MuleClient().send("vm://quartz.scheduler", "quartz test", null);
+        new MuleClient(muleContext).send("vm://quartz.scheduler", "quartz test", null);
         assertTrue(count.await(5000));
     }
 
@@ -47,7 +47,7 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
         Map<String,String> props = new HashMap<String,String>();
         props.put("ENDPOINT_NAME", "quartz.expression.in");
 
-        new MuleClient().send("vm://quartz.expression.scheduler", "quartz test", props);
+        new MuleClient(muleContext).send("vm://quartz.expression.scheduler", "quartz test", props);
         assertTrue(count.await(5000));
     }
 }

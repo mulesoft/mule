@@ -34,7 +34,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
 
     public void testCaseGoodAuthentication() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
@@ -51,7 +51,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
 
     public void testCaseDifferentGoodAuthentication() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
@@ -68,7 +68,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
 
     public void testCaseWrongCombinationOfCorrectUsernameAndPassword() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
@@ -88,7 +88,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
 
     public void testCaseBadUserName() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
             .getSecurityManager()
@@ -106,7 +106,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
 
     public void testCaseBadPassword() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Map props = new HashMap();
         EncryptionStrategy strategy = muleContext
             .getSecurityManager()

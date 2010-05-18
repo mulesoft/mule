@@ -27,7 +27,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
 
     public void doTest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in", "hello world", null));
         Service service = muleContext.getRegistry().lookupService(SERVICE);
         service.pause();

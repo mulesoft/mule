@@ -27,7 +27,7 @@ public class MessagingExceptionTestCase extends AbstractJbpmTestCase
 
     public void testNoException() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("bpm://exception", "testNoException", null);                                  
 
         // Both messages should have been sent.
@@ -37,7 +37,7 @@ public class MessagingExceptionTestCase extends AbstractJbpmTestCase
 
     public void testExceptionInService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             client.send("bpm://exception", "testExceptionInService", null);                      
@@ -55,7 +55,7 @@ public class MessagingExceptionTestCase extends AbstractJbpmTestCase
 
     public void testExceptionInTransformer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         try
         {
             client.send("bpm://exception", "testExceptionInTransformer", null);                      

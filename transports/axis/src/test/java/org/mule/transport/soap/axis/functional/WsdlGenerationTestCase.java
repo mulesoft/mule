@@ -39,7 +39,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         Map props = new HashMap();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("http://localhost:62081/services/EchoService1?wsdl", null, props);
         assertNotNull(result);
@@ -68,7 +68,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         Map props = new HashMap();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("http://localhost:62082/services/EchoService2?wsdl", null, props);
         assertNotNull(result);
@@ -92,7 +92,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
     {
         Map props = new HashMap();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("http://localhost:62083/services/EchoService3?wsdl", null, props);
         assertNotNull(result);

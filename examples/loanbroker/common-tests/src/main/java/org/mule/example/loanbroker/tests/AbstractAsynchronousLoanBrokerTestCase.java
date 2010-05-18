@@ -54,7 +54,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     @Override
     public void testSingleLoanRequest() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         // Send asynchronous request
@@ -73,7 +73,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     @Override
     public void testLotsOfLoanRequests() throws Exception
     {
-        final MuleClient client = new MuleClient();
+        final MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest[] requests = new CustomerQuoteRequest[3];
         requests[0] = new CustomerQuoteRequest(c, 100000, 48);
@@ -142,7 +142,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
             int i = 0;
             try
             {
-                MuleClient client = new MuleClient();
+                MuleClient client = new MuleClient(muleContext);
                 MuleMessage result = null;
                 for (i = 0; i < numberOfRequests; i++)
                 {

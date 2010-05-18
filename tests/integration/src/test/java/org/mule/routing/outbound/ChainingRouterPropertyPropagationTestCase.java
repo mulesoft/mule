@@ -61,7 +61,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         hop1.setEventCallback(callback1);
         hop2.setEventCallback(callback2);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         DefaultMuleMessage request = new DefaultMuleMessage("payload", muleContext);
         MuleMessage reply = client.send("inboundEndpoint", request);
         assertNotNull(reply);

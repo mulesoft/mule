@@ -44,7 +44,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
     
     public void testStockQuoteExample() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://stockquote", "CSCO", null);
 
         if (null == response)

@@ -57,7 +57,7 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
         ((FunctionalTestComponent) hop1).setEventCallback(callback1);
         ((FunctionalTestComponent) hop2).setEventCallback(callback2);
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         DefaultMuleMessage request = new DefaultMuleMessage("payload", muleContext);
         client.send("vm://inbound", request);
         Thread.sleep(1000);

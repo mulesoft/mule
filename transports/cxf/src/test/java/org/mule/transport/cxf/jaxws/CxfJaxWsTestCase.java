@@ -23,7 +23,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
 {
     public void testEchoService() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
             null);
         assertEquals("Hello!", result.getPayload());
@@ -31,7 +31,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
 
     public void testOneWay() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("cxf:http://localhost:63081/services/async?method=send", "Hello!",
             null);
         assertEquals(NullPayload.getInstance(), result.getPayload());

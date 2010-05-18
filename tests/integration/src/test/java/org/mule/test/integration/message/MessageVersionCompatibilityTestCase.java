@@ -28,7 +28,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
 
     public void testOldToOld() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in1", "test", null);
 
         MuleMessage reply = client.request("vm://out1", TIMEOUT);
@@ -38,7 +38,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
 
     public void testOldToNew() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in2", "test", null);
 
         MuleMessage reply = client.request("vm://out2", TIMEOUT);
@@ -48,7 +48,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
 
     public void testNewToOld() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in3", "test", null);
 
         MuleMessage reply = client.request("vm://out3", TIMEOUT);
@@ -59,7 +59,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
     
     public void testNewToNew() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in4", "test", null);
 
         MuleMessage reply = client.request("vm://out4", TIMEOUT);

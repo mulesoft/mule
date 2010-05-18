@@ -78,7 +78,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         subscriptionBean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
         multicaster.removeApplicationListener(subscriptionBean);
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         assertEquals(0, eventCounter1.get());
@@ -109,7 +109,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(3000, TimeUnit.MILLISECONDS);
@@ -156,7 +156,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 2, whenFinished));
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
         ApplicationContext context = ((MuleEventMulticaster) muleContext.getRegistry().lookupObject(
             "applicationEventMulticaster")).applicationContext;
@@ -175,7 +175,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Latch whenFinished = new Latch();
         subscriptionBean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(3000, TimeUnit.MILLISECONDS);
@@ -313,7 +313,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             {
                 try
                 {
-                    MuleClient client = new MuleClient();
+                    MuleClient client = new MuleClient(muleContext);
                     for (int i = 0; i < count; i++)
                     {
                         client.send(url, payload, null);

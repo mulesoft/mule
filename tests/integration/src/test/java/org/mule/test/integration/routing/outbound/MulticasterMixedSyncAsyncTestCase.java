@@ -28,7 +28,7 @@ public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
 
     public void testMixedMulticast() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", new Apple(), null);
 
         assertNotNull(result);

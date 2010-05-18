@@ -67,7 +67,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
     public void testBasicAuthWithCxfClient() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send("cxfOutbound", "Hello", null);
 

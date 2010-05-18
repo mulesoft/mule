@@ -28,7 +28,7 @@ public class CorrelationResequencerTestCase extends FunctionalTestCase
 
     public void testResequencer() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://splitter", Arrays.asList("a", "b", "c", "d", "e", "f"), null);
 
         FunctionalTestComponent resequencer = getFunctionalTestComponent("test validator");
