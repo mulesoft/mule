@@ -133,7 +133,7 @@ public interface MuleMessage extends Serializable
      *
      * @param name the name or key of the property
      * @param scope The scope of the property to retrieve
-     * @return the property value or the defaultValue if the property does not exist in the specificed scope
+     * @return the property value or the defaultValue if the property does not exist in the specified scope
      */
     Object getProperty(String name, PropertyScope scope);
     
