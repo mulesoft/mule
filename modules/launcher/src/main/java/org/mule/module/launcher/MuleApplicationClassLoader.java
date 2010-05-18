@@ -57,7 +57,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
 
             if (logger.isInfoEnabled())
             {
-                logger.info("Library directory: " + libDir);
+                logger.info(String.format("[%s] Library directory: %s", appName, libDir));
             }
 
             if (libDir.exists() && libDir.canRead())
@@ -68,7 +68,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
                 if (!jars.isEmpty() && logger.isInfoEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("Loading the following jars:").append(SystemUtils.LINE_SEPARATOR);
+                    sb.append(String.format("[%s] Loading the following jars:", appName)).append(SystemUtils.LINE_SEPARATOR);
                     sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
                     for (File jar : jars)
@@ -92,7 +92,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug(String.format("[%s]", appName), e);
             }
         }
     }
