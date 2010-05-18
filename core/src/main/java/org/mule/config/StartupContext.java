@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public class StartupContext
 {
-
-    private static final ThreadLocal<StartupContext> info = new ThreadLocal<StartupContext>(){
+    private static final ThreadLocal<StartupContext> info = new ThreadLocal<StartupContext>()
+    {
         @Override
         protected StartupContext initialValue()
         {

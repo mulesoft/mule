@@ -57,8 +57,8 @@ public class MuleContainerWrapper implements WrapperListener
 
             Thread.currentThread().setContextClassLoader(muleSystemCl);
 
-            Class muleClass = Thread.currentThread().getContextClassLoader().loadClass(CLASSNAME_MULE_CONTAINER);
-            Constructor c = muleClass.getConstructor(String[].class);
+            Class<?> muleClass = Thread.currentThread().getContextClassLoader().loadClass(CLASSNAME_MULE_CONTAINER);
+            Constructor<?> c = muleClass.getConstructor(String[].class);
             mule = c.newInstance(new Object[] {args});
             Method startMethod = muleClass.getMethod("start", boolean.class, boolean.class);
             startMethod.invoke(mule, false, false);

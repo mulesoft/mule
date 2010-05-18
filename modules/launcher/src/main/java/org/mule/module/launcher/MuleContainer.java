@@ -34,17 +34,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleContainer
 {
-
     public static final String CLI_OPTIONS[][] = {
-            {"builder", "true", "Configuration Builder Type"},
-            {"config", "true", "Configuration File"},
-            {"idle", "false", "Whether to run in idle (unconfigured) mode"},
-            {"main", "true", "Main Class"},
-            {"mode", "true", "Run Mode"},
-            {"props", "true", "Startup Properties"},
-            {"production", "false", "Production Mode"},
-            {"debug", "false", "Configure Mule for JPDA remote debugging."},
-            {"app", "true", "Application to start"}
+        {"builder", "true", "Configuration Builder Type"},
+        {"config", "true", "Configuration File"},
+        {"idle", "false", "Whether to run in idle (unconfigured) mode"},
+        {"main", "true", "Main Class"},
+        {"mode", "true", "Run Mode"},
+        {"props", "true", "Startup Properties"},
+        {"production", "false", "Production Mode"},
+        {"debug", "false", "Configure Mule for JPDA remote debugging."},
+        {"app", "true", "Application to start"}
     };
 
     /**
@@ -101,19 +100,17 @@ public class MuleContainer
      */
     public static void main(String[] args) throws Exception
     {
-        MuleContainer server = new MuleContainer(args);
-        server.start(false, true);
-
+        MuleContainer container = new MuleContainer(args);
+        container.start(false, true);
     }
 
     public MuleContainer()
     {
-        init(new String[] {});
+        init(new String[0]);
     }
 
     public MuleContainer(String configResources)
     {
-        // setConfigurationResources(configResources);
         init(new String[] {"-config", configResources});
     }
 
@@ -201,7 +198,7 @@ public class MuleContainer
     {
         if (builderClassName != null)
         {
-            Class cls = ClassUtils.loadClass(builderClassName, MuleContainer.class);
+            Class<?> cls = ClassUtils.loadClass(builderClassName, MuleContainer.class);
             if (ConfigurationBuilder.class.isAssignableFrom(cls))
             {
                 MuleContainer.configBuilderClassName = builderClassName;
@@ -344,7 +341,6 @@ public class MuleContainer
      */
     private class MuleShutdownHook extends Thread
     {
-
         public MuleShutdownHook()
         {
             super();

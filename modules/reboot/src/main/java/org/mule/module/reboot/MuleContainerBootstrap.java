@@ -85,7 +85,7 @@ public class MuleContainerBootstrap
 
         if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory())
         {
-            throw new IllegalArgumentException("Either MULE_HOME is not set or does not contain a valid directory.");
+            throw new IllegalArgumentException("Either the system property mule.home is not set or does not contain a valid directory.");
         }
         return muleHome;
     }

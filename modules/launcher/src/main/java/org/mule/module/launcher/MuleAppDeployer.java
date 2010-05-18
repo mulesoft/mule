@@ -337,12 +337,12 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
     protected class ConfigFileWatcher extends FileWatcher
     {
-
         public ConfigFileWatcher(File watchedResource)
         {
             super(watchedResource);
         }
 
+        @Override
         protected synchronized void onChange(File file)
         {
             if (logger.isInfoEnabled())
@@ -355,5 +355,5 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             Thread.currentThread().setContextClassLoader(cl);
             redeploy();
         }
-            }
+    }
 }
