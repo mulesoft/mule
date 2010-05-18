@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * TODO this test does not use the Test scenarios, I think it would need a new Method
  * sendAndReceive It might make sense to leave this test as is because it tests that
- * the client also works witrh ReplyTo correctly
+ * the client also works with ReplyTo correctly
  */
 public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 {

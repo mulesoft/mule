@@ -137,9 +137,8 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
 
         send(scenarioCommit);
 
-        TestExceptionStrategy exceptionStrategy = (TestExceptionStrategy) muleContext.getRegistry()
-            .lookupService(serviceName)
-            .getExceptionListener();
+        TestExceptionStrategy exceptionStrategy = (TestExceptionStrategy) 
+            muleContext.getRegistry().lookupService(serviceName).getExceptionListener();
         exceptionStrategy.setExceptionCallback(new ExceptionCallback()
         {
             public void onException(Throwable t)

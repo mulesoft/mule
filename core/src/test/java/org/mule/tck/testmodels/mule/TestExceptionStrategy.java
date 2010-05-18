@@ -11,12 +11,11 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.DefaultExceptionStrategy;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
- * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the {@link org.mule.DefaultExceptionStrategy}
- * This is used to test that overriding the default Exception strategy works
+ * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the 
+ * {@link org.mule.DefaultExceptionStrategy}. This is used to test that overriding the default 
+ * Exception strategy works.
  */
 public class TestExceptionStrategy extends DefaultExceptionStrategy
 {
@@ -47,7 +46,7 @@ public class TestExceptionStrategy extends DefaultExceptionStrategy
     @Override
     public void exceptionThrown(Exception e)
     {
-        if(callback != null)
+        if (callback != null)
         {
             callback.onException(e);
         }
