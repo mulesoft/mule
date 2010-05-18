@@ -167,13 +167,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     {
         HttpResponse response = new HttpResponse();
 
-        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
+        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
         int status = HttpConstants.SC_OK;
 
-        if (tmp == null) {
-            tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
-        }
-        
         if (tmp != null)
         {
             status = Integer.valueOf(tmp.toString());
