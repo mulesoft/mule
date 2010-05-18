@@ -10,12 +10,14 @@
 
 package org.mule.transformer.simple;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transport.NullPayload;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     private Map addProperties = null;
     /** the properties map containing rename mappings for message properties */
     private Map renameProperties;
+    private String getProperty;
     private boolean overwrite = true;
     private PropertyScope scope;
 
@@ -177,6 +180,20 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                 }
             }
         }
+        
+        if (getProperty != null)
+        {
+            Object prop = message.getProperty(getProperty, scope);
+            if (prop != null)
+            {
+                message = new DefaultMuleMessage(prop, muleContext);
+            }
+            else
+            {
+                message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            }
+        }
+
         return message;
     }
 
@@ -214,6 +231,16 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     public void setRenameProperties(Map renameProperties)
     {
         this.renameProperties = renameProperties;
+    }
+
+    public String getGetProperty()
+    {
+        return getProperty;
+    }
+
+    public void setGetProperty(String getProperty)
+    {
+        this.getProperty = getProperty;
     }
 
     public boolean isOverwrite()

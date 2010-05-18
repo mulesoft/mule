@@ -254,7 +254,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return getPayload(outputType, getEncoding());
     }
 
-    MuleContext getMuleContext()
+    public MuleContext getMuleContext()
     {
         return muleContext;
     }
@@ -967,6 +967,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 if (transformer.isSourceTypeSupported(srcCls))
                 {
                     Object result = transformer.transform(this);
+                    // Update the RequestContext with the result of the transformation.
+                    RequestContext.internalRewriteEvent(this, false);
 
                     if (originalPayload == null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
                     {

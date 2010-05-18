@@ -62,7 +62,10 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
 
+        Thread.sleep(WAIT_TIME_MILLIS);
         muleContext.stop();
+        Thread.sleep(WAIT_TIME_MILLIS);
+
 
         assertNoLostMessages(NUM_MESSAGES, service);
         // Persistent queue is being used so seda queue is not emptied when service
@@ -102,6 +105,8 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         service.resume();
         Thread.sleep(WAIT_TIME_MILLIS);
         muleContext.stop();
+
+        Thread.sleep(WAIT_TIME_MILLIS);
 
         assertNoLostMessages(NUM_MESSAGES, service);
 

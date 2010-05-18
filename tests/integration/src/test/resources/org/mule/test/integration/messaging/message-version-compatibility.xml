@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+    xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.2 http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd">
+
+    <vm:connector name="vmConnector" queueEvents="true" />
+
+    <jms:activemq-connector name="jmsConnector" />
+
+    <jms:activemq-connector name="jmsLegacyConnector">
+        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
+    </jms:activemq-connector>
+
+    <script:script name="SetProperty" engine="groovy">
+         eventContext.getSession().setProperty("foo", "bar")
+         return eventContext.transformMessage()
+    </script:script>
+
+    <script:script name="GetProperty" engine="groovy">
+        if (!("bar".equals(eventContext.getSession().getProperty("foo"))))
+            throw new IllegalStateException()
+         return eventContext.transformMessage()
+    </script:script>
+
+    <model>
+        <!-- Send old format, receive old format -->
+        <service name="s1">
+            <inbound>
+                <vm:inbound-endpoint path="in1" synchronous="false" />
+            </inbound>
+            <script:component script-ref="SetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint connector-ref="jmsLegacyConnector" queue="q1" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        <service name="r1">
+            <inbound>
+                <jms:inbound-endpoint connector-ref="jmsLegacyConnector" queue="q1" />
+            </inbound>
+            <script:component script-ref="GetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out1" synchronous="false" />
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <!-- Send old format, receive new format -->
+        <service name="s2">
+            <inbound>
+                <vm:inbound-endpoint path="in2" synchronous="false" />
+            </inbound>
+            <script:component script-ref="SetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint connector-ref="jmsLegacyConnector" queue="q2" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        <service name="r2">
+            <inbound>
+                <jms:inbound-endpoint connector-ref="jmsConnector" queue="q2" />
+            </inbound>
+            <script:component script-ref="GetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out2" synchronous="false" />
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <!-- Send new format, receive old format -->
+        <service name="s3">
+            <inbound>
+                <vm:inbound-endpoint path="in3" synchronous="false" />
+            </inbound>
+            <script:component script-ref="SetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="q3" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        <service name="r3">
+            <inbound>
+                <jms:inbound-endpoint connector-ref="jmsLegacyConnector" queue="q3" />
+            </inbound>
+            <script:component script-ref="GetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out3" synchronous="false" />
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <!-- Send new format, receive new format -->
+        <service name="s4">
+            <inbound>
+                <vm:inbound-endpoint path="in4" synchronous="false" />
+            </inbound>
+            <script:component script-ref="SetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="q4" />
+                </pass-through-router>
+            </outbound>
+        </service>
+        <service name="r4">
+            <inbound>
+                <jms:inbound-endpoint connector-ref="jmsConnector" queue="q4" />
+            </inbound>
+            <script:component script-ref="GetProperty" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out4" synchronous="false" />
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

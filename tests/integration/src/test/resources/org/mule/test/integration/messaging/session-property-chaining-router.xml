@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2" xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+
+    <spring:bean id="nonSerializable" class="org.mule.tck.NonSerializableObject" />
+
+    <model>
+        <service name="Service1">
+            <inbound>
+                <vm:inbound-endpoint path="in" synchronous="true">
+                    <message-properties-transformer scope="session">
+                        <add-message-property key="foo" value-ref="nonSerializable" />
+                    </message-properties-transformer>
+                </vm:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <chaining-router>
+                    <cxf:outbound-endpoint synchronous="true" 
+                        address="http://localhost:65082/services/EchoUMO" operation="echo" />
+                    <vm:outbound-endpoint path="service3" synchronous="true">
+                        <custom-transformer class="org.mule.transformer.simple.MessagePropertiesTransformer">
+                            <spring:property name="getProperty" value="foo" />
+                            <spring:property name="scopeName" value="session" />
+                        </custom-transformer>
+                    </vm:outbound-endpoint>
+                </chaining-router>
+            </outbound>
+        </service>
+
+        <service name="Service2">
+            <inbound>
+                <cxf:inbound-endpoint synchronous="true"
+                    address="http://localhost:65082/services/EchoUMO"
+                    serviceClass="org.mule.test.integration.tck.Echo" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="Service3">
+            <inbound>
+                <vm:inbound-endpoint path="service3" synchronous="true" />
+            </inbound>
+            <echo-component />
+        </service>
+    </model>
+</mule>

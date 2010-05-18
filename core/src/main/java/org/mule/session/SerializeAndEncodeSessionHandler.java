@@ -10,20 +10,16 @@
 
 package org.mule.session;
 
+import java.io.IOException;
+
+import org.apache.commons.lang.SerializationUtils;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
-import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
-
-import java.io.IOException;
-
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * A session handler used to store and retrieve session information on an
@@ -32,14 +28,14 @@ import org.apache.commons.logging.LogFactory;
  * wire). The session is stored in the "MULE_SESSION" property as Base64 encoded
  * byte array.
  */
-public class SerializeAndEncodeSessionHandler implements SessionHandler
+public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandler
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
-
+    @Override
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
-        String serializedEncodedSession = (String) message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
+        String serializedEncodedSession = (String) message.getProperty(MuleProperties.MULE_SESSION_PROPERTY);
+        message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
         
         if (serializedEncodedSession != null)
         {
@@ -52,17 +48,10 @@ public class SerializeAndEncodeSessionHandler implements SessionHandler
         return session;
     }
 
-    /**
-     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
-     */
-    public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
-    {
-        session = retrieveSessionInfoFromMessage(message);
-    }
-
+    @Override
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
-    {
-        byte[] serializedSession = SerializationUtils.serialize(session);
+    {        
+        byte[] serializedSession = SerializationUtils.serialize(removeNonSerializableProperties(session));
         String serializedEncodedSession;
         try
         {
@@ -78,13 +67,5 @@ public class SerializeAndEncodeSessionHandler implements SessionHandler
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
         message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession);
-    }
-    
-    /**
-     * @deprecated This method is no longer needed and will be removed in the next major release
-     */
-    public String getSessionIDKey()
-    {
-        return "ID";
     }
 }

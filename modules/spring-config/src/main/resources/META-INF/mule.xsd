@@ -678,15 +678,15 @@
     <xsd:complexType name="customEntryPointResolverSetType">
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverSetType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -726,15 +726,15 @@
     <xsd:complexType name="customEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -1535,15 +1535,15 @@
     <xsd:complexType name="customTransactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="jndiTransactionManagerType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2030,15 +2030,15 @@
     <xsd:complexType name="customFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2133,15 +2133,15 @@
     <xsd:complexType name="customInterceptorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptorType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2222,15 +2222,15 @@
     <xsd:complexType name="customTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2780,15 +2780,15 @@
     <xsd:complexType name="customSecurityProviderType">
         <xsd:complexContent>
             <xsd:extension base="securityProviderType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="provider-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2983,15 +2983,15 @@
     <xsd:complexType name="customExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="endpointExceptionStrategyType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3015,17 +3015,17 @@
     <xsd:complexType name="customConnectorType">
         <xsd:complexContent>
             <xsd:extension base="connectorType">
-            	<!-- This is already on the standard connector (but probably shouldn't be...)
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
-	             -->
+                <!-- This is already on the standard connector (but probably shouldn't be...)
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                 -->
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3287,15 +3287,15 @@
     <xsd:complexType name="customCorrelationAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="messageChunkingAggregatorRouterType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3895,15 +3895,15 @@
     <xsd:complexType name="customCatchAllStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractCatchAllStrategyType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3938,15 +3938,15 @@
     <xsd:complexType name="customForwardingCatchAllStrategyType">
         <xsd:complexContent>
             <xsd:extension base="forwardingCatchAllStrategyType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3989,15 +3989,15 @@
     <xsd:complexType name="customMessageInfoMappingType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageInfoMappingType">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4024,15 +4024,15 @@
     <xsd:complexType name="customLifecycleAdapterFactory">
         <xsd:complexContent>
             <xsd:extension base="abstractLifecycleAdapterFactory">
-	            <xsd:sequence>
-	                <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Spring-style property element for custom configuration.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:element>
-	            </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>

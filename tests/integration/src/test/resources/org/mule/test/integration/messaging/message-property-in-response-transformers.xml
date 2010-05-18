@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+    xmlns:mule-xml="http://www.mulesource.org/schema/mule/xml/2.2"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+       http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd">
+    
+    <model>
+        <service name="test">
+            <inbound>
+                <cxf:inbound-endpoint  address="http://localhost:63081/ser" frontend="simple">
+                    <response-transformers>
+                        <message-properties-transformer>
+                            <add-message-property key="foo" value="bar"/>
+                        </message-properties-transformer>
+                        <mule-xml:xslt-transformer xsl-file="org/mule/test/integration/messaging/parametrized-transform.xslt" >
+                            <mule-xml:context-property key="prop" value="#[mule:message.header(foo)]"/>
+                        </mule-xml:xslt-transformer>
+                    </response-transformers>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <echo-component />
+        </service>
+    </model>
+</mule>

@@ -10,6 +10,19 @@
 
 package org.mule;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -31,20 +44,6 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for
@@ -96,7 +95,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     public DefaultMuleSession(MuleContext muleContext)
     {
-        this(null, muleContext);
+        this((Service) null, muleContext);
     }
 
     public DefaultMuleSession(Service service, MuleContext muleContext)
@@ -158,6 +157,21 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         else if (logger.isDebugEnabled())
         {
             logger.debug("Got session with id: " + id);
+        }
+    }
+
+    public DefaultMuleSession(MuleSession session, MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+        this.id = session.getId();
+        this.securityContext = session.getSecurityContext();
+        this.service = session.getService();
+        this.valid = session.isValid();
+
+        this.properties = new HashMap<String, Object>();
+        for (Object key : session.getPropertyNamesAsSet())
+        {
+            this.properties.put(key, session.getProperty(key));
         }
     }
 
@@ -261,14 +275,15 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
                 if (connector instanceof AbstractConnector)
                 {
-                    ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(this,
-                            event.getMessage());
+                    ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(
+                        new DefaultMuleSession(this, muleContext), event.getMessage());
                 }
                 else
                 {
                     // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using  default");
-                    new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
+                    new MuleSessionHandler().storeSessionInfoToMessage(
+                        new DefaultMuleSession(this, muleContext), event.getMessage());
                 }
 
                 ((OutboundEndpoint) event.getEndpoint()).dispatch(event);
@@ -324,13 +339,14 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                 if (connector instanceof AbstractConnector)
                 {
                     ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(this,
-                            event.getMessage());
+                        event.getMessage());
                 }
                 else
                 {
                     // TODO in Mule 2.0 we'll flatten the Connector hierachy
                     logger.warn("A session handler could not be obtained, using default.");
-                    new MuleSessionHandler().storeSessionInfoToMessage(this, event.getMessage());
+                    new MuleSessionHandler().storeSessionInfoToMessage(
+                        new DefaultMuleSession(this, muleContext), event.getMessage());
                 }
 
                 MuleMessage response = ((OutboundEndpoint) event.getEndpoint()).send(event);
@@ -511,12 +527,12 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @deprecated Use getPropertyNamesAsSet() instead
      */
     @Deprecated
-    public Iterator getPropertyNames()
+    public Iterator<String> getPropertyNames()
     {
         return properties.keySet().iterator();
     }
 
-    public Set getPropertyNamesAsSet()
+    public Set<String> getPropertyNamesAsSet()
     {
         return Collections.unmodifiableSet(properties.keySet());
     }

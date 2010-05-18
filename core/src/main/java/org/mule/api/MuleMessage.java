@@ -485,4 +485,6 @@ public interface MuleMessage extends Serializable
      */
     @Deprecated
     Object getOrginalPayload();
+
+    MuleContext getMuleContext();
 }

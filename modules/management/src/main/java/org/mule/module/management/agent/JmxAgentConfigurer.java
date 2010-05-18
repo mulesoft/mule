@@ -13,15 +13,15 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.RegistrationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.management.remote.rmi.RMIConnectorServer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Mule now binds to a platform mbeanserver by default and jmx agent is always registered via a

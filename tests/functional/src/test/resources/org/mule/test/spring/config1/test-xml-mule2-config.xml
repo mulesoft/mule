@@ -141,7 +141,7 @@
         </custom-exception-strategy>
 
         <custom-entry-point-resolver-set class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet">
-        	<spring:property name="testProperty" value="testValue" />
+            <spring:property name="testProperty" value="testValue" />
         </custom-entry-point-resolver-set>
 
         <service name="orangeComponent">
@@ -180,7 +180,7 @@
                 <inbound-endpoint address="test://response1"/>
                 <inbound-endpoint ref="appleResponseEndpoint"/>
                 <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator">
-                	<spring:property name="testProperty" value="testValue" />
+                    <spring:property name="testProperty" value="testValue" />
                 </custom-async-reply-router>
             </async-reply>
 
@@ -205,7 +205,7 @@
                 </selective-consumer-router>
                 <idempotent-receiver-router/>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy">
-                	<spring:property name="testProperty" value="testValue" />
+                    <spring:property name="testProperty" value="testValue" />
                 </custom-catch-all-strategy>
             </inbound>
 
@@ -235,10 +235,10 @@
         
         <service name="anotherComponent">
             <inbound>
-				<inbound-endpoint address="test://KiwiIn" />
-				<custom-correlation-aggregator-router class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
-					<spring:property name="testProperty" value="testValue" />
-				</custom-correlation-aggregator-router>
+                <inbound-endpoint address="test://KiwiIn" />
+                <custom-correlation-aggregator-router class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
+                    <spring:property name="testProperty" value="testValue" />
+                </custom-correlation-aggregator-router>
             </inbound>
             <component class="org.mule.tck.testmodels.fruit.Kiwi" />
         </service>
