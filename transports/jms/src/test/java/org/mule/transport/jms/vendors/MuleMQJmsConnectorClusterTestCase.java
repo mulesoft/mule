@@ -16,12 +16,11 @@ import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsTopicResolver;
 import org.mule.transport.jms.mulemq.MuleMQJmsConnector;
 
-public class MuleMQJmsConnectorTestCase extends FunctionalTestCase
+public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase
 {
-    @Override
     protected String getConfigResources()
     {
-        return "mulemq-config.xml";
+        return "mulemq-cluster-config.xml";
     }
 
     public void testDefaultConfig() throws Exception
@@ -30,13 +29,11 @@ public class MuleMQJmsConnectorTestCase extends FunctionalTestCase
         assertNotNull(c);
         assertTrue(c instanceof MuleMQJmsConnector);
         MuleMQJmsConnector mqc = (MuleMQJmsConnector)c;
-
-        assertFalse(mqc.isInCluster());
-        
+        assertTrue(mqc.isInCluster());
         assertTrue(c.isEagerConsumer());
         JmsTopicResolver resolver = c.getTopicResolver();
         assertNotNull("Topic resolver must not be null.", resolver);
         assertTrue("Wrong topic resolver configured on the connector.",
-                   resolver instanceof DefaultJmsTopicResolver);
+                   resolver instanceof DefaultJmsTopicResolver);   
     }
 }

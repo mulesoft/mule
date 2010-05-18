@@ -17,23 +17,27 @@ import org.junit.Test;
  */
 public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
-    private static final String CONNECTOR_NAME = "jmsConnector";
-
-    public JmsSingleTransactionNoneTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-single-tx-NONE.xml";
     }
 
+    @Override
+    protected void suitePreSetUp() throws Exception
+    {
+        super.suitePreSetUp();
+
+        purge(getInboundQueueName());
+        purge(getJmsConfig().getMiddleDestinationName());
+        purge(getOutboundQueueName());
+    }
+
     @Test
     public void testNoneTx() throws Exception
     {
-        send();
-        receiveAndAssert();
-        receiveAndAssertNone();
+        send(scenarioNoTx);
+        receive(scenarioNoTx);
+        receive(scenarioNotReceive);
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: JmsSingleTransactionAlwaysBeginConfigurationTestCase.java 14304 2009-03-15 11:19:11Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,40 +10,20 @@
 
 package org.mule.transport.jms.integration;
 
-import java.util.Properties;
-
 import org.junit.Test;
 
-public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends AbstractJmsFunctionalTestCase
+/**
+ * Test all combinations of (inbound) ALWAYS_JOIN.  They should all fail.
+ */
+public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase extends
+    AbstractJmsSingleTransactionSingleServiceTestCase
 {
-    public static final String JMS_QUEUE_INPUT_CONF_A = "in1";
-    public static final String JMS_QUEUE_OUTPUT_CONF_A = "out1";
-    public static final String JMS_QUEUE_INPUT_CONF_B = "in2";
-    public static final String JMS_QUEUE_OUTPUT_CONF_B = "out2";
-    public static final String JMS_QUEUE_INPUT_CONF_C = "in3";
-    public static final String JMS_QUEUE_OUTPUT_CONF_C = "out3";
-
-    @Override
-    protected Properties getStartUpProperties()
-    {
-        Properties props = super.getStartUpProperties();
-        // Inject endpoint names into the config
-        props.put(INBOUND_ENDPOINT_KEY + "1", getJmsConfig().getInboundEndpoint() + "1");
-        props.put(INBOUND_ENDPOINT_KEY + "2", getJmsConfig().getInboundEndpoint() + "2");
-        props.put(INBOUND_ENDPOINT_KEY + "3", getJmsConfig().getInboundEndpoint() + "3");
-        props.put(OUTBOUND_ENDPOINT_KEY + "1", getJmsConfig().getOutboundEndpoint() + "1");
-        props.put(OUTBOUND_ENDPOINT_KEY + "2", getJmsConfig().getOutboundEndpoint() + "2");
-        props.put(OUTBOUND_ENDPOINT_KEY + "3", getJmsConfig().getOutboundEndpoint() + "3");
-        return props;
-    }
-
     protected String getConfigResources()
     {
-        return "integration/jms-single-tx-ALWAYS_BEGIN.xml";
+        return "integration/jms-single-tx-single-service-always-join.xml";
     }
-
     @Test
-    public void testConfigurationA() throws Exception
+    public void testNone() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
         scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_A);
@@ -52,14 +32,11 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
         scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_A);
 
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        runTransactionFail("testNone");
     }
 
     @Test
-    public void testConfigurationB() throws Exception
+    public void testAlwaysBegin() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
         scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_B);
@@ -68,14 +45,11 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
         scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_B);
 
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        runTransactionFail("testAlwaysBegin");
     }
 
     @Test
-    public void testConfigurationC() throws Exception
+    public void testBeginOrJoin() throws Exception
     {
         scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
         scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_C);
@@ -84,9 +58,32 @@ public class JmsSingleTransactionAlwaysBeginConfigurationTestCase extends Abstra
         scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
         scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_C);
 
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        runTransactionFail("testBeginOrJoin");
+    }
+
+    @Test
+    public void testAlwaysJoin() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+
+        runTransactionFail("testAlwaysJoin");
+    }
+
+    @Test
+    public void testJoinIfPossible() throws Exception
+    {
+        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_E);
+        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
+        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
+        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_E);
+
+        runTransactionFail("testJoinIfPossible");
     }
 }

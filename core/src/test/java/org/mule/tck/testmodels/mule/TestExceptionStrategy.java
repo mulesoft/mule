@@ -11,6 +11,8 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.DefaultExceptionStrategy;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
  * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the {@link org.mule.DefaultExceptionStrategy}
@@ -18,6 +20,8 @@ import org.mule.DefaultExceptionStrategy;
  */
 public class TestExceptionStrategy extends DefaultExceptionStrategy
 {
+    private ExceptionCallback callback;
+    
     private String testProperty;
 
     public String getTestProperty()
@@ -28,5 +32,34 @@ public class TestExceptionStrategy extends DefaultExceptionStrategy
     public void setTestProperty(String testProperty)
     {
         this.testProperty = testProperty;
+    }
+/*    
+    protected void defaultHandler(Throwable t)
+    {
+        super.defaultHandler(t);
+        if(callback != null)
+        {
+            callback.onException(t);
+        }
+    }
+*/
+    
+    @Override
+    public void exceptionThrown(Exception e)
+    {
+        if(callback != null)
+        {
+            callback.onException(e);
+        }
+    }
+
+    public interface ExceptionCallback
+    {
+        void onException(Throwable t);
+    }
+
+    public void setExceptionCallback(ExceptionCallback exceptionCallback)
+    {
+        this.callback = exceptionCallback;        
     }
 }

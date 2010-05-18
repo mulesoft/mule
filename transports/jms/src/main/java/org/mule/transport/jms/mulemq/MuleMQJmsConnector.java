@@ -12,6 +12,7 @@ package org.mule.transport.jms.mulemq;
 
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.ExceptionHelper;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -22,6 +23,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 
 public class MuleMQJmsConnector extends JmsConnector
 {
@@ -89,6 +91,8 @@ public class MuleMQJmsConnector extends JmsConnector
 
     public boolean supportJms102bSpec = false;
 
+    private boolean inCluster = false;
+    
     public MuleMQJmsConnector(MuleContext context)
     {
         super(context);
@@ -207,6 +211,14 @@ public class MuleMQJmsConnector extends JmsConnector
     public void setRealmURL(String realmURL)
     {
         this.realmURL = realmURL;
+        if (realmURL != null)
+        {
+            String[] realms = realmURL.split(",");
+            if (realms != null && realms.length > 1)
+            {
+                this.setInCluster(true);
+            }
+        }
     }
 
     public String getBufferOutput()
@@ -369,13 +381,69 @@ public class MuleMQJmsConnector extends JmsConnector
         return retryCommit;
     }
 
-	public boolean isEnableMultiplexedConnections() 
-	{
-		return enableMultiplexedConnections;
-	}
+    public boolean isEnableMultiplexedConnections()
+    {
+        return enableMultiplexedConnections;
+    }
 
-	public void setEnableMultiplexedConnections(boolean enableMultiplexedConnections) 
-	{
-		this.enableMultiplexedConnections = enableMultiplexedConnections;
-	}
+    public void setEnableMultiplexedConnections(boolean enableMultiplexedConnections)
+    {
+        this.enableMultiplexedConnections = enableMultiplexedConnections;
+    }
+
+    public boolean isInCluster()
+    {
+        return inCluster;
+    }
+
+    public void setInCluster(boolean inCluster)
+    {
+        this.inCluster = inCluster;
+    }
+
+    public void onException(JMSException jmsException)
+    {
+        Throwable th = ExceptionHelper.getRootException(jmsException);
+        if (th == null) th = jmsException;
+        String errMsg = th.getMessage();
+
+        if (errMsg.contains("Channel is full :"))
+        {
+            if(logger.isWarnEnabled())
+            {
+                // TODO : externalize strings
+                StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+                msg.append(th.getMessage());
+                msg.append("Older Messages will be discarded by MULE MQ.To prevent message loss use transacted outbound-endpoint");
+                msg.append("Refer to 'Queue Capacity' at http://www.mulesoft.org/display/MQ/Configuring+Mule+MQ#ConfiguringMuleMQ-ConfiguringQueues");
+                // This error does not mean that connection has been closed. Log Capacity
+                // is full warn and return.
+                logger.warn(msg.toString(),th);
+            }
+        }
+        else if (this.isInCluster() && errMsg.contains("Disconnected from :"))
+        {
+            // TODO : externalize strings
+            StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+            msg.append(th.getMessage());
+            msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
+            // Nothing to do here, log error and return
+            logger.warn(msg.toString(),th);
+        }
+        else if (this.isInCluster() && errMsg.contains("Reconnected to :"))
+        {
+            // TODO : externalize strings
+            StringBuffer msg = new StringBuffer("MuleMQJmsConnector.onException() received exception: ");
+            msg.append(th.getMessage());
+            msg.append("If using Mule MQ in a cluster Mule ESB will reconnect automatically in a few seconds");
+            // Nothing to do here, log message and return
+            logger.warn(msg.toString(),th);
+        }
+        else
+        {
+            // This is connection error in a single node server. Follow regular
+            // connection error logic
+            super.onException(jmsException);
+        }
+    }
 }

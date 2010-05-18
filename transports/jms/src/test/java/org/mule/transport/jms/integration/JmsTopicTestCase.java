@@ -17,13 +17,6 @@ import org.junit.Test;
  */
 public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsTopicTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-        // This test actually uses the topic as if it were a queue
-        //setUseTopics(true);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-topic.xml";
@@ -33,22 +26,22 @@ public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
     public void testJmsTopic() throws Exception
     {
         // One message is sent.
-        send();
+        dispatchMessage();
         // The same message is read twice from the same JMS topic.
-        receiveAndAssert();
-        receiveAndAssert();
+        receiveMessage();
+        receiveMessage();
     }
 
     @Test
     public void testMultipleSend() throws Exception
     {
         // One message is sent.
-        send();
-        send();
+        dispatchMessage();
+        dispatchMessage();
         // The same message is read twice from the same JMS topic.
-        receiveAndAssert();
-        receiveAndAssert();
-        receiveAndAssert();
-        receiveAndAssert();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
     }
 }

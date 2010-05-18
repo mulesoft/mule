@@ -17,11 +17,6 @@ import org.junit.Test;
  */
 public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue.xml";
@@ -30,26 +25,20 @@ public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testJmsQueue() throws Exception
     {
-        send(DEFAULT_INPUT_MESSAGE);
-        
-        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, receive());
-        
-        // No more messages
-        assertNull(receiveNoWait());
+        dispatchMessage();
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testMultipleSend() throws Exception
     {
-        send(DEFAULT_INPUT_MESSAGE);
-        send(DEFAULT_INPUT_MESSAGE);
-        send(DEFAULT_INPUT_MESSAGE);
-        
-        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, receive());
-        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, receive());
-        assertPayloadEquals(DEFAULT_OUTPUT_MESSAGE, receive());
-
-        // No more messages
-        assertNull(receiveNoWait());
+        dispatchMessage();
+        dispatchMessage();
+        dispatchMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 }

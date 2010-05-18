@@ -15,8 +15,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.awt.Color;
 import java.io.Serializable;
 
-import javax.jms.Message;
-
 import org.junit.Test;
 
 /**
@@ -24,11 +22,6 @@ import org.junit.Test;
  */
 public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueMessageTypesTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue-message-types.xml";
@@ -37,48 +30,44 @@ public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testTextMessage() throws Exception
     {
-        send("TEST MESSAGE");
-        Message output = receive();
-        assertPayloadEquals("TEST MESSAGE", output);
-        assertNull(receiveNoWait());
+        dispatchMessage("TEST MESSAGE");
+        receiveMessage("TEST MESSAGE");
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testNumberMessage() throws Exception
     {
-        send(25.75);
-        Message output = receive();
-        assertPayloadEquals(25.75, output);
-        assertNull(receiveNoWait());
+        dispatchMessage(25.75);
+        receiveMessage(25.75);
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testBinaryMessage() throws Exception
     {
         byte[] bytes = new byte[] {'\u0000', '\u007F', '\u0033', '\u007F', '\u0055'};
-        send(bytes);
-        Message output = receive();
-        assertPayloadEquals(bytes, output);
-        assertNull(receiveNoWait());
+        dispatchMessage(bytes);
+        receiveMessage(bytes);
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testJdkObjectMessage() throws Exception
     {
-        Serializable obj = new Color(0);        
-        send(obj);
-        Message output = receive();
-        assertPayloadEquals(obj, output);
-        assertNull(receiveNoWait());
+        Serializable obj = new Color(0);
+        dispatchMessage(obj);
+        receiveMessage(obj);
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testCustomObjectMessage() throws Exception
     {
         Serializable obj = new Apple();
-        send(obj);
-        Message output = receive();
-        assertPayloadEquals(obj, output);
-        assertNull(receiveNoWait());
+        dispatchMessage(obj);
+        receiveMessage(obj);
+        receive(scenarioNotReceive);
     }
+
 }

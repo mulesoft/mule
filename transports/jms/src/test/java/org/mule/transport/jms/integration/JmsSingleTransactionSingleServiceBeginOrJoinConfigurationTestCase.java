@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: JmsSingleTransactionAlwaysBeginConfigurationTestCase.java 14304 2009-03-15 11:19:11Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,21 +10,14 @@
 
 package org.mule.transport.jms.integration;
 
-import org.junit.Test;
-
-public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
+/**
+ * Test all combinations of (inbound) BEGIN_OR_JOIN.  They should all pass.
+ */
+public class JmsSingleTransactionSingleServiceBeginOrJoinConfigurationTestCase extends
+    AbstractJmsSingleTransactionSingleServiceTestCase
 {
     protected String getConfigResources()
     {
-        return "integration/jms-single-tx-BEGIN_OR_JOIN_AND_ALWAYS_BEGIN.xml";
-    }
-
-    @Test
-    public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
-    {
-        send(scenarioCommit);
-        receive(scenarioRollback);
-        receive(scenarioCommit);
-        receive(scenarioNotReceive);
+        return "integration/jms-single-tx-single-service-begin-or-join.xml";
     }
 }

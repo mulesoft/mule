@@ -10,17 +10,17 @@
 
 package org.mule.transport.jms.integration;
 
+import javax.jms.Connection;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.junit.Test;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsDurableTopicTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-        setUseTopics(true);
-    }
+    private String clientId;
 
     protected String getConfigResources()
     {
@@ -31,20 +31,88 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
     public void testProviderDurableSubscriber() throws Exception
     {
         setClientId("Client1");
-        assertNull(receiveNoWait());
+        receive(scenarioNotReceive);
         setClientId("Client2");
-        assertNull(receiveNoWait());
+        receive(scenarioNotReceive);
 
         setClientId("Sender");
-        send();
+        send(scenarioNonTx);
 
         setClientId("Client1");
-        Message output = receive();
-        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
-        assertNull(receiveNoWait());
+        receive(scenarioNonTx);
+        receive(scenarioNotReceive);
         setClientId("Client2");
-        output = receive();
-        assertPayloadEquals(DEFAULT_INPUT_MESSAGE, output);
-        assertNull(receiveNoWait());
+        receive(scenarioNonTx);
+        receive(scenarioNotReceive);
+    }
+
+    Scenario scenarioNonTx = new NonTransactedScenario()
+    {
+        public String getOutputDestinationName()
+        {
+            return getJmsConfig().getBroadcastDestinationName();
+        }
+    };
+
+    Scenario scenarioNotReceive = new ScenarioNotReceive()
+    {
+        public String getOutputDestinationName()
+        {
+            return getJmsConfig().getBroadcastDestinationName();
+        }
+    };
+
+    public Message receive(Scenario scenario) throws Exception
+    {
+        Connection connection = null;
+        try
+        {
+            connection = getConnection(true, false);
+            connection.setClientID(getClientId());
+            connection.start();
+            Session session = null;
+            try
+            {
+                session = connection.createSession(scenario.isTransacted(), scenario.getAcknowledge());
+                Topic destination = session.createTopic(scenario.getOutputDestinationName());
+                MessageConsumer consumer = null;
+                try
+                {
+                    consumer = session.createDurableSubscriber(destination, getClientId());
+                    return scenario.receive(session, consumer);
+                }
+                finally
+                {
+                    if (consumer != null)
+                    {
+                        consumer.close();
+                    }
+                }
+            }
+            finally
+            {
+                if (session != null)
+                {
+                    session.close();
+                }
+            }
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                connection.close();
+            }
+        }
+    }
+
+    public String getClientId()
+    {
+        return clientId;
+    }
+
+    public void setClientId(String clientId)
+    {
+        this.clientId = clientId;
     }
 }

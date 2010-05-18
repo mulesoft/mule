@@ -19,11 +19,6 @@ import org.junit.Test;
  */
 public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsQueueWithCompressionTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
-
     protected String getConfigResources()
     {
         return "integration/jms-queue-with-compression.xml";
@@ -33,20 +28,20 @@ public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCa
     public void testJmsQueue() throws Exception
     {
         // Lets test it doesn't blow up with serialized objects
-        send(new Apple());
-        receiveAndAssert();
-        assertNull(receiveNoWait());
+        dispatchMessage(new Apple());
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 
     @Test
     public void testMultipleSend() throws Exception
     {
-        send();
-        send();
-        send();
-        receiveAndAssert();
-        receiveAndAssert();
-        receiveAndAssert();
-        assertNull(receiveNoWait());
+        dispatchMessage();
+        dispatchMessage();
+        dispatchMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 }
