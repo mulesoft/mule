@@ -1000,7 +1000,7 @@
         </xsd:sequence>
         <xsd:attribute name="enableNotifications" type="xsd:boolean">
             <xsd:annotation>
-                <xsd:documentation>Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs.
+                <xsd:documentation>Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
