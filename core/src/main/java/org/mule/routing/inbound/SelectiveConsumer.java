@@ -57,14 +57,11 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
             return true;
         }
 
-        MuleMessage message = event.getMessage();
-
         if (transformFirst)
         {
             try
             {
-                Object payload = event.transformMessage();
-                message = new DefaultMuleMessage(payload, message, muleContext);
+                event.transformMessage();
             }
             catch (TransformerException e)
             {
@@ -74,7 +71,7 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
             }
         }
 
-        boolean result = filter.accept(message);
+        boolean result = filter.accept(event.getMessage());
 
         if (logger.isDebugEnabled())
         {
@@ -87,14 +84,7 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
 
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
-        if (this.isMatch(event))
-        {
-            return new MuleEvent[]{event};
-        }
-        else
-        {
-            return null;
-        }
+        return new MuleEvent[]{event};
     }
 
     public Filter getFilter()
