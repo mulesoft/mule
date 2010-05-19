@@ -17,9 +17,13 @@ public class MuleClientTestCase extends AbstractMuleClientTestCase
 
     public void testCreateMuleClient() throws MuleException
     {
+        assertNotNull(muleContext);
         MuleClient muleClient = new MuleClient(muleContext);
         assertEquals(muleContext, muleClient.getMuleContext());
         assertTrue(muleContext.isInitialised());
+
+        muleContext.start();
+
         assertTrue(muleContext.isStarted());
         muleClient.dispatch("test://test", "message", null);
         muleClient.send("test://test", "message", null);
