@@ -23,7 +23,7 @@ public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase
 
     public void testCreateMuleClient() throws MuleException
     {
-        MuleClient muleClient = new MuleClient(muleContext);
+        MuleClient muleClient = new MuleClient();
         assertNotSame(muleContext, muleClient.getMuleContext());
         assertTrue(muleClient.getMuleContext().isInitialised());
         assertTrue(muleClient.getMuleContext().isStarted());
