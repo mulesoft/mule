@@ -15,6 +15,7 @@ import org.mule.transport.ajax.embedded.AjaxConnector;
 
 public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 {
+    @Override
     public Connector createConnector() throws Exception
     {
         AjaxConnector c = new AjaxConnector(muleContext);
@@ -25,11 +26,13 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "ajax:http://0.0.0.0:58080/service/request";

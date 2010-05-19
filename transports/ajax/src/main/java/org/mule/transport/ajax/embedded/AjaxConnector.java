@@ -12,7 +12,6 @@ package org.mule.transport.ajax.embedded;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -26,14 +25,12 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxMuleMessageFactory;
+import org.mule.transport.ajax.AjaxServletContextListener;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
@@ -306,20 +303,11 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 
     protected ContinuationCometdServlet createServletForConnector(Connector connector, ImmutableEndpoint endpoint) throws MuleException
     {
-
         ContinuationCometdServlet servlet = new MuleAjaxServlet();
 
         Context context = new Context(this.getHttpServer(), "/", Context.NO_SESSIONS);
         context.setConnectorNames(new String[]{connector.getName()});
-        context.addEventListener(new ServletContextListener() {
-            public void contextInitialized(ServletContextEvent sce)
-            {
-                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
-                sce.getServletContext().setAttribute(MuleAjaxServlet.AJAX_CONNECTOR_NAME_PROPERTY, getName());
-            }
-
-            public void contextDestroyed(ServletContextEvent sce) { }
-        });
+        context.addEventListener(new AjaxServletContextListener(muleContext, getName()));
 
         ServletHolder holder = new ServletHolder();
         holder.setServlet(servlet);

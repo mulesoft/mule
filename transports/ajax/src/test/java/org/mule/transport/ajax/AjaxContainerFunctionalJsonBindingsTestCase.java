@@ -10,11 +10,7 @@
 
 package org.mule.transport.ajax;
 
-import org.mule.api.config.MuleProperties;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -31,19 +27,11 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
-        c.addEventListener(new ServletContextListener() {
-            public void contextInitialized(ServletContextEvent sce)
-            {
-                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
-            }
-
-            public void contextDestroyed(ServletContextEvent sce) { }
-        });
-
+        c.addEventListener(new AjaxServletContextListener(muleContext, null));
+        
         httpServer.start();
 
         super.doSetUp();
-
     }
 
     @Override
