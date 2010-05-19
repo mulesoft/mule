@@ -34,10 +34,9 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
     
-    public MuleMessage executeStatement(JdbcConnector connector,
-            ImmutableEndpoint endpoint,MuleEvent event,long timeout) throws Exception
+    public MuleMessage executeStatement(JdbcConnector connector, ImmutableEndpoint endpoint,
+        MuleEvent event, long timeout) throws Exception
     {
-            
         logger.debug("Trying to receive a message with a timeout of " + timeout);
         
         String[] stmts = connector.getReadAndAckStatements(endpoint);

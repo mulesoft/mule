@@ -41,8 +41,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispose()
     {
         // template method
-    }
-
+    } 
+    
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         if (logger.isDebugEnabled())
@@ -53,17 +54,18 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         doSend(event);
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         // Use a strategy pattern to choose a particular strategy to handle the SQL request
-        ImmutableEndpoint endpoint = event.getEndpoint();
-        JdbcConnector connector = (JdbcConnector) endpoint.getConnector();
-        String statement = connector.getStatement(endpoint);
+        ImmutableEndpoint ep = event.getEndpoint();
+        JdbcConnector jdbcConnector = (JdbcConnector) ep.getConnector();
+        String statement = jdbcConnector.getStatement(ep);
         Object payload = event.transformMessage();
         
         SqlStatementStrategy strategy = 
-            connector.getSqlStatementStrategyFactory().create(statement, payload);
-        return strategy.executeStatement(connector, endpoint, event, event.getTimeout());
+            jdbcConnector.getSqlStatementStrategyFactory().create(statement, payload);
+        return strategy.executeStatement(jdbcConnector, ep, event, event.getTimeout());
     }
 
     @Override
@@ -77,5 +79,4 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
-
 }

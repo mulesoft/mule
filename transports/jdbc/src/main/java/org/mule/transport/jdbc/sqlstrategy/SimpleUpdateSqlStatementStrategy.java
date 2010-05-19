@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 /**
  * Implements strategy for handling individual insert, update, and delete statements
  *
@@ -33,8 +34,8 @@ public  class SimpleUpdateSqlStatementStrategy implements SqlStatementStrategy
 {
     protected transient Logger logger = Logger.getLogger(getClass());
     
-    public MuleMessage executeStatement(JdbcConnector connector,
-            ImmutableEndpoint endpoint, MuleEvent event,long timeout) throws Exception
+    public MuleMessage executeStatement(JdbcConnector connector, ImmutableEndpoint endpoint, 
+        MuleEvent event,long timeout) throws Exception
     {
         //Unparsed SQL statement (with #[foo] format parameters)
         String statement = connector.getStatement(endpoint);

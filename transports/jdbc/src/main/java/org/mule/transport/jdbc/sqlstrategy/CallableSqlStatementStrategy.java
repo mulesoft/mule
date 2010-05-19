@@ -8,20 +8,18 @@
  * LICENSE.txt file.
  */
 
-
 package org.mule.transport.jdbc.sqlstrategy;
 
 /**
  * Implements strategy for executing simple stored procedures.  Only IN parameters
  * can be used and no OUT values can be returned from the stored procedure.
- * 
  */
-
 public  class CallableSqlStatementStrategy extends SimpleUpdateSqlStatementStrategy
 {
     protected static final String STORED_PROCEDURE_PREFIX = "{ ";
     protected static final String STORED_PROCEDURE_SUFFIX = " }";
     
+    @Override
     protected String escapeStatement(String statement)
     {
         return STORED_PROCEDURE_PREFIX  + statement + STORED_PROCEDURE_SUFFIX;
