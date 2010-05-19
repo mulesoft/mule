@@ -28,9 +28,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase 
 {
+    protected static String TEST_TCP_MESSAGE = "Test TCP Request";
 
-    protected static String TEST_MESSAGE = "Test TCP Request";
-
+    @Override
     protected String getConfigResources()
     {
         return "tcp-keep-send-socket-open.xml";
@@ -39,12 +39,14 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        MuleMessage result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
+        assertEquals(TEST_TCP_MESSAGE + " Received", result.getPayloadAsString());
+        
         // try an extra message in case it's a problem on repeat
-        result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
+        assertEquals(TEST_TCP_MESSAGE + " Received", result.getPayloadAsString());
     }
 
     private void useServer(String endpoint, int port, int count) throws Exception
@@ -71,12 +73,12 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
 
     public void testClose() throws Exception
     {
-        useServer("tcp://localhost:60220?connector=closeConnectorLength", 60220, 2);
+        useServer("tcp://localhost:60194?connector=closeConnectorLength", 60194, 2);
     }
 
+    @SuppressWarnings("synthetic-access")
     private class SimpleServerSocket implements Runnable
-    {
-        
+    { 
         private ServerSocket server;
         AtomicBoolean running = new AtomicBoolean(true);
         AtomicInteger count = new AtomicInteger(0);
@@ -142,5 +144,4 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
             }
         }
     }
-
 }
