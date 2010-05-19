@@ -24,10 +24,6 @@ import org.junit.Test;
  */
 public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsSynchronousResponseTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
     
     @Override
     protected String getConfigResources()

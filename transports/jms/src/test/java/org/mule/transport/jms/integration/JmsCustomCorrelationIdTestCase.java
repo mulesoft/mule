@@ -21,10 +21,6 @@ import org.junit.Test;
 
 public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsCustomCorrelationIdTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
 
     protected String getConfigResources()
     {

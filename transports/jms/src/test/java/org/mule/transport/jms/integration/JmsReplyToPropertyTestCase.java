@@ -20,10 +20,6 @@ import org.junit.Test;
 
 public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsReplyToPropertyTestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
 
     @Override
     protected String getConfigResources()

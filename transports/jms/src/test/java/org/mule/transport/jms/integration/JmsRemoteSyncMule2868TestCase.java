@@ -18,10 +18,6 @@ import org.junit.Test;
 
 public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
 {
-    public JmsRemoteSyncMule2868TestCase(JmsVendorConfiguration config)
-    {
-        super(config);
-    }
 
     protected String getConfigResources()
     {
