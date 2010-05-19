@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * <li>now - Returns a {@link java.sql.Timestamp} with the current time.</li>
  * <li>date - Returns a {@link java.util.Date} with the current time.</li>
  * <li>dateStamp - Returns a {@link java.lang.String} that contains the current date formatted according to {@link #DEFAULT_DATE_FORMAT}.</li>
- * <li>dateStamp(dd-MM-yyyy) - Returns a {@link java.lang.String} that contains the current date formatted according to the format passed into the function.</li>
+ * <li>dateStamp-dd-MM-yyyy - Returns a {@link java.lang.String} that contains the current date formatted according to the format passed into the function.</li>
  * <li>uuid - Returns a globally unique identifier</li>
  * <li>hostname - Returns the hostname of the machine Mule is running on</li>
  * <li>ip - Returns the IP address of the machine Mule is running on</li>

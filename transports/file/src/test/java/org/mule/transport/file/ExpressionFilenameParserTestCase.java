@@ -14,6 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.util.Date;
+
 /**
  * Test the syntax of the SimpleFilename parser
  */
@@ -42,10 +44,10 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test1_0.txt", result);
 
         result = parser.getFilename(message, "Test2_#[function:datestamp-yyMMdd].txt");
-        assertEquals(16, result.length());
-
+        assertDatestampWithYearMonthAndDayMatches(result);
+        
         result = parser.getFilename(message, "Test3_#[function:datestamp].txt");
-        assertEquals(31, result.length());
+        assertDefaultDatestampMatches(result);
 
         result = parser.getFilename(message, "Test4_#[function:systime].txt");
         assertFalse(result.equals("Test4_#[function:systime].txt"));
@@ -72,7 +74,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            //Expected
+            // Expected
         }
     }
 
@@ -82,10 +84,10 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         assertEquals("Test1_0.txt", result);
 
         result = parser.getFilename(message, "Test2_[function:dateStamp-yyMMdd].txt");
-        assertEquals("got result: " + result, 16, result.length());
+        assertDatestampWithYearMonthAndDayMatches(result);
 
         result = parser.getFilename(message, "Test3_[function:dateStamp].txt");
-        assertEquals("got result: '" + result, 31, result.length());
+        assertDefaultDatestampMatches(result);
 
         result = parser.getFilename(message, "Test4_[function:systime].txt");
         assertFalse(result.equals("Test4_[function:systime].txt"));
@@ -109,10 +111,28 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            //Expected
+            // Expected
         }
 
         result = parser.getFilename(message, "Test9_[header:xxx?].txt");
         assertEquals("Test9_[header:xxx?].txt", result);
+    }
+
+    private void assertDatestampWithYearMonthAndDayMatches(String result)
+    {
+        Date now = new Date();
+        String expected = String.format("Test2_%1$ty%1$tm%1$td.txt", now);
+        assertEquals(expected, result);
+    }
+
+    private void assertDefaultDatestampMatches(String result)
+    {
+        Date now = new Date();
+
+        // can't compare exactly as the time differs between formatting the expected
+        // result and the actual invocation of the function
+        String expected = String.format("Test3_%1$td-%1$tm-%1$ty_%1$tH-%1$tM-.*.txt", now);
+
+        assertTrue(result.matches(expected));
     }
 }
