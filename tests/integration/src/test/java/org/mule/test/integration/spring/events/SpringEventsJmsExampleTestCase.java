@@ -32,11 +32,6 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }
 
-    public SpringEventsJmsExampleTestCase()
-    {
-        setStartContext(false);
-    }
-
     protected void doSetUp() throws Exception
     {
         eventCount.set(0);
