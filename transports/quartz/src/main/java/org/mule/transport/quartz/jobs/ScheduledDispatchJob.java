@@ -55,7 +55,7 @@ public class ScheduledDispatchJob implements Job, Serializable
 
         try
         {
-            MuleClient client = new MuleClient();
+            MuleClient client = new MuleClient(config.getMuleContext());
 
             String endpointRef = config.getEndpointRef();
             if (jobDataMap.containsKey("endpointRef")) 
