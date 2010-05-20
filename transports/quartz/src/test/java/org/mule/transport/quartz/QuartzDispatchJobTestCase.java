@@ -28,7 +28,7 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
 
     public void testMuleClientDispatchJob() throws Exception 
     {
-        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("scheduledService");
+        FunctionalTestComponent component = getFunctionalTestComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
@@ -39,7 +39,7 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
 
     public void testMuleClientDispatchJobWithExpressionAddress() throws Exception 
     {
-        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("expressionScheduledService");
+        FunctionalTestComponent component = getFunctionalTestComponent("expressionScheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
