@@ -25,7 +25,6 @@ import org.mule.transport.quartz.jobs.CustomJobFromMessageConfig;
 import org.mule.transport.quartz.jobs.ScheduledDispatchJobConfig;
 
 import java.util.Date;
-import java.util.Iterator;
 
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -37,7 +36,7 @@ import org.quartz.Trigger;
 
 /**
  * Can schedule a Job with the Quartz scheduler. The event must contain the Job to
- * invoke or have it set as a property. Time triggger properties can be set on the
+ * invoke or have it set as a property. Time trigger properties can be set on the
  * event to control how and when the event is fired.
  */
 public class QuartzMessageDispatcher extends AbstractMessageDispatcher
@@ -69,9 +68,8 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         JobDataMap jobDataMap = new JobDataMap();
         MuleMessage msg = event.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        for (String propertyKey : msg.getPropertyNames())
         {
-            String propertyKey = (String) iterator.next();
             jobDataMap.put(propertyKey, msg.getProperty(propertyKey));
         }
         
