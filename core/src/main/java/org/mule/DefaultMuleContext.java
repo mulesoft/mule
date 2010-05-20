@@ -97,8 +97,6 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
-    private static MuleContext staticInstance;
-
     private SplashScreen startupScreen;
     private SplashScreen shutdownScreen;
 
@@ -120,14 +118,6 @@ public class DefaultMuleContext implements MuleContext
 
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
-
-        //TODO URGENT remove - currently used by the MuleClient only
-        staticInstance = this;
-    }
-
-    public static MuleContext getContext()
-    {
-        return staticInstance;
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -288,7 +278,6 @@ public class DefaultMuleContext implements MuleContext
             logger.info(shutdownScreen.toString());
         }
 
-        staticInstance = null;
         // SplashScreen holds static variables which need to be cleared in case we restart the server.
         SplashScreen.dispose();
     }
