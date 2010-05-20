@@ -151,7 +151,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * 
      * @return the newly-created ProcessInstance
      */
-    public synchronized Object startProcess(Object processDefinitionKey, Object signalName, Map variables) throws Exception
+    public Object startProcess(Object processDefinitionKey, Object signalName, Map variables) throws Exception
     {
         ProcessInstance processInstance = 
             processEngine.getExecutionService().startProcessInstanceByKey((String) processDefinitionKey, (Map) variables);
@@ -183,7 +183,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * @param processVariables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
-    public synchronized Object advanceProcess(Object executionId, Object signalName, Map variables) throws Exception
+    public Object advanceProcess(Object executionId, Object signalName, Map variables) throws Exception
     {
         // Get Process ID
         String processId;
@@ -203,7 +203,11 @@ public class Jbpm implements BPMS, Initialisable, Disposable
             processEngine.getExecutionService().setVariables((String) executionId, variables);
         }
 
-        processEngine.getExecutionService().signalExecutionById((String) executionId, (String) signalName, variables);
+        // MULE-1690
+        synchronized (this)
+        {
+            processEngine.getExecutionService().signalExecutionById((String) executionId, (String) signalName, variables);
+        }
 
         // Refresh process info. from the DB
         ProcessInstance process = processEngine.getExecutionService().findProcessInstanceById(processId);
@@ -220,7 +224,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * 
      * @return the updated ProcessInstance
      */
-    public synchronized Object updateProcess(Object executionId, Map variables) throws Exception
+    public Object updateProcess(Object executionId, Map variables) throws Exception
     {
         // Get Process ID
         String processId;
@@ -253,7 +257,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
     /**
      * Delete a process instance.
      */
-    public synchronized void abortProcess(Object processInstanceId) throws Exception
+    public void abortProcess(Object processInstanceId) throws Exception
     {
         processEngine.getExecutionService().endProcessInstance((String) processInstanceId, Execution.STATE_ENDED);
     }
@@ -311,7 +315,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * 
      * @return the ProcessInstance
      */
-    public synchronized Object lookupProcess(Object processId) throws Exception
+    public Object lookupProcess(Object processId) throws Exception
     {
         return processEngine.getExecutionService().findProcessInstanceById((String) processId);
     }
@@ -339,7 +343,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         completeTask(task, null, null);
     }
 
-    public synchronized void completeTask(Task task, String outcome, Map variables)
+    public void completeTask(Task task, String outcome, Map variables)
     {
         processEngine.getTaskService().completeTask(task.getId(), outcome, variables);
     }
