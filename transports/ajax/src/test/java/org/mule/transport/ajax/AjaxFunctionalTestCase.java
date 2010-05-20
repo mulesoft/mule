@@ -96,8 +96,9 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
 
     public void testClientPublishWithString() throws Exception
     {
-        bayeuxClient.publish("/test2", "Ross", null);
         MuleClient muleClient = new MuleClient(muleContext);
+
+        bayeuxClient.publish("/test2", "Ross", null);
         MuleMessage msg = muleClient.request("vm://in2", 5000L);
 
         assertNotNull(msg);
