@@ -101,7 +101,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerEndpointBuilder("CustomerRequestsREST", CustomerRequestsREST);
         EndpointBuilder CustomerRequests = new EndpointURIEndpointBuilder(new URIBuilder("vm://customer.requests", muleContext));
         registry.registerEndpointBuilder("CustomerRequests", CustomerRequests);
-        EndpointBuilder LoanQuotes = new EndpointURIEndpointBuilder(new URIBuilder("axis:http://localhost:10080/mule", muleContext));
+        EndpointBuilder LoanQuotes = new EndpointURIEndpointBuilder(new URIBuilder("jms://esb.loan.quotes", muleContext));
         registry.registerEndpointBuilder("LoanQuotes", LoanQuotes);
         EndpointBuilder CustomerResponses = LoanQuotes;
         registry.registerEndpointBuilder("CustomerResponses", CustomerResponses);
@@ -117,25 +117,25 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         EndpointBuilder BankingGateway = new EndpointURIEndpointBuilder(new URIBuilder("jms://esb.banks", muleContext));
 
         EndpointBuilder bank1 = new EndpointURIEndpointBuilder(new URIBuilder(
-            "axis:http://localhost:10080/mule/TheBank1?method=getLoanQuote", muleContext));
+            "cxf:http://localhost:10080/mule/TheBank1?operation=getLoanQuote", muleContext));
         registry.registerEndpointBuilder("bank1", bank1);
         EndpointBuilder bank2 = new EndpointURIEndpointBuilder(new URIBuilder(
-            "axis:http://localhost:20080/mule/TheBank2?method=getLoanQuote", muleContext));
+            "cxf:http://localhost:20080/mule/TheBank2?operation=getLoanQuote", muleContext));
         registry.registerEndpointBuilder("bank2", bank2);
         EndpointBuilder bank3 = new EndpointURIEndpointBuilder(new URIBuilder(
-            "axis:http://localhost:30080/mule/TheBank3?method=getLoanQuote", muleContext));
+            "cxf:http://localhost:30080/mule/TheBank3?operation=getLoanQuote", muleContext));
         registry.registerEndpointBuilder("bank3", bank3);
         EndpointBuilder bank4 = new EndpointURIEndpointBuilder(new URIBuilder(
-            "axis:http://localhost:40080/mule/TheBank4?method=getLoanQuote", muleContext));
+            "cxf:http://localhost:40080/mule/TheBank4?operation=getLoanQuote", muleContext));
         registry.registerEndpointBuilder("bank4", bank4);
 
-        EndpointBuilder bank1In = new EndpointURIEndpointBuilder(new URIBuilder("axis:http://localhost:10080/mule", muleContext));
+        EndpointBuilder bank1In = new EndpointURIEndpointBuilder(new URIBuilder("cxf:http://localhost:10080/mule?serviceClass=org.mule.example.loanbroker.bank.BankService", muleContext));
         registry.registerEndpointBuilder("bank1In", bank1In);
-        EndpointBuilder bank2In = new EndpointURIEndpointBuilder(new URIBuilder("axis:http://localhost:20080/mule", muleContext));
+        EndpointBuilder bank2In = new EndpointURIEndpointBuilder(new URIBuilder("cxf:http://localhost:20080/mule?serviceClass=org.mule.example.loanbroker.bank.BankService", muleContext));
         registry.registerEndpointBuilder("bank2In", bank2In);
-        EndpointBuilder bank3In = new EndpointURIEndpointBuilder(new URIBuilder("axis:http://localhost:30080/mule", muleContext));
+        EndpointBuilder bank3In = new EndpointURIEndpointBuilder(new URIBuilder("cxf:http://localhost:30080/mule?serviceClass=org.mule.example.loanbroker.bank.BankService", muleContext));
         registry.registerEndpointBuilder("bank3In", bank3In);
-        EndpointBuilder bank4In = new EndpointURIEndpointBuilder(new URIBuilder("axis:http://localhost:40080/mule", muleContext));
+        EndpointBuilder bank4In = new EndpointURIEndpointBuilder(new URIBuilder("cxf:http://localhost:40080/mule?serviceClass=org.mule.example.loanbroker.bank.BankService", muleContext));
         registry.registerEndpointBuilder("bank4In", bank4In);
 
         // Model

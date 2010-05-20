@@ -13,10 +13,13 @@ package org.mule.example.loanbroker.bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 
+import javax.jws.WebService;
+
 /**
  * <code>BankService</code> is a representation of a bank form which to obtain loan
  * quotes.
  */
+@WebService
 public interface BankService
 {
     LoanQuote getLoanQuote(LoanBrokerQuoteRequest request);
