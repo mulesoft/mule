@@ -74,6 +74,16 @@
             <type>pom</type>
         </dependency>
 
+        <!--
+            include the Axis transport in the distro although it's not used
+            in the examples any more
+        -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <!-- re-declaration of dependencies that never ever may end up in the .rar -->
         <dependency>
             <groupId>org.mule.examples</groupId>
@@ -100,10 +110,10 @@
             <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- Do not exclude geronimo-stax-api because some appservers (e.g. jboss 4.2.3) does not 
+        <!-- Do not exclude geronimo-stax-api because some appservers (e.g. jboss 4.2.3) does not
              come with this API -->
         <!-- Distributed separately in profiler pack -->
-        
+
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
