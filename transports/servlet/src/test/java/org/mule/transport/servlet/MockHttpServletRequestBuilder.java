@@ -17,6 +17,7 @@ import com.mockobjects.dynamic.Mock;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,10 @@ public class MockHttpServletRequestBuilder
         Mock mockRequest = new Mock(HttpServletRequest.class);
 
         mockRequest.expectAndReturn("getMethod", method);
+        
+        Enumeration<?> emptyEnumeration = new Hashtable<Object, Object>().elements();
+        mockRequest.expectAndReturn("getParameterNames", emptyEnumeration);
+        
         mockRequest.expectAndReturn("getRequestURI", requestUri);
         mockRequest.expectAndReturn("getQueryString", queryString);
         mockRequest.expectAndReturn("getInputStream", inputStream);
