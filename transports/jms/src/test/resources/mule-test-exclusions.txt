@@ -5,5 +5,6 @@
 # MULE-3682
 org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
 
-# custom-exception-strategy is not catching the error, even though it shows on the console, investigating
-org.mule.transport.jms.integration.JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase
+# EE-1933 : jms local transactions 'actions' not behaving as expected
+org.mule.transport.jms.integration.transactions.local.JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase
+

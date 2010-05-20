@@ -8,7 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms.integration;
+package org.mule.transport.jms.integration.transactions.local;
+
+import org.mule.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
 
 import org.junit.Test;
 
@@ -20,7 +22,7 @@ public class JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase ex
 {
     protected String getConfigResources()
     {
-        return "integration/jms-single-tx-single-service-always-join.xml";
+        return "integration/transactions/local/jms-single-tx-single-service-always-join.xml";
     }
     @Test
     public void testNone() throws Exception

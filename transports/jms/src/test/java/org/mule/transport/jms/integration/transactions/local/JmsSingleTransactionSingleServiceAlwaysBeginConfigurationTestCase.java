@@ -8,7 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms.integration;
+package org.mule.transport.jms.integration.transactions.local;
+
+import org.mule.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
 
 /**
  * Test all combinations of (inbound) ALWAYS_BEGIN.  They should all pass.
@@ -18,6 +20,6 @@ public class JmsSingleTransactionSingleServiceAlwaysBeginConfigurationTestCase e
 {
     protected String getConfigResources()
     {
-        return "integration/jms-single-tx-single-service-always-begin.xml";
+        return "integration/transactions/local/jms-single-tx-single-service-always-begin.xml";
     }
 }
