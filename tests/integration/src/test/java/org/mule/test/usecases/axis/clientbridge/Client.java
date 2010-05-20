@@ -22,10 +22,11 @@ public class Client
 {
     private static final String LOCAL_ENDPOINT = "vm://complexRequest";
     private static final String AXIS_ENDPOINT = "axis:http://localhost:8002/axisService/doSomeWork";
+    protected static MuleContext muleContext;
 
     public static void main(String[] args) throws Exception
     {
-        MuleContext muleContext = null;
+        muleContext = null;
 
         try
         {
@@ -49,7 +50,7 @@ public class Client
 
     private void execute() throws MuleException
     {
-        client = new MuleClient();
+        client = new MuleClient(muleContext);
 
         try
         {
