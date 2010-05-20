@@ -38,11 +38,11 @@ public abstract class SplashScreen
     
     private static Log logger = LogFactory.getLog(SplashScreen.class);
     
-    private static final Map instances = new HashMap();    
+    private static final Map<Class, SplashScreen> instances = new HashMap<Class, SplashScreen>();
     
     public static synchronized SplashScreen getInstance(Class clazz)
     {
-        SplashScreen splashScreen = (SplashScreen) instances.get(clazz);
+        SplashScreen splashScreen = instances.get(clazz);
         
         if (splashScreen == null)
         {
@@ -69,7 +69,6 @@ public abstract class SplashScreen
      * Setting the header clears body and footer assuming a new
      * splash-screen is built.
      * 
-     * @param context
      */
     final public void setHeader(MuleContext context)
     {
