@@ -500,7 +500,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = new MuleClient(isStartContext());
+        client = new MuleClient(muleContext);
     }
 
     protected void doTearDown() throws Exception
