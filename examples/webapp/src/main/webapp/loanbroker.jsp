@@ -5,6 +5,8 @@
                  org.mule.api.MuleMessage,
                  java.util.Iterator,
                  java.util.List"%>
+<%@ page import="org.mule.api.config.MuleProperties" %>
+<%@ page import="org.mule.api.MuleContext" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 
 <html>
@@ -33,7 +35,8 @@
 
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {
-        MuleClient client = new MuleClient();
+        MuleContext muleContext = (MuleContext) application.getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        MuleClient client = new MuleClient(muleContext);
         Customer cust = new Customer(name, 1234);
         double amount = Double.valueOf(amountString).doubleValue();
         int duration = Integer.parseInt(durationString);

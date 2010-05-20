@@ -10,7 +10,6 @@
 
 package org.mule.module.client;
 
-import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -60,7 +59,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,7 +100,7 @@ public class MuleClient implements Disposable
     /**
      * The local MuleContext instance.
      */
-    private static MuleContext muleContext;
+    private MuleContext muleContext;
 
     private List dispatchers = new ArrayList();
 
@@ -119,15 +117,13 @@ public class MuleClient implements Disposable
      * 
      * @throws MuleException
      */
-    public MuleClient() throws MuleException
+    protected MuleClient() throws MuleException
     {
         this(true);
     }
 
     public MuleClient(boolean startContext) throws MuleException
     {
-        //TODO URGENT This is the last refernece to a static instance of MuleContext
-        muleContext = DefaultMuleContext.getContext();        
         init(startContext);
     }
 
@@ -162,8 +158,6 @@ public class MuleClient implements Disposable
      */
     public MuleClient(String user, String password) throws MuleException
     {
-        //TODO URGENT This is the last refernece to a static instance of MuleContext        
-        muleContext = DefaultMuleContext.getContext();
         init(/* startManager */true);
         this.user = new MuleCredentials(user, password.toCharArray());
     }
@@ -210,11 +204,6 @@ public class MuleClient implements Disposable
     {
         this(configResources, builder);
         this.user = new MuleCredentials(user, password.toCharArray());
-    }
-
-    public static void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
     }
 
     /**

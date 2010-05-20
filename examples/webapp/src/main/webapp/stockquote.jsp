@@ -1,5 +1,7 @@
 <%@ page import="org.mule.module.client.MuleClient,
                  org.mule.api.MuleMessage"%>
+<%@ page import="org.mule.api.config.MuleProperties" %>
+<%@ page import="org.mule.api.MuleContext" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 
 <html>
@@ -10,7 +12,8 @@
 <%
     String symbol = request.getParameter("symbol");
     if(symbol!=null) {
-        MuleClient client = new MuleClient();
+        MuleContext muleContext = (MuleContext) application.getAttribute(MuleProperties.MULE_CONTEXT_PROPERTY);
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://stockquote", symbol, null);
 
         if(message!=null) { %>
