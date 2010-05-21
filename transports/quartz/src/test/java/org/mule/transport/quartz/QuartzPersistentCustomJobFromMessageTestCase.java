@@ -30,6 +30,7 @@ public class QuartzPersistentCustomJobFromMessageTestCase extends FunctionalTest
         MuleClient client = new MuleClient(muleContext);
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
+        jobConfig.setMuleContext(muleContext);
         jobConfig.setEndpointRef("vm://resultQueue");
         client.send("vm://customJobQueue", jobConfig, null);
 

@@ -9,7 +9,9 @@
  */
 package org.mule.transport.quartz.jobs;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.quartz.config.AbstractJobConfig;
 import org.mule.transport.quartz.config.JobConfig;
@@ -62,16 +64,22 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
             evaluator = customEvaluator;
         }
 
-        Object result = getMuleContext().getExpressionManager().evaluate(expression, evaluator, message, true);
+        final MuleContext muleContext = getMuleContext();
+        Object result = muleContext.getExpressionManager().evaluate(expression, evaluator, message, true);
         if (result instanceof Job)
         {
             CustomJobConfig customJob = new CustomJobConfig();
             customJob.setJob((Job) result);
+            customJob.setMuleContext(muleContext);
             return customJob;
         }
         else if (result instanceof JobConfig)
         {
-            return (JobConfig)result;
+            if (result instanceof MuleContextAware)
+            {
+                ((MuleContextAware) result).setMuleContext(muleContext);
+            }
+            return (JobConfig) result;
         }
         else
         {
