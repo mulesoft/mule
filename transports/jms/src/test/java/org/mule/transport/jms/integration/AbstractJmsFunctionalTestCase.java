@@ -222,7 +222,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         purge(getInboundQueueName());
         purge(getOutboundQueueName());
-        purge(getDeadLetterQueueName());
         // TODO DZ: get all of the queue/topic names from the Mule config and just purge those 
     }
 
@@ -664,7 +663,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
      * @see #suitePreSetUp()
      * @see #suitePostTearDown()
      */
-    protected void purge(final String destination) throws Exception
+    protected void purge(final String destination) throws JMSException
     {
         Connection c = null;
         Session s = null;
@@ -684,6 +683,10 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 logger.debug("Destination " + destination + " isn't empty, draining it");
             }
         }
+        catch (Exception e)        
+        {
+            logger.error("unable to purge : " + destination);
+        }
         finally
         {
             if (c != null)
@@ -696,7 +699,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 c.close();
             }
         }
-
     }
 
     /**
