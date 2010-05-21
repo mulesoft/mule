@@ -38,6 +38,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 
         Map<String, Object> props = new HashMap<String, Object>();
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
+        jobConfig.setMuleContext(muleContext);
         jobConfig.setEndpointRef("vm://quartz.in");
         props.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
 
@@ -59,6 +60,7 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
+        jobConfig.setMuleContext(muleContext);
         jobConfig.setEndpointRef("vm://quartz.in");
 
         client.send("vm://quartz.scheduler2", jobConfig, null);
