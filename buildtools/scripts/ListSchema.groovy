@@ -52,7 +52,7 @@ def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule
 def parseArguments(def arguments)
 {
 	def cliBuilder = new CliBuilder()
-	cliBuilder.d(longOpt: "davmountpoint", "mount point of the DAV filesystem")
+	cliBuilder.d(longOpt: "davmountpoint", args: 1, "mount point of the DAV filesystem")
 	cliBuilder.h(longOpt: "help", "show usage info")
 	cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
 	
