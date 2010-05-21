@@ -222,7 +222,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         purge(getInboundQueueName());
         purge(getOutboundQueueName());
-        // TODO Add other queues if necessary
+        purge(getDeadLetterQueueName());
+        // TODO DZ: get all of the queue/topic names from the Mule config and just purge those 
     }
 
     /**
@@ -389,6 +390,20 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         return getJmsConfig().getInboundDestinationName();
     }
 
+    /**
+     * The test dead letter queue name.  For consistency this should always be 'dlq'. Note that you need to make
+     * sure that this queue is available in the the JMS provider being tested.
+     * <p/>
+     * This calls through to {@link org.mule.transport.jms.integration.JmsVendorConfiguration#getDeadLetterDestinationName()}
+     *
+     * @return The test inbound destination name
+     */    
+    protected final String getDeadLetterQueueName()
+    {
+        checkConfig();
+        return getJmsConfig().getDeadLetterDestinationName();
+    }    
+    
     /**
      * The test outbound queue name.  For consistency this should always be 'out'. Note that you need to make
      * sure that this queue is available in the the JMS provider being tested.
