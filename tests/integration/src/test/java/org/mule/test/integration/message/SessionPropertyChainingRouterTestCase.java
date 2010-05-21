@@ -31,7 +31,7 @@ public class SessionPropertyChainingRouterTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://in", "test message", null);
         assertNotNull(response);
-        assertTrue("Reponse is " + response.getPayload(), response.getPayload() instanceof NonSerializableObject);
+        assertTrue("Response is " + response.getPayload(), response.getPayload() instanceof NonSerializableObject);
     }
 }
 
