@@ -1,4 +1,3 @@
-package org.mule.test.integration.tck;
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -8,6 +7,8 @@ package org.mule.test.integration.tck;
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.test.integration.tck;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
