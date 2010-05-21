@@ -22,13 +22,18 @@
         using the XmlToObject transformer.
     </description>
 
+    <!-- 
+        If you need to use a web proxy to access www.webservicesx.com configure your proxy settings
+        in proxy.properties and uncomment this block.
+
     <context:property-placeholder location="proxy.properties"/>
 
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"
                     proxyPassword="${proxyPassword}"
                     proxyPort="${proxyPort}"
-                    proxyUsername="${proxyUsername}"/>
+                    proxyUsername="${proxyUsername}"/>            
+     -->
 
     <xm:xml-to-object-transformer name="XmlToObject"/>
     <xml-entity-decoder-transformer name="XmlDecoder"/>
