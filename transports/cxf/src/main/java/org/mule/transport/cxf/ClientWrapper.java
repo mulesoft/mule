@@ -132,6 +132,12 @@ public class ClientWrapper
             client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
             conduit.setCloseInput(false);
         }
+        else
+        {
+            // EE-1806/MULE-4404
+            client.getInInterceptors().add(new StreamClosingInterceptor());
+            client.getInFaultInterceptors().add(new StreamClosingInterceptor());
+        }
         
         String value = (String) endpoint.getProperty(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL);
         applyTransformersToProtocol = isTrue(value, true); 
