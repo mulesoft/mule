@@ -295,22 +295,9 @@ public class MuleContextLifecycleTestCase
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
         new DefaultsConfigurationBuilder().configure(ctx);
-        final AtomicBoolean stoppingNotifFired = new AtomicBoolean(false);
-        final AtomicBoolean stoppedNotifFired = new AtomicBoolean(false);
-        ctx.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            public void onNotification(MuleContextNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPING)
-                {
-                    stoppingNotifFired.set(true);
-                }
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
-                {
-                    stoppedNotifFired.set(true);
-                }
-            }
-        });
+        final NotificationListener listener = new NotificationListener();
+        ctx.registerListener(listener);
+
         ctx.start();
         ctx.dispose();
         assertFalse(ctx.isInitialised());
@@ -322,8 +309,8 @@ public class MuleContextLifecycleTestCase
         // disposing started must go through stop
         assertLifecycleManagerDidApplyAllPhases();
 
-        assertTrue("CONTEXT_STOPPING notification never fired", stoppingNotifFired.get());
-        assertTrue("CONTEXT_STOPPED notification never fired", stoppedNotifFired.get());
+        assertTrue("CONTEXT_STOPPING notification never fired", listener.stoppingNotificationFired.get());
+        assertTrue("CONTEXT_STOPPED notification never fired", listener.stoppedNotificationFired.get());
     }
     
     @Test
@@ -413,16 +400,17 @@ public class MuleContextLifecycleTestCase
     {
         final AtomicBoolean startingNotificationFired = new AtomicBoolean(false);
         final AtomicBoolean startedNotificationFired = new AtomicBoolean(false);
-        
+        final AtomicBoolean stoppingNotificationFired = new AtomicBoolean(false);
+        final AtomicBoolean stoppedNotificationFired = new AtomicBoolean(false);
+
         public void onNotification(MuleContextNotification notification)
         {
-            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTING)
+            switch (notification.getAction())
             {
-                startingNotificationFired.set(true);
-            }
-            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-            {
-                startedNotificationFired.set(true);
+                case MuleContextNotification.CONTEXT_STARTING: startingNotificationFired.set(true); break;
+                case MuleContextNotification.CONTEXT_STARTED : startedNotificationFired.set(true); break;
+                case MuleContextNotification.CONTEXT_STOPPING: stoppingNotificationFired.set(true); break;
+                case MuleContextNotification.CONTEXT_STOPPED : stoppedNotificationFired.set(true); break;
             }
         }
     }
