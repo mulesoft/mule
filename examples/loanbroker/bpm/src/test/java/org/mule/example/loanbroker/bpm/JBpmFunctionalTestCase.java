@@ -37,6 +37,12 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     }
 
     @Override
+    protected int getDelay()
+    {
+        return 20000;
+    }
+
+    @Override
     protected int getNumberOfRequests()
     {
         return 100;
