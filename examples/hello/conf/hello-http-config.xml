@@ -31,7 +31,7 @@
 
     To invoke the Hello service programatically, use the MuleClient:
 
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         client.send("vm://greeter", "Ross", null);
         UMOMessage response = client.send("vm://greeter", "Ross", null);
         System.out.println("response = " + response.getPayload());

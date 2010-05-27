@@ -42,7 +42,7 @@ public abstract class AbstractWebappTestCase extends FunctionalTestCase
     /* EE-332 : fails when external web service is not responsive/times out
     public void testStockQuoteExample() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://stockquote", "CSCO", null);
     
         if (null == response)

@@ -71,7 +71,7 @@ public class BookstoreTestCase extends FunctionalTestCase
 //        request.setAttribute("title", "blah");
 //        request.setAttribute("author", "blah");
 //        
-//        MuleClient client = new MuleClient();
+//        MuleClient client = new MuleClient(muleContext);
 //        client.send("servlet://catalog", request, null);
 //    }
 }

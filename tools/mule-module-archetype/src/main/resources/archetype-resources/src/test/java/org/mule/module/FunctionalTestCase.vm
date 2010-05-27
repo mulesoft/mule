@@ -22,7 +22,7 @@ public class ${ModuleName}TestCase extends FunctionalTestCase
 
     public void test${ModuleName}() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://in", "some data", null);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
