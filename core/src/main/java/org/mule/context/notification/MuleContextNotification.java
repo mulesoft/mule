@@ -48,7 +48,7 @@ public class MuleContextNotification extends ServerNotification implements Block
 
     private String clusterId;
     private String domain;
-
+    private transient MuleContext muleContext;
 
     public MuleContextNotification(MuleContext context, String action)
     {
@@ -58,7 +58,8 @@ public class MuleContextNotification extends ServerNotification implements Block
     public MuleContextNotification(MuleContext context, int action)
     {
         super(generateId(context), action);
-        resourceIdentifier = getSource().toString();
+        this.muleContext = context;
+        this.resourceIdentifier = context.getConfiguration().getId();
         this.clusterId = context.getConfiguration().getClusterId();
         this.domain = context.getConfiguration().getDomainId();
     }
@@ -71,6 +72,11 @@ public class MuleContextNotification extends ServerNotification implements Block
     public String getDomain()
     {
         return domain;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return this.muleContext;
     }
 
     @Override

@@ -32,12 +32,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mule.tck.MuleAssert.assertTrue;
 
@@ -341,7 +345,33 @@ public class MuleContextLifecycleTestCase
         // can't call twice
         ctx.dispose();
     }
-    
+
+    @Test
+    public void notificationHasMuleContextRef() throws Exception
+    {
+        MuleContext ctx = ctxBuilder.buildMuleContext();
+        ctx.initialise();
+
+        new DefaultsConfigurationBuilder().configure(ctx);
+        final AtomicReference<MuleContext> notifCtx = new AtomicReference<MuleContext>();
+        final AtomicReference<String> resourceId = new AtomicReference<String>();
+        MuleContextNotificationListener listener = new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            public void onNotification(MuleContextNotification notification)
+            {
+                notifCtx.set(notification.getMuleContext());
+                resourceId.set(notification.getResourceIdentifier());
+            }
+        };
+        ctx.registerListener(listener);
+        ctx.start();
+
+        assertNotNull(notifCtx.get());
+        assertSame(ctx, notifCtx.get());
+        assertEquals(ctx.getConfiguration().getId(), resourceId.get());
+    }
+
+
     private MuleContext buildStartedMuleContext() throws Exception
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
