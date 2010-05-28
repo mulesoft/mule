@@ -37,9 +37,13 @@ public interface JmxSupport
      * <li>If this server's instance ID is available, append "." (dot) and the ID
      * <li>If no instance ID is available, don't append anything
      * </ul>
+     *
+     * Domain clash is resolved by appending a counter at the end.
      * @return JMX domain name
      */
     String getDomainName(MuleContext context);
+
+    String getDomainName(MuleContext context, boolean resolveClash);
 
     /**
      * Create an object name. May cache the result.

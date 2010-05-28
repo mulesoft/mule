@@ -67,7 +67,11 @@ public abstract class AbstractJmxSupport implements JmxSupport
     /** {@inheritDoc} */
     public String getDomainName(MuleContext context)
     {
-        // TODO add some config options to the JmxAgent
+        return getDomainName(context, true);
+    }
+
+    public String getDomainName(MuleContext context, boolean resolveClash)
+    {
         String domain = DEFAULT_JMX_DOMAIN_PREFIX;
         String instanceId = StringUtils.defaultString(context.getConfiguration().getId());
         if (instanceId.length() > 0)
@@ -78,10 +82,13 @@ public abstract class AbstractJmxSupport implements JmxSupport
         JmxRegistrationContext ctx = JmxRegistrationContext.getCurrent(context);
 
         String resolvedDomain = ctx.getResolvedDomain();
-        if (StringUtils.isBlank(resolvedDomain))
+        if (resolveClash)
         {
-            domain = resolveDomainClash(domain);
-            ctx.setResolvedDomain(domain);
+            if (StringUtils.isBlank(resolvedDomain))
+            {
+                domain = resolveDomainClash(domain);
+                ctx.setResolvedDomain(domain);
+            }
         }
 
         return domain;

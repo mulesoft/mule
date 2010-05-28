@@ -601,7 +601,11 @@ public class JmxAgent extends AbstractAgent
 
         try
         {
-            ObjectName query = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":*");
+            // note that we don't try a resolve domain name clash here.
+            // e.g. when stopping an app via jmx, we want to obtain current domain only,
+            // but the execution thread is different, and saved one isn't accessible 
+            final String domain = jmxSupport.getDomainName(muleContext, false);
+            ObjectName query = jmxSupport.getObjectName(domain + ":*");
             Set<ObjectName> mbeans = mBeanServer.queryNames(query, null);
             while (!mbeans.isEmpty())
             {
