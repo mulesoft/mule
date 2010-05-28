@@ -20,15 +20,15 @@ public interface MuleConfigurationServiceMBean
 {
     String DEFAULT_JMX_NAME = "type=org.mule.Configuration,name=GlobalConfiguration";
 
-    public boolean isSynchronous();
+    boolean isSynchronous();
 
-    public int getSynchronousEventTimeout();
+    int getSynchronousEventTimeout();
 
-    public String getWorkingDirectory();
+    String getWorkingDirectory();
 
-    public int getTransactionTimeout();
+    int getTransactionTimeout();
     
-    public int getShutdownTimeout();
+    int getShutdownTimeout();
     
-    public String getEncoding();
+    String getEncoding();
 }
