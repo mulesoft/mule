@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * Deploys multiple applications.
  */
-public class MultiDeployer implements Deployer
+public class MultiApplication implements Application
 {
 
-    private List<Deployer> deployers = new ArrayList<Deployer>();
+    private List<Application> applications = new ArrayList<Application>();
 
     public void install() throws InstallException
     {
@@ -25,13 +25,13 @@ public class MultiDeployer implements Deployer
 
     public void start() throws DeploymentStartException
     {
-        for (Deployer deployer : deployers)
+        for (Application application : applications)
         {
             try
             {
-                deployer.install();
-                deployer.init();
-                deployer.start();
+                application.install();
+                application.init();
+                application.start();
             }
             catch (DeploymentException e)
             {
@@ -43,11 +43,11 @@ public class MultiDeployer implements Deployer
 
     public void stop()
     {
-        for (Deployer deployer : deployers)
+        for (Application application : applications)
         {
             try
             {
-                deployer.stop();
+                application.stop();
             }
             catch (DeploymentException e)
             {
@@ -59,11 +59,11 @@ public class MultiDeployer implements Deployer
 
     public void dispose()
     {
-        for (Deployer deployer : deployers)
+        for (Application application : applications)
         {
             try
             {
-                deployer.dispose();
+                application.dispose();
             }
             catch (DeploymentException e)
             {
@@ -75,11 +75,11 @@ public class MultiDeployer implements Deployer
 
     public void redeploy()
     {
-        for (Deployer deployer : deployers)
+        for (Application application : applications)
         {
             try
             {
-                deployer.redeploy();
+                application.redeploy();
             }
             catch (DeploymentException e)
             {
@@ -109,8 +109,8 @@ public class MultiDeployer implements Deployer
         throw new UnsupportedOperationException("getDeploymentClassLoader");
     }
 
-    public List<Deployer> getDeployers()
+    public List<Application> getDeployers()
     {
-        return deployers;
+        return applications;
     }
 }

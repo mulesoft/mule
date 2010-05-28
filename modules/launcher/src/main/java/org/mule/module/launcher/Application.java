@@ -16,7 +16,7 @@ import org.mule.api.MuleContext;
  *
  * @param <M> - meta data class type
  */
-public interface Deployer<M>
+public interface Application<M>
 {
     void install() throws InstallException;
 

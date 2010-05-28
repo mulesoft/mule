@@ -18,12 +18,12 @@ import org.mule.api.MuleContext;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class DeployerWrapper<M> implements Deployer<M>
+public class ApplicationWrapper<M> implements Application<M>
 {
 
-    private Deployer<M> delegate;
+    private Application<M> delegate;
 
-    public DeployerWrapper(Deployer<M> delegate)
+    public ApplicationWrapper(Application<M> delegate)
     {
         this.delegate = delegate;
     }

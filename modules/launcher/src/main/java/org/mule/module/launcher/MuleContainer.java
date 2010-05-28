@@ -17,7 +17,6 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
@@ -92,7 +91,7 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected Deployer<Map<String, Object>> deployer = new MultiDeployer();
+    protected DefaultMuleDeployer deployer;
 
     /**
      * Application entry point.
@@ -163,34 +162,9 @@ public class MuleContainer
         }
         try
         {
-            // install phase
-            final Map<String, Object> options = StartupContext.get().getStartupOptions();
-            String application = (String) options.get("app");
-
-            String[] apps;
-            if (application == null)
-            {
-                apps = MuleContainerBootstrapUtils.getMuleAppsFile().list();
-            }
-            else
-            {
-                apps = application.split(":");
-            }
-
-            for (String app : apps)
-            {
-                final DeployerWrapper<Map<String, Object>> d = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(app));
-                d.setMetaData(options);
-                ((MultiDeployer) deployer).getDeployers().add(d);
-            }
-
             // TODO pluggable deployer
-            deployer.install();
-
-            logger.info("Mule Container initializing...");
-            deployer.init();
-            logger.info("Mule Container starting...");
-            deployer.start();
+            deployer = new DefaultMuleDeployer();
+            deployer.deploy();
         }
         catch (Throwable e)
         {

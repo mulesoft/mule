@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Meta data is commandline options.
  */
-public class MuleAppDeployer implements Deployer<Map<String, Object>>
+public class DefaultMuleApplication implements Application<Map<String, Object>>
 {
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
@@ -66,7 +66,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
     private ClassLoader deploymentClassLoader;
     private boolean redeploymentEnabled = true;
 
-    public MuleAppDeployer(String appName)
+    public DefaultMuleApplication(String appName)
     {
         this.appName = appName;
     }
@@ -80,7 +80,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
 
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         // try to load the config as a file as well
-        final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), MuleAppDeployer.DEFAULT_CONFIGURATION);
+        final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), DefaultMuleApplication.DEFAULT_CONFIGURATION);
         configUrl = IOUtils.getResourceAsUrl(configPath, getClass(), true, false);
         if (configUrl == null)
         {
