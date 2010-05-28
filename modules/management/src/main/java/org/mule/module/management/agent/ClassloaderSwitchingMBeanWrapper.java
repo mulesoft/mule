@@ -5,6 +5,9 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ReflectionException;
 import javax.management.StandardMBean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Ensures any external jmx invocation (like e.g. remote) is executed with a correct application
  * classloader (otherwise a bootstrap classloader is used by default for platform mbean server). Note
@@ -14,6 +17,7 @@ import javax.management.StandardMBean;
  */
 public class ClassloaderSwitchingMBeanWrapper extends StandardMBean
 {
+    protected Log logger = LogFactory.getLog(getClass());
 
     private ClassLoader executionClassLoader;
 
@@ -32,6 +36,24 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean
         {
             Thread.currentThread().setContextClassLoader(executionClassLoader);
             return super.invoke(actionName, params, signature);
+        }
+        catch (MBeanException mbex)
+        {
+            throw mbex;
+        }
+        catch (ReflectionException rex)
+        {
+            throw rex;
+        }
+        catch (Exception ex)
+        {
+            logger.error(String.format("MBean operation '%s' failed", actionName), ex);
+            if (ex instanceof RuntimeException)
+            {
+                throw (RuntimeException) ex;
+            }
+
+            throw new RuntimeException(ex);
         }
         finally
         {
