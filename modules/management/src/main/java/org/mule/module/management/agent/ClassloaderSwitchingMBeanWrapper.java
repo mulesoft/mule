@@ -14,6 +14,7 @@ import javax.management.StandardMBean;
  */
 public class ClassloaderSwitchingMBeanWrapper extends StandardMBean
 {
+
     private ClassLoader executionClassLoader;
 
     public <T> ClassloaderSwitchingMBeanWrapper(T implementation, Class<T> mbeanInterface, ClassLoader executionClassLoader)
@@ -27,10 +28,13 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException
     {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-        try {
+        try
+        {
             Thread.currentThread().setContextClassLoader(executionClassLoader);
             return super.invoke(actionName, params, signature);
-        } finally {
+        }
+        finally
+        {
             Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
