@@ -4,6 +4,7 @@ import org.mule.config.StartupContext;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,8 @@ public class DefaultMuleDeployer
 
     public void dispose()
     {
+        // tear down apps in reverse order
+        Collections.reverse(applications);
         for (Application application : applications)
         {
             try
