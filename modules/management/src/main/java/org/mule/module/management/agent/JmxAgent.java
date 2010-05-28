@@ -396,6 +396,11 @@ public class JmxAgent extends AbstractAgent
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
         ObjectName on = jmxSupport.getObjectName(String.format("%s:%s", jmxSupport.getDomainName(muleContext), MuleServiceMBean.DEFAULT_JMX_NAME));
+        if (muleContext.getConfiguration().isContainerMode() && mBeanServer.isRegistered(on))
+        {
+            // while in container mode, a previous stop() action leaves MuleContext MBean behind for remote start() operation
+            return;
+        }
         MuleService service = new MuleService(muleContext);
         ClassloaderSwitchingMBeanWrapper serviceMBean = new ClassloaderSwitchingMBeanWrapper(service, MuleServiceMBean.class, muleContext.getExecutionClassLoader());
         logger.debug("Registering mule with name: " + on);
