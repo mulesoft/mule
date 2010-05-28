@@ -31,4 +31,7 @@ public interface MuleConfigurationServiceMBean
     int getShutdownTimeout();
     
     String getEncoding();
+
+    boolean isContainerMode();
+
 }

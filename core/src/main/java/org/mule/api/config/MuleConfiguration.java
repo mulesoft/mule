@@ -51,4 +51,6 @@ public interface MuleConfiguration
     int getDefaultQueueTimeout();
     
     int getShutdownTimeout();
+
+    boolean isContainerMode();
 }

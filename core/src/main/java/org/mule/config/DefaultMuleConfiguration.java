@@ -23,15 +23,15 @@ import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -103,9 +103,17 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
+    private boolean containerMode;
 
-    public DefaultMuleConfiguration()  
+    public DefaultMuleConfiguration()
     {
+        this(false);
+    }
+
+    public DefaultMuleConfiguration(boolean containerMode)  
+    {
+        this.containerMode = containerMode;
+        
         // Apply any settings which come from the JVM system properties.
         applySystemProperties();
         
@@ -510,6 +518,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    public boolean isContainerMode()
+    {
+        return this.containerMode;
+    }
+
     @Override
     public int hashCode()
     {
@@ -531,6 +544,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + (synchronous ? 1231 : 1237);
         result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        result = prime * result + (containerMode ? 1231 : 1237);
         return result;
     }
 
@@ -581,7 +595,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             if (other.workingDirectory != null) return false;
         }
         else if (!workingDirectory.equals(other.workingDirectory)) return false;
+
+        if (containerMode != other.containerMode) return false;
+
         return true;
     }
-    
+
 }

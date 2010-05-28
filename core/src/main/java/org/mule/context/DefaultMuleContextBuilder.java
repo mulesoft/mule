@@ -131,7 +131,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            return new DefaultMuleConfiguration();
+            return createMuleConfiguration();
         }
     }
 
@@ -143,9 +143,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            MuleContextLifecycleManager manager = new MuleContextLifecycleManager();
-            addRequiredLifecyclePairs(manager);
-            return manager;
+            return createLifecycleManager();
         }
     }
 
@@ -212,7 +210,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer", getMuleConfiguration().getShutdownTimeout());
+            return createWorkManager();
         }
     }
 
@@ -224,7 +222,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            return new DefaultWorkListener();
+            return createWorkListener();
         }
     }
 
@@ -236,27 +234,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         }
         else
         {
-            ServerNotificationManager manager = new ServerNotificationManager();
-            manager.addInterfaceToType(MuleContextNotificationListener.class,
-                MuleContextNotification.class);
-            manager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
-            manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
-            manager.addInterfaceToType(ServiceNotificationListener.class,
-                ServiceNotification.class);
-            manager.addInterfaceToType(SecurityNotificationListener.class,
-                SecurityNotification.class);
-            manager.addInterfaceToType(ManagementNotificationListener.class,
-                ManagementNotification.class);
-            manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-            manager.addInterfaceToType(ConnectionNotificationListener.class,
-                ConnectionNotification.class);
-            manager.addInterfaceToType(RegistryNotificationListener.class,
-                RegistryNotification.class);
-            manager.addInterfaceToType(ExceptionNotificationListener.class,
-                ExceptionNotification.class);
-            manager.addInterfaceToType(TransactionNotificationListener.class,
-                TransactionNotification.class);
-            return manager;
+            return createNotificationManager();
         }
     }
 
@@ -280,14 +258,61 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         this.shutdownScreen = shutdownScreen;
     }
 
+    protected DefaultMuleConfiguration createMuleConfiguration()
+    {
+        return new DefaultMuleConfiguration();
+    }
+
+    protected MuleContextLifecycleManager createLifecycleManager()
+    {
+        MuleContextLifecycleManager manager = new MuleContextLifecycleManager();
+        addRequiredLifecyclePairs(manager);
+        return manager;
+    }
+
+    protected MuleWorkManager createWorkManager()
+    {
+        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer", getMuleConfiguration().getShutdownTimeout());
+    }
+
+    protected DefaultWorkListener createWorkListener()
+    {
+        return new DefaultWorkListener();
+    }
+
+    protected ServerNotificationManager createNotificationManager()
+    {
+        ServerNotificationManager manager = new ServerNotificationManager();
+        manager.addInterfaceToType(MuleContextNotificationListener.class,
+                                   MuleContextNotification.class);
+        manager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
+        manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
+        manager.addInterfaceToType(ServiceNotificationListener.class,
+                                   ServiceNotification.class);
+        manager.addInterfaceToType(SecurityNotificationListener.class,
+                                   SecurityNotification.class);
+        manager.addInterfaceToType(ManagementNotificationListener.class,
+                                   ManagementNotification.class);
+        manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+        manager.addInterfaceToType(ConnectionNotificationListener.class,
+                                   ConnectionNotification.class);
+        manager.addInterfaceToType(RegistryNotificationListener.class,
+                                   RegistryNotification.class);
+        manager.addInterfaceToType(ExceptionNotificationListener.class,
+                                   ExceptionNotification.class);
+        manager.addInterfaceToType(TransactionNotificationListener.class,
+                                   TransactionNotification.class);
+        return manager;
+    }
+
     @Override
     public String toString()
     {
-        return ClassUtils.getClassName(getClass()) + 
+        return ClassUtils.getClassName(getClass()) +
             "{muleConfiguration=" + config +
-            ", lifecycleManager=" + lifecycleManager + 
-            ", workManager=" + workManager + 
-            ", workListener=" + workListener + 
+            ", lifecycleManager=" + lifecycleManager +
+            ", workManager=" + workManager +
+            ", workListener=" + workListener +
             ", notificationManager=" + notificationManager + "}";
     }
 }

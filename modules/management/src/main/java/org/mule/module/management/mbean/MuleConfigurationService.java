@@ -14,10 +14,8 @@ import org.mule.api.config.MuleConfiguration;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
- * a management service
+ * a management service.
  * 
- * TODO MULE-3110 I'm not sure this is relevant anymore since the MuleConfiguration should
- * be immutable after startup.
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
 {
@@ -32,11 +30,6 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
     {
         return muleConfiguration.isDefaultSynchronousEndpoints();
     }
-
-//    public void setSynchronous(boolean synchronous)
-//    {
-//        muleConfiguration.setDefaultSynchronousEndpoints(synchronous);
-//    }
 
     public int getSynchronousEventTimeout()
     {
@@ -69,4 +62,8 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return muleConfiguration.getDefaultEncoding();
     }
 
+    public boolean isContainerMode()
+    {
+        return muleConfiguration.isContainerMode();
+    }
 }
