@@ -15,34 +15,12 @@ public class MultiDeployer implements Deployer
 
     public void install() throws InstallException
     {
-        for (Deployer deployer : deployers)
-        {
-            try
-            {
-                deployer.install();
-            }
-            catch (DeploymentException e)
-            {
-                // TODO MultiXXXException to report multiple failures
-                e.printStackTrace();
-            }
-        }
+        // no-op, apps handled in start()
     }
 
     public void init()
     {
-        for (Deployer deployer : deployers)
-        {
-            try
-            {
-                deployer.init();
-            }
-            catch (DeploymentException e)
-            {
-                // TODO MultiXXXException to report multiple failures
-                e.printStackTrace();
-            }
-        }
+        // no-op, apps handled in start()
     }
 
     public void start() throws DeploymentStartException
@@ -51,6 +29,8 @@ public class MultiDeployer implements Deployer
         {
             try
             {
+                deployer.install();
+                deployer.init();
                 deployer.start();
             }
             catch (DeploymentException e)

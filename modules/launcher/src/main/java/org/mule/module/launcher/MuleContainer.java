@@ -147,28 +147,6 @@ public class MuleContainer
             setStartupPropertiesFile(propertiesFile);
         }
         StartupContext.get().setStartupOptions(commandlineOptions);
-
-        String application = (String) commandlineOptions.get("app");
-
-        String[] apps;
-        if (application == null)
-        {
-            apps = MuleContainerBootstrapUtils.getMuleAppsFile().list();
-        }
-        else
-        {
-            apps = application.split(":");
-        }
-
-        for (String app : apps)
-        {
-            final DeployerWrapper<Map<String, Object>> d = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(app));
-            d.setMetaData(commandlineOptions);
-            ((MultiDeployer) deployer).getDeployers().add(d);
-        }
-
-        // TODO pluggable deployer
-        deployer.install();
     }
 
     /**
@@ -185,6 +163,30 @@ public class MuleContainer
         }
         try
         {
+            // install phase
+            final Map<String, Object> options = StartupContext.get().getStartupOptions();
+            String application = (String) options.get("app");
+
+            String[] apps;
+            if (application == null)
+            {
+                apps = MuleContainerBootstrapUtils.getMuleAppsFile().list();
+            }
+            else
+            {
+                apps = application.split(":");
+            }
+
+            for (String app : apps)
+            {
+                final DeployerWrapper<Map<String, Object>> d = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(app));
+                d.setMetaData(options);
+                ((MultiDeployer) deployer).getDeployers().add(d);
+            }
+
+            // TODO pluggable deployer
+            deployer.install();
+
             logger.info("Mule Container initializing...");
             deployer.init();
             logger.info("Mule Container starting...");
