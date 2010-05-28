@@ -1,3 +1,5 @@
 #
 # Test cases listed in this file are not run.
 #
+# MULE-4890
+org.mule.example.loanbroker.bpm.JBpmFunctionalTestCase
