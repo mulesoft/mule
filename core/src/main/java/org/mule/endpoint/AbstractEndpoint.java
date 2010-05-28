@@ -146,24 +146,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
-        if (transformers == null)
-        {
-            this.transformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
-        }
-        else
-        {
-            updateTransformerEndpoints(transformers);
-            this.transformers = Collections.unmodifiableList(transformers);
-        }
-        if (responseTransformers == null)
-        {
-            this.responseTransformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
-        }
-        else
-        {
-            updateTransformerEndpoints(responseTransformers);
-            this.responseTransformers = Collections.unmodifiableList(responseTransformers);
-        }
         this.name = name;
         // TODO Properties should be immutable. See MULE-3105
         // this.properties = Collections.unmodifiableMap(properties);
@@ -198,6 +180,25 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             this.synchronous = synchronous;
         }
+
+        if (transformers == null)
+        {
+            this.transformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            updateTransformerEndpoints(transformers);
+            this.transformers = Collections.unmodifiableList(transformers);
+        }
+        if (responseTransformers == null)
+        {
+            this.responseTransformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            updateTransformerEndpoints(responseTransformers);
+            this.responseTransformers = Collections.unmodifiableList(responseTransformers);
+        }   
     }
 
     public EndpointURI getEndpointURI()
