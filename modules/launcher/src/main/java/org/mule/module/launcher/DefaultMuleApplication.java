@@ -188,7 +188,9 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
                     @Override
                     protected DefaultMuleConfiguration createMuleConfiguration()
                     {
-                        return new DefaultMuleConfiguration(true);
+                        final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
+                        configuration.setId(appName);
+                        return configuration;
                     }
                 });
 
