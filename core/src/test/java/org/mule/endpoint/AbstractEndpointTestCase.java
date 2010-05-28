@@ -23,18 +23,17 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class AbstractEndpointTestCase extends TestCase
+public class AbstractEndpointTestCase extends AbstractMuleTestCase
 {
     /**
      * Tests that endpoint configuration is done before setting the endpoint in the
