@@ -84,9 +84,9 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         configUrl = IOUtils.getResourceAsUrl(configPath, getClass(), true, false);
         if (configUrl == null)
         {
-            System.out.println(CoreMessages.configNotFoundUsage());
-            // TODO replace with a deployment exception
-            System.exit(-1);
+            //System.out.println(CoreMessages.configNotFoundUsage());
+            // TODO a better message
+            throw new InstallException(CoreMessages.configNotFoundUsage());
         }
 
 
@@ -119,8 +119,7 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
             logger.fatal(e);
             final Message message = CoreMessages.failedToLoad("Builder: " + this.configBuilderClassName);
             System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
-            // TODO replace with a deployment exception
-            System.exit(1);
+            throw new InstallException(message, e);
         }
 
         createDeploymentClassLoader();
@@ -285,6 +284,14 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         this.redeploymentEnabled = redeploymentEnabled;
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("%s[%s]@%s", getClass().getName(),
+                             appName,
+                             Integer.toHexString(System.identityHashCode(this)));
+    }
+
     protected void createDeploymentClassLoader()
     {
         // TODO shared domain from deployment descriptor/config
@@ -302,7 +309,8 @@ public class MuleAppDeployer implements Deployer<Map<String, Object>>
         final FileWatcher watcher = new ConfigFileWatcher(new File(configUrl.getFile()));
 
         // register a config monitor only after context has started, as it may take some time
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
+        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        {
 
             public void onNotification(MuleContextNotification notification)
             {

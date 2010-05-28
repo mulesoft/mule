@@ -17,6 +17,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
@@ -91,7 +92,7 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected Deployer<Map<String, Object>> deployer;
+    protected Deployer<Map<String, Object>> deployer = new MultiDeployer();
 
     /**
      * Application entry point.
@@ -139,24 +140,34 @@ public class MuleContainer
         // properties
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
-        String application = (String) commandlineOptions.get("app");
-        if (application == null)
-        {
-            application = "default";
-        }
-
         // Startup properties
         String propertiesFile = (String) commandlineOptions.get("props");
         if (propertiesFile != null)
         {
             setStartupPropertiesFile(propertiesFile);
         }
-
         StartupContext.get().setStartupOptions(commandlineOptions);
 
+        String application = (String) commandlineOptions.get("app");
+
+        String[] apps;
+        if (application == null)
+        {
+            apps = MuleContainerBootstrapUtils.getMuleAppsFile().list();
+        }
+        else
+        {
+            apps = application.split(":");
+        }
+
+        for (String app : apps)
+        {
+            final DeployerWrapper<Map<String, Object>> d = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(app));
+            d.setMetaData(commandlineOptions);
+            ((MultiDeployer) deployer).getDeployers().add(d);
+        }
+
         // TODO pluggable deployer
-        deployer = new DeployerWrapper<Map<String, Object>>(new MuleAppDeployer(application));
-        deployer.setMetaData(commandlineOptions);
         deployer.install();
     }
 

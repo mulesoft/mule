@@ -99,6 +99,7 @@ public class DefaultMuleContext implements MuleContext
 
     private SplashScreen startupScreen;
     private SplashScreen shutdownScreen;
+    private ClassLoader executionClassLoader;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -621,6 +622,16 @@ public class DefaultMuleContext implements MuleContext
     public ExpressionManager getExpressionManager()
     {
         return expressionManager;
+    }
+
+    public void setExecutionClassLoader(ClassLoader cl)
+    {
+        this.executionClassLoader = cl;
+    }
+
+    public ClassLoader getExecutionClassLoader()
+    {
+        return executionClassLoader;
     }
 
     public void addRegistry(Registry registry)

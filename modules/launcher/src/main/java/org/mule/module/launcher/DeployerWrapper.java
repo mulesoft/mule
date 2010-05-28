@@ -133,4 +133,13 @@ public class DeployerWrapper<M> implements Deployer<M>
             Thread.currentThread().setContextClassLoader(originalCl);
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s(%s)@%s", getClass().getName(),
+                             delegate,
+                             Integer.toHexString(System.identityHashCode(this)));
+
+    }
 }

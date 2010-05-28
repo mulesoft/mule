@@ -208,4 +208,8 @@ public interface MuleContext extends Lifecycle
      * @see org.mule.api.expression.ExpressionManager
      */
     ExpressionManager getExpressionManager();
+
+    void setExecutionClassLoader(ClassLoader cl);
+
+    ClassLoader getExecutionClassLoader();
 }

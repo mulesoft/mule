@@ -99,6 +99,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                                                          getNotificationManager());
         manager.setMuleContext(muleContext);
         muleContext.setSplash(startupScreen, shutdownScreen);
+        muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
         return muleContext;
     }
 

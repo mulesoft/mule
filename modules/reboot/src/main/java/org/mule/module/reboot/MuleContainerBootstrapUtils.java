@@ -22,6 +22,7 @@ import java.security.PrivilegedAction;
 
 public final class MuleContainerBootstrapUtils
 {
+    private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
     private static final String MULE_HOME = System.getProperty("mule.home");
 
@@ -48,6 +49,14 @@ public final class MuleContainerBootstrapUtils
     public static File getMuleHomeFile()
     {
         return isStandalone() ? new File(MULE_HOME) : null;
+    }
+
+    /**
+     * @return null if running embedded
+     */
+    public static File getMuleAppsFile()
+    {
+        return isStandalone() ? new File(getMuleHomeFile(), MULE_APPS_FILENAME) : null;
     }
 
     /**
