@@ -74,7 +74,6 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements M
         this.executionClassLoader = executionClassLoader;
     }
 
-    @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
         if (getImplementation() instanceof MBeanRegistration)
@@ -85,7 +84,6 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements M
         return name;
     }
 
-    @Override
     public void postRegister(Boolean registrationDone)
     {
         if (getImplementation() instanceof MBeanRegistration)
@@ -94,7 +92,6 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements M
         }
     }
 
-    @Override
     public void preDeregister() throws Exception
     {
         if (getImplementation() instanceof MBeanRegistration)
@@ -103,7 +100,6 @@ public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements M
         }
     }
 
-    @Override
     public void postDeregister()
     {
         if (getImplementation() instanceof MBeanRegistration)
