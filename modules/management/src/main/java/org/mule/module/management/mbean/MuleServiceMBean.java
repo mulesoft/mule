@@ -20,7 +20,9 @@ import java.util.Date;
  */
 public interface MuleServiceMBean
 {
-    String DEFAULT_JMX_NAME = "type=org.mule.MuleContext,name=MuleServerInfo";
+    // CRITICAL: do not modify the order of key/value pairs here, it MUST
+    // match the one returned by ObjectName.getCanonicalKeyPropertyListString()
+    String DEFAULT_JMX_NAME = "name=MuleServerInfo,type=org.mule.MuleContext";
 
     boolean isInitialised();
 

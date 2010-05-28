@@ -594,6 +594,14 @@ public class JmxAgent extends AbstractAgent
 
     protected void unregisterMBeansIfNecessary()
     {
+        unregisterMBeansIfNecessary(false);
+    }
+
+    /**
+     * @param containerMode when true, MuleContext will still be exposed to enable the 'start' operation
+     */
+    protected void unregisterMBeansIfNecessary(boolean containerMode)
+    {
         if (mBeanServer == null)
         {
             return;
@@ -601,9 +609,9 @@ public class JmxAgent extends AbstractAgent
 
         try
         {
-            // note that we don't try a resolve domain name clash here.
+            // note that we don't try to resolve a domain name clash here.
             // e.g. when stopping an app via jmx, we want to obtain current domain only,
-            // but the execution thread is different, and saved one isn't accessible 
+            // but the execution thread is different, and doesn't have the resolved domain info 
             final String domain = jmxSupport.getDomainName(muleContext, false);
             ObjectName query = jmxSupport.getObjectName(domain + ":*");
             Set<ObjectName> mbeans = mBeanServer.queryNames(query, null);
@@ -612,7 +620,10 @@ public class JmxAgent extends AbstractAgent
                 ObjectName name = mbeans.iterator().next();
                 try
                 {
-                    mBeanServer.unregisterMBean(name);
+                    if (!(containerMode && MuleServiceMBean.DEFAULT_JMX_NAME.equals(name.getCanonicalKeyPropertyListString())))
+                    {
+                        mBeanServer.unregisterMBean(name);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -622,6 +633,12 @@ public class JmxAgent extends AbstractAgent
                 // query mbeans again, as some mbeans have cascaded unregister operations,
                 // this prevents duplicate unregister attempts
                 mbeans = mBeanServer.queryNames(query, null);
+
+                if (containerMode)
+                {
+                    // filter out MuleContext MBean to avoid an endless loop
+                    mbeans.remove(jmxSupport.getObjectName(domain + ":" + MuleServiceMBean.DEFAULT_JMX_NAME));
+                }
             }
         }
         catch (MalformedObjectNameException e)
@@ -655,6 +672,7 @@ public class JmxAgent extends AbstractAgent
 
         public void onNotification(MuleContextNotification notification)
         {
+            // TODO different logic based on whether we're running in containerMode
             if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
                 try
@@ -683,7 +701,9 @@ public class JmxAgent extends AbstractAgent
         {
             if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
             {
-                unregisterMBeansIfNecessary();
+                // TODO different logic based on whether we're running in containerMode
+                boolean containerMode = notification.getMuleContext().getConfiguration().isContainerMode();
+                unregisterMBeansIfNecessary(containerMode);
             }
         }
     }
