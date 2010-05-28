@@ -19,11 +19,6 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.tanukisoftware.wrapper.jmx.WrapperManager;
-import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
-
 import java.util.List;
 
 import javax.management.InstanceNotFoundException;
@@ -34,6 +29,10 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.tanukisoftware.wrapper.jmx.WrapperManager;
+import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
 
 /**
  * This agent integrates Java Service Wrapper into Mule. See
@@ -45,7 +44,7 @@ public class WrapperManagerAgent extends AbstractAgent
     /**
      * MBean name to register under.
      */
-    public static final String WRAPPER_OBJECT_NAME = "name=WrapperManager";
+    public static final String WRAPPER_JMX_NAME = "name=WrapperManager";
 
     /**
      * For cases when Mule is embedded in another process and that external process
@@ -120,7 +119,22 @@ public class WrapperManagerAgent extends AbstractAgent
                 return;
             }
 
-            wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + WRAPPER_OBJECT_NAME);
+            final boolean containerMode = muleContext.getConfiguration().isContainerMode();
+            if (containerMode)
+            {
+                // container mode, register mbean under Mule domain, no duplicates under each app's domain
+                wrapperName = jmxSupport.getObjectName(JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX + ":" + WRAPPER_JMX_NAME);
+                if (mBeanServer.isRegistered(wrapperName))
+                {
+                    // ignore duplicate invocations when running in Mule container mode
+                    return;
+                }
+            }
+            else
+            {
+                // embedded case, use Mule's single domain
+                wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + WRAPPER_JMX_NAME);
+            }
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(wrapperManagerRef.get(), wrapperName);
