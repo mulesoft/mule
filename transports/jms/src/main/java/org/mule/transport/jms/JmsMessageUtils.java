@@ -117,104 +117,140 @@ public class JmsMessageUtils
         }
         else if (object instanceof String)
         {
-            return session.createTextMessage((String) object);
+            return stringToMessage((String) object, session);
         }
         else if (object instanceof Map<?, ?> && validateMapMessageType((Map<?, ?>)object))
         {
-            MapMessage mMsg = session.createMapMessage();
-            Map<?, ?> src = (Map<?, ?>) object;
-
-            for (Iterator<?> i = src.entrySet().iterator(); i.hasNext();)
-            {
-                Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
-                mMsg.setObject(entry.getKey().toString(), entry.getValue());
-            }
-
-            return mMsg;
+            return mapToMessage((Map<?, ?>) object, session);
         }
         else if (object instanceof InputStream)
         {
-            StreamMessage streamMessage = session.createStreamMessage();
-            InputStream temp = (InputStream) object;
-
-            byte[] buffer = new byte[4096];
-            int len;
-
-            try
-            {
-                while ((len = temp.read(buffer)) != -1)
-                {
-                    streamMessage.writeBytes(buffer, 0, len);
-                }
-            }
-            catch (IOException e)
-            {
-                throw new JMSException("Failed to read input stream to create a stream message: " + e);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(temp);
-            }
-
-            return streamMessage;
+            return inputStreamToMessage((InputStream) object, session);
         }
         else if (object instanceof List<?>)
         {
-            StreamMessage sMsg = session.createStreamMessage();
-            List<?> list = (List<?>) object;
-            for (Iterator<?> iter = list.iterator(); iter.hasNext();)
-            {
-                Object o = iter.next();
-                if (validateStreamMessageType(o))
-                {
-                    sMsg.writeObject(o);
-                }
-                else
-                {
-                    throw new MessageFormatException(String.format("Invalid type passed to StreamMessage: %s . Allowed types are: " +
-                            "Boolean, Byte, Short, Character, Integer, Long, Float, Double," +
-                            "String and byte[]",
-                            ClassUtils.getShortClassName(o, "null")));
-                }
-            }
-            return sMsg;
+            return listToMessage((List<?>) object, session);
         }
         else if (object instanceof byte[])
         {
-            BytesMessage bMsg = session.createBytesMessage();
-            bMsg.writeBytes((byte[]) object);
-            return bMsg;
+            return byteArrayToMessage((byte[]) object, session);
         }
         else if (object instanceof Serializable)
         {
-            ObjectMessage oMsg = session.createObjectMessage();
-            oMsg.setObject((Serializable) object);
-            return oMsg;
+            return serializableToMessage((Serializable) object, session);
         }
         else if (object instanceof OutputHandler)
         {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            try
-            {
-                ((OutputHandler) object).write(null, output);
-            }
-            catch (IOException e)
-            {
-                JMSException j = new JMSException("Could not serialize OutputHandler.");
-                j.initCause(e);
-                throw j;
-            }
-
-            BytesMessage bMsg = session.createBytesMessage();
-            bMsg.writeBytes(output.toByteArray());
-            return bMsg;
+            return outputHandlerToMessage((OutputHandler) object, session);
         }
         else
         {
             throw new JMSException(
-                    "Source was not of a supported type, data must be Serializable, String, byte[], Map or InputStream, " +
-                            "but was " + ClassUtils.getShortClassName(object, "<null>"));
+                "Source was not of a supported type. Valid types are Message, String, Map, InputStream, List, byte[], Serializable or OutputHandler, "
+                                + "but was " + ClassUtils.getShortClassName(object, "<null>"));
         }
+    }
+
+    private static Message stringToMessage(String value, Session session) throws JMSException
+    {
+        return session.createTextMessage(value);
+    }
+
+    private static Message mapToMessage(Map<?, ?> value, Session session) throws JMSException
+    {
+        MapMessage mMsg = session.createMapMessage();
+
+        for (Iterator<?> i = value.entrySet().iterator(); i.hasNext();)
+        {
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
+            mMsg.setObject(entry.getKey().toString(), entry.getValue());
+        }
+
+        return mMsg;
+    }
+
+    private static Message inputStreamToMessage(InputStream value, Session session) throws JMSException
+    {
+        StreamMessage streamMessage = session.createStreamMessage();
+        byte[] buffer = new byte[4096];
+        int len;
+
+        try
+        {
+            while ((len = value.read(buffer)) != -1)
+            {
+                streamMessage.writeBytes(buffer, 0, len);
+            }
+        }
+        catch (IOException e)
+        {
+            throw new JMSException("Failed to read input stream to create a stream message: " + e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(value);
+        }
+
+        return streamMessage;
+    }
+
+    private static Message listToMessage(List<?> value, Session session)
+        throws JMSException
+    {
+        StreamMessage sMsg = session.createStreamMessage();
+
+        for (Iterator<?> iter = value.iterator(); iter.hasNext();)
+        {
+            Object o = iter.next();
+            if (validateStreamMessageType(o))
+            {
+                sMsg.writeObject(o);
+            }
+            else
+            {
+                throw new MessageFormatException(String.format(
+                    "Invalid type passed to StreamMessage: %s . Allowed types are: "
+                                    + "Boolean, Byte, Short, Character, Integer, Long, Float, Double,"
+                                    + "String and byte[]", ClassUtils.getShortClassName(o, "null")));
+            }
+        }
+        return sMsg;
+    }
+
+    private static Message byteArrayToMessage(byte[] value, Session session) throws JMSException
+    {
+        BytesMessage bMsg = session.createBytesMessage();
+        bMsg.writeBytes(value);
+
+        return bMsg;
+    }
+
+    private static Message serializableToMessage(Serializable value, Session session) throws JMSException
+    {
+        ObjectMessage oMsg = session.createObjectMessage();
+        oMsg.setObject(value);
+
+        return oMsg;
+    }
+
+    private static Message outputHandlerToMessage(OutputHandler value, Session session) throws JMSException
+    {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try
+        {
+            value.write(null, output);
+        }
+        catch (IOException e)
+        {
+            JMSException j = new JMSException("Could not serialize OutputHandler.");
+            j.initCause(e);
+            throw j;
+        }
+
+        BytesMessage bMsg = session.createBytesMessage();
+        bMsg.writeBytes(output.toByteArray());
+
+        return bMsg;
     }
 
     public static Object toObject(Message source, String jmsSpec, String encoding) throws JMSException, IOException
