@@ -10,12 +10,13 @@
 
 package org.mule.transport.http.functional;
 
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConstants;
 
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
@@ -39,7 +40,7 @@ public class Http10FunctionalTestCase extends FunctionalTestCase
     {
         HttpClient client = setupHttpClient();
 
-        GetMethod request = new GetMethod("http://localhost:60213/streaming");
+        GetMethod request = new GetMethod("http://localhost:60232/streaming");
         client.executeMethod(request);
         assertEquals("hello", request.getResponseBodyAsString());
         
@@ -47,5 +48,3 @@ public class Http10FunctionalTestCase extends FunctionalTestCase
         assertNotNull(request.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH));
     }
 }
-
-
