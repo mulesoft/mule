@@ -26,6 +26,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
 
     private HttpMethodBase method;
 
+    @Override
     protected String getConfigResources()
     {
         return "http-method-test.xml";
@@ -42,7 +43,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testHead() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HeadMethod("http://localhost:60200");
+        method = new HeadMethod("http://localhost:60228");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
 
@@ -51,7 +52,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testOptions() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new OptionsMethod("http://localhost:60200");
+        method = new OptionsMethod("http://localhost:60228");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
@@ -59,7 +60,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testPut() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new PutMethod("http://localhost:60200");
+        method = new PutMethod("http://localhost:60228");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
@@ -67,7 +68,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testDelete() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new DeleteMethod("http://localhost:60200");
+        method = new DeleteMethod("http://localhost:60228");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
@@ -75,7 +76,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testTrace() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new TraceMethod("http://localhost:60200");
+        method = new TraceMethod("http://localhost:60228");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
@@ -83,8 +84,9 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testConnect() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HttpMethodBase("http://localhost:60200")
+        method = new HttpMethodBase("http://localhost:60228")
         {
+            @Override
             public String getName()
             {
                 return "CONNECT";
@@ -97,8 +99,9 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testFoo() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HttpMethodBase("http://localhost:60200")
+        method = new HttpMethodBase("http://localhost:60228")
         {
+            @Override
             public String getName()
             {
                 return "FOO";

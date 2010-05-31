@@ -11,7 +11,7 @@
     <model name="main">
         <service name="httpIn">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60200" synchronous="true"/>
+                <http:inbound-endpoint host="localhost" port="60228" synchronous="true"/>
             </inbound>
             <echo-component/>
         </service>
