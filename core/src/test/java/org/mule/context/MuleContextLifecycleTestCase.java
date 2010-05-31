@@ -351,26 +351,26 @@ public class MuleContextLifecycleTestCase
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
         ctx.initialise();
-
         new DefaultsConfigurationBuilder().configure(ctx);
-        final AtomicReference<MuleContext> notifCtx = new AtomicReference<MuleContext>();
+        
+        final AtomicReference<MuleContext> contextFromNotification = new AtomicReference<MuleContext>();
         final AtomicReference<String> resourceId = new AtomicReference<String>();
-        MuleContextNotificationListener listener = new MuleContextNotificationListener<MuleContextNotification>()
+        MuleContextNotificationListener<MuleContextNotification> listener = 
+            new MuleContextNotificationListener<MuleContextNotification>()
         {
             public void onNotification(MuleContextNotification notification)
             {
-                notifCtx.set(notification.getMuleContext());
+                contextFromNotification.set(notification.getMuleContext());
                 resourceId.set(notification.getResourceIdentifier());
             }
         };
         ctx.registerListener(listener);
         ctx.start();
 
-        assertNotNull(notifCtx.get());
-        assertSame(ctx, notifCtx.get());
+        assertNotNull(contextFromNotification.get());
+        assertSame(ctx, contextFromNotification.get());
         assertEquals(ctx.getConfiguration().getId(), resourceId.get());
     }
-
 
     private MuleContext buildStartedMuleContext() throws Exception
     {
@@ -437,10 +437,21 @@ public class MuleContextLifecycleTestCase
         {
             switch (notification.getAction())
             {
-                case MuleContextNotification.CONTEXT_STARTING: startingNotificationFired.set(true); break;
-                case MuleContextNotification.CONTEXT_STARTED : startedNotificationFired.set(true); break;
-                case MuleContextNotification.CONTEXT_STOPPING: stoppingNotificationFired.set(true); break;
-                case MuleContextNotification.CONTEXT_STOPPED : stoppedNotificationFired.set(true); break;
+                case MuleContextNotification.CONTEXT_STARTING: 
+                    startingNotificationFired.set(true); 
+                    break;
+                    
+                case MuleContextNotification.CONTEXT_STARTED: 
+                    startedNotificationFired.set(true); 
+                    break;
+                    
+                case MuleContextNotification.CONTEXT_STOPPING: 
+                    stoppingNotificationFired.set(true); 
+                    break;
+                    
+                case MuleContextNotification.CONTEXT_STOPPED: 
+                    stoppedNotificationFired.set(true); 
+                    break;
             }
         }
     }
