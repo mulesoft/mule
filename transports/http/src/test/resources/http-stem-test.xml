@@ -13,14 +13,14 @@
     <model name="main">
         <custom-service name="/foo" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60200/foo" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60229/foo" synchronous="true"/>
             </inbound>
             <test:component appendString=" Received"/>
         </custom-service>
         
         <custom-service name="/bar" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60200/bar" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60229/bar" synchronous="true"/>
             </inbound>
             <test:component appendString=" Received"/>
         </custom-service>

@@ -20,7 +20,7 @@ import org.mule.transport.http.HttpConnector;
 
 public class HttpStemTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "http-stem-test.xml";
@@ -29,10 +29,10 @@ public class HttpStemTestCase extends FunctionalTestCase
     public void testStemMatching() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        doTest(client, "http://localhost:60200/foo", "/foo", "/foo");
-        doTest(client, "http://localhost:60200/foo/baz", "/foo", "/foo/baz");
-        doTest(client, "http://localhost:60200/bar", "/bar", "/bar");
-        doTest(client, "http://localhost:60200/bar/baz", "/bar", "/bar/baz");
+        doTest(client, "http://localhost:60229/foo", "/foo", "/foo");
+        doTest(client, "http://localhost:60229/foo/baz", "/foo", "/foo/baz");
+        doTest(client, "http://localhost:60229/bar", "/bar", "/bar");
+        doTest(client, "http://localhost:60229/bar/baz", "/bar", "/bar/baz");
     }
     
     protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
@@ -57,7 +57,4 @@ public class HttpStemTestCase extends FunctionalTestCase
         assertEquals("Hello World Received", result.getPayloadAsString());
         assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
-
 }
-
-
