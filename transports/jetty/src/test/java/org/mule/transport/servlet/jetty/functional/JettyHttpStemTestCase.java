@@ -18,7 +18,7 @@ import org.mule.transport.http.HttpConnector;
 
 public class JettyHttpStemTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "jetty-http-stem-test.xml";
@@ -27,9 +27,9 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
     public void testStemMatchingHttp() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        doTest(client, "http://localhost:60200/foo", "Hello World");
-        doTest(client, "http://localhost:60200/foo/bar", "Hello World");
-        doTest(client, "http://localhost:60200/foo/bestmatch", "Hello World Best Match");
+        doTest(client, "http://localhost:60230/foo", "Hello World");
+        doTest(client, "http://localhost:60230/foo/bar", "Hello World");
+        doTest(client, "http://localhost:60230/foo/bestmatch", "Hello World Best Match");
     }
 
     protected void doTest(MuleClient client, String url, String value) throws Exception
@@ -38,5 +38,4 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
         assertEquals(value, result.getPayloadAsString());
         assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
-
 }
