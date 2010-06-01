@@ -43,7 +43,7 @@ public class DummySecurityFilter extends AbstractEndpointSecurityFilter
     {
         try
         {
-            Map payload = event.getMessage().getPayload(Map.class);
+            Map<?, ?> payload = event.getMessage().getPayload(Map.class);
             String user = (String) payload.get("user");
             if (user == null)
             {

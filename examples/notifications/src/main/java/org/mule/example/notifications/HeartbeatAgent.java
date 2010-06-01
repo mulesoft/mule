@@ -86,6 +86,7 @@ public class HeartbeatAgent extends AbstractAgent
             //No Op
         }
 
+        @SuppressWarnings("synthetic-access")
         public void run()
         {
             while(true)
