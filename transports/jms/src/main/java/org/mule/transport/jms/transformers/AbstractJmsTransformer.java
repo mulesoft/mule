@@ -17,6 +17,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.ConnectException;
@@ -157,7 +158,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
 
     protected void setJmsProperties(MuleMessage message, Message msg) throws JMSException
     {
-        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+        for (Iterator iterator = message.getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
         {
             String key = iterator.next().toString();
 
