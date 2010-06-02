@@ -171,9 +171,8 @@ public class DefaultMuleContext implements MuleContext
 
         try
         {
-
-
-            // Initialize internal registries
+            // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
+            //The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
             muleRegistryHelper.initialise();
 
             //We need to start the work manager straight away since we need it to fire notifications
@@ -200,7 +199,7 @@ public class DefaultMuleContext implements MuleContext
 
     public synchronized void start() throws MuleException
     {
-        lifecycleManager.checkPhase(Startable.PHASE_NAME);
+        getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
         if (getSecurityManager() == null)
         {
@@ -233,9 +232,9 @@ public class DefaultMuleContext implements MuleContext
      */
     public synchronized void stop() throws MuleException
     {
-        lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
+        getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
-        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
+        getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
     }
 
@@ -253,7 +252,7 @@ public class DefaultMuleContext implements MuleContext
             }
         }
 
-        lifecycleManager.checkPhase(Disposable.PHASE_NAME);
+        getLifecycleManager().checkPhase(Disposable.PHASE_NAME);
 
         fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
 
@@ -291,7 +290,7 @@ public class DefaultMuleContext implements MuleContext
      */
     public boolean isInitialised()
     {
-        return lifecycleManager.getState().isInitialised();
+        return getLifecycleManager().getState().isInitialised();
     }
 
     /**
@@ -301,17 +300,17 @@ public class DefaultMuleContext implements MuleContext
      */
     public boolean isInitialising()
     {
-        return lifecycleManager.getState().isInitialising();
+        return getLifecycleManager().getState().isInitialising();
     }
 
     protected boolean isStopped()
     {
-        return lifecycleManager.getState().isStopped();
+        return getLifecycleManager().getState().isStopped();
     }
 
     protected boolean isStopping()
     {
-        return lifecycleManager.getState().isStopping();
+        return getLifecycleManager().getState().isStopping();
     }
 
     /**
@@ -321,22 +320,22 @@ public class DefaultMuleContext implements MuleContext
      */
     public boolean isStarted()
     {
-        return lifecycleManager.isPhaseComplete(Startable.PHASE_NAME);
+        return getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME);
     }
 
     protected boolean isStarting()
     {
-        return lifecycleManager.getState().isStarting();
+        return getLifecycleManager().getState().isStarting();
     }
 
     public boolean isDisposed()
     {
-        return lifecycleManager.getState().isDisposed();
+        return getLifecycleManager().getState().isDisposed();
     }
 
     public boolean isDisposing()
     {
-        return lifecycleManager.getState().isDisposing();
+        return getLifecycleManager().getState().isDisposing();
     }
 
     public LifecycleManager getLifecycleManager()
@@ -345,9 +344,9 @@ public class DefaultMuleContext implements MuleContext
     }
 
     /**
-     * Gets all statisitcs for this instance
+     * Gets all statistics for this instance
      *
-     * @return all statisitcs for this instance
+     * @return all statistics for this instance
      */
     public AllStatistics getStatistics()
     {
@@ -501,10 +500,10 @@ public class DefaultMuleContext implements MuleContext
     }
 
     /**
-     * Sets the Jta Transaction Manager to use with this Mule server instance
+     * Sets the JTA Transaction Manager to use with this Mule server instance
      *
      * @param manager the manager to use
-     * @throws Exception
+     * @throws RegistrationException if a transaction manager has already been set
      */
     public void setTransactionManager(TransactionManager manager) throws RegistrationException
     {
@@ -547,23 +546,6 @@ public class DefaultMuleContext implements MuleContext
         }
         return transactionManager;
     }
-
-
-    public void register() throws RegistrationException
-    {
-        throw new UnsupportedOperationException("register");
-    }
-
-    public void deregister() throws RegistrationException
-    {
-        throw new UnsupportedOperationException("deregister");
-    }
-
-    public String getRegistryId()
-    {
-        throw new UnsupportedOperationException("registryId");
-    }
-
 
     protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException
     {

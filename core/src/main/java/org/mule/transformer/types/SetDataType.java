@@ -12,9 +12,11 @@ package org.mule.transformer.types;
 import java.util.Set;
 
 /**
- * TODO
+ * Defines a Set collection type with item type information
+ *
+ * @since 3.0
  */
-public class SetDataType extends CollectionDataType
+public class SetDataType<T> extends CollectionDataType<T>
 {
     public SetDataType()
     {

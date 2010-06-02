@@ -14,6 +14,8 @@ import org.mule.api.transformer.DataType;
 /**
  * A data type that simply wraps a Java type.  This type also allows a mime type to be associated
  * with the Java type.
+ *
+ * @since 3.0
  */
 public class SimpleDataType<T> implements DataType<T>
 {

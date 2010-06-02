@@ -11,6 +11,8 @@ package org.mule.transformer.types;
 
 /**
  * Common mime types used in Mule
+ *
+ * @since 3.0
  */
 public interface MimeTypes
 {

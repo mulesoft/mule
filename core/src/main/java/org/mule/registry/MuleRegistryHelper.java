@@ -18,8 +18,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
@@ -62,7 +60,7 @@ import org.apache.commons.logging.LogFactory;
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
  */
-public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposable
+public class MuleRegistryHelper implements MuleRegistry
 {
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
@@ -90,6 +88,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     public void initialise() throws InitialisationException
     {
         //no-op
+
+        //This is called when the MuleContext starts up, and should only do initialisation for any state on this class, the lifecycle
+        //for the registries will be handled by the LifecycleManager on the registry that this class wraps
     }
 
     /**
@@ -117,7 +118,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
      * Removed this method from {@link Registry} API as it should only be used
      * internally and may confuse users. The {@link EndpointFactory} should be used
      * for creating endpoints.<br/><br/> Looks up an returns endpoints registered in the
-     * registry by their idendifier (currently endpoint name)<br/><br/ <b>NOTE:
+     * registry by their identifier (currently endpoint name)<br/><br/ <b>NOTE:
      * This method does not create new endpoint instances, but rather returns
      * existing endpoint instances that have been registered. This lookup method
      * should be avoided and the intelligent, role specific endpoint lookup methods

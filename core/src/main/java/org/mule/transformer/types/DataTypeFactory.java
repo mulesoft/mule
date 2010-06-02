@@ -23,6 +23,8 @@ import java.util.Collection;
 /**
  * Factory class used to create {@link org.mule.api.transformer.DataType} objects based on the 
  * parameter types passed into the factory methods.
+ *
+ * @since 3.0
  */
 public class DataTypeFactory
 {

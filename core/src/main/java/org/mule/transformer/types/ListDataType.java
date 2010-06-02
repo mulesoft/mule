@@ -12,9 +12,11 @@ package org.mule.transformer.types;
 import java.util.List;
 
 /**
- * TODO
+ * Defines a List collection type with item type information
+ *
+ * @since 3.0
  */
-public class ListDataType extends CollectionDataType
+public class ListDataType<T> extends CollectionDataType<T>
 {
     public ListDataType()
     {

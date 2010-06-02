@@ -20,7 +20,7 @@ import java.util.Collection;
  * A data type that represents a generified collection.  When checked for compatability both the colection type and the
  * generic item type will be compared.
  *
- * @since 3.0.0
+ * @since 3.0
  */
 public class CollectionDataType<T> extends SimpleDataType<T>
 {
