@@ -269,7 +269,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     public void setEndpoints(List<OutboundEndpoint> endpoints)
     {
         this.endpoints.clear();
-        this.endpoints.addAll(endpoints);
+        for (OutboundEndpoint endpoint : endpoints)
+        {
+            addEndpoint(endpoint);
+        }
     }
 
     public void addEndpoint(OutboundEndpoint endpoint)
