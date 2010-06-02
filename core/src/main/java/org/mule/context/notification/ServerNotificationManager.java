@@ -103,7 +103,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
-    public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event)
+    public void addInterfaceToType(Class<? extends ServerNotificationListener<?>> iface, Class<? extends ServerNotification> event)
     {
         configuration.addInterfaceToType(iface, event);
     }
@@ -118,17 +118,17 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.addListenerSubscriptionPair(pair);
     }
 
-    public void addListener(ServerNotificationListener listener)
+    public void addListener(ServerNotificationListener<?> listener)
     {
         configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener));
     }
 
-    public void addListenerSubscription(ServerNotificationListener listener, String subscription)
+    public void addListenerSubscription(ServerNotificationListener<?> listener, String subscription)
     {
         configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, subscription));
     }
 
-    public void addAllListenerSubscriptionPairs(Collection pairs)
+    public void addAllListenerSubscriptionPairs(Collection<?> pairs)
     {
         configuration.addAllListenerSubscriptionPairs(pairs);
     }
@@ -138,7 +138,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
      * @param pairs
      */
     @Deprecated
-    public void setAllListenerSubscriptionPairs(Collection pairs)
+    public void setAllListenerSubscriptionPairs(Collection<?> pairs)
     {
         configuration.addAllListenerSubscriptionPairs(pairs);
     }
@@ -146,7 +146,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     /**
      * This removes *all* registrations that reference this listener
      */
-    public void removeListener(ServerNotificationListener listener)
+    public void removeListener(ServerNotificationListener<?> listener)
     {
         configuration.removeListener(listener);
     }
@@ -156,7 +156,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.removeAllListeners(listeners);
     }
 
-    public void disableInterface(Class<? extends ServerNotificationListener> iface) throws ClassNotFoundException
+    public void disableInterface(Class<? extends ServerNotificationListener<?>> iface) throws ClassNotFoundException
     {
         configuration.disableInterface(iface);
     }
@@ -178,10 +178,9 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
 
     public boolean isListenerRegistered(ServerNotificationListener listener)
     {
-
         for (ListenerSubscriptionPair pair : configuration.getListeners())
         {
-            if(pair.getListener().equals(listener))
+            if (pair.getListener().equals(listener))
             {
                 return true;
             }
