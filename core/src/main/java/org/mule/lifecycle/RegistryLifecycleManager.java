@@ -37,6 +37,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
 
     public RegistryLifecycleManager(Registry registry)
     {
+        super(registry.getRegistryId());
         this.registry = registry;
     }
 

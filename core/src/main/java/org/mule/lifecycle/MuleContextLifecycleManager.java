@@ -9,6 +9,7 @@
  */
 package org.mule.lifecycle;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 
@@ -18,6 +19,19 @@ import org.mule.api.lifecycle.LifecyclePhase;
  */
 public class MuleContextLifecycleManager extends AbstractLifecycleManager
 {
+    private MuleContext muleContext;
+
+    public MuleContextLifecycleManager()
+    {
+        super("MuleContext");
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     @Override
     protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
     {

@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.ReverseLifecyclePhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +64,8 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
     protected LifecycleState state;
     protected MuleContext muleContext;
 
+    protected String lifecycleManagerId;
+
     //this is an internal list to track indexes
     protected List<LifecyclePhase> index;
 
@@ -75,9 +78,10 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
         DIRECT_TRANSITIONS = Collections.unmodifiableSet(directTransitions);
     }
     
-    public AbstractLifecycleManager()
+    public AbstractLifecycleManager(String id)
     {
         state = createLifecycleState();
+        lifecycleManagerId = id;
     }
 
     public void setMuleContext(MuleContext context)
@@ -318,24 +322,24 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
         {
             if (name.equalsIgnoreCase(executingPhase))
             {
-                throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
+                throw new IllegalStateException(getLifecycleManagerId() + "Phase '" + name + "' is already currently being executed");
             }
             else
             {
-                throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+                throw new IllegalStateException(getLifecycleManagerId() + "Currently executing lifecycle phase: " + executingPhase);
             }
         }
 
         if (name.equalsIgnoreCase(currentPhase))
         {
-            throw new IllegalStateException("Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
+            throw new IllegalStateException(getLifecycleManagerId() + "Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
         }
 
 
         int phaseIndex = getPhaseIndex(name);
         if (phaseIndex == -1)
         {
-            throw new IllegalStateException("Phase does not exist: " + name);
+            throw new IllegalStateException(getLifecycleManagerId() + "Phase does not exist: " + name);
         }
         else
         {
@@ -358,7 +362,19 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
                     return;
                 }
             }
-            throw new IllegalStateException("Lifecycle phase: " + currentPhase + " does not support phase: " + name);
+            throw new IllegalStateException(getLifecycleManagerId() + "Lifecycle phase: " + currentPhase + " does not support phase: " + name);
+        }
+    }
+
+    private String getLifecycleManagerId()
+    {
+        if(lifecycleManagerId==null)
+        {
+            return StringUtils.EMPTY;
+        }
+        else
+        {
+            return "Lifecycle Manager " + lifecycleManagerId + ": ";
         }
     }
 
@@ -367,7 +383,7 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
         int phaseIndex = getPhaseIndex(phase);
         if (phaseIndex == -1)
         {
-            throw new IllegalArgumentException("No lifecycle phase registered with name: " + phase);
+            throw new IllegalArgumentException(getLifecycleManagerId() + "No lifecycle phase registered with name: " + phase);
         }
         return getPhaseForIndex(phaseIndex);
     }

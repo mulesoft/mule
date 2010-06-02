@@ -41,6 +41,7 @@ public class ServiceLifecycleManager extends AbstractLifecycleManager
 
     public ServiceLifecycleManager(AbstractService service, LifecycleManager lifecycleManager) throws MuleException
     {
+        super(service.getName());
         this.service = service;
         for (LifecyclePair pair : lifecycleManager.getLifecyclePairs())
         {

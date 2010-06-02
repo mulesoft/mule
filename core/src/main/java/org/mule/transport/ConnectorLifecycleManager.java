@@ -18,13 +18,9 @@ import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.context.notification.ServiceNotification;
 import org.mule.lifecycle.AbstractLifecycleManager;
-import org.mule.service.Pausable;
-import org.mule.service.Resumable;
 
 /**
  * TODO
@@ -35,6 +31,7 @@ public class ConnectorLifecycleManager extends AbstractLifecycleManager
 
     public ConnectorLifecycleManager(AbstractConnector connector, LifecycleManager lifecycleManager) throws MuleException
     {
+        super(connector.getName());
         this.connector = connector;
         //TODO see if we can incorporate connect and disconnect
         for (LifecyclePair pair : lifecycleManager.getLifecyclePairs())

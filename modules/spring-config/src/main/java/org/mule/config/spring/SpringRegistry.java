@@ -12,17 +12,19 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePair;
+import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.DefaultLifecyclePair;
 import org.mule.lifecycle.RegistryLifecycleManager;
-import org.mule.lifecycle.phases.ContainerManagedDisposePhase;
-import org.mule.lifecycle.phases.ContainerManagedInitialisePhase;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.util.StringUtils;
 
@@ -46,7 +48,7 @@ public class SpringRegistry extends AbstractRegistry
      * Registry interface.
      */
     public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
-    
+
     protected ApplicationContext applicationContext;
 
     //This is used to track the Spring context lifecycle since there is no way to confirm the
@@ -111,7 +113,7 @@ public class SpringRegistry extends AbstractRegistry
         }
 
         if (applicationContext instanceof ConfigurableApplicationContext
-            && ((ConfigurableApplicationContext) applicationContext).isActive())
+                && ((ConfigurableApplicationContext) applicationContext).isActive())
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
@@ -127,16 +129,10 @@ public class SpringRegistry extends AbstractRegistry
         for (LifecyclePair pair : lifecyclePairs)
         {
             //Marker: MULE-4813
-            if(pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
+            if (pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
             {
                 lifecycleManager.registerLifecycle(new DefaultLifecyclePair(
-                        new ContainerManagedInitialisePhase(), new ContainerManagedDisposePhase(){
-                            @Override
-                            public void applyLifecycle(Object o) throws LifecycleException
-                            {
-                                doDispose();
-                            }
-                        }));
+                        new SpringContextInitialisePhase(), new SpringContextDisposePhase()));
             }
             else
             {
@@ -229,11 +225,11 @@ public class SpringRegistry extends AbstractRegistry
     {
         throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////
     // Registry meta-data
     ////////////////////////////////////////////////////////////////////////////////////
-    
+
     public boolean isReadOnly()
     {
         return true;
@@ -243,4 +239,55 @@ public class SpringRegistry extends AbstractRegistry
     {
         return false;
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    // Spring custom lifecycle phases
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * A lifecycle phase that will delegate any lifecycle invocations to a container such as Spring or Guice
+     */
+    class SpringContextInitialisePhase extends ContainerManagedLifecyclePhase
+    {
+        public SpringContextInitialisePhase()
+        {
+            super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
+            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
+        }
+
+        /**
+         * We don't need to apply any lifecycle here since Spring manages that for us
+         *
+         * @param o the object apply lifecycle to.  This parameter will be ignorred
+         * @throws LifecycleException never thrown
+         */
+        @Override
+        public void applyLifecycle(Object o) throws LifecycleException
+        {
+            //Spring starts initialised, do nothing here
+        }
+    }
+
+
+    /**
+     * A lifecycle phase that will delegate to the {@link org.mule.config.spring.SpringRegistry#doDispose()} method which in
+     * turn will destroy the application context managed by this registry
+     */
+    class SpringContextDisposePhase extends ContainerManagedLifecyclePhase
+    {
+        public SpringContextDisposePhase()
+        {
+            super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
+            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
+            //You can dispose from all phases
+            registerSupportedPhase(LifecyclePhase.ALL_PHASES);
+        }
+
+        @Override
+        public void applyLifecycle(Object o) throws LifecycleException
+        {
+            doDispose();
+        }
+    }
+
 }

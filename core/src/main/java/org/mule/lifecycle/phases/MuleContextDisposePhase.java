@@ -30,6 +30,20 @@ import java.util.Set;
  * it must also take care of disposing them. However, a user may want to initiate a dispose via the
  * {@link org.mule.DefaultMuleContext} so the dispose Lifecycle phase for the {@link org.mule.DefaultMuleContext}
  * needs to call dispose on the Registry.
+ *
+ * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is disposed.  The MuleContext is associated
+ * with one or more registries that inherit the lifecycle of the MuleContext.
+ *
+ * This phase is responsible for disposing objects. Any object that implements {@link org.mule.api.lifecycle.Disposable} will
+ * have its {@link org.mule.api.lifecycle.Disposable#dispose()} method called.  Objects are initialised in the order based on type:
+ * {@link org.mule.api.service.Service}, {@link org.mule.api.model.Model}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.transport.Connector}, followed
+ * by any other object that implements {@link org.mule.api.lifecycle.Disposable}.
+ *
+ * @see org.mule.api.MuleContext
+ * @see org.mule.api.lifecycle.LifecycleManager
+ * @see org.mule.api.lifecycle.Disposable
+ *
+ * @since 3.0
  */
 public class MuleContextDisposePhase extends DefaultLifecyclePhase
 {

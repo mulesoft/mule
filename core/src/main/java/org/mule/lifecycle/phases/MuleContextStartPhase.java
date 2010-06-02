@@ -29,12 +29,21 @@ import java.util.Set;
 /**
  * The Start phase for the MuleContext. Calling
  * {@link MuleContext#start()} will initiate this phase via the
- * {@link org.mule.api.lifecycle.LifecycleManager}. This phase controls the order in
- * which objects should be started.
- * 
+ * {@link org.mule.api.lifecycle.LifecycleManager}.
+ *
+ * The MuleContextStartPhase defines the lifecycle behaviour when the Mule context is started.  The MuleContext is associated
+ * with one or more registries that inherit the lifecycle of the MuleContext.
+ *
+ * This phase is responsible for starting objects. Any object that implements {@link org.mule.api.lifecycle.Startable} will
+ * have its {@link org.mule.api.lifecycle.Startable#start()} method called.  Objects are initialised in the order based on type:
+ * {@link org.mule.api.transport.Connector}, {@link org.mule.api.agent.Agent}, {@link org.mule.api.model.Model}, {@link org.mule.api.service.Service}, followed
+ * by any other object that implements {@link org.mule.api.lifecycle.Startable}.
+ *
  * @see org.mule.api.MuleContext
  * @see org.mule.api.lifecycle.LifecycleManager
  * @see org.mule.api.lifecycle.Startable
+ *
+ * @since 3.0
  */
 public class MuleContextStartPhase extends DefaultLifecyclePhase
 {
