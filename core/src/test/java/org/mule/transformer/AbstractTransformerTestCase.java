@@ -17,6 +17,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -100,7 +101,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void doTestBadReturnType(Transformer tran, Object src) throws Exception
     {
-        tran.setReturnClass(InvalidSatsuma.class);
+        tran.setReturnDataType(DataTypeFactory.create(InvalidSatsuma.class));
         try
         {
             tran.transform(src);

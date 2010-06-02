@@ -13,6 +13,7 @@ package org.mule.transport.xmpp.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
 import org.mule.util.StringUtils;
 
@@ -23,7 +24,7 @@ public class XmppPacketToObject extends AbstractMessageAwareTransformer
     public XmppPacketToObject()
     {
         registerSourceType(Message.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     @Override

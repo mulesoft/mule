@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;
 
@@ -34,7 +35,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     public SerializableToByteArray()
     {
         this.registerSourceType(Serializable.class);
-        this.setReturnClass(byte[].class);
+        this.setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
     public boolean isAcceptMuleMessage()

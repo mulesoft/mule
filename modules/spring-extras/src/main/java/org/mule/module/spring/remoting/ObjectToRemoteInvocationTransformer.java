@@ -12,6 +12,7 @@ package org.mule.module.spring.remoting;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
         this.registerSourceType(RemoteInvocation.class);
         this.registerSourceType(byte[].class);
         this.registerSourceType(InputStream.class);
-        this.setReturnClass(RemoteInvocation.class);
+        this.setReturnDataType(DataTypeFactory.create(RemoteInvocation.class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

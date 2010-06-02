@@ -17,6 +17,7 @@ import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -153,7 +154,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
             // TODO Find a more direct way to do this
             XmlToDomDocument tr = new XmlToDomDocument();
             tr.setMuleContext(muleContext);
-            tr.setReturnClass(org.dom4j.Document.class);
+            tr.setReturnDataType(DataTypeFactory.create(org.dom4j.Document.class));
             return (org.dom4j.Document) tr.transform(obj);
         }
         else if (obj instanceof java.io.InputStream)

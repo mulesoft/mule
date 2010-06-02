@@ -15,32 +15,33 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.io.FilterInputStream;
-import java.io.InputStream;
 
 public class TransformerCachingTestCase extends AbstractMuleTestCase
 {
     public void testCacheUpdate() throws Exception
     {
-        Transformer trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        Transformer trans = muleContext.getRegistry().lookupTransformer(new SimpleDataType(FilterInputStream.class), DataTypeFactory.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 
         Transformer trans2 = new FilterInputStreamToByteArray();
         muleContext.getRegistry().registerTransformer(trans2);
 
-        trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(new SimpleDataType(FilterInputStream.class), DataTypeFactory.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof FilterInputStreamToByteArray);
 
-        trans = muleContext.getRegistry().lookupTransformer(InputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(DataTypeFactory.INPUT_STREAM, DataTypeFactory.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 
         muleContext.getRegistry().unregisterTransformer(trans2.getName());
 
-        trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(new SimpleDataType(FilterInputStream.class), DataTypeFactory.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 
@@ -51,7 +52,7 @@ public class TransformerCachingTestCase extends AbstractMuleTestCase
         public FilterInputStreamToByteArray()
         {
             registerSourceType(FilterInputStream.class);
-            setReturnClass(byte[].class);
+            setReturnDataType(DataTypeFactory.create(byte[].class));
         }
 
         protected Object doTransform(Object src, String encoding) throws TransformerException

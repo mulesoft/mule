@@ -10,10 +10,14 @@
 
 package org.mule.transport.bpm;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleSession;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -81,18 +85,25 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         {
             message = createMuleMessage(payload, this.endpoint.getEncoding());
         }
-        message.addProperties(messageProperties);
 
         MuleMessage response = null;
         if (connector.isAllowGlobalDispatcher())
         {
+            //TODO should probably cache this
+            EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry()
+                .lookupEndpointFactory().getEndpointBuilder(endpoint);
+            endpointBuilder.setSynchronous(synchronous);
+            OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
+
+            DefaultMuleEvent event = new DefaultMuleEvent(message, ep, 
+                new DefaultMuleSession(service, connector.getMuleContext()), synchronous);
             if (synchronous)
             {
-                response = connector.getMuleClient().send(endpoint, message);
+                return ep.send(event);
             }
             else
             {
-                connector.getMuleClient().dispatch(endpoint, message);
+                ep.dispatch(event);
             }
         }
         else

@@ -18,6 +18,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
@@ -77,7 +78,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             Class srcType = returnMessage.getPayload().getClass();
             for (Transformer t : getTransformers())
             {
-                if (t.isSourceTypeSupported(srcType))
+                if (t.isSourceDataTypeSupported(DataTypeFactory.create(srcType)))
                 {
                     if (t.getEndpoint() == null)
                     {

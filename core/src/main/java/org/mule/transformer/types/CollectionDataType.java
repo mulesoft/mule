@@ -33,7 +33,7 @@ public class CollectionDataType<T> extends SimpleDataType<T>
      */
     public CollectionDataType(Class<? extends Collection> collectionType)
     {
-        super(Object.class, null);
+        super(Object.class);
         this.collectionType = collectionType;
     }
 
@@ -77,7 +77,7 @@ public class CollectionDataType<T> extends SimpleDataType<T>
 
         if (collType != null)
         {
-            return new CollectionDataType(m.getReturnType(), collType, mimeType);
+            return new CollectionDataType((Class<? extends Collection>)m.getReturnType(), collType, mimeType);
         }
         else
         {
@@ -96,7 +96,7 @@ public class CollectionDataType<T> extends SimpleDataType<T>
 
         if (collType != null)
         {
-            return new CollectionDataType(collType, m.getParameterTypes()[paramIndex], mimeType);
+            return new CollectionDataType((Class<? extends Collection>)m.getParameterTypes()[paramIndex], collType, mimeType);
         }
         else
         {
@@ -129,16 +129,8 @@ public class CollectionDataType<T> extends SimpleDataType<T>
         CollectionDataType that = (CollectionDataType) dataType;
 
         //Untyped compatible collection
-        if (that.getItemType() == Object.class)
-        {
-            return true;
-        }
+        return that.getItemType() == Object.class || this.getItemType().isAssignableFrom(that.getItemType());
 
-        if (!this.getItemType().isAssignableFrom(that.getItemType()))
-        {
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -165,12 +157,8 @@ public class CollectionDataType<T> extends SimpleDataType<T>
             return false;
         }
 
-        if (!getType().equals(that.getType()))
-        {
-            return false;
-        }
+        return getType().equals(that.getType());
 
-        return true;
     }
 
     @Override

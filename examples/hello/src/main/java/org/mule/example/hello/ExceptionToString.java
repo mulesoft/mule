@@ -12,6 +12,7 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>ExceptionToString</code> converts an exception to a String,
@@ -24,7 +25,7 @@ public class ExceptionToString extends AbstractTransformer
     {
         super();
         this.registerSourceType(Exception.class);
-        this.setReturnClass(String.class);
+        this.setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     @Override

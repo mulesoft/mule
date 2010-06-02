@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * TODO
  */
-public class SetDataType<T> extends CollectionDataType<T>
+public class SetDataType extends CollectionDataType
 {
     public SetDataType()
     {

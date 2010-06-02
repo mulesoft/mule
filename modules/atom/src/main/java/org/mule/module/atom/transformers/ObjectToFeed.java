@@ -12,6 +12,7 @@ package org.mule.module.atom.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ public class ObjectToFeed extends AbstractDiscoverableTransformer
         this.registerSourceType(byte[].class);
         this.registerSourceType(InputStream.class);
         this.registerSourceType(String.class);
-        setReturnClass(Feed.class);
+        setReturnDataType(DataTypeFactory.create(Feed.class));
     }
 
     @Override

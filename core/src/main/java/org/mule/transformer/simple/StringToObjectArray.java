@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -34,7 +35,7 @@ public class StringToObjectArray extends AbstractTransformer
         registerSourceType(String.class);
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
-        setReturnClass(Object[].class);
+        setReturnDataType(DataTypeFactory.create(Object[].class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

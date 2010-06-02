@@ -13,6 +13,7 @@ package org.mule.transport.http.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
@@ -29,7 +30,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageAwareTransformer
     public HttpRequestBodyToParamMap()
     {
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     @Override

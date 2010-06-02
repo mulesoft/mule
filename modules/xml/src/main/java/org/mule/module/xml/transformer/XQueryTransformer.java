@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -89,7 +90,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         registerSourceType(Document.class);
         registerSourceType(Element.class);
         registerSourceType(InputStream.class);
-        setReturnClass(Element.class);
+        setReturnDataType(DataTypeFactory.create(Element.class));
     }
 
     public XQueryTransformer(String xqueryFile)

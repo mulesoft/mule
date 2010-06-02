@@ -13,6 +13,7 @@ package org.mule.module.xml.transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -31,7 +32,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
         this.registerSourceType(String.class);
         this.registerSourceType(org.dom4j.Document.class);
         this.registerSourceType(org.w3c.dom.Document.class);
-        this.setReturnClass(String.class);
+        this.setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     public synchronized OutputFormat getOutputFormat()

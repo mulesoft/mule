@@ -15,6 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -44,7 +45,7 @@ public abstract class AbstractJaxpFilter
     public AbstractJaxpFilter()
     {
         super();
-        xmlToDom.setReturnClass(Document.class);
+        xmlToDom.setReturnDataType(DataTypeFactory.create(Document.class));
     }
     public void initialise() throws InitialisationException
     {

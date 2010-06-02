@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
         registerSourceType(Serializable.class);
-        setReturnClass(OutputHandler.class);
+        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
     public Object doTransform(final Object src, final String encoding) throws TransformerException

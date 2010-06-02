@@ -14,6 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.example.geomail.dao.Sender;
 import org.mule.example.geomail.dao.SenderDao;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * TODO
@@ -25,7 +26,7 @@ public class IPToSender extends AbstractTransformer
     public IPToSender()
     {
         registerSourceType(String.class);
-        setReturnClass(Sender.class);
+        setReturnDataType(DataTypeFactory.create(Sender.class));
     }
 
     @Override

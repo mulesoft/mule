@@ -12,6 +12,7 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * The transformation removes break-lines and newlines from the string, which
@@ -23,7 +24,7 @@ public class StdinToNameString extends AbstractTransformer
     {
         super();
         this.registerSourceType(String.class);
-        this.setReturnClass(NameString.class);
+        this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 
     @Override

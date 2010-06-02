@@ -13,6 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XQueryTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "    for $cd in $document/catalog/cd\n" +
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} \n</cd-listings>");
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         Properties params = new Properties();
         params.setProperty("title", "#[mule:message.header(ListTitle)]");
         params.setProperty("rating", "#[mule:message.header(ListRating)]");

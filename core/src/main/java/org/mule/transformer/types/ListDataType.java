@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * TODO
  */
-public class ListDataType<T> extends CollectionDataType<T>
+public class ListDataType extends CollectionDataType
 {
     public ListDataType()
     {

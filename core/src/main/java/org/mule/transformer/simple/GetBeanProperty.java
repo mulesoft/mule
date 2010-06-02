@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -33,7 +34,7 @@ public class GetBeanProperty extends AbstractTransformer
     {
         super();
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

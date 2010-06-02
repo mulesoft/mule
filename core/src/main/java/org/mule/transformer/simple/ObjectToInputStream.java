@@ -13,6 +13,7 @@ package org.mule.transformer.simple;
 import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +32,7 @@ public class ObjectToInputStream extends SerializableToByteArray
     {
         this.registerSourceType(String.class);
         this.registerSourceType(OutputHandler.class);
-        setReturnClass(InputStream.class);
+        setReturnDataType(DataTypeFactory.create(InputStream.class));
     }
 
     @Override

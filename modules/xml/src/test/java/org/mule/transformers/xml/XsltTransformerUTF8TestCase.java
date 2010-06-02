@@ -12,6 +12,7 @@ package org.mule.transformers.xml;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
@@ -32,7 +33,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

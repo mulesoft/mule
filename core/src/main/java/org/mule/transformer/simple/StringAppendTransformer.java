@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -30,7 +31,7 @@ public class StringAppendTransformer extends AbstractTransformer
     public StringAppendTransformer(String message)
     {
         this.message = message;
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
         registerSourceType(String.class);
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);

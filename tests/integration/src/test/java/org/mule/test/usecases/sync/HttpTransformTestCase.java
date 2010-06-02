@@ -15,6 +15,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Arrays;
 
@@ -32,7 +33,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
-        gu.setReturnClass(String.class);
+        gu.setReturnDataType(DataTypeFactory.create(String.class));
         assertNotNull(message.getPayload());
         String result = (String)gu.transform(message.getPayloadAsBytes());
         assertEquals("<string>payload</string>", result);

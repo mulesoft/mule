@@ -15,6 +15,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Properties;
 
@@ -115,7 +116,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            assertFalse(getTransformer().isSourceTypeSupported(String.class));
+            assertFalse(getTransformer().isSourceDataTypeSupported(DataTypeFactory.create(String.class)));
             getTransformer().transform(getResultData());
             fail("Should throw exception for string source type");
         }

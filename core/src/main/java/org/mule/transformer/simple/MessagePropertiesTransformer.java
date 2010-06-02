@@ -17,6 +17,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.text.MessageFormat;
@@ -51,7 +52,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     public MessagePropertiesTransformer()
     {
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     @Override
@@ -76,11 +77,13 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         return clone;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         if (deleteProperties != null && deleteProperties.size() > 0)

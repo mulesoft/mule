@@ -11,6 +11,7 @@ package org.mule.module.rss.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -37,7 +38,7 @@ public class ObjectToRssFeed extends AbstractDiscoverableTransformer
         registerSourceType(Document.class);
         registerSourceType(InputSource.class);
         registerSourceType(File.class);
-        setReturnClass(SyndFeed.class);
+        setReturnDataType(DataTypeFactory.create(SyndFeed.class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

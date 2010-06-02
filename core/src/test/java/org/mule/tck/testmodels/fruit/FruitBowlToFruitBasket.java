@@ -12,6 +12,7 @@ package org.mule.tck.testmodels.fruit;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Converts a FruitBowl to a FruitBasket (for testing obviously :)
@@ -23,7 +24,7 @@ public class FruitBowlToFruitBasket extends AbstractTransformer implements Disco
     public FruitBowlToFruitBasket()
     {
         registerSourceType(FruitBowl.class);
-        setReturnClass(FruitBasket.class);
+        setReturnDataType(DataTypeFactory.create(FruitBasket.class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

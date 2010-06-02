@@ -14,6 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.ResponseWriter;
@@ -37,7 +38,7 @@ public class HttpResponseToString extends AbstractTransformer
     public HttpResponseToString()
     {
         registerSourceType(HttpResponse.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     /**

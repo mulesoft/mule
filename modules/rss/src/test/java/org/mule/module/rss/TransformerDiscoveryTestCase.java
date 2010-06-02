@@ -21,10 +21,9 @@ public class TransformerDiscoveryTestCase extends AbstractMuleTestCase
 {
     public void testLookup() throws Exception
     {
-        Transformer t = muleContext.getRegistry().lookupTransformer(DataInputStream.class, SyndFeed.class);
+        Transformer t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.create(DataInputStream.class), DataTypeFactory.create(SyndFeed.class));
         assertNotNull(t);
-        DataTypeFactory factory = new DataTypeFactory();
-        t = muleContext.getRegistry().lookupTransformer(factory.create(DataInputStream.class), factory.create(SyndFeed.class));
+        t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.create(DataInputStream.class), DataTypeFactory.create(SyndFeed.class));
         assertNotNull(t);
     }
 }

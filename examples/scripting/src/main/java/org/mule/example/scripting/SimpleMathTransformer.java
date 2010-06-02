@@ -14,6 +14,7 @@ package org.mule.example.scripting;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NumberUtils;
 
 /** 
@@ -30,7 +31,7 @@ public class SimpleMathTransformer extends AbstractTransformer
     public SimpleMathTransformer()
     {
         registerSourceType(Number.class);
-        setReturnClass(Number.class);
+        setReturnDataType(DataTypeFactory.create(Number.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

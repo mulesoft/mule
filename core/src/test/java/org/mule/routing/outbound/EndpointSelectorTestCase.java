@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -34,9 +34,9 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     }
 
     Mock session;
-    ImmutableEndpoint dest1;
-    ImmutableEndpoint dest2;
-    ImmutableEndpoint dest3;
+    OutboundEndpoint dest1;
+    OutboundEndpoint dest2;
+    OutboundEndpoint dest3;
     EndpointSelector router;
 
     @Override
@@ -49,7 +49,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");
 
-        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(dest1);
         endpoints.add(dest2);
         endpoints.add(dest3);

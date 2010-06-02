@@ -15,6 +15,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         registerSourceType(OutputHandler.class);
         registerSourceType(XMLStreamReader.class);
         registerSourceType(DelayedResult.class);
-        setReturnClass(OutputHandler.class);
+        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
     public Object transform(MuleMessage message, final String encoding) throws TransformerException

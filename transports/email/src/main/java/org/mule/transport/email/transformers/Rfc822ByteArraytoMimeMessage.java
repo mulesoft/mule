@@ -14,6 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.AbstractMailConnector;
 
 import java.io.ByteArrayInputStream;
@@ -31,7 +32,7 @@ public class Rfc822ByteArraytoMimeMessage extends AbstractTransformer
     {
         registerSourceType(byte[].class);
         registerSourceType(InputStream.class);
-        setReturnClass(MimeMessage.class);
+        setReturnDataType(DataTypeFactory.create(MimeMessage.class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

@@ -25,7 +25,7 @@ public interface DataType<T>
      *
      * @return the class object of the source object. This must not be null
      */
-    Class<T> getType();
+    Class<?> getType();
 
     /**
      * The mime type of the the source object to transform.

@@ -14,6 +14,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
     public ServletRequestToOutputHandler()
     {
         registerSourceType(HttpServletRequest.class);
-        setReturnClass(OutputHandler.class);
+        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
     @Override

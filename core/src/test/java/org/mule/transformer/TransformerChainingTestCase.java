@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Collections;
 
@@ -170,7 +171,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         };
         
         transformer.registerSourceType(Integer.class);
-        transformer.setReturnClass(Integer.class);
+        transformer.setReturnDataType(DataTypeFactory.create(Integer.class));
         
         return transformer;
     }

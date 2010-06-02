@@ -15,6 +15,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Converts parameters on the message into a CustomerQuoteRequest object
@@ -24,7 +25,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageAwareTransforme
 
     public RestRequestToCustomerRequest()
     {
-        setReturnClass(CustomerQuoteRequest.class);
+        setReturnDataType(DataTypeFactory.create(CustomerQuoteRequest.class));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

@@ -13,6 +13,7 @@ package org.mule.transport.email.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.MailUtils;
 import org.mule.transport.email.SmtpConnector;
@@ -48,7 +49,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
     public StringToEmailMessage()
     {
         this.registerSourceType(String.class);
-        this.setReturnClass(Message.class);
+        this.setReturnDataType(DataTypeFactory.create(Message.class));
     }
 
 

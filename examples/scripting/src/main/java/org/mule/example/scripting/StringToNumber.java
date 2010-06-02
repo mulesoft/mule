@@ -13,6 +13,7 @@ package org.mule.example.scripting;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NumberUtils;
 
 /** 
@@ -26,7 +27,7 @@ public class StringToNumber extends AbstractTransformer
     public StringToNumber()
     {
         registerSourceType(String.class);
-        setReturnClass(Number.class);
+        setReturnDataType(DataTypeFactory.create(Number.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

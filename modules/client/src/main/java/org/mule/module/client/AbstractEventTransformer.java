@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.lang.reflect.Method;
 
@@ -26,7 +27,7 @@ public abstract class AbstractEventTransformer extends AbstractTransformer
 {
     protected AbstractEventTransformer()
     {
-        setReturnClass(MuleMessage.class);
+        setReturnDataType(DataTypeFactory.create(MuleMessage.class));
     }
 
     public MuleMessage transform(Object src, Method method) throws TransformerException

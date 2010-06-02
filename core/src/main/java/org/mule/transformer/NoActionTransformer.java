@@ -11,6 +11,7 @@
 package org.mule.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>NoActionTransformer</code> doesn't do any transformation on the source
@@ -23,7 +24,7 @@ public final class NoActionTransformer extends AbstractTransformer
     public NoActionTransformer()
     {
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     @Override

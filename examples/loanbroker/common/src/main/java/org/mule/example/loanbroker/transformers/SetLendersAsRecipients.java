@@ -16,6 +16,7 @@ import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Set the Recipient List property on the LoanBrokerQuoteRequest message based on the
@@ -27,7 +28,7 @@ public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
     public SetLendersAsRecipients()
     {
         this.registerSourceType(LoanBrokerQuoteRequest.class);
-        this.setReturnClass(MuleMessage.class);
+        this.setReturnDataType(DataTypeFactory.create(MuleMessage.class));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

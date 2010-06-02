@@ -16,6 +16,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.transformers.AbstractExpressionTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class AtomEntryBuilder extends AbstractExpressionTransformer
 {
     public AtomEntryBuilder()
     {
-        setReturnClass(OutputHandler.class);
+        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
     public Object transform(MuleMessage message, String s) throws TransformerException

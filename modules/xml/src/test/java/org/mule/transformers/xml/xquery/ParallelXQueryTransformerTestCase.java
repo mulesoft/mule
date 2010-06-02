@@ -14,6 +14,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XQueryTransformer;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.Iterator;
@@ -40,7 +41,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
     public Transformer getTransformer() throws Exception
     {
         XQueryTransformer transformer = new XQueryTransformer();
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setXqueryFile("cd-catalog.xquery");
         transformer.setMuleContext(muleContext);
         transformer.initialise();

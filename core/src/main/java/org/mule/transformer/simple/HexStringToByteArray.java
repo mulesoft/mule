@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
 
@@ -24,7 +25,7 @@ public class HexStringToByteArray extends AbstractTransformer
     public HexStringToByteArray()
     {
         registerSourceType(String.class);
-        setReturnClass(byte[].class);
+        setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

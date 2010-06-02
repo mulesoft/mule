@@ -12,6 +12,7 @@ package org.mule.expression.transformers;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,7 +45,7 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageAware
     {
         //No type checking by default
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
         arguments = new ArrayList<ExpressionArgument>(4);
     }
 

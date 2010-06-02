@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.ReleasingInputStream;
@@ -37,7 +38,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
     public HttpClientMethodResponseToObject()
     {
         registerSourceType(HttpMethod.class);
-        setReturnClass(MuleMessage.class);
+        setReturnDataType(DataTypeFactory.create(MuleMessage.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

@@ -17,14 +17,12 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.util.StringUtils;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,6 +31,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
 
 /**
  * Converts a {@link MuleMessage} into an Http response.
@@ -46,7 +47,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     public MuleMessageToHttpResponse()
     {
         registerSourceType(Object.class);
-        setReturnClass(HttpResponse.class);
+        setReturnDataType(DataTypeFactory.create(HttpResponse.class));
     }
 
     @Override

@@ -28,20 +28,19 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     public void testSimpleTypes() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.create(Exception.class);
-        DataType dt2 = factory.create(Exception.class);
+        DataType dt = DataTypeFactory.create(Exception.class);
+        DataType dt2 = DataTypeFactory.create(Exception.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertEquals(dt, dt2);
 
-        dt2 = factory.create(IOException.class);
+        dt2 = DataTypeFactory.create(IOException.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         //Check mime type matching
-        dt2 = factory.create(IOException.class, "application/exception+java");
+        dt2 = DataTypeFactory.create(IOException.class, "application/exception+java");
 
         //Will match because the default mime type is '*/*'
         assertTrue(dt.isCompatibleWith(dt2));
@@ -52,8 +51,8 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt = factory.create(Exception.class);
-        dt2 = factory.create(String.class);
+        dt = DataTypeFactory.create(Exception.class);
+        dt2 = DataTypeFactory.create(String.class);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -61,20 +60,19 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     public void testCollectionTypes() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.create(List.class);
-        DataType dt2 = factory.create(List.class);
+        DataType dt = DataTypeFactory.create(List.class);
+        DataType dt2 = DataTypeFactory.create(List.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertEquals(dt, dt2);
 
-        dt2 = factory.create(ArrayList.class);
+        dt2 = DataTypeFactory.create(ArrayList.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         //Check mime type matching
-        dt2 = factory.create(ArrayList.class, "application/list+java");
+        dt2 = DataTypeFactory.create(ArrayList.class, "application/list+java");
 
         //Will match because the default mime type is '*/*'        
         assertTrue(dt.isCompatibleWith(dt2));
@@ -85,8 +83,8 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt = factory.create(List.class);
-        dt2 = factory.create(Set.class);
+        dt = DataTypeFactory.create(List.class);
+        dt2 = DataTypeFactory.create(Set.class);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -95,20 +93,19 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     public void testGenericCollectionTypes() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.create(List.class, Exception.class);
-        DataType dt2 = factory.create(List.class, Exception.class);
+        DataType dt = DataTypeFactory.create(List.class, Exception.class);
+        DataType dt2 = DataTypeFactory.create(List.class, Exception.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertEquals(dt, dt2);
 
-        dt2 = factory.create(ArrayList.class, IOException.class);
+        dt2 = DataTypeFactory.create(ArrayList.class, IOException.class);
 
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
         //Check mime type matching
-        dt2 = factory.create(ArrayList.class, IOException.class, "application/list+java");
+        dt2 = DataTypeFactory.create(ArrayList.class, IOException.class, "application/list+java");
 
         //Will match because the default mime type is '*/*'
         assertTrue(dt.isCompatibleWith(dt2));
@@ -120,8 +117,8 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.equals(dt2));
 
         //Test Generic Item types don't match
-        dt = factory.create(List.class, Exception.class);
-        dt2 = factory.create(List.class, String.class);
+        dt = DataTypeFactory.create(List.class, Exception.class);
+        dt2 = DataTypeFactory.create(List.class, String.class);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -130,18 +127,17 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     public void testGenericCollectionTypesFromMethodReturn() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", String.class));
+        DataType dt = DataTypeFactory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", String.class));
         assertTrue(dt instanceof CollectionDataType);
 
         assertEquals(List.class, dt.getType());
         assertEquals(Exception.class, ((CollectionDataType) dt).getItemType());
 
-        DataType dt2 = factory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", String.class));
+        DataType dt2 = DataTypeFactory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", String.class));
         assertTrue(dt.isCompatibleWith(dt2));
         assertEquals(dt, dt2);
 
-        dt2 = factory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", Integer.class));
+        dt2 = DataTypeFactory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", Integer.class));
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
@@ -149,26 +145,24 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     public void testGenericCollectionTypesFromMethodParam() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", Collection.class), 0);
+        DataType dt = DataTypeFactory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", Collection.class), 0);
         assertTrue(dt instanceof CollectionDataType);
 
         assertEquals(Collection.class, dt.getType());
         assertEquals(Exception.class, ((CollectionDataType) dt).getItemType());
 
-        DataType dt2 = factory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", Collection.class), 0);
+        DataType dt2 = DataTypeFactory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", Collection.class), 0);
         assertTrue(dt.isCompatibleWith(dt2));
         assertEquals(dt, dt2);
 
-        dt2 = factory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", List.class), 0);
+        dt2 = DataTypeFactory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", List.class), 0);
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
     }
 
     public void testGenericCollectionTypesFromField() throws Exception
     {
-        DataTypeFactory factory = new DataTypeFactory();
-        DataType dt = factory.createFromField(getClass().getDeclaredField("listOfExceptions"));
+        DataType dt = DataTypeFactory.createFromField(getClass().getDeclaredField("listOfExceptions"));
         assertTrue(dt instanceof CollectionDataType);
 
         assertEquals(List.class, dt.getType());

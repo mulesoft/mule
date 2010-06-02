@@ -23,8 +23,7 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 
     public void testPrettyPrinter()
     {
-        XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer(
-            "MyXMLPrettyPrinter");
+        XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer("MyXMLPrettyPrinter");
 
         assertNotNull(pp);
         assertEquals("ISO-8859-15", pp.getEncoding());

@@ -14,6 +14,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMuleContext(muleContext);
         transformer.initialise();

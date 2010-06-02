@@ -13,6 +13,7 @@ package org.mule.transport.servlet.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.servlet.ServletConnector;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
     public HttpRequestToParameterMap()
     {
         registerSourceType(Object.class);
-        setReturnClass(Map.class);
+        setReturnDataType(DataTypeFactory.create(Map.class));
     }
 
     @Override

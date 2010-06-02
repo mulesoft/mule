@@ -19,6 +19,7 @@ import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -46,7 +47,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
         transformer.setMuleContext(muleContext);
@@ -159,7 +160,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setMuleContext(muleContext);
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         // set stylesheet
         transformer.setXslt(xsl);
 
@@ -218,7 +219,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setMuleContext(muleContext);        
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setMuleContext(muleContext);
         // set stylesheet
         transformer.setXslt(xsl);

@@ -12,6 +12,7 @@ package org.mule.transport.servlet.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,7 @@ public class HttpRequestToInputStream extends AbstractDiscoverableTransformer
     public HttpRequestToInputStream()
     {
         super();
-        setReturnClass(InputStream.class);
+        setReturnDataType(DataTypeFactory.create(InputStream.class));
         registerSourceType(HttpServletRequest.class);
     }
 

@@ -12,6 +12,7 @@ package org.mule.transport.jms.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
 import javax.jms.Message;
@@ -40,7 +41,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
 
     protected void declareInputOutputClasses()
     {
-        setReturnClass(Message.class);
+        setReturnDataType(DataTypeFactory.create(Message.class));
     }
         
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

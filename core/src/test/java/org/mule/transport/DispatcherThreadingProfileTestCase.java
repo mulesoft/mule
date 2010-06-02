@@ -35,7 +35,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
 {
 
-    public static int DELAY_TIME = 50;
+    public static int DELAY_TIME = 500;
     public static int WAIT_TIME = DELAY_TIME + DELAY_TIME / 4;
     public static int SERIAL_WAIT_TIME = (DELAY_TIME * 2) + DELAY_TIME / 4;
     public static int LONGER_WAIT_TIME = DELAY_TIME * 5;

@@ -12,6 +12,7 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>NameStringToChatString</code> converts from a NameString object to a
@@ -24,7 +25,7 @@ public class NameStringToChatString extends AbstractTransformer
     {
         super();
         this.registerSourceType(NameString.class);
-        this.setReturnClass(ChatString.class);
+        this.setReturnDataType(DataTypeFactory.create(ChatString.class));
     }
 
     @Override

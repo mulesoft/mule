@@ -11,6 +11,7 @@
 package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -27,7 +28,7 @@ public class FileToString extends FileToByteArray
         registerSourceType(File.class);
         registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     /**

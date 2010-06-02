@@ -13,6 +13,7 @@ package org.mule.transformer.simple;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class MapLookup extends AbstractTransformer
     public MapLookup()
     {
         registerSourceType(Map.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

@@ -11,6 +11,7 @@
 package org.mule.example.hello;
 
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -147,7 +148,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
     {
         NameString temp = new NameString("the other one");
         NameStringToChatString trans = new NameStringToChatString();
-        trans.setReturnClass(ChatString.class);
+        trans.setReturnDataType(DataTypeFactory.create(ChatString.class));
 
         Object result = trans.transform(temp);
         assertNotNull(result);

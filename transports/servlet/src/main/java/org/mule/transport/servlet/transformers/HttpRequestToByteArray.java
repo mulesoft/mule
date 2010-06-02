@@ -11,6 +11,7 @@ package org.mule.transport.servlet.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 
@@ -29,7 +30,7 @@ public class HttpRequestToByteArray extends AbstractDiscoverableTransformer
     public HttpRequestToByteArray()
     {
         registerSourceType(HttpServletRequest.class);
-        setReturnClass(byte[].class);
+        setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

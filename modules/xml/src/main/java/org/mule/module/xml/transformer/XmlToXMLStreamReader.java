@@ -10,12 +10,13 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.MuleMessage;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 
@@ -40,7 +41,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         registerSourceType(byte[].class);
         registerSourceType(String.class);
 
-        setReturnClass(XMLStreamReader.class);
+        setReturnDataType(DataTypeFactory.create(XMLStreamReader.class));
         
     }
 

@@ -12,6 +12,7 @@ package org.mule.transformers.xml.xquery;
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XQueryTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import org.custommonkey.xmlunit.XMLUnit;
@@ -39,7 +40,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
                 "    for $cd in $document/catalog/cd\n" +
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} </cd-listings>");
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

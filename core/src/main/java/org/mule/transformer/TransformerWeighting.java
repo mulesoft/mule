@@ -9,10 +9,10 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,12 +39,11 @@ public class TransformerWeighting implements Comparable
     private void init()
     {
         inputWeighting = Integer.MAX_VALUE;
-        List sourceTypes = transformer.getSourceTypes();
+        List<DataType<?>> sourceTypes = transformer.getSourceDataTypes();
 
-        for (Iterator iterator = sourceTypes.iterator(); iterator.hasNext();)
+        for (DataType type : sourceTypes)
         {
-            Class aClass = (Class) iterator.next();
-            int weighting = getWeighting(-1, inputClass, aClass);
+            int weighting = getWeighting(-1, inputClass, type.getType());
             if (weighting < inputWeighting && weighting != -1)
             {
                 inputWeighting = weighting;

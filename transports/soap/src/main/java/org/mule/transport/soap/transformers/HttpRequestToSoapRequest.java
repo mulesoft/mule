@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
@@ -43,7 +44,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

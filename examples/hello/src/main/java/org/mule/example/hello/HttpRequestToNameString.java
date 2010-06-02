@@ -12,6 +12,7 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -28,7 +29,7 @@ public class HttpRequestToNameString extends AbstractTransformer
         this.registerSourceType(String.class);
         this.registerSourceType(byte[].class);
         this.registerSourceType(InputStream.class);
-        this.setReturnClass(NameString.class);
+        this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

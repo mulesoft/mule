@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
@@ -23,7 +22,6 @@ import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.transaction.TransactionTemplate;
@@ -51,7 +49,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected List endpoints = new CopyOnWriteArrayList();
+    protected List<OutboundEndpoint> endpoints = new CopyOnWriteArrayList();
 
     protected String replyTo = null;
 
@@ -263,30 +261,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public List getEndpoints()
+    public List<OutboundEndpoint> getEndpoints()
     {
         return endpoints;
     }
 
-    public void setEndpoints(List endpoints)
+    public void setEndpoints(List<OutboundEndpoint> endpoints)
     {
         this.endpoints.clear();
-        // this.endpoints = new CopyOnWriteArrayList(endpoints);
-        // Ensure all endpoints are outbound endpoints
-        // This will go when we start dropping support for 1.4 and start using 1.5
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
-            ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
-            if (!(endpoint instanceof OutboundEndpoint))
-            {
-                throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
-                        this, endpoint));
-            }
-            else
-            {
-                addEndpoint((OutboundEndpoint) endpoint);
-            }
-        }
+        this.endpoints.addAll(endpoints);
     }
 
     public void addEndpoint(OutboundEndpoint endpoint)

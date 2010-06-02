@@ -13,6 +13,7 @@ package org.mule.transport.http.transformers;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.ResponseWriter;
@@ -57,7 +58,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
     public void testTransformChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
-        trasf.setReturnClass(String.class);
+        trasf.setReturnDataType(DataTypeFactory.create(String.class));
 
         _resp.setHeader(new Header(HttpConstants.HEADER_TRANSFER_ENCODING,
             HttpConstants.TRANSFER_ENCODING_CHUNKED));
@@ -77,7 +78,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
     public void testTransformNotChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
-        trasf.setReturnClass(String.class);
+        trasf.setReturnDataType(DataTypeFactory.create(String.class));
 
         _resultNotChunked += _body;
 

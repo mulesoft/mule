@@ -219,7 +219,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     public boolean isSourceTypeSupported(Class aClass)
     {
-        return isSourceDataTypeSupported(new SimpleDataType(aClass), false);
+        return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
     }
 
     public boolean isSourceDataTypeSupported(DataType dataType)

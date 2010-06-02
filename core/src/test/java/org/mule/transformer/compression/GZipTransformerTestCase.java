@@ -13,6 +13,7 @@ package org.mule.transformer.compression;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.compression.GZipCompression;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -54,7 +55,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     public Transformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
 
         try
         {

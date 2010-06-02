@@ -12,6 +12,7 @@ package org.mule.transformer;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 public class NullResultTestCase extends AbstractTransformerTestCase
@@ -41,7 +42,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
 
     public void testNullNotExpected() throws Exception
     {
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         try
         {
             testTransform();
@@ -59,7 +60,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
         {
             super();
             this.registerSourceType(Object.class);
-            this.setReturnClass(NullPayload.class);
+            this.setReturnDataType(DataTypeFactory.create(NullPayload.class));
         }
 
         public Object doTransform(Object src, String encoding) throws TransformerException

@@ -12,6 +12,7 @@ package org.mule.transformer.codec;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.Base64;
 
 public class Base64TransformersTestCase extends AbstractTransformerTestCase
@@ -45,7 +46,7 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
     {
         Transformer t = new Base64Decoder();
         // our input is a String so we expect a String as output
-        t.setReturnClass(String.class);
+        t.setReturnDataType(DataTypeFactory.create(String.class));
         return t;
     }
     

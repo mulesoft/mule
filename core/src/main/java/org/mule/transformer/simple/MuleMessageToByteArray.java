@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -21,7 +22,7 @@ public class MuleMessageToByteArray extends AbstractMessageAwareTransformer
     public MuleMessageToByteArray()
     {
         registerSourceType(MuleMessage.class);
-        setReturnClass(byte[].class);
+        setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

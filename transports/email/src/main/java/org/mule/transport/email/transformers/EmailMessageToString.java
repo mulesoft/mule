@@ -12,6 +12,7 @@ package org.mule.transport.email.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import javax.mail.Message;
 import javax.mail.internet.MimeMultipart;
@@ -26,7 +27,7 @@ public class EmailMessageToString extends AbstractTransformer
     public EmailMessageToString()
     {
         registerSourceType(Message.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     @Override

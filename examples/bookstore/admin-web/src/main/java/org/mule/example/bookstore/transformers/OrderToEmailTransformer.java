@@ -15,6 +15,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.Order;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
 
 /**
@@ -26,7 +27,7 @@ public class OrderToEmailTransformer extends AbstractTransformer
     {
         super();
         registerSourceType(Order.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
     
     @Override

@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.AbstractDiscoverableTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +31,7 @@ public class BaseToOutputHandler extends AbstractDiscoverableTransformer
     public BaseToOutputHandler()
     {
         this.registerSourceType(Base.class);
-        setReturnClass(OutputHandler.class);
+        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
     // @Override

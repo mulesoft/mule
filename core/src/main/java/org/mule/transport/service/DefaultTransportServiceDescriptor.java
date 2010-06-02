@@ -10,7 +10,6 @@
 
 package org.mule.transport.service;
 
-import org.mule.MuleSessionHandler;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -30,6 +29,7 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.UrlEndpointURIBuilder;
+import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -165,7 +165,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         if (sessionHandler == null)
         {
-            sessionHandler = MuleSessionHandler.class.getName();
+            sessionHandler = SerializeAndEncodeSessionHandler.class.getName();
             if (logger.isDebugEnabled())
             {
                 logger.debug("No session.handler set in service description, defaulting to: "

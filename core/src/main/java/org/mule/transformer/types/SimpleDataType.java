@@ -17,21 +17,21 @@ import org.mule.api.transformer.DataType;
  */
 public class SimpleDataType<T> implements DataType<T>
 {
-    protected Class<T> type;
+    protected Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
 
-    public SimpleDataType(Class type, String mimeType)
+    public SimpleDataType(Class<?> type, String mimeType)
     {
         this.type = type;
         this.mimeType = (mimeType == null ? ANY_MIME_TYPE : mimeType);
     }
 
-    public SimpleDataType(Class<T> type)
+    public SimpleDataType(Class type)
     {
         this.type = type;
     }
 
-    public Class<T> getType()
+    public Class getType()
     {
         return type;
     }

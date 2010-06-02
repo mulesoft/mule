@@ -15,6 +15,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.BookstoreAdminMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 /**
@@ -28,7 +29,7 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
     {
         super();
         registerSourceType(Object.class);
-        setReturnClass(Book.class);
+        setReturnDataType(DataTypeFactory.create(Book.class));
     }
 
     @Override

@@ -23,7 +23,6 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("", url.getAddress());
-        assertNull(url.getEndpointName());
         assertNotNull(url.getParams());
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
         assertEquals("jdbc:/?sql=SELECT%20*%20FROM%20TABLE", url.toString());
@@ -35,7 +34,6 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("jdbc", url.getAddress());
-        assertNull(url.getEndpointName());
         assertNotNull(url.getParams());
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
         assertEquals("jdbc://?sql=SELECT%20*%20FROM%20TABLE", url.toString());
@@ -43,14 +41,13 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
 
     public void testWithEndpointName() throws Exception
     {
-        EndpointURI url = new MuleEndpointURI("jdbc://history/writeTests?type=2", muleContext);
+        EndpointURI url = new MuleEndpointURI("jdbc://writeTests?type=2", muleContext);
         url.initialise();
         assertEquals("jdbc", url.getScheme());
         assertEquals("writeTests", url.getAddress());
-        assertEquals("history", url.getEndpointName());
         assertNotNull(url.getParams());
         assertEquals("2", url.getParams().get("type"));
-        assertEquals("jdbc://history/writeTests?type=2", url.toString());
+        assertEquals("jdbc://writeTests?type=2", url.toString());
     }
 
 }

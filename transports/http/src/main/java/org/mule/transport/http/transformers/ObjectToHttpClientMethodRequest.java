@@ -18,6 +18,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -61,7 +62,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     
     public ObjectToHttpClientMethodRequest()
     {
-        setReturnClass(HttpMethod.class);
+        setReturnDataType(DataTypeFactory.create(HttpMethod.class));
         registerSourceType(MuleMessage.class);
         registerSourceType(byte[].class);
         registerSourceType(String.class);

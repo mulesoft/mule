@@ -14,6 +14,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.json.JsonData;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -48,7 +49,7 @@ public class JsonToObject extends AbstractJsonTransformer
         this.registerSourceType(String.class);
         this.registerSourceType(InputStream.class);
         this.registerSourceType(byte[].class);
-        setReturnClass(JsonData.class);
+        setReturnDataType(DataTypeFactory.create(JsonData.class));
     }
 
 

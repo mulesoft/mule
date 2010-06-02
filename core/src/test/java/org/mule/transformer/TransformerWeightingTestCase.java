@@ -19,6 +19,8 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.SerializableToByteArray;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.SimpleDataType;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -32,7 +34,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     {
 
         DummyTransformer trans = new DummyTransformer();
-        trans.setReturnClass(byte[].class);
+        trans.setReturnDataType(DataTypeFactory.create(byte[].class));
         trans.registerSourceType(IOException.class);
 
         TransformerWeighting weighting = new TransformerWeighting(IOException.class, byte[].class, trans);
@@ -71,7 +73,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnClass(byte[].class);
+        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
         trans2.registerSourceType(Exception.class);
 
         TransformerWeighting weighting1 =
@@ -98,7 +100,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnClass(byte[].class);
+        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
         trans2.registerSourceType(IOException.class);
 
         TransformerWeighting weighting1 =
@@ -125,7 +127,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnClass(byte[].class);
+        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
         trans2.registerSourceType(FruitBowl.class);
 
         TransformerWeighting weighting1 =
@@ -152,16 +154,16 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         DummyTransformer t1 = new DummyTransformer();
         t1.setName("--t1");
         t1.registerSourceType(Orange.class);
-        t1.setReturnClass(Fruit.class);
+        t1.setReturnDataType(DataTypeFactory.create(Fruit.class));
         muleContext.getRegistry().registerTransformer(t1);
 
         DummyTransformer t2 = new DummyTransformer();
         t2.setName("--t2");
         t2.registerSourceType(Object.class);
-        t2.setReturnClass(Fruit.class);
+        t2.setReturnDataType(DataTypeFactory.create(Fruit.class));
         muleContext.getRegistry().registerTransformer(t2);
 
-        List trans = muleContext.getRegistry().lookupTransformers(BloodOrange.class, Fruit.class);
+        List trans = muleContext.getRegistry().lookupTransformers(new SimpleDataType(BloodOrange.class), new SimpleDataType(Fruit.class));
         assertEquals(2, trans.size());
         for (Iterator iterator = trans.iterator(); iterator.hasNext();)
         {
@@ -169,7 +171,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
             assertTrue(transformer.getName().startsWith("--"));
         }
 
-        Transformer result = muleContext.getRegistry().lookupTransformer(BloodOrange.class, Fruit.class);
+        Transformer result = muleContext.getRegistry().lookupTransformer(new SimpleDataType(BloodOrange.class), new SimpleDataType(Fruit.class));
         assertNotNull(result);
         assertEquals("--t1", result.getName());
     }

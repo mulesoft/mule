@@ -333,7 +333,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return (T)transformMessage(new DataTypeFactory().create(outputType));
+        return (T)transformMessage(DataTypeFactory.create(outputType));
     }
 
     public <T> T transformMessage(DataType<T> outputType) throws TransformerException

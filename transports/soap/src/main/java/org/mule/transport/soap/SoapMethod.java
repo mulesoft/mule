@@ -210,7 +210,7 @@ public class SoapMethod
         return returnClass;
     }
 
-    public void setReturnClass(Class returnClass)
+    public void setReturnDataType(Class returnClass)
     {
         this.returnClass = returnClass;
     }

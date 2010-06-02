@@ -173,7 +173,7 @@ public class ExpressionArgument implements MuleContextAware
         return returnClass;
     }
 
-    public void setReturnClass(Class returnClass)
+    public void setReturnDataType(Class returnClass)
     {
         this.returnClass = returnClass;
     }

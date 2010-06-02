@@ -16,6 +16,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import org.dom4j.DocumentHelper;
@@ -41,7 +42,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(DomDocumentToXml.class);
-        trans.setReturnClass(String.class);
+        trans.setReturnDataType(DataTypeFactory.create(String.class));
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("US-ASCII");
@@ -55,7 +56,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
-        trans.setReturnClass( org.w3c.dom.Document.class);
+        trans.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
         return trans;
     }
 

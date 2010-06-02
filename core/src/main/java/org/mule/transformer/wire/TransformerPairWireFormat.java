@@ -17,6 +17,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class TransformerPairWireFormat implements WireFormat
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
         }
-        if (inboundTransformer.isSourceTypeSupported(InputStream.class))
+        if (inboundTransformer.isSourceDataTypeSupported(DataTypeFactory.create(InputStream.class)))
         {
             return inboundTransformer.transform(in);
         }

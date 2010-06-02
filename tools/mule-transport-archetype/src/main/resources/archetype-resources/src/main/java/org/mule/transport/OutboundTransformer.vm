@@ -37,7 +37,7 @@ public class ${outboundTransformer} extends AbstractMessageAwareTransformer
            type for this transformer here This helps Mule validate event flows
            and Transformer chains
 
-             setReturnClass(YYY.class);
+             setReturnDataType(DataTypeFactory.create(YYY.class);
         */
     }
 

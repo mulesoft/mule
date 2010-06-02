@@ -13,6 +13,7 @@ package org.mule.example.loanbroker.transformers;
 import org.mule.api.transformer.TransformerException;
 import org.mule.example.loanbroker.messages.CreditProfile;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -25,7 +26,7 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
     {
         registerSourceType(String.class);
         registerSourceType(Document.class);
-        setReturnClass(CreditProfile.class);
+        setReturnDataType(DataTypeFactory.create(CreditProfile.class));
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

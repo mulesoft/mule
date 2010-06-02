@@ -15,6 +15,7 @@ import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.Transformer;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Arrays;
 
@@ -69,7 +70,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         DecryptionTransformer transformer = new DecryptionTransformer();
         transformer.setStrategy(strat);
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         try
         {
             transformer.initialise();

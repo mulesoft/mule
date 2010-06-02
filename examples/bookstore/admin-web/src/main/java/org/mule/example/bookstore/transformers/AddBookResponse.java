@@ -13,6 +13,7 @@ package org.mule.example.bookstore.transformers;
 import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.web.HtmlTemplate;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * A call to addBook() returns a Long representing the number of 
@@ -25,7 +26,7 @@ public class AddBookResponse extends AbstractTransformer
     {
         super();
         registerSourceType(Long.class);
-        setReturnClass(String.class);
+        setReturnDataType(DataTypeFactory.create(String.class));
     }
 
     @Override

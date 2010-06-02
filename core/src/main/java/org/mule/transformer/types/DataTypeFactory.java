@@ -14,6 +14,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -32,16 +33,24 @@ public class DataTypeFactory
     public static final DataType<String> ATOM_STRING = new SimpleDataType<String>(String.class, MimeTypes.ATOM);
     public static final DataType<String> RSS_STRING = new SimpleDataType<String>(String.class, MimeTypes.RSS);
 
-    public <T> DataType<T> create(Class<T> type)
+    //Common Java types
+    public static final DataType<String> STRING = new SimpleDataType<String>(String.class);
+    public static final DataType<String> OBJECT = new SimpleDataType<String>(Object.class);
+    public static final DataType<String> BYTE_ARRAY = new SimpleDataType<String>(byte[].class);
+    public static final DataType<String> INPUT_STREAM = new SimpleDataType<String>(InputStream.class);
+
+
+
+    public static DataType<?> create(Class<?> type)
     {
         return create(type, MimeTypes.ANY);
     }
 
-    public <T> DataType<T> create(Class<?> type, String mimeType)
+    public static DataType<?> create(Class<?> type, String mimeType)
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            Class<? extends Collection> cType = (Class<? extends Collection>)type;
+            Class<? extends Collection<?>> cType = (Class<? extends Collection<?>>)type;
             Class itemType = GenericsUtils.getCollectionType(cType);
             if (itemType == null)
             {
@@ -55,17 +64,17 @@ public class DataTypeFactory
         //Special case where proxies are used for testing
         if (Proxy.isProxyClass(type))
         {
-            type = type.getInterfaces()[0];
+            return new SimpleDataType(type.getInterfaces()[0], mimeType);
         }
         return new SimpleDataType(type, mimeType);
     }
 
-    public DataType create(Class<? extends Collection> collClass, Class itemType)
+    public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType)
     {
         return create(collClass, itemType, null);
     }
 
-    public DataType create(Class<? extends Collection> collClass, Class itemType, String mimeType)
+    public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType, String mimeType)
     {
         return new CollectionDataType(collClass, itemType, mimeType);
     }
@@ -80,7 +89,7 @@ public class DataTypeFactory
      *          object
      * @return a data type that represents the object type.
      */
-    public DataType createFromObject(Object o)
+    public static DataType createFromObject(Object o)
     {
         Class type = o.getClass();
         String mime = null;
@@ -104,12 +113,12 @@ public class DataTypeFactory
         return create(type, mime);
     }
 
-    public DataType createFromReturnType(Method m)
+    public static DataType createFromReturnType(Method m)
     {
         return createFromReturnType(m, null);
     }
 
-    public DataType createFromReturnType(Method m, String mimeType)
+    public static DataType createFromReturnType(Method m, String mimeType)
     {
         if (Collection.class.isAssignableFrom(m.getReturnType()))
         {
@@ -131,12 +140,12 @@ public class DataTypeFactory
         }
     }
 
-    public DataType createFromParameterType(Method m, int paramIndex)
+    public static DataType createFromParameterType(Method m, int paramIndex)
     {
         return createFromParameterType(m, paramIndex, null);
     }
 
-    public DataType createFromParameterType(Method m, int paramIndex, String mimeType)
+    public static DataType createFromParameterType(Method m, int paramIndex, String mimeType)
     {
         if (Collection.class.isAssignableFrom(m.getParameterTypes()[paramIndex]))
         {
@@ -159,12 +168,12 @@ public class DataTypeFactory
     }
 
 
-    public DataType createFromField(Field f)
+    public static DataType createFromField(Field f)
     {
         return createFromField(f, null);
     }
 
-    public DataType createFromField(Field f, String mimeType)
+    public static DataType createFromField(Field f, String mimeType)
     {
         if (Collection.class.isAssignableFrom(f.getType()))
         {

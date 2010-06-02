@@ -12,6 +12,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +43,7 @@ public class XmlToObject extends AbstractXStreamTransformer
         registerSourceType(InputStream.class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.dom4j.Document.class);
-        setReturnClass(Object.class);
+        setReturnDataType(DataTypeFactory.create(Object.class));
     }
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException

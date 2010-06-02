@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.BeanUtils;
 
 import java.util.Map;
@@ -29,7 +30,7 @@ public class BeanToMap extends AbstractTransformer implements DiscoverableTransf
     public BeanToMap()
     {
         registerSourceType(Object.class);
-        setReturnClass(Map.class);
+        setReturnDataType(DataTypeFactory.create(Map.class));
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException

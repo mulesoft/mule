@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -50,15 +49,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
  
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
+        OutboundEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy1");
 
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy2");
 
-        ImmutableEndpoint endpoint3 = muleContext.getRegistry()
+        OutboundEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3");
 
@@ -66,7 +65,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
@@ -92,15 +91,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
+        OutboundEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy1?synchronous=true");
 
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy2?synchronous=true");
 
-        ImmutableEndpoint endpoint3 = muleContext.getRegistry()
+        OutboundEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3?synchronous=true");
 
@@ -108,7 +107,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         endpoints.add(endpoint3);
@@ -136,11 +135,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getService", getTestService());
 
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
+        OutboundEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 
@@ -148,7 +147,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
-        List<ImmutableEndpoint> endpoints = new ArrayList<ImmutableEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
         endpoints.add(endpoint2);
         router.setEndpoints(endpoints);

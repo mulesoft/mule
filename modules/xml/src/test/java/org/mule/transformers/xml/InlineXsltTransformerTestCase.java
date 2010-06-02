@@ -13,6 +13,7 @@ package org.mule.transformers.xml;
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.Iterator;
@@ -38,7 +39,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
                             + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
                             + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
                             + "</xsl:template>\n" + "</xsl:stylesheet>");
-        transformer.setReturnClass(String.class);
+        transformer.setReturnDataType(DataTypeFactory.create(String.class));
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

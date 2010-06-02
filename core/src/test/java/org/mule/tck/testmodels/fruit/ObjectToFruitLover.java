@@ -12,13 +12,14 @@ package org.mule.tck.testmodels.fruit;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class ObjectToFruitLover extends AbstractTransformer
 {
 
     public ObjectToFruitLover()
     {
-        this.setReturnClass(FruitLover.class);
+        this.setReturnDataType(DataTypeFactory.create(FruitLover.class));
         this.registerSourceType(String.class);
         this.registerSourceType(FruitLover.class);
     }

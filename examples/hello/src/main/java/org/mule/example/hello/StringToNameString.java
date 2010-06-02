@@ -12,6 +12,7 @@ package org.mule.example.hello;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>StringToNameString</code> converts from a String to a NameString object.
@@ -23,7 +24,7 @@ public class StringToNameString extends AbstractTransformer
     {
         super();
         this.registerSourceType(String.class);
-        this.setReturnClass(NameString.class);
+        this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 
     @Override

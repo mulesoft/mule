@@ -15,6 +15,7 @@ import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -51,14 +52,14 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class);
-        trans.setReturnClass(org.w3c.dom.Document.class);
+        trans.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
         return trans;
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
         DomDocumentToXml trans = createObject(DomDocumentToXml.class);
-        trans.setReturnClass(String.class);
+        trans.setReturnDataType(DataTypeFactory.create(String.class));
         return trans;
     }
 

@@ -13,6 +13,7 @@ package org.mule.module.xml.transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,7 +58,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
         registerSourceType(org.mule.api.transport.OutputHandler.class);
         registerSourceType(javax.xml.stream.XMLStreamReader.class);
         registerSourceType(org.mule.module.xml.transformer.DelayedResult.class);
-        setReturnClass(byte[].class);
+        setReturnDataType(DataTypeFactory.create(byte[].class));
         
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlOutputFactory = XMLOutputFactory.newInstance();

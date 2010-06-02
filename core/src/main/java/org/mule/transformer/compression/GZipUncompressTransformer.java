@@ -12,6 +12,7 @@ package org.mule.transformer.compression;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.compression.GZipCompression;
 
@@ -32,7 +33,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(byte[].class);
         this.registerSourceType(InputStream.class);
-        this.setReturnClass(byte[].class);
+        this.setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
     @Override
