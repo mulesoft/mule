@@ -103,7 +103,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         }
     }
 
-    public void addInterfaceToType(Class<? extends ServerNotificationListener<?>> iface, Class<? extends ServerNotification> event)
+    public void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> event)
     {
         configuration.addInterfaceToType(iface, event);
     }
@@ -156,7 +156,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.removeAllListeners(listeners);
     }
 
-    public void disableInterface(Class<? extends ServerNotificationListener<?>> iface) throws ClassNotFoundException
+    public void disableInterface(Class<? extends ServerNotificationListener> iface) throws ClassNotFoundException
     {
         configuration.disableInterface(iface);
     }
