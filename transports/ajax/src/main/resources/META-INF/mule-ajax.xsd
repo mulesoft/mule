@@ -17,7 +17,7 @@
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation>The AJAX transport provides support for listening to and dispatching AJAX events using Bayeux.
+        <xsd:documentation>The new AJAX connector allows Mule events to be sent and received in a web browser. The connector includes a JavaScript client that can be used to listen for events, send events and perform RPC calls. The AJAX connector works when deployed in Mule stand-alone or embedded in a servlet container such as Apache Tomcat.
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>AJAX</schemadoc:short-name>
@@ -35,7 +35,7 @@
     <xsd:element name="connector" type="ajaxConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                Allows Mule to expose Mule Services over HTTP using a Jetty HTTP server and Cometd. A single Jetty server is created for each connector instance. One connector can serve many endpoints. Users should rarely need to have more than one Jetty connector. The Jetty connector can be configured using a Jetty XML config file, but the default configuration is sufficient for most scenarios.
+                Allows Mule to expose Mule Services over HTTP using a Jetty HTTP server and Cometd. A single Jetty server is created for each connector instance. One connector can serve many endpoints. Users should rarely need to have more than one AJAX servlet connector.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -84,13 +84,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="requestAvailable" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                             If true, the current request is made available via the {@link AbstractBayeux#getCurrentRequest()} method
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="refsThreshold" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -108,7 +101,7 @@
     <xsd:element name="inbound-endpoint" type="ajaxInboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a Mule service to receive AJAX events over HTTP using a Jetty server.
+                Allows a Mule service to receive AJAX events over HTTP using a Jetty server. This is different from the equivalent {{servlet-inbound-endpoint}} because it uses an embedded servlet container rather that reliying on a pre-existing servlet container instance.  This endpoint type should not be used if running Mule embedded in a servlet container.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -121,7 +114,7 @@
     <xsd:element name="outbound-endpoint" type="ajaxOutboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a Mule service to send AJAX evnets over HTTP using Bayeux.
+                Allows a Mule service to send AJAX events over HTTP using Bayeux. JavaScript clients can register interest in these events using the Mule JavaScript client.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -137,7 +130,7 @@
     <xsd:element name="endpoint" type="ajaxGlobalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Allows users to configure a global AJAX endpoint.
+                Allows users to configure a global AJAX endpoint. Global endpoints can be referenced in the configuration and further configuration added.  Think of global endpoints as template endpoint configurations.  Using global endpoints has the advantage that endpoint configuration can be separated from the service flow.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -151,7 +144,7 @@
     <xsd:element name="servlet-inbound-endpoint" type="servletInboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a Mule service to receive AJAX events sent via a servlet contianer
+                Allows a Mule service to receive AJAX events sent via a servlet container.  This endpoint should be used if Mule is embedded inside a servlet container. This endpoint will bind to the servlet http connection (typically port 8080).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -161,7 +154,7 @@
                 <xsd:attribute name="path" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            the servlett path to bind the service to.
+                            the servlet path to bind the service endpoint to. This path is relative to the context path that your application is deployed to in the servlet container. For example if your application is deployed under the path '/foo' and this endpoint path is '/mule' The full endpoint path would be '/foo/mule'.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -172,7 +165,7 @@
     <xsd:element name="servlet-outbound-endpoint" type="servletOutboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Allows a Mule service to send AJAX events to a browser using cometd
+                Allows a Mule service endpoint to send AJAX events to a browser using cometd. The default outbound transformer will convert the payload of the event to JSON, The only other formats that are useful at the browser are XML and plain text. However, neither are as easierto use and JSON is recommended. To use a different format you just need to add a different transformer to the endpoint endpoint configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -182,7 +175,7 @@
                 <xsd:attribute name="path" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            the servlett path to publish events to.
+                            the servlet path to publish events to. This path is relative to the context path that your application is deployed to in the servlet container. For example if your application is deployed under the path '/foo' and this endpoint path is '/mule' The full endpoint path would be '/foo/mule'.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -203,7 +196,7 @@
                 <xsd:attribute name="path" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            the servlett path to bind the service to.
+                            the servlet path to bind the service to. This path is relative to the context path that your application is deployed to in the servlet container. For example if your application is deployed under the path '/foo' and this endpoint path is '/mule' The full endpoint path would be '/foo/mule'.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

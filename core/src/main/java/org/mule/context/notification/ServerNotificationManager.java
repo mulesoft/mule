@@ -21,9 +21,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.util.ClassUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -38,6 +35,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off
  * switches in the config.
@@ -136,6 +137,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
      * @deprecated Use addAllListenerSubscriptionPairs which better describes the "add" operation that occurs.
      * @param pairs
      */
+    @Deprecated
     public void setAllListenerSubscriptionPairs(Collection pairs)
     {
         configuration.addAllListenerSubscriptionPairs(pairs);
@@ -176,9 +178,10 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
 
     public boolean isListenerRegistered(ServerNotificationListener listener)
     {
+
         for (ListenerSubscriptionPair pair : configuration.getListeners())
         {
-            if(pair.getListener().getClass().equals(listener.getClass()))
+            if(pair.getListener().equals(listener))
             {
                 return true;
             }
