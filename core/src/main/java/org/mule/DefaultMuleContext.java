@@ -188,8 +188,6 @@ public class DefaultMuleContext implements MuleContext
             getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
 
             fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
-
-            initSplashScreens();
         }
         catch (Exception e)
         {
@@ -220,6 +218,7 @@ public class DefaultMuleContext implements MuleContext
 
         if (logger.isInfoEnabled())
         {
+            initSplashScreens();
             logger.info(startupScreen.toString());
         }
     }
