@@ -9,18 +9,13 @@
  */
 package org.mule.config.dsl;
 
+import org.mule.api.MuleContext;
+
 /**
  * TODO
  */
-public class RouteBuilder
-{
-    public RouteBuilder to(String uri)
-    {
-        return null;
-    }
 
-    public RouteBuilder thenTo(String uri)
-    {
-        return null;
-    }
+public interface Builder<T>
+{
+    T create(MuleContext muleContext);
 }

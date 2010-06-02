@@ -50,9 +50,11 @@ public class ServiceBuilder
         return builder;
     }
 
-    public RouteBuilder to(String uri)
+    public OutRouteBuilder to(String uri)
     {
-        return null;
+        OutRouteBuilder rb = new OutRouteBuilder(service.getOutboundRouter(), muleContext);
+        rb.to(uri);
+        return rb;
     }
 
     Service create()

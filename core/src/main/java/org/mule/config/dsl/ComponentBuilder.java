@@ -33,7 +33,7 @@ public class ComponentBuilder
     private Component component;
     private MuleContext muleContext;
 
-    public ComponentBuilder(Scope scope, Class clazz, MuleContext muleContext)
+    ComponentBuilder(Scope scope, Class clazz, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         AbstractObjectFactory factory;
@@ -56,7 +56,7 @@ public class ComponentBuilder
         }
     }
 
-    public ComponentBuilder(Object instance, MuleContext muleContext)
+    ComponentBuilder(Object instance, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         ObjectFactory  factory = new SingletonObjectFactory(instance);
@@ -68,7 +68,7 @@ public class ComponentBuilder
         return component;
     }
 
-    public RouteBuilder to(String uri)
+    public OutRouteBuilder to(String uri)
     {
         return null;
     }
