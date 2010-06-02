@@ -83,12 +83,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                         SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleExceptionByService(e, event);
+                handleException(e);
                 return;
             }
             catch (Exception e)
             {
-                handleExceptionByService(e, event);
+                handleException(e);
                 return;
             }
         }
@@ -121,7 +121,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            handleExceptionByService(e, event);
+            handleException(e);
         }
     }
 
@@ -151,12 +151,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.fireNotification(new SecurityNotification(e,
                         SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleExceptionByService(e, event);
+                handleException(e);
                 return event.getMessage();
             }
             catch (Exception e)
             {
-                handleExceptionByService(e, event);
+                handleException(e);
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
@@ -205,29 +205,17 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (DispatchException e)
         {
-            handleExceptionByService(e, event);
+            handleException(e);
             throw e;
         }
         catch (Exception e)
         {
-            handleExceptionByService(e, event);
+            handleException(e);
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
-    public void handleExceptionByService(Exception exception, MuleEvent event)
-    {
-        if (event.getService() != null)
-        {
-            event.getService().getExceptionListener().exceptionThrown(exception);
-        }
-        else
-        {
-            handleException(exception);
-        }
-    }
-
-	/**
+    /**
      * @deprecated
      */
     @Deprecated
