@@ -68,7 +68,7 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
 
     public void testOpen() throws Exception
     {
-        useServer("tcp://localhost:60197?connector=openConnectorLength", 60197, 1);
+        useServer("tcp://localhost:60190?connector=openConnectorLength", 60190, 1);
     }
 
     public void testClose() throws Exception
