@@ -14,17 +14,16 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
 
-public abstract class AbstractBpmTestCase extends FunctionalTestCase 
+public abstract class AbstractBpmTestCase extends FunctionalTestCase
 {
     protected ProcessConnector connector;
     protected BPMS bpms;
 
-    protected void doSetUp() throws Exception {
-        connector =
-            (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        connector = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnector");
         bpms = connector.getBpms();
         super.doSetUp();
     }
 }
-
-

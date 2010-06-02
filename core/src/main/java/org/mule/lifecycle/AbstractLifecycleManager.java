@@ -44,7 +44,7 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(AbstractLifecycleManager.class);
+    protected final Log logger = LogFactory.getLog(getClass());
 
     protected static final NotInLifecyclePhase notInLifecyclePhase = new NotInLifecyclePhase();
 

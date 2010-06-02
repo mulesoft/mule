@@ -17,6 +17,7 @@ public abstract class AbstractJbpmTestCase extends AbstractBpmTestCase
 {
     private static boolean derbySetupDone = false;
 
+    @Override
     protected void suitePreSetUp() throws Exception
     {
         if (!derbySetupDone)
@@ -30,5 +31,4 @@ public abstract class AbstractJbpmTestCase extends AbstractBpmTestCase
 
         super.suitePreSetUp();
     }
-
 }

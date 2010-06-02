@@ -10,17 +10,17 @@
 
 package org.mule.transport.jbpm;
 
-import org.jbpm.api.ProcessInstance;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.bpm.BPMS;
+
+import org.jbpm.api.ProcessInstance;
 
 /**
  * Tests the connector against jBPM with a simple process.
  */
 public class ForkedProcessTestCase extends AbstractJbpmTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "jbpm-functional-test.xml";
@@ -30,7 +30,6 @@ public class ForkedProcessTestCase extends AbstractJbpmTestCase
     {
         MuleMessage response;
         ProcessInstance process;
-        BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient(muleContext);
         try
         {

@@ -634,25 +634,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         {
             logger.warn("Failed to dispose connector: " + name, e);
         }
-//
-//        if (this.isStarted())
-//        {
-//            try
-//            {
-//                this.stop();
-//            }
-//            catch (MuleException e)
-//            {
-//                // when disposing just log errors so that we get a clean shutdown
-//                logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
-//            }
-//        }
-
+        
         this.disposeReceivers();
-
-
-
-
     }
 
     protected void initWorkManagers() throws MuleException
@@ -1644,7 +1627,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 ConnectionNotification.CONNECTION_DISCONNECTED));
         // TODO Shouldn't this come at the end of the method, after the receivers have been disconnected?
         connected.set(false);
-
 
         try
         {
