@@ -14,6 +14,7 @@ import org.mule.tck.testmodels.fruit.BananaFactory;
 import org.mule.tck.testmodels.mule.TestAgent;
 
 import com.google.inject.Provides;
+import com.google.inject.name.Named;
 
 /**
  * Simple Guice module that binds a service interface
@@ -29,7 +30,7 @@ public class ConfigServiceModule extends AbstractMuleGuiceModule
         this.bind(BananaServiceInterface.class).to(BananaInjectionService.class);
 
         //Will make the transformer available in Mule
-        this.bind(Transformer.class).to(OrangetoAppleTransformer.class);
+        //this.bind(Transformer.class).to(OrangetoAppleTransformer.class);
 
     }
 
@@ -44,5 +45,11 @@ public class ConfigServiceModule extends AbstractMuleGuiceModule
     TestAgent provideTestAgent()
     {
         return new TestAgent();
+    }
+
+    @Provides @Named("orange-to-apple")
+    Transformer providesOrangetoAppleTransformer()
+    {
+        return new OrangetoAppleTransformer();
     }
 }

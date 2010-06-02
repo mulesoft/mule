@@ -14,6 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * TODO
@@ -22,7 +23,7 @@ public class OrangetoAppleTransformer extends AbstractTransformer implements Dis
 {
     public OrangetoAppleTransformer()
     {
-        setReturnClass(Apple.class);
+        setReturnDataType(DataTypeFactory.create(Apple.class));
         registerSourceType(Orange.class);
     }
 

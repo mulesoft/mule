@@ -9,32 +9,37 @@
  */
 package org.mule.module.guice;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextFactory;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.DefaultMuleContextBuilder;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.context.DefaultMuleContextBuilder;
+import org.mule.context.DefaultMuleContextFactory;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Orange;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-public class GuiceRegistryTestCase extends FunctionalTestCase
+public class GuiceAndSpringTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "guice-service-lookup-config.xml";
     }
 
+
+    @Override
     protected MuleContext createMuleContext() throws Exception
     {
-        // Should we set up the manager for every method?
+        //We have to override this method since we are combining Guice and Spring in this test
+
         MuleContext context;
         if (getTestInfo().isDisposeManagerPerSuite() && muleContext != null)
         {
@@ -43,12 +48,9 @@ public class GuiceRegistryTestCase extends FunctionalTestCase
         else
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            List builders = new ArrayList();
+            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
-
-            //No way of hooking this in right now
-            builders.add(new GuiceConfigurationBuilder("org/mule/module/guice"));
-            
+            builders.add(new GuiceConfigurationBuilder(new ConfigServiceModule()));
             builders.add(getBuilder());
 
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();

@@ -8,7 +8,8 @@
        http://www.mulesoft.org/schema/mule/guice http://www.mulesoft.org/schema/mule/guice/3.0/mule-guice.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <!-- The transformer configured in the Guice module OrangeToAppleTransformer -->
+    <!-- The transformer configured in the Guice module OrangeToAppleTransformer, but we cannot access it directly in the XML (Spring) config
+         instead we can just configure an Auto transformer, which will find the OrangeToAppleTransformer -->
     <auto-transformer name="auto-transform" returnClass="org.mule.tck.testmodels.fruit.Apple"/>
 
     <model name="main">

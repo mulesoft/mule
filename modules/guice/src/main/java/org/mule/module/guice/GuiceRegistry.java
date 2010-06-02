@@ -10,6 +10,7 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,11 +21,14 @@ import org.mule.registry.AbstractRegistry;
 import com.google.inject.Binding;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,17 +90,65 @@ public class GuiceRegistry extends AbstractRegistry
 
     public <T> T lookupObject(String key)
     {
+        //Guice isn't really supposed to work this way but in Mule we need to look up objects by name only sometimes
+        for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet())
+        {
+            if(entry.getKey().getAnnotation() instanceof Named && ((Named)entry.getKey().getAnnotation()).value().equals(key))
+            {
+                Object o = entry.getValue().getProvider().get();
+                //TODO his isn't the right place for this, need to plug into the Injector
+                setNameIfNamedObject(((Named)entry.getKey().getAnnotation()).value(), o);
+                return (T)o;
+            }
+        }
         return null;
     }
 
-    public <T> T get(String key)
+    protected void setNameIfNamedObject(String name, Object object)
     {
-        return null;
+        if(object instanceof NamedObject && ((NamedObject)object).getName()==null)
+        {
+            ((NamedObject)object).setName(name);
+        }
     }
+
 
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
-        return null;
+        try
+        {
+            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
+            if(bindings!=null && bindings.size()>0)
+            {
+                Map<String, T> map = new HashMap<String, T>(bindings.size());
+                String name;
+                T object;
+                for (Binding<T> binding : bindings)
+                {
+                    object = binding.getProvider().get();
+
+                    if(binding.getKey().getAnnotation() instanceof Named)
+                    {
+                        name = ((Named)binding.getKey().getAnnotation()).value();
+                    }
+                    else if(object instanceof NamedObject)
+                    {
+                        name = ((NamedObject)object).getName();
+                    }
+                    else
+                    {
+                        name = "_" + object.hashCode();
+                    }
+                    map.put(name, object);
+                }
+                return map;
+            }
+            return Collections.emptyMap();
+        }
+        catch (ConfigurationException e)
+        {
+            return Collections.emptyMap();
+        }
     }
 
     public <T> Collection<T> lookupObjects(Class<T> type)

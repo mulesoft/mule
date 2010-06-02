@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.NamedObject;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
@@ -20,6 +21,7 @@ import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.module.guice.i18n.GuiceMessages;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.MembersInjector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -54,11 +56,21 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
     @Override
     protected final void configure()
     {
+        this.
         bindListener(Matchers.any(), new TypeListener()
         {
             public <I> void hear(TypeLiteral<I> iTypeLiteral, TypeEncounter<I> iTypeEncounter)
             {
                 iTypeEncounter.register(new MuleRegistryInjectionLister());
+                iTypeEncounter.register(new MembersInjector() {
+                    public void injectMembers(Object o)
+                    {
+                        if(o instanceof MuleContextAware)
+                        {
+                            ((MuleContextAware)o).setMuleContext(muleContext);
+                        }
+                    }
+                });
             }
         });
         bind(MuleContext.class).toInstance(muleContext);
@@ -115,6 +127,7 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
         }
         try
         {
+
             Object result = muleContext.getRegistry().applyProcessors(o, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
             if(result!=null)
             {
@@ -146,9 +159,10 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
             {
                 return;
             }
+            
             try
             {
-                initialiseObject(o);
+                //initialiseObject(o);
             }
             catch (Exception e)
             {

@@ -10,31 +10,17 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.agent.Agent;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.registry.InjectProcessor;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.ObjectProcessor;
-import org.mule.api.registry.PreInitProcessor;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.config.builders.AbstractConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
-import org.mule.util.ObjectNameHelper;
 import org.mule.util.scan.ClasspathScanner;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 
@@ -116,7 +102,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 {
                     basepath = (basepath.equals("") ? "/" : basepath);
                 }
-                //lets just log a noticable exception as a warning since the Guice build can compliment other configuration builders
+                //lets just log a noticeable exception as a warning since the Guice build can compliment other configuration builders
                 logger.warn(new ConfigurationException(CoreMessages.createStaticMessage("There are no Guice modules or module factories on the classpath under: " + basepath)));
                 return;
             }
@@ -152,43 +138,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             injector = Guice.createInjector(modules);
         }
         GuiceRegistry registry = new GuiceRegistry(injector, muleContext);
-        muleContext.addRegistry(registry);
-
-        for (Iterator<Key<?>> iterator = injector.getBindings().keySet().iterator(); iterator.hasNext();)
-        {
-            Key key = iterator.next();
-            if (key.getAnnotation() instanceof AnnotatedService)
-            {
-                Object obj = injector.getInstance(key);
-                //This will cause the annotations on the object to be processed and a service object created and registered
-                //we bypass inject processors since Guice has already done that for us
-                applyProcessors(obj, key, injector, muleContext);
-            }
-            else if (Connector.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
-            {
-                Connector c = (Connector) injector.getInstance(key);
-                c.setName(new ObjectNameHelper(muleContext).getConnectorName(c));
-                muleContext.getRegistry().registerConnector(c);
-            }
-            else if (Agent.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
-            {
-                Agent a = (Agent) injector.getInstance(key);
-                muleContext.getRegistry().registerAgent(a);
-            }
-            else if (Transformer.class.isAssignableFrom(key.getTypeLiteral().getRawType()))
-            {
-                Transformer t = (Transformer) injector.getInstance(key);
-                muleContext.getRegistry().registerTransformer(t);
-            }
-            //TODO EndpointBuilders
-            //TODO Security Providers
-
-        }
         registry.initialise();
-    }
-
-    protected void applyProcessors(Object o, Key key, Injector injector, MuleContext muleContext) throws MuleException
-    {
-        muleContext.getRegistry().applyProcessors(o);
+        muleContext.addRegistry(registry);
     }
 }
