@@ -61,10 +61,16 @@ public class ServerNotificationManagerConfigurator
 
         // Merge:
         // i) explicitly configured notification listeners,
-        // ii) any singleton beans defined in spring that implement
-        // ServerNotificationListener.
-        notificationManager.addAllListenerSubscriptionPairs(getMergedListeners(notificationManager));
-
+        // ii) any singleton beans defined in spring that implement ServerNotificationListener.
+        Set<ListenerSubscriptionPair> subs = getMergedListeners(notificationManager);
+        for (ListenerSubscriptionPair sub : subs)
+        {
+            // Do this to avoid warnings when the Spring context is refreshed
+            if(!notificationManager.isListenerRegistered(sub.getListener()))
+            {
+                notificationManager.addListenerSubscriptionPair(sub);
+            }
+        }
         return notificationManager;
     }
 
