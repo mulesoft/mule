@@ -15,7 +15,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
@@ -137,11 +136,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         logger.debug("Initialising transformer: " + this);
         try
         {
-            if(xslt != null && xslFile !=null)
-            {
-                throw new InitialisationException(XmlMessages.canOnlySetFileOrXslt(), this);
-            }
-
             // Only load the file once at initialize time
             if (xslFile != null)
             {

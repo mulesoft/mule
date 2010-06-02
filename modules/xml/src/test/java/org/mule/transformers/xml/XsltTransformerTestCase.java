@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
@@ -70,7 +69,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     @Override
     public Object getTestData()
     {
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
         return new DefaultMuleMessage(srcData, props, muleContext);
@@ -84,8 +83,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
     public void testAllXmlMessageTypes() throws Exception
     {
-        List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
-        Iterator it = list.iterator();
+        List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
+        Iterator<?> it = list.iterator();
         
         Object expectedResult = getResultData();
         assertNotNull(expectedResult);
@@ -286,23 +285,6 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         catch (InitialisationException e)
         {
             assertTrue(e.getMessage().contains(someNonExistentFileName));
-        }
-    }
-
-    public void testInitialiseMustLoadXsltFile_MustNotSetXslTextAndXslFileAtTheSameTime() throws Exception
-    {
-        XsltTransformer xsltTransformer = new XsltTransformer();
-        String someFileName = "some filename";
-        xsltTransformer.setXslFile(someFileName);
-        xsltTransformer.setXslt(someXslText());
-        try
-        {
-            xsltTransformer.initialise();
-            fail("Should have thrown an exception because you cannot set both xsl-text and xsl-file at the same time");
-        }
-        catch (InitialisationException e)
-        {
-            assertTrue(e.getMessage().contains(XmlMessages.canOnlySetFileOrXslt().getMessage()));
         }
     }
 
