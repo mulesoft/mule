@@ -218,21 +218,41 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         reg.fireLifecycle(Startable.PHASE_NAME);
         assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
 
-//        reg.fireLifecycle(Startable.PHASE_NAME);
-//        assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
+        try
+        {
+            reg.fireLifecycle(Startable.PHASE_NAME);
+            fail("Registry is already started");
+        }
+        catch (Exception e)
+        {
+            //expected
+        }
 
         reg.fireLifecycle(Stoppable.PHASE_NAME);
         assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
 
-//        reg.fireLifecycle(Stoppable.PHASE_NAME);
-//        assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
+        try
+        {
+            reg.fireLifecycle(Stoppable.PHASE_NAME);
+            fail("Registry is already stopped");
+        }
+        catch (Exception e)
+        {
+            //expected
+        }
 
         reg.dispose();
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
 
-        reg.dispose();
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
-
+        try
+        {
+            reg.dispose();
+            fail("Registry is already disposed");
+        }
+        catch (Exception e)
+        {
+            //expected
+        }
     }
 
 

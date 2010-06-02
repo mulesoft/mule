@@ -12,6 +12,8 @@ package org.mule.registry;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
@@ -55,6 +57,17 @@ public abstract class AbstractRegistry implements Registry
 
     public final synchronized void dispose()
     {
+        //Fire dispose lifecycle before calling doDispose() that that registries can clear any object caches once all objects
+        //are disposed
+        try
+        {
+            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
+        }
+        catch (LifecycleException e)
+        {
+            logger.error("Failed to shut down registry cleanly: " + getRegistryId(), e);
+        }
+
         try
         {
             doDispose();
@@ -96,6 +109,18 @@ public abstract class AbstractRegistry implements Registry
             throw e;
         }
         catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        try
+        {
+            fireLifecycle(Initialisable.PHASE_NAME);
+        }
+        catch (InitialisationException e)
+        {
+            throw e;
+        }
+        catch (LifecycleException e)
         {
             throw new InitialisationException(e, this);
         }

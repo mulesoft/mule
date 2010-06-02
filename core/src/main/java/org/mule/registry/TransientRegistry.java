@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.registry.InjectProcessor;
@@ -79,28 +78,12 @@ public class TransientRegistry extends AbstractRegistry
         applyProcessors(lookupObjects(Model.class), null);
         applyProcessors(lookupObjects(Service.class), null);
         applyProcessors(lookupObjects(Object.class), null);
-
-        try
-        {
-            getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
     }
 
     @Override
     protected void doDispose()
     {
-        try
-        {
-            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
-        }
-        catch (MuleException e)
-        {
-            logger.warn("Failed to dipose the registry cleanly", e);
-        }
+        registry.clear();
     }
 
     protected Map applyProcessors(Map<String, Object> objects)

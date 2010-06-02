@@ -49,7 +49,9 @@ public class SpringRegistry extends AbstractRegistry
     
     protected ApplicationContext applicationContext;
 
-    protected AtomicBoolean initialised = new AtomicBoolean(false);
+    //This is used to track the Spring context lifecycle since there is no way to confirm the
+    //lifecycle phase from the application context
+    protected AtomicBoolean springContextInitialised = new AtomicBoolean(false);
 
     public SpringRegistry(MuleContext muleContext)
     {
@@ -94,24 +96,16 @@ public class SpringRegistry extends AbstractRegistry
         {
             ((ConfigurableApplicationContext) applicationContext).refresh();
         }
-
-         try
-        {
-            //Spring starts initialised, we just transition to the next phase on the lifecycle manager here
-            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
-        }
-        catch (LifecycleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        initialised.set(true);
+        //This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the application context
+        springContextInitialised.set(true);
     }
 
-    protected void doDispose()
+    @Override
+    public void doDispose()
     {
         // check we aren't trying to close a context which has never been started,
         // spring's appContext.isActive() isn't working for this case
-        if (!this.initialised.get())
+        if (!this.springContextInitialised.get())
         {
             return;
         }
@@ -122,7 +116,7 @@ public class SpringRegistry extends AbstractRegistry
             ((ConfigurableApplicationContext) applicationContext).close();
         }
 
-        this.initialised.set(false);
+        this.springContextInitialised.set(false);
     }
 
     @Override
@@ -136,7 +130,13 @@ public class SpringRegistry extends AbstractRegistry
             if(pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
             {
                 lifecycleManager.registerLifecycle(new DefaultLifecyclePair(
-                        new ContainerManagedInitialisePhase(), new ContainerManagedDisposePhase()));
+                        new ContainerManagedInitialisePhase(), new ContainerManagedDisposePhase(){
+                            @Override
+                            public void applyLifecycle(Object o) throws LifecycleException
+                            {
+                                doDispose();
+                            }
+                        }));
             }
             else
             {

@@ -64,7 +64,7 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
     protected MuleContext muleContext;
 
     //this is an internal list to track indexes
-    private List<LifecyclePhase> index;
+    protected List<LifecyclePhase> index;
 
     static
     {

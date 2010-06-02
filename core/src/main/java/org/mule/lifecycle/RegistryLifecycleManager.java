@@ -9,7 +9,9 @@
  */
 package org.mule.lifecycle;
 
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.registry.Registry;
 
@@ -43,7 +45,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Applying lifecycle phase: " + phase.getName());
+            logger.debug("Applying lifecycle phase: " + phase.getName() + " for registry: " + registry.getClass().getSimpleName());
         }
 
         if(phase instanceof ContainerManagedLifecyclePhase)
@@ -87,6 +89,57 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager
             }
 
             lo.firePostNotification(muleContext);
+        }
+    }
+
+    @Override
+    public void checkPhase(String name) throws IllegalStateException
+    {
+        if (executingPhase != null)
+        {
+            if (name.equalsIgnoreCase(executingPhase))
+            {
+                throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
+            }
+            else
+            {
+                throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+            }
+        }
+
+        if (name.equalsIgnoreCase(currentPhase))
+        {
+            throw new IllegalStateException("Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
+        }
+
+
+        Integer phaseIndex = getPhaseIndex(name);
+        if (phaseIndex == null)
+        {
+            throw new IllegalStateException("Phase does not exist: " + name);
+        }
+        else
+        {
+            //Allow dispose to be called from any other lifecycle
+            if(Disposable.PHASE_NAME.equals(name))
+            {
+                return;
+            }
+            //We can always transition to the next phase
+            if(index.get(phaseIndex-1).getName().equals(getCurrentPhase()))
+            {
+                return;
+            }
+            for (LifecyclePair pair : lifecyclePairs)
+            {
+                //Always allow a phase to transition from begin phase to end phase
+                if(pair.getBegin().getName().equals(name) && pair.getEnd().getName().equals(getCurrentPhase()) ||
+                   pair.getEnd().getName().equals(name) && pair.getBegin().getName().equals(getCurrentPhase()))
+                {
+                    return;
+                }
+            }
+            throw new IllegalStateException("Registry " + registry.getRegistryId() + " Lifecycle phase: " + currentPhase + " does not support phase: " + name);
         }
     }
 }
