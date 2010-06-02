@@ -31,6 +31,8 @@ import java.util.StringTokenizer;
  */
 public abstract class AbstractEndpointAnnotationParser implements EndpointAnnotationParser, MuleContextAware
 {
+    public static final String ENDPOINT_BUILDER_POSTFIX = ".builder";
+
     protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
@@ -89,7 +91,7 @@ public abstract class AbstractEndpointAnnotationParser implements EndpointAnnota
         {
             return null;
         }
-        Object o = muleContext.getRegistry().lookupObject(location + ".helper");
+        Object o = muleContext.getRegistry().lookupObject(location + ENDPOINT_BUILDER_POSTFIX);
         if (o == null)
         {
             o = muleContext.getRegistry().lookupObject(location);

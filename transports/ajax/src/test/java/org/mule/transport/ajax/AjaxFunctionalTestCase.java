@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
@@ -30,7 +29,7 @@ import org.mortbay.jetty.client.HttpClient;
 
 public class AjaxFunctionalTestCase extends FunctionalTestCase
 {
-    public static final int SERVER_PORT = 58080;
+    public static final int SERVER_PORT = 58381;
     
     private HttpClient httpClient;
     private BayeuxClient bayeuxClient;
