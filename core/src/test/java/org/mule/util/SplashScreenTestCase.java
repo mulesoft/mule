@@ -17,7 +17,7 @@ public class SplashScreenTestCase extends AbstractMuleTestCase
 
     public void testMuleContextSplashScreenRendering() throws Exception
     {
-        SplashScreen serverStartupSplashScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
+        SplashScreen serverStartupSplashScreen = new ServerStartupSplashScreen();
         assertNotNull(serverStartupSplashScreen);
         assertTrue(serverStartupSplashScreen.toString().length() > 0);
         

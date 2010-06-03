@@ -13,12 +13,7 @@ package org.mule.util;
 import org.mule.api.MuleContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements singleton pattern to allow different splash-screen implementations
@@ -36,35 +31,6 @@ public abstract class SplashScreen
     protected List<String> body = new ArrayList<String>();
     protected List<String> footer = new ArrayList<String>();
     
-    private static Log logger = LogFactory.getLog(SplashScreen.class);
-    
-    private static final Map<Class, SplashScreen> instances = new HashMap<Class, SplashScreen>();
-    
-    public static synchronized SplashScreen getInstance(Class clazz)
-    {
-        SplashScreen splashScreen = instances.get(clazz);
-        
-        if (splashScreen == null)
-        {
-            try
-            {
-                splashScreen = (SplashScreen) clazz.newInstance();
-                instances.put(clazz, splashScreen);
-            }
-            catch (Exception ignore)
-            {
-                logger.debug(ignore);
-            }
-        }
-        
-        return splashScreen;
-    }
-
-    public static void dispose()
-    {
-        instances.clear();
-    }
-
     /**
      * Setting the header clears body and footer assuming a new
      * splash-screen is built.
