@@ -41,6 +41,8 @@ import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.util.ApplicationShutdownSplashScreen;
+import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.ServerShutdownSplashScreen;
 import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
@@ -192,9 +194,7 @@ public class DefaultMuleContext implements MuleContext
 
         if (logger.isInfoEnabled())
         {
-            SplashScreen startupScreen = new ServerStartupSplashScreen();
-            startupScreen.setHeader(this);
-            startupScreen.setFooter(this);
+            SplashScreen startupScreen = buildStartupSplash();
             logger.info(startupScreen.toString());
         }
     }
@@ -250,12 +250,10 @@ public class DefaultMuleContext implements MuleContext
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
-            SplashScreen shutdownScreen = new ServerShutdownSplashScreen();
-            shutdownScreen.setHeader(this);
+            SplashScreen shutdownScreen = buildShutdownSplash();
             logger.info(shutdownScreen.toString());
         }
     }
-
 
     /**
      * Determines if the server has been initialised
@@ -598,5 +596,24 @@ public class DefaultMuleContext implements MuleContext
     public void removeRegistry(Registry registry)
     {
         registryBroker.removeRegistry(registry);
+    }
+
+    protected SplashScreen buildStartupSplash()
+    {
+        SplashScreen startupScreen = config.isContainerMode()
+                                         ? new ApplicationStartupSplashScreen()
+                                         : new ServerStartupSplashScreen();
+        startupScreen.setHeader(this);
+        startupScreen.setFooter(this);
+        return startupScreen;
+    }
+
+    protected SplashScreen buildShutdownSplash()
+    {
+        SplashScreen shutdownScreen = config.isContainerMode()
+                                         ? new ApplicationShutdownSplashScreen()
+                                         : new ServerShutdownSplashScreen();
+        shutdownScreen.setHeader(this);
+        return shutdownScreen;
     }
 }

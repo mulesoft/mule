@@ -1193,4 +1193,15 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 306, listenerPair);
     }
+
+    public static Message applicationShutdownNormally(String appName, Date date)
+    {
+        return factory.createMessage(BUNDLE_PATH, 307, appName, date);
+    }
+
+    public static Message applicationWasUpForDuration(long duration)
+    {
+        String formattedDuration = DateUtils.getFormattedDuration(duration);
+        return factory.createMessage(BUNDLE_PATH, 308, formattedDuration);
+    }
 }

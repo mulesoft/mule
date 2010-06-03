@@ -30,7 +30,21 @@ public class ApplicationWrapper<M> implements Application<M>
 
     public void dispose()
     {
-        delegate.dispose();
+        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            ClassLoader appCl = getDeploymentClassLoader();
+            // if not initialized yet, it can be null
+            if (appCl != null)
+            {
+                Thread.currentThread().setContextClassLoader(appCl);
+            }
+            delegate.dispose();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(originalCl);
+        }
     }
 
     public ClassLoader getDeploymentClassLoader()
