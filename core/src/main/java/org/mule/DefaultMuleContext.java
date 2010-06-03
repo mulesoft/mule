@@ -137,24 +137,6 @@ public class DefaultMuleContext implements MuleContext
         shutdownScreen = shutdown;
     }
 
-    protected void initSplashScreens()
-    {
-        if (startupScreen == null)
-        {
-            startupScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
-        }
-
-        if (shutdownScreen == null)
-        {
-            shutdownScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
-        }
-
-        startupScreen.setHeader(this);
-        startupScreen.setFooter(this);
-        shutdownScreen.setHeader(this);
-        shutdownScreen.setFooter(this);
-    }
-
     public synchronized void initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
@@ -218,8 +200,10 @@ public class DefaultMuleContext implements MuleContext
 
         if (logger.isInfoEnabled())
         {
-            initSplashScreens();
-            logger.info(startupScreen.toString());
+            SplashScreen splashScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
+            splashScreen.setHeader(this);
+            splashScreen.setFooter(this);
+            logger.info(splashScreen.toString());
         }
     }
 
@@ -274,7 +258,9 @@ public class DefaultMuleContext implements MuleContext
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
-            logger.info(shutdownScreen.toString());
+            SplashScreen splashScreen = SplashScreen.getInstance(ServerShutdownSplashScreen.class);
+            splashScreen.setHeader(this);
+            logger.info(splashScreen.toString());
         }
 
         // SplashScreen holds static variables which need to be cleared in case we restart the server.
