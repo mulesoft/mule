@@ -160,6 +160,11 @@ public class MuleContainer
         {
             registerShutdownHook();
         }
+
+        final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
+        splashScreen.doBody();
+        logger.info(splashScreen.toString());
+
         try
         {
             // TODO pluggable deployer

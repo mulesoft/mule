@@ -21,13 +21,10 @@ public class ApplicationStartupSplashScreen extends SplashScreen
 {
     protected void doHeader(MuleContext context)
     {
-        if (context.getStartDate() > 0)
-        {
-            // TODO not sure this one makes sense for an app
-            header.add(CoreMessages.serverStartedAt(context.getStartDate()).getMessage());
-        }
         header.add("Application: " + context.getConfiguration().getId());
-
+        header.add(String.format("OS encoding: %s, Mule encoding: %s",
+                                 System.getProperty("file.encoding"),
+                                 context.getConfiguration().getDefaultEncoding()));
         header.add(" ");
     }
    
