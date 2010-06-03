@@ -12,7 +12,6 @@ package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.bpm.BPMS;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +19,12 @@ import java.util.Map;
 
 public class VariablesTestCase extends AbstractJbpmTestCase
 {
-	static {
+	static 
+	{
 	   	System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
 	}
 	
+    @Override
     protected String getConfigResources()
     {
         return "jbpm-functional-test.xml";
@@ -31,11 +32,10 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 
     public void testVariables() throws Exception
     {
-        BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient(muleContext);
         try
         {
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             props.put("foo", "bar");
             MuleMessage response = client.send("bpm://variables", "data", props);  
             String processId = (String) bpms.getId(response.getPayload());
@@ -47,7 +47,7 @@ public class VariablesTestCase extends AbstractJbpmTestCase
             assertEquals(0.75, response.getProperty("fraction"));
 
             // Advance the process
-            props = new HashMap();
+            props = new HashMap<String, Object>();
             props.put("straw", "berry");
             props.put("time", new Date());
             response = client.send("bpm://variables/" + processId, "data", props);
