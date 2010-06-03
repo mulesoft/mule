@@ -85,6 +85,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         {
             message = createMuleMessage(payload, this.endpoint.getEncoding());
         }
+        message.addProperties(messageProperties);
 
         MuleMessage response = null;
         if (connector.isAllowGlobalDispatcher())
