@@ -13,7 +13,9 @@ package org.mule.transport.${ModuleNameLower}.transformers;
 
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.api.transformer.Transformer;
-
+#if( $outboundTransformer != "n" || $inboundTransformer != "n" )
+import org.mule.transformer.types.DataTypeFactory;
+#end
 
 public class ${ModuleName}TransformersTestCase extends AbstractTransformerTestCase
 {
