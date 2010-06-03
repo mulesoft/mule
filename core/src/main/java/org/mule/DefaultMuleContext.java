@@ -131,12 +131,6 @@ public class DefaultMuleContext implements MuleContext
         return new MuleRegistryHelper(registry, this);
     }
 
-    public void setSplash(SplashScreen startup, SplashScreen shutdown)
-    {
-        startupScreen = startup;
-        shutdownScreen = shutdown;
-    }
-
     public synchronized void initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
