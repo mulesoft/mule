@@ -97,8 +97,6 @@ public class DefaultMuleContext implements MuleContext
 
     private ExpressionManager expressionManager;
 
-    private SplashScreen startupScreen;
-    private SplashScreen shutdownScreen;
     private ClassLoader executionClassLoader;
 
     public DefaultMuleContext(MuleConfiguration config,
@@ -194,7 +192,7 @@ public class DefaultMuleContext implements MuleContext
 
         if (logger.isInfoEnabled())
         {
-            startupScreen = new ServerStartupSplashScreen();
+            SplashScreen startupScreen = new ServerStartupSplashScreen();
             startupScreen.setHeader(this);
             startupScreen.setFooter(this);
             logger.info(startupScreen.toString());
@@ -252,7 +250,7 @@ public class DefaultMuleContext implements MuleContext
 
         if ((getStartDate() > 0) && logger.isInfoEnabled())
         {
-            shutdownScreen = new ServerShutdownSplashScreen();
+            SplashScreen shutdownScreen = new ServerShutdownSplashScreen();
             shutdownScreen.setHeader(this);
             logger.info(shutdownScreen.toString());
         }
