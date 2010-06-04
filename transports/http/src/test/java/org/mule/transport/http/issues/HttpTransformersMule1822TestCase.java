@@ -18,9 +18,9 @@ import org.mule.tck.functional.StringAppendTestTransformer;
 
 public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 {
-
     public static final String OUTBOUND_MESSAGE = "Test message";
 
+    @Override
     protected String getConfigResources()
     {
         return "http-transformers-mule-1822-test.xml";
@@ -36,8 +36,6 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 
     /**
      * With no transformer we expect just the modification from the FTC
-     *
-     * @throws Exception
      */
     public void testBase() throws Exception
     {
@@ -47,8 +45,6 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 
     /**
      * But response transformers on the base model should be applied
-     *
-     * @throws Exception
      */
     public void testResponse() throws Exception
     {
@@ -60,9 +56,7 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
     }
 
     /**
-     * Shouldalso work with inbound transformers
-     *
-     * @throws Exception
+     * Should also work with inbound transformers
      */
     public void testBoth() throws Exception
     {
@@ -73,5 +67,4 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
                         StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received")),
                 sendTo("both").getPayloadAsString());
     }
-
 }

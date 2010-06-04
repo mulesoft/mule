@@ -15,9 +15,9 @@
     <!-- Try diffent variations of endpoint config -->
     <endpoint name="base" address="http://localhost:60222" synchronous="true"/>
 
-    <http:endpoint name="response" address="http://localhost:60223" synchronous="true"/>
+    <http:endpoint name="response" address="http://localhost:60233" synchronous="true"/>
 
-    <http:endpoint name="both" host="localhost" port="60224" synchronous="true"/>
+    <http:endpoint name="both" host="localhost" port="60234" synchronous="true"/>
 
     <append-string-transformer name="appendString" message=" transformed"/>
     <append-string-transformer name="appendString2" message=" transformed 2"/>
@@ -26,10 +26,8 @@
     <append-string-transformer name="appendResponse2" message=" response 2"/>
 
 
-
     <!-- first, the simple two service model we use in all cases, with no additional
          transformers -->
-
     <model name="baseModel">
 
         <service name="baseService1">
@@ -55,9 +53,7 @@
 
     </model>
 
-
     <!-- add reponse transformers to the base model should make a difference -->
-
     <model name="responseModel">
 
         <service name="responseService1">
@@ -84,7 +80,6 @@
 
 
     <!-- grand finale - innies and outies together! -->
-
     <model name="bothModel">
 
         <service name="bothService1">
@@ -111,7 +106,5 @@
             </inbound>
             <test:component appendString=" Received"/>
         </service>
-
     </model>
-
 </mule>
