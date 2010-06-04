@@ -15,7 +15,7 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60197"/>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60188"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>

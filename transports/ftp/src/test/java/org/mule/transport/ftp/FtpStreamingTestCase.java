@@ -23,13 +23,14 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 {
-    private static int PORT = 60197;
+    private static int PORT = 60188;
 
     public FtpStreamingTestCase()
     {
         super(PORT);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "ftp-streaming-test.xml";
