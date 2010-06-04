@@ -22,7 +22,7 @@
 
         <service name="pollingUMO">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="61205"
+                <http:inbound-endpoint host="localhost" port="61206"
                                        connector-ref="PollingHttpConnector">
                     <append-string-transformer message=" toClient-only"/>
                 </http:inbound-endpoint>
@@ -37,7 +37,7 @@
 
         <service name="polledUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:61205" synchronous="true" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:61206" synchronous="true" connector-ref="HttpConnector"/>
             </inbound>
             <test:component appendString="foo"/>
         </service>
