@@ -128,7 +128,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         setMuleContext(muleContext);
         initAppliedTransformerHashCodes();
 
-        // Explicitly check for MuleMessage as a safeguard since MuleMessage is instance of MessageAdapter
         if (message instanceof MuleMessage)
         {
             MuleMessage muleMessage = (MuleMessage) message;
@@ -300,7 +299,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
         }
         
-        // Pass in the adapter itself
+        // Pass in the message itself
         Object result = transformer.transform(this, encoding);
 
         // Unless we disallow Object.class as a valid return type we need to do this extra check
@@ -1085,11 +1084,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         //
         // To remove the underlying cause, however, you probably need to do one of:
         //
-        // - make sure that the message adapter you are using correctly implements the
-        // ThreadSafeAccess interface
+        // - make sure that the message you are using correctly implements the ThreadSafeAccess
+        //   interface
         //
         // - make sure that dispatcher and receiver classes copy ThreadSafeAccess instances when
-        // they are passed between threads
+        //   they are passed between threads
 
         Thread currentThread = Thread.currentThread();
         if (currentThread.equals(ownerThread.get()))

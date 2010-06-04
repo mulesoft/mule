@@ -16,13 +16,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * The OutputHandler is a strategy class that is set on the StreamMessageAdapter to
- * defer the writing of the message payload until there is a stream available to
- * write it to.
+ * The OutputHandler is a strategy class that is used to defer the writing of the message payload 
+ * until there is a stream available to write it to.
  */
 public interface OutputHandler
 {
-
     /**
      * Write the event payload to the stream. Depending on the underlying transport,
      * attachements and message properties may be written to the stream here too.
@@ -32,5 +30,4 @@ public interface OutputHandler
      * @throws IOException in case of error
      */
     void write(MuleEvent event, OutputStream out) throws IOException;
-
 }

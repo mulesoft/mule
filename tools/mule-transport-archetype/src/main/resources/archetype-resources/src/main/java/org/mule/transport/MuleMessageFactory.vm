@@ -15,7 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 /**
- * <code>${ModuleName}MessageAdapter</code> TODO document
+ * <code>${ModuleName}MuleMessageFactory</code> TODO document
  */
 public class ${ModuleName}MuleMessageFactory extends AbstractMuleMessageFactory
 {

@@ -368,13 +368,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * This method is called once the JMS message is created.  It allows custom JmsMessageAdapters to alter the
-     * message if necessary
+     * This method is called once the JMS message is created.  It allows subclasses to alter the
+     * message if necessary.
      *
      * @param msg   The JMS message that will be sent
      * @param event the current event
-     * @throws JMSException if the JmsMessage cannot be written to, this should not happen because the JMSMessage passed
-     *                      in will always be newly created
+     * @throws JMSException if the JmsMessage cannot be written to, this should not happen because 
+     *          the JMSMessage passed in will always be newly created
      */
     protected void processMessage(Message msg, MuleEvent event) throws JMSException
     {
@@ -382,7 +382,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * Some Jms implementations do not support ReplyTo or require some further fiddling of the message
+     * Some JMS implementations do not support ReplyTo or require some further fiddling of the message
      *
      * @param msg   The JMS message that will be sent
      * @param event the current event

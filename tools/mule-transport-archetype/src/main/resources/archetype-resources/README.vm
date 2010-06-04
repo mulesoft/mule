@@ -102,7 +102,7 @@ The class responsible for parsing custom endpoints for this transport.
 
 This transformer should convert the inbound message into a type consumable by Mule.  For example, in the case of JMS this
 class would would convert a JMSMessage to a String, object, Map, etc depending on the time of message.  If your transport
-does not have a specific message type you do not need this class (see ${ModuleName}MessageAdapter).
+does not have a specific message type you do not need this class.
 
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/${ModuleName}OutboundTransformer.java

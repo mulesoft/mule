@@ -9,7 +9,6 @@
  */
 package org.mule.transport;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.MuleSessionHandler;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -25,7 +24,6 @@ import org.mule.transaction.TransactionTemplate;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.resource.spi.work.Work;
@@ -37,18 +35,18 @@ import org.apache.commons.lang.SerializationException;
  */
 public abstract class AbstractReceiverWorker implements Work
 {
-    protected List messages;
+    protected List<Object> messages;
     protected InboundEndpoint endpoint;
     protected AbstractMessageReceiver receiver;
     protected OutputStream out;
 
-    public AbstractReceiverWorker(List messages, AbstractMessageReceiver receiver)
+    public AbstractReceiverWorker(List<Object> messages, AbstractMessageReceiver receiver)
     {
         this(messages, receiver, null);
     }
 
 
-    public AbstractReceiverWorker(List messages, AbstractMessageReceiver receiver, OutputStream out)
+    public AbstractReceiverWorker(List<Object> messages, AbstractMessageReceiver receiver, OutputStream out)
     {
         this.messages = messages;
         this.receiver = receiver;
@@ -93,12 +91,10 @@ public abstract class AbstractReceiverWorker implements Work
                 {
                     bindTransaction(tx);
                 }
-                List results = new ArrayList(messages.size());
+                List<Object> results = new ArrayList<Object>(messages.size());
 
-                for (Iterator iterator = messages.iterator(); iterator.hasNext();)
+                for (Object payload : messages)
                 {
-                    Object payload = iterator.next();
-
                     payload = preProcessMessage(payload);
                     if (payload != null)
                     {

@@ -55,8 +55,8 @@ public interface ThreadSafeAccess
 
     /**
      * This method should ONLY be used in the construction of composite ThreadSafeAccess instances.
-     * For example, a ThreadSafeAccess MuleEvent contains a ThreadSafeAccess MessageAdapter. During
-     * the construction of the event, the message adapter may be bound to the contructing thread.
+     * For example, a ThreadSafeAccess MuleEvent contains a ThreadSafeAccess MuleMessage. During
+     * the construction of the event, the message may be bound to the contructing thread.
      * Calling this method releases that binding so that the event as a whole can be passed to a new
      * thread unbound.
      */

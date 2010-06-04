@@ -277,7 +277,6 @@ public class CxfServiceComponent implements Callable, Lifecycle
             DefaultMuleMessage muleResMsg = new DefaultMuleMessage(outputHandler, muleReqMsg, ctx.getMuleContext());
             // EE-1613 Propagate the Correlation-related properties from the previous message.
             // TODO Ideally this should be handled in a transport-agnostic way (i.e., in the core Mule classes)
-            //      Perhaps this can be addressed as part of the MessageAdapter refactoring work for 3.0
             Object p = muleReqMsg.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
             if (p != null)
             {

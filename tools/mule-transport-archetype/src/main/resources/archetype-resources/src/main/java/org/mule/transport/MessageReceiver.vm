@@ -117,19 +117,19 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            and should clean up any resources. The doStop() and doDisconnect()
            methods will be called implicitly when this method is called. */
     }
+    
 #if( $isPollingReceiver == "y")
     public void poll() throws Exception
     {
         /* IMPLEMENTATION NOTE: Once you have read the object it can be passed
-           into Mule by first wrapping the object with the Message adapter for
-           this transport and calling routeMessage i.e.
+           into Mule by first creating a new MuleMesage with the object and 
+           calling routeMessage i.e.
 
-            MessageAdapter adapter = connector.getMessageAdapter(object);
-            routeMessage(new MuleMessage(adapter, connector.getMuleContext()), endpoint.isSynchronous());
+			MuleMessage message = createMuleMessage(object);
+            routeMessage(message, endpoint.isSynchronous());
         */
 
         // TODO request a message from the underlying technology e.g. Read a file
     }
 #end
 }
-

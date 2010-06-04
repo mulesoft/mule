@@ -29,7 +29,7 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
 
     public AbstractReceiverResourceWorker(Object resource, AbstractMessageReceiver receiver, OutputStream out)
     {
-        super(new ArrayList(), receiver, out);
+        super(new ArrayList<Object>(), receiver, out);
         this.resource = resource;
     }
 
@@ -62,9 +62,8 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
      * The method used to read the next message from the underlying transport.
      * @param resource the resource to read from, this may be a socket, a directory or some higher level
      * representation.
-     * @return the message read from the resource.  This can be raw data such as a byte[] or a MessageAdapter.
+     * @return the message read from the resource.  This can be raw data such as a byte[].
      * @throws Exception
      */
     protected abstract Object getNextMessage(Object resource) throws Exception;
-    
 }

@@ -75,8 +75,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 //
 //            if (response != null)
 //            {
-//                return new DefaultMuleMessage(connector.getMessageAdapter(response), 
-//                    connector.getMuleContext());
+//                return createMuleMessage(response);
 //            }
 //        }
         return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
