@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractMessageRequester;
 
 import java.io.File;
@@ -87,8 +88,8 @@ public class FtpMessageRequester extends AbstractMessageRequester
 
             fileToProcess = prepareFile(client, fileToProcess);
 
-            FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(client);
-            return muleMessageFactory.create(fileToProcess, endpoint.getEncoding());
+            FtpMuleMessageFactory messageFactory = createMuleMessageFactory(client);
+            return messageFactory.create(fileToProcess, endpoint.getEncoding());
         }
         finally
         {
@@ -96,6 +97,14 @@ public class FtpMessageRequester extends AbstractMessageRequester
         }
     }
     
+    @Override
+    protected void initializeMessageFactory() throws InitialisationException
+    {
+        // Do not initialize the muleMessageFactory instance variable of our super class as 
+        // we're creating MuleMessageFactory instances per request. 
+        // See createMuleMessageFactory(FTPClient) below.
+    }
+
     protected FtpMuleMessageFactory createMuleMessageFactory(FTPClient client) throws CreateException
     {
         FtpMuleMessageFactory factory = (FtpMuleMessageFactory) createMuleMessageFactory();
@@ -166,6 +175,11 @@ public class FtpMessageRequester extends AbstractMessageRequester
     
     private static class AcceptAllFilenameFilter implements FilenameFilter
     {
+        public AcceptAllFilenameFilter()
+        {
+            super();
+        }
+        
         public boolean accept(File dir, String name)
         {
             return true;

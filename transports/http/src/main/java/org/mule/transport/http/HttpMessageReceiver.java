@@ -24,11 +24,13 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.api.transport.MuleMessageFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -495,20 +497,29 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     }
     
     @Override
-    protected MuleMessageFactory createMuleMessageFactory() throws CreateException
+    protected void initializeMessageFactory() throws InitialisationException
     {
-        HttpMuleMessageFactory factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
+        HttpMuleMessageFactory factory;
+        try
+        {
+            factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
 
-        boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
-            HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
-        factory.setEnableCookies(enableCookies);
+            boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
+                HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
+            factory.setEnableCookies(enableCookies);
 
-        String cookieSpec = MapUtils.getString(endpoint.getProperties(),
-            HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
-        factory.setCookieSpec(cookieSpec);
-        
-        factory.setSynchronous(endpoint.isSynchronous());
+            String cookieSpec = MapUtils.getString(endpoint.getProperties(),
+                HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
+            factory.setCookieSpec(cookieSpec);
+            
+            factory.setSynchronous(endpoint.isSynchronous());
 
-        return factory;
+            muleMessageFactory = factory;
+        }
+        catch (CreateException ce)
+        {
+            Message message = MessageFactory.createStaticMessage(ce.getMessage());
+            throw new InitialisationException(message, ce, this);
+        }
     }
 }
