@@ -100,7 +100,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -517,28 +516,10 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     public final synchronized void stop() throws MuleException
     {
-        stop(true);
-    }
-
-    /**
-     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251
-     *                         without breaking retry and without making large changes to the connector lifecycle.
-     *                         It should be removed for 3.x.
-     */
-    private final synchronized void stop(boolean disposeWorkManagers) throws MuleException
-    {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
 
         // shutdown our scheduler service
         shutdownScheduler();
-
-        // Dispose work managers here to ensure that all jobs that are currently
-        // processing or waiting can complete so that all message flow completes in
-        // stop phase.  See MULE-4521
-        if (disposeWorkManagers)
-        {
-            disposeWorkManagers();
-        }
 
         lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
 
@@ -640,6 +621,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             logger.warn("Failed to dispose connector: " + name, e);
         }
         
+        this.disposeWorkManagers();
         this.disposeReceivers();
     }
 
@@ -971,7 +953,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * The only time this method should be used is when a subclassing connector needs to delay the start lifecycle due to
      * a dependence on an external system. Most users can ignore this.
      *
-     * @param true to stop the connector starting through normal lifecycle.  It will be the responsibility
+     * @param initialStateStopped true to stop the connector starting through normal lifecycle.  It will be the responsibility
      * of the code that sets this property to start the connector
      *
      * @since 3.0.0
@@ -1632,22 +1614,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     public void disconnect() throws Exception
     {
-        disconnect(true);
-    }
-
-    /**
-     * @param stopWorkManagers - This is a hack for 2.2.x so that we can implement the fix for MULE-4251
-     *                         without breaking retry and without making large changes to the connector lifecycle.
-     *                         It should be removed for 3.x.
-     */
-    private void disconnect(boolean stopWorkManagers) throws Exception
-    {
         startOnConnect = isStarted();
-
-        this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                ConnectionNotification.CONNECTION_DISCONNECTED));
-        // TODO Shouldn't this come at the end of the method, after the receivers have been disconnected?
-        connected.set(false);
 
         try
         {
@@ -1681,15 +1648,15 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     }
                 }
             }
-
-            // TODO Shouldn't stop() come before disconnect(), not after ?
-            if (this.isStarted())
-            {
-                this.stop(stopWorkManagers);
-            }
         }
 
-        logger.info("Disconnected: " + this.getConnectionDescription());
+        connected.set(false);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Disconnected: " + this.getConnectionDescription());
+        }
+        this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                                                         ConnectionNotification.CONNECTION_DISCONNECTED));
     }
 
     public String getConnectionDescription()

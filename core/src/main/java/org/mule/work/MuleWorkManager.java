@@ -131,8 +131,7 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
                     // tasks
                     List outstanding = workExecutorService.shutdownNow();
                     // Wait a while for tasks to respond to being cancelled
-                    if (!workExecutorService.awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT,
-                        TimeUnit.MILLISECONDS))
+                    if (!workExecutorService.awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
                     {
                         logger.warn(MessageFormat.format(
                             "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
