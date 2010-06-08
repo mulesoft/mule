@@ -175,15 +175,19 @@ LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
 
 # Resolve the location of the 'ps' command
-PSEXE="/usr/bin/ps"
+PSEXE="/usr/ucb/ps"
 if [ ! -x "$PSEXE" ]
 then
-    PSEXE="/bin/ps"
+    PSEXE="/usr/bin/ps"
     if [ ! -x "$PSEXE" ]
     then
-        echo "Unable to locate 'ps'."
-        echo "Please report this message along with the location of the command on your system."
-        exit 1
+        PSEXE="/bin/ps"
+        if [ ! -x "$PSEXE" ]
+        then
+            echo "Unable to locate 'ps'."
+            echo "Please report this message along with the location of the command on your system."
+            exit 1
+        fi
     fi
 fi
 PSKEYWORD="args"
@@ -239,7 +243,7 @@ do
         'pa_risc' | 'pa-risc')
             DIST_ARCH="parisc"
             break;;
-        'sun4u' | 'sun4us' | 'sun4v' | 'sparcv9' | 'sparc') 
+        'sun4u' | 'sun4us' | 'sun4v' | 'sparcv9' | 'sparc')
             DIST_ARCH="sparc"
             break;;
         '9000/800')
@@ -436,7 +440,15 @@ getpid() {
                 # this test fail if the path is too long.
                 # http://sourceforge.net/tracker/index.php?func=detail&aid=1664303&group_id=39428&atid=425187
                 ######################################################################
-                pidtest=`$PSEXE -p $pid -o $PSKEYWORD | grep "$WRAPPER_CMD" | tail -1`
+                if [ "$DIST_OS" = 'solaris' ]
+                then
+                    # on Solaris, both /usr/ucb/ps and /usr/bin/ps accept the ww option.
+                    # Use it to overcome the truncation issue mentioned above
+                    pidtest=`$PSEXE ww $pid | grep "$WRAPPER_CMD" | tail -1`
+                else
+                    pidtest=`$PSEXE -p $pid -o $PSKEYWORD | grep "$WRAPPER_CMD" | tail -1`
+                fi
+
                 if [ "X$pidtest" = "X" ]
                 then
                     # This is a stale pid file.
