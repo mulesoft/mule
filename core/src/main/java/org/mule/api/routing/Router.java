@@ -17,7 +17,6 @@ import org.mule.management.stats.RouterStatistics;
 /**
  * <code>Router</code> is a base interface for all routers.
  */
-//public interface Router extends Registerable
 public interface Router extends Initialisable, Disposable
 {
     void setRouterStatistics(RouterStatistics stats);
