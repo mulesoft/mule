@@ -164,6 +164,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * Factory used to create requesters for this connector
      */
     protected volatile MessageRequesterFactory requesterFactory;
+    
+    /**
+     * Factory used to create new {@link MuleMessage} instances
+     */
+    protected MuleMessageFactory muleMessageFactory = null;
 
     /**
      * A pool of dispatchers for this connector, keyed by endpoint
@@ -924,6 +929,22 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // we keep a reference to the unadapted factory, otherwise people might end
         // up with ClassCastExceptions on downcast to their implementation (sigh)
         this.requesterFactory = requesterFactory;
+    }
+    
+    /**
+     * <p>The connector creates a {@link MuleMessageFactory} lazily and holds a reference to it for
+     * others to use.</p>
+     * <p>The typical use case is to share a single {@link MuleMessageFactory} between all
+     * {@link MessageDispatcher}, {@link MessageReceiver} and {@link MessageRequester} instances
+     * belonging to this connector.</p>
+     */
+    public MuleMessageFactory getMuleMessageFactory() throws CreateException
+    {
+        if (muleMessageFactory == null)
+        {
+            muleMessageFactory = createMuleMessageFactory();
+        }
+        return muleMessageFactory;
     }
 
     /**

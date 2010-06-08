@@ -133,11 +133,15 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
+    /**
+     * Subclasses can override this method to create a custom {@link MuleMessageFactory} instead
+     * of re-using the instance from the connector.
+     */
     protected void initializeMessageFactory() throws InitialisationException
     {
         try
         {
-            muleMessageFactory = createMuleMessageFactory();
+            muleMessageFactory = connector.getMuleMessageFactory();
         }
         catch (CreateException ce)
         {
