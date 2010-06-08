@@ -9,50 +9,53 @@
  */
 package org.mule.api.store;
 
-/**
- * TODO
- */
-
 public interface ObjectStore
 {
     /**
      * Check whether the given Object is already registered with this store.
      *
-     * @param id the ID to check
-     * @return <code>true</code> if the ID is stored or <code>false</code> if it could
-     *         not be found
-     * @throws IllegalArgumentException if the given ID is <code>null</code>
-     * @throws Exception if any implementation-specific error occured, e.g. when the store
-     *             is not available
+     * @param id the identifier of the object to check
+     * @return <code>true</code> if the ID is stored or <code>false</code> if it could not be found
+     * @throws IllegalArgumentException if the given ID is <code>null</code>.
+     * @throws Exception if any implementation-specific error occured, e.g. when the store is 
+     *          not available
      */
     boolean containsObject(String id) throws Exception;
 
     /**
      * Store the given Object.
      *
-     * @param id the ID to store
-     * @param item the Object to store with the id
-     * @return <code>true</code> if the ID was stored properly, or <code>false</code>
-     *         if it already existed
-     * @throws IllegalArgumentException if the given ID cannot be stored or is
-     *             <code>null</code>
-     * @throws Exception if the store is not available or any other
-     *             implementation-specific error occured
+     * @param id the identifier for <code>item</code>
+     * @param item the Object to store with <code>id</code>
+     * @return <code>true</code> if the object was stored properly, or <code>false</code> if an
+     *          object with the given id already existed.
+     * @throws IllegalArgumentException if the given ID cannot be stored or is <code>null</code>
+     * @throws Exception if the store is not available or any other implementation-specific 
+     *          error occured.
      */
     boolean storeObject(String id, Object item) throws Exception;
 
     /**
      * Retrieve the given Object.
      *
-     * @param id the ID to store
-     * @return the object instance associated with this id or null if there was no entry for the supplied id.
-     * @throws IllegalArgumentException if the given ID cannot be stored or is
-     *             <code>null</code>
-     * @throws Exception if the store is not available or any other
-     *             implementation-specific error occured
+     * @param id the identifier of the object to retrieve.
+     * @return the object associated with the given ID or <code>null</code> if there was no entry 
+     *          for the supplied ID.
+     * @throws IllegalArgumentException if the given ID is <code>null</code>
+     * @throws Exception if the store is not available or any other implementation-specific 
+     *          error occured
      */
     Object retrieveObject(String id) throws Exception;
 
+    /**
+     * Remove the object with ID.
+     * 
+     * @param id the identifier of the object to remove.
+     * @return <code>true</code> if the object was found and removed or <code>false</code> if no
+     *          object with ID was stored.
+     * @throws IllegalArgumentException if the given ID is <code>null</code>
+     * @throws Exception if the store is not available or any other implementation-specific 
+     *          error occured
+     */
     boolean removeObject(String id) throws Exception;
-
 }
