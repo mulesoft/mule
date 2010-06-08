@@ -16,7 +16,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class AbstractEndpointURIBuilderTestCase extends AbstractMuleTestCase
+public class EndpointURIBuilderTestCase extends AbstractMuleTestCase
 {
     // Test for MULE-2720
     public void testGetPropertiesForURI() throws MalformedEndpointException, URISyntaxException

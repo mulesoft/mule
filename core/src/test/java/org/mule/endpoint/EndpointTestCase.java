@@ -33,7 +33,7 @@ import java.util.Map;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class AbstractEndpointTestCase extends AbstractMuleTestCase
+public class EndpointTestCase extends AbstractMuleTestCase
 {
     /**
      * Tests that endpoint configuration is done before setting the endpoint in the
