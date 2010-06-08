@@ -40,7 +40,7 @@ public class GenericsUtils
      * @param collectionClass the collection class to introspect
      * @return the generic type, or <code>null</code> if none
      */
-    public static Class<?> getCollectionType(Class<? extends Collection> collectionClass)
+    public static Class<?> getCollectionType(Class<? extends Collection<?>> collectionClass)
     {
         return extractTypeFromClass(collectionClass, Collection.class, 0);
     }
@@ -52,7 +52,7 @@ public class GenericsUtils
      * @param mapClass the map class to introspect
      * @return the generic type, or <code>null</code> if none
      */
-    public static Class<?> getMapKeyType(Class<? extends Map> mapClass)
+    public static Class<?> getMapKeyType(Class<? extends Map<?, ?>> mapClass)
     {
         return extractTypeFromClass(mapClass, Map.class, 0);
     }
@@ -64,7 +64,7 @@ public class GenericsUtils
      * @param mapClass the map class to introspect
      * @return the generic type, or <code>null</code> if none
      */
-    public static Class<?> getMapValueType(Class<? extends Map> mapClass)
+    public static Class<?> getMapValueType(Class<? extends Map<?, ?>> mapClass)
     {
         return extractTypeFromClass(mapClass, Map.class, 1);
     }
@@ -311,14 +311,13 @@ public class GenericsUtils
      * @param currentLevel the current nested level
      * @return the generic type as Class, or <code>null</code> if none
      */
-    private static Class<?> extractType(
-            MethodParameter methodParam, Type type, Class<?> source, int typeIndex, int nestingLevel, int currentLevel)
+    private static Class<?> extractType(MethodParameter methodParam, Type type, Class<?> source, 
+        int typeIndex, int nestingLevel, int currentLevel)
     {
-
         Type resolvedType = type;
-        if (type instanceof TypeVariable && methodParam != null && methodParam.typeVariableMap != null)
+        if (type instanceof TypeVariable<?> && methodParam != null && methodParam.typeVariableMap != null)
         {
-            Type mappedType = methodParam.typeVariableMap.get((TypeVariable) type);
+            Type mappedType = methodParam.typeVariableMap.get(type);
             if (mappedType != null)
             {
                 resolvedType = mappedType;
@@ -329,9 +328,10 @@ public class GenericsUtils
             return extractTypeFromParameterizedType(
                     methodParam, (ParameterizedType) resolvedType, source, typeIndex, nestingLevel, currentLevel);
         }
-        else if (resolvedType instanceof Class)
+        else if (resolvedType instanceof Class<?>)
         {
-            return extractTypeFromClass(methodParam, (Class) resolvedType, source, typeIndex, nestingLevel, currentLevel);
+            Class<?> resolvedClass = (Class<?>) resolvedType;
+            return extractTypeFromClass(methodParam, resolvedClass, source, typeIndex, nestingLevel, currentLevel);
         }
         else
         {
@@ -351,14 +351,15 @@ public class GenericsUtils
      * @return the generic type as Class, or <code>null</code> if none
      */
     private static Class<?> extractTypeFromParameterizedType(MethodParameter methodParam,
-                                                             ParameterizedType ptype, Class<?> source, int typeIndex, int nestingLevel, int currentLevel)
+         ParameterizedType ptype, Class<?> source, int typeIndex, int nestingLevel, int currentLevel)
     {
 
-        if (!(ptype.getRawType() instanceof Class))
+        if (!(ptype.getRawType() instanceof Class<?>))
         {
             return null;
         }
-        Class rawType = (Class) ptype.getRawType();
+        
+        Class<?> rawType = (Class<?>) ptype.getRawType();
         Type[] paramTypes = ptype.getActualTypeArguments();
         if (nestingLevel - currentLevel > 0)
         {
@@ -373,7 +374,7 @@ public class GenericsUtils
         {
             return null;
         }
-        Class fromSuperclassOrInterface =
+        Class<?> fromSuperclassOrInterface =
                 extractTypeFromClass(methodParam, rawType, source, typeIndex, nestingLevel, currentLevel);
         if (fromSuperclassOrInterface != null)
         {
@@ -384,9 +385,9 @@ public class GenericsUtils
             return null;
         }
         Type paramType = paramTypes[typeIndex];
-        if (paramType instanceof TypeVariable && methodParam != null && methodParam.typeVariableMap != null)
+        if (paramType instanceof TypeVariable<?> && methodParam != null && methodParam.typeVariableMap != null)
         {
-            Type mappedType = methodParam.typeVariableMap.get((TypeVariable) paramType);
+            Type mappedType = methodParam.typeVariableMap.get(paramType);
             if (mappedType != null)
             {
                 paramType = mappedType;
@@ -417,15 +418,16 @@ public class GenericsUtils
         {
             // A generic array type... Let's turn it into a straight array type if possible.
             Type compType = ((GenericArrayType) paramType).getGenericComponentType();
-            if (compType instanceof Class)
+            if (compType instanceof Class<?>)
             {
-                return Array.newInstance((Class) compType, 0).getClass();
+                Class<?> compClass = (Class<?>) compType;
+                return Array.newInstance(compClass, 0).getClass();
             }
         }
-        else if (paramType instanceof Class)
+        else if (paramType instanceof Class<?>)
         {
             // We finally got a straight Class...
-            return (Class) paramType;
+            return (Class<?>) paramType;
         }
         return null;
     }
@@ -438,7 +440,7 @@ public class GenericsUtils
      * @param typeIndex the index of the actual type argument
      * @return the generic type as Class, or <code>null</code> if none
      */
-    private static Class<?> extractTypeFromClass(Class clazz, Class<?> source, int typeIndex)
+    private static Class<?> extractTypeFromClass(Class<?> clazz, Class<?> source, int typeIndex)
     {
         return extractTypeFromClass(null, clazz, source, typeIndex, 1, 1);
     }
@@ -476,7 +478,7 @@ public class GenericsUtils
                 {
                     rawType = ((ParameterizedType) ifc).getRawType();
                 }
-                if (rawType instanceof Class<?> && isIntrospectionCandidate((Class) rawType))
+                if (rawType instanceof Class<?> && isIntrospectionCandidate((Class<?>) rawType))
                 {
                     return extractType(methodParam, ifc, source, typeIndex, nestingLevel, currentLevel);
                 }
@@ -492,7 +494,7 @@ public class GenericsUtils
      * @param clazz the class to check
      * @return whether the given class is assignable to Collection or Map
      */
-    private static boolean isIntrospectionCandidate(Class clazz)
+    private static boolean isIntrospectionCandidate(Class<?> clazz)
     {
         return (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz));
     }

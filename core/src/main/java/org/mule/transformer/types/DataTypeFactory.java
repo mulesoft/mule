@@ -52,15 +52,15 @@ public class DataTypeFactory
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            Class<? extends Collection<?>> cType = (Class<? extends Collection<?>>)type;
-            Class itemType = GenericsUtils.getCollectionType(cType);
+            Class<? extends Collection<?>> collectionType = (Class<? extends Collection<?>>)type;
+            Class<?> itemType = GenericsUtils.getCollectionType(collectionType);
             if (itemType == null)
             {
-                return new CollectionDataType(cType, mimeType);
+                return new CollectionDataType(collectionType, mimeType);
             }
             else
             {
-                return new CollectionDataType(cType, itemType, mimeType);
+                return new CollectionDataType(collectionType, itemType, mimeType);
             }
         }
         //Special case where proxies are used for testing
@@ -168,7 +168,6 @@ public class DataTypeFactory
             return new SimpleDataType(m.getParameterTypes()[paramIndex], mimeType);
         }
     }
-
 
     public static DataType createFromField(Field f)
     {

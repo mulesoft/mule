@@ -60,7 +60,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected DataType returnType = new SimpleDataType<Object>(Object.class);
+    protected DataType<?> returnType = new SimpleDataType<Object>(Object.class);
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -87,11 +87,6 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     private boolean ignoreBadInput = false;
 
     /**
-     * Used to create Data Types
-     */
-    private DataTypeFactory dataTypeFactory = new DataTypeFactory();
-
-    /**
      * default constructor required for discovery
      */
     public AbstractTransformer()
@@ -103,7 +98,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     {
         if (returnType != null)
         {
-            DataType dt = dataTypeFactory.create(object.getClass());
+            DataType<?> dt = DataTypeFactory.create(object.getClass());
             if (!returnType.isCompatibleWith(dt))
             {
                 throw new TransformerException(
@@ -129,7 +124,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      */
     protected void registerSourceType(Class<?> aClass)
     {
-        registerSourceType(new SimpleDataType(aClass));
+        registerSourceType(new SimpleDataType<Object>(aClass));
     }
 
     /**
@@ -139,7 +134,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      */
     protected void unregisterSourceType(Class<?> aClass)
     {
-        unregisterSourceType(new SimpleDataType(aClass));
+        unregisterSourceType(new SimpleDataType<Object>(aClass));
     }
 
     /**
@@ -148,7 +143,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      *
      * @param dataType the source type to allow
      */
-    protected void registerSourceType(DataType dataType)
+    protected void registerSourceType(DataType<?> dataType)
     {
         if (!sourceTypes.contains(dataType))
         {
@@ -166,7 +161,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      *
      * @param dataType the type to remove
      */
-    protected void unregisterSourceType(DataType dataType)
+    protected void unregisterSourceType(DataType<?> dataType)
     {
         sourceTypes.remove(dataType);
     }
@@ -197,32 +192,32 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         name = string;
     }
 
-    public Class getReturnClass()
+    public Class<?> getReturnClass()
     {
         return returnType.getType();
     }
 
-    public void setReturnDataType(DataType type)
+    public void setReturnDataType(DataType<?> type)
     {
         this.returnType = type;
     }
 
-    public DataType getReturnDataType()
+    public DataType<?> getReturnDataType()
     {
         return returnType;
     }
 
-    public void setReturnClass(Class newClass)
+    public void setReturnClass(Class<?> newClass)
     {
-        returnType = new SimpleDataType(newClass);
+        returnType = new SimpleDataType<Object>(newClass);
     }
 
-    public boolean isSourceTypeSupported(Class aClass)
+    public boolean isSourceTypeSupported(Class<?> aClass)
     {
         return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
     }
 
-    public boolean isSourceDataTypeSupported(DataType dataType)
+    public boolean isSourceDataTypeSupported(DataType<?> dataType)
     {
         return isSourceDataTypeSupported(dataType, false);
     }
@@ -250,7 +245,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      *                   for a compatible data type.
      * @return true if the source type is supported by this transformer, false otherwise
      */
-    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
+    public boolean isSourceDataTypeSupported(DataType<?> dataType, boolean exactMatch)
     {
         int numTypes = sourceTypes.size();
 
@@ -259,7 +254,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             return !exactMatch;
         }
 
-        for (DataType sourceType : sourceTypes)
+        for (DataType<?> sourceType : sourceTypes)
         {
             if (exactMatch)
             {
@@ -298,7 +293,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             }
         }
 
-        DataType sourceType = new DataTypeFactory().create(payload.getClass());
+        DataType<?> sourceType = DataTypeFactory.create(payload.getClass());
         //Once we support mime types, it should be possible to do this since we'll be able to discern the difference
         //between objects with the same type
 //        if(getReturnDataType().isCompatibleWith(sourceType))
@@ -366,7 +361,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         return encoding;
     }
 
-    protected boolean isConsumed(Class srcCls)
+    protected boolean isConsumed(Class<?> srcCls)
     {
         return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
     }
@@ -405,8 +400,8 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     protected String generateTransformerName()
     {
-        String name = ClassUtils.getSimpleName(this.getClass());
-        int i = name.indexOf("To");
+        String transformerName = ClassUtils.getSimpleName(this.getClass());
+        int i = transformerName.indexOf("To");
         if (i > 0 && returnType != null)
         {
             String target = ClassUtils.getSimpleName(returnType.getType());
@@ -414,9 +409,9 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             {
                 target = "byteArray";
             }
-            name = name.substring(0, i + 2) + StringUtils.capitalize(target);
+            transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
         }
-        return name;
+        return transformerName;
     }
 
     public List<Class<?>> getSourceTypes()
