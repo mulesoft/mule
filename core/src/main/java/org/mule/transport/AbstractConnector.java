@@ -1872,7 +1872,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Returns a work manager for message receivers.
      */
-    protected WorkManager getReceiverWorkManager(String receiverName) throws MuleException
+    protected WorkManager getReceiverWorkManager() throws MuleException
     {
         return (WorkManager) receiverWorkManager.get();
     }

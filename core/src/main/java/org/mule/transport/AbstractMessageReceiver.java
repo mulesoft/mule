@@ -444,7 +444,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     {
         try
         {
-            return connector.getReceiverWorkManager("receiver");
+            return connector.getReceiverWorkManager();
         }
         catch (MuleException e)
         {

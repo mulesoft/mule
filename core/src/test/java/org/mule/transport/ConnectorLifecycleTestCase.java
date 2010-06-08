@@ -393,33 +393,33 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     public void testWorkManagerLifecycle() throws MuleException, WorkException
     {
-        assertNull(connector.getReceiverWorkManager(null));
+        assertNull(connector.getReceiverWorkManager());
         assertNull(connector.getDispatcherWorkManager());
         assertNull(connector.getRequesterWorkManager());
 
         connector.start();
-        assertNotNull(connector.getReceiverWorkManager(null));
+        assertNotNull(connector.getReceiverWorkManager());
         assertNotNull(connector.getDispatcherWorkManager());
         assertNotNull(connector.getRequesterWorkManager());
-        connector.getReceiverWorkManager(null).doWork(createSomeWork());
+        connector.getReceiverWorkManager().doWork(createSomeWork());
         connector.getDispatcherWorkManager().doWork(createSomeWork());
         connector.getRequesterWorkManager().doWork(createSomeWork());
 
         connector.stop();
-        assertNull(connector.getReceiverWorkManager(null));
+        assertNull(connector.getReceiverWorkManager());
         assertNull(connector.getDispatcherWorkManager());
         assertNull(connector.getRequesterWorkManager());
 
         connector.start();
-        assertNotNull(connector.getReceiverWorkManager(null));
+        assertNotNull(connector.getReceiverWorkManager());
         assertNotNull(connector.getDispatcherWorkManager());
         assertNotNull(connector.getRequesterWorkManager());
-        connector.getReceiverWorkManager(null).doWork(createSomeWork());
+        connector.getReceiverWorkManager().doWork(createSomeWork());
         connector.getDispatcherWorkManager().doWork(createSomeWork());
         connector.getRequesterWorkManager().doWork(createSomeWork());
 
         connector.dispose();
-        assertNull(connector.getReceiverWorkManager(null));
+        assertNull(connector.getReceiverWorkManager());
         assertNull(connector.getDispatcherWorkManager());
         assertNull(connector.getRequesterWorkManager());
     }
