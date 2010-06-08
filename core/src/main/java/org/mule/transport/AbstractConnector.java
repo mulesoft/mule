@@ -163,11 +163,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * Factory used to create requesters for this connector
      */
     protected volatile MessageRequesterFactory requesterFactory;
-    
+
     /**
      * Factory used to create new {@link MuleMessage} instances
      */
-    protected MuleMessageFactory muleMessageFactory = null;
+    protected MuleMessageFactory muleMessageFactory;
 
     /**
      * A pool of dispatchers for this connector, keyed by endpoint
