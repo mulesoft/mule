@@ -557,8 +557,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // make sure the scheduler is gone
         scheduler = null;
 
-        // we do not need to stop the work managers because they do no harm (will just be idle)
-        // and will be reused on restart without problems.
+        this.disposeWorkManagers();
     }
 
     protected void shutdownScheduler()
@@ -621,7 +620,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             logger.warn("Failed to dispose connector: " + name, e);
         }
         
-        this.disposeWorkManagers();
         this.disposeReceivers();
     }
 
