@@ -13,7 +13,6 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -28,7 +27,6 @@ import org.mule.transport.NullPayload;
  */
 public class ChainingRouter extends FilteringOutboundRouter
 {
-
     @Override
     public void initialise() throws InitialisationException
     {

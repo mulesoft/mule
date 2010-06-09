@@ -32,6 +32,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
 {
     private boolean deterministic = true;
+    
     /* Users should only disable this if they have filters configured on the endpoint
      * that will control which endpoint will receive the message
      */
@@ -85,6 +86,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
      * @return a {@link java.util.List} of message parts.  Each part will become the payload of the outgoing
      *         message.  Note that the parts will be dispatched to
      */
+    @Override
     protected SplitMessage getMessageParts(MuleMessage message, List endpoints)
     {
         SplitMessage splitMessage = new SplitMessage();

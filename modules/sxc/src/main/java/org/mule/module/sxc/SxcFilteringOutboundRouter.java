@@ -56,7 +56,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
 
     private NamespaceManager namespaceManager;
 
-
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -68,9 +68,10 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         {
             throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
         }
-        if(namespaceManager!=null)
+        
+        if (namespaceManager != null)
         {
-            if(namespaces == null)
+            if (namespaces == null)
             {
                 namespaces = new HashMap(namespaceManager.getNamespaces());
             }
@@ -149,7 +150,6 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
     @Override
     public boolean isMatch(MuleMessage message) throws RoutingException
     {
-
         ReversibleXMLStreamReader reader = null;
         try
         {

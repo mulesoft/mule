@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
@@ -25,7 +24,6 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -37,12 +35,11 @@ import java.util.Map;
  */
 public class TemplateEndpointRouter extends FilteringOutboundRouter
 {
-
     // We used square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         MuleMessage result = null;
 
@@ -53,7 +50,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
 
         try
         {
-            OutboundEndpoint ep = (OutboundEndpoint) endpoints.get(0);
+            OutboundEndpoint ep = endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -66,9 +63,8 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
             Map props = new HashMap();
             props.putAll(ep.getProperties());
 
-            for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+            for (String propertyKey : message.getPropertyNames())
             {
-                String propertyKey = (String) iterator.next();
                 props.put(propertyKey, message.getProperty(propertyKey));
             }
 
@@ -100,10 +96,9 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (ImmutableEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
         }
 
         return result;
     }
-
 }

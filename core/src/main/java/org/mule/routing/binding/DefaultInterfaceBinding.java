@@ -30,10 +30,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultInterfaceBinding extends AbstractRouter implements InterfaceBinding
 {
-
     protected static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
 
-    private Class interfaceClass;
+    private Class<?> interfaceClass;
 
     private String methodName;
 
@@ -50,12 +49,12 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         return outboundRouter.route(message, session);
     }
 
-    public void setInterface(Class interfaceClass)
+    public void setInterface(Class<?> interfaceClass)
     {
         this.interfaceClass = interfaceClass;
     }
 
-    public Class getInterface()
+    public Class<?> getInterface()
     {
         return interfaceClass;
     }
@@ -103,7 +102,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         }
     }
 
-    public Class getInterfaceClass()
+    public Class<?> getInterfaceClass()
     {
         return interfaceClass;
     }

@@ -19,6 +19,7 @@ import org.mule.routing.EventCorrelatorCallback;
  */
 public class SimpleCollectionAggregator extends AbstractEventAggregator
 {
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback(muleContext);

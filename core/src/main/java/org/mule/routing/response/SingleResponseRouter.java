@@ -14,13 +14,12 @@ import org.mule.routing.EventCorrelatorCallback;
 import org.mule.routing.SingleCorrelatorCallback;
 
 /**
- * Handles single event responses from a replyTo address. If multiple responses will
- * be received for a single invocation, the {@link ResponseCorrelationAggregator}
- * should be used.
+ * Handles single event responses from a replyTo address. If multiple responses will be received 
+ * for a single invocation, the {@link ResponseCorrelationAggregator} should be used.
  */
 public class SingleResponseRouter extends AbstractResponseAggregator
 {
-
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new SingleCorrelatorCallback();

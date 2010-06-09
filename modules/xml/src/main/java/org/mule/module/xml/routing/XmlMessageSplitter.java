@@ -63,7 +63,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     protected volatile String splitExpression = "";
-    protected volatile Map namespaces;
+    protected volatile Map<?, ?> namespaces;
     protected NamespaceManager namespaceManager;
 
     protected volatile boolean validateSchema;
@@ -74,12 +74,12 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         this.splitExpression = StringUtils.trimToEmpty(splitExpression);
     }
 
-    public void setNamespaces(Map namespaces)
+    public void setNamespaces(Map<?, ?> namespaces)
     {
         this.namespaces = namespaces;
     }
 
-    public Map getNamespaces()
+    public Map<?, ?> getNamespaces()
     {
         return Collections.unmodifiableMap(namespaces);
     }
@@ -132,7 +132,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
             {
                 if (namespaces == null)
                 {
-                    namespaces = new HashMap(namespaceManager.getNamespaces());
+                    namespaces = new HashMap<Object, Object>(namespaceManager.getNamespaces());
                 }
                 else
                 {
@@ -249,17 +249,14 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         }
     }
 
-
     protected void setDoSchemaValidation(SAXReader reader, boolean validate) throws Exception
     {
         reader.setValidation(validate);
         reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA, validate);
         reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, true);
 
-        /*
-        * By default we're not validating against an XSD. If this is the case,
-        * there's no need to continue here, so we bail.
-        */
+        // By default we're not validating against an XSD. If this is the case,
+        // there's no need to continue here, so we bail.
         if (!validate)
         {
             return;
@@ -269,7 +266,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
         if (xsdAsStream == null)
         {
             throw new IllegalArgumentException("Couldn't find schema at "
-                    + getExternalSchemaLocation());
+                + getExternalSchemaLocation());
         }
 
         // Set schema language property (must be done before the schemaSource

@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -23,6 +22,7 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class FilteringOutboundRouter extends AbstractOutboundRouter
 {
-    private List transformers = new LinkedList();
+    private List<Transformer> transformers = new LinkedList<Transformer>();
 
     private Filter filter;
 
@@ -60,14 +60,14 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         expressionManager = muleContext.getExpressionManager();
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         MuleMessage result = null;
 
         if (endpoints == null || endpoints.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), 
+                message, null);
         }
 
         OutboundEndpoint ep = getEndpoint(0, message);
@@ -106,29 +106,31 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         {
             return true;
         }
+        
         try
         {
             message.applyTransformers(transformers);
         }
         catch (TransformerException e)
         {
-            throw new RoutingException(
-                    CoreMessages.transformFailedBeforeFilter(),
-                    message, (ImmutableEndpoint) endpoints.get(0), e);
+            throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
+                endpoints.get(0), e);
         }
+        
         return getFilter().accept(message);
     }
 
-    public List getTransformers()
+    public List<Transformer> getTransformers()
     {
         return transformers;
     }
 
-    public void setTransformers(List transformers)
+    public void setTransformers(List<Transformer> transformers)
     {
         this.transformers = transformers;
     }
 
+    @Override
     public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (!useTemplates && parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
@@ -154,11 +156,11 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     {
         if (!useTemplates)
         {
-            return (OutboundEndpoint) endpoints.get(index);
+            return endpoints.get(index);
         }
         else
         {
-            OutboundEndpoint ep = (OutboundEndpoint) endpoints.get(index);
+            OutboundEndpoint ep = endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -212,6 +214,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         this.useTemplates = useTemplates;
     }
     
+    @Override
     public boolean isRequiresNewMessage()
     {
         return !transformers.isEmpty();

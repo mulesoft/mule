@@ -15,7 +15,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
@@ -32,9 +31,8 @@ import java.util.List;
 
 public class MulticastingRouter extends FilteringOutboundRouter
 {
-
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
         {
@@ -60,7 +58,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
             OutboundEndpoint endpoint;
             for (int i = 0; i < endpoints.size(); i++)
             {
-                endpoint = (OutboundEndpoint) endpoints.get(i);
+                endpoint = endpoints.get(i);
                 if(endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
                 {
                     if (((DefaultMuleMessage) message).isConsumable())
@@ -70,7 +68,8 @@ public class MulticastingRouter extends FilteringOutboundRouter
                             message);
                     }
                     
-                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
+                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), 
+                        message, muleContext);
                     if (endpoint.isSynchronous())
                     {
                         results.add(send(session, clonedMessage, endpoint));
@@ -84,7 +83,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (ImmutableEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
         }
         return resultsHandler.aggregateResults(results, message, muleContext);
     }

@@ -35,12 +35,10 @@ import java.util.List;
  * exception is thrown. <p/> The router will override the sync/async mode of the
  * endpoint and force the sync mode for all endpoints except the last one.
  */
-
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         List recipients = null;
         try

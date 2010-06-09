@@ -20,10 +20,9 @@ import org.mule.routing.inbound.EventGroup;
  * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a
  * response flow using the Correlation Id to group events.
  */
-
 public abstract class ResponseCorrelationAggregator extends AbstractResponseAggregator
 {
-
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new DefaultEventCorrelatorCallback();
@@ -80,6 +79,6 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
         public EventGroup createEventGroup(MuleEvent event, Object id)
         {
             return new EventGroup(id, event.getMessage().getCorrelationGroupSize());
-    }
+        }
     }
 }

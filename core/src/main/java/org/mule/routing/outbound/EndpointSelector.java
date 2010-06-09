@@ -53,8 +53,8 @@ public class EndpointSelector extends FilteringOutboundRouter
 
     private ExpressionConfig expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
-            throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         List<Object> endpoints;
         String endpointName;
@@ -141,11 +141,11 @@ public class EndpointSelector extends FilteringOutboundRouter
 
     protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException
     {
-        OutboundEndpoint ep;
-        Iterator iterator = endpoints.iterator();
+        Iterator<OutboundEndpoint> iterator = endpoints.iterator();
         while (iterator.hasNext())
         {
-            ep = (OutboundEndpoint) iterator.next();
+            OutboundEndpoint ep = iterator.next();
+            
             // Endpoint identifier (deprecated)
             if (endpointName.equals(ep.getName()))
             {
@@ -170,8 +170,6 @@ public class EndpointSelector extends FilteringOutboundRouter
             throw new EndpointNotFoundException(CoreMessages.endpointNotFound(endpointName), e);
         }
     }
-
-
 
     public String getExpression()
     {

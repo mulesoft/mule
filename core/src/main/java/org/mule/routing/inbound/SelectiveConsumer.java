@@ -10,10 +10,8 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RoutingException;
@@ -35,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.api.routing.InboundRouterCollection
  * @see org.mule.api.routing.RouterCollection
  */
-
 public class SelectiveConsumer extends AbstractRouter implements InboundRouter
 {
     protected final Log logger = LogFactory.getLog(getClass());
@@ -65,9 +62,8 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(
-                    CoreMessages.transformFailedBeforeFilter(), event.getMessage(), 
-                    event.getEndpoint(), e);
+                throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), 
+                    event.getMessage(),  event.getEndpoint(), e);
             }
         }
 

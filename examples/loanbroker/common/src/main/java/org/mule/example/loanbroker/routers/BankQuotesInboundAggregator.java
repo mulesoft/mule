@@ -32,6 +32,7 @@ public class BankQuotesInboundAggregator extends AbstractCorrelationAggregator
      *             whole event group is removed and passed to the exception handler
      *             for this componenet
      */
+    @Override
     protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
         try
@@ -43,5 +44,4 @@ public class BankQuotesInboundAggregator extends AbstractCorrelationAggregator
             throw new AggregationException(events, null, e);
         }
     }
-
 }

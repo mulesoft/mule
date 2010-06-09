@@ -28,7 +28,7 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
     {
         return new CollectionCorrelatorCallback(muleContext)
         {
-
+            @Override
             public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
             {
                 try

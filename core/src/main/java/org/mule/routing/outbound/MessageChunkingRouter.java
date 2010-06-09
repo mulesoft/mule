@@ -48,8 +48,8 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
         this.numberOfMessages = numberOfMessages;
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         if (messageSize == 0 && numberOfMessages < 2)
         {
@@ -93,8 +93,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     part.setCorrelationId(message.getUniqueId());
                     part.setCorrelationGroupSize(parts);
                     part.setCorrelationSequence(count);
-                    // TODO - remove or downgrade once MULE-1718 is fixed,
-                    // for now these really help see the problem if you set the level for this class to INFO
+
                     if (logger.isInfoEnabled())
                     {
                         logger.info("sending part " + count + " of " + parts);
@@ -105,7 +104,6 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                         logger.info("sent");
                     }
                 }
-
             }
             catch (RoutingException e)
             {

@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
@@ -24,21 +23,10 @@ import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 
-import java.util.Iterator;
-
-/**
- * The DynamicEndpointRouter allows endpoints to be altered at runtime based on
- * properties set on the current event or fallback values set on the endpoint
- * properties. Templated values are expressed using square braces around a property
- * name, i.e. axis:http://localhost:8082/MyService?method=[SOAP_METHOD]. Note that
- * Ant style property templates cannot be used in valid URI strings, so we must use
- * square braces instead.
- */
 public class DynamicEndpointRouter extends FilteringOutboundRouter
 {
-
-    public MuleMessage route(MuleMessage message, MuleSession session)
-        throws RoutingException
+    @Override
+    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         MuleMessage result = null;
 
@@ -49,16 +37,16 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
 
         try
         {
-            OutboundEndpoint ep = (OutboundEndpoint) endpoints.get(0);
+            OutboundEndpoint ep = endpoints.get(0);
             EndpointURI newUri;
 
-            for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+            for (String propertyKey : message.getPropertyNames())
             {
-                String propertyKey = (String) iterator.next();
                 Object propertyValue = message.getProperty(propertyKey);
                 if (propertyKey.equalsIgnoreCase("packet.port"))
                 {
-                    newUri = new MuleEndpointURI("udp://localhost:" + ((Integer) propertyValue).intValue(), muleContext);
+                    int port = ((Integer) propertyValue).intValue();
+                    newUri = new MuleEndpointURI("udp://localhost:" + port, muleContext);
                     if (logger.isDebugEnabled())
                     {
                         logger.info("Uri after parsing is: " + newUri.getAddress());
@@ -79,11 +67,9 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (ImmutableEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
         }
 
         return result;
-
     }
-
 }

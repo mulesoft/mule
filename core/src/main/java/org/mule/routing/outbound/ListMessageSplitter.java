@@ -23,12 +23,12 @@ import java.util.List;
  */
 public class ListMessageSplitter extends AbstractRoundRobinMessageSplitter
 {
-
     public ListMessageSplitter()
     {
         setDisableRoundRobin(true);
     }
 
+    @Override
     protected List splitMessage(MuleMessage message)
     {
         if (message.getPayload() instanceof List)

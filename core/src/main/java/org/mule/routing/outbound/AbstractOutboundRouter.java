@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,6 +50,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    @SuppressWarnings("unchecked")
     protected List<OutboundEndpoint> endpoints = new CopyOnWriteArrayList();
 
     protected String replyTo = null;
@@ -362,9 +364,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     public OutboundEndpoint getEndpoint(String name)
     {
         OutboundEndpoint endpointDescriptor;
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        for (Iterator<OutboundEndpoint> iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (OutboundEndpoint) iterator.next();
+            endpointDescriptor = iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

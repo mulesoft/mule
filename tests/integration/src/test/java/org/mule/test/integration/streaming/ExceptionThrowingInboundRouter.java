@@ -16,10 +16,9 @@ import org.mule.routing.inbound.SelectiveConsumer;
 
 public class ExceptionThrowingInboundRouter extends SelectiveConsumer
 {
-
+    @Override
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
         throw new RuntimeException();
     }
-
 }

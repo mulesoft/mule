@@ -26,17 +26,13 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
 
     public ExpressionMessageSplitter()
     {
-        //default
+        super();
     }
 
     public ExpressionMessageSplitter(ExpressionConfig config)
     {
         this.config = config;
-        //Switch to XPath node since we want the Dom nodes not the value of the node
-        if(this.config.getEvaluator().equals("xpath"))
-        {
-            this.config.setEvaluator("xpath-node");
-        }
+        setEvaluator(config.getEvaluator());
     }
 
     public String getCustomEvaluator()
@@ -57,7 +53,7 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
     public void setEvaluator(String evaluator)
     {
         //Switch to XPath node since we want the Dom nodes not the value of the node
-        if(evaluator.equals("xpath"))
+        if (evaluator.equals("xpath"))
         {
             evaluator = "xpath-node";
         }
@@ -86,7 +82,7 @@ public class ExpressionMessageSplitter extends AbstractRoundRobinMessageSplitter
     {
         List results = new ArrayList(4);
         Object result = muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), message);
-        if(result instanceof List)
+        if (result instanceof List)
         {
             results.addAll((List)result);
         }

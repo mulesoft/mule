@@ -12,12 +12,13 @@ package org.mule.routing.response;
 import org.mule.routing.EventCorrelatorCallback;
 
 /**
- * The router configured to handle reply messages when the {@link org.mule.config.annotations.endpoints.Reply} annotation
- * is used and the "aggregate" flag  is set on the annotation. This router will correlate all messages with the same
- * correlation information set on them.
+ * The router configured to handle reply messages when the {@link org.mule.config.annotations.endpoints.Reply} 
+ * annotation is used and the "aggregate" flag  is set on the annotation. This router will correlate all 
+ * messages with the same correlation information set on them.
  */
 public class CollectionResponseWithCallbackRouter extends AbstractResponseCallbackAggregator
 {
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionResponseWithCallbackCorrelator(getCallbackMethod(), muleContext);

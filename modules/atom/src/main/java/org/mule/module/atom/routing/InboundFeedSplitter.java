@@ -60,6 +60,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
         try
         {
             Object payload = muleEvent.getMessage().getPayload();
+            
             Feed feed;
             if (payload instanceof Feed)
             {
@@ -71,7 +72,6 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
             }
 
             List<MuleEvent> events = new ArrayList<MuleEvent>();
-            //MuleEvent[] events = new MuleEvent[feed.getEntries().size()];
             Set<Entry> entries = new TreeSet<Entry>(new EntryComparator());
             entries.addAll(feed.getEntries());
             for (Entry entry : entries)
@@ -129,12 +129,10 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
         this.acceptedContentTypes = acceptedContentTypes;
     }
 
-    class EntryComparator implements Comparator
+    class EntryComparator implements Comparator<Entry>
     {
-        public int compare(Object o1, Object o2)
+        public int compare(Entry e1, Entry e2)
         {
-            Entry e1 = (Entry) o1;
-            Entry e2 = (Entry) o2;
             if (e1.getPublished().before(e2.getPublished()))
             {
                 return -1;

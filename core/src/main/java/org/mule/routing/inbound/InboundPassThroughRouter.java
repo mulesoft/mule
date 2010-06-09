@@ -18,9 +18,9 @@ import org.mule.api.routing.RoutingException;
  * registered endpoints without any filtering. This class is used by Mule when a
  * specific inbound router has not been configured on a Service.
  */
-
 public class InboundPassThroughRouter extends SelectiveConsumer
 {
+    @Override
     public MuleEvent[] process(MuleEvent event) throws RoutingException
     {
         synchronized (event)
@@ -29,6 +29,7 @@ public class InboundPassThroughRouter extends SelectiveConsumer
         }
     }
 
+    @Override
     public boolean isMatch(MuleEvent event) throws RoutingException
     {
         return true;

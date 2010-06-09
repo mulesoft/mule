@@ -18,6 +18,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaModel;
@@ -68,7 +69,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         service.setModel(model);
         return service;
     }
-
 
     /**
      * If there is just one outbound router we don't need to do any copying at all
@@ -320,13 +320,13 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         public TestRequiresNewMessageOutboundRouter(boolean expectCopy)
         {
             this.expectCopy = expectCopy;
-            List transformers = new ArrayList();
+            List<Transformer> transformers = new ArrayList<Transformer>();
             transformers.add(new NoActionTransformer());
             setTransformers(transformers);
         }
 
         @Override
-        public List getEndpoints()
+        public List<OutboundEndpoint> getEndpoints()
         {
             List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
             try
@@ -367,7 +367,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public List getEndpoints()
+        public List<OutboundEndpoint> getEndpoints()
         {
             List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
             try
@@ -419,5 +419,4 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
             return super.route(message, session);
         }
     }
-
 }

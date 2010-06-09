@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class ResponseAggregatorTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/routing/response/response-router.xml";
@@ -59,9 +59,14 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
      */
     private static final class RelaxedResponseAggregator extends SingleResponseRouter
     {
+        public RelaxedResponseAggregator()
+        {
+            super();
+        }
+        
         public Map getResponseEvents()
         {
-            return this.getEventCorrelator().getResponseMessages();
+            return getEventCorrelator().getResponseMessages();
         }
     }
 }

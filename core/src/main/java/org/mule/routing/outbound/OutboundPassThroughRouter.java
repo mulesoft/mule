@@ -22,7 +22,6 @@ import java.util.List;
  * <code>OutboundPassThroughRouter</code> allows outbound routing over a single
  * endpoint without any filtering. This class is used by Mule when a single outbound
  * router is set on a Service.
- * 
  */
 public class OutboundPassThroughRouter extends FilteringOutboundRouter
 {
@@ -31,7 +30,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
         super();
     }
 
-
+    @Override
     public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (endpoint == null)
@@ -45,7 +44,8 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
         super.addEndpoint(endpoint);
     }
 
-    public void setEndpoints(List endpoints)
+    @Override
+    public void setEndpoints(List<OutboundEndpoint> endpoints)
     {
         if (endpoints.size() > 1)
         {
@@ -54,12 +54,14 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
         super.setEndpoints(endpoints);
     }
 
+    @Override
     public void setFilter(Filter filter)
     {
         throw new UnsupportedOperationException(
             "The Pass Through cannot use filters, use the FilteringOutboundRouter instead");
     }
 
+    @Override
     public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)

@@ -13,13 +13,14 @@ import org.mule.routing.CollectionCorrelatorCallback;
 import org.mule.routing.EventCorrelatorCallback;
 
 /**
- * A simple aggregator that will keep collecting events until a timeout is reached.  It will then return
- * a {@link org.mule.api.MuleMessageCollection} message.
+ * A simple aggregator that will keep collecting events until a timeout is reached.  It will then 
+ * return a {@link org.mule.api.MuleMessageCollection} message.
  *
  * @see org.mule.api.MuleMessageCollection
  */
 public class SimpleCollectionResponseAggregator extends ResponseCorrelationAggregator
 {
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback(muleContext);

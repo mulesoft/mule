@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -39,9 +38,8 @@ public class TransformerRouter extends AbstractOutboundRouter
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(
-                    CoreMessages.transformFailedBeforeFilter(),
-                    message, (ImmutableEndpoint)endpoints.get(0), e);
+                throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
+                    endpoints.get(0), e);
             }
         }
         return message;

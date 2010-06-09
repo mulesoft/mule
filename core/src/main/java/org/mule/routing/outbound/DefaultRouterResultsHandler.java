@@ -48,9 +48,9 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else
         {
             MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
-            for (Iterator iterator = results.iterator(); iterator.hasNext();)
+            for (Iterator<MuleMessage> iterator = results.iterator(); iterator.hasNext();)
             {
-                MuleMessage muleMessage = (MuleMessage) iterator.next();
+                MuleMessage muleMessage = iterator.next();
                 if(muleMessage!=null)
                 {
                     coll.addMessage(muleMessage);

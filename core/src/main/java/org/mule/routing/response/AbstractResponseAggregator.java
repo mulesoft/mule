@@ -53,7 +53,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         return eventCorrelator;
     }
 
-
     public void process(MuleEvent event) throws RoutingException
     {
         eventCorrelator.addEvent(event);
@@ -70,7 +69,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         return eventCorrelator.getResponse(message);
     }
-
 
     public boolean isFailOnTimeout()
     {
@@ -98,5 +96,4 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         return null;
     }
-
 }

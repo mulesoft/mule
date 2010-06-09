@@ -31,7 +31,6 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
 {
     public static final int DEFAULT_BUFFER_SIZE = 4096;
 
-
     protected Comparator eventComparator;
 
     public MessageChunkingAggregator()
@@ -40,6 +39,7 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
         eventComparator= new CorrelationSequenceComparator();
     }
 
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback(muleContext)
@@ -55,6 +55,7 @@ public class MessageChunkingAggregator extends AbstractEventAggregator
              *             this scenario the whole event group is removed and passed to the
              *             exception handler for this componenet
              */
+            @Override
             public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
             {
                 MuleEvent[] collectedEvents = events.toArray();

@@ -13,12 +13,14 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to split
@@ -28,17 +30,18 @@ import java.util.List;
  */
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
+    @Override
     public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
     {
         String correlationId = messageInfoMapping.getCorrelationId(message);
 
-        List results = new java.util.ArrayList();
+        List results = new ArrayList();
         int correlationSequence = 1;
         SplitMessage splitMessage = getMessageParts(message, getEndpoints());
 
         // Cache the properties here because for some message types getting the
         // properties can be expensive
-        java.util.Map props = new java.util.HashMap();
+        Map props = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String propertyKey = (String) iterator.next();
@@ -69,11 +72,8 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                         sendMessage.setCorrelationId(correlationId);
                     }
 
-                    // take correlation group size from the message
-                    // properties, set by concrete message splitter
-                    // implementations
-                    //final int groupSize = sendMessage.getCorrelationGroupSize();
-                    //message.setCorrelationGroupSize(groupSize);
+                    // take correlation group size from the message properties, set by concrete 
+                    // message splitter implementations
                     sendMessage.setCorrelationGroupSize(splitMessage.size());
                     sendMessage.setCorrelationSequence(correlationSequence++);
                 }

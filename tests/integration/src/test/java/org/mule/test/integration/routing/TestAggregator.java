@@ -24,19 +24,19 @@ import java.util.Iterator;
 
 public class TestAggregator extends ResponseCorrelationAggregator
 {
-
     @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new CollectionCorrelatorCallback(muleContext)
         {
+            @Override
             public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
             {
                 StringBuffer buffer = new StringBuffer(128);
 
-                for (Iterator iterator = events.iterator(); iterator.hasNext();)
+                for (Iterator<MuleEvent> iterator = events.iterator(); iterator.hasNext();)
                 {
-                    MuleEvent event = (MuleEvent) iterator.next();
+                    MuleEvent event = iterator.next();
                     try
                     {
                         buffer.append(event.transformMessageToString());
@@ -52,6 +52,4 @@ public class TestAggregator extends ResponseCorrelationAggregator
             }
         };
     }
-
-
 }

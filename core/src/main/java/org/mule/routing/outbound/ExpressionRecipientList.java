@@ -21,12 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
- * recipients over the same transport. The recipient endpoints for this router can be
- * configured statically on the router itself.
- */
-
 public class ExpressionRecipientList extends AbstractRecipientList
 {
     public static final String DEFAULT_SELECTOR_PROPERTY = "recipients";
@@ -38,17 +32,18 @@ public class ExpressionRecipientList extends AbstractRecipientList
     private String customEvaluator;
     private String fullExpression;
 
+    @Override
     protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException
     {
         String expr = getFullExpression();
-        if(!muleContext.getExpressionManager().isValidExpression(expr))
+        if (!muleContext.getExpressionManager().isValidExpression(expr))
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionInvalidForProperty("expression", expr), message, null);
         }
 
         Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, message);
-        if(msgRecipients ==null)
+        if (msgRecipients == null)
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), message, null);
