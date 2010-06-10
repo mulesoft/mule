@@ -335,7 +335,10 @@ public abstract class AbstractLifecycleManager implements LifecycleManager, Mule
             throw new IllegalStateException(getLifecycleManagerId() + "Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
         }
 
-
+        if(currentPhase.equals(Disposable.PHASE_NAME))
+        {
+            throw new IllegalStateException(getLifecycleManagerId() + "Cannot invoke further lifecycle once the dispose phase has been called");
+        }
         int phaseIndex = getPhaseIndex(name);
         if (phaseIndex == -1)
         {
