@@ -115,7 +115,7 @@ public class MuleContextLifecycleTestCase
         ctx.initialise();
     }
 
-    @Test(expected=InitialisationException.class)
+    @Test(expected=IllegalStateException.class)
     public void initialiseOnDisposed() throws Exception
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
@@ -343,17 +343,8 @@ public class MuleContextLifecycleTestCase
         ctx.initialise();
         ctx.dispose();
         
-        try
-        {
-            // can't call twice
-
-            ctx.dispose();
-            Assert.fail("Can't call dispose twice");
-        }
-        catch (Exception e)
-        {
-            //expected
-        }
+        // can't call twice
+        ctx.dispose();
     }
 
     @Test
