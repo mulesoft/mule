@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -342,8 +343,17 @@ public class MuleContextLifecycleTestCase
         ctx.initialise();
         ctx.dispose();
         
-        // can't call twice
-        ctx.dispose();
+        try
+        {
+            // can't call twice
+
+            ctx.dispose();
+            Assert.fail("Can't call dispose twice");
+        }
+        catch (Exception e)
+        {
+            //expected
+        }
     }
 
     @Test
