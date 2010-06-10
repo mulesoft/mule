@@ -21,6 +21,7 @@ import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -65,7 +66,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
-        session.matchAndReturn("getService", getTestService("TEST", Object.class));    
+        session.matchAndReturn("getService", getTestService("TEST", Apple.class));
     }
 
     public void testChainingOutboundRouterSynchronous() throws Exception

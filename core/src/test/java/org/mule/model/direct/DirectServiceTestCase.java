@@ -14,6 +14,7 @@ import org.mule.api.service.Service;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.model.AbstractServiceTestCase;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.tck.testmodels.fruit.Apple;
 
 public class DirectServiceTestCase extends AbstractServiceTestCase
 {
@@ -23,7 +24,7 @@ public class DirectServiceTestCase extends AbstractServiceTestCase
     {
         service = new DirectService(muleContext);
         service.setName("direct");
-        SingletonObjectFactory factory = new SingletonObjectFactory(Object.class);
+        SingletonObjectFactory factory = new SingletonObjectFactory(Apple.class);
         final DefaultJavaComponent component = new DefaultJavaComponent(factory);
         component.setMuleContext(muleContext);
         service.setComponent(component);
