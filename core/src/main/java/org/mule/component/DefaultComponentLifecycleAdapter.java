@@ -99,7 +99,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
 
-
         // save a ref for later disposal call
         this.muleContext = muleContext;
         registerComponentIfNecessary();
@@ -112,13 +111,16 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
         this(componentObject, component, muleContext);
         this.entryPointResolver = entryPointResolver;
+        setLifecycleFlags();
+        configureBinding();
+    }
 
+    protected void setLifecycleFlags()
+    {
         isInitialisable = Initialisable.class.isInstance(componentObject);
         isStartable = Startable.class.isInstance(componentObject);
         isStoppable = Stoppable.class.isInstance(componentObject);
         isDisposable = Disposable.class.isInstance(componentObject);
-
-        configureBinding();
     }
 
     protected void registerComponentIfNecessary() throws RegistrationException
