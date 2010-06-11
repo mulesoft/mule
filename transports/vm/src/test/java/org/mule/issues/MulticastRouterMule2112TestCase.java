@@ -10,7 +10,6 @@
 
 package org.mule.issues;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -29,11 +28,9 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 
     public void testMulticastRoutingOverTwoEndpoints() throws Exception
     {
-        Object hop1 = getComponent("hop1");
-        assertTrue("FunctionalTestComponent expected", hop1 instanceof FunctionalTestComponent);
-        Object hop2 = getComponent("hop2");
-        assertTrue("FunctionalTestComponent expected", hop2 instanceof FunctionalTestComponent);
+        FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1");
         assertNotNull(hop1);
+        FunctionalTestComponent hop2 = getFunctionalTestComponent("hop2");
         assertNotNull(hop2);
 
         final AtomicBoolean hop1made = new AtomicBoolean(false);
@@ -54,12 +51,11 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
             }
         };
 
-        ((FunctionalTestComponent) hop1).setEventCallback(callback1);
-        ((FunctionalTestComponent) hop2).setEventCallback(callback2);
+        hop1.setEventCallback(callback1);
+        hop2.setEventCallback(callback2);
 
         MuleClient client = new MuleClient(muleContext);
-        DefaultMuleMessage request = new DefaultMuleMessage("payload", muleContext);
-        client.send("vm://inbound", request);
+        client.send("vm://inbound", "payload", null);
         Thread.sleep(1000);
 
         assertTrue("First callback never fired", hop1made.get());
