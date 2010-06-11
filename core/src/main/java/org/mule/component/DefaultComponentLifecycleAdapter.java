@@ -26,6 +26,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
@@ -55,7 +56,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 {
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     protected static final Log logger = LogFactory.getLog(DefaultComponentLifecycleAdapter.class);
 
     protected SoftReference<?> componentObject;
@@ -67,10 +70,11 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected JavaComponent component;
     protected EntryPointResolverSet entryPointResolver;
-    
-    private boolean isStoppable = false;
-    private boolean isStartable = false;
-    private boolean isDisposable = false;
+
+    protected boolean isInitialisable = false;
+    protected boolean isStartable = false;
+    protected boolean isStoppable = false;
+    protected boolean isDisposable = false;
 
     private boolean started = false;
     private boolean disposed = false;
@@ -95,31 +99,56 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
 
-
         // save a ref for later disposal call
         this.muleContext = muleContext;
-        // store a hard ref to the component object in the registry, so it's not GC'ed too early
-        MuleRegistry r = muleContext.getRegistry();
-        componentObjectRegistryKey = createRegistryHardRefName(componentObject);
-        if (r.lookupObject(componentObjectRegistryKey) == null)
-        {
-            r.registerObject(componentObjectRegistryKey, new ComponentObjectHolder(componentObject));
-        }
+        registerComponentIfNecessary();
     }
 
     public DefaultComponentLifecycleAdapter(Object componentObject,
-                                   JavaComponent component,
-                                   EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
+                                            JavaComponent component,
+                                            EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
     {
 
         this(componentObject, component, muleContext);
         this.entryPointResolver = entryPointResolver;
-        
+        setLifecycleFlags();
+        configureBinding();
+    }
+
+    protected void setLifecycleFlags()
+    {
+        isInitialisable = Initialisable.class.isInstance(componentObject);
         isStartable = Startable.class.isInstance(componentObject);
         isStoppable = Stoppable.class.isInstance(componentObject);
         isDisposable = Disposable.class.isInstance(componentObject);
+    }
 
-        configureBinding();
+    protected void registerComponentIfNecessary() throws RegistrationException
+    {
+        // store a hard ref to the component object in the registry, so it's not GC'ed too early
+        MuleRegistry r = muleContext.getRegistry();
+        final String key = createRegistryHardRefName(component);
+        // register only if none registered yet
+        if (r.lookupObjects(componentObject.get().getClass()).size() == 0)
+        {
+            // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
+            r.registerObject(key, componentObject.get(), MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG);
+        }
+    }
+
+    /**
+     * Propagates initialise() life-cycle to component object implementations if they
+     * implement the mule {@link Initialisable} interface.
+     * <p/>
+     * <b>NOTE:</b> It is up to component implementations to ensure their implementation of
+     * <code>initialise()</code> is thread-safe.
+     */
+    public void initialise() throws InitialisationException
+    {
+        if (isInitialisable)
+        {
+            ((Initialisable) componentObject.get()).initialise();
+        }
     }
 
     /**
@@ -139,7 +168,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
             catch (Exception e)
             {
                 throw new DefaultMuleException(CoreMessages.failedToStart("Service: "
-                                                                          + component.getService().getName()), e);
+                        + component.getService().getName()), e);
             }
         }
         else
@@ -165,7 +194,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
             catch (Exception e)
             {
                 throw new DefaultMuleException(CoreMessages.failedToStop("Service: "
-                                                                         + component.getService().getName()), e);
+                        + component.getService().getName()), e);
             }
         }
         else
@@ -206,13 +235,17 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         disposed = true;
     }
 
-    /** @return true if the service has been started */
+    /**
+     * @return true if the service has been started
+     */
     public boolean isStarted()
     {
         return started;
     }
 
-    /** @return whether the service managed by this lifecycle has been disposed */
+    /**
+     * @return whether the service managed by this lifecycle has been disposed
+     */
     public boolean isDisposed()
     {
         return disposed;
@@ -243,21 +276,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         return result;
     }
 
-    /**
-     * Propagates initialise() life-cycle to component object implementations if they
-     * implement the mule {@link Initialisable} interface.
-     * <p/> 
-     * <b>NOTE:</b> It is up to component implementations to ensure their implementation of 
-     * <code>initialise()</code> is thread-safe.
-     */
-    public void initialise() throws InitialisationException
-    {
-        if (Initialisable.class.isInstance(componentObject.get()))
-        {
-            ((Initialisable) componentObject.get()).initialise();
-        }
-    }
-
     protected void configureBinding() throws MuleException
     {
         // Initialise the nested router and bind the endpoints to the methods using a
@@ -283,7 +301,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
                     Method setterMethod;
 
                     List methods = ClassUtils.getSatisfiableMethods(componentObject.get().getClass(),
-                        new Class[]{interfaceBinding.getInterface()}, true, false, null);
+                            new Class[]{interfaceBinding.getInterface()}, true, false, null);
                     if (methods.size() == 1)
                     {
                         setterMethod = (Method) methods.get(0);
@@ -291,12 +309,12 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
                     else if (methods.size() > 1)
                     {
                         throw new TooManySatisfiableMethodsException(componentObject.get().getClass(),
-                            new Class[]{interfaceBinding.getInterface()});
+                                new Class[]{interfaceBinding.getInterface()});
                     }
                     else
                     {
                         throw new NoSatisfiableMethodsException(componentObject.get().getClass(),
-                            new Class[]{interfaceBinding.getInterface()});
+                                new Class[]{interfaceBinding.getInterface()});
                     }
 
                     try
@@ -306,7 +324,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
                     catch (Exception e)
                     {
                         throw new InitialisationException(CoreMessages.failedToSetProxyOnService(interfaceBinding,
-                            componentObject.get().getClass()), e, this);
+                                componentObject.get().getClass()), e, this);
                     }
                 }
                 else
@@ -319,14 +337,14 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     }
 
     /**
-     * Generate a registry key name for this component. Used to bind component's hard reference to 
+     * Generate a registry key name for this component. Used to bind component's hard reference to
      * the Mule's lifecycle and prevent the garbage collector from kicking in too early.
      */
     protected String createRegistryHardRefName(Object object)
     {
         return "_component.hardref." + component.getService().getName() + "." + System.identityHashCode(object);
     }
-    
+
     /**
      * Holder class used only to crate reference to component instance from registry
      * without if receiving muleContext injection or lifecycle for a second time.
