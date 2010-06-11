@@ -10,31 +10,34 @@
 package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
+import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
 
 import com.google.inject.Binding;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.guiceyfruit.Injectors;
-import org.guiceyfruit.support.CloseFailedException;
 
 /**
  * The internal Mule interface for retreiving objects from a Guice injector.  This registry is read-only since all
  * objects should be configured by {@link com.google.inject.Module} objects.  The lifecycle of objects will be
  * managed by Mule since Guice does not provide lifecycle support.
- * <p/>
+ *
  * To create modules extend the {@link org.mule.module.guice.AbstractMuleGuiceModule} since it provides hooks and helpers for
  * working with Mule configuration.  Any modules independent of Mule can just extend the Guice {@link com.google.inject.AbstractModule}
  * as normal.
- * <p/>
+ *
  * Mule will discover modules on the classpath, if you need to configure a module before passing it to the Guice injector you
  * need to implement a {@link org.mule.module.guice.GuiceModuleFactory} for your module.
  *
@@ -64,14 +67,7 @@ public class GuiceRegistry extends AbstractRegistry
 
     protected void doDispose()
     {
-        try
-        {
-            Injectors.close(injector);
-        }
-        catch (CloseFailedException e)
-        {
-            logger.error("Failed to close the Guice registry cleanly", e);
-        }
+        //do nothing
     }
 
     public <T> T lookupObject(String key)
@@ -79,85 +75,84 @@ public class GuiceRegistry extends AbstractRegistry
         //Guice isn't really supposed to work this way but in Mule we need to look up objects by name only sometimes
         for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet())
         {
-            if (entry.getKey().getAnnotation() instanceof Named)
+            if(entry.getKey().getAnnotation() instanceof Named && ((Named)entry.getKey().getAnnotation()).value().equals(key))
             {
-                String name = ((Named) entry.getKey().getAnnotation()).value();
-                if (name.equals(key))
-                {
-                    Object o = entry.getValue().getProvider().get();
-                    return (T) o;
-                }
+                Object o = entry.getValue().getProvider().get();
+                //TODO his isn't the right place for this, need to plug into the Injector
+                setNameIfNamedObject(((Named)entry.getKey().getAnnotation()).value(), o);
+                return (T)o;
             }
         }
         return null;
     }
 
-    @Override
-    public <T> T lookupObject(Class<T> type) throws RegistrationException
+    protected void setNameIfNamedObject(String name, Object object)
     {
-        return injector.getInstance(type);
+        if(object instanceof NamedObject && ((NamedObject)object).getName()==null)
+        {
+            ((NamedObject)object).setName(name);
+        }
     }
+
 
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
-        return Collections.EMPTY_MAP;
-//        try
-//        {
-//            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
-//            if(bindings!=null && bindings.size()>0)
-//            {
-//                Map<String, T> map = new HashMap<String, T>(bindings.size());
-//                String name;
-//                T object;
-//                for (Binding<T> binding : bindings)
-//                {
-//                    object = binding.getProvider().get();
-//
-//                    if(binding.getKey().getAnnotation() instanceof Named)
-//                    {
-//                        name = ((Named)binding.getKey().getAnnotation()).value();
-//                    }
-//                    else if(object instanceof NamedObject)
-//                    {
-//                        name = ((NamedObject)object).getName();
-//                    }
-//                    else
-//                    {
-//                        name = "_" + object.hashCode();
-//                    }
-//                    map.put(name, object);
-//                }
-//                return map;
-//            }
-//            return Collections.emptyMap();
-//        }
-//        catch (ConfigurationException e)
-//        {
-//            return Collections.emptyMap();
-//        }
+        try
+        {
+            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
+            if(bindings!=null && bindings.size()>0)
+            {
+                Map<String, T> map = new HashMap<String, T>(bindings.size());
+                String name;
+                T object;
+                for (Binding<T> binding : bindings)
+                {
+                    object = binding.getProvider().get();
+
+                    if(binding.getKey().getAnnotation() instanceof Named)
+                    {
+                        name = ((Named)binding.getKey().getAnnotation()).value();
+                    }
+                    else if(object instanceof NamedObject)
+                    {
+                        name = ((NamedObject)object).getName();
+                    }
+                    else
+                    {
+                        name = "_" + object.hashCode();
+                    }
+                    map.put(name, object);
+                }
+                return map;
+            }
+            return Collections.emptyMap();
+        }
+        catch (ConfigurationException e)
+        {
+            return Collections.emptyMap();
+        }
     }
 
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
-        return Collections.emptyList();
-//        try
-//        {
-//            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
-//            if(bindings!=null && bindings.size()>0)
-//            {
-//                List<T> list = new ArrayList<T>(bindings.size());
-//                for (Binding<T> binding : bindings)
-//                {
-//                    list.add(binding.getProvider().get());
-//                }
-//                return list;
-//            }
-//            return Collections.emptyList();
-//        }
-//        catch (ConfigurationException e)
-//        {
-//            return Collections.emptyList();
-//        }
+        try
+        {
+            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
+            if(bindings!=null && bindings.size()>0)
+            {
+                List<T> list = new ArrayList<T>(bindings.size());
+                for (Binding<T> binding : bindings)
+                {
+                    list.add(binding.getProvider().get());
+                }
+                return list;
+            }
+            return Collections.emptyList();
+        }
+        catch (ConfigurationException e)
+        {
+            return Collections.emptyList();
+        }
     }
 
     public void registerObject(String key, Object value) throws RegistrationException

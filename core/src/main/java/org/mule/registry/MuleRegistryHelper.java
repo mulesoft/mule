@@ -18,8 +18,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.model.Model;
@@ -105,18 +103,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     public void fireLifecycle(String phase) throws LifecycleException
     {
-        if(Initialisable.PHASE_NAME.equals(phase))
-        {
-            registry.initialise();
-        }
-        else if(Disposable.PHASE_NAME.equals(phase))
-        {
-            registry.dispose();
-        }
-        else
-        {
-            registry.fireLifecycle(phase);
-        }
+        registry.fireLifecycle(phase);
     }
 
     /**

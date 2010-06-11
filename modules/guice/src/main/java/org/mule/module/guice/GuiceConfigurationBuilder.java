@@ -21,12 +21,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-
-import org.guiceyfruit.mule.MuleModule;
 
 
 /**
@@ -85,9 +80,6 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-
-        List<Module> allModules = getSystemModules(muleContext);
-
         Injector injector;
         if (basepath != null && basepath.startsWith("/"))
         {
@@ -96,10 +88,11 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
         if (modules == null)
         {
-            ClasspathScanner scanner = new ClasspathScanner(classLoader, basepath);
+            ClasspathScanner scanner = new ClasspathScanner(classLoader, new String[]{basepath});
             Set<Class> classes = scanner.scanFor(Module.class);
+            Set<Class> factories = scanner.scanFor(GuiceModuleFactory.class);
 
-            if (classes.size() == 0)
+            if (classes.size() == 0 && factories.size() == 0)
             {
                 try
                 {
@@ -114,11 +107,17 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 return;
             }
 
+            modules = new Module[classes.size() + factories.size()];
             int i = 0;
             for (Class moduleClass : classes)
             {
                 Module module = (Module) ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS);
                 modules[i++] = module;
+            }
+            for (Class factoryClass : factories)
+            {
+                GuiceModuleFactory factory = (GuiceModuleFactory) ClassUtils.instanciateClass(factoryClass, ClassUtils.NO_ARGS);
+                modules[i++] = factory.createModule();
             }
         }
 
@@ -130,29 +129,16 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 ((AbstractMuleGuiceModule) module).setMuleContext(muleContext);
             }
         }
-
-        allModules.addAll(Arrays.asList(modules));
-
         if (stage != null)
         {
-            injector = Guice.createInjector(stage, allModules);
+            injector = Guice.createInjector(stage, modules);
         }
         else
         {
-            injector = Guice.createInjector(allModules);
+            injector = Guice.createInjector(modules);
         }
-        
         GuiceRegistry registry = new GuiceRegistry(injector, muleContext);
         registry.initialise();
         muleContext.addRegistry(registry);
-    }
-
-    protected List<Module> getSystemModules(MuleContext muleContext)
-    {
-        List<Module> modules = new ArrayList<Module>();
-        //JSR-250 lifecycle and @Resource annotation support & Mule lifecycle support
-        modules.add(new MuleModule());
-        modules.add(new MuleSupportModule(muleContext));
-        return modules;
     }
 }
