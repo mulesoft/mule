@@ -117,10 +117,10 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected void setLifecycleFlags()
     {
-        isInitialisable = Initialisable.class.isInstance(componentObject);
-        isStartable = Startable.class.isInstance(componentObject);
-        isStoppable = Stoppable.class.isInstance(componentObject);
-        isDisposable = Disposable.class.isInstance(componentObject);
+        isInitialisable = Initialisable.class.isInstance(componentObject.get());
+        isStartable = Startable.class.isInstance(componentObject.get());
+        isStoppable = Stoppable.class.isInstance(componentObject.get());
+        isDisposable = Disposable.class.isInstance(componentObject.get());
     }
 
     protected void registerComponentIfNecessary() throws RegistrationException
