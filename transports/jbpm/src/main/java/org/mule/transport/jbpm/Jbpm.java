@@ -190,7 +190,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         Execution execution = processEngine.getExecutionService().findExecutionById((String) executionId);
         if (execution == null)
         {
-            throw new IllegalArgumentException("No process execution found with id = " executionId + " (it may have already terminated)");
+            throw new IllegalArgumentException("No process execution found with id = " + executionId + " (it may have already terminated)");
         }
         if (execution.getProcessInstance() != null)
         {
@@ -235,7 +235,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         Execution execution = processEngine.getExecutionService().findExecutionById((String) executionId);
         if (execution == null)
         {
-            throw new IllegalArgumentException("No process execution found with id = " executionId + " (it may have already terminated)");
+            throw new IllegalArgumentException("No process execution found with id = " + executionId + " (it may have already terminated)");
         }
         if (execution.getProcessInstance() != null)
         {
