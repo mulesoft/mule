@@ -28,9 +28,39 @@
     <tcp:polling-connector name="pollingConnector"
                    clientSoTimeout="3000"
                    pollingFrequency="4000"/>
+                   
+    <tcp:connector name="defaultExceptionPolicyConnector"
+                   clientSoTimeout="3000"
+                   serverSoTimeout="4000">
+        <tcp:default-exception-policy/>
+    </tcp:connector>
+    
+    <tcp:connector name="rewriteExceptionPolicyConnector"
+                   clientSoTimeout="3000"
+                   serverSoTimeout="4000">
+        <tcp:rewrite-exception-policy/>
+    </tcp:connector>
+    
+    <spring:bean id="theClass"
+        factory-bean="rewriteExceptionPolicyConnector"
+        factory-method="getClass"/>
 
     <spring:bean name="tcpProtocol" class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
     <tcp:connector name="connectorWithProtocolRef">
         <tcp:custom-protocol ref="tcpProtocol"/>
     </tcp:connector>    
+
+    <spring:bean id="classLoader"
+            factory-bean="theClass"
+            factory-method="getClassLoader"/>
+
+    <tcp:connector name="custom-class-loading-protocol-connector">
+        <tcp:custom-class-loading-protocol payloadOnly="true" classLoader-ref="classLoader"/>
+    </tcp:connector>
+    
+    <spring:bean id="messageDispatcherFactory" class="org.mule.transport.tcp.LocalSocketTcpMessageDispatcherFactory"/>
+    
+    <tcp:connector name="messageDispatcherFactoryConnector" dispatcherFactory-ref="messageDispatcherFactory" >
+        <tcp:rewrite-exception-policy/>
+    </tcp:connector>
 </mule>

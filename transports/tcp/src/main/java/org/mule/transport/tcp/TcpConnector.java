@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
@@ -69,6 +70,7 @@ public class TcpConnector extends AbstractConnector
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
+    private NextMessageExceptionPolicy nextMessageExceptionPolicy;
 
     /** 
      * If set, the socket is not closed after sending a message.  This attribute 
@@ -491,5 +493,33 @@ public class TcpConnector extends AbstractConnector
     {
         this.keepAliveTimeout = keepAliveTimeout;
     }
+
+    /**
+     * @return the exception policy to be used when trying to receive the next message
+     */
+    public NextMessageExceptionPolicy getNextMessageExceptionPolicy()
+    {
+        if (this.nextMessageExceptionPolicy == null) {
+            this.nextMessageExceptionPolicy = new DefaultMessageExceptionPolicy();
+        }
+        return nextMessageExceptionPolicy;
+    }
+
+    /**
+     * Set the exception policy to be used when trying to receive the next message
+     * 
+     * @param nextMessageExceptionPolicy the exception policy to be used
+     */
+    public void setNextMessageExceptionPolicy(NextMessageExceptionPolicy nextMessageExceptionPolicy)
+    {
+        this.nextMessageExceptionPolicy = nextMessageExceptionPolicy;
+    }
     
+    @Override
+    public void setDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
+    {
+        if (this.dispatcherFactory == null) {
+            super.setDispatcherFactory(dispatcherFactory);
+        }
+    }
 }

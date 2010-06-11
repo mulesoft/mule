@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/tcp"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/tcp"
             elementFormDefault="qualified"
@@ -12,6 +13,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -154,10 +157,43 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element ref="abstract-next-message-exception-policy" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The exception policy to be used when trying to receive the next message
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="dispatcherFactory-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to define a custom message dispatcher factory
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="abstract-next-message-exception-policy" abstract="true" type="abstractNextMessageExceptionPolicyType"/>
+    <xsd:complexType name="abstractNextMessageExceptionPolicyType"/>
+
+    <xsd:element name="default-exception-policy" type="abstractNextMessageExceptionPolicyType" substitutionGroup="abstract-next-message-exception-policy">
+        <xsd:annotation>
+            <xsd:documentation>
+                An exception policy that returns null when the exception is thrown
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="rewrite-exception-policy" type="abstractNextMessageExceptionPolicyType" substitutionGroup="abstract-next-message-exception-policy">
+        <xsd:annotation>
+            <xsd:documentation>
+                An exception policy that rewrites the exception
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="abstract-protocol" abstract="true" type="abstractProtocolType"/>
     <xsd:complexType name="abstractProtocolType"/>
@@ -224,6 +260,28 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="custom-class-loading-protocol" type="customClassLoadingProtocolType" substitutionGroup="abstract-protocol">
+        <xsd:annotation>
+            <xsd:documentation>
+                A length protocol that uses a specific class loader to load objects from streams
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="customClassLoadingProtocolType">
+        <xsd:complexContent>
+            <xsd:extension base="lengthProtocolType">
+                <xsd:attribute name="classLoader-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows Spring beans to be defined for class loading
+                            </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>
             <xsd:documentation>
@@ -231,7 +289,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
+    
     <xsd:complexType name="lengthProtocolType">
         <xsd:complexContent>
             <xsd:extension base="byteOrMessageProtocolType">

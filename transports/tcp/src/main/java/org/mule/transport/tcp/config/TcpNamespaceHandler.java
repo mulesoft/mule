@@ -14,9 +14,12 @@ import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
+import org.mule.transport.tcp.DefaultMessageExceptionPolicy;
+import org.mule.transport.tcp.RewriteMessageExceptionPolicy;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.tcp.PollingTcpConnector;
 import org.mule.transport.tcp.TcpProtocol;
+import org.mule.transport.tcp.protocols.CustomClassLoadingLengthProtocol;
 import org.mule.transport.tcp.protocols.DirectProtocol;
 import org.mule.transport.tcp.protocols.EOFProtocol;
 import org.mule.transport.tcp.protocols.LengthProtocol;
@@ -41,6 +44,9 @@ public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
         registerConnectorDefinitionParser(TcpConnector.class);
 
+        registerBeanDefinitionParser("default-exception-policy", new ChildDefinitionParser("nextMessageExceptionPolicy", DefaultMessageExceptionPolicy.class));
+        registerBeanDefinitionParser("rewrite-exception-policy", new ChildDefinitionParser("nextMessageExceptionPolicy", RewriteMessageExceptionPolicy.class));
+
         registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(PollingTcpConnector.class, true));
         registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
         registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));
@@ -51,6 +57,7 @@ public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("direct-protocol", new ByteOrMessageProtocolDefinitionParser(DirectProtocol.class, MuleMessageDirectProtocol.class));
         registerBeanDefinitionParser("streaming-protocol", new ByteOrMessageProtocolDefinitionParser(StreamingProtocol.class, MuleMessageDirectProtocol.class));
         registerBeanDefinitionParser("custom-protocol", new ClassOrRefDefinitionParser(TCP_PROTOCOL_PROPERTY));
+        registerBeanDefinitionParser("custom-class-loading-protocol", new ByteOrMessageProtocolDefinitionParser(CustomClassLoadingLengthProtocol.class, CustomClassLoadingLengthProtocol.class));
     }
 
 }
