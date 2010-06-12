@@ -14,6 +14,8 @@ import org.mule.module.client.MuleClient;
 import org.mule.registry.AbstractLifecycleTracker;
 import org.mule.tck.AbstractMuleTestCase;
 
+import com.google.inject.AbstractModule;
+
 import org.junit.Assert;
 
 public class GuiceLifecyceTestCase extends AbstractMuleTestCase
@@ -88,10 +90,10 @@ public class GuiceLifecyceTestCase extends AbstractMuleTestCase
         return ltc;
     }
 
-    public class GuiceLifecycleModule extends AbstractMuleGuiceModule
+    public class GuiceLifecycleModule extends AbstractModule
     {
         @Override
-        protected void doConfigure() throws Exception
+        protected void configure()
         {
 
         }

@@ -16,6 +16,7 @@ import org.mule.tck.testmodels.fruit.RedApple;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transformer.types.DataTypeFactory;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -79,10 +80,10 @@ public class MuleObjectCreationTestCase extends AbstractMuleTestCase
         assertTrue(c2.isDisposed());
     }
 
-    public class MuleObjectsModule extends AbstractMuleGuiceModule
+    public class MuleObjectsModule extends AbstractModule
     {
         @Override
-        protected void doConfigure() throws Exception
+        protected void configure() 
         {
             //lets test injection of properties into providers
             bindConstant().annotatedWith(Names.named("connectorProperty")).to("boundProperty");

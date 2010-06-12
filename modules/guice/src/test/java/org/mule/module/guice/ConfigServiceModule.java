@@ -13,15 +13,16 @@ import org.mule.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 import org.mule.tck.testmodels.mule.TestAgent;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
 
 /**
  * Simple Guice module that binds a service interface
  */
-public class ConfigServiceModule extends AbstractMuleGuiceModule
+public class ConfigServiceModule extends AbstractModule
 {
-    protected void doConfigure()
+    protected void configure()
     {
         //Our auto transform service component
         this.bind(AutoTransformServiceInterface.class).to(DefaultAutoTransformService.class);
