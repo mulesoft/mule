@@ -109,7 +109,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
 
     // MULE-2130 (Impossible to re-initialise SMTP connector)
-    public void testConnectorReinitialise() throws Exception
+    public void testConnectorRestart() throws Exception
     {
         Connector c = getConnector();
         assertTrue(c.isStarted());
@@ -117,17 +117,10 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         c.stop();
         assertFalse(c.isStarted());
 
-        c.dispose();
-        assertFalse(c.isStarted());
-        assertTrue(c.isDisposed());
-
-        c.initialise();
-        assertFalse(c.isDisposed());
         assertFalse(c.isStarted());
 
         c.start();
         assertFalse(c.isDisposed());
         assertTrue(c.isStarted());
     }
-
 }
