@@ -63,7 +63,8 @@ geronimo-jta_1.0.1B_spec-1.1-osgi
 geronimo-stax-api_1.0_spec-1.0.1
 geronimo-ws-metadata_2.0_spec-1.1.2
 groovy-all-1.6.7
-guice-2.0
+guice-all-2.0
+guiceyfruit-core-2.0
 hibernate-core-3.3.2.GA
 jackson-core-asl-1.3.1
 jackson-mapper-asl-1.3.1

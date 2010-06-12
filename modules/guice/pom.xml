@@ -41,6 +41,12 @@
             <artifactId>aopalliance</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.guiceyfruit</groupId>
+            <artifactId>guiceyfruit-core</artifactId>
+            <version>2.0</version>
+        </dependency>
+        
 
         <!-- test dependencies -->
         <dependency>
@@ -60,12 +66,6 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.guicyfruit</groupId>
-            <artifactId>guicyfruit-core</artifactId>
-            <version>2.0</version>
         </dependency>
     </dependencies>
 </project>
