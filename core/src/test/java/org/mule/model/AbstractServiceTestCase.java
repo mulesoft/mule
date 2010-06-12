@@ -200,15 +200,20 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         assertFalse(getService().isPaused());
         getService().dispose();
 
-        getService().initialise();
-        assertFalse(getService().isStarted());
-
-        getService().dispose();
-        assertFalse(getService().isStarted());
         try
         {
             getService().dispose();
             fail("Exception expected: Cannot dispose a service that is already disposed");
+        }
+        catch (IllegalStateException e)
+        {
+            // expected
+        }
+
+        try
+        {
+            getService().initialise();
+            fail("Exception expected: Cannot invoke initialise (or any lifecycle) on an object once it is disposed");
         }
         catch (IllegalStateException e)
         {

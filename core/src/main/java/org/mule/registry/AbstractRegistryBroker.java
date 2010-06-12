@@ -10,7 +10,6 @@
 
 package org.mule.registry;
 
-import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,17 +28,9 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 {
     public void initialise() throws InitialisationException
     {
-        try
+        for (Registry registry : getRegistries())
         {
-            fireLifecycle(Initialisable.PHASE_NAME);
-        }
-        catch (InitialisationException e)
-        {
-            throw e;
-        }
-        catch (MuleException me)
-        {
-            throw new InitialisationException(me, this);
+            registry.initialise();
         }
     }
 
@@ -47,23 +38,28 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     {
         for (Registry registry : getRegistries())
         {
-            try
-            {
-                registry.fireLifecycle(Disposable.PHASE_NAME);
-            }
-            catch (MuleException e)
-            {
-                //ignore
-            }
+            registry.dispose();
         }
     }
 
     public void fireLifecycle(String phase) throws LifecycleException
     {
-        for (Registry registry : getRegistries())
+        if (Initialisable.PHASE_NAME.equals(phase))
         {
-            registry.fireLifecycle(phase);
+            initialise();
         }
+        else if (Disposable.PHASE_NAME.equals(phase))
+        {
+            dispose();
+        }
+        else
+        {
+            for (Registry registry : getRegistries())
+            {
+                registry.fireLifecycle(phase);
+            }
+        }
+
     }
 
     public String getRegistryId()
@@ -108,21 +104,16 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
-        // Accumulate objects from all registries.
-        Collection<T> objects = lookupObjects(type);
-
-        if (objects.size() == 1)
+        Object object;
+        for (Registry registry : getRegistries())
         {
-            return objects.iterator().next();
+            object = registry.lookupObject(type);
+            if (object != null)
+            {
+                return (T) object;
+            }
         }
-        else if (objects.size() > 1)
-        {
-            throw new RegistrationException("More than one object of type " + type + " registered but only one expected.");
-        }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     public <T> Collection<T> lookupObjects(Class<T> type)

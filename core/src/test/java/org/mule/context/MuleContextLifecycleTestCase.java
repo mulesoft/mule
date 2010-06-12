@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -114,7 +115,7 @@ public class MuleContextLifecycleTestCase
         ctx.initialise();
     }
 
-    @Test(expected=InitialisationException.class)
+    @Test(expected=IllegalStateException.class)
     public void initialiseOnDisposed() throws Exception
     {
         MuleContext ctx = ctxBuilder.buildMuleContext();
