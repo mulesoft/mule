@@ -41,5 +41,5 @@ in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the example
 by simply running "ant" or "mvn".  This will compile the example classes, produce a
-jar file, and copy everything to $MULE_HOME/lib/user, which is where your custom classes
-and configuration files should go.
+jar file, and copy everything to $MULE_HOME/apps/echo-stdin and $MULE_HOME/apps/echo-cxf, 
+which is where your custom classes and configuration files should go.
