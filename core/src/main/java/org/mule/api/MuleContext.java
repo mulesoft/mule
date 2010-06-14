@@ -212,4 +212,10 @@ public interface MuleContext extends Lifecycle
     void setExecutionClassLoader(ClassLoader cl);
 
     ClassLoader getExecutionClassLoader();
+
+    boolean isStopped();
+
+    boolean isStopping();
+
+    boolean isStarting();
 }

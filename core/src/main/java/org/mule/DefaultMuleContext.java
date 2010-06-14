@@ -275,12 +275,12 @@ public class DefaultMuleContext implements MuleContext
         return getLifecycleManager().getState().isInitialising();
     }
 
-    protected boolean isStopped()
+    public boolean isStopped()
     {
         return getLifecycleManager().getState().isStopped();
     }
 
-    protected boolean isStopping()
+    public boolean isStopping()
     {
         return getLifecycleManager().getState().isStopping();
     }
@@ -295,7 +295,7 @@ public class DefaultMuleContext implements MuleContext
         return getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME);
     }
 
-    protected boolean isStarting()
+    public boolean isStarting()
     {
         return getLifecycleManager().getState().isStarting();
     }

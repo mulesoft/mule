@@ -10,7 +10,6 @@
 
 package org.mule.util.queue;
 
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
@@ -117,8 +116,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
             catch (InterruptedException iex)
             {
-                // TODO MULE-4718 MuleContext is missing isStopping() method
-                if (!Stoppable.PHASE_NAME.equals(queueManager.getMuleContext().getLifecycleManager().getExecutingPhase()))
+                if (queueManager.getMuleContext().isStopping())
                 {
                     throw iex;
                 }

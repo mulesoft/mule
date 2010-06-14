@@ -12,7 +12,6 @@ package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.util.queue.QueuePersistenceStrategy.Holder;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -315,8 +314,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
             catch (InterruptedException e)
             {
-                // TODO MULE-4718 MuleContext is missing isStopping() method
-                if (!Stoppable.PHASE_NAME.equals(getMuleContext().getLifecycleManager().getExecutingPhase()))
+                if (muleContext.isStopping())
                 {
                     throw e;
                 }
