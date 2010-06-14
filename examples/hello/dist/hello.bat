@@ -14,5 +14,5 @@ ECHO   2. Hello using the HTTP transport
 ECHO      (surf to http://localhost:8888/?name=Dolly)
 SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -config %MULE_BASE%\apps\mule-example-hello\hello-config.xml
-IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -config %MULE_BASE%\apps\mule-example-hello\hello-http-config.xml
+IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -app hello-stdin
+IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -app hello-http

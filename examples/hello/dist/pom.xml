@@ -134,29 +134,24 @@
                 overwriting the previous one. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.2</version>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
                         <phase>install</phase>
+
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>run</goal>
                         </goals>
+
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}</outputDirectory>                            
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/classes</directory>
-                                    <includes>
-                                        <include>*.xml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
+                            <tasks>
+                                <copy tofile="${MULE_HOME}/apps/hello-stdin/mule-config.xml" file="${basedir}/target/classes/hello-config.xml"/>
+                                <copy tofile="${MULE_HOME}/apps/hello-http/mule-config.xml" file="${basedir}/target/classes/hello-http-config.xml"/>
+                            </tasks>                            
                         </configuration>
                     </execution>
+                                   
                 </executions>
             </plugin>
             <plugin>
@@ -170,7 +165,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}/lib</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/hello-stdin/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -183,6 +178,26 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-artifact2</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/apps/hello-http/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>                    
                 </executions>
             </plugin>
         </plugins>

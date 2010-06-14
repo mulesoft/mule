@@ -26,5 +26,5 @@ in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the 
 example by simply running "ant" or "mvn".  This will compile the example 
-classes, produce a jar file, and copy everything to $MULE_HOME/lib/user, which 
+classes, produce a jar file, and copy everything to $MULE_HOME/apps/hello-stdin and $MULE_HOME/apps/hello-http, which 
 is where your custom classes should go.
