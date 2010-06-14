@@ -15,7 +15,6 @@ import org.mule.transport.tcp.TcpMessageReceiver.TcpWorker;
 /**
  * An exception policy that returns null when the exception is thrown
  * 
- * @author estebanroblesluna
  * @since 2.2.6
  */
 public class DefaultMessageExceptionPolicy implements NextMessageExceptionPolicy

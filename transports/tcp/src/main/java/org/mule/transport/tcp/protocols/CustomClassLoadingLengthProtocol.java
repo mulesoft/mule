@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 /**
  * A length protocol that uses a specific class loader to load objects from streams
  * 
- * @author estebanroblesluna
  * @since 2.2.6
  */
 public class CustomClassLoadingLengthProtocol extends LengthProtocol

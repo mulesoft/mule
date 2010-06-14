@@ -15,8 +15,6 @@ import org.mule.transport.tcp.TcpMessageReceiver.TcpWorker;
 /**
  * An exception policy that is called when an exception is thrown while processing the next message 
  *
- *
- * @author estebanroblesluna
  * @since 2.2.6
  */
 public interface NextMessageExceptionPolicy

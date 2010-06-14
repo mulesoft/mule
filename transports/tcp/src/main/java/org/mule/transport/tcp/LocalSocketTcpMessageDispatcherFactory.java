@@ -16,8 +16,8 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 
 /**
+ * A factory for <code>LocalSocketTcpMessageDispatcher</code>
  * 
- * @author estebanroblesluna
  * @since 2.2.6
  */
 public class LocalSocketTcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory

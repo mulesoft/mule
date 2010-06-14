@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * An exception policy that rewrites the exception
  * 
- * @author estebanroblesluna
  * @since 2.2.6
  */
 public class RewriteMessageExceptionPolicy implements NextMessageExceptionPolicy
