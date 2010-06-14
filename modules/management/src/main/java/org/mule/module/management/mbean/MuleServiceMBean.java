@@ -22,7 +22,7 @@ public interface MuleServiceMBean
 {
     // CRITICAL: do not modify the order of key/value pairs here, it MUST
     // match the one returned by ObjectName.getCanonicalKeyPropertyListString()
-    String DEFAULT_JMX_NAME = "name=MuleServerInfo,type=org.mule.MuleContext";
+    String DEFAULT_JMX_NAME = "name=MuleContext";
 
     boolean isInitialised();
 

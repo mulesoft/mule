@@ -18,7 +18,7 @@ package org.mule.module.management.mbean;
  */
 public interface MuleConfigurationServiceMBean
 {
-    String DEFAULT_JMX_NAME = "type=org.mule.Configuration,name=GlobalConfiguration";
+    String DEFAULT_JMX_NAME = "type=Configuration,name=GlobalConfiguration";
 
     boolean isSynchronous();
 

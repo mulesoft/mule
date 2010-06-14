@@ -477,7 +477,7 @@ public class JmxAgent extends AbstractAgent
 
         StringBuilder fullName = new StringBuilder(128);
         fullName.append(jmxSupport.getDomainName(muleContext, !containerMode));
-        fullName.append(":type=org.mule.Endpoint,service=");
+        fullName.append(":type=Endpoint,service=");
         fullName.append(jmxSupport.escape(mBean.getComponentName()));
         fullName.append(",connector=");
         fullName.append(connector.getName());
@@ -646,7 +646,7 @@ public class JmxAgent extends AbstractAgent
                 if (containerMode)
                 {
                     // filter out MuleContext MBean to avoid an endless loop
-                    mbeans.remove(jmxSupport.getObjectName(domain + ":" + MuleServiceMBean.DEFAULT_JMX_NAME));
+                    mbeans.remove(jmxSupport.getObjectName(String.format("%s:%s", domain, MuleServiceMBean.DEFAULT_JMX_NAME)));
                 }
             }
         }
@@ -681,7 +681,6 @@ public class JmxAgent extends AbstractAgent
 
         public void onNotification(MuleContextNotification notification)
         {
-            // TODO different logic based on whether we're running in containerMode
             if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
                 try
@@ -710,7 +709,6 @@ public class JmxAgent extends AbstractAgent
         {
             if (notification.getAction() == MuleContextNotification.CONTEXT_STOPPED)
             {
-                // TODO different logic based on whether we're running in containerMode
                 boolean containerMode = notification.getMuleContext().getConfiguration().isContainerMode();
                 unregisterMBeansIfNecessary(containerMode);
             }
