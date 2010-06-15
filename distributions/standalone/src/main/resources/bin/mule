@@ -19,6 +19,11 @@ if [ -z "$MULE_HOME" ] ; then
     exit -1
 fi
 
+# strip a potential trailing slash in MULE_HOME. This is required to build a
+# valid path for WRAPPER_CMD below which is used when running the stop
+# command
+MULE_HOME=`echo ${MULE_HOME} | sed -e 's/\/$//'`
+
 # If MULE_BASE is not set, set it to MULE_HOME
 if [ -z "$MULE_BASE" ] ; then
     MULE_BASE=$MULE_HOME
@@ -465,7 +470,14 @@ getpid() {
 }
 
 testpid() {
-    pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -1`
+    if [ "$DIST_OS" = 'solaris' ]
+    then
+        # on Solaris, both /usr/ucb/ps and /usr/bin/ps accept the ww option.
+        pid=`$PSEXE ww $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -1`
+    else
+        pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -1`
+    fi
+
     if [ "X$pid" = "X" ]
     then
         # Process is gone so remove the pid file.
