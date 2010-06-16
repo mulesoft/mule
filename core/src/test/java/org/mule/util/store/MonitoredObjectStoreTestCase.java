@@ -61,22 +61,22 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
             }
         }
         
-        public boolean containsObject(String id) throws Exception
+        public boolean contains(String id) throws Exception
         {
             return false;
         }
 
-        public boolean removeObject(String id) throws Exception
+        public boolean remove(String id) throws Exception
         {
             return false;
         }
 
-        public Object retrieveObject(String id) throws Exception
+        public Object retrieve(String id) throws Exception
         {
             return null;
         }
 
-        public boolean storeObject(String id, Object item) throws Exception
+        public boolean store(String id, Object item) throws Exception
         {
             return false;
         }

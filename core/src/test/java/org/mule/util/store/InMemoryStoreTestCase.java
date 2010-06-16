@@ -73,13 +73,13 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         
         createBoundedObjectStore(1);
         
-        assertTrue(store.storeObject(key, value));
+        assertTrue(store.store(key, value));
         assertObjectsInStore(key);
         
-        Object retrieved = store.retrieveObject(key);
+        Object retrieved = store.retrieve(key);
         assertEquals(value, retrieved);
         
-        store.removeObject(key);        
+        store.remove(key);        
         assertObjectsExpired(key);
     }
     
@@ -105,10 +105,10 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         assertObjectsInStore("1", "2", "3");
 
         // exceed threshold
-        assertTrue(store.storeObject("4", "4"));
+        assertTrue(store.store("4", "4"));
 
         // the oldest entry should still be there, not yet expired
-        assertTrue(store.containsObject("1"));
+        assertTrue(store.contains("1"));
 
         // expire manually
         store.expire();
@@ -132,7 +132,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
     {
         for (String entry : objects)
         {
-            assertTrue(store.storeObject(entry, entry));
+            assertTrue(store.store(entry, entry));
         }
     }
     
@@ -141,7 +141,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         for (String id : identifiers)
         {
             String message = "id " + id + " not in store " + store;
-            assertTrue(message, store.containsObject(id));
+            assertTrue(message, store.contains(id));
         }
     }
     
@@ -149,7 +149,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
     {
         for (String id : identifiers)
         {
-            assertFalse(store.containsObject(id));
+            assertFalse(store.contains(id));
         }
     }
 

@@ -53,22 +53,22 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
         // store entries in quick succession
-        assertTrue(store.storeObject("1", "1"));
-        assertTrue(store.storeObject("2", "2"));
-        assertTrue(store.storeObject("3", "3"));
+        assertTrue(store.store("1", "1"));
+        assertTrue(store.store("2", "2"));
+        assertTrue(store.store("3", "3"));
 
         // they should still be alive at this point
-        assertTrue(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
+        assertTrue(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
 
         // wait until the entry TTL has been exceeded
         Thread.sleep(4000);
 
         // make sure all values are gone
-        assertFalse(store.containsObject("1"));
-        assertFalse(store.containsObject("2"));
-        assertFalse(store.containsObject("3"));
+        assertFalse(store.contains("1"));
+        assertFalse(store.contains("2"));
+        assertFalse(store.contains("3"));
 
     }
 
@@ -85,14 +85,14 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
         // store entries in quick succession
-        assertTrue(store.storeObject("1", "1"));
-        assertTrue(store.storeObject("2", "2"));
-        assertTrue(store.storeObject("3", "3"));
+        assertTrue(store.store("1", "1"));
+        assertTrue(store.store("2", "2"));
+        assertTrue(store.store("3", "3"));
 
         // they should still be alive at this point
-        assertTrue(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
+        assertTrue(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
 
         store.dispose();
 
@@ -105,17 +105,17 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.setExpirationInterval(1000);
         store.initialise();
 
-        assertTrue(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
+        assertTrue(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
 
         // wait until the entry TTL has been exceeded
         Thread.sleep(4000);
 
         // make sure all values are gone
-        assertFalse(store.containsObject("1"));
-        assertFalse(store.containsObject("2"));
-        assertFalse(store.containsObject("3"));
+        assertFalse(store.contains("1"));
+        assertFalse(store.contains("2"));
+        assertFalse(store.contains("3"));
 
         store.dispose();
 
@@ -129,9 +129,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
 // make sure all values are gone
-        assertFalse(store.containsObject("1"));
-        assertFalse(store.containsObject("2"));
-        assertFalse(store.containsObject("3"));
+        assertFalse(store.contains("1"));
+        assertFalse(store.contains("2"));
+        assertFalse(store.contains("3"));
 
 
     }
@@ -151,7 +151,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         // store entries in quick succession
         try
         {
-            assertTrue(store.storeObject("1", new Apple()));
+            assertTrue(store.store("1", new Apple()));
             fail("should not be abe to store objects");
         }
         catch (Exception e)
@@ -173,56 +173,56 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
 
-        assertTrue(store.storeObject("1", "1"));
-        assertTrue(store.storeObject("2", "2"));
-        assertTrue(store.storeObject("3", "3"));
+        assertTrue(store.store("1", "1"));
+        assertTrue(store.store("2", "2"));
+        assertTrue(store.store("3", "3"));
 
-        assertTrue(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
+        assertTrue(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
 
         // sleep a bit to make sure that entries are not expired, even though the expiry
         // thread is running every second
         Thread.sleep(3000);
-        assertTrue(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
+        assertTrue(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
 
         // exceed threshold
-        assertTrue(store.storeObject("4", "4"));
+        assertTrue(store.store("4", "4"));
 
         // the oldest entry should still be there
-        assertTrue(store.containsObject("1"));
+        assertTrue(store.contains("1"));
 
         // expire manually
         store.expire();
-        assertFalse(store.containsObject("1"));
-        assertTrue(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
-        assertTrue(store.containsObject("4"));
+        assertFalse(store.contains("1"));
+        assertTrue(store.contains("2"));
+        assertTrue(store.contains("3"));
+        assertTrue(store.contains("4"));
 
         // exceed some more
-        assertTrue(store.storeObject("5", "5"));
+        assertTrue(store.store("5", "5"));
         store.expire();
-        assertFalse(store.containsObject("2"));
-        assertTrue(store.containsObject("3"));
-        assertTrue(store.containsObject("4"));
-        assertTrue(store.containsObject("5"));
+        assertFalse(store.contains("2"));
+        assertTrue(store.contains("3"));
+        assertTrue(store.contains("4"));
+        assertTrue(store.contains("5"));
 
         // and multiple times
-        assertTrue(store.storeObject("6", "6"));
-        assertTrue(store.storeObject("7", "7"));
-        assertTrue(store.storeObject("8", "8"));
-        assertTrue(store.storeObject("9", "9"));
+        assertTrue(store.store("6", "6"));
+        assertTrue(store.store("7", "7"));
+        assertTrue(store.store("8", "8"));
+        assertTrue(store.store("9", "9"));
 
         store.expire();
-        assertTrue(store.containsObject("7"));
-        assertTrue(store.containsObject("8"));
-        assertTrue(store.containsObject("9"));
-        assertFalse(store.containsObject("3"));
-        assertFalse(store.containsObject("4"));
-        assertFalse(store.containsObject("5"));
-        assertFalse(store.containsObject("6"));
+        assertTrue(store.contains("7"));
+        assertTrue(store.contains("8"));
+        assertTrue(store.contains("9"));
+        assertFalse(store.contains("3"));
+        assertFalse(store.contains("4"));
+        assertFalse(store.contains("5"));
+        assertFalse(store.contains("6"));
     }
 
 }

@@ -74,7 +74,7 @@ public class TextFileObjectStore extends InMemoryObjectStore
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
-            super.storeObject(entry.getKey().toString(), entry.getValue());
+            super.store(entry.getKey().toString(), entry.getValue());
         }
     }
 
@@ -90,13 +90,13 @@ public class TextFileObjectStore extends InMemoryObjectStore
      *                                  implementation-specific error occured
      */
     @Override
-    public boolean storeObject(String id, Object item) throws Exception
+    public boolean store(String id, Object item) throws Exception
     {
         if (!(item instanceof String))
         {
             throw new IllegalArgumentException("TextFile store can only be used for storing text entries");
         }
-        boolean result = super.storeObject(id, item);
+        boolean result = super.store(id, item);
         if (output == null)
         {
             output = new FileOutputStream(fileStore, true);

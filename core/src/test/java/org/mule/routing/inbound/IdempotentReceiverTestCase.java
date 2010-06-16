@@ -55,24 +55,24 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         {
             private Map store = new HashedMap();
 
-            public boolean storeObject(String id, Object item) throws Exception
+            public boolean store(String id, Object item) throws Exception
             {
                 store.put(id, item);
                 return true;
             }
 
-            public Object retrieveObject(String id) throws Exception
+            public Object retrieve(String id) throws Exception
             {
                 return store.get(id);
             }
 
-            public boolean removeObject(String id) throws Exception
+            public boolean remove(String id) throws Exception
             {
                 store.remove(id);
                 return true;
             }
 
-            public boolean containsObject(String id) throws Exception
+            public boolean contains(String id) throws Exception
             {
                 return store.containsKey(id);
             }

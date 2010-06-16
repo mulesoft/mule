@@ -93,7 +93,7 @@ public class IdempotentReceiver extends SelectiveConsumer
 
             try
             {
-                return !store.containsObject(this.getIdForEvent(event));
+                return !store.contains(this.getIdForEvent(event));
             }
             catch (Exception ex)
             {
@@ -120,7 +120,7 @@ public class IdempotentReceiver extends SelectiveConsumer
 
         try
         {
-            if (store.storeObject(id, id))
+            if (store.store(id, id))
             {
                 return new MuleEvent[]{event};
             }

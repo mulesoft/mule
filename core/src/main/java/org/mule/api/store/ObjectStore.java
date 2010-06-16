@@ -20,7 +20,7 @@ public interface ObjectStore
      * @throws Exception if any implementation-specific error occured, e.g. when the store is 
      *          not available
      */
-    boolean containsObject(String id) throws Exception;
+    boolean contains(String id) throws Exception;
 
     /**
      * Store the given Object.
@@ -33,7 +33,7 @@ public interface ObjectStore
      * @throws Exception if the store is not available or any other implementation-specific 
      *          error occured.
      */
-    boolean storeObject(String id, Object item) throws Exception;
+    boolean store(String id, Object item) throws Exception;
 
     /**
      * Retrieve the given Object.
@@ -45,7 +45,7 @@ public interface ObjectStore
      * @throws Exception if the store is not available or any other implementation-specific 
      *          error occured
      */
-    Object retrieveObject(String id) throws Exception;
+    Object retrieve(String id) throws Exception;
 
     /**
      * Remove the object with ID.
@@ -57,5 +57,5 @@ public interface ObjectStore
      * @throws Exception if the store is not available or any other implementation-specific 
      *          error occured
      */
-    boolean removeObject(String id) throws Exception;
+    boolean remove(String id) throws Exception;
 }

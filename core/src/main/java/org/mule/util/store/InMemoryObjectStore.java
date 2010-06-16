@@ -36,7 +36,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * {@inheritDoc}
      */
-    public boolean containsObject(String id) throws Exception
+    public boolean contains(String id) throws Exception
     {
         if (id == null)
         {
@@ -52,7 +52,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * {@inheritDoc}
      */
-    public boolean storeObject(String id, Object item) throws Exception
+    public boolean store(String id, Object item) throws Exception
     {
         if (id == null)
         {
@@ -83,7 +83,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * {@inheritDoc}
      */
-    public Object retrieveObject(String id) throws Exception
+    public Object retrieve(String id) throws Exception
     {
         synchronized (store)
         {
@@ -97,7 +97,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         return null;
     }
 
-    public boolean removeObject(String id) throws Exception
+    public boolean remove(String id) throws Exception
     {
         synchronized (store)
         {
