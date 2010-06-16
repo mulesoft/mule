@@ -108,6 +108,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="recursive" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to recurse or not when a directory is read
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

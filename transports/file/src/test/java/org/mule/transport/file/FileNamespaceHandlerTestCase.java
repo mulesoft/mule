@@ -55,6 +55,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());
         assertEquals(false, c.isStreaming());
+        assertTrue(c.isRecursive());
 
         // Not implemented yet, see MULE-2671
         //assertNull(c.getComparator());
@@ -77,6 +78,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        assertFalse(c.isRecursive());
     }
 
     public void testTransformersOnEndpoints() throws Exception

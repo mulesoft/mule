@@ -17,9 +17,13 @@
     <!-- access this from test code to set destination directory -->
     <file:connector name="receiveConnector" fileAge="500" autoDelete="true" pollingFrequency="100"/>
 
-    <vm:connector name="vmQueue"/>
+    <file:connector name="recursiveConnector" fileAge="0" autoDelete="true" pollingFrequency="10" recursive="true"/>
+
+    <file:endpoint path="./.mule/in" name="get" connector-ref="recursiveConnector"/>
 
     <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
+
+    <vm:connector name="vmQueue"/>
     
     <endpoint address="vm://receive" name="receive"/>
 
@@ -38,6 +42,20 @@
             </outbound>
         </service>
 
+        <service name="recursiveService">
+            <inbound>
+                <file:inbound-endpoint ref="get"
+                                       comparator="org.mule.transport.file.comparator.OlderFirstComparator"
+                                       reverseOrder="true">
+                    <file:file-to-byte-array-transformer/>
+                </file:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="receive"/>
+                </pass-through-router>
+            </outbound>
+        </service>
     </model>
 
 </mule>

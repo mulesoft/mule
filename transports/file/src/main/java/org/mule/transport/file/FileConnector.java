@@ -108,6 +108,8 @@ public class FileConnector extends AbstractConnector
 
     public FilenameParser filenameParser;
 
+    private boolean recursive = false;
+
     public FileConnector(MuleContext context)
     {
         super(context);
@@ -597,5 +599,14 @@ public class FileConnector extends AbstractConnector
         {
             return super.createMuleMessageFactory();
         }
+    }
+    public boolean isRecursive()
+    {
+        return recursive;
+    }
+
+    public void setRecursive(boolean recursive)
+    {
+        this.recursive = recursive;
     }
 }

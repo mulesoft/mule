@@ -32,7 +32,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -48,7 +51,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
-    private static final File[] NO_FILES = new File[0];
+    private static final List<File> NO_FILES = new ArrayList<File>();
 
     private String readDir = null;
     private String moveDir = null;
@@ -134,15 +137,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            File[] files = this.listFiles();
+            List<File> files = this.listFiles();
             if (logger.isDebugEnabled())
             {
-                logger.debug("Files: " + Arrays.toString(files));
+                logger.debug("Files: " + Arrays.toString(files.toArray()));
             }
             Comparator comparator = getComparator();
             if (comparator != null)
             {
-                Arrays.sort(files, comparator);
+                Collections.sort(files, comparator);
             }
             for (File file : files)
             {
@@ -427,25 +430,45 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
      * @throws org.mule.api.MuleException which will wrap any other exceptions or
      *             errors.
      */
-    File[] listFiles() throws MuleException
+    List<File> listFiles() throws MuleException
     {
         try
         {
-            File[] todoFiles;
-            if (fileFilter != null)
-            {
-                todoFiles = readDirectory.listFiles(fileFilter);
-            }
-            else
-            {
-                todoFiles = readDirectory.listFiles(filenameFilter);
-            }
-
-            return (todoFiles == null ? NO_FILES : todoFiles);
+            List<File> files = new ArrayList<File>();
+            this.basicListFiles(readDirectory, files);
+            return (files.isEmpty() ? NO_FILES : files);
         }
         catch (Exception e)
         {
             throw new DefaultMuleException(FileMessages.errorWhileListingFiles(), e);
+        }
+    }
+
+    protected void basicListFiles(File currentDirectory, List<File> foundedFiles)
+    {
+        File[] files;
+        if (fileFilter != null)
+        {
+            files = currentDirectory.listFiles(fileFilter);
+        }
+        else
+        {
+            files = currentDirectory.listFiles(filenameFilter);
+        }
+
+        for (File file : files)
+        {
+            if (!file.isDirectory())
+            {
+                foundedFiles.add(file);
+            }
+            else
+            {
+                if (((FileConnector) this.getConnector()).isRecursive())
+                {
+                    this.basicListFiles(file, foundedFiles);
+                }
+            }
         }
     }
 
