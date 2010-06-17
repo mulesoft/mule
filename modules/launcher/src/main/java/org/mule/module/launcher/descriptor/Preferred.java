@@ -10,15 +10,15 @@
 
 package org.mule.module.launcher.descriptor;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- *
+ * Provides a means to give preference to an SPI implementation over others. Use either with
+ * or without a weight, in the latter case the higher the value, the stronger the preference.
  */
-public interface DescriptorParser
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Preferred
 {
-    ApplicationDescriptor parse(File descriptor) throws IOException;
-
-    String getSupportedFormat();
+    int weight() default -1;
 }

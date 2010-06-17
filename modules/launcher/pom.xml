@@ -20,17 +20,26 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-reboot</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
             <artifactId>wrapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
         </dependency>
     </dependencies>
 </project>
