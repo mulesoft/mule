@@ -12,16 +12,21 @@ package org.mule.module.guice;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.AbstractRegistry;
 
 import com.google.inject.Binding;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.guiceyfruit.Injectors;
@@ -96,20 +101,28 @@ public class GuiceRegistry extends AbstractRegistry
     @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
-        try
+        //We have to loop through all objects since Guice will act as a factory and create a binding for the given class
+        //if one is not bound in the registry.
+        List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
+        if(bindings.size()==0)
         {
-            return injector.getInstance(type);
-        }
-        catch (ConfigurationException e)
-        {
-            //If there is not an object bound to this type an exception is thrown.  We only need to
-            //return null here
             return null;
+
+        }
+        else if (bindings.size()==1)
+        {
+            return bindings.get(0).getProvider().get();
+        }
+        else
+        {
+            throw new RegistrationException("More than one object of type: " + type + ", was found");
         }
     }
 
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
+
+
         return Collections.EMPTY_MAP;
 //        try
 //        {
@@ -150,6 +163,7 @@ public class GuiceRegistry extends AbstractRegistry
     public <T> Collection<T> lookupObjects(Class<T> type)
     {
         return Collections.emptyList();
+
 //        try
 //        {
 //            List<Binding<T>> bindings = injector.findBindingsByType(TypeLiteral.get(type));
