@@ -18,11 +18,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import org.apache.commons.pool.KeyedObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+
 /**
  * TODO
  */
 public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    
+    public static class StubSocketPoolFactory implements SocketPoolFactory
+    {
+        public KeyedObjectPool createSocketPool(TcpConnector connector)
+        {
+            return new GenericKeyedObjectPool();
+        }
+    }
+    
     protected String getConfigResources()
     {
         return "tcp-namespace-config.xml";
@@ -44,6 +56,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
         assertEquals(c.getNextMessageExceptionPolicy().getClass(), DefaultMessageExceptionPolicy.class);
+        assertEquals(c.getSocketPoolFactory().getClass(), DefaultSocketPoolFactory.class);
     }
     
     public void testSeparateTimeouts() throws Exception
@@ -55,6 +68,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
         assertEquals(c.getNextMessageExceptionPolicy().getClass(), DefaultMessageExceptionPolicy.class);
+        assertEquals(c.getSocketPoolFactory().getClass(), StubSocketPoolFactory.class);
     }
     
     public void testTcpProtocolWithClass()

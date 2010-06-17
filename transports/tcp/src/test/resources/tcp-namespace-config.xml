@@ -19,11 +19,15 @@
 
     <tcp:connector name="separateTimeouts"
                    clientSoTimeout="3000"
-                   serverSoTimeout="4000"/>
+                   serverSoTimeout="4000"
+                   socketPoolFactory-ref="socketPool"/>
                    
     <tcp:connector name="connectorWithProtocolClass">
         <tcp:custom-protocol class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
     </tcp:connector>
+                   
+    <spring:bean name="socketPool"
+        class="org.mule.transport.tcp.TcpNamespaceHandlerTestCase$StubSocketPoolFactory"/>
                    
     <tcp:polling-connector name="pollingConnector"
                    clientSoTimeout="3000"
