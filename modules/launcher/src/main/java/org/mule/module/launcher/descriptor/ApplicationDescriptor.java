@@ -18,7 +18,7 @@ public class ApplicationDescriptor
     private String configurationBuilder;
     private String domain;
     private boolean parentFirstClassLoader = true;
-    private String[] configUrls;
+    private String[] configUrls = new String[] {DEFAULT_CONFIGURATION_URL};
     private boolean redeploymentEnabled = true;
 
     public static final String DEFAULT_CONFIGURATION_URL = "mule-config.xml";

@@ -18,33 +18,4 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor
         return appName;
     }
 
-    public String getEncoding()
-    {
-        return null;
-    }
-
-    public String getConfigurationBuilder()
-    {
-        return null;
-    }
-
-    public String getDomainName()
-    {
-        return null;
-    }
-
-    public boolean isParentFirstClassLoader()
-    {
-        return true;
-    }
-
-    public int getDescriptorVersion()
-    {
-        return 1;
-    }
-
-    public String[] getConfigUrls()
-    {
-        return new String[] {DEFAULT_CONFIGURATION_URL};
-    }
 }
