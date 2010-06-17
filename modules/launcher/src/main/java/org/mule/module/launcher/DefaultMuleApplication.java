@@ -205,7 +205,11 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
                     {
                         final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
                         configuration.setId(appName);
-                        configuration.setDefaultEncoding(descriptor.getEncoding());
+                        final String encoding = descriptor.getEncoding();
+                        if (StringUtils.isNotBlank(encoding))
+                        {
+                            configuration.setDefaultEncoding(encoding);
+                        }
                         return configuration;
                     }
                 });
