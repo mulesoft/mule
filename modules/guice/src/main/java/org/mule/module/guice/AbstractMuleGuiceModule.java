@@ -11,22 +11,10 @@ package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.NamedObject;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.RegistrationException;
 import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.module.guice.i18n.GuiceMessages;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.MembersInjector;
-import com.google.inject.TypeLiteral;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.spi.InjectionListener;
-import com.google.inject.spi.TypeEncounter;
-import com.google.inject.spi.TypeListener;
 
 /**
  * A mule specific Guice module that allows users to override the {@link #configureMuleContext(org.mule.api.MuleContext)} method
@@ -53,39 +41,6 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
         // do nothing
     }
 
-    @Override
-    protected final void configure()
-    {
-        this.
-        bindListener(Matchers.any(), new TypeListener()
-        {
-            public <I> void hear(TypeLiteral<I> iTypeLiteral, TypeEncounter<I> iTypeEncounter)
-            {
-                iTypeEncounter.register(new MuleRegistryInjectionLister());
-                iTypeEncounter.register(new MembersInjector() {
-                    public void injectMembers(Object o)
-                    {
-                        if(o instanceof MuleContextAware)
-                        {
-                            ((MuleContextAware)o).setMuleContext(muleContext);
-                        }
-                    }
-                });
-            }
-        });
-        bind(MuleContext.class).toInstance(muleContext);
-        try
-        {
-            doConfigure();
-        }
-        catch (Exception e)
-        {
-            addError(e);
-        }
-    }
-
-    protected abstract void doConfigure() throws Exception;
-
     /**
      * Creates an {@link org.mule.api.endpoint.EndpointBuilder} instance for the endpoint uri.  The builder can be used to add
      * further configuration options and then used to create either {@link org.mule.api.endpoint.OutboundEndpoint} or
@@ -93,81 +48,12 @@ public abstract class AbstractMuleGuiceModule extends AbstractModule
      *
      * @param uri the address URI for the endpoint
      * @return and EndpointBuilder instance that can be used to create endpoints
-     * @throws MuleException if the builder cannt be created for any reason
+     * @throws MuleException if the builder cannot be created for any reason
      */
     protected EndpointBuilder createEndpointBuilder(String uri) throws MuleException
     {
         DefaultEndpointFactory endpointFactory = new DefaultEndpointFactory();
         endpointFactory.setMuleContext(muleContext);
         return endpointFactory.getEndpointBuilder(uri);
-    }
-
-    /**
-     * A convenience method that will register an object in the registry using its hashcode as the key.  This will cause the object
-     * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
-     * lifecycle as the MuleContext
-     *
-     * @param o the object to register and initialise it
-     * @throws org.mule.api.registry.RegistrationException
-     *
-     */
-    protected void initialiseObject(Object o) throws RegistrationException
-    {
-        //bypass any injection provided by Mule
-        int flags = MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG + MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG;
-
-        String name;
-        if (o instanceof NamedObject)
-        {
-            name = ((NamedObject) o).getName();
-        }
-        else
-        {
-            name = String.valueOf(o.getClass().getSimpleName() + "#" + o.hashCode());
-        }
-        try
-        {
-
-            Object result = muleContext.getRegistry().applyProcessors(o, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
-            if(result!=null)
-            {
-                muleContext.getRegistry().registerObject(name, result, flags);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new RegistrationException(e);
-        }
-    }
-
-    /**
-     * Used to register any objects created by Guice with the Mule registry, which means all lifecycle, callbacks and
-     * annotations will be honoured.
-     */
-    private class MuleRegistryInjectionLister implements InjectionListener
-    {
-        public MuleRegistryInjectionLister()
-        {
-            super();
-        }
-        
-        public void afterInjection(Object o)
-        {
-            //We don't need or want to register this object again.
-            //Guice doesn't create it, but we bind it in the injector
-            if (o instanceof MuleContext)
-            {
-                return;
-            }
-            
-            try
-            {
-                //initialiseObject(o);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(GuiceMessages.failedToRegisterOBjectWithMule(o.getClass()), e);
-            }
-        }
     }
 }
