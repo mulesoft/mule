@@ -54,7 +54,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
     protected URL configUrl;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
-    private boolean redeploymentEnabled = true;
     protected ApplicationDescriptor descriptor;
 
     public DefaultMuleApplication(String appName)
@@ -89,14 +88,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             //System.out.println(CoreMessages.configNotFoundUsage());
             // TODO a better message
             throw new InstallException(CoreMessages.configNotFoundUsage());
-        }
-
-
-        // Configuration builder
-        String builder = (String) metaData.get("builder");
-        if (StringUtils.isBlank(builder))
-        {
-            builder = ApplicationDescriptor.CLASSNAME_DEFAULT_CONFIG_BUILDER;
         }
 
         createDeploymentClassLoader();
@@ -176,7 +167,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
                 // TODO properties for the app should come from the app descriptor
                 this.muleContext = muleContextFactory.createMuleContext(cfgBuilder, new ApplicationMuleContextBuilder(descriptor));
 
-                if (redeploymentEnabled)
+                if (descriptor.isRedeploymentEnabled())
                 {
                     createRedeployMonitor();
                 }
@@ -265,16 +256,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             // TODO add app name to the exception field
             throw new DeploymentStopException(MessageFactory.createStaticMessage(appName), e);
         }
-    }
-
-    public boolean isRedeploymentEnabled()
-    {
-        return redeploymentEnabled;
-    }
-
-    public void setRedeploymentEnabled(boolean redeploymentEnabled)
-    {
-        this.redeploymentEnabled = redeploymentEnabled;
     }
 
     @Override

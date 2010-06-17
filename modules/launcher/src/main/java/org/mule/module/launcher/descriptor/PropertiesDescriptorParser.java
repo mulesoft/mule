@@ -22,6 +22,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty("encoding"));
         d.setConfigurationBuilder(p.getProperty("config.builder"));
         d.setDomain(p.getProperty("domain"));
+        // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
         d.setParentFirstClassLoader(Boolean.parseBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
 
         final String urlsProp = p.getProperty("config.urls");
@@ -35,6 +36,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
             urls = urlsProp.split(",");
         }
         d.setConfigUrls(urls);
+
+        // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
+        d.setRedeploymentEnabled(Boolean.parseBoolean(p.getProperty("redeployment.enabled", Boolean.TRUE.toString())));
 
         return d;
     }
