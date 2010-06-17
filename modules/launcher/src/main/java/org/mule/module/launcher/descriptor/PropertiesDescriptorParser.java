@@ -13,7 +13,7 @@ package org.mule.module.launcher.descriptor;
 import org.mule.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -26,7 +26,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
         final Properties p = new Properties();
-        p.load(new FileReader(descriptor));
+        p.load(new FileInputStream(descriptor));
 
         ApplicationDescriptor d = new ApplicationDescriptor();
         d.setEncoding(p.getProperty("encoding"));
