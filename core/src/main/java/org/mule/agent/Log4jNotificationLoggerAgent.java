@@ -39,7 +39,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     private String logConfigFile = null;
     private String chainsawHost = "localhost";
     private int chainsawPort = -1;
-    private Map levelMappings = new HashMap();
+    private Map<?, ?> levelMappings = new HashMap<Object, Object>();
 
 
     public Log4jNotificationLoggerAgent()
@@ -179,7 +179,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
         this.chainsawPort = chainsawPort;
     }
 
-    public Map getLevelMappings()
+    public Map<?, ?> getLevelMappings()
     {
         return levelMappings;
     }
