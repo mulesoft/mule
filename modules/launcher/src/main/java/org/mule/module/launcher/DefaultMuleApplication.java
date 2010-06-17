@@ -16,8 +16,8 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -26,7 +26,6 @@ import org.mule.context.notification.NotificationException;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -54,7 +53,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
     private String appName;
     private Map<String, Object> metaData;
-    private String configBuilderClassName;
     protected URL configUrl;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
@@ -77,7 +75,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         // try to load the config as a file as well
         final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), ApplicationDescriptor.DEFAULT_CONFIGURATION_URL);
 
-        // TODO encapsulate in 'app sniffer'
         AppBloodhound bh = new DefaultAppBloodhound();
         try
         {
@@ -85,7 +82,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            throw new InstallException(MessageFactory.createStaticMessage("Failed to parse the application deployment descriptor"), e);
         }
 
         configUrl = IOUtils.getResourceAsUrl(configPath, getClass(), true, false);
@@ -102,31 +99,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         if (StringUtils.isBlank(builder))
         {
             builder = ApplicationDescriptor.CLASSNAME_DEFAULT_CONFIG_BUILDER;
-        }
-
-        // TODO discover it from app descriptor?
-        // Configuration builder
-        //String cfgBuilderClassName = (String) commandlineOptions.get("builder");
-
-        // Configuration builder
-        try
-        {
-            // Provide a shortcut for Spring: "-builder spring"
-            if ("spring".equalsIgnoreCase(builder))
-            {
-                this.configBuilderClassName = ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
-            }
-            else
-            {
-                this.configBuilderClassName = builder;
-            }
-        }
-        catch (Exception e)
-        {
-            logger.fatal(e);
-            final Message message = CoreMessages.failedToLoad("Builder: " + this.configBuilderClassName);
-            System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
-            throw new InstallException(message, e);
         }
 
         createDeploymentClassLoader();
@@ -167,8 +139,24 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             logger.info("Initializing application: " + appName);
         }
 
+        String configBuilderClassName = null;
         try
         {
+            // Configuration builder
+            // Provide a shortcut for Spring: "-builder spring"
+            final String builderFromDesc = descriptor.getConfigurationBuilder();
+            if ("spring".equalsIgnoreCase(builderFromDesc))
+            {
+                configBuilderClassName = ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
+            }
+            else if (builderFromDesc == null)
+            {
+                configBuilderClassName = AutoConfigurationBuilder.class.getName();
+            }
+            else
+            {
+                configBuilderClassName = builderFromDesc;
+            }
             // create a new ConfigurationBuilder that is disposed afterwards
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
                                                                                                  new Object[] {configUrl.toExternalForm()}, getDeploymentClassLoader());
