@@ -29,6 +29,7 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -67,6 +68,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
     private boolean redeploymentEnabled = true;
+    protected ApplicationDescriptor descriptor;
 
     public DefaultMuleApplication(String appName)
     {
@@ -83,6 +85,19 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         // try to load the config as a file as well
         final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), DefaultMuleApplication.DEFAULT_CONFIGURATION);
+
+        // TODO encapsulate in 'app sniffer'
+        AppBloodhound bh = new DefaultAppBloodhound();
+        try
+        {
+            descriptor = bh.fetch(getAppName());
+            System.out.println("desc = " + descriptor);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         configUrl = IOUtils.getResourceAsUrl(configPath, getClass(), true, false);
         if (configUrl == null)
         {
@@ -190,6 +205,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
                     {
                         final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
                         configuration.setId(appName);
+                        configuration.setDefaultEncoding(descriptor.getEncoding());
                         return configuration;
                     }
                 });
