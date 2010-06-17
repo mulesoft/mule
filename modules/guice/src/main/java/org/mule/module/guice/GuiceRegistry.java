@@ -15,6 +15,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.registry.AbstractRegistry;
 
 import com.google.inject.Binding;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Named;
@@ -95,7 +96,16 @@ public class GuiceRegistry extends AbstractRegistry
     @Override
     public <T> T lookupObject(Class<T> type) throws RegistrationException
     {
-        return injector.getInstance(type);
+        try
+        {
+            return injector.getInstance(type);
+        }
+        catch (ConfigurationException e)
+        {
+            //If there is not an object bound to this type an exception is thrown.  We only need to
+            //return null here
+            return null;
+        }
     }
 
     public <T> Map<String, T> lookupByType(Class<T> type)
