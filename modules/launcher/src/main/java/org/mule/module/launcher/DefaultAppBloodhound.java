@@ -23,6 +23,7 @@ public class DefaultAppBloodhound implements AppBloodhound
         final InputStream is = IOUtils.getResourceAsStream(deployConfig, getClass());
         if (is == null)
         {
+            // TODO return a 'defaults' object instead
             return null;
         }
 

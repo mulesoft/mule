@@ -321,8 +321,19 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
     protected void createDeploymentClassLoader()
     {
-        // TODO shared domain from deployment descriptor/config
-        ClassLoader parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+        final String domain = descriptor.getDomainName();
+        ClassLoader parent;
+
+        if (StringUtils.isBlank(domain) || DefaultMuleSharedDomainClassLoader.DEFAULT_DOMAIN_NAME.equals(domain))
+        {
+            parent = new DefaultMuleSharedDomainClassLoader(getClass().getClassLoader());
+        }
+        else
+        {
+            // TODO handle non-existing domains with an exception
+            parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
+        }
+
         this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
     }
 
