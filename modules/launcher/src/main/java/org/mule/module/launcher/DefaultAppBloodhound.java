@@ -1,11 +1,20 @@
 package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.util.IOUtils;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.descriptor.DescriptorParser;
+import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
+import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
+import org.mule.util.FileUtils;
+import org.mule.util.FilenameUtils;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
  *
@@ -13,47 +22,43 @@ import java.util.Properties;
 public class DefaultAppBloodhound implements AppBloodhound
 {
 
+    protected Map<String, DescriptorParser> parserRegistry;
+
+    public DefaultAppBloodhound()
+    {
+        parserRegistry = new HashMap<String, DescriptorParser>();
+        // file extension -> parser implementation
+        // TODO MULE-4909 better spi discovery mechanism with weighs
+        parserRegistry.put("properties", new PropertiesDescriptorParser());
+    }
+
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-        // TODO pluggable discovery mechanism
-        final String deployConfig = String.format("%s/apps/%s/%s", muleHome, appName, "mule-deploy.properties");
 
-        final Properties p = new Properties();
-        final InputStream is = IOUtils.getResourceAsStream(deployConfig, getClass());
-        if (is == null)
+        File appDir = new File(String.format("%s/apps/%s", muleHome, appName));
+        // list mule-deploy.* files
+        @SuppressWarnings("unchecked")
+        Collection<File> deployFiles = FileUtils.listFiles(appDir, new WildcardFileFilter("mule-deploy.*"), null);
+
+        // none found, return defaults
+        if (deployFiles.isEmpty())
         {
             return new EmptyApplicationDescriptor();
         }
 
-        p.load(is);
+        // lookup the implementation by extension
 
-        return new ApplicationDescriptor()
+        for (File file : deployFiles)
         {
-            public String getEncoding()
-            {
-                return p.getProperty("encoding");
-            }
+            final String ext = FilenameUtils.getExtension(file.getName());
+            System.out.println("ext = " + ext);
+        }
 
-            public String getConfigurationBuilder()
-            {
-                return p.getProperty("config.builder");
-            }
+        final String deployConfig = String.format("%s/apps/%s/%s", muleHome, appName, "mule-deploy.properties");
 
-            public String getDomainName()
-            {
-                return p.getProperty("domain");
-            }
+        ApplicationDescriptor desc = new PropertiesDescriptorParser().parse(new File(deployConfig));
+        return desc;
 
-            public boolean isParentFirstClassLoader()
-            {
-                return Boolean.parseBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString()));
-            }
-
-            public int getDescriptorVersion()
-            {
-                return 1;
-            }
-        };
     }
 }

@@ -23,6 +23,7 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -45,17 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleApplication implements Application<Map<String, Object>>
 {
 
-    public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
-
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
-
-    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
-
-    /**
-     * Required to support the '-config spring' shortcut. Don't use a class object so
-     * the core doesn't depend on mule-module-spring.
-     */
-    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
@@ -84,14 +75,13 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
         // try to load the config as a file as well
-        final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), DefaultMuleApplication.DEFAULT_CONFIGURATION);
+        final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), ApplicationDescriptor.DEFAULT_CONFIGURATION_URL);
 
         // TODO encapsulate in 'app sniffer'
         AppBloodhound bh = new DefaultAppBloodhound();
         try
         {
             descriptor = bh.fetch(getAppName());
-            System.out.println("desc = " + descriptor);
         }
         catch (IOException e)
         {
@@ -111,7 +101,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         String builder = (String) metaData.get("builder");
         if (StringUtils.isBlank(builder))
         {
-            builder = CLASSNAME_DEFAULT_CONFIG_BUILDER;
+            builder = ApplicationDescriptor.CLASSNAME_DEFAULT_CONFIG_BUILDER;
         }
 
         // TODO discover it from app descriptor?
@@ -124,7 +114,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             // Provide a shortcut for Spring: "-builder spring"
             if ("spring".equalsIgnoreCase(builder))
             {
-                this.configBuilderClassName = CLASSNAME_SPRING_CONFIG_BUILDER;
+                this.configBuilderClassName = ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
             }
             else
             {
@@ -325,7 +315,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
     protected void createDeploymentClassLoader()
     {
-        final String domain = descriptor.getDomainName();
+        final String domain = descriptor.getDomain();
         ClassLoader parent;
 
         if (StringUtils.isBlank(domain) || DefaultMuleSharedDomainClassLoader.DEFAULT_DOMAIN_NAME.equals(domain))

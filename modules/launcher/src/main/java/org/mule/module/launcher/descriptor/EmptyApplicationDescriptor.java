@@ -1,9 +1,9 @@
-package org.mule.module.launcher;
+package org.mule.module.launcher.descriptor;
 
 /**
  * Encapsulates defaults when no explicit descriptor provided with an app.
  */
-public class EmptyApplicationDescriptor implements ApplicationDescriptor
+public class EmptyApplicationDescriptor extends ApplicationDescriptor
 {
 
     public String getEncoding()
@@ -29,5 +29,10 @@ public class EmptyApplicationDescriptor implements ApplicationDescriptor
     public int getDescriptorVersion()
     {
         return 1;
+    }
+
+    public String[] getConfigUrls()
+    {
+        return new String[] {DEFAULT_CONFIGURATION_URL};
     }
 }
