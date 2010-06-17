@@ -13,7 +13,7 @@ package org.mule.module.launcher.descriptor;
 
 public class ApplicationDescriptor
 {
-
+    private String appName;
     private String encoding;
     private String configurationBuilder;
     private String domain;
@@ -27,6 +27,16 @@ public class ApplicationDescriptor
      * the core doesn't depend on mule-module-spring.
      */
     public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+
+    public String getAppName()
+    {
+        return appName;
+    }
+
+    public void setAppName(String appName)
+    {
+        this.appName = appName;
+    }
 
     public String getEncoding()
     {

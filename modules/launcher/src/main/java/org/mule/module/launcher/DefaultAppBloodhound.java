@@ -44,7 +44,7 @@ public class DefaultAppBloodhound implements AppBloodhound
         // none found, return defaults
         if (deployFiles.isEmpty())
         {
-            return new EmptyApplicationDescriptor();
+            return new EmptyApplicationDescriptor(appName);
         }
 
         // lookup the implementation by extension
@@ -58,6 +58,8 @@ public class DefaultAppBloodhound implements AppBloodhound
         final String deployConfig = String.format("%s/apps/%s/%s", muleHome, appName, "mule-deploy.properties");
 
         ApplicationDescriptor desc = new PropertiesDescriptorParser().parse(new File(deployConfig));
+        // app name is external to the deployment descriptor
+        desc.setAppName(appName);
         return desc;
 
     }

@@ -6,6 +6,18 @@ package org.mule.module.launcher.descriptor;
 public class EmptyApplicationDescriptor extends ApplicationDescriptor
 {
 
+    private String appName;
+
+    public EmptyApplicationDescriptor(String appName)
+    {
+        this.appName = appName;
+    }
+
+    public String getAppName()
+    {
+        return appName;
+    }
+
     public String getEncoding()
     {
         return null;

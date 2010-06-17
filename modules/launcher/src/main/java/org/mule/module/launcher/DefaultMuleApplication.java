@@ -15,11 +15,9 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -176,21 +174,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 // TODO properties for the app should come from the app descriptor
-                this.muleContext = muleContextFactory.createMuleContext(cfgBuilder, new DefaultMuleContextBuilder()
-                {
-                    @Override
-                    protected DefaultMuleConfiguration createMuleConfiguration()
-                    {
-                        final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
-                        configuration.setId(appName);
-                        final String encoding = descriptor.getEncoding();
-                        if (StringUtils.isNotBlank(encoding))
-                        {
-                            configuration.setDefaultEncoding(encoding);
-                        }
-                        return configuration;
-                    }
-                });
+                this.muleContext = muleContextFactory.createMuleContext(cfgBuilder, new ApplicationMuleContextBuilder(descriptor));
 
                 if (redeploymentEnabled)
                 {
