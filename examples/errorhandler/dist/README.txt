@@ -17,7 +17,7 @@ in Mule's README.txt
 Depending on the build tool you are using (Ant or Maven), you can build the 
 example by simply running "ant" or "mvn".  This will download any additional 
 libraries, compile the example classes, produce a jar file, and copy everything 
-to $MULE_HOME/lib/user, which is where your custom classes and configuration 
+to $MULE_HOME/apps/errorhandler, which is where your custom classes and configuration 
 files should go.
 
 (If you are unable to download the libraries it may be because you are behind a 

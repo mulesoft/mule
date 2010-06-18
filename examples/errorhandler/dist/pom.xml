@@ -318,31 +318,22 @@
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.2</version>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
                         <phase>install</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/classes</directory>
-                                    <includes>
-                                        <include>*.xml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
+                            <tasks>
+                                <copy tofile="${MULE_HOME}/apps/errorhandler/mule-config.xml" file="${basedir}/target/classes/error-config.xml"/>
+                            </tasks>   
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -354,7 +345,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}/lib</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/errorhandler/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>

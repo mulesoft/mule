@@ -11,10 +11,10 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
-if [ ! -d "$MULE_BASE/apps/mule-example-errorhandler" ]
+if [ ! -d "$MULE_BASE/apps/errorhandler" ]
 then
     echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
     exit 1
 fi         
 
-exec "$MULE_BASE/bin/mule" -config $MULE_BASE/apps/mule-example-errorhandler/error-config.xml
+exec "$MULE_BASE/bin/mule" -app errorhandler

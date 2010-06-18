@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Error Handler" default="setup">
+<project name="Mule Examples: Error Handler" default="deploy">
 
     <property name="app.name" value="mule-example-errorhandler"/>
     <property environment="env"/>
@@ -33,7 +33,7 @@
              usetimestamp="true"/>
     </target>
 
-    <target name="init" depends="get.libraries">
+    <target name="init" depends="get.libraries, setup,ifMuleBase,ifMuleHome">
 
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
@@ -83,28 +83,30 @@
              basedir="${dir.classes}"/>
    </target>
 
-   <target name="deploy"
-           depends="package"
+    <target name="deploy" 
+           depends="package, test" 
            description="Deploy the application to the Mule server">
 
-            <copy file="${dir.build}/${app.name}.jar"
-                  todir="${dir.mule.home}/apps/${app.name}/lib"
-                  overwrite="true" verbose="true"/>
-           <copy todir="${dir.mule.home}/apps/${app.name}"
-                 overwrite="true" verbose="true">
-                <fileset dir="${dir.classes}">
-                    <include name="**/*.xml"/>
-                </fileset>
-           </copy>
-           <copy todir="${dir.mule.home}/apps/${app.name}/lib"
-                 overwrite="true" verbose="true">
-                <fileset dir="${dir.build}/lib">
-                    <include name="**/*.jar"/>
-                </fileset>
-           </copy>
-   </target>
+        <antcall target="deploy-instance">
+            <param name="instance.name" value="errorhandler" />
+            <param name="config.file.name" value="error" />
+        </antcall>
+    </target>
 
-   <target name="setup">
+    <target name="deploy-instance" description="deploys an instance of the errorhandler config">
+        <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
+        <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
+        <copy file="${dir.build}/${app.name}.jar" todir="${dir.mule.home}/apps/${instance.name}/lib" overwrite="true" verbose="true"/>
+        <copy file="${dir.classes}/${config.file.name}-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/mule-config.xml"/>
+        <copy todir="${dir.mule.home}/apps/${instance.name}/lib"
+              overwrite="true" verbose="true">
+             <fileset dir="${dir.build}/lib">
+                 <include name="**/*.jar"/>
+             </fileset>
+        </copy>        
+    </target>
+
+    <target name="setup">
       <fail message="MULE_HOME environment variable has not been set.">
        <condition>
         <or>
@@ -116,21 +118,37 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
    </target>
+
+    <target name="test" depends="compile">
+        <junit haltonerror="true" haltonfailure="true">
+            <classpath>
+                <pathelement location="${dir.build}/classes"/>
+                <pathelement location="${dir.java}/test/resources"/>
+                <path refid="classpath.mule"/>
+                <path>
+                    <fileset dir="${dir.build}/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </path>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest fork="yes" todir="${dir.build}">
+                <fileset dir="${dir.java}/test/java">
+                    <include name="**/*TestCase.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
 
 </project>
