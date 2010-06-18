@@ -23,12 +23,10 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,10 +49,11 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
     private String appName;
     private Map<String, Object> metaData;
-    protected URL configUrl;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
     protected ApplicationDescriptor descriptor;
+
+    protected String[] absoluteResourcePaths;
 
     public DefaultMuleApplication(String appName)
     {
@@ -68,10 +67,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             logger.info("Installing application: " + appName);
         }
 
-        final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-        // try to load the config as a file as well
-        final String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), ApplicationDescriptor.DEFAULT_CONFIGURATION_URL);
-
         AppBloodhound bh = new DefaultAppBloodhound();
         try
         {
@@ -82,12 +77,21 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             throw new InstallException(MessageFactory.createStaticMessage("Failed to parse the application deployment descriptor"), e);
         }
 
-        configUrl = IOUtils.getResourceAsUrl(configPath, getClass(), true, false);
-        if (configUrl == null)
+        // convert to absolute paths
+        final String[] configResources = descriptor.getConfigResources();
+        absoluteResourcePaths = new String[configResources.length];
+        for (int i = 0; i < configResources.length; i++)
         {
-            //System.out.println(CoreMessages.configNotFoundUsage());
-            // TODO a better message
-            throw new InstallException(CoreMessages.configNotFoundUsage());
+            String resource = configResources[i];
+            final File file = toAbsoluteFile(resource);
+            if (!file.exists())
+            {
+                throw new InstallException(
+                        MessageFactory.createStaticMessage(String.format("Config for app '%s' not found: %s", getAppName(), file))
+                );
+            }
+
+            absoluteResourcePaths[i] = file.getAbsolutePath();
         }
 
         createDeploymentClassLoader();
@@ -146,9 +150,10 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             {
                 configBuilderClassName = builderFromDesc;
             }
-            // create a new ConfigurationBuilder that is disposed afterwards
+
+
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                 new Object[] {configUrl.toExternalForm()}, getDeploymentClassLoader());
+                                                                                                 new Object[] {absoluteResourcePaths}, getDeploymentClassLoader());
             if (!cfgBuilder.isConfigured())
             {
                 //List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
@@ -164,7 +169,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
                 //}
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-                // TODO properties for the app should come from the app descriptor
                 this.muleContext = muleContextFactory.createMuleContext(cfgBuilder, new ApplicationMuleContextBuilder(descriptor));
 
                 if (descriptor.isRedeploymentEnabled())
@@ -243,6 +247,11 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
 
     public void stop()
     {
+        if (this.muleContext == null)
+        {
+            // app never started, maybe due to a previous error
+            return;
+        }
         if (logger.isInfoEnabled())
         {
             logger.info("Stopping application: " + appName);
@@ -281,17 +290,17 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
         }
 
-        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, new File(configUrl.getFile()), parent);
+        this.deploymentClassLoader = new MuleApplicationClassLoader(appName, parent);
     }
 
     protected void createRedeployMonitor() throws NotificationException
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Monitoring for hot-deployment: " + configUrl.toExternalForm());
+            logger.info("Monitoring for hot-deployment: " + new File(absoluteResourcePaths [0]));
         }
 
-        final FileWatcher watcher = new ConfigFileWatcher(new File(configUrl.getFile()));
+        final FileWatcher watcher = new ConfigFileWatcher(new File(absoluteResourcePaths [0]));
 
         // register a config monitor only after context has started, as it may take some time
         muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
@@ -325,6 +334,18 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         {
             logger.info("Reload interval: " + reloadIntervalMs);
         }
+    }
+
+
+    /**
+     * Resolve a resource relative to an application root.
+     * @return absolute path, may not actually exist (check with File.exists())
+     */
+    protected File toAbsoluteFile(String path)
+    {
+        final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
+        String configPath = String.format("%s/apps/%s/%s", muleHome, getAppName(), path);
+        return new File(configPath);
     }
 
 

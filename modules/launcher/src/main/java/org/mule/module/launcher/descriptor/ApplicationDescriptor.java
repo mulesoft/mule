@@ -18,10 +18,10 @@ public class ApplicationDescriptor
     private String configurationBuilder;
     private String domain;
     private boolean parentFirstClassLoader = true;
-    private String[] configUrls = new String[] {DEFAULT_CONFIGURATION_URL};
+    private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private boolean redeploymentEnabled = true;
 
-    public static final String DEFAULT_CONFIGURATION_URL = "mule-config.xml";
+    public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
     public static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
@@ -92,14 +92,14 @@ public class ApplicationDescriptor
         this.parentFirstClassLoader = parentFirstClassLoader;
     }
 
-    public String[] getConfigUrls()
+    public String[] getConfigResources()
     {
-        return configUrls;
+        return configResources;
     }
 
-    public void setConfigUrls(String[] configUrls)
+    public void setConfigResources(String[] configResources)
     {
-        this.configUrls = configUrls;
+        this.configResources = configResources;
     }
 
     public boolean isRedeploymentEnabled()

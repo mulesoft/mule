@@ -35,17 +35,17 @@ public class PropertiesDescriptorParser implements DescriptorParser
         // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
         d.setParentFirstClassLoader(Boolean.parseBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
 
-        final String urlsProp = p.getProperty("config.urls");
+        final String resProps = p.getProperty("config.resources");
         String[] urls;
-        if (StringUtils.isBlank(urlsProp))
+        if (StringUtils.isBlank(resProps))
         {
-            urls = new String[] {ApplicationDescriptor.DEFAULT_CONFIGURATION_URL};
+            urls = new String[] {ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE};
         }
         else
         {
-            urls = urlsProp.split(",");
+            urls = resProps.split(",");
         }
-        d.setConfigUrls(urls);
+        d.setConfigResources(urls);
 
         // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
         d.setRedeploymentEnabled(Boolean.parseBoolean(p.getProperty("redeployment.enabled", Boolean.TRUE.toString())));

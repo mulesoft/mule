@@ -12,12 +12,10 @@ package org.mule.module.launcher;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.util.ClassUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -174,54 +172,6 @@ public class MuleContainer
         catch (Throwable e)
         {
             shutdown(e);
-        }
-    }
-
-    /**
-     * Sets the configuration builder to use for this server. Note that if a builder
-     * is not set and the server's start method is called the default is an instance
-     * of <code>SpringXmlConfigurationBuilder</code>.
-     *
-     * @param builderClassName the configuration builder FQN to use
-     * @throws ClassNotFoundException if the class with the given name can not be
-     *                                loaded
-     */
-    public static void setConfigBuilderClassName(String builderClassName) throws ClassNotFoundException
-    {
-        if (builderClassName != null)
-        {
-            Class<?> cls = ClassUtils.loadClass(builderClassName, MuleContainer.class);
-            if (ConfigurationBuilder.class.isAssignableFrom(cls))
-            {
-                MuleContainer.configBuilderClassName = builderClassName;
-            }
-            else
-            {
-                throw new IllegalArgumentException("Not a usable ConfigurationBuilder class: "
-                                                   + builderClassName);
-            }
-        }
-        else
-        {
-            MuleContainer.configBuilderClassName = null;
-        }
-    }
-
-    /**
-     * Returns the class name of the configuration builder used to create this
-     * MuleContainer.
-     *
-     * @return FQN of the current config builder
-     */
-    public static String getConfigBuilderClassName()
-    {
-        if (configBuilderClassName != null)
-        {
-            return configBuilderClassName;
-        }
-        else
-        {
-            return CLASSNAME_DEFAULT_CONFIG_BUILDER;
         }
     }
 

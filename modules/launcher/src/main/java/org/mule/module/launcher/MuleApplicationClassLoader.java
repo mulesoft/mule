@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -37,19 +38,18 @@ public class MuleApplicationClassLoader extends URLClassLoader
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
     protected final transient Log logger = LogFactory.getLog(getClass());
-    private File monitoredResource;
     private String appName;
 
-    // TODO refactor to use an app name instead and use convention for monitoredResource
-    public MuleApplicationClassLoader(String appName, File monitoredResource, ClassLoader parentCl)
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
         super(CLASSPATH_EMPTY, parentCl);
         this.appName = appName;
-        this.monitoredResource = monitoredResource;
         try
         {
-            // get lib dir on the same level as monitored resource and...
-            File parentFile = monitoredResource.getParentFile();
+            // get lib dir
+            final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
+            String configPath = String.format("%s/apps/%s", muleHome, appName);
+            File parentFile = new File(configPath); 
             File classesDir = new File(parentFile, PATH_CLASSES);
             addURL(classesDir.toURI().toURL());
 
@@ -95,11 +95,6 @@ public class MuleApplicationClassLoader extends URLClassLoader
                 logger.debug(String.format("[%s]", appName), e);
             }
         }
-    }
-
-    public File getMonitoredResource()
-    {
-        return this.monitoredResource;
     }
 
     public String getAppName()
