@@ -32,7 +32,7 @@ public class MuleContainerSystemClassLoader extends URLClassLoader
         {
             DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(MuleContainerBootstrap.lookupMuleHome(),
                                                                                   MuleContainerBootstrap.lookupMuleBase());
-
+            @SuppressWarnings("unchecked")
             final List<URL> urlsList = classPath.getURLs();
             for (URL url : urlsList)
             {
