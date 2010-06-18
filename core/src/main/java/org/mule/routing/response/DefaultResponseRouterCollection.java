@@ -11,40 +11,34 @@
 package org.mule.routing.response;
 
 import org.mule.OptimizedRequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.AbstractRouterCollection;
+import org.mule.routing.inbound.DefaultInboundRouterCollection;
 
 import java.util.Iterator;
-import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <code>DefaultResponseRouterCollection</code> is a router that can be used to control how
- * the response in a request/response message flow is created. Main usecase is to
- * aggregate a set of asynchonous events into a single response
+ * <code>DefaultResponseRouterCollection</code> is a router that can be used to
+ * control how the response in a request/response message flow is created. Main
+ * usecase is to aggregate a set of asynchonous events into a single response
  */
-public class DefaultResponseRouterCollection extends AbstractRouterCollection implements ResponseRouterCollection
+public class DefaultResponseRouterCollection extends DefaultInboundRouterCollection
+    implements ResponseRouterCollection
 {
-    @SuppressWarnings("unchecked")
-    private volatile List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();
-    
     private volatile int timeout = -1; // undefined
     private volatile boolean failOnTimeout = true;
 
     public DefaultResponseRouterCollection()
     {
-        super(RouterStatistics.TYPE_RESPONSE);
+        statistics = new RouterStatistics(RouterStatistics.TYPE_RESPONSE);
     }
-
 
     @Override
     public void initialise() throws InitialisationException
@@ -56,7 +50,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         super.initialise();
     }
 
-    public void route(MuleEvent event) throws RoutingException
+    public MuleEvent process(MuleEvent event) throws MessagingException
     {
         ResponseRouter router;
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
@@ -69,6 +63,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
                 getStatistics().incrementRoutedMessage(event.getEndpoint());
             }
         }
+        return null;
     }
 
     public MuleMessage getResponse(MuleMessage message) throws RoutingException
@@ -76,7 +71,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         MuleMessage result = null;
         if (routers.size() == 0)
         {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
             {
                 logger.debug("There are no routers configured on the response router. Returning the current message");
             }
@@ -119,71 +114,6 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
         routers.add(router);
     }
 
-    public ResponseRouter removeRouter(ResponseRouter router)
-    {
-        if (routers.remove(router))
-        {
-            return router;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public void addEndpoint(InboundEndpoint endpoint)
-    {
-        if (endpoint != null)
-        {
-            endpoints.add(endpoint);
-        }
-        else
-        {
-            throw new IllegalArgumentException("endpoint = null");
-        }
-    }
-
-    public boolean removeEndpoint(InboundEndpoint endpoint)
-    {
-        return endpoints.remove(endpoint);
-    }
-
-    public List<InboundEndpoint> getEndpoints()
-    {
-        return endpoints;
-    }
-
-    public void setEndpoints(List<InboundEndpoint> endpoints)
-    {
-        if (endpoints != null)
-        {
-            this.endpoints.clear();
-            this.endpoints.addAll(endpoints);
-        }
-        else
-        {
-            throw new IllegalArgumentException("List of endpoints = null");
-        }
-    }
-
-    /**
-     * @param name the Endpoint identifier
-     * @return the Endpoint or null if the endpointUri is not registered
-     * @see org.mule.api.routing.InboundRouterCollection
-     */
-    public InboundEndpoint getEndpoint(String name)
-    {
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            if (endpoint.getName().equals(name))
-            {
-                return endpoint;
-            }
-        }
-        
-        return null;
-    }
-
     public int getTimeout()
     {
         return timeout;
@@ -208,4 +138,5 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     {
         return !getEndpoints().isEmpty();
     }
+
 }

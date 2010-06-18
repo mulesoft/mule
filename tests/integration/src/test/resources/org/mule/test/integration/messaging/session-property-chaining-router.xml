@@ -4,10 +4,12 @@
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <vm:connector name="vmConnector">
@@ -17,6 +19,10 @@
     <cxf:connector name="cxfConnector">
         <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
     </cxf:connector>
+
+    <http:connector name="httpConnector">
+        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
+    </http:connector>
 
     <spring:bean id="nonSerializable" class="org.mule.tck.NonSerializableObject" />
 

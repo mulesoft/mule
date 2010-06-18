@@ -15,6 +15,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -27,8 +28,8 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "udp://localhost:10100");
         Mock mockComponent = new Mock(Service.class);
-        mockComponent.expectAndReturn("getResponseTransformer", null);
-        mockComponent.expectAndReturn("getResponseRouter", null);
+        mockComponent.expect("getResponseRouter");
+        mockComponent.expectAndReturn("getInboundRouter", new DefaultInboundRouterCollection());
 
         return new UdpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }

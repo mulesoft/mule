@@ -360,14 +360,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new HttpResponseException(method.getStatusText(), method.getStatusCode());
         }
-        OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(), connector.getMuleContext()).buildOutboundEndpoint();
-        if (event.isSynchronous())
+        OutboundEndpoint out = new EndpointURIEndpointBuilder(locationHeader.getValue(),
+            connector.getMuleContext()).buildOutboundEndpoint();
+        MuleEvent result = out.process(event);
+        if (result != null)
         {
-            return connector.send(out, event);
+            return result.getMessage();
         }
         else
         {
-            connector.dispatch(out, event);
             return null;
         }
     }

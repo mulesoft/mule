@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
@@ -18,6 +19,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.PatternAware;
 import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -31,18 +33,17 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
-import org.mule.api.model.ModelException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -54,8 +55,6 @@ import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -105,6 +104,10 @@ public abstract class AbstractService implements Service
     protected OutboundRouterCollection outboundRouter = new DefaultOutboundRouterCollection();
 
     protected ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
+    
+    protected CompositeMessageSource inboundSourceAggregator;
+
+    protected CompositeMessageSource responseSourceAggregator;
 
     /**
      * Determines the initial state of this service when the model starts. Can be
@@ -181,6 +184,21 @@ public abstract class AbstractService implements Service
 //            ((Initialisable) exceptionListener).initialise();
         }
 
+        inboundSourceAggregator = ((DefaultInboundRouterCollection) inboundRouter).getSourceAggregator();;
+        inboundSourceAggregator.setListener(inboundRouter);
+        if (inboundSourceAggregator instanceof PatternAware)
+        {
+            ((PatternAware) inboundSourceAggregator).setPattern(this);
+        }
+        responseSourceAggregator = ((DefaultInboundRouterCollection) responseRouter).getSourceAggregator();;
+        responseSourceAggregator.setListener(responseRouter);
+        if (responseSourceAggregator instanceof PatternAware)
+        {
+            ((PatternAware) responseSourceAggregator).setPattern(this);
+        }
+
+        inboundRouter.setListener(new InternalServiceMessageProcessor());
+        
         try
         {
             lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
@@ -231,10 +249,14 @@ public abstract class AbstractService implements Service
 
     public void stop() throws MuleException
     {
-        //TODO this wasn't being called stopListeners();
-        // Unregister Listeners for the service
-        unregisterListeners();
-
+        if (inboundSourceAggregator instanceof Stoppable)
+        {
+            ((Stoppable) inboundSourceAggregator).stop();
+        }
+        if (responseSourceAggregator instanceof Stoppable)
+        {
+            ((Stoppable) responseSourceAggregator).stop();
+        }
         // Stop component.  We do this here in case there are any queues that need to be consumed first.
         component.stop();
         lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
@@ -257,17 +279,15 @@ public abstract class AbstractService implements Service
         // be sure we start it here.
         component.start();
 
-        // Create the receivers for the service but do not start them yet.
-        registerListeners();
-
-        // We connect the receivers _before_ starting the service because there may
-        // be
-        // some initialization required for the service which needs to have them
-        // connected.
-        // For example, the org.mule.transport.soap.glue.GlueMessageReceiver adds
-        // InitialisationCallbacks within its doConnect() method (see MULE-804).
-        connectListeners();
-
+        // Now component is started, start message sources
+        if (inboundSourceAggregator instanceof Startable)
+        {
+            ((Startable) inboundSourceAggregator).start();
+        }
+        if (responseSourceAggregator instanceof Startable)
+        {
+            ((Startable) responseSourceAggregator).start();
+        }
 
         if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
         {
@@ -282,11 +302,6 @@ public abstract class AbstractService implements Service
         }
         beyondInitialState.set(true);
 
-        // We start the receivers _after_ starting the service because if a message
-        // gets routed to the service before it is started,
-        // org.mule.model.AbstractComponent.dispatchEvent() will throw a
-        // ServiceException with message COMPONENT_X_IS_STOPPED (see MULE-526).
-        startListeners();
     }
 
 
@@ -377,7 +392,7 @@ public abstract class AbstractService implements Service
         {
             try
             {
-                ((OutboundEndpoint) endpoint).dispatch(event);
+                ((OutboundEndpoint) endpoint).process(event);
             }
             catch (Exception e)
             {
@@ -512,157 +527,7 @@ public abstract class AbstractService implements Service
     protected abstract MuleMessage doSend(MuleEvent event) throws MuleException;
 
     protected abstract void doDispatch(MuleEvent event) throws MuleException;
-
-    protected void registerListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            try
-            {
-                endpoint.getConnector().registerListener(this, endpoint);
-            }
-            catch (MuleException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new ModelException(
-                        CoreMessages.failedtoRegisterOnEndpoint(name, endpoint.getEndpointURI()), e);
-            }
-        }
-    }
-
-    protected void unregisterListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            try
-            {
-                endpoint.getConnector().unregisterListener(this, endpoint);
-            }
-            catch (MuleException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new ModelException(
-                        CoreMessages.failedToUnregister(name, endpoint.getEndpointURI()), e);
-            }
-        }
-    }
-
-    protected void startListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
-                    endpoint);
-            if (receiver != null && endpoint.getConnector().isStarted()
-                    && endpoint.getInitialState().equals(ImmutableEndpoint.INITIAL_STATE_STARTED))
-            {
-                receiver.start();
-            }
-        }
-    }
-
-    // This is not called by anything?!
-    protected void stopListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this, endpoint);
-            if (receiver != null)
-            {
-                receiver.stop();
-            }
-        }
-    }
-
-    protected void connectListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-            MessageReceiver receiver = connector.getReceiver(this, endpoint);
-            if (receiver != null && connector.isConnected())
-            {
-                try
-                {
-                    receiver.connect();
-                }
-                catch (Exception e)
-                {
-                    throw new ModelException(
-                            MessageFactory.createStaticMessage("Failed to connect listener "
-                                    + receiver + " for endpoint " + endpoint.getName()), e);
-                }
-            }
-        }
-    }
-
-    protected void disconnectListeners() throws MuleException
-    {
-        @SuppressWarnings("unchecked")
-        List<InboundEndpoint> endpoints = getIncomingEndpoints();
-
-        for (InboundEndpoint endpoint : endpoints)
-        {
-            MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
-                    endpoint);
-            if (receiver != null)
-            {
-                try
-                {
-                    receiver.disconnect();
-                }
-                catch (Exception e)
-                {
-                    throw new ModelException(
-                            MessageFactory.createStaticMessage("Failed to disconnect listener "
-                                    + receiver + " for endpoint " + endpoint.getName()),
-                            e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns a list of all incoming endpoints on a service.
-     * TODO generify
-     */
-    protected List<InboundEndpoint> getIncomingEndpoints()
-    {
-        List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
-
-        // Add inbound endpoints
-        endpoints.addAll(inboundRouter.getEndpoints());
-
-        // Add response endpoints
-        if (responseRouter != null
-                && responseRouter.getEndpoints() != null)
-        {
-            endpoints.addAll(responseRouter.getEndpoints());
-        }
-        return endpoints;
-    }
-
+    
     // /////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     // /////////////////////////////////////////////////////////////////////////////////////////
@@ -859,4 +724,29 @@ public abstract class AbstractService implements Service
     {
         return lifecycleManager;
     }
+    
+    class InternalServiceMessageProcessor implements MessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            if (event.isSynchronous())
+            {
+                MuleMessage result = sendEvent(event);
+                if (result != null)
+                {
+                    return new DefaultMuleEvent(result, event);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                dispatchEvent(event);
+                return null;
+            }
+        }
+    }
+    
 }

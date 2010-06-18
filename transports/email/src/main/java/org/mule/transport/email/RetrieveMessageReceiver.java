@@ -40,9 +40,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 /**
- * Poll a mailbox for messages, remove the messages and route them as events into Mule.
+ * Poll a mailbox for messages, remove the messages and route them as events into
+ * Mule.
  * <p/>
- * This contains a reference to a mail folder (and also the endpoint and connector, via superclasses)
+ * This contains a reference to a mail folder (and also the endpoint and connector,
+ * via superclasses)
  */
 public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver implements MessageCountListener
 {
@@ -52,18 +54,17 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private String backupFolder = null;
 
     public RetrieveMessageReceiver(Connector connector,
-                                        Service service,
-                                        InboundEndpoint endpoint,
-                                        long checkFrequency,
-                                        boolean backupEnabled,
-                                        String backupFolder)
-                 throws CreateException
+                                   Service service,
+                                   InboundEndpoint endpoint,
+                                   long checkFrequency,
+                                   boolean backupEnabled,
+                                   String backupFolder) throws CreateException
     {
         super(connector, service, endpoint);
-             this.backupFolder = backupFolder;
-             this.backupEnabled = backupEnabled;
-             this.setFrequency(checkFrequency);
-         }
+        this.backupFolder = backupFolder;
+        this.backupEnabled = backupEnabled;
+        this.setFrequency(checkFrequency);
+    }
 
     private AbstractRetrieveMailConnector castConnector()
     {
@@ -78,7 +79,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         Store store = session.newStore();
         store.connect();
         folder = store.getFolder(castConnector().getMailboxFolder());
-        if(castConnector().getMoveToFolder()!=null)
+        if (castConnector().getMoveToFolder() != null)
         {
             moveToFolder = store.getFolder(castConnector().getMoveToFolder());
             moveToFolder.open(Folder.READ_WRITE);
@@ -87,8 +88,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         // set default value if empty/null
         if (StringUtils.isEmpty(backupFolder))
         {
-            this.backupFolder =
-                    connector.getMuleContext().getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
+            this.backupFolder = connector.getMuleContext().getConfiguration().getWorkingDirectory()
+                                + "/mail/" + folder.getName();
         }
 
         if (backupFolder != null && !this.backupFolder.endsWith(File.separator))
@@ -129,7 +130,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             {
                 try
                 {
-                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED) && !messages[i].getFlags().contains(Flags.Flag.SEEN))
+                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
+                        && !messages[i].getFlags().contains(Flags.Flag.SEEN))
                     {
                         MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
                         storeMessage(mimeMessage);
@@ -167,8 +169,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                     handleException(forwarded);
                 }
             }
-            //Lets move all messages in one go
-            if(moveToFolder !=null)
+            // Lets move all messages in one go
+            if (moveToFolder != null)
             {
                 try
                 {
@@ -180,25 +182,6 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 }
             }
         }
-    }
-
-    @Override
-    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
-    {
-        super.handleUnacceptedFilter(message);
-        if (message.getPayload() instanceof Message)
-        {
-            Message msg = (Message) message.getPayload();
-            try
-            {
-                msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
-            }
-            catch (MessagingException e)
-            {
-                logger.error("failed to set message deleted: " + e.getMessage(), e);
-            }
-        }
-        return message;
     }
 
     public void messagesRemoved(MessageCountEvent event)
@@ -226,7 +209,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         return folder;
     }
 
-    /** @param folder  */
+    /** @param folder */
     public synchronized void setFolder(Folder folder)
     {
         if (folder == null)
@@ -252,10 +235,12 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
 
     /**
      * Helper method for testing which stores a copy of the message locally as the
-     * POP3 <p/> message will be deleted from the server
-     *
+     * POP3
+     * <p/>
+     * message will be deleted from the server
+     * 
      * @param msg the message to store
-     * @throws IOException        If a failure happens writing the message
+     * @throws IOException If a failure happens writing the message
      * @throws MessagingException If a failure happens reading the message
      */
     protected void storeMessage(Message msg) throws IOException, MessagingException
@@ -269,8 +254,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 if (from != null && from.length > 0)
                 {
                     filename = from[0] instanceof InternetAddress
-                            ? ((InternetAddress) from[0]).getAddress()
-                            : from[0].toString();
+                                                                 ? ((InternetAddress) from[0]).getAddress()
+                                                                 : from[0].toString();
                 }
                 else
                 {
@@ -315,13 +300,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             {
                 Message[] messages = folder.getMessages();
                 MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
-                        messages);
+                    messages);
                 messagesAdded(event);
             }
             else if (count == -1)
             {
                 throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                        + " as folder is closed");
+                                             + " as folder is closed");
             }
         }
         catch (MessagingException e)

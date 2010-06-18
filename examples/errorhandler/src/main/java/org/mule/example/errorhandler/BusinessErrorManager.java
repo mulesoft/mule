@@ -33,7 +33,7 @@ public class BusinessErrorManager implements Callable
 
     public Object onCall(MuleEventContext context) throws MuleException
     {
-        ErrorMessage msg = (ErrorMessage)context.transformMessage();
+        ErrorMessage msg = (ErrorMessage)context.getMessage().getPayload();
         // Do something with the error message
         List msgs = new ArrayList();
 

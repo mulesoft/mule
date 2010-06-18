@@ -236,9 +236,9 @@ public class AjaxServletConnector extends ServletConnector
     }
 
     @Override
-    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
+    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
-        AjaxMessageReceiver receiver = (AjaxMessageReceiver)super.registerListener(service, endpoint);
+        AjaxMessageReceiver receiver = (AjaxMessageReceiver) super.createReceiver(service, endpoint);
         receiver.setBayeux(getBayeux());
         return receiver;
     }

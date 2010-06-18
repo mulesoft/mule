@@ -36,22 +36,14 @@ public class ArrayEntryPointResolver extends AbstractArgumentEntryPointResolver
     @Override
     protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
     {
-        Object temp;
-        if (isTransformFirst())
-        {
-            temp = context.transformMessage();
-        }
-        else
-        {
-            temp = context.getMessage().getPayload();
-        }
+        Object temp = context.getMessage().getPayload();
         if (temp instanceof Object[])
         {
             return new Object[]{temp};
         }
         else
         {
-            //Payload type not supported by this resolver
+            // Payload type not supported by this resolver
             return null;
         }
     }

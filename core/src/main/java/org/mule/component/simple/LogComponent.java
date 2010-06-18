@@ -33,7 +33,7 @@ public class LogComponent implements Callable, LogService
         msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
                         + StringMessageUtils.truncate(contents, 100, true) + "'");
         log(msg);
-        return context.transformMessage();
+        return context.getMessage();
     }
 
     public void log(String message)

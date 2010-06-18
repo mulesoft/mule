@@ -175,7 +175,6 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
     {
         final StringBuffer sb = new StringBuffer();
         sb.append("AnnotatedEntryPointResolver");
-        sb.append("{transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');
         return sb.toString();

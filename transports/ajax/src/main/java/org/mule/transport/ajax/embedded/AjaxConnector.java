@@ -206,12 +206,11 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     }
 
     @Override
-    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
+    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
-        MessageReceiver receiver = super.registerListener(service, endpoint);
+        MessageReceiver receiver =  super.createReceiver(service, endpoint);
         BayeuxHolder holder = registerBayeuxEndpoint(receiver.getEndpoint());
         ((AjaxMessageReceiver) receiver).setBayeux(holder.getBayeux());
-
         return receiver;
     }
 

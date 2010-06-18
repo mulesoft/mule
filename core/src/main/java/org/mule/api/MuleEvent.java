@@ -212,13 +212,6 @@ public interface MuleEvent
     boolean isSynchronous();
 
     /**
-     * Determines whether the was sent synchrounously or not
-     * 
-     * @param value true if the event is synchronous
-     */
-    void setSynchronous(boolean value);
-
-    /**
      * The number of milliseconds to wait for a return event when running
      * synchronously. 0 wait forever -1 try and receive, but do not wait or a
      * positive millisecond value

@@ -192,8 +192,8 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
     {
         OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "test://test");
-        endpoint.dispatch(getTestEvent("data", endpoint, false));
-        endpoint.dispatch(getTestEvent("data", endpoint, false));
+        endpoint.process(getTestEvent("data", endpoint, false));
+        endpoint.process(getTestEvent("data", endpoint, false));
     }
 
     public class DelayTestMessageDispatcher extends TestMessageDispatcher

@@ -15,7 +15,6 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -23,7 +22,6 @@ import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transaction.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -172,9 +170,4 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         }
     }
     
-    @Override
-    protected TransactionTemplate createTransactionTemplate(MuleSession session, ImmutableEndpoint endpoint)
-    {
-        return new TransactionTemplate(endpoint.getTransactionConfig(), null, muleContext);
-    }
 }

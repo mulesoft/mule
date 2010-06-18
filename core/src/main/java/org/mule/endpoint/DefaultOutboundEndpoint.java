@@ -12,7 +12,7 @@ package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -21,7 +21,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.DispatchException;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -72,18 +71,13 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
     }
 
-    public void dispatch(MuleEvent event) throws DispatchException
-    {
-        getConnector().dispatch(this, event);
-    }
-
-    public MuleMessage send(MuleEvent event) throws DispatchException
-    {
-        return getConnector().send(this, event);
-    }
-
     public List<String> getResponseProperties()
     {
         return responseProperties;
+    }
+
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        return getConnector().getOutboundEndpointMessageProcessor(this).process(event);
     }
 }

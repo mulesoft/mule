@@ -10,11 +10,12 @@
 
 package org.mule.api.endpoint;
 
+import org.mule.api.PatternAware;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transport.MessageRequesting;
 
-public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting
+public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting, MessageSource, PatternAware, Startable, Stoppable
 {
-    // no additional methods in this interface
 }
-
-

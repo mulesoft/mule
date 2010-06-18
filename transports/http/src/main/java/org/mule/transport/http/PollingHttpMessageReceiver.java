@@ -110,14 +110,21 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // We need to create an outbound endpoint to do the polled request using
             // send() as thats the only way we can customize headers and use eTags
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
-            // Must not use inbound transformers for the outbound request
+            // Must not use transformers
             endpointBuilder.setTransformers(Collections.EMPTY_LIST);
+            endpointBuilder.setResponseTransformers(Collections.EMPTY_LIST);
+            endpointBuilder.setSynchronous(true);
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }
         MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint, session, true);
 
-        MuleMessage message = connector.send(outboundEndpoint, event);
+        MuleEvent result = outboundEndpoint.process(event);
+        MuleMessage message = null;
+        if (result != null)
+        {
+            message = result.getMessage();
+        }
 
         if (message.getIntProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1) == 0 && discardEmptyContent)
         {

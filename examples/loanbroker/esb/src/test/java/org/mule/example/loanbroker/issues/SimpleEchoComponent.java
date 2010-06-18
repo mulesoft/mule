@@ -23,7 +23,7 @@ public class SimpleEchoComponent implements Callable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-        Object message = context.transformMessage();
+        Object message = context.getMessage().getPayload();
         logger.debug("received " + message);
 
         return message;

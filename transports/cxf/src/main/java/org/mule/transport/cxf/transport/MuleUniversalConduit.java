@@ -291,6 +291,10 @@ public class MuleUniversalConduit extends AbstractConduit
         MuleRegistry registry = connector.getMuleContext().getRegistry();
         OutboundEndpoint protocolEndpoint;
 
+
+        EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder(uri, connector.getMuleContext());
+        builder.setSynchronous(true);
+
         if (muleEndpoint == null)
         {
             // Someone is using a JAX-WS client directly and not going through
@@ -300,8 +304,6 @@ public class MuleUniversalConduit extends AbstractConduit
         else
         {
             // MuleClient/Dispatcher case
-            EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder(uri,
-                connector.getMuleContext());
             String connectorName = (String) muleEndpoint.getProperty("protocolConnector");
             if (connectorName != null)
             {
@@ -309,8 +311,8 @@ public class MuleUniversalConduit extends AbstractConduit
             }
             // Propagate responseTimeout to http endpoint.
             builder.setResponseTimeout(muleEndpoint.getResponseTimeout());
-            protocolEndpoint = registry.lookupEndpointFactory().getOutboundEndpoint(builder);
         }
+        protocolEndpoint = registry.lookupEndpointFactory().getOutboundEndpoint(builder);
         protocolEndpoints.put(uri, protocolEndpoint);
         return protocolEndpoint;
     }
@@ -454,15 +456,11 @@ public class MuleUniversalConduit extends AbstractConduit
         }
 
         MuleMessage msg = null;
-        if (muleEndpoint == null || muleEndpoint.isSynchronous())
+        MuleEvent result = protocolEndpoint.process(event);
+        if (result != null)
         {
-            msg = protocolEndpoint.send(event);
+            msg = result.getMessage();
         }
-        else
-        {
-            protocolEndpoint.dispatch(event);
-        }
-        
         // We need to grab this back in the CxfMessageDispatcher again.
         Holder<MuleMessage> holder = (Holder<MuleMessage>) exchange.get("holder");
         // it's null if there is no dispatcher and the Client is being used directly over Mule

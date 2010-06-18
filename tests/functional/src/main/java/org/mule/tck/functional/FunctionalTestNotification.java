@@ -62,7 +62,7 @@ public class FunctionalTestNotification extends CustomNotification
     public FunctionalTestNotification(MuleEventContext context, Object replyMessage, int action)
             throws TransformerException
     {
-        super(context.transformMessage(), action);
+        super(context.getMessage().getPayload(), action);
         resourceIdentifier = context.getService().getName();
         this.replyMessage = replyMessage;
         this.eventContext = context;

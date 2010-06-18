@@ -61,10 +61,10 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
             .lookupEndpointFactory()
             .getInboundEndpoint("ssl://localhost:30303");
 
-        connector.registerListener(service, endpoint2);
+        connector.registerListener(endpoint2, getNullMessageProcessor(), service);
         try
         {
-            connector.registerListener(service, endpoint2);
+            connector.registerListener(endpoint2, getNullMessageProcessor(), service);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

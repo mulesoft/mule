@@ -11,17 +11,17 @@
 package org.mule.api.transport;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
+import org.mule.api.Pattern;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.service.Service;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
@@ -35,25 +35,32 @@ public interface Connector extends Lifecycle, NamedObject
     int INT_VALUE_NOT_SET = -1;
 
     /**
-     * This creates a <code>MessageReceiver</code> associated with this endpoint
-     * and registers it with the connector
+     * Registers a MessageProcessor listener which will listen to new message
+     * received from a specific transport channel and then processed by the endpoint.
+     * Only a single listener can be registered for a given endpoints. Attempts to
+     * register a listener when one is already registered will fail.
      * 
-     * @param service the listening service
-     * @param endpoint the endpoint contains the listener endpointUri on which to
-     *            listen on.
-     * @throws Exception if the MessageReceiver cannot be created or the Receiver
-     *             cannot be registered
+     * @param endpoint defines both the transport and channel/resource uri as well
+     *            the processing (transformation/filtering) that should occur when
+     *            the endpoint processes a new message from the transport receiver.
+     * @param listener the listener that will be invoked when messages are received
+     *            on the endpoint.
+     * @param pattern reference to the runtime construct that the listener is part of
+     *            for use as context for logging, notifications and error handling.
+     * @throws Exception
      */
-    MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception;
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern)
+        throws Exception;
 
     /**
-     * @param service the listening service
-     * @param endpoint the associated endpointDescriptor with the listener
-     * @throws Exception if the listener cannot be unregistered. If a listener is not
-     *             associated with the given endpoint this will not throw an
-     *             exception
+     * Unregisters the listener for the given endpoints. This will mean that the
+     * listener that was registered for this endpoint will no longer receive any
+     * messages.
+     * 
+     * @param endpoint
+     * @throws Exception
      */
-    void unregisterListener(Service service, InboundEndpoint endpoint) throws Exception;
+    public void unregisterListener(InboundEndpoint endpoint) throws Exception;
 
     /**
      * @return true if the endpoint is started
@@ -146,14 +153,6 @@ public interface Connector extends Lifecycle, NamedObject
     boolean isSyncEnabled(String protocol);
 
     /**
-     * Dispatches an event from the endpoint to the external system
-     * 
-     * @param event The event to dispatch
-     * @throws DispatchException if the event fails to be dispatched
-     */
-    void dispatch(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException;
-
-    /**
      * Make a specific request to the underlying transport
      *
      * @param uri the endpoint uri to use when connecting to the resource
@@ -184,15 +183,6 @@ public interface Connector extends Lifecycle, NamedObject
     MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
     /**
-     * Sends an event from the endpoint to the external system
-     * 
-     * @param event The event to send
-     * @return event the response form the external system wrapped in a MuleEvent
-     * @throws DispatchException if the event fails to be dispatched
-     */
-    MuleMessage send(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException;
-
-    /**
      * Will get the output stream for this type of transport. Typically this
      * will be called only when Streaming is being used on an outbound endpoint.
      * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
@@ -209,4 +199,15 @@ public interface Connector extends Lifecycle, NamedObject
     MuleContext getMuleContext();
 
     RetryPolicyTemplate getRetryPolicyTemplate();
+
+    /**
+     * Returns a message processor chain that implements the outbound message flow
+     * for the given endpoint
+     * 
+     * @param endpoint the endpoint for which MessageProcessor should be returned
+     * @return
+     * @throws MuleException
+     */
+    MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException;
+
 }

@@ -20,6 +20,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
     public SmtpsConnectorTestCase()
     {
         super(ServerSetup.PROTOCOL_SMTPS, 50008);
+        setStartContext(true);
     }
 
     @Override

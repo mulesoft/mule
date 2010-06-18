@@ -148,17 +148,12 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         assertTrue(asyncXmlSplitter.isMatch(message));
         final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
         asyncXmlSplitter.route(message, (MuleSession) session.proxy());
         session.verify();
 
         message = new DefaultMuleMessage(payload, muleContext);
-
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
 
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);

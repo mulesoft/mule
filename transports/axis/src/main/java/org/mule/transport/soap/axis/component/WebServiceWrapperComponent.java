@@ -49,7 +49,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         {
             tempUrl = address;
         }
-        MuleMessage message = new DefaultMuleMessage(event.transformMessage(), muleContext);
+        MuleMessage message = event.getMessage();
 
         if (properties != null && properties.get(AxisConnector.SOAP_METHODS) != null)
         {

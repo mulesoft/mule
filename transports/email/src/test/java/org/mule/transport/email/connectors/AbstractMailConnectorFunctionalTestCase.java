@@ -10,6 +10,7 @@
 
 package org.mule.transport.email.connectors;
 
+import org.mule.transformer.NoActionTransformer;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 
@@ -63,6 +64,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     {
         super.doSetUp();
         startServers();
+        muleContext.getRegistry().registerObject("noActionTransformer",new NoActionTransformer());
     }
     
     @Override
@@ -127,10 +129,20 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     @Override
     public String getTestEndpointURI()
     {
-        return protocol + "://" + USER + ":" + PASSWORD + "@" + LOCALHOST + ":" + port +
-                "?connector=" + connectorName;
+        String uri = protocol + "://" + USER + ":" + PASSWORD + "@" + LOCALHOST + ":" + port + "?connector="
+                     + connectorName;
+        if (!transformInboundMessage())
+        {
+            uri = uri + "&transformers=noActionTransformer";
+        }
+        return uri;
     }
 
+    protected boolean transformInboundMessage()
+    {
+        return false;
+    }
+    
     protected void assertMessageOk(Object mailMessage) throws Exception
     {
         assertTrue("Did not receive a MimeMessage", mailMessage instanceof MimeMessage);

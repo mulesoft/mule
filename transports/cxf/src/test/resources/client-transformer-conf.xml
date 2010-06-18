@@ -13,7 +13,7 @@
     
     <cxf:endpoint 
         name="payloadTransformerClient" 
-        address="vm://in"
+        address="vm://in?synchronous=false"
         proxy="true"
         applyTransformersToProtocol="false"
         synchronous="false">
@@ -24,7 +24,7 @@
     
     <cxf:endpoint 
         name="protocolTransformerClient" 
-        address="vm://in"
+        address="vm://in?synchronous=false"
         proxy="true"
         applyTransformersToProtocol="true"
         synchronous="false">
@@ -33,7 +33,7 @@
         </transformers>
     </cxf:endpoint>
 
-    <model name="TestCxfModel">
+	<model name="TestCxfModel">
         <service name="echoService">
             <inbound>
                 <inbound-endpoint address="cxf:vm://service"/>

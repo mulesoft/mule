@@ -12,9 +12,13 @@ package org.mule.transport.email;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
@@ -27,6 +31,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
+import javax.mail.Flags;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
 
@@ -224,6 +231,34 @@ public abstract class AbstractMailConnector extends AbstractConnector
         {
             logger.debug("skipped " + skipped);
         }
+    }
+    
+    @Override
+    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    {
+        builder.replaceMessageProcessor(InboundFilterMessageProcessor.class,
+            new InboundFilterMessageProcessor()
+            {
+            
+                @Override
+                protected MuleMessage handleUnacceptedFilter(MuleMessage message, InboundEndpoint endpoint)
+                {
+                    super.handleUnacceptedFilter(message, endpoint);
+                    if (message.getPayload() instanceof Message)
+                    {
+                        Message msg = (Message) message.getPayload();
+                        try
+                        {
+                            msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
+                        }
+                        catch (MessagingException e)
+                        {
+                            logger.error("failed to set message deleted: " + e.getMessage(), e);
+                        }
+                    }
+                    return message;
+                }
+            });
     }
     
     // supply these here because sub-classes are very simple

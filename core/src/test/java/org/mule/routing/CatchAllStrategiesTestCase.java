@@ -44,7 +44,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
     public void testLoggingOnlyStrategy() throws Exception
     {
-        //Just test it works without failure
+        // Just test it works without failure
         MuleEvent event = getTestEvent("UncaughtEvent");
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
         strategy.catchMessage(event.getMessage(), null);
@@ -57,15 +57,14 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(MessageDispatcher.class);
         Mock connector = MuleTestUtils.getMockConnector();
         MuleEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((OutboundEndpoint)endpoint.proxy());
+        strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
 
-        endpoint.expectAndReturn("isSynchronous", false);
-        endpoint.expectAndReturn("isSynchronous", false);
+        endpoint.expectAndReturn("isSynchronous", true);
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
-        endpoint.expect("dispatch", C.isA(DefaultMuleEvent.class));
+        endpoint.expect("process", C.isA(DefaultMuleEvent.class));
 
         strategy.catchMessage(event.getMessage(), null);
 
@@ -85,7 +84,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         strategy.setEndpoint(null);
         MuleEvent event = getTestEvent("UncaughtEvent");
         MuleSession session = getTestSession(getTestService(), muleContext);
-     
+
         try
         {
             strategy.catchMessage(event.getMessage(), session);
@@ -96,14 +95,14 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             // we expected this exception
         }
     }
-    
+
     private static class TestEventTransformer extends AbstractTransformer
     {
         public TestEventTransformer()
         {
             super();
         }
-        
+
         @Override
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
@@ -121,16 +120,14 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         MuleEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
 
-        endpoint.expectAndReturn("isSynchronous", true);
-        endpoint.expectAndReturn("isSynchronous", true);
-
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
+        endpoint.expectAndReturn("isSynchronous", true);
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
-        endpoint.expect("send", new Constraint()
+        endpoint.expect("process", new Constraint()
         {
             public boolean eval(Object object)
             {

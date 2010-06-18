@@ -367,14 +367,7 @@ public abstract class AbstractExceptionListener
                 new DefaultMuleSession(muleContext), true);
             exceptionEvent = RequestContext.setEvent(exceptionEvent);
 
-            if (endpoint.isSynchronous())
-            {
-                endpoint.send(exceptionEvent);
-            }
-            else
-            {
-                endpoint.dispatch(exceptionEvent);
-            }
+            endpoint.process(exceptionEvent);
 
             if (logger.isDebugEnabled())
             {
@@ -392,20 +385,6 @@ public abstract class AbstractExceptionListener
         // on exception strategies.
         MulticastingRouter router = new MulticastingRouter()
         {
-            @Override
-            protected TransactionTemplate createTransactionTemplate(MuleSession session,
-                                                                    ImmutableEndpoint endpoint)
-            {
-                return new TransactionTemplate(endpoint.getTransactionConfig(), new ExceptionListener()
-                {
-                    public void exceptionThrown(Exception e)
-                    {
-                        // Log only, do not handle exception.
-                        logException(e);
-                    }
-                }, muleContext);
-            }
-
             @Override
             protected void setMessageProperties(MuleSession session,
                                                 MuleMessage message,

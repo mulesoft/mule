@@ -27,7 +27,7 @@ public class Kiwi implements Fruit
 
     public void handle(MuleEventContext eventContext) throws Exception
     {
-        final Object payload = eventContext.transformMessage();
+        final Object payload = eventContext.getMessage().getPayload();
         if (payload instanceof FruitLover)
         {
             this.bite();

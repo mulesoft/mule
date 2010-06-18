@@ -103,7 +103,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         if(isDoInboundTransform())
         {
-            Object o = context.transformMessage();
+            Object o = context.getMessage().getPayload();
             if(getAppendString()!=null && !(o instanceof String))
             {
                 o = context.transformMessageToString();

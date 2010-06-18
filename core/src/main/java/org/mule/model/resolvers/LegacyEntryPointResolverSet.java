@@ -12,6 +12,8 @@ package org.mule.model.resolvers;
 /**
  * An {@link org.mule.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
+ * <b>NOTE:</b> Since 3.0 this legacy entry point resolver will always invoked after message transformation 
+ * and not before.
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
@@ -26,7 +28,6 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
         addEntryPointResolver(preTransformResolver);
 
         ReflectionEntryPointResolver postTransformResolver = new ReflectionEntryPointResolver();
-        postTransformResolver.setTransformFirst(false);
         //In Mule 1.x you could call setXX methods as service methods by default
         postTransformResolver.removeIgnoredMethod("set*");
         addEntryPointResolver(postTransformResolver);

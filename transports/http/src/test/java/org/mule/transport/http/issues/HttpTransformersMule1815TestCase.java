@@ -57,13 +57,14 @@ public class HttpTransformersMule1815TestCase extends FunctionalTestCase
     }
 
     /**
-     * Transformers on the adapted model should be ignored
+     * Change in behaviour: transformers are now always applied as part of inbound flow even if component doesn't invoke them.
+     * was: Transformers on the adapted model should be ignored
      *
      * @throws Exception
      */
     public void testIgnored() throws Exception
     {
-        assertEquals(OUTBOUND_MESSAGE + " Received",
+        assertEquals(OUTBOUND_MESSAGE +" transformed" +" transformed 2" + " Received",
                 sendTo("ignored").getPayloadAsString());
     }
 

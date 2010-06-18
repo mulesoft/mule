@@ -24,7 +24,7 @@ public class EchoComponent extends LogComponent implements EchoService
     public Object onCall(MuleEventContext context) throws Exception
     {
         super.onCall(context);
-        return context.transformMessage();
+        return context.getMessage();
     }
 
     public String echo(String echo)

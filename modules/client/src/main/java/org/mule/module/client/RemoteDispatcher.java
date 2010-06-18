@@ -107,8 +107,13 @@ public class RemoteDispatcher implements Disposable
     protected WireFormat requestWireFormat() throws MuleException
     {
         MuleMessage msg = new DefaultMuleMessage(ServerHandshake.SERVER_HANDSHAKE_PROPERTY, muleContext);
-        MuleMessage result = syncServerEndpoint.send(new DefaultMuleEvent(msg, syncServerEndpoint,
-                new DefaultMuleSession(muleContext), true));
+        MuleMessage result = null;
+        MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg, syncServerEndpoint,
+            new DefaultMuleSession(muleContext), true));
+        if (resultEvent != null)
+        {
+            result = resultEvent.getMessage();
+        }
 
         if(result==null)
         {
@@ -372,18 +377,15 @@ public class RemoteDispatcher implements Disposable
                          + serverEndpoint.toString() + " . Event is: " + event);
         }
 
-        MuleMessage result;
+
+        MuleMessage result = null;
 
         try
         {
-            if (synchronous)
+            MuleEvent resultEvent = serverEndpoint.process(event);
+            if (resultEvent != null)
             {
-                result = serverEndpoint.send(event);
-            }
-            else
-            {
-                serverEndpoint.dispatch(event);
-                return null;
+                result = resultEvent.getMessage();
             }
 
             if (result != null && result.getPayload() != null)

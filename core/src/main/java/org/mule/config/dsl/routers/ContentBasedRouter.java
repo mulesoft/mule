@@ -11,6 +11,8 @@ package org.mule.config.dsl.routers;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -27,15 +29,31 @@ public class ContentBasedRouter extends AbstractOutboundRouter
         {
             if(isMatch(message))
             {
-                DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous());
-                if(endpoint.isSynchronous())
+                try
                 {
-                    return endpoint.send(event);
+                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous());
+                    if(endpoint.isSynchronous())
+                    {
+                        MuleEvent resultEvent;
+                        resultEvent = endpoint.process(event);
+                        if (resultEvent != null)
+                        {
+                            return resultEvent.getMessage();
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        endpoint.process(event);
+                        return null;
+                    }
                 }
-                else
+                catch (MuleException e)
                 {
-                    endpoint.dispatch(event);
-                    return null;
+                    throw new MessagingException(e.getI18nMessage(), message, e);
                 }
             }
         }
@@ -54,6 +72,4 @@ public class ContentBasedRouter extends AbstractOutboundRouter
         }
         return false;
     }
-
-
 }

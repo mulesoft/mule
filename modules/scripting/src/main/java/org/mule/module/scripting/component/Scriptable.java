@@ -216,16 +216,7 @@ public class Scriptable implements Initialisable, MuleContextAware
     {
         populateBindings(bindings, event.getMessage());
         bindings.put("originalPayload", event.getMessage().getPayload());
-
-        try
-        {
-            bindings.put("payload", event.transformMessage());
-        }
-        catch (TransformerException e)
-        {
-            logger.warn(e);
-        }
-        
+        bindings.put("payload", event.getMessage().getPayload());
         bindings.put("eventContext", new DefaultMuleEventContext(event));
         bindings.put("id", event.getId());
         bindings.put("service", event.getService());

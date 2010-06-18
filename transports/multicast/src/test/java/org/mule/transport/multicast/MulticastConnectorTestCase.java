@@ -48,10 +48,10 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             .lookupEndpointFactory()
             .getInboundEndpoint("multicast://228.2.3.4:10100");
 
-        connector.registerListener(service, endpoint2);
+        connector.registerListener(endpoint2, getNullMessageProcessor(), service);
         try
         {
-            connector.registerListener(service, endpoint2);
+            connector.registerListener(endpoint2, getNullMessageProcessor(), service);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

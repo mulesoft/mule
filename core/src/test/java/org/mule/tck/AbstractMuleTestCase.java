@@ -13,6 +13,7 @@ package org.mule.tck;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
@@ -20,6 +21,7 @@ import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
@@ -54,9 +56,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -910,6 +914,34 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     protected void initialiseObject(Object o) throws RegistrationException
     {
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
+    }
+    
+    public SensingNullMessageProcessor getNullMessageProcessor()
+    {
+        return new SensingNullMessageProcessor();
+    }
+    
+    public class SensingNullMessageProcessor implements MessageProcessor
+    {
+        public MuleEvent event;
+
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            this.event = event;
+            if (event.getEndpoint().isSynchronous())
+            {
+                return event;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+        public void clear()
+        {
+            event = null;
+        }
     }
 
 }

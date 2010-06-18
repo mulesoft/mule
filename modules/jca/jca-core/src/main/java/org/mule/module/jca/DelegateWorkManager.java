@@ -11,6 +11,7 @@
 package org.mule.module.jca;
 
 import org.mule.api.MuleException;
+import org.mule.config.ImmutableThreadingProfile;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
@@ -118,6 +119,11 @@ public class DelegateWorkManager implements org.mule.api.context.WorkManager
         {
             command.run();
         }
+    }
+
+    public ImmutableThreadingProfile getThreadingProfile()
+    {
+        throw new UnsupportedOperationException("Container does not have a Mule ThreadingProfile");
     }
 
 }

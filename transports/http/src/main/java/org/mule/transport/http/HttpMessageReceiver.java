@@ -104,18 +104,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return true;
     }
 
-    @Override
-    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Message request '" + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
-                    + "' is being rejected since it does not match the filter on this endpoint: " + endpoint);
-        }
-        message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
-        return message;
-    }
-
     @SuppressWarnings("synthetic-access")
     protected class HttpWorker implements Work, Expirable
     {
@@ -255,7 +243,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
 
                 preRouteMessage(message);
-                MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
+                MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous());
 
                 Object tempResponse;
                 if (returnMessage != null)

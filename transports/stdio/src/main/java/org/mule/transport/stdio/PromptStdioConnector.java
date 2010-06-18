@@ -13,12 +13,12 @@ package org.mule.transport.stdio;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.Pattern;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 
@@ -197,15 +197,14 @@ public class PromptStdioConnector extends StdioConnector
         return this;
     }
 
-    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern) throws Exception
     {
         if (receivers.size() > 0)
         {
             throw new UnsupportedOperationException(
                 "You can only register one listener per system stream connector");
         }
-        MessageReceiver receiver = super.registerListener(service, endpoint);
-        return receiver;
+        super.registerListener(endpoint, listener, pattern);
     }
 
     public long getMessageDelayTime()

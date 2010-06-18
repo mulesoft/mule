@@ -12,6 +12,7 @@ package org.mule.api.context;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
+import org.mule.config.ImmutableThreadingProfile;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
@@ -23,4 +24,6 @@ public interface WorkManager extends javax.resource.spi.work.WorkManager, Starta
 {
     /** Is the WorkManager ready to accept work? */
     public boolean isStarted();
+    
+    public ImmutableThreadingProfile getThreadingProfile();
 }

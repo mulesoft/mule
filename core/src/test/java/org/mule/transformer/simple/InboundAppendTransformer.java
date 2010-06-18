@@ -14,10 +14,11 @@ import org.mule.transformer.simple.StringAppendTransformer;
 
 public class InboundAppendTransformer  extends StringAppendTransformer
 {
+    public static String APPEND_STRING = " inbound";
 
     public InboundAppendTransformer()
     {
-        super(" inbound");
+        super(APPEND_STRING);
     }
 
 }

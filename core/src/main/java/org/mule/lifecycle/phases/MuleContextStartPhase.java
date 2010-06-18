@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.DefaultLifecyclePhase;
 import org.mule.lifecycle.LifecycleObject;
@@ -49,7 +50,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
 {
     public MuleContextStartPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class});
+        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class});
     }
 
     public MuleContextStartPhase(Class<?>[] ignorredObjects)

@@ -21,11 +21,10 @@ import java.util.concurrent.TimeUnit;
  * Tests large requests sent to the proxy and back.
  *
  * @author lenhag
- * @version $Id$
  */
 public class LargeProxyTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "largeproxytest-config.xml";
@@ -91,6 +90,4 @@ public class LargeProxyTestCase extends FunctionalTestCase
 
         latch.await(60000, TimeUnit.SECONDS);
     }
-
-
 }

@@ -62,9 +62,9 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();
-        recipients.add("vm://service4?responseTransformers=validateResponse");
-        recipients.add("vm://service5?responseTransformers=validateResponse");
-        recipients.add("vm://service6?responseTransformers=validateResponse");
+        recipients.add("vm://service4?responseTransformers=validateResponse&synchronous=true");
+        recipients.add("vm://service5?responseTransformers=validateResponse&synchronous=true");
+        recipients.add("vm://service6?responseTransformers=validateResponse&synchronous=true");
         props.put("recipients", recipients);
         MuleMessage reply = client.send("vm://in3", "request", props);
         assertNotNull(reply);
@@ -80,8 +80,8 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();
-        recipients.add("vm://service998");
-        recipients.add("vm://service5");
+        recipients.add("vm://service998?synchronous=true");
+        recipients.add("vm://service5?synchronous=true");
         recipients.add("vm://service999");
         props.put("recipients", recipients);
         MuleMessage reply = client.send("vm://in3", "request", props);

@@ -147,7 +147,6 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         final StringBuffer sb = new StringBuffer();
         sb.append("MethodHeaderPropertyEntryPointResolver");
         sb.append("{methodHeader=").append(methodProperty);
-        sb.append(", transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');
         return sb.toString();

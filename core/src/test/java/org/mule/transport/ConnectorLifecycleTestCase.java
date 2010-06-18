@@ -16,8 +16,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.DispatchException;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -263,7 +261,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     public void testReceiversLifecycle() throws Exception
     {
-        connector.registerListener(getTestService(), getTestInboundEndpoint("in", "test://in"));
+        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getNullMessageProcessor(), getTestService());
 
         assertEquals(1, connector.receivers.size());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
@@ -273,7 +271,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        connector.registerListener(getTestService(), getTestInboundEndpoint("in2", "test://in2"));
+        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getNullMessageProcessor(), getTestService());
 
         assertEquals(2, connector.receivers.size());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
@@ -305,7 +303,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     public void testReceiversServiceLifecycle() throws Exception
     {
         Service service = getTestService();
-        service.setInboundRouter(new DefaultInboundRouterCollection());
         InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
         service.getInboundRouter().addEndpoint(endpoint);
         connector = (TestConnector) endpoint.getConnector();
@@ -346,13 +343,13 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         // This should fail because the connector is not started!
         try
         {
-            connector.send(out, getTestEvent("data"));
+            out.process(getTestEvent("data"));
             fail("cannot sent on a connector that is not started");
         }
-        catch (DispatchException e)
+        catch (LifecycleException e)
         {
             //Expected
-            assertTrue(e.getCause() instanceof LifecycleException);
+            //assertTrue(e.getCause() instanceof LifecycleException);
         }
 
         assertEquals(0, connector.dispatchers.getNumIdle());
@@ -364,9 +361,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertDispatcherStartedConntected(out, true, true);
 
         OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
-        connector.send(out2, getTestEvent("data"));
+        out2.process(getTestEvent("data"));
 
-        assertEquals(2, connector.dispatchers.getNumIdle());
+
+        assertEquals(1, connector.dispatchers.getNumIdle());
         assertDispatcherStartedConntected(out, true, true);
         assertDispatcherStartedConntected(out2, true, true);
 
@@ -382,7 +380,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
          assertDispatcherStartedConntected(out, true, true);
          assertDispatcherStartedConntected(out2, true, true);
 
-        connector.send(out, getTestEvent("data"));
+        out.process(getTestEvent("data"));
         assertEquals(2, connector.dispatchers.getNumIdle());
         assertDispatcherStartedConntected(out, true, true);
 

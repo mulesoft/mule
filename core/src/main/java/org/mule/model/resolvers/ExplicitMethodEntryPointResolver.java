@@ -99,7 +99,6 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
         final StringBuffer sb = new StringBuffer();
         sb.append("ExplicitMethodEntryPointResolver");
         sb.append("{methods=").append(StringMessageUtils.toString(methods));
-        sb.append("{transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');
         return sb.toString();

@@ -16,6 +16,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transaction.Transaction;
 
 import java.io.OutputStream;
@@ -31,7 +32,7 @@ import java.io.OutputStream;
  * data from the external system. For example, the file endpoint will poll a
  * specified directory for its data.
  */
-public interface MessageReceiver extends Connectable
+public interface MessageReceiver extends Connectable, MessageSource
 {
     /**
      * @return the endpoint from which we are receiving events 
@@ -63,11 +64,6 @@ public interface MessageReceiver extends Connectable
     MuleMessage routeMessage(MuleMessage message, boolean synchronous) throws MuleException;
 
     MuleMessage routeMessage(MuleMessage message, Transaction trans, boolean synchronous)
-            throws MuleException;
-
-    MuleMessage routeMessage(MuleMessage message, OutputStream outputStream) throws MuleException;
-
-    MuleMessage routeMessage(MuleMessage message, boolean synchronous, OutputStream outputStream)
         throws MuleException;
 
     MuleMessage routeMessage(MuleMessage message,

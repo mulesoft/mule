@@ -10,10 +10,9 @@
 
 package org.mule.api.routing;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.InterceptingMessageProcessor;
 
 import java.util.List;
 
@@ -21,17 +20,15 @@ import java.util.List;
  * <code>DefaultInboundRouterCollection</code> manages a collection of inbound routers.
  */
 
-public interface InboundRouterCollection extends RouterCollection
+public interface InboundRouterCollection extends RouterCollection, InterceptingMessageProcessor
 {
-    MuleMessage route(MuleEvent event) throws MessagingException;
-
     void addRouter(InboundRouter router);
 
     InboundRouter removeRouter(InboundRouter router);
 
-    void addEndpoint(InboundEndpoint endpoint);
+    void addEndpoint(InboundEndpoint endpoint) throws MuleException;
 
-    boolean removeEndpoint(InboundEndpoint endpoint);
+    boolean removeEndpoint(InboundEndpoint endpoint) throws MuleException;
 
     List<InboundEndpoint> getEndpoints();
 
@@ -42,5 +39,5 @@ public interface InboundRouterCollection extends RouterCollection
      */
     InboundEndpoint getEndpoint(String name);
 
-    void setEndpoints(List<InboundEndpoint> endpoints);
+    void setEndpoints(List<InboundEndpoint> endpoints) throws MuleException;
 }

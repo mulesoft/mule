@@ -41,6 +41,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public SmtpConnectorTestCase()
     {
         this(ServerSetup.PROTOCOL_SMTP, 50007);
+        setStartContext(true);
     } 
     
     public SmtpConnectorTestCase(String protocol, int port)
@@ -53,6 +54,12 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         SmtpConnector c = new SmtpConnector(muleContext);
         c.setName("SmtpConnector");
         return c;
+    }
+    
+    @Override
+    protected boolean transformInboundMessage()
+    {
+        return true;
     }
 
     /**
@@ -74,7 +81,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
             builder);
         try
         {
-            connector.registerListener(service, endpoint);
+            connector.registerListener(endpoint, getNullMessageProcessor(), service);
             fail("SMTP connector does not accept listeners");
         }
         catch (Exception e)
@@ -98,7 +105,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         MuleSession session = getTestSession(getTestService("apple", Apple.class), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true, new ResponseOutputStream(System.out));
-        endpoint.dispatch(event);
+        endpoint.process(event);
 
         getServers().waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
         MimeMessage[] messages = getServers().getReceivedMessages();

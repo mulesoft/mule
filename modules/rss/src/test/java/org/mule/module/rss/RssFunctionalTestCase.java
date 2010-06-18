@@ -21,7 +21,7 @@ public class RssFunctionalTestCase extends FunctionalTestCase
     public void testRSS() throws Exception
     {
         //lets wait to read the feed
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         RssEntryCounterComponent component = (RssEntryCounterComponent) this.getComponent("rssTester");
         assertTrue(component.getCount() > 2);
 

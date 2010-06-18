@@ -48,10 +48,10 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
             .lookupEndpointFactory()
             .getInboundEndpoint("udp://localhost:3456");
 
-        connector.registerListener(service, endpoint2);
+        connector.registerListener(endpoint2, getNullMessageProcessor(), service);
         try
         {
-            connector.registerListener(service, endpoint2);
+            connector.registerListener(endpoint2, getNullMessageProcessor(), service);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

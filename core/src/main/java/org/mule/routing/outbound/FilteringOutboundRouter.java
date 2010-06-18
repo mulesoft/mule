@@ -161,7 +161,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         else
         {
             OutboundEndpoint ep = endpoints.get(index);
-            String uri = ep.getEndpointURI().toString();
+            String uri = ep.getEndpointURI().getUri().toString();
 
             if (logger.isDebugEnabled())
             {

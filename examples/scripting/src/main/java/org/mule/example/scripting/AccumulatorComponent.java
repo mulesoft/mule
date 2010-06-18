@@ -29,7 +29,7 @@ public class AccumulatorComponent implements Callable
     
     public Object onCall(MuleEventContext context) throws Exception
     {
-        Object msg = context.transformMessage();
+        Object msg = context.getMessage().getPayload();
 
         double data = NumberUtils.toDouble(msg);
         if (data == NumberUtils.DOUBLE_ERROR)

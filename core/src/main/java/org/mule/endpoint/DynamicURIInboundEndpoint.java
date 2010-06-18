@@ -11,14 +11,19 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.Pattern;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +38,8 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     private InboundEndpoint endpoint;
     private EndpointURI dynamicEndpointURI;
+    private MessageProcessor listener;
+    private Pattern pattern;
 
     public DynamicURIInboundEndpoint(InboundEndpoint endpoint)
     {
@@ -220,6 +227,40 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
             return false;
         }
         return true;
+    }
+
+    public void start() throws MuleException
+    {
+        try
+        {
+            getConnector().registerListener(this, listener, pattern);
+        }
+        catch (Exception e)
+        {
+            throw new LifecycleException(CoreMessages.failedToStartInboundEndpoint(this), e, this);
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        try
+        {
+            getConnector().unregisterListener(this);
+        }
+        catch (Exception e)
+        {
+            throw new LifecycleException(CoreMessages.failedToStartInboundEndpoint(this), e, this);
+        }
+    }
+
+    public void setPattern(Pattern pattern)
+    {
+        this.pattern = pattern;
+    }
+
+    public void setListener(MessageProcessor listener)
+    {
+        this.listener = listener;
     }
 
 }

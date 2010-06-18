@@ -71,7 +71,6 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
     {
         Router r = lookupInboundRouterFromService("SelectiveConsumerRouter");
         assertTrue(r instanceof SelectiveConsumer);
-        assertFalse(((SelectiveConsumer) r).isTransformFirst());
     }
 
     protected Router lookupInboundRouterFromService(String serviceName) throws Exception

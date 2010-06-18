@@ -60,22 +60,17 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 
             MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, getEndpoint().isSynchronous());
 
-            if (getEndpoint().isSynchronous())
+            MuleEvent result = endpoint.process(newEvent);
+            if (statistics != null)
             {
-                MuleMessage result = endpoint.send(newEvent);
-                if (statistics != null)
-                {
-                    statistics.incrementRoutedMessage(getEndpoint());
-                }
-                return result;
+                statistics.incrementRoutedMessage(getEndpoint());
+            }
+            if (result != null)
+            {
+                return result.getMessage();
             }
             else
             {
-                endpoint.dispatch(newEvent);
-                if (statistics != null)
-                {
-                    statistics.incrementRoutedMessage(getEndpoint());
-                }
                 return null;
             }
         }

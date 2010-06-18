@@ -10,16 +10,13 @@
 
 package org.mule.transformer.simple;
 
-import org.mule.transformer.simple.StringAppendTransformer;
-
-public class ResponseAppendTransformer  extends StringAppendTransformer
+public class ResponseAppendTransformer extends StringAppendTransformer
 {
+    public static String APPEND_STRING = " response";
 
     public ResponseAppendTransformer()
     {
-        super(" response");
+        super(APPEND_STRING);
     }
 
 }
-
-

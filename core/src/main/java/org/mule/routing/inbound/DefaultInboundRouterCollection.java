@@ -10,19 +10,21 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
+import org.mule.source.StartablePatternAwareCompositeMessageSource;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -38,10 +40,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
  * current event for the event to be routed.
  */
 
-public class DefaultInboundRouterCollection extends AbstractRouterCollection implements InboundRouterCollection
+public class DefaultInboundRouterCollection extends AbstractRouterCollection
+    implements InboundRouterCollection
 {
+    
+    protected CompositeMessageSource sourceAggregator = new StartablePatternAwareCompositeMessageSource();
+    
     @SuppressWarnings("unchecked")
     private final List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();
+
+    private MessageProcessor listener;
 
     public DefaultInboundRouterCollection()
     {
@@ -50,23 +58,8 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         setMatchAll(true);
     }
 
-    public MuleMessage route(MuleEvent event) throws MessagingException
+    public MuleEvent process(MuleEvent event) throws MessagingException
     {
-        // If the endpoint has a logical name, use it, otherwise use the URI.
-        String inboundEndpoint = event.getEndpoint().getName();            
-
-        if (StringUtils.isBlank(inboundEndpoint))
-        {
-            // Global endpoint
-            inboundEndpoint = event.getEndpoint().getName();
-        }
-        if (StringUtils.isBlank(inboundEndpoint))
-        {
-            // URI
-            inboundEndpoint = event.getEndpoint().getEndpointURI().getUri().toString();
-        }
-        event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
-
         if (endpoints.size() > 0 && routers.size() == 0)
         {
             addRouter(new InboundPassThroughRouter());
@@ -134,8 +127,16 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                         {
                             getStatistics().incrementCaughtMessage();
                         }
-                        return getCatchAllStrategy().catchMessage(event.getMessage(), event.getSession());
-
+                        MuleMessage result = getCatchAllStrategy().catchMessage(event.getMessage(),
+                            event.getSession());
+                        if (result != null)
+                        {
+                            return new DefaultMuleEvent(result, event);
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                     else
                     {
@@ -162,7 +163,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
             {
                 try
                 {
-                    MuleMessage messageResult = null;
+                    MuleEvent messageResult = null;
                     /*
                         DON'T CHANGE THIS ITERATOR TYPE.
                         Looks like Iterator and Iterable for LinkedHashMap have different order.
@@ -172,21 +173,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                     for (Iterator iterator = eventsToRoute.values().iterator(); iterator.hasNext();)
                     {
                         MuleEvent eventToRoute = (MuleEvent) iterator.next();
-
-                        // Set the originating endpoint so we'll know where this event came from further down the pipeline.
-                        if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null)
-                        {
-                            event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
-                        }
-
-                        if (event.isSynchronous())
-                        {
-                            messageResult = send(eventToRoute);
-                        }
-                        else
-                        {
-                            dispatch(eventToRoute);
-                        }
+                        messageResult = listener.process(eventToRoute);
                         // Update stats
                         if (getStatistics().isEnabled())
                         {
@@ -201,11 +188,13 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 }
             }
         }
-        if(event.isSynchronous())
+        if (event.isSynchronous())
         {
-            //This is required if the Router short-circuits the service and diverts processing elsewhere
-            //The only example of this right now is the FowardingConsumer (<forwarding-router/>)
-            return (lastEvent == null ? null : lastEvent.getMessage());
+            // This is required if the Router short-circuits the service and diverts
+            // processing elsewhere
+            // The only example of this right now is the FowardingConsumer
+            // (<forwarding-router/>)
+            return lastEvent;
         }
         else
         {
@@ -241,13 +230,15 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         }
     }
 
-    public void addEndpoint(InboundEndpoint endpoint)
+    public void addEndpoint(InboundEndpoint endpoint) throws MuleException
     {
         endpoints.add(endpoint);
+        sourceAggregator.addSource(endpoint);
     }
 
-    public boolean removeEndpoint(InboundEndpoint endpoint)
+    public boolean removeEndpoint(InboundEndpoint endpoint) throws MuleException
     {
+        sourceAggregator.removeSource(endpoint);
         return endpoints.remove(endpoint);
     }
 
@@ -256,12 +247,19 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         return endpoints;
     }
 
-    public void setEndpoints(List<InboundEndpoint> endpoints)
+    public void setEndpoints(List<InboundEndpoint> endpointList) throws MuleException
     {
         if (endpoints != null)
         {
+            for (InboundEndpoint endpoint : endpoints)
+            {
+                removeEndpoint(endpoint);
+            }
             this.endpoints.clear();
-            this.endpoints.addAll(endpoints);
+            for (InboundEndpoint endpoint : endpointList)
+            {
+                addEndpoint(endpoint);
+            }
         }
         else
         {
@@ -286,4 +284,14 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         
         return null;
     }
+
+    public void setListener(MessageProcessor listener)
+    {
+        this.listener = listener;
+    }
+
+    public CompositeMessageSource getSourceAggregator()
+    {
+        return sourceAggregator;
+    }    
 }

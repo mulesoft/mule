@@ -10,14 +10,13 @@
 
 package org.mule.transformer.simple;
 
-import org.mule.transformer.simple.StringAppendTransformer;
-
 public class OutboundAppendTransformer extends StringAppendTransformer
 {
+    public static String APPEND_STRING = " outbound";
 
     public OutboundAppendTransformer()
     {
-        super(" outbound");
+        super(APPEND_STRING);
     }
 
 }

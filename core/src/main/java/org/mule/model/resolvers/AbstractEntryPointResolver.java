@@ -36,24 +36,12 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     /** logger used by this class */
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    private boolean transformFirst = true;
-
     private boolean acceptVoidMethods = false;
 
     private boolean synchronizeCall = false;
 
     // @GuardedBy(itself)
     protected final ConcurrentHashMap methodCache = new ConcurrentHashMap(4);
-
-    public boolean isTransformFirst()
-    {
-        return transformFirst;
-    }
-
-    public void setTransformFirst(boolean transformFirst)
-    {
-        this.transformFirst = transformFirst;
-    }
 
     public boolean isAcceptVoidMethods()
     {
@@ -116,15 +104,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
     {
-        Object temp;
-        if (isTransformFirst())
-        {
-            temp = context.transformMessage();
-        }
-        else
-        {
-            temp = context.getMessage().getPayload();
-        }
+        Object temp = context.getMessage().getPayload();
         if (temp instanceof Object[])
         {
             return (Object[]) temp;
@@ -192,7 +172,6 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     {
         final StringBuffer sb = new StringBuffer();
         sb.append("AbstractEntryPointResolver");
-        sb.append("{transformFirst=").append(transformFirst);
         sb.append(", acceptVoidMethods=").append(acceptVoidMethods);
         sb.append('}');
         return sb.toString();

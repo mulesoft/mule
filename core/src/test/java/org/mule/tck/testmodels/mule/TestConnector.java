@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
@@ -190,5 +191,11 @@ public class TestConnector extends AbstractConnector
     public int getDisposeCount() 
     {
         return disposeCount;
+    }
+    
+    public MessageProcessor createInboundEndpointMessageProcessorChain(InboundEndpoint endpoint,
+                                                                       MessageProcessor listener)
+    {
+        return super.createInboundEndpointMessageProcessorChain(endpoint, listener);
     }
 }

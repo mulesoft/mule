@@ -10,7 +10,6 @@
 
 package org.mule.transport.cxf.component;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -43,7 +42,6 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         {
             tempUrl = address;
         }
-        MuleMessage message = new DefaultMuleMessage(event.transformMessage(), muleContext);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("cxf:" + tempUrl, muleContext);
         if (wsdlPort != null)
@@ -59,7 +57,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 
-        MuleMessage result = event.getSession().sendEvent(message, endpoint);
+        MuleMessage result = event.getSession().sendEvent(event.getMessage(), endpoint);
         return result;
     }
 

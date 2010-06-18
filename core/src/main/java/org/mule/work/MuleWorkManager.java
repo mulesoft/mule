@@ -34,6 +34,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.work.WorkExecutor;
+import org.mule.config.ImmutableThreadingProfile;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -48,6 +49,7 @@ import javax.resource.spi.work.WorkListener;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -279,5 +281,10 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
         {
             threadingProfile.setMuleContext(muleContext);
         }
+    }
+    
+    public ImmutableThreadingProfile getThreadingProfile()
+    {
+        return new ImmutableThreadingProfile(threadingProfile);
     }
 }

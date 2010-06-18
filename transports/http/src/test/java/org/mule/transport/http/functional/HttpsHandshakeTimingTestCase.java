@@ -19,6 +19,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsMessageReceiver;
@@ -120,7 +121,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
         
         Mock mockService = new Mock(Service.class);
         mockService.expectAndReturn("getResponseRouter", null);
-        mockService.expectAndReturn("getResponseRouter", null);
+        mockService.expectAndReturn("getInboundRouter", new DefaultInboundRouterCollection());
         Service service = (Service) mockService.proxy();
         
         MockHttpsMessageReceiver messageReceiver = new MockHttpsMessageReceiver(httpsConnector, service, inboundEndpoint);

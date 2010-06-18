@@ -13,14 +13,17 @@ package org.mule.transport.http;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.Pattern;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transport.tcp.TcpConnector;
 
 import java.io.UnsupportedEncodingException;
@@ -180,7 +183,7 @@ public class HttpConnector extends TcpConnector
      * @see Connector#registerListener(Service, InboundEndpoint)
      */
     @Override
-    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern) throws Exception
     {
         if (endpoint != null)
         {
@@ -207,7 +210,7 @@ public class HttpConnector extends TcpConnector
             }
         }
         // proceed as usual
-        return super.registerListener(service, endpoint);
+        super.registerListener(endpoint, listener, pattern);
     }
 
     /**
@@ -395,6 +398,29 @@ public class HttpConnector extends TcpConnector
             url = "/" + url;
         }
         return url;
+    }
+    
+    @Override
+    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    {
+        builder.replaceMessageProcessor(InboundFilterMessageProcessor.class,
+            new InboundFilterMessageProcessor()
+            {
+                @Override
+                protected MuleMessage handleUnacceptedFilter(MuleMessage message, InboundEndpoint endpoint)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Message request '"
+                                     + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
+                                     + "' is being rejected since it does not match the filter on this endpoint: "
+                                     + endpoint);
+                    }
+                    message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
+                        String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
+                    return message;
+                }
+            });
     }
 
 }

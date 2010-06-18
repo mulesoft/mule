@@ -10,32 +10,26 @@
 
 package org.mule.transport;
 
-import org.mule.OptimizedRequestContext;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpointDecorator;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouterCollection;
-import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.context.notification.SecurityNotification;
-import org.mule.transaction.TransactionCoordination;
-
-import java.util.List;
 
 /**
- * Provide a default dispatch (client) support for handling threads lifecycle and validation.
+ * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors
+ * send messages over over a specific transport. Different implementations may
+ * support different Message Exchange Patterns.
  */
 public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
 {
+
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -45,7 +39,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     public final void initialise() throws InitialisationException
     {
         super.initialise();
-
         doInitialise();
     }
 
@@ -63,156 +56,35 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
     }
 
-    public final void dispatch(MuleEvent event) throws DispatchException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.setSynchronous(false);
-        event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-                event.getEndpoint().getEndpointURI().toString());
-
-        // Apply Security filter if one is set
-        ImmutableEndpoint endpoint = event.getEndpoint();
-        if (endpoint.getSecurityFilter() != null)
-        {
-            try
-            {
-                endpoint.getSecurityFilter().authenticate(event);
-            }
-            catch (org.mule.api.security.SecurityException e)
-            {
-                // TODO MULE-863: Do we need this warning?
-                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                connector.fireNotification(new SecurityNotification(e,
-                        SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
-                return;
-            }
-            catch (Exception e)
-            {
-                handleException(e);
-                return;
-            }
-        }
-
+        MuleEvent result = null;
         try
         {
-            if (endpoint instanceof OutboundEndpointDecorator)
-            {
-                // Notify the endpoint of the new message
-                if (!((OutboundEndpointDecorator) endpoint).onMessage(event.getMessage()))
-                {
-                    return;
-                }
-            }
-            // Make sure we are connected
             connect();
-            doDispatch(event);
 
-            if (connector.isEnableMessageEvents())
+            if (endpoint.isSynchronous())
             {
-                String component = null;
-                if (event.getService() != null)
+                MuleMessage resultMessage = doSend(event);
+                if (resultMessage != null)
                 {
-                    component = event.getService().getName();
+                    result = new DefaultMuleEvent(resultMessage, event);
                 }
-
-                connector.fireNotification(new EndpointMessageNotification(event.getMessage(),
-                    event.getEndpoint(), component, EndpointMessageNotification.MESSAGE_DISPATCHED));
             }
+            else
+            {
+                doDispatch(event);
+            }
+        }
+        catch (MuleException muleException)
+        {
+            throw muleException;
         }
         catch (Exception e)
         {
-            handleException(e);
+            throw new DispatchException(event.getMessage(), endpoint, e);
         }
-    }
-
-    public final MuleMessage send(MuleEvent event) throws DispatchException
-    {
-        // No point continuing if the service has rolledback the transaction
-        if (isTransactionRollback())
-        {
-            return event.getMessage();
-        }
-
-        event.setSynchronous(true);
-        event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-                event.getEndpoint().getEndpointURI().getUri().toString());
-        event = OptimizedRequestContext.unsafeSetEvent(event);
-
-        // Apply Security filter if one is set
-        ImmutableEndpoint endpoint = event.getEndpoint();
-        if (endpoint.getSecurityFilter() != null)
-        {
-            try
-            {
-                endpoint.getSecurityFilter().authenticate(event);
-            }
-            catch (org.mule.api.security.SecurityException e)
-            {
-                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                connector.fireNotification(new SecurityNotification(e,
-                        SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                handleException(e);
-                return event.getMessage();
-            }
-            catch (Exception e)
-            {
-                handleException(e);
-                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-            }
-        }
-
-        try
-        {
-            //Notify the endpoint of the new message
-            if (endpoint instanceof OutboundEndpointDecorator)
-            {
-                if (!((OutboundEndpointDecorator) endpoint).onMessage(event.getMessage()))
-                {
-                    return null;
-                }
-            }
-
-            // Make sure we are connected
-            connect();
-
-            MuleMessage result = doSend(event);
-
-            if (result != null)
-            {
-                // Properties which should be carried over from the request message to the response message
-                List<String> responseProperties = ((OutboundEndpoint) endpoint).getResponseProperties();
-                for (String propertyName : responseProperties)
-                {
-                    Object propertyValue = event.getMessage().getProperty(propertyName);
-                    if (propertyValue != null)
-                    {
-                        result.setProperty(propertyName, propertyValue);
-                    }
-                }
-            }
-
-            if (connector.isEnableMessageEvents())
-            {
-                String component = null;
-                if (event.getService() != null)
-                {
-                    component = event.getService().getName();
-                }
-                connector.fireNotification(new EndpointMessageNotification(event.getMessage(), event.getEndpoint(),
-                        component, EndpointMessageNotification.MESSAGE_SENT));
-            }
-            return result;
-        }
-        catch (DispatchException e)
-        {
-            handleException(e);
-            throw e;
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-        }
+        return result;
     }
 
     /**
@@ -244,7 +116,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
      * set the REMOTE_SYNC header when client.send(..) is called so that results are
      * returned from remote invocations too.
      * </ol>
-     *
+     * 
      * @param event the current event
      * @return true if a response channel should be used to get a response from the
      *         event dispatch.
@@ -277,27 +149,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
-    }
-
-    /**
-     * Checks to see if the current transaction has been rolled back
-     */
-    protected boolean isTransactionRollback()
-    {
-        try
-        {
-            Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            if (tx != null && tx.isRollbackOnly())
-            {
-                return true;
-            }
-        }
-        catch (TransactionException e)
-        {
-            // TODO MULE-863: What should we really do?
-            logger.warn(e.getMessage());
-        }
-        return false;
     }
 
     @Override

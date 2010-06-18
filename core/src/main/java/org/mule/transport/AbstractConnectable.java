@@ -495,6 +495,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         return sb.toString();
     }
 
+    // TODO MULE-4871 Endpoint should not be mutable
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         if (endpoint == null)

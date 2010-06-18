@@ -10,6 +10,26 @@
 
 package org.mule;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointNotFoundException;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.security.SecurityContext;
+import org.mule.api.service.Service;
+import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.ReceiveException;
+import org.mule.api.transport.SessionHandler;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.util.CaseInsensitiveHashMap;
+import org.mule.util.UUID;
+import org.mule.util.store.DeserializationPostInitialisable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,27 +43,6 @@ import java.util.Set;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointNotFoundException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.security.SecurityContext;
-import org.mule.api.service.Service;
-import org.mule.api.transport.Connector;
-import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.ReceiveException;
-import org.mule.api.transport.SessionHandler;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.AbstractConnector;
-import org.mule.util.CaseInsensitiveHashMap;
-import org.mule.util.UUID;
-import org.mule.util.store.DeserializationPostInitialisable;
 
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for
@@ -249,49 +248,14 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         }
 
         MuleEvent event = createOutboundEvent(message, endpoint, null);
-        MuleMessage result = sendEvent(event);
-
-        // Handles the situation where a response has been received via a remote
-        // ReplyTo channel.
-        if (endpoint.isSynchronous() && result != null)
-        {
-            result.applyTransformers(endpoint.getResponseTransformers());
-        }
-        return result;
+        return sendEvent(event);
     }
 
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
         if (event.getEndpoint() instanceof OutboundEndpoint)
         {
-            try
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("dispatching event: " + event);
-                }
-
-                Connector connector = event.getEndpoint().getConnector();
-
-                if (connector instanceof AbstractConnector)
-                {
-                    ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(
-                        new DefaultMuleSession(this, muleContext), event.getMessage());
-                }
-                else
-                {
-                    // TODO in Mule 2.0 we'll flatten the Connector hierachy
-                    logger.warn("A session handler could not be obtained, using  default");
-                    new MuleSessionHandler().storeSessionInfoToMessage(
-                        new DefaultMuleSession(this, muleContext), event.getMessage());
-                }
-
-                ((OutboundEndpoint) event.getEndpoint()).dispatch(event);
-            }
-            catch (Exception e)
-            {
-                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-            }
+            ((OutboundEndpoint) event.getEndpoint()).process(event);
         }
         else if (service != null)
         {
@@ -314,9 +278,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         return id;
     }
 
-    // TODO This method is practically the same as dispatchEvent(MuleEvent event),
-    // so we could use some refactoring here.
-
     public MuleMessage sendEvent(MuleEvent event) throws MuleException
     {
         int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
@@ -327,45 +288,15 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
         if (event.getEndpoint() instanceof OutboundEndpoint)
         {
-            try
+            MuleEvent resultEvent = ((OutboundEndpoint) event.getEndpoint()).process(event);
+            if (resultEvent != null)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("sending event: " + event);
-                }
-
-                Connector connector = event.getEndpoint().getConnector();
-
-                if (connector instanceof AbstractConnector)
-                {
-                    ((AbstractConnector) connector).getSessionHandler().storeSessionInfoToMessage(this,
-                        event.getMessage());
-                }
-                else
-                {
-                    // TODO in Mule 2.0 we'll flatten the Connector hierachy
-                    logger.warn("A session handler could not be obtained, using default.");
-                    new MuleSessionHandler().storeSessionInfoToMessage(
-                        new DefaultMuleSession(this, muleContext), event.getMessage());
-                }
-
-                MuleMessage response = ((OutboundEndpoint) event.getEndpoint()).send(event);
-                // See MULE-2692
-                //RM* This actually performs the function of adding properties from the request to the response
-                // message I think this could be done without the performance hit.
-                //Or we could provide a way to set the request message as the OriginalAdapter on the message
-                //And provide access to the request properties that way
-                return OptimizedRequestContext.unsafeRewriteEvent(response);
+                return resultEvent.getMessage();
             }
-            catch (MuleException e)
+            else
             {
-                throw e;
+                return null;
             }
-            catch (Exception e)
-            {
-                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-            }
-
         }
         else if (service != null)
         {
@@ -437,7 +368,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             }
             else
             {
-                event = new DefaultMuleEvent(message, endpoint, this, false, null);
+                event = new DefaultMuleEvent(message, endpoint, this, endpoint.isSynchronous(), null);
             }
             return event;
         }

@@ -49,7 +49,7 @@ public class GroovyRefreshableBeanBuilder implements Callable
                     throw new DefaultMuleException(CoreMessages.propertiesNotSet("methodName"));
                 }
                 
-                return script.invokeMethod(methodName, eventContext.transformMessage());
+                return script.invokeMethod(methodName, eventContext.getMessage().getPayload());
             }
             
         }

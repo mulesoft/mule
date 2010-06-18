@@ -54,7 +54,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
             builder);
         try
         {
-            ep.send(getTestEvent("hello", ep));
+            ep.process(getTestEvent("hello", ep));
         }
         catch (Exception e)
         {
@@ -79,7 +79,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         
         try
         {
-            ep.send(getTestEvent("hello", ep));
+            ep.process(getTestEvent("hello", ep));
         }
         catch (Exception e)
         {

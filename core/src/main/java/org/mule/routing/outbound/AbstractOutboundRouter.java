@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -20,11 +21,9 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
-import org.mule.transaction.TransactionTemplate;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -66,7 +65,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
 
-    public void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
+    protected void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {
         setMessageProperties(session, message, endpoint);
 
@@ -86,19 +85,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        TransactionTemplate tt = createTransactionTemplate(session, endpoint);
-        TransactionCallback cb = new TransactionCallback()
-        {
-            public Object doInTransaction() throws Exception
-            {
-                session.dispatchEvent(message, endpoint);
-                return null;
-            }
-        };
-
         try
         {
-            tt.execute(cb);
+            session.dispatchEvent(message, endpoint);
         }
         catch (Exception e)
         {
@@ -115,7 +104,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public MuleMessage send(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
+    protected MuleMessage send(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {
         if (replyTo != null)
         {
@@ -144,19 +133,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        TransactionTemplate tt = createTransactionTemplate(session, endpoint);
-        TransactionCallback cb = new TransactionCallback()
-        {
-            public Object doInTransaction() throws Exception
-            {
-                return session.sendEvent(message, endpoint);
-            }
-        };
-
         MuleMessage result;
+
         try
         {
-            result = (MuleMessage) tt.execute(cb);
+            result = session.sendEvent(message, endpoint);
+        }
+        catch (MessagingException me)
+        {
+            throw me;
         }
         catch (Exception e)
         {
@@ -190,12 +175,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
 
         return result;
-    }
-
-    protected TransactionTemplate createTransactionTemplate(MuleSession session, ImmutableEndpoint endpoint)
-    {
-        return new TransactionTemplate(endpoint.getTransactionConfig(),
-                session.getService().getExceptionListener(), muleContext);
     }
 
     protected void setMessageProperties(MuleSession session, MuleMessage message, OutboundEndpoint endpoint)

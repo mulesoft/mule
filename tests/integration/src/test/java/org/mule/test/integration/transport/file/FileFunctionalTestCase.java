@@ -96,7 +96,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         {
             // there should not be any transformers configured by default, so the
             // return message should be a byte[]
-            super.setReturnData(context.transformMessage());
+            super.setReturnData(context.getMessage().getPayload());
             return super.onCall(context);
         }
     }

@@ -98,10 +98,6 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncSplitter.isMatch(message));
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
         session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Orange.class), C.eq(endpoint2)));
@@ -110,11 +106,6 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         session.verify();
 
         message = new DefaultMuleMessage(payload, muleContext);
-
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
 
         session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint4)),
                 message);

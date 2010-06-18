@@ -22,6 +22,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
@@ -157,28 +158,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.id = generateEventId();
         this.synchronous = synchronous;
         this.outputStream = outputStream;
-        fillProperties(null);
-    }
-
-    /**
-     * Contructor.
-     *
-     * @param message  the event payload
-     * @param endpoint the endpoint to associate with the event
-     * @param session  the previous event if any
-     */
-    public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
-                            MuleSession session,
-                            String eventId,
-                            boolean synchronous)
-    {
-        super(message.getPayload());
-        this.message = message;
-        this.endpoint = endpoint;
-        this.session = session;
-        this.id = eventId;
-        this.synchronous = synchronous;
         fillProperties(null);
     }
 
@@ -547,12 +526,17 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public boolean isSynchronous()
     {
-        return synchronous;
-    }
-
-    public void setSynchronous(boolean value)
-    {
-        synchronous = value;
+        if (endpoint instanceof OutboundEndpoint)
+        {
+            // If this is an outbound endpoint then synchronicity is determined by
+            // endpoint
+            return endpoint.isSynchronous();
+        }
+        else
+        {
+            // TODO This should be determined by the inbound endpoint only
+            return synchronous;
+        }
     }
 
     public int getTimeout()

@@ -12,7 +12,7 @@ package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -20,7 +20,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.DispatchException;
 import org.mule.config.MuleManifest;
 
 import java.util.List;
@@ -64,21 +63,6 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public void setEndpointURI(EndpointURI dynamicEndpointURI)
     {
         this.dynamicEndpointURI = dynamicEndpointURI;
-    }
-
-    public void dispatch(MuleEvent event) throws DispatchException
-    {
-        if (getConnector() != null)
-        {
-            getConnector().dispatch(this, event);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the
-            // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                    + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
     }
 
     public RetryPolicyTemplate getRetryPolicyTemplate()
@@ -176,21 +160,6 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getResponseProperties();
     }
 
-    public MuleMessage send(MuleEvent event) throws DispatchException
-    {
-        if (getConnector() != null)
-        {
-            return getConnector().send(this, event);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the
-            // message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                    + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
-    }
-
     public String getEndpointBuilderName()
     {
         return endpoint.getEndpointBuilderName();
@@ -248,5 +217,10 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public boolean isProtocolSupported(String protocol)
     {
         return getConnector().supportsProtocol(protocol);
+    }
+    
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        return getConnector().getOutboundEndpointMessageProcessor(this).process(event);
     }
 }

@@ -46,7 +46,6 @@ import org.mule.model.seda.SedaService;
 import org.mule.module.spring.i18n.SpringMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -448,7 +447,7 @@ public class MuleEventMulticaster
      */
     public Object onCall(MuleEventContext context) throws TransformerException, MalformedEndpointException
     {
-        multicastEvent(new MuleApplicationEvent(context.transformMessage(), context, applicationContext));
+        multicastEvent(new MuleApplicationEvent(context.getMessage().getPayload(), context, applicationContext));
         context.setStopFurtherProcessing(true);
         return null;
     }
@@ -502,7 +501,7 @@ public class MuleEventMulticaster
                             applicationEvent.getProperties(), muleContext);
                         message.applyTransformers(endpoint.getTransformers());
                     }
-                    endpoint.dispatch(new DefaultMuleEvent(message, endpoint, session, false));
+                    endpoint.process(new DefaultMuleEvent(message, endpoint, session, false));
                 }
             }
             catch (Exception e1)

@@ -14,12 +14,15 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConstants;
@@ -167,7 +170,7 @@ public class RestServiceWrapper extends AbstractComponent
     {
         Object requestBody;
 
-        Object request = event.transformMessage();
+        Object request = event.getMessage().getPayload();
         String tempUrl = serviceUrl;
         MuleMessage result;
         if (muleContext.getExpressionManager().isValidExpression(serviceUrl))
@@ -199,8 +202,12 @@ public class RestServiceWrapper extends AbstractComponent
 
         event.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
+        endpointBuilder.setSynchronous(true);
+        OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
+
         result = RequestContext.getEventContext().sendEvent(
-                new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), tempUrl);
+            new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint);
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),

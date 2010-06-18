@@ -180,7 +180,6 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         final StringBuffer sb = new StringBuffer();
         sb.append("ReflectionEntryPointResolver");
         sb.append("{ignoredMethods=").append(StringMessageUtils.toString(ignoredMethods));
-        sb.append("{transformFirst=").append(isTransformFirst());
         sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
         sb.append('}');
         return sb.toString();

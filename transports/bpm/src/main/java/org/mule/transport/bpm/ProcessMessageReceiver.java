@@ -12,6 +12,7 @@ package org.mule.transport.bpm;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
@@ -100,11 +101,19 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
                 new DefaultMuleSession(service, connector.getMuleContext()), synchronous);
             if (synchronous)
             {
-                return ep.send(event);
+                MuleEvent resultEvent = ep.process(event);
+                if (resultEvent != null)
+                {
+                    return resultEvent.getMessage();
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                ep.dispatch(event);
+                ep.process(event);
             }
         }
         else

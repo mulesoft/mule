@@ -88,14 +88,14 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         Service testService = getTestService("test", Apple.class);
 
-        InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
+        InboundRouterCollection messageRouter = testService.getInboundRouter();
 
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint = getTestInboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store
@@ -109,7 +109,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         // called by idempotent receiver
         session.expectAndReturn("getService", testService);
-        messageRouter.route(event);
+        messageRouter.process(event);
 
         session.verify();
         message = new DefaultMuleMessage("test event", muleContext);
@@ -120,7 +120,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         session.expectAndReturn("getService", testService);
         // called by Inbound message router
         session.expectAndReturn("getService", testService);
-        MuleMessage result = messageRouter.route(event);
+        MuleMessage result = messageRouter.process(event).getMessage();
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -133,7 +133,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         // we've already received this message
         assertTrue(!router.isMatch(event));
 
-        messageRouter.route(event);
+        messageRouter.process(event);
         session.verify();
     }
 

@@ -43,7 +43,7 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
     @SuppressWarnings("unchecked")
     protected List<Router> routers = new CopyOnWriteArrayList();
 
-    private RouterStatistics statistics;
+    protected RouterStatistics statistics;
 
     private RouterCatchAllStrategy catchAllStrategy;
     

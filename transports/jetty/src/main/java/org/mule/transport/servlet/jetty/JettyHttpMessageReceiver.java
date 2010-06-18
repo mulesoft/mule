@@ -73,7 +73,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 endpointBuilder.setTransformers(endpoint.getTransformers());
                 InboundEndpoint ep = 
                     muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-                scon.registerListener(service, ep);
+                scon.registerListener(ep, service.getInboundRouter(), service);
             }
             catch (Exception e)
             {

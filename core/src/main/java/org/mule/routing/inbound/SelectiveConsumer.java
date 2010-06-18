@@ -14,10 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
 
@@ -38,7 +35,6 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
     protected final Log logger = LogFactory.getLog(getClass());
 
     private volatile Filter filter;
-    private volatile boolean transformFirst = true;
 
     private MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
@@ -52,19 +48,6 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
         if (filter == null)
         {
             return true;
-        }
-
-        if (transformFirst)
-        {
-            try
-            {
-                event.transformMessage();
-            }
-            catch (TransformerException e)
-            {
-                throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), 
-                    event.getMessage(),  event.getEndpoint(), e);
-            }
         }
 
         boolean result = filter.accept(event.getMessage());
@@ -91,16 +74,6 @@ public class SelectiveConsumer extends AbstractRouter implements InboundRouter
     public void setFilter(Filter filter)
     {
         this.filter = filter;
-    }
-
-    public boolean isTransformFirst()
-    {
-        return transformFirst;
-    }
-
-    public void setTransformFirst(boolean transformFirst)
-    {
-        this.transformFirst = transformFirst;
     }
 
     public MessageInfoMapping getMessageInfoMapping()

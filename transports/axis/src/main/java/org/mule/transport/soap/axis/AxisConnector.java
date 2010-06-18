@@ -328,7 +328,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             try
             {
                 endpoint.getConnector()
-                        .unregisterListener(receiver.getService(), receiver.getEndpoint());
+                        .unregisterListener(receiver.getEndpoint());
             }
             catch (Exception e)
             {

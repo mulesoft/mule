@@ -9,9 +9,9 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <endpoint name="service1" address="vm://service1" responseTransformer-refs="validateResponse" />
-    <endpoint name="service2" address="vm://service2" responseTransformer-refs="validateResponse" />
-    <endpoint name="service3" address="vm://service3" responseTransformer-refs="validateResponse" />
+    <endpoint name="service1" address="vm://service1" responseTransformer-refs="validateResponse" synchronous="true"/>
+    <endpoint name="service2" address="vm://service2" responseTransformer-refs="validateResponse" synchronous="true"/>
+    <endpoint name="service3" address="vm://service3" responseTransformer-refs="validateResponse" synchronous="true"/>
 
     <custom-transformer name="validateResponse" class="org.mule.tck.transformer.ValidateResponse" />
 
@@ -22,9 +22,9 @@
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint ref="service1" />
-                    <outbound-endpoint ref="service2" />
-                    <outbound-endpoint ref="service3" />
+                    <outbound-endpoint ref="service1" synchronous="true"/>
+                    <outbound-endpoint ref="service2" synchronous="true"/>
+                    <outbound-endpoint ref="service3" synchronous="true"/>
                 </exception-based-router>
             </outbound>
         </service>
@@ -35,16 +35,16 @@
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="vm://service4" responseTransformer-refs="validateResponse" />
-                    <outbound-endpoint address="vm://service5" responseTransformer-refs="validateResponse" />
-                    <outbound-endpoint address="vm://service6" responseTransformer-refs="validateResponse" />
+                    <outbound-endpoint address="vm://service4" responseTransformer-refs="validateResponse" synchronous="true"/>
+                    <outbound-endpoint address="vm://service5" responseTransformer-refs="validateResponse" synchronous="true"/>
+                    <outbound-endpoint address="vm://service6" responseTransformer-refs="validateResponse" synchronous="true"/>
                 </exception-based-router>
             </outbound>
         </service>
 
         <service name="DynamicEndpoints">
             <inbound>
-                <vm:inbound-endpoint path="in3" />
+                <vm:inbound-endpoint path="in3" synchronous="true"/>
             </inbound>
             <outbound>
                 <recipient-list-exception-based-router evaluator="header" expression="recipients" />
