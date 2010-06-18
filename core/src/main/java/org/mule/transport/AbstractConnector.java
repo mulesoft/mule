@@ -205,9 +205,10 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
+    @SuppressWarnings("unchecked")
     protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
 
-    protected final Map<String, Pattern> patternByEndpoint = new HashMap();
+    protected final Map<String, Pattern> patternByEndpoint = new HashMap<String, Pattern>();
     
     /**
      * Outbound endpoint MessageProcessors keyed by outbound endpoint instance.

@@ -27,12 +27,12 @@ public class ContentBasedRouter extends AbstractOutboundRouter
     {
         for (OutboundEndpoint endpoint : endpoints)
         {
-            if(isMatch(message))
+            if (isMatch(message))
             {
                 try
                 {
                     DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous());
-                    if(endpoint.isSynchronous())
+                    if (endpoint.isSynchronous())
                     {
                         MuleEvent resultEvent;
                         resultEvent = endpoint.process(event);
@@ -65,7 +65,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
     {
         for (OutboundEndpoint endpoint : endpoints)
         {
-            if(endpoint.getFilter()==null || endpoint.getFilter().accept(message))
+            if (endpoint.getFilter() == null || endpoint.getFilter().accept(message))
             {
                 return true;
             }

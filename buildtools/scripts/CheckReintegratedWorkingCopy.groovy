@@ -24,10 +24,10 @@ file = new File(args[0])
 removedBlock = new Block()
 insertedBlock = new Block()
 diffedFile = null
-file .eachLine 
-{ 
+file.eachLine
+{
     line ->
-    
+
     if (line.startsWith("diff"))
     {
         compareDifference()
@@ -53,7 +53,7 @@ def compareDifference()
     {
         return
     }
-    
+
     if (!removedBlockMatchesSvnId() || !insertedBlockMatchesSvnId())
     {
         println(diffedFile)
@@ -68,7 +68,7 @@ def removedBlockMatchesSvnId()
     {
         return false
     }
-    
+
     // regex matches '< * $Id: filename revision date author $'
     matcher = removedBlock.content =~ /<\s+\*\s+\$[I]d:.*\$\n/
     return matcher.matches()
@@ -77,7 +77,7 @@ def removedBlockMatchesSvnId()
 def insertedBlockMatchesSvnId()
 {
     if (insertedBlock.lineCount > 1)
-    {    
+    {
         return false
     }
 
@@ -96,13 +96,13 @@ class Block
 {
     String content
     int lineCount
-    
+
     Block()
     {
         content = ""
         lineCount = 0
     }
-    
+
     void addLine(String line)
     {
         content = content + line + "\n"
