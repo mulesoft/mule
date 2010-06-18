@@ -11,7 +11,7 @@
 package org.mule.test.integration.models;
 
 
-import org.mule.model.direct.DirectModel;
+import org.mule.model.seda.SedaModel;
 import org.mule.tck.FunctionalTestCase;
 
 public class ConfigureModelTestCase extends FunctionalTestCase
@@ -24,7 +24,7 @@ public class ConfigureModelTestCase extends FunctionalTestCase
 
     public void testConfigure()
     {
-        assertTrue(muleContext.getRegistry().lookupModel("main") instanceof DirectModel);
+        assertTrue(muleContext.getRegistry().lookupModel("main") instanceof SedaModel);
         assertEquals("main", muleContext.getRegistry().lookupModel("main").getName());
     }
 }

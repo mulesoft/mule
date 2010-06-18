@@ -12,7 +12,7 @@ package org.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.model.direct.DirectService;
+import org.mule.model.seda.SedaService;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -25,7 +25,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleTestC
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
         return new DefaultMuleEvent(message,
                 MuleTestUtils.getTestInboundEndpoint("test", muleContext),
-                new DefaultMuleSession(new DirectService(muleContext), muleContext), false);
+                new DefaultMuleSession(new SedaService(muleContext), muleContext), false);
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

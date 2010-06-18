@@ -12,8 +12,8 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
-import org.mule.model.direct.DirectService;
-import org.mule.model.direct.DirectModel;
+import org.mule.model.seda.SedaModel;
+import org.mule.model.seda.SedaService;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -22,8 +22,8 @@ public class SimpleNamespaceHandler extends NamespaceHandlerSupport
 
     public void init()
     {
-        registerBeanDefinitionParser("model", new OrphanDefinitionParser(DirectModel.class, true));
-        registerBeanDefinitionParser("service", new ServiceDefinitionParser(DirectService.class));
+        registerBeanDefinitionParser("model", new OrphanDefinitionParser(SedaModel.class, true));
+        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
     }
 
 }

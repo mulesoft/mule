@@ -7,5 +7,5 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <!-- the components for this test are standard and are cnfigured in the pipeline-test-config.xml -->
-    <model name="main" type="direct"/>
+    <model name="main" type="seda"/>
 </mule>
