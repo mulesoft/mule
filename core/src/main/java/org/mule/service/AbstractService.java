@@ -57,7 +57,6 @@ import org.mule.util.ClassUtils;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -184,13 +183,13 @@ public abstract class AbstractService implements Service
 //            ((Initialisable) exceptionListener).initialise();
         }
 
-        inboundSourceAggregator = ((DefaultInboundRouterCollection) inboundRouter).getSourceAggregator();;
+        inboundSourceAggregator = ((DefaultInboundRouterCollection) inboundRouter).getSourceAggregator();
         inboundSourceAggregator.setListener(inboundRouter);
         if (inboundSourceAggregator instanceof PatternAware)
         {
             ((PatternAware) inboundSourceAggregator).setPattern(this);
         }
-        responseSourceAggregator = ((DefaultInboundRouterCollection) responseRouter).getSourceAggregator();;
+        responseSourceAggregator = ((DefaultInboundRouterCollection) responseRouter).getSourceAggregator();
         responseSourceAggregator.setListener(responseRouter);
         if (responseSourceAggregator instanceof PatternAware)
         {
