@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.lang.BooleanUtils;
+
 /**
  *
  */
@@ -32,8 +34,8 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty("encoding"));
         d.setConfigurationBuilder(p.getProperty("config.builder"));
         d.setDomain(p.getProperty("domain"));
-        // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
-        d.setParentFirstClassLoader(Boolean.parseBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
+        // supports true (case insensitive), yes, on as positive values
+        d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
 
         final String resProps = p.getProperty("config.resources");
         String[] urls;
@@ -47,8 +49,8 @@ public class PropertiesDescriptorParser implements DescriptorParser
         }
         d.setConfigResources(urls);
 
-        // TODO use BooleanUtils.toBoolean() for friendlier flag definition support (true/false, on, yes/no)
-        d.setRedeploymentEnabled(Boolean.parseBoolean(p.getProperty("redeployment.enabled", Boolean.TRUE.toString())));
+        // supports true (case insensitive), yes, on as positive values
+        d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty("redeployment.enabled", Boolean.TRUE.toString())));
 
         return d;
     }
