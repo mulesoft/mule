@@ -57,13 +57,13 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
             return new NullMessageProcesser();
         }
 
-        InterceptingMessageProcessor first = createInterceptngMessageProcessor(chain.get(0));
+        InterceptingMessageProcessor first = createInterceptingMessageProcessor(chain.get(0));
         MessageProcessor composite = new ChainedCompositeMessageProcessor(first, chain, name);
         InterceptingMessageProcessor current = first;
 
         for (int i = 1; i < chain.size(); i++)
         {
-            InterceptingMessageProcessor mp = createInterceptngMessageProcessor(chain.get(i));
+            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(chain.get(i));
             current.setListener(mp);
             current = mp;
         }
@@ -75,7 +75,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         this.name = name;
     }
 
-    private InterceptingMessageProcessor createInterceptngMessageProcessor(MessageProcessor processor)
+    private InterceptingMessageProcessor createInterceptingMessageProcessor(MessageProcessor processor)
     {
         if (processor instanceof InterceptingMessageProcessor)
         {
