@@ -1,0 +1,2 @@
+#Disabled and tracked by MULE-4914
+org.mule.transport.quartz.QuartzFunctionalTestCase
