@@ -94,12 +94,15 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
             basepath = basepath.substring(1);
         }
 
+        //No modules were set explicitly on this ConfigurationBuilder so we now try and discover
+        //modules and {@link GuiceModuleFactory} instances on the classpath
         if (modules == null)
         {
             ClasspathScanner scanner = new ClasspathScanner(classLoader, basepath);
             Set<Class> classes = scanner.scanFor(Module.class);
+            Set<Class> factories = scanner.scanFor(GuiceModuleFactory.class);
 
-            if (classes.size() == 0)
+            if (classes.size() == 0 && factories.size() == 0)
             {
                 try
                 {
@@ -114,24 +117,28 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 return;
             }
 
-            int i = 0;
             for (Class moduleClass : classes)
             {
-                Module module = (Module) ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS);
-                modules[i++] = module;
+                allModules.add((Module) ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS));
+            }
+            for (Class factoryClass : factories)
+            {
+                GuiceModuleFactory factory = (GuiceModuleFactory) ClassUtils.instanciateClass(factoryClass, ClassUtils.NO_ARGS);
+                allModules.add(factory.createModule());
             }
         }
-
-        for (int i = 0; i < modules.length; i++)
+        else
         {
-            Module module = modules[i];
+            allModules.addAll(Arrays.asList(modules));
+        }
+
+        for (Module module : allModules)
+        {
             if (module instanceof AbstractMuleGuiceModule)
             {
                 ((AbstractMuleGuiceModule) module).setMuleContext(muleContext);
             }
         }
-
-        allModules.addAll(Arrays.asList(modules));
 
         if (stage != null)
         {
