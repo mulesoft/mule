@@ -18,7 +18,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
-    private InMemoryObjectStore store = null;
+    private InMemoryObjectStore<String> store = null;
     
     @Override
     protected void doTearDown() throws Exception
@@ -73,10 +73,10 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         
         createBoundedObjectStore(1);
         
-        assertTrue(store.store(key, value));
+        store.store(key, value);
         assertObjectsInStore(key);
         
-        Object retrieved = store.retrieve(key);
+        String retrieved = store.retrieve(key);
         assertEquals(value, retrieved);
         
         store.remove(key);        
@@ -105,7 +105,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         assertObjectsInStore("1", "2", "3");
 
         // exceed threshold
-        assertTrue(store.store("4", "4"));
+        store.store("4", "4");
 
         // the oldest entry should still be there, not yet expired
         assertTrue(store.contains("1"));
@@ -132,7 +132,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
     {
         for (String entry : objects)
         {
-            assertTrue(store.store(entry, entry));
+            store.store(entry, entry);
         }
     }
     
@@ -159,7 +159,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         assertTrue("objects' time to live must be greater than the expire interval", 
             timeToLive > expireInterval);
         
-        store = new InMemoryObjectStore();
+        store = new InMemoryObjectStore<String>();
         store.setName("timed");
         store.setMaxEntries(3);
         store.setEntryTTL(timeToLive);
@@ -194,7 +194,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
      * the first run of the expire method in initialize and only then continues with the execution 
      * of the current thread.
      */
-    private static class NonExpiringInMemoryObjectStore extends InMemoryObjectStore
+    private static class NonExpiringInMemoryObjectStore extends InMemoryObjectStore<String>
     {
         private CountDownLatch expireLatch;
 

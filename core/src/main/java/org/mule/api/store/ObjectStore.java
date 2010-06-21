@@ -9,53 +9,53 @@
  */
 package org.mule.api.store;
 
-public interface ObjectStore
+import java.io.Serializable;
+
+public interface ObjectStore<T extends Serializable>
 {
     /**
      * Check whether the given Object is already registered with this store.
      *
-     * @param id the identifier of the object to check
-     * @return <code>true</code> if the ID is stored or <code>false</code> if it could not be found
-     * @throws IllegalArgumentException if the given ID is <code>null</code>.
-     * @throws Exception if any implementation-specific error occured, e.g. when the store is 
-     *          not available
+     * @param key the identifier of the object to check
+     * @return <code>true</code> if the key is stored or <code>false</code> no value was stored for
+     *          the key.
+     * @throws ObjectStoreException if the given key is <code>null</code>.
+     * @throws ObjectStoreNotAvaliableException if any implementation-specific error occured, e.g. 
+     *          when the store is not available
      */
-    boolean contains(String id) throws Exception;
+    boolean contains(Serializable key) throws ObjectStoreNotAvaliableException;
 
     /**
      * Store the given Object.
      *
-     * @param id the identifier for <code>item</code>
-     * @param item the Object to store with <code>id</code>
-     * @return <code>true</code> if the object was stored properly, or <code>false</code> if an
-     *          object with the given id already existed.
-     * @throws IllegalArgumentException if the given ID cannot be stored or is <code>null</code>
-     * @throws Exception if the store is not available or any other implementation-specific 
-     *          error occured.
+     * @param key the identifier for <code>value</code>
+     * @param value the Object to store with <code>key</code>
+     * @throws ObjectStoreException if the given ID cannot be stored or is <code>null</code> or
+     *          if the store is not available or any other implementation-specific error occured.
+     * @throws ObjectAlreadyExistsException if an attempt is made to store an object for a key
+     *          that already has an object associated.
      */
-    boolean store(String id, Object item) throws Exception;
+    void store(Serializable key, T value) throws ObjectStoreException;
 
     /**
      * Retrieve the given Object.
      *
-     * @param id the identifier of the object to retrieve.
-     * @return the object associated with the given ID or <code>null</code> if there was no entry 
-     *          for the supplied ID.
-     * @throws IllegalArgumentException if the given ID is <code>null</code>
-     * @throws Exception if the store is not available or any other implementation-specific 
-     *          error occured
+     * @param key the identifier of the object to retrieve.
+     * @return the object associated with the given key. If no object for the given key was found
+     *          this method throws an {@link ObjectDoesNotExistException}.
+     * @throws ObjectStoreException if the given ID is <code>null</code> of if the store is not 
+     *          available or any other implementation-specific error occured
      */
-    Object retrieve(String id) throws Exception;
+    T retrieve(Serializable key) throws ObjectStoreException;
 
     /**
      * Remove the object with ID.
      * 
-     * @param id the identifier of the object to remove.
+     * @param key the identifier of the object to remove.
      * @return <code>true</code> if the object was found and removed or <code>false</code> if no
-     *          object with ID was stored.
-     * @throws IllegalArgumentException if the given ID is <code>null</code>
-     * @throws Exception if the store is not available or any other implementation-specific 
-     *          error occured
+     *          object with the key was stored.
+     * @throws ObjectStoreException if the given key is <code>null</code> or if the store is not 
+     *          available or any other implementation-specific error occured
      */
-    boolean remove(String id) throws Exception;
+    T remove(Serializable key) throws ObjectStoreException;
 }

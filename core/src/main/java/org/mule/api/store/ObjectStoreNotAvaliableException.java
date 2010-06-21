@@ -1,0 +1,41 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.api.store;
+
+import org.mule.config.i18n.Message;
+
+/**
+ * This exception is thrown when the underlying to an {@link ObjectStore}'s system fails.
+ */
+public class ObjectStoreNotAvaliableException extends ObjectStoreException
+{
+    public ObjectStoreNotAvaliableException()
+    {
+        super();
+    }
+
+    public ObjectStoreNotAvaliableException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public ObjectStoreNotAvaliableException(Message message)
+    {
+        super(message);
+    }
+
+    public ObjectStoreNotAvaliableException(Throwable cause)
+    {
+        super(cause);
+    }
+}
+
+

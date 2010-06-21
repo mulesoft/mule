@@ -10,6 +10,7 @@
 package org.mule.util.store;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -28,16 +30,15 @@ import java.util.Properties;
  *
  * This store is backed by an in-memory store and supports the ability to expire and apply TTL to objects in the store.
  */
-public class TextFileObjectStore extends InMemoryObjectStore
+public class TextFileObjectStore extends InMemoryObjectStore<String>
 {
-
     protected File fileStore;
     protected String directory;
     protected String encoding;
 
     private FileOutputStream output;
 
-
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
@@ -64,47 +65,39 @@ public class TextFileObjectStore extends InMemoryObjectStore
         {
             throw new InitialisationException(e, this);
         }
-
     }
 
     protected synchronized void loadFromStore() throws Exception
     {
         Properties props = new Properties();
         props.load(new FileInputStream(fileStore));
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+        
+        for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            super.store(entry.getKey().toString(), entry.getValue());
+            super.store(entry.getKey().toString(), entry.getValue().toString());
         }
     }
 
-    /**
-     * Store the given Object.
-     *
-     * @param id the ID to store
-     * @return <code>true</code> if the ID was stored properly, or <code>false</code>
-     *         if it already existed
-     * @throws IllegalArgumentException if the given ID cannot be stored or is
-     *                                  <code>null</code>
-     * @throws Exception                if the store is not available or any other
-     *                                  implementation-specific error occured
-     */
     @Override
-    public boolean store(String id, Object item) throws Exception
+    public void store(Serializable id, String item) throws ObjectStoreException
     {
-        if (!(item instanceof String))
+        super.store(id, item);
+
+        try
         {
-            throw new IllegalArgumentException("TextFile store can only be used for storing text entries");
+            if (output == null)
+            {
+                output = new FileOutputStream(fileStore, true);
+            }
+
+            StringBuffer buf = new StringBuffer();
+            buf.append(id).append("=").append(item.toString()).append(IOUtils.LINE_SEPARATOR);
+            output.write(buf.toString().getBytes());
         }
-        boolean result = super.store(id, item);
-        if (output == null)
+        catch (IOException iox)
         {
-            output = new FileOutputStream(fileStore, true);
+            throw new ObjectStoreException(iox);
         }
-        StringBuffer buf = new StringBuffer();
-        buf.append(id).append("=").append(item.toString()).append(IOUtils.LINE_SEPARATOR);
-        output.write(buf.toString().getBytes());
-        return result;
     }
 
     public String getDirectory()
@@ -127,11 +120,13 @@ public class TextFileObjectStore extends InMemoryObjectStore
         this.encoding = encoding;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
     public synchronized void dispose()
     {
         Properties props = new Properties();
 
-        for (Iterator iterator = super.store.values().iterator(); iterator.hasNext();)
+        for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext();)
         {
             StoredObject storedObject = (StoredObject) iterator.next();
             props.put(storedObject.getId(), storedObject.getItem());
@@ -154,7 +149,6 @@ public class TextFileObjectStore extends InMemoryObjectStore
         {
             IOUtils.closeQuietly(output);
         }
-        
         
         super.dispose();
     }

@@ -10,7 +10,6 @@
 package org.mule.util.store;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -53,9 +52,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
         // store entries in quick succession
-        assertTrue(store.store("1", "1"));
-        assertTrue(store.store("2", "2"));
-        assertTrue(store.store("3", "3"));
+        store.store("1", "1");
+        store.store("2", "2");
+        store.store("3", "3");
 
         // they should still be alive at this point
         assertTrue(store.contains("1"));
@@ -85,9 +84,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
         // store entries in quick succession
-        assertTrue(store.store("1", "1"));
-        assertTrue(store.store("2", "2"));
-        assertTrue(store.store("3", "3"));
+        store.store("1", "1");
+        store.store("2", "2");
+        store.store("3", "3");
 
         // they should still be alive at this point
         assertTrue(store.contains("1"));
@@ -128,7 +127,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.setExpirationInterval(1000);
         store.initialise();
 
-// make sure all values are gone
+        // make sure all values are gone
         assertFalse(store.contains("1"));
         assertFalse(store.contains("2"));
         assertFalse(store.contains("3"));
@@ -147,17 +146,6 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.setEntryTTL(3000);
         store.setExpirationInterval(1000);
         store.initialise();
-
-        // store entries in quick succession
-        try
-        {
-            assertTrue(store.store("1", new Apple()));
-            fail("should not be abe to store objects");
-        }
-        catch (Exception e)
-        {
-            //expected
-        }
     }
 
     public void testMaxSize() throws Exception
@@ -173,9 +161,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
 
 
-        assertTrue(store.store("1", "1"));
-        assertTrue(store.store("2", "2"));
-        assertTrue(store.store("3", "3"));
+        store.store("1", "1");
+        store.store("2", "2");
+        store.store("3", "3");
 
         assertTrue(store.contains("1"));
         assertTrue(store.contains("2"));
@@ -189,7 +177,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         assertTrue(store.contains("3"));
 
         // exceed threshold
-        assertTrue(store.store("4", "4"));
+        store.store("4", "4");
 
         // the oldest entry should still be there
         assertTrue(store.contains("1"));
@@ -202,7 +190,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         assertTrue(store.contains("4"));
 
         // exceed some more
-        assertTrue(store.store("5", "5"));
+        store.store("5", "5");
         store.expire();
         assertFalse(store.contains("2"));
         assertTrue(store.contains("3"));
@@ -210,10 +198,10 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         assertTrue(store.contains("5"));
 
         // and multiple times
-        assertTrue(store.store("6", "6"));
-        assertTrue(store.store("7", "7"));
-        assertTrue(store.store("8", "8"));
-        assertTrue(store.store("9", "9"));
+        store.store("6", "6");
+        store.store("7", "7");
+        store.store("8", "8");
+        store.store("9", "9");
 
         store.expire();
         assertTrue(store.contains("7"));

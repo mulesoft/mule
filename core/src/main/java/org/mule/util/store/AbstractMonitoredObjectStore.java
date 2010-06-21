@@ -19,6 +19,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.UUID;
 import org.mule.util.concurrent.DaemonThreadFactory;
 
+import java.io.Serializable;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -28,7 +30,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * TODO
  */
-public abstract class AbstractMonitoredObjectStore implements ObjectStore, Runnable, MuleContextAware, Initialisable, Disposable
+public abstract class AbstractMonitoredObjectStore<T extends Serializable> 
+    implements ObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable
 {
     protected final Log logger = LogFactory.getLog(this.getClass());
 

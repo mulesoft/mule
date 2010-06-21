@@ -30,7 +30,7 @@ import java.text.MessageFormat;
  */
 public class IdempotentReceiver extends SelectiveConsumer
 {
-    protected volatile ObjectStore store;
+    protected volatile ObjectStore<String> store;
     protected volatile String assignedComponentName;
 
     protected String idExpression = MessageFormat.format("{0}message:id{1}",
@@ -61,9 +61,9 @@ public class IdempotentReceiver extends SelectiveConsumer
         }
     }
 
-    protected ObjectStore createMessageIdStore() throws InitialisationException
+    protected ObjectStore<String> createMessageIdStore() throws InitialisationException
     {
-        InMemoryObjectStore s = new InMemoryObjectStore();
+        InMemoryObjectStore<String> s = new InMemoryObjectStore<String>();
         s.setName(assignedComponentName);
         s.setMaxEntries(-1);
         s.setEntryTTL(60 * 5 * 1000);
@@ -120,14 +120,8 @@ public class IdempotentReceiver extends SelectiveConsumer
 
         try
         {
-            if (store.store(id, id))
-            {
-                return new MuleEvent[]{event};
-            }
-            else
-            {
-                return null;
-            }
+            store.store(id, id);
+            return new MuleEvent[]{event};
         }
         catch (Exception e)
         {
@@ -151,12 +145,12 @@ public class IdempotentReceiver extends SelectiveConsumer
         this.idExpression = idExpression;
     }
 
-    public ObjectStore getStore()
+    public ObjectStore<String> getStore()
     {
         return store;
     }
 
-    public void setStore(ObjectStore store)
+    public void setStore(ObjectStore<String> store)
     {
         this.store = store;
     }

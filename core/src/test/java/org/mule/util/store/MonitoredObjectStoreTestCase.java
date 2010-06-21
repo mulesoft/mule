@@ -11,7 +11,11 @@
 package org.mule.util.store;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.io.Serializable;
 
 public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
 {
@@ -41,10 +45,15 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
         return store;
     }
     
-    private static class ExpiringStore extends AbstractMonitoredObjectStore
+    private static class ExpiringStore extends AbstractMonitoredObjectStore<String>
     {
         protected boolean expireStarted = false;
         protected boolean expireFinished = false;
+        
+        public ExpiringStore()
+        {
+            super();
+        }
         
         @Override
         protected void expire()
@@ -61,24 +70,24 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
             }
         }
         
-        public boolean contains(String id) throws Exception
+        public boolean contains(Serializable id) throws ObjectStoreNotAvaliableException
         {
             return false;
         }
 
-        public boolean remove(String id) throws Exception
-        {
-            return false;
-        }
-
-        public Object retrieve(String id) throws Exception
+        public String remove(Serializable id) throws ObjectStoreException
         {
             return null;
         }
 
-        public boolean store(String id, Object item) throws Exception
+        public String retrieve(Serializable id) throws ObjectStoreException
         {
-            return false;
+            return null;
+        }
+
+        public void store(Serializable id, String item) throws ObjectStoreException
+        {
+            // does nothing
         }
     }
 }

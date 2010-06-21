@@ -346,7 +346,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 75, object, service);
     }
 
-    public static Message objectNotFound(String object)
+    public static Message objectNotFound(Object object)
     {
         return factory.createMessage(BUNDLE_PATH, 76, object);
     }

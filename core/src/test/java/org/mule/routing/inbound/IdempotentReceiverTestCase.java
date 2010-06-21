@@ -20,6 +20,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -28,9 +30,9 @@ import org.mule.tck.testmodels.fruit.Apple;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
 
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
@@ -41,48 +43,26 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
     public void testIdempotentReceiverDefaultInMemoryObjectStore() throws Exception
     {
-        IdempotentReceiver router = new IdempotentReceiver();
-        router.setMuleContext(muleContext);
-
+        IdempotentReceiver router = createIdempotentRouter();
         testIdempotentRouter(router);
     }
 
     public void testIdempotentReceiverCustomIDStore() throws Exception
     {
-        IdempotentReceiver router = new IdempotentReceiver();
-        router.setMuleContext(muleContext);
-        router.setStore(new ObjectStore()
-        {
-            private Map store = new HashedMap();
-
-            public boolean store(String id, Object item) throws Exception
-            {
-                store.put(id, item);
-                return true;
-            }
-
-            public Object retrieve(String id) throws Exception
-            {
-                return store.get(id);
-            }
-
-            public boolean remove(String id) throws Exception
-            {
-                store.remove(id);
-                return true;
-            }
-
-            public boolean contains(String id) throws Exception
-            {
-                return store.containsKey(id);
-            }
-        });
-
+        IdempotentReceiver router = createIdempotentRouter();
+        router.setStore(new CustomObjectStore());
         router.initialise();
 
         testIdempotentRouter(router);
     }
 
+    private IdempotentReceiver createIdempotentRouter()
+    {
+        IdempotentReceiver router = new IdempotentReceiver();
+        router.setMuleContext(muleContext);
+        return router;
+    }
+    
     protected void testIdempotentRouter(IdempotentReceiver router) throws Exception, MessagingException
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -137,4 +117,33 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         session.verify();
     }
 
+    private static class CustomObjectStore implements ObjectStore<String>
+    {
+        private Map<Serializable, String> store = new HashMap<Serializable, String>();
+
+        public CustomObjectStore()
+        {
+            super();
+        }
+
+        public boolean contains(Serializable key) throws ObjectStoreNotAvaliableException
+        {
+            return store.containsKey(key);
+        }
+
+        public String remove(Serializable key) throws ObjectStoreException
+        {
+            return store.remove(key);
+        }
+
+        public String retrieve(Serializable key) throws ObjectStoreException
+        {
+            return store.get(key);
+        }
+
+        public void store(Serializable key, String value) throws ObjectStoreException
+        {
+            store.put(key, value);
+        }
+    }
 }

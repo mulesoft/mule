@@ -9,8 +9,13 @@
  */
 package org.mule.util.store;
 
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * means that the store may temporarily exceed its maximum size between expiry runs, but
  * will eventually shrink to its configured size.
  */
-public class InMemoryObjectStore extends AbstractMonitoredObjectStore
+public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T>
 {
     protected ConcurrentSkipListMap/*<Long, StoredObject>*/ store;
 
@@ -36,23 +41,23 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * {@inheritDoc}
      */
-    public boolean contains(String id) throws Exception
+    public boolean contains(Serializable key) throws ObjectStoreNotAvaliableException
     {
-        if (id == null)
+        if (key == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("id").toString());
         }
 
         synchronized (store)
         {
-            return store.values().contains(new StoredObject(id, null));
+            return store.values().contains(new StoredObject<T>(key, null));
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean store(String id, Object item) throws Exception
+    public void store(Serializable id, T value) throws ObjectStoreException
     {
         if (id == null)
         {
@@ -61,12 +66,12 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
 
         // this block is unfortunately necessary to counter a possible race condition
         // between multiple nonatomic calls to containsObject/storeObject
-        StoredObject obj = new StoredObject(id, item);
+        StoredObject<T> obj = new StoredObject<T>(id, value);
         synchronized (store)
         {
             if (store.values().contains(obj))
             {
-                return false;
+                throw new ObjectAlreadyExistsException();
             }
 
             boolean written = false;
@@ -75,43 +80,30 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
                 Long key = Long.valueOf(System.nanoTime());
                 written = (store.put(key, obj) == null);
             }
-
-            return true;
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public Object retrieve(String id) throws Exception
+    @SuppressWarnings("unchecked")
+    public T retrieve(Serializable key) throws ObjectStoreException
     {
         synchronized (store)
         {
-            Map.Entry<?, ?> entry = findEntry(id);
+            Map.Entry<?, ?> entry = findEntry(key);
             if (entry != null)
             {
                 StoredObject object = (StoredObject) entry.getValue();
-                return object.getItem();
+                return (T)object.getItem();
             }
         }
-        return null;
+        
+        throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
     }
 
-    public boolean remove(String id) throws Exception
-    {
-        synchronized (store)
-        {
-            Map.Entry<?, ?> entry = findEntry(id);
-            if (entry != null)
-            {
-                Object removedObject = store.remove(entry.getKey());
-                return (removedObject != null);
-            }
-        }
-        return true;
-    }
-    
-    private Map.Entry<?, ?> findEntry(String id)
+    @SuppressWarnings("unchecked")
+    private Map.Entry<?, ?> findEntry(Serializable key)
     {
         Iterator<?> entryIterator = store.entrySet().iterator();
         while (entryIterator.hasNext())
@@ -119,7 +111,7 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
             Map.Entry<?, ?> entry = (Map.Entry<?, ?>) entryIterator.next();
             
             StoredObject object = (StoredObject) entry.getValue();
-            if (object.getId().equals(id))
+            if (object.getId().equals(key))
             {
                 return entry;
             }
@@ -127,6 +119,23 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
         return null;
     }
 
+    @SuppressWarnings("unchecked")
+    public T remove(Serializable key) throws ObjectStoreException
+    {
+        synchronized (store)
+        {
+            Map.Entry<?, ?> entry = findEntry(key);
+            if (entry != null)
+            {
+                StoredObject removedObject = (StoredObject) store.remove(entry.getKey());
+                return (T)removedObject.getItem();
+            }
+        }
+        
+        throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
+    }
+    
+    @Override
     public void expire()
     {
         // this is not guaranteed to be precise, but we don't mind
@@ -199,28 +208,29 @@ public class InMemoryObjectStore extends AbstractMonitoredObjectStore
     /**
      * Represents the object stored in the store. This class holds the Object itslef and its ID.
      */
-    protected static class StoredObject
+    protected static class StoredObject<T>
     {
-        private String id;
-        private Object item;
+        private Serializable id;
+        private T item;
 
-        public StoredObject(String id, Object item)
+        public StoredObject(Serializable id, T item)
         {
             this.id = id;
             this.item = item;
         }
 
-        public String getId()
+        public Serializable getId()
         {
             return id;
         }
 
-        public Object getItem()
+        public T getItem()
         {
             return item;
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public boolean equals(Object o)
         {
             if (this == o)
