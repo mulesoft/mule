@@ -198,6 +198,13 @@ public abstract class AbstractService implements Service
 
         inboundRouter.setListener(new InternalServiceMessageProcessor());
         
+        // Ensure Component has service instance and is initialised. If the component
+        // was configured with spring and is therefore in the registry it will get
+        // started automatically, if it was set on the service directly then it won't
+        // be started automatically. So to be sure we start it here.
+        component.setService(this);
+        component.initialise();
+
         try
         {
             lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
@@ -206,12 +213,6 @@ public abstract class AbstractService implements Service
         {
             throw new InitialisationException(e, this);
         }
-        // Ensure Component has service instance and is initialised. If the component
-        // was configured with spring and is therefore in the registry it will get
-        // started automatically, if it was set on the service directly then it won't
-        // be started automatically. So to be sure we start it here.
-        component.setService(this);
-        component.initialise();
 
         // initialise statistics
         stats = createStatistics();

@@ -12,6 +12,9 @@ package org.mule.component;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
+import org.mule.api.service.Service;
+import org.mule.lifecycle.LifecycleTrackerComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -75,6 +78,19 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         component.dispose();
 
         assertNull(lifecycleAdapter.componentObject.get());
+    }
+    
+    public void testServicePropogatedLifecycle() throws InitialisationException
+    {
+        Service service = new SedaService(muleContext);
+        service.setName("service");
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        LifecycleTrackerComponent component = new LifecycleTrackerComponent();
+        service.setComponent(component);
+        
+        service.initialise();
+        
+        assertTrue(component.getTracker().contains("initialise"));
     }
 
 }

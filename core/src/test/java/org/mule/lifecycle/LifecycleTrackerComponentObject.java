@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.components;
+package org.mule.lifecycle;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
@@ -18,7 +18,7 @@ import org.mule.api.service.ServiceAware;
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerComponent extends AbstractLifecycleTracker
+public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker
         implements ServiceAware, Callable {
 
     public void springInitialize() {

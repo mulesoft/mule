@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.components;
+package org.mule.lifecycle;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
