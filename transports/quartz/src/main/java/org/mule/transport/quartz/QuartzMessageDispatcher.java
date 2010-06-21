@@ -168,7 +168,6 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         Scheduler scheduler = ((QuartzConnector) this.getConnector()).getQuartzScheduler();
         scheduler.scheduleJob(jobDetail, trigger);
-       // scheduler.start();
     }
 
     @Override

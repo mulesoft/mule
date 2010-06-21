@@ -165,8 +165,6 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 logger.warn("A quartz Job with name: " + endpoint.getEndpointURI().getAddress() +
                         " has already been registered. Cannot register again");
             }
-
-            scheduler.start();
         }
         catch (Exception e)
         {
