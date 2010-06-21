@@ -8,12 +8,12 @@
 
     <configuration defaultSynchronousEndpoints="true" />
 
-    <spring:bean id="SpringBeanLifecycleTrackerComponent" class="org.mule.test.integration.components.LifecycleTrackerComponent"
+    <spring:bean id="SpringBeanLifecycleTrackerComponent" class="org.mule.lifecycle.LifecycleTrackerComponentObject"
         init-method="springInitialize" destroy-method="springDestroy" scope="singleton">
         <spring:property name="property" value="sbltc" />
     </spring:bean>
 
-    <spring:bean id="SpringBeanLifecycleTrackerComponent2" class="org.mule.test.integration.components.LifecycleTrackerComponent"
+    <spring:bean id="SpringBeanLifecycleTrackerComponent2" class="org.mule.lifecycle.LifecycleTrackerComponentObject"
         scope="singleton">
         <spring:property name="property" value="sbltc" />
     </spring:bean>
@@ -43,7 +43,7 @@
                 <vm:inbound-endpoint path="MulePrototypeService.In" />
             </inbound>
             <component>
-                <prototype-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+                <prototype-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
                     <property key="property" value="mps" />
                 </prototype-object>
             </component>
@@ -54,7 +54,7 @@
                 <vm:inbound-endpoint path="MulePooledPrototypeService.In" />
             </inbound>
             <pooled-component>
-                <prototype-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+                <prototype-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
                     <property key="property" value="mpps" />
                 </prototype-object>
                 <pooling-profile maxActive="3" initialisationPolicy="INITIALISE_ALL" />
@@ -66,7 +66,7 @@
                 <vm:inbound-endpoint path="MulePooledSingletonService.In" />
             </inbound>
             <pooled-component>
-                <singleton-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+                <singleton-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
                     <property key="property" value="mpps" />
                 </singleton-object>
                 <pooling-profile maxActive="3" initialisationPolicy="INITIALISE_ALL" />
@@ -78,7 +78,7 @@
                 <vm:inbound-endpoint path="MuleSingletonService.In" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.components.LifecycleTrackerComponent">
+                <singleton-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
                     <property key="property" value="mss" />
                 </singleton-object>
             </component>
