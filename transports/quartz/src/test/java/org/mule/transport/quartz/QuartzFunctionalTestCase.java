@@ -16,6 +16,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 
 public class QuartzFunctionalTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "quartz-functional-test.xml";
@@ -32,7 +33,6 @@ public class QuartzFunctionalTestCase extends FunctionalTestCase
         assertNotNull(component);
         CountdownCallback count2 = new CountdownCallback(2);
         component.setEventCallback(count2);
-
 
         // we wait up to 60 seconds here which is WAY too long for three ticks with 1
         // second interval, but it seems that "sometimes" it takes a very long time
