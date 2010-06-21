@@ -35,27 +35,28 @@ import org.apache.commons.logging.LogFactory;
  * Implementation of {@link CompositeMessageSource} that propagates both injection of
  * {@link Pattern} and lifecycle to nested {@link MessageSource}s.
  * <p>
- * <li>This MessageSourceAggregator cannot be started without a listener set.
- * <li>If sources are added when this composie is started they will be started.
- * <li>If a MessageSource is started in isolation when composite is stopped then
+ * <li>This message source cannot be started without a listener set.
+ * <li>If sources are added when this composie is started they will be started as well.
+ * <li>If a {@link MessageSource} is started in isolation when composite is stopped then
  * messages will be lost.
  * <li>Message will only be received from endpoints if the connector is also started.
  */
 public class StartablePatternAwareCompositeMessageSource
     implements CompositeMessageSource, Startable, Stoppable, PatternAware
 {
-    private static final Log log = LogFactory.getLog(StartablePatternAwareCompositeMessageSource.class);
+    protected static final Log log = LogFactory.getLog(StartablePatternAwareCompositeMessageSource.class);
 
-    private MessageProcessor listener;
+    protected MessageProcessor listener;
+    protected AtomicBoolean started = new AtomicBoolean(false);
     private MessageProcessor internalListener = new InternalMessageProcessor();
     private List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
-    private AtomicBoolean started = new AtomicBoolean(false);
     private Pattern pattern;
 
     public void addSource(MessageSource source) throws MuleException
     {
         sources.add(source);
         source.setListener(internalListener);
+        
         if (started.get())
         {
             if (source instanceof PatternAware)
@@ -71,16 +72,11 @@ public class StartablePatternAwareCompositeMessageSource
 
     public void removeSource(MessageSource source) throws MuleException
     {
-        if (started.get() && source instanceof Stoppable)
+        if (started.get() && (source instanceof Stoppable))
         {
             ((Stoppable) source).stop();
         }
         sources.remove(source);
-    }
-
-    public void setListener(MessageProcessor listener)
-    {
-        this.listener = listener;
     }
 
     public void start() throws MuleException
@@ -89,6 +85,7 @@ public class StartablePatternAwareCompositeMessageSource
         {
             throw new LifecycleException(CoreMessages.objectIsNull("listener"), this);
         }
+        
         synchronized (sources)
         {
             for (MessageSource source : sources)
@@ -102,6 +99,7 @@ public class StartablePatternAwareCompositeMessageSource
                     ((Startable) source).start();
                 }
             }
+            
             started.set(true);
         }
     }
@@ -117,8 +115,14 @@ public class StartablePatternAwareCompositeMessageSource
                     ((Stoppable) source).stop();
                 }
             }
+            
             started.set(false);
         }
+    }
+
+    public void setListener(MessageProcessor listener)
+    {
+        this.listener = listener;
     }
 
     public void setPattern(Pattern pattern)
@@ -136,6 +140,11 @@ public class StartablePatternAwareCompositeMessageSource
 
     private class InternalMessageProcessor implements MessageProcessor
     {
+        public InternalMessageProcessor()
+        {
+            super();
+        }
+        
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             if (started.get())
@@ -145,7 +154,7 @@ public class StartablePatternAwareCompositeMessageSource
             else
             {
                 log.warn("Message " + event
-                         + " was recieved from MessageSource, but MessageSourceAggregator " + this
+                         + " was recieved from MessageSource, but message source " + this
                          + " is stopped.  Message will be discarded.");
                 return null;
             }
