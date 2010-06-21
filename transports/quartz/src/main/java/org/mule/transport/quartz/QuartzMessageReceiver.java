@@ -144,16 +144,19 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
                 throw new IllegalArgumentException(
                         QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
             }
+
+            trigger.setName(endpoint.getEndpointURI().getAddress());
+            trigger.setGroup(groupName);
+            trigger.setJobName(endpoint.getEndpointURI().getAddress());
+            trigger.setJobGroup(jobGroupName);
+
+            // Minimize the the time window capturing the start time and scheduling the job.
             long start = System.currentTimeMillis();
             if (startDelay != null)
             {
                 start += Long.parseLong(startDelay);
             }
             trigger.setStartTime(new Date(start));
-            trigger.setName(endpoint.getEndpointURI().getAddress());
-            trigger.setGroup(groupName);
-            trigger.setJobName(endpoint.getEndpointURI().getAddress());
-            trigger.setJobGroup(jobGroupName);
 
             // We need to handle cases when the job has already been persisted
             try

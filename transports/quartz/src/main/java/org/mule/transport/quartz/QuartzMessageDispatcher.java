@@ -155,18 +155,21 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             throw new IllegalArgumentException(
                 QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
         }
-        long start = System.currentTimeMillis();
-        if (startDelay != null)
-        {
-            start += Long.parseLong(startDelay);
-        }
-        trigger.setStartTime(new Date(start));
         trigger.setName(event.getEndpoint().getEndpointURI().toString() + "-" + event.getId());
         trigger.setGroup(groupName);
         trigger.setJobName(jobDetail.getName());
         trigger.setJobGroup(jobGroupName);
 
         Scheduler scheduler = ((QuartzConnector) this.getConnector()).getQuartzScheduler();
+
+        // Minimize the the time window capturing the start time and scheduling the job.
+        long start = System.currentTimeMillis();
+        if (startDelay != null)
+        {
+            start += Long.parseLong(startDelay);
+        }
+        trigger.setStartTime(new Date(start));
+
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
