@@ -138,7 +138,8 @@
         <slf4jVersion>1.5.0</slf4jVersion>
         <smackVersion>3.1.0</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
-        <springVersion>2.5.6</springVersion>
+        <!-- see http://www.springsource.com/security/cve-2010-1622 -->
+        <springVersion>2.5.6.SEC02</springVersion>
         <springSecurityVersion>2.0.4</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
