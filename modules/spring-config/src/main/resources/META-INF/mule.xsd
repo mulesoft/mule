@@ -94,6 +94,22 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:element name="transaction-manager-properties">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Defines properties that modify the behavior of the Mule transaction manager
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                    <xsd:attribute name="joinExternal" type="xsd:boolean" default="false">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                If "true", Mule will join transaction started by external code.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-agent"/>
             <xsd:element ref="abstract-security-manager"/>

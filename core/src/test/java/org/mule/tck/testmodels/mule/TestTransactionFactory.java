@@ -14,13 +14,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.transaction.AbstractTransactionFactory;
 
 /**
  * <code>TestTransactionFactory</code> creates a {@link org.mule.tck.testmodels.mule.TestTransaction}
  * 
  */
 
-public class TestTransactionFactory implements TransactionFactory
+public class TestTransactionFactory extends AbstractTransactionFactory implements TransactionFactory
 {
 
     // for testsing properties

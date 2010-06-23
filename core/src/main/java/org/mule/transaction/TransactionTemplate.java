@@ -45,8 +45,18 @@ public class TransactionTemplate
             return callback.doInTransaction();
         }
 
+        Transaction joinedExternal = null;
         byte action = (config != null) ? config.getAction() : TransactionConfig.ACTION_DEFAULT;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx == null && context != null  && config != null)
+        {
+            TransactionManagerProperties tmProperties = context.getTransactionManagerProperties();
+            if (tmProperties.isJoinExternal())
+            {
+                joinedExternal = tx = config.getFactory().joinExternalTransaction(context);
+            }
+        }
+        
         Transaction suspendedXATx = null;
         
         if (action == TransactionConfig.ACTION_NEVER && tx != null)
@@ -167,6 +177,11 @@ public class TransactionTemplate
                 tx.rollback();
             }
             throw e;
+        }
+        finally
+        {
+            if (joinedExternal != null)
+                TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
         }
     }
 
