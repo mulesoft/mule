@@ -23,15 +23,16 @@ public interface ObjectStore<T extends Serializable>
      * @throws ObjectStoreNotAvaliableException if any implementation-specific error occured, e.g. 
      *          when the store is not available
      */
-    boolean contains(Serializable key) throws ObjectStoreNotAvaliableException;
+    boolean contains(Serializable key) throws ObjectStoreException;
 
     /**
      * Store the given Object.
      *
      * @param key the identifier for <code>value</code>
      * @param value the Object to store with <code>key</code>
-     * @throws ObjectStoreException if the given ID cannot be stored or is <code>null</code> or
-     *          if the store is not available or any other implementation-specific error occured.
+     * @throws ObjectStoreException if the given key cannot be stored or is <code>null</code>.
+     * @throws ObjectStoreNotAvaliableException if the store is not available or any other 
+     *          implementation-specific error occured.
      * @throws ObjectAlreadyExistsException if an attempt is made to store an object for a key
      *          that already has an object associated.
      */
@@ -43,8 +44,10 @@ public interface ObjectStore<T extends Serializable>
      * @param key the identifier of the object to retrieve.
      * @return the object associated with the given key. If no object for the given key was found
      *          this method throws an {@link ObjectDoesNotExistException}.
-     * @throws ObjectStoreException if the given ID is <code>null</code> of if the store is not 
-     *          available or any other implementation-specific error occured
+     * @throws ObjectStoreException if the given key is <code>null</code>.
+     * @throws ObjectStoreNotAvaliableException if the store is not  available or any other 
+     *          implementation-specific error occured.
+     * @throws ObjectDoesNotExistException if no value for the given key was previously stored.
      */
     T retrieve(Serializable key) throws ObjectStoreException;
 
@@ -56,6 +59,7 @@ public interface ObjectStore<T extends Serializable>
      *          object with the key was stored.
      * @throws ObjectStoreException if the given key is <code>null</code> or if the store is not 
      *          available or any other implementation-specific error occured
+     * @throws ObjectDoesNotExistException if no value for the given key was previously stored.
      */
     T remove(Serializable key) throws ObjectStoreException;
 }

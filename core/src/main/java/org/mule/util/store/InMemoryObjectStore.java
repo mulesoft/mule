@@ -12,7 +12,6 @@ package org.mule.util.store;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
@@ -41,11 +40,11 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     /**
      * {@inheritDoc}
      */
-    public boolean contains(Serializable key) throws ObjectStoreNotAvaliableException
+    public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("id").toString());
+            throw new ObjectStoreException(CoreMessages.objectIsNull("id"));
         }
 
         synchronized (store)
@@ -61,7 +60,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     {
         if (id == null)
         {
-            throw new IllegalArgumentException(CoreMessages.objectIsNull("id").toString());
+            throw new ObjectStoreException(CoreMessages.objectIsNull("id"));
         }
 
         // this block is unfortunately necessary to counter a possible race condition
