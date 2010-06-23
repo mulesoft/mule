@@ -252,7 +252,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         }
     }
 
-    static class NullMessageProcesser implements MessageProcessor
+    public static class NullMessageProcesser implements MessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException
         {

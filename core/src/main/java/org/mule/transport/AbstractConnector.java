@@ -2467,56 +2467,72 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         requesters.setMaxWait(maxWait);
     }
 
-    public MessageProcessor createOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
-        throws MuleException
+    public MessageProcessor createOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
         // -- REQUEST CHAIN --
         ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
         outboundChainBuilder.setName("Outbound endpoint request chain");
-
-        // Log but don't proceed if connector is not started
-        outboundChainBuilder.chain(new OutboundLoggingMessageProcessor()).chain(
-            new AssertConnectorStartedMessageProcessor());
-
-        // Everything is processed within TransactionTempplate
-        outboundChainBuilder.chain(new TransactionalInterceptingMessageProcessor(
-            endpoint.getTransactionConfig(), this, muleContext));
-
-        outboundChainBuilder.chain(new OutboundEventTimeoutMessageProcessor());
-
-        // Exception handling to preserve previous MuleSession level exception
-        // handling behaviour
-        outboundChainBuilder.chain(new OutboundSimpleTryCatchMessageProcessor());
-        outboundChainBuilder.chain(new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this));
-
-        outboundChainBuilder.chain(new OutboundSessionHandlerMessageProcessor(getSessionHandler())).chain(
-            new OutboundEndpointPropertyMessageProcessor());
-
-        // TODO MULE-4872
-        if (endpoint instanceof OutboundEndpointDecorator)
-        {
-            outboundChainBuilder.chain(new OutboundEndpointDecoratorMessageProcessor(
-                (OutboundEndpointDecorator) endpoint));
-        }
-
-        outboundChainBuilder.chain(new OutboundSecurityFilterMessageProcessor(endpoint)).chain(
-            new OutboundTryCatchMessageProcessor(endpoint)).chain(
-            new OutboundResponsePropertiesMessageProcessor(endpoint)).chain(
-            new InternalDispatcherMessageProcessor(endpoint));
+        outboundChainBuilder.chain(createOutboundRequestMessageProcessors(endpoint));
+        
+        // -- OUTBOUND ROUTER --
+        outboundChainBuilder.chain(new InternalDispatcherMessageProcessor(endpoint));
 
         // -- RESPONSE CHAIN --
         ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
         responseChainBuilder.setName("Outbound endpoint response chain");
-        responseChainBuilder.chain(new TransformerMessageProcessor(endpoint.getResponseTransformers()))
-            .chain(new OutboundRewriteResponseEventMessageProcessor());
+        responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
 
-        // -- COMPOSITE CHAIN --
+        // Compose request and response chains. We do this so that if the request
+        // chain returns early the response chain is still invoked.
         ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
         compositeChainBuilder.setName("Outbound endpoint request/response composite chain");
         compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
         return compositeChainBuilder.build();
     }
 
+    /** Override this method to change the default MessageProcessors. */
+    public MessageProcessor[] createOutboundRequestMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    {
+        return new MessageProcessor[] 
+        { 
+            // Log but don't proceed if connector is not started
+            new OutboundLoggingMessageProcessor(), 
+            new AssertConnectorStartedMessageProcessor(),
+    
+            // Everything is processed within TransactionTemplate
+            new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(), this, muleContext),
+    
+            new OutboundEventTimeoutMessageProcessor(),
+    
+            // Exception handling to preserve previous MuleSession level exception
+            // handling behaviour
+            new OutboundSimpleTryCatchMessageProcessor(),
+            new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this),
+    
+            new OutboundSessionHandlerMessageProcessor(getSessionHandler()),
+            new OutboundEndpointPropertyMessageProcessor(),
+    
+            // TODO MULE-4872
+            (endpoint instanceof OutboundEndpointDecorator ? 
+                 new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint) : 
+                 new ChainMessageProcessorBuilder.NullMessageProcesser()),
+    
+            new OutboundSecurityFilterMessageProcessor(endpoint),
+            new OutboundTryCatchMessageProcessor(endpoint),
+            new OutboundResponsePropertiesMessageProcessor(endpoint)
+        };
+    }
+    
+    /** Override this method to change the default MessageProcessors. */
+    public MessageProcessor[] createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    {
+        return new MessageProcessor[] 
+        { 
+            new TransformerMessageProcessor(endpoint.getResponseTransformers()),
+            new OutboundRewriteResponseEventMessageProcessor()
+        };
+    }
+    
     /**
      * Create a default inbound endpoint {@link MessageProcessor} chain suitable for
      * use by most transports.
@@ -2524,23 +2540,18 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     protected MessageProcessor createInboundEndpointMessageProcessorChain(InboundEndpoint endpoint,
                                                                           MessageProcessor listener)
     {
-        // Construct inbound chain
+        // -- REQUEST CHAIN --
         ChainMessageProcessorBuilder requestChainBuilder = new ChainMessageProcessorBuilder();
         requestChainBuilder.setName("Inbound endpoint request pipeline");
-        requestChainBuilder.chain(new InboundEndpointPropertyMessageProcessor(endpoint),
-            new InboundNotificationMessageProcessor(endpoint), new InboundLoggingMessageProcessor(endpoint),
-            new InboundFilterMessageProcessor(), new InboundSecurityFilterMessageProcessor(endpoint),
-            new TransformerMessageProcessor(endpoint.getTransformers()));
-
+        requestChainBuilder.chain(createInboundRequestMessageProcessors(endpoint));
+        
+        // -- INVOKE SERVICE --
         requestChainBuilder.chain(listener);
 
-        customizeInboundEndpointRequestChain(requestChainBuilder);
-
-        // Construct response chain
+        // -- RESPONSE CHAIN --
         ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
         responseChainBuilder.setName("Inbound endpoint response pipeline");
-        responseChainBuilder.chain(new InboundExceptionDetailsMessageProcessor(this),
-            new TransformerMessageProcessor(endpoint.getResponseTransformers()));
+        responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
 
         // Compose request and response chains. We do this so that if the request
         // chain returns early the response chain is still invoked.
@@ -2551,11 +2562,30 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         return inboundChainBuilder.build();
     }
 
-    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    /** Override this method to change the default MessageProcessors. */
+    protected MessageProcessor[] createInboundRequestMessageProcessors(InboundEndpoint endpoint)
     {
-        // Template method
+        return new MessageProcessor[] 
+        { 
+            new InboundEndpointPropertyMessageProcessor(endpoint),
+            new InboundNotificationMessageProcessor(endpoint), 
+            new InboundLoggingMessageProcessor(endpoint),
+            new InboundFilterMessageProcessor(), 
+            new InboundSecurityFilterMessageProcessor(endpoint),
+            new TransformerMessageProcessor(endpoint.getTransformers()) 
+        };
     }
-
+    
+    /** Override this method to change the default MessageProcessors. */
+    protected MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
+    {
+        return new MessageProcessor[] 
+        { 
+            new InboundExceptionDetailsMessageProcessor(this),
+            new TransformerMessageProcessor(endpoint.getResponseTransformers()) 
+        };
+    }
+    
     public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
         throws MuleException
     {
