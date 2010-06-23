@@ -87,6 +87,12 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${cxfVersion}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Test jars -->
         <dependency>
             <groupId>org.mule.modules</groupId>

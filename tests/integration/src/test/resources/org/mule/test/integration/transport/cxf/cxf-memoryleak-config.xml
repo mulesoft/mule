@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/ee/jdbc"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="
+                  http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/3.0/mule-jdbc-ee.xsd
+                  http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+                  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+                  http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+                  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+                  http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+                  http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
+                  http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd">
+
+    <cxf:connector name="cxfConnector">
+        <service-overrides dispatcherFactory="org.mule.test.integration.transport.cxf.TestCxfMessageDispatcherFactory"/>
+    </cxf:connector>
+
+    <cxf:endpoint
+            name="clientEndpoint"
+            address="http://localhost:63081/services/greeter"
+            clientClass="org.apache.hello_world_soap_http.SOAPService"
+            wsdlPort="SoapPort"
+            wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+    </cxf:endpoint>
+
+    <model>
+        <service name="greeterService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
+            </inbound>
+            <component>
+                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
+            </component>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="PopulateBatchData">
+            <inbound>
+                <vm:inbound-endpoint path="in"/>
+            </inbound>
+            <scripting:component>
+                <scripting:script engine="groovy">
+                    <![CDATA[
+                    import org.mule.DefaultMuleMessage;
+
+                    return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sim=\"http://www.example.org/simplewithheader/\"><soapenv:Header><sim:header><headerparam>?</headerparam></sim:header></soapenv:Header><soapenv:Body><sim:NewOperationRequest><in>Garbage</in></sim:NewOperationRequest></soapenv:Body></soapenv:Envelope>";
+                    ]]>
+                </scripting:script>
+            </scripting:component>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint
+                            address="http://localhost:63081/services/greeter"
+                            clientClass="org.apache.hello_world_soap_http.SOAPService"
+                            wsdlPort="SoapPort"
+                            wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+                            operation="greetMe"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
