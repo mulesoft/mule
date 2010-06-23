@@ -16,7 +16,6 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
-import org.mule.transaction.AbstractTransactionFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -26,7 +25,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * TODO: document this class
  */
-public class SpringTransactionFactory extends AbstractTransactionFactory implements TransactionFactory
+public class SpringTransactionFactory implements TransactionFactory
 {
 
     private PlatformTransactionManager manager;

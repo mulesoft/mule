@@ -129,7 +129,6 @@ import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.service.DefaultServiceExceptionStrategy;
-import org.mule.transaction.TransactionManagerProperties;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -251,9 +250,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("jrun-transaction-manager", new TransactionManagerDefinitionParser(JRunTransactionManagerLookupFactory.class));
         registerBeanDefinitionParser("resin-transaction-manager", new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
         registerBeanDefinitionParser("websphere-transaction-manager", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
-
-        // Transaction manager properties
-        registerBeanDefinitionParser("transaction-manager-properties", new MuleOrphanDefinitionParser(TransactionManagerProperties.class, true));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));

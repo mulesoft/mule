@@ -266,7 +266,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
-        XaTransaction muleTx = new XaTransaction(muleContext, false);
+        XaTransaction muleTx = new XaTransaction(muleContext);
         assertFalse(muleTx.isBegun());
         assertEquals(Status.STATUS_NO_TRANSACTION, muleTx.getStatus());
         muleTx.begin();

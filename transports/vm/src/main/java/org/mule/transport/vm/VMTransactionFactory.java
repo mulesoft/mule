@@ -14,9 +14,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.transaction.AbstractTransactionFactory;
 
-public class VMTransactionFactory extends AbstractTransactionFactory implements TransactionFactory
+public class VMTransactionFactory implements TransactionFactory
 {
 
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException

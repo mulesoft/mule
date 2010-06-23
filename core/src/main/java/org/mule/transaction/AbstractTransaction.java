@@ -84,7 +84,7 @@ public abstract class AbstractTransaction implements Transaction
         }
         finally
         {
-            unbindTransaction();
+            TransactionCoordination.getInstance().unbindTransaction(this);
         }
     }
 
@@ -99,18 +99,8 @@ public abstract class AbstractTransaction implements Transaction
         }
         finally
         {
-            unbindTransaction();
+            TransactionCoordination.getInstance().unbindTransaction(this);
         }
-    }
-
-    /**
-     * unbind this transaction when it completes 
-     *
-     * @throws TransactionException
-     */
-    protected void unbindTransaction() throws TransactionException
-    {
-        TransactionCoordination.getInstance().unbindTransaction(this);
     }
 
     /**

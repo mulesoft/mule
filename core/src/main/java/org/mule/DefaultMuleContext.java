@@ -41,7 +41,6 @@ import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
-import org.mule.transaction.TransactionManagerProperties;
 import org.mule.util.ApplicationShutdownSplashScreen;
 import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.ServerShutdownSplashScreen;
@@ -520,15 +519,6 @@ public class DefaultMuleContext implements MuleContext
         return transactionManager;
     }
 
-    public TransactionManagerProperties getTransactionManagerProperties()
-    {
-        Collection temp = registryBroker.lookupObjects(TransactionManagerProperties.class);
-        if (temp.size() > 0)
-            return (TransactionManagerProperties) temp.iterator().next();
-        else
-            return new TransactionManagerProperties(); // use default properties
-    }
-    
     protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException
     {
         if (lifecycleManager.isPhaseComplete(phase))

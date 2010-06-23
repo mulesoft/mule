@@ -14,13 +14,12 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.transaction.AbstractTransactionFactory;
 
 /**
  * <p>
  * <code>JmsTransactionFactory</code> creates a JMS local transaction
  */
-public class JmsTransactionFactory extends AbstractTransactionFactory implements TransactionFactory
+public class JmsTransactionFactory implements TransactionFactory
 {
     private String name;
     

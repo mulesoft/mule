@@ -14,14 +14,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.transaction.AbstractTransactionFactory;
 
 /**
  * <code>JmsClientAcknowledgeTransactionFactory</code> creates a JMS Client
  * Acknowledge Transaction using a JMS Message.
  */
 
-public class JmsClientAcknowledgeTransactionFactory extends AbstractTransactionFactory implements TransactionFactory
+public class JmsClientAcknowledgeTransactionFactory implements TransactionFactory
 {
     public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
