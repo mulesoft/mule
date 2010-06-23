@@ -16,19 +16,17 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestMessageReceiver;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.simple.InboundAppendTransformer;
 import org.mule.transformer.simple.ResponseAppendTransformer;
@@ -41,10 +39,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTestCase
 {
     private static final String TEST_MESSAGE = "test";
-    private MessageReceiver receiver;
+    private InboundEndpoint endpoint;
     private SensingNullMessageProcessor inboundListener;
     private MuleMessage inMessage;
+    private MuleEvent requestEvent;
     private MuleEvent responseEvent;
+    private MuleEvent result;
 
     private static String RESPONSE_MESSAGE = "response-message";
 
@@ -58,60 +58,70 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
 
     public void testDefaultFlowSync() throws Exception
     {
-        receiver = createTestMessageReceiver(null, null, null, null, true, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, true, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
     public void testDefaultFlowAsync() throws Exception
     {
-        receiver = createTestMessageReceiver(null, null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(false);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
     public void testFilterAccept() throws Exception
     {
-        receiver = createTestMessageReceiver(new TestFilter(true), null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(new TestFilter(true), null, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(false);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
 
     }
 
     public void testFilterNotAccept() throws Exception
     {
-        receiver = createTestMessageReceiver(new TestFilter(false), null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(new TestFilter(false), null, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageNotSent();
-        assertEquals(inMessage, result);
-        assertNull(result.getExceptionPayload());
+        assertEquals(inMessage, result.getMessage());
+        assertNull(result.getMessage().getExceptionPayload());
 
     }
 
     public void testSecurityFilterAccept() throws Exception
     {
-        receiver = createTestMessageReceiver(null, new TestSecurityFilter(true), null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(false);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
 
     }
 
@@ -120,23 +130,24 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
         muleContext.registerListener(securityNotificationListener);
 
-        receiver = createTestMessageReceiver(null, new TestSecurityFilter(false), null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageNotSent();
         assertNotNull(result);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getPayloadAsString());
-        assertNotNull(result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
+        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
+        assertNotNull(result.getMessage().getExceptionPayload());
+        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
             securityNotificationListener.securityNotification.getAction());
         assertEquals(securityNotificationListener.securityNotification.getResourceIdentifier(),
             TestSecurityFilter.StaticMessageUnauthorisedException.class.getName());
-
     }
 
     /**
@@ -146,16 +157,18 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
     public void testFilterFirstThenSecurityFilter() throws Exception
     {
         TestSecurityFilter securityFilter = new TestSecurityFilter(false);
-        receiver = createTestMessageReceiver(new TestFilter(false), securityFilter, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(new TestFilter(false), securityFilter, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertFalse(securityFilter.wasCalled());
 
         assertMessageNotSent();
-        assertEquals(inMessage, result);
-        assertNull(result.getExceptionPayload());
+        assertEquals(inMessage, result.getMessage());
+        assertNull(result.getMessage().getExceptionPayload());
     }
 
     /**
@@ -164,16 +177,17 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
      */
     public void testRemoteSyncMessagePropertyForcesSync() throws Exception
     {
-        receiver = createTestMessageReceiver(null, null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
 
-        inMessage = createTestRequestMessage();
         inMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
     /**
@@ -183,48 +197,53 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
     {
         TransactionConfig txConfig = new MuleTransactionConfig();
         txConfig.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        receiver = createTestMessageReceiver(null, null, null, null, false, txConfig);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, false, txConfig);
 
         inMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
-        assertEquals(responseEvent.getMessage(), result);
+        assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
     public void testMessagePropertyErrorMapping() throws Exception
     {
-        receiver = createTestMessageReceiver(null, null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSentSame(false);
-        assertEquals(responseEvent.getMessage(), result);
-        assertEquals(500, result.getIntProperty("status", 0));
+        assertEquals(responseEvent.getMessage(), result.getMessage());
+        assertEquals(500, result.getMessage().getIntProperty("status", 0));
     }
 
     public void testResponseTransformerExceptionDetailAfterRequestFlowInterupt() throws Exception
     {
-        receiver = createTestMessageReceiver(null, new TestSecurityFilter(false), null,
+        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), null,
             new ResponseAppendTransformer(), false, null);
-        responseEvent = createTestResponseEvent(receiver);
-
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
-        MuleMessage result = receiver.routeMessage(inMessage);
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageNotSent();
         assertNotNull(result);
         assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
-            result.getPayloadAsString());
-        assertEquals(403, result.getIntProperty("status", 0));
+            result.getMessage().getPayloadAsString());
+        assertEquals(403, result.getMessage().getIntProperty("status", 0));
 
-        assertNotNull(result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
+        assertNotNull(result.getMessage().getExceptionPayload());
+        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
     }
 
     public void testNotfication() throws Exception
@@ -232,13 +251,16 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
         muleContext.registerListener(listener);
 
-        receiver = createTestMessageReceiver(null, null, null, null, false, null);
-        responseEvent = createTestResponseEvent(receiver);
+        endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        receiver.routeMessage(createTestRequestMessage());
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
+
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(EndpointMessageNotification.MESSAGE_RECEIVED, listener.messageNotification.getAction());
-        assertEquals(receiver.getEndpoint().getEndpointURI().getUri().toString(),
+        assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(inMessage.getPayload(),
@@ -247,35 +269,27 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
 
     public void testTransformers() throws Exception
     {
-        receiver = createTestMessageReceiver(null, null, new InboundAppendTransformer(),
+        endpoint = createTestInboundEndpoint(null, null, new InboundAppendTransformer(),
             new ResponseAppendTransformer(), true, null);
-        responseEvent = createTestResponseEvent(receiver);
+        requestEvent = createTestRequestEvent(endpoint);
+        responseEvent = createTestResponseEvent(endpoint);
 
-        MuleMessage response = receiver.routeMessage(createTestRequestMessage());
+        MessageProcessor mpChain = createInboundEndpointMessageProcessorChain(endpoint, inboundListener);
+        result = mpChain.process(requestEvent);
 
         assertMessageSent(true);
         assertEquals(TEST_MESSAGE + InboundAppendTransformer.APPEND_STRING,
             inboundListener.sensedEvent.getMessageAsString());
 
-        assertNotNull(response);
+        assertNotNull(result);
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
-            response.getPayloadAsString());
+            result.getMessage().getPayloadAsString());
     }
 
-    protected MessageReceiver createTestMessageReceiver(Filter filter,
-                                                        EndpointSecurityFilter securityFilter,
-                                                        Transformer in,
-                                                        Transformer response,
-                                                        boolean sync,
-                                                        TransactionConfig txConfig) throws Exception
+    protected MessageProcessor createInboundEndpointMessageProcessorChain(InboundEndpoint endpoint,
+                                                                          MessageProcessor listener)
     {
-        InboundEndpoint endpoint = createTestInboundEndpoint(filter, securityFilter, in, response, sync,
-            txConfig);
-        TestConnector connector = (TestConnector) endpoint.getConnector();
-        receiver = new TestMessageReceiver(connector, getTestService(), endpoint);
-        receiver.setListener(connector.createInboundEndpointMessageProcessorChain(endpoint, inboundListener));
-        receiver.initialise();
-        return receiver;
+        return ((TestConnector) endpoint.getConnector()).createInboundEndpointMessageProcessorChain(endpoint, listener);
     }
 
     protected MuleMessage createTestRequestMessage()
@@ -285,10 +299,24 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }
 
-    protected MuleEvent createTestResponseEvent(MessageReceiver receiver) throws Exception
+    protected MuleEvent createTestRequestEvent(ImmutableEndpoint endpoint) throws Exception
+    {
+        boolean synchronous;
+        if (inMessage.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false))
+        {
+            synchronous = true;
+        }
+        else
+        {
+            synchronous = endpoint.isSynchronous();
+        }
+        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext), synchronous);
+    }
+    
+    protected MuleEvent createTestResponseEvent(ImmutableEndpoint endpoint) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
-            receiver.getEndpoint(), getTestSession(getTestService(), muleContext), true);
+            endpoint, getTestSession(getTestService(), muleContext), true);
     }
 
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException
@@ -318,7 +346,6 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
 
     class SensingNullMessageProcessor implements MessageProcessor
     {
-
         MuleEvent sensedEvent;
 
         public MuleEvent process(MuleEvent event) throws MuleException
@@ -326,7 +353,5 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
             sensedEvent = event;
             return responseEvent;
         }
-
     }
-
 }
