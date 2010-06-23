@@ -5,7 +5,26 @@
     $Id$
 */
 
-def muleRoot = '../..'
+def parser = new XmlSlurper()
+
+def cliBuilder = new CliBuilder()
+cliBuilder.r(longOpt: "root", args: 1, required: true, "start scanning at this root folder")
+
+options = cliBuilder.parse(args)
+if (!options)
+{
+    println ""
+    println "Error parsing options " + args
+    println ""
+    System.exit(1)
+}
+if (options.h)
+{
+    cliBuilder.usage()
+    System.exit(0)
+}
+
+def muleRoot = options.r
 
 def ant = new AntBuilder()
 
