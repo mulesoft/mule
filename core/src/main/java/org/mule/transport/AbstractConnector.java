@@ -2548,6 +2548,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // -- INVOKE SERVICE --
         requestChainBuilder.chain(listener);
 
+        customizeInboundEndpointRequestChain(requestChainBuilder);
+        
         // -- RESPONSE CHAIN --
         ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
         responseChainBuilder.setName("Inbound endpoint response pipeline");
@@ -2585,7 +2587,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             new TransformerMessageProcessor(endpoint.getResponseTransformers()) 
         };
     }
-    
+
+    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    {
+        // Template method
+    }
+        
     public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
         throws MuleException
     {
