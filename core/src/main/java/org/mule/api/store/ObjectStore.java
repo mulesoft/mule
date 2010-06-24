@@ -52,11 +52,10 @@ public interface ObjectStore<T extends Serializable>
     T retrieve(Serializable key) throws ObjectStoreException;
 
     /**
-     * Remove the object with ID.
+     * Remove the object with key.
      * 
      * @param key the identifier of the object to remove.
-     * @return <code>true</code> if the object was found and removed or <code>false</code> if no
-     *          object with the key was stored.
+     * @return the object that was previously stored for the given key
      * @throws ObjectStoreException if the given key is <code>null</code> or if the store is not 
      *          available or any other implementation-specific error occured
      * @throws ObjectDoesNotExistException if no value for the given key was previously stored.
