@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.endpoint;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.List;
@@ -45,4 +46,26 @@ public class EndpointMessageProcessorsTestCase extends AbstractEndpointTestCase
         assertEquals("3", ((TestMessageProcessor) processors.get(2)).getLabel());
     }
 
+    public void testLocalEndpoints() throws MuleException
+    {
+        ImmutableEndpoint endpoint = 
+            muleContext.getRegistry().lookupService("localEndpoints").getInboundRouter().getEndpoint("ep3");
+
+        List <MessageProcessor> processors = endpoint.getMessageProcessors();
+        assertNotNull(processors);
+        assertEquals(3, processors.size());
+        assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
+        assertEquals("B", ((TestMessageProcessor) processors.get(1)).getLabel());
+        assertEquals("C", ((TestMessageProcessor) processors.get(2)).getLabel());
+
+        endpoint = 
+            ((OutboundPassThroughRouter) muleContext.getRegistry().lookupService("localEndpoints").getOutboundRouter().getRouters().get(0)).getEndpoint("ep4");
+
+        processors = endpoint.getMessageProcessors();
+        assertNotNull(processors);
+        assertEquals(3, processors.size());
+        assertEquals("D", ((TestMessageProcessor) processors.get(0)).getLabel());
+        assertEquals("E", ((TestMessageProcessor) processors.get(1)).getLabel());
+        assertEquals("F", ((TestMessageProcessor) processors.get(2)).getLabel());
+    }
 }
