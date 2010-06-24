@@ -21,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -78,6 +79,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Integer createConnector;
     protected RetryPolicyTemplate retryPolicyTemplate;
     protected String responsePropertiesList;
+    protected List<MessageProcessor> messageProcessors;
 
     // not included in equality/hash
     protected String registryId = null;
@@ -155,7 +157,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector));
+                name, muleContext, getRetryPolicyTemplate(connector), messageProcessors);
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -191,7 +193,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList);
+                name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList, messageProcessors);
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
@@ -579,6 +581,25 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setResponseTransformers(List<Transformer> transformers)
     {
         this.responseTransformers = transformers;
+    }
+
+    public void addMessageProcessor(MessageProcessor messageProcessor)
+    {
+        if (messageProcessors == null)
+        {
+            messageProcessors = new LinkedList<MessageProcessor>();
+        }
+        messageProcessors.add(messageProcessor);
+    }
+
+    public void setMessageProcessors(List <MessageProcessor> messageProcessors)
+    {
+        this.messageProcessors = messageProcessors;
+    }
+
+    public List <MessageProcessor> getMessageProcessors()
+    {
+        return messageProcessors;
     }
 
     public void setName(String name)

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:parsers-test="http://www.mulesoft.org/schema/mule/parsers-test"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/3.0/mule-parsers-test.xsd">
+
+    <custom-message-processor name="testMP" class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
+
+    <parsers-test:complex-endpoint name="ep1" path="foo" bar="123" string="hello world">
+        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
+    </parsers-test:complex-endpoint>
+
+    <parsers-test:complex-endpoint name="ep2" path="foo" bar="123" string="hello world">
+        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+            <spring:property name="label" value="1" />
+        </custom-message-processor>
+        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+            <spring:property name="label" value="2" />
+        </custom-message-processor>
+        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+            <spring:property name="label" value="3" />
+        </custom-message-processor>
+    </parsers-test:complex-endpoint>
+
+    <!-- TODO Enable "ref" for global message-processor 
+    <parsers-test:complex-endpoint name="ep3" path="foo" bar="123" string="hello world">
+        <custom-message-processor ref="testMP" />
+    </parsers-test:complex-endpoint>
+    -->
+
+</mule>

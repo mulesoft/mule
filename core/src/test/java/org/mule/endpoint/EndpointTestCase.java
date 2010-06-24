@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -66,6 +67,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final String endpointBuilderName = "builderName1";
         final MuleContext muleContext = mock(MuleContext.class);
         final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
+        final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
 
         // Creates a mock Transformer that will check that the endpoint is completely
         // configured when setEndpoint method is called.
@@ -103,7 +105,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         new AbstractEndpoint(mockConnector, uri, inputTransformers, outputTransformers, name, properties,
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
             synchronous, responseTimeout, initialState, endpointEncoding, endpointBuilderName, muleContext,
-            retryPolicyTemplate)
+            retryPolicyTemplate, messageProcessors)
         {
         };
     }

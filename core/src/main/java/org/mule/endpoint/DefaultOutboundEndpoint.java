@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -52,11 +53,12 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String endpointBuilderName,
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate,
-                                   String responsePropertiesList)
+                                   String responsePropertiesList,
+                                   List <MessageProcessor> messageProcessors)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
                 deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
+                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessors);
 
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).

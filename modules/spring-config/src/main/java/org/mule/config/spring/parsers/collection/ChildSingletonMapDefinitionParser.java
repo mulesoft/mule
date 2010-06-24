@@ -15,13 +15,8 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 public class ChildSingletonMapDefinitionParser extends ChildDefinitionParser
 {
-
-    public static final String KEY = "key";
-    public static final String VALUE = "value";
-
     public ChildSingletonMapDefinitionParser(String setterMethod)
     {
         super(setterMethod, MapEntryCombiner.class);
     }
-
 }

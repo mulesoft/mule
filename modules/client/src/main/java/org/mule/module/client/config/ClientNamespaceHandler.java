@@ -11,7 +11,7 @@ package org.mule.module.client.config;
 
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.module.xml.transformer.wire.XStreamWireFormat;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
@@ -31,7 +31,7 @@ public class ClientNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("remote-dispatcher-agent", new RemoteDispatcherAgentDefinitionParser());
-        registerBeanDefinitionParser("remote-endpoint", new GenericEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("remote-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("xml-wire-format", new ChildDefinitionParser("wireFormat", XStreamWireFormat.class));
         registerBeanDefinitionParser("serialization-wire-format", new ChildDefinitionParser("wireFormat", SerializedMuleMessageWireFormat.class));
         registerBeanDefinitionParser("custom-wire-format", new ChildDefinitionParser("wireFormat"));

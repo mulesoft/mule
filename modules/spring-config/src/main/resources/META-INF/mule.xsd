@@ -104,6 +104,7 @@
             <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
+            <xsd:element ref="abstract-message-processor"/>
         </xsd:choice>
     </xsd:group>
 
@@ -219,6 +220,36 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- Message Processors -->
+    <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for message processor elements. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractMessageProcessorType" />
+
+    <xsd:element name="custom-message-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
+    <xsd:complexType name="customMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType">
@@ -1631,6 +1662,7 @@
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
                 <xsd:group ref="endpointTransformers"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>

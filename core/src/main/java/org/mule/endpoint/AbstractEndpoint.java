@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -30,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,6 +68,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * The transformers used to transform the incoming or outgoing data
      */
     private final List responseTransformers;
+
+    private final List <MessageProcessor> messageProcessors;
 
     /**
      * The name for the endpoint
@@ -142,7 +146,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String endpointEncoding,
                             String endpointBuilderName,
                             MuleContext muleContext,
-                            RetryPolicyTemplate retryPolicyTemplate)
+                            RetryPolicyTemplate retryPolicyTemplate,
+                            List <MessageProcessor> messageProcessors)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -179,6 +184,15 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         else
         {
             this.synchronous = synchronous;
+        }
+
+        if (messageProcessors == null)
+        {
+            this.messageProcessors = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            this.messageProcessors = Collections.unmodifiableList(messageProcessors);
         }
 
         if (transformers == null)
@@ -219,6 +233,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public String getName()
     {
         return name;
+    }
+
+    public List <MessageProcessor> getMessageProcessors()
+    {
+        return messageProcessors;
     }
 
     public List getTransformers()

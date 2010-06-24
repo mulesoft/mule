@@ -11,7 +11,6 @@
 package org.mule.endpoint.outbound;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
@@ -20,6 +19,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 /**
  * Unit test for configuring message processors on an outbound endpoint.
@@ -41,7 +41,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundM
     public void testProcessors() throws Exception
     {
         ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new LabelMessageProcessor("1"), new LabelMessageProcessor("2"), new LabelMessageProcessor("3"));
+        builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
         MessageProcessor mpChain = builder.build();
         
         result = mpChain.process(testOutboundEvent);
@@ -68,21 +68,5 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundM
         Connector connector = endpoint.getConnector();
         connector.start();
         return endpoint;
-    }
-
-    class LabelMessageProcessor implements MessageProcessor
-    {
-        String label;
-        
-        public LabelMessageProcessor(String label)
-        {
-            this.label = label;
-        }
-        
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            event.getMessage().setPayload(event.getMessage().getPayload() + ":" + label);
-            return event;
-        }
     }
 }

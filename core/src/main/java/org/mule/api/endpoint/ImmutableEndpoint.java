@@ -11,6 +11,7 @@
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleContext;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -161,6 +162,8 @@ public interface ImmutableEndpoint extends Serializable
      */
     EndpointSecurityFilter getSecurityFilter();
 
+    List <MessageProcessor> getMessageProcessors();
+    
     /**
      * Determines if requests originating from this endpoint should be synchronous
      * i.e. execute in a single thread and possibly return an result. This property

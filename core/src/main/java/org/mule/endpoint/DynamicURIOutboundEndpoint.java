@@ -15,12 +15,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.config.MuleManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -123,6 +123,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     public List getResponseTransformers()
     {
         return endpoint.getResponseTransformers();
+    }
+
+    public List <MessageProcessor> getMessageProcessors()
+    {
+        return endpoint.getMessageProcessors();
     }
 
     public EndpointSecurityFilter getSecurityFilter()

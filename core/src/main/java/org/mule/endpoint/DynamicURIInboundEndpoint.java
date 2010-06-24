@@ -134,6 +134,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getResponseTransformers();
     }
 
+    public List <MessageProcessor> getMessageProcessors()
+    {
+        return endpoint.getMessageProcessors();
+    }
+
     public EndpointSecurityFilter getSecurityFilter()
     {
         return endpoint.getSecurityFilter();

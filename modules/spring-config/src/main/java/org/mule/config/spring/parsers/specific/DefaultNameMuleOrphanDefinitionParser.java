@@ -13,16 +13,16 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.ProvideDefaultNameFromElement;
 
-public class AgentDefinitionParser extends MuleOrphanDefinitionParser
+public class DefaultNameMuleOrphanDefinitionParser extends MuleOrphanDefinitionParser
 {
 
-    public AgentDefinitionParser()
+    public DefaultNameMuleOrphanDefinitionParser()
     {
         super(true);
         registerPreProcessor(new ProvideDefaultNameFromElement());
     }
 
-    public AgentDefinitionParser(Class beanClass)
+    public DefaultNameMuleOrphanDefinitionParser(Class beanClass)
     {
         super(beanClass, true);
         registerPreProcessor(new ProvideDefaultNameFromElement());

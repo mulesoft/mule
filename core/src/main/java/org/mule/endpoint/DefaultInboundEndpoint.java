@@ -52,11 +52,12 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   String endpointEncoding,
                                   String endpointBuilderName,
                                   MuleContext muleContext,
-                                  RetryPolicyTemplate retryPolicyTemplate)
+                                  RetryPolicyTemplate retryPolicyTemplate,
+                                  List <MessageProcessor> messageProcessors)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
             deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate);
+            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessors);
     }
 
     public MuleMessage request(long timeout) throws Exception
@@ -72,11 +73,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             throw new IllegalStateException("The connector on the endpoint: " + toString()
                                             + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
-    }
-
-    public void registerListener(MessageProcessor listener, Pattern pattern) throws Exception
-    {
-        getConnector().registerListener(this, listener, pattern);
     }
 
     public void unregisterListener() throws Exception

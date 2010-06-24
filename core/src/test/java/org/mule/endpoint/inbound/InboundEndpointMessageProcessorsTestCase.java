@@ -13,12 +13,12 @@ package org.mule.endpoint.inbound;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +47,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
     public void testProcessors() throws Exception
     {
         ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new LabelMessageProcessor("1"), new LabelMessageProcessor("2"), new LabelMessageProcessor("3"));
+        builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
         MessageProcessor mpChain = builder.build();
         
         result = mpChain.process(requestEvent);
@@ -73,21 +73,5 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
     protected MuleEvent createTestRequestEvent(ImmutableEndpoint endpoint) throws Exception
     {
         return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext), endpoint.isSynchronous());
-    }
-    
-    class LabelMessageProcessor implements MessageProcessor
-    {
-        String label;
-        
-        public LabelMessageProcessor(String label)
-        {
-            this.label = label;
-        }
-        
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            event.getMessage().setPayload(event.getMessage().getPayload() + ":" + label);
-            return event;
-        }
-    }
+    }    
 }
