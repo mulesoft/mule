@@ -148,8 +148,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                     connector.getProtocol(), endpointURI).getMessage());
         }
 
-        List transformers = getInboundTransformers(connector, endpointURI);
-        List responseTransformers = getInboundEndpointResponseTransformers(connector, endpointURI);
+        List<Transformer> transformers = getInboundTransformers(connector, endpointURI);
+        List<Transformer> responseTransformers = getInboundEndpointResponseTransformers(connector, endpointURI);
 
         boolean synchronous = getSynchronous(connector, endpointURI);
 
@@ -184,8 +184,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                     connector.getProtocol(), endpointURI).getMessage());
         }
 
-        List transformers = getOutboundTransformers(connector, endpointURI);
-        List responseTransformers = getOutboundEndpointResponseTransformers(connector, endpointURI);
+        List<Transformer> transformers = getOutboundTransformers(connector, endpointURI);
+        List<Transformer> responseTransformers = getOutboundEndpointResponseTransformers(connector, endpointURI);
 
         boolean synchronous = getSynchronous(connector, endpointURI);
 
@@ -280,7 +280,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return deleteUnacceptedMessages != null
                 ? deleteUnacceptedMessages.booleanValue()
                 : getDefaultDeleteUnacceptedMessages(connector);
-
     }
 
     protected boolean getDefaultDeleteUnacceptedMessages(Connector connector)
@@ -301,7 +300,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Filter getFilter(Connector connector)
     {
         return filter != null ? filter : getDefaultFilter(connector);
-
     }
 
     protected Filter getDefaultFilter(Connector connector)
@@ -312,7 +310,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String getInitialState(Connector connector)
     {
         return initialState != null ? initialState : getDefaultInitialState(connector);
-
     }
 
     protected String getDefaultInitialState(Connector connector)
@@ -331,7 +328,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return muleContext.getConfiguration().getDefaultResponseTimeout();
     }
 
-    protected List getInboundTransformers(Connector connector, EndpointURI endpointURI)
+    protected List<Transformer> getInboundTransformers(Connector connector, EndpointURI endpointURI)
             throws TransportFactoryException
     {
         // #1 Transformers set on builder
@@ -341,7 +338,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
 
         // #2 Transformer specified on uri
-        List transformers = getTransformersFromString(endpointURI.getTransformers());
+        List<Transformer> transformers = getTransformersFromString(endpointURI.getTransformers());
         if (transformers != null)
         {
             return transformers;
@@ -351,7 +348,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return getDefaultInboundTransformers(connector);
     }
 
-    protected List getDefaultInboundTransformers(Connector connector) throws TransportFactoryException
+    protected List<Transformer> getDefaultInboundTransformers(Connector connector) throws TransportFactoryException
     {
         try
         {
@@ -364,7 +361,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected List getOutboundTransformers(Connector connector, EndpointURI endpointURI)
+    protected List<Transformer> getOutboundTransformers(Connector connector, EndpointURI endpointURI)
             throws TransportFactoryException
     {
         // #1 Transformers set on builder
@@ -384,7 +381,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return getDefaultOutboundTransformers(connector);
     }
 
-    protected List getDefaultOutboundTransformers(Connector connector) throws TransportFactoryException
+    protected List<Transformer> getDefaultOutboundTransformers(Connector connector) throws TransportFactoryException
     {
         try
         {
@@ -397,7 +394,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected List getInboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
+    protected List<Transformer> getInboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
             throws TransportFactoryException
     {
         // #1 Transformers set on builder
@@ -417,7 +414,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return getDefaultResponseTransformers(connector);
     }
 
-    protected List getOutboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
+    protected List<Transformer> getOutboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
             throws TransportFactoryException
     {
         // #1 Transformers set on builder
@@ -427,15 +424,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
 
         // #2 Transformer specified on uri
-        List transformers = getTransformersFromString(endpointURI.getResponseTransformers());
+        List<Transformer> transformers = getTransformersFromString(endpointURI.getResponseTransformers());
         if (transformers != null)
         {
             return transformers;
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
-    protected List getDefaultResponseTransformers(Connector connector) throws TransportFactoryException
+    protected List<Transformer> getDefaultResponseTransformers(Connector connector) throws TransportFactoryException
     {
         try
         {
@@ -448,7 +445,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    private List getTransformersFromString(String transformers) throws TransportFactoryException
+    private List<Transformer> getTransformersFromString(String transformers) throws TransportFactoryException
     {
         try
         {
@@ -633,49 +630,41 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setTransactionConfig(TransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
-
     }
 
     public void setFilter(Filter filter)
     {
         this.filter = filter;
-
     }
 
     public void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
     {
         this.deleteUnacceptedMessages = Boolean.valueOf(deleteUnacceptedMessages);
-
     }
 
     public void setSecurityFilter(EndpointSecurityFilter securityFilter)
     {
         this.securityFilter = securityFilter;
-
     }
 
     public void setSynchronous(boolean synchronous)
     {
         this.synchronous = Boolean.valueOf(synchronous);
-
     }
 
     public void setResponseTimeout(int responseTimeout)
     {
         this.responseTimeout = new Integer(responseTimeout);
-
     }
 
     public void setInitialState(String initialState)
     {
         this.initialState = initialState;
-
     }
 
     public void setEncoding(String encoding)
     {
         this.encoding = encoding;
-
     }
 
     public void setCreateConnector(int createConnector)
@@ -686,19 +675,16 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setRegistryId(String registryId)
     {
         this.registryId = registryId;
-
     }
 
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-
     }
 
     public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
     {
         this.retryPolicyTemplate = retryPolicyTemplate;
-
     }
 
     public URIBuilder getEndpointBuilder()
@@ -709,7 +695,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setURIBuilder(URIBuilder URIBuilder)
     {
         this.uriBuilder = URIBuilder;
-
     }
 
     @Override
@@ -785,5 +770,4 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         return builder;
     }
-
 }
