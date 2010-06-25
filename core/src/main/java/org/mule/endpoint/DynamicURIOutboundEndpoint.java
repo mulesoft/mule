@@ -130,6 +130,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getMessageProcessors();
     }
 
+    public List<MessageProcessor> getResponseMessageProcessors()
+    {
+        return endpoint.getResponseMessageProcessors();
+    }
+
     public EndpointSecurityFilter getSecurityFilter()
     {
         return endpoint.getSecurityFilter();
@@ -226,6 +231,6 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return getConnector().getOutboundEndpointMessageProcessor(this).process(event);
+        return endpoint.process(event);
     }
 }

@@ -24,6 +24,7 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -93,6 +94,12 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         {
             chain.add(messageProcessor);
         }
+        return this;
+    }
+
+    public ChainMessageProcessorBuilder chain(Collection <MessageProcessor> processors)
+    {
+        chain.addAll(processors);
         return this;
     }
 

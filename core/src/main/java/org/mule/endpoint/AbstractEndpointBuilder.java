@@ -80,6 +80,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected RetryPolicyTemplate retryPolicyTemplate;
     protected String responsePropertiesList;
     protected List<MessageProcessor> messageProcessors;
+    protected List<MessageProcessor> responseMessageProcessors;
 
     // not included in equality/hash
     protected String registryId = null;
@@ -157,7 +158,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector), messageProcessors);
+                name, muleContext, getRetryPolicyTemplate(connector), 
+                messageProcessors, responseMessageProcessors);
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -193,7 +195,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList, messageProcessors);
+                name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList, 
+                messageProcessors, responseMessageProcessors);
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
@@ -597,6 +600,25 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public List <MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
+    }
+
+    public void addResponseMessageProcessor(MessageProcessor messageProcessor)
+    {
+        if (responseMessageProcessors == null)
+        {
+            responseMessageProcessors = new LinkedList<MessageProcessor>();
+        }
+        responseMessageProcessors.add(messageProcessor);
+    }
+
+    public void setResponseMessageProcessors(List <MessageProcessor> messageProcessors)
+    {
+        this.responseMessageProcessors = messageProcessors;
+    }
+
+    public List <MessageProcessor> getResponseMessageProcessors()
+    {
+        return responseMessageProcessors;
     }
 
     public void setName(String name)

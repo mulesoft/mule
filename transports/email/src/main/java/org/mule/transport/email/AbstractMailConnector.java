@@ -234,7 +234,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
     }
     
     @Override
-    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    public void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
     {
         builder.replaceMessageProcessor(InboundFilterMessageProcessor.class,
             new InboundFilterMessageProcessor()

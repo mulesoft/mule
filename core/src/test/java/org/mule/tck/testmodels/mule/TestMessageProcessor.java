@@ -30,7 +30,10 @@ public class TestMessageProcessor implements MessageProcessor
     
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.getMessage().setPayload(event.getMessage().getPayload() + ":" + label);
+        if (event != null && event.getMessage() != null)
+        {
+            event.getMessage().setPayload(event.getMessage().getPayload() + ":" + label);
+        }
         return event;
     }
 

@@ -114,7 +114,6 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
@@ -210,11 +209,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     protected final Map<String, Pattern> patternByEndpoint = new HashMap<String, Pattern>();
     
-    /**
-     * Outbound endpoint MessageProcessors keyed by outbound endpoint instance.
-     */
-    protected final ConcurrentMap outboundEndpointMessageProcessors = new ConcurrentHashMap();
-
     /**
      * Defines the dispatcher threading profile
      */
@@ -1246,16 +1240,16 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     }
 
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern) throws Exception
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor messageProcessorChain, Pattern pattern) throws Exception
     {
         if (endpoint == null)
         {
             throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
         }
 
-        if (listener == null)
+        if (messageProcessorChain == null)
         {
-            throw new IllegalArgumentException("The listemer cannot be null when registering a listener");
+            throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
         }
         
         Service service = null;
@@ -1283,8 +1277,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
 
         MessageReceiver receiver = createReceiver(service, endpoint);
-        MessageProcessor endpointMessageProcessor = createInboundEndpointMessageProcessorChain(endpoint, listener);
-        receiver.setListener(endpointMessageProcessor);
+        receiver.setListener(messageProcessorChain);
 
         Object receiverKey = getReceiverKey(service, endpoint);
         receiver.setReceiverKey(receiverKey.toString());
@@ -2467,29 +2460,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         requesters.setMaxWait(maxWait);
     }
 
-    public MessageProcessor createOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException
-    {
-        // -- REQUEST CHAIN --
-        ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
-        outboundChainBuilder.setName("Outbound endpoint request chain");
-        outboundChainBuilder.chain(createOutboundRequestMessageProcessors(endpoint));
-        
-        // -- OUTBOUND ROUTER --
-        outboundChainBuilder.chain(new InternalDispatcherMessageProcessor(endpoint));
-
-        // -- RESPONSE CHAIN --
-        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
-        responseChainBuilder.setName("Outbound endpoint response chain");
-        responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
-
-        // Compose request and response chains. We do this so that if the request
-        // chain returns early the response chain is still invoked.
-        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
-        compositeChainBuilder.setName("Outbound endpoint request/response composite chain");
-        compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
-        return compositeChainBuilder.build();
-    }
-
     /** Override this method to change the default MessageProcessors. */
     public MessageProcessor[] createOutboundRequestMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
@@ -2533,39 +2503,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         };
     }
     
-    /**
-     * Create a default inbound endpoint {@link MessageProcessor} chain suitable for
-     * use by most transports.
-     */
-    protected MessageProcessor createInboundEndpointMessageProcessorChain(InboundEndpoint endpoint,
-                                                                          MessageProcessor listener)
-    {
-        // -- REQUEST CHAIN --
-        ChainMessageProcessorBuilder requestChainBuilder = new ChainMessageProcessorBuilder();
-        requestChainBuilder.setName("Inbound endpoint request pipeline");
-        requestChainBuilder.chain(createInboundRequestMessageProcessors(endpoint));
-        
-        // -- INVOKE SERVICE --
-        requestChainBuilder.chain(listener);
-
-        customizeInboundEndpointRequestChain(requestChainBuilder);
-        
-        // -- RESPONSE CHAIN --
-        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
-        responseChainBuilder.setName("Inbound endpoint response pipeline");
-        responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
-
-        // Compose request and response chains. We do this so that if the request
-        // chain returns early the response chain is still invoked.
-        ChainMessageProcessorBuilder inboundChainBuilder = new ChainMessageProcessorBuilder();
-        inboundChainBuilder.setName("Inbound endpoint request/response composite pipeline");
-        inboundChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
-
-        return inboundChainBuilder.build();
-    }
-
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createInboundRequestMessageProcessors(InboundEndpoint endpoint)
+    public MessageProcessor[] createInboundRequestMessageProcessors(InboundEndpoint endpoint)
     {
         return new MessageProcessor[] 
         { 
@@ -2579,7 +2518,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
+    public MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
     {
         return new MessageProcessor[] 
         { 
@@ -2588,28 +2527,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         };
     }
 
-    protected void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
+    public void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
     {
         // Template method
     }
         
-    public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
-        throws MuleException
-    {
-        MessageProcessor processor = (MessageProcessor) outboundEndpointMessageProcessors.get(endpoint);
-        if (processor == null)
-        {
-            processor = createOutboundEndpointMessageProcessor(endpoint);
-            MessageProcessor concurrentlyAddedProcessor = (MessageProcessor) outboundEndpointMessageProcessors.putIfAbsent(
-                endpoint, processor);
-            if (concurrentlyAddedProcessor != null)
-            {
-                return concurrentlyAddedProcessor;
-            }
-        }
-        return processor;
-    }
-
     private class AssertConnectorStartedMessageProcessor implements MessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException
@@ -2623,6 +2545,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
     }
 
+    public MessageProcessor getDispatcherMessageProcessor(OutboundEndpoint endpoint)
+    {
+        return new InternalDispatcherMessageProcessor(endpoint);
+    }
+    
     private class InternalDispatcherMessageProcessor implements MessageProcessor
     {
         private OutboundEndpoint endpoint;

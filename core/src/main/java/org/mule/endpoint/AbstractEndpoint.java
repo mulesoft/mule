@@ -11,6 +11,7 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -70,6 +71,9 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     private final List responseTransformers;
 
     private final List <MessageProcessor> messageProcessors;
+    private final List <MessageProcessor> responseMessageProcessors;
+    
+    private MessageProcessor messageProcessorChain;
 
     /**
      * The name for the endpoint
@@ -147,7 +151,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate,
-                            List <MessageProcessor> messageProcessors)
+                            List <MessageProcessor> messageProcessors,
+                            List <MessageProcessor> responseMessageProcessors)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -194,6 +199,14 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             this.messageProcessors = Collections.unmodifiableList(messageProcessors);
         }
+        if (responseMessageProcessors == null)
+        {
+            this.responseMessageProcessors = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+        }
+        else
+        {
+            this.responseMessageProcessors = Collections.unmodifiableList(responseMessageProcessors);
+        }
 
         if (transformers == null)
         {
@@ -238,6 +251,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public List <MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
+    }
+
+    public List <MessageProcessor> getResponseMessageProcessors()
+    {
+        return responseMessageProcessors;
     }
 
     public List getTransformers()
@@ -455,4 +473,15 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     {
         return connector.supportsProtocol(protocol);
     }
+    
+    public MessageProcessor getMessageProcessorChain() throws MuleException
+    {
+        if (messageProcessorChain == null)
+        {
+            messageProcessorChain = createMessageProcessorChain();
+        }
+        return messageProcessorChain;
+    }
+
+    abstract protected MessageProcessor createMessageProcessorChain() throws MuleException;
 }

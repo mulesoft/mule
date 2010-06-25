@@ -19,6 +19,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 import org.mule.transport.AbstractMessageReceiver;
@@ -192,10 +193,10 @@ public class TestConnector extends AbstractConnector
     {
         return disposeCount;
     }
-    
-    public MessageProcessor createInboundEndpointMessageProcessorChain(InboundEndpoint endpoint,
-                                                                       MessageProcessor listener)
+
+    public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
+        throws MuleException
     {
-        return super.createInboundEndpointMessageProcessorChain(endpoint, listener);
-    }
+        return ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+    }    
 }

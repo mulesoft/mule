@@ -91,6 +91,10 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void addMessageProcessor(MessageProcessor messageProcessor);
 
+    void setResponseMessageProcessors(List <MessageProcessor> responseMessageProcessors);
+
+    void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
+
     void setURIBuilder(URIBuilder URIBuilder);
 
     Object clone() throws CloneNotSupportedException;

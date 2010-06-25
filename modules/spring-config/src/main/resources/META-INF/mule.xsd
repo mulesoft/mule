@@ -1663,6 +1663,13 @@
         <xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="response" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
                 <xsd:group ref="endpointTransformers"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
@@ -1676,6 +1683,14 @@
     <xsd:group name="defaultXaEndpointElements">
         <xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="response" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
                 <xsd:group ref="endpointTransformers"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>

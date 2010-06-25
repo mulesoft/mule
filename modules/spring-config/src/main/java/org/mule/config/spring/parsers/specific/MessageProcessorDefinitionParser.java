@@ -16,21 +16,24 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 /**
  * This allows a message processor to be defined globally, or embedded within an endpoint.
+ * (as either a normal or response processor).
  */
 public class MessageProcessorDefinitionParser extends ParentContextDefinitionParser
 {
     public MessageProcessorDefinitionParser(Class messageProcessor)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(messageProcessor, false));
+        and("response", new ChildDefinitionParser("responseMessageProcessor", messageProcessor));
         otherwise(new ChildDefinitionParser("messageProcessor", messageProcessor));
     }
 
     /**
-     * For custom transformers
+     * For custom processors
      */
     public MessageProcessorDefinitionParser()
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(false));
+        and("response", new ChildDefinitionParser("responseMessageProcessor"));
         otherwise(new ChildDefinitionParser("messageProcessor"));
     }
 

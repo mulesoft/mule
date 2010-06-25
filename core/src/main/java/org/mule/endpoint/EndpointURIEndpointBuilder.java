@@ -51,6 +51,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         encoding = global.encoding;
         retryPolicyTemplate = global.retryPolicyTemplate;
         messageProcessors = global.messageProcessors;
+        responseMessageProcessors = global.responseMessageProcessors;
     }
 
     public EndpointURIEndpointBuilder(URIBuilder builder)
@@ -89,6 +90,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setSynchronous(source.isSynchronous());
         setMuleContext(source.getMuleContext());
         setMessageProcessors(source.getMessageProcessors().isEmpty() ? null : source.getMessageProcessors());
+        setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? null : source.getResponseMessageProcessors());
     }
 
 }

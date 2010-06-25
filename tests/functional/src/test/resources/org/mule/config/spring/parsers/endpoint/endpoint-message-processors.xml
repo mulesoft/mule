@@ -1,37 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:parsers-test="http://www.mulesoft.org/schema/mule/parsers-test"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/3.0/mule-parsers-test.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
     <custom-message-processor name="testMP" class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
 
-    <parsers-test:complex-endpoint name="ep1" path="foo" bar="123" string="hello world">
+    <endpoint name="ep1" address="test://ep1">
         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
-    </parsers-test:complex-endpoint>
+        <response>
+            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor" />
+        </response>
+    </endpoint>
 
-    <parsers-test:complex-endpoint name="ep2" path="foo" bar="123" string="hello world">
+    <endpoint name="ep2" address="test://ep2">
         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
             <spring:property name="label" value="1" />
         </custom-message-processor>
         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
             <spring:property name="label" value="2" />
         </custom-message-processor>
-        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-            <spring:property name="label" value="3" />
-        </custom-message-processor>
-    </parsers-test:complex-endpoint>
+        <response>
+            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                <spring:property name="label" value="3" />
+            </custom-message-processor>
+            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                <spring:property name="label" value="4" />
+            </custom-message-processor>
+        </response>
+    </endpoint>
 
     <!-- TODO Enable "ref" for global message-processor 
-    <parsers-test:complex-endpoint name="ep3" path="foo" bar="123" string="hello world">
+    <endpoint name="ep3" address="test://ep3">
         <custom-message-processor ref="testMP" />
-    </parsers-test:complex-endpoint>
+    </endpoint>
     -->
 
     <model>
@@ -45,7 +51,7 @@
                 </pass-through-router>
             </outbound>
         </service>
-
+        
         <service name="localEndpoints">
             <inbound>
                 <inbound-endpoint name="ep3" address="test://ep3">
@@ -55,23 +61,33 @@
                     <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="B" />
                     </custom-message-processor>
-                    <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                        <spring:property name="label" value="C" />
-                    </custom-message-processor>
+                    <response>
+                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <spring:property name="label" value="C" />
+                        </custom-message-processor>
+                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <spring:property name="label" value="D" />
+                        </custom-message-processor>
+                    </response>
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint name="ep4" address="test://ep4">
                         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                            <spring:property name="label" value="D" />
-                        </custom-message-processor>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="E" />
                         </custom-message-processor>
                         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
                         </custom-message-processor>
+                        <response>
+                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                                <spring:property name="label" value="G" />
+                            </custom-message-processor>
+                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                                <spring:property name="label" value="H" />
+                            </custom-message-processor>
+                        </response>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

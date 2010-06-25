@@ -163,6 +163,7 @@ public interface ImmutableEndpoint extends Serializable
     EndpointSecurityFilter getSecurityFilter();
 
     List <MessageProcessor> getMessageProcessors();
+    List <MessageProcessor> getResponseMessageProcessors();
     
     /**
      * Determines if requests originating from this endpoint should be synchronous

@@ -139,6 +139,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getMessageProcessors();
     }
 
+    public List<MessageProcessor> getResponseMessageProcessors()
+    {
+        return endpoint.getResponseMessageProcessors();
+    }
+
     public EndpointSecurityFilter getSecurityFilter()
     {
         return endpoint.getSecurityFilter();
@@ -267,5 +272,4 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         this.listener = listener;
     }
-
 }

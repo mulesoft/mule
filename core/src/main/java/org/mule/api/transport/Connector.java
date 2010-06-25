@@ -199,15 +199,4 @@ public interface Connector extends Lifecycle, NamedObject
     MuleContext getMuleContext();
 
     RetryPolicyTemplate getRetryPolicyTemplate();
-
-    /**
-     * Returns a message processor chain that implements the outbound message flow
-     * for the given endpoint
-     * 
-     * @param endpoint the endpoint for which MessageProcessor should be returned
-     * @return
-     * @throws MuleException
-     */
-    MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException;
-
 }
