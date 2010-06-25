@@ -74,7 +74,6 @@ public class JdbcConnector extends AbstractConnector
     protected ResultSetHandler resultSetHandler;
     protected QueryRunner queryRunner;
     
-    private final Map<Integer, ExtendedQueryRunner> extendedQueryRunnerCache = new HashMap<Integer, ExtendedQueryRunner>();
     private int queryTimeout;
     
     /** 
@@ -460,14 +459,14 @@ public class JdbcConnector extends AbstractConnector
         {
             queryTimeout = Integer.valueOf(queryTimeoutAsString);
         }
-        catch (Exception e)
+        catch (NumberFormatException e)
         {
 
         }
         
         if (queryTimeout >= 0)
         {
-            return this.getExtendedQueryRunner(queryTimeout);
+            return new ExtendedQueryRunner(queryTimeout);
         }
         else
         {
@@ -475,19 +474,6 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    private ExtendedQueryRunner getExtendedQueryRunner(Integer queryTimeout)
-    {
-        synchronized (this.extendedQueryRunnerCache)
-        {
-            if (!this.extendedQueryRunnerCache.containsKey(queryTimeout))
-            {
-                ExtendedQueryRunner endpointQueryRunner = new ExtendedQueryRunner(queryTimeout);
-                this.extendedQueryRunnerCache.put(queryTimeout, endpointQueryRunner);
-            }
-            return this.extendedQueryRunnerCache.get(queryTimeout);
-        }
-    }
-    
     public QueryRunner getQueryRunner()
     {
         return queryRunner;
