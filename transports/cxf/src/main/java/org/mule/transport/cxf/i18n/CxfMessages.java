@@ -99,6 +99,11 @@ public class CxfMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH,23);
     }
+
+    public static Message invalidPayloadToArgumentsParameter(String nullPayloadParameterValue)
+    {
+        return factory.createMessage(BUNDLE_PATH, 24, nullPayloadParameterValue);
+    }
 }
 
 

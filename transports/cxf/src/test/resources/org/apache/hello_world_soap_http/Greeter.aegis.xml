@@ -1,0 +1,15 @@
+
+    <!--
+        For details about *.aegis.xml files check these:
+        http://cxf.apache.org/docs/aegis-21.html#Aegis%282.1%29-XMLMappingFiles
+        http://cxf.apache.org/docs/annotated-aegis-file-schema.html
+    -->
+<mappings>
+    <mapping>
+        <method name="greetMe">
+            <return-type name="return" componentType="java.lang.String" />
+            <parameter index="0" componentType="java.lang.String"
+                mappedName="me" />
+        </method>
+    </mapping>
+</mappings>

@@ -17,6 +17,7 @@ public class CxfConstants
     public static final String FRONTEND = "frontend";
     public static final String JAX_WS_FRONTEND = "jaxws";
     public static final String SIMPLE_FRONTEND = "simple";
+    public static final String AEGIS_FRONTEND = "aegis";
     public static final String WSDL_LOCATION = "wsdlLocation";
     public static final String NAMESPACE = "namespace";
     public static final String SERVICE_NAME = "serviceName";
@@ -46,4 +47,9 @@ public class CxfConstants
     public static final String PAYLOAD = "payload";
     public static final String PAYLOAD_BODY = "body";
     public static final String PAYLOAD_ENVELOPE = "envelope";
+
+    public static final String PAYLOAD_TO_ARGUMENTS = "payloadToArguments";
+    public static final String PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER = "nullPayloadAsParameter";
+    public static final String PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_VOID = "nullPayloadAsVoid";
+    public static final String PAYLOAD_TO_ARGUMENTS_BY_DEFAULT = PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER;
 }

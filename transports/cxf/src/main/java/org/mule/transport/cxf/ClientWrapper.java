@@ -30,6 +30,7 @@ import org.mule.transport.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.transport.cxf.support.StreamClosingInterceptor;
 import org.mule.transport.cxf.transport.MuleUniversalConduit;
 import org.mule.transport.soap.i18n.SoapMessages;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -45,6 +46,7 @@ import javax.xml.ws.WebServiceClient;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
@@ -100,21 +102,7 @@ public class ClientWrapper
     {
         this(endpoint);
         
-        String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
-        proxy = BooleanUtils.toBoolean((String) endpoint.getProperty(CxfConstants.PROXY));
-        
-        if (clientClass != null)
-        {
-            createClientFromClass(bus, clientClass);
-        }
-        else if (proxy)
-        {
-            createClientProxy(bus);
-        }
-        else
-        {
-            createClientFromLocalServer(bus);
-        }
+        createClient(bus, endpoint);
         
         addInterceptors(client.getInInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.IN_INTERCEPTORS));
         addInterceptors(client.getInFaultInterceptors(), (List<Interceptor>) endpoint.getProperty(CxfConstants.IN_FAULT_INTERCEPTORS));
@@ -168,6 +156,30 @@ public class ClientWrapper
         addMuleInterceptors();
     }
 
+    protected final void createClient(Bus bus, ImmutableEndpoint endpoint) throws CreateException, Exception
+    {
+        String clientClass = (String) endpoint.getProperty(CxfConstants.CLIENT_CLASS);
+        proxy = BooleanUtils.toBoolean((String) endpoint.getProperty(CxfConstants.PROXY));
+        boolean aegisBinding = isAegisBinding(endpoint);
+
+        if (aegisBinding)
+        {
+            createClientWithAegisBinding(bus);
+        }
+        else if (clientClass != null)
+        {
+            createClientFromClass(bus, clientClass);
+        }
+        else if (proxy)
+        {
+            createClientProxy(bus);
+        }
+        else
+        {
+            createClientFromLocalServer(bus);
+        }
+    }
+
     public Client getClient()
     {
         return client;
@@ -199,10 +211,6 @@ public class ClientWrapper
         if (defaultMethod == null)
         {
             String op = (String) endpoint.getProperties().get(CxfConstants.OPERATION);
-            if (op == null)
-            {
-                op = (String) endpoint.getProperties().get(CxfConstants.OPERATION);
-            }
 
             if (op != null)
             {
@@ -213,17 +221,20 @@ public class ClientWrapper
         return null;
     }
 
-    protected BindingOperationInfo getOperation(String opName) throws Exception
+    protected BindingOperationInfo getOperation(final String opName) throws Exception
     {
         // Normally its not this hard to invoke the CXF Client, but we're
         // sending along some exchange properties, so we need to use a more advanced
         // method
         Endpoint ep = client.getEndpoint();
-        QName q = new QName(ep.getService().getName().getNamespaceURI(), opName);
-        BindingOperationInfo bop = ep.getBinding().getBindingInfo().getOperation(q);
+        BindingOperationInfo bop = getBindingOperationFromEndpoint(ep, opName);
         if (bop == null)
         {
-            throw new Exception("No such operation: " + opName);
+            bop = tryToGetTheOperationInDotNetNamingConvention(ep, opName);
+            if (bop == null)
+            {
+                throw new Exception("No such operation: " + opName);
+            }
         }
 
         if (bop.isUnwrappedCapable())
@@ -233,12 +244,100 @@ public class ClientWrapper
         return bop;
     }
 
+    /**
+     * This method tries to call
+     * {@link #getBindingOperationFromEndpoint(Endpoint, String)} with the .net
+     * naming convention for .net webservices (method names start with a capital
+     * letter).
+     * <p>
+     * CXF generates method names compliant with Java naming so if the WSDL operation
+     * names starts with uppercase letter, matching with method name does not work -
+     * thus the work around.
+     * 
+     * @param opName
+     * @param ep
+     * @return
+     */
+    protected BindingOperationInfo tryToGetTheOperationInDotNetNamingConvention(Endpoint ep,
+                                                                                final String opName)
+    {
+        final String capitalizedOpName = opName.substring(0, 1).toUpperCase() + opName.substring(1);
+        return getBindingOperationFromEndpoint(ep, capitalizedOpName);
+    }
+
+    protected BindingOperationInfo getBindingOperationFromEndpoint(Endpoint ep, final String operationName)
+    {
+        QName q = new QName(ep.getService().getName().getNamespaceURI(), operationName);
+        BindingOperationInfo bop = ep.getBinding().getBindingInfo().getOperation(q);
+        return bop;
+    }
+
     private Method getMethodFromOperation(String op) throws Exception
     {
         BindingOperationInfo bop = getOperation(op);
         MethodDispatcher md = (MethodDispatcher) client.getEndpoint().getService().get(
             MethodDispatcher.class.getName());
         return md.getMethod(bop);
+    }
+
+    protected boolean isAegisBinding(ImmutableEndpoint endpoint)
+    {
+        if (endpoint == null)
+        {
+            return false;
+        }
+        if (!(endpoint.getConnector() instanceof CxfConnector))
+        {
+            return false;
+        }
+        String endpointFrontend = (String) endpoint.getProperty(CxfConstants.FRONTEND);
+        if (endpointFrontend == null)
+        {
+            CxfConnector cxfConnector = (CxfConnector) endpoint.getConnector();
+            return CxfConstants.AEGIS_FRONTEND.equals(cxfConnector.getDefaultFrontend());
+        }
+        else
+        {
+            return CxfConstants.AEGIS_FRONTEND.equals(endpointFrontend);
+        }
+    }
+
+    private void createClientWithAegisBinding(final Bus bus) throws CreateException
+    {
+        String wsdlLocation = (String) endpoint.getProperty(CxfConstants.WSDL_LOCATION);
+        String serviceClassString = (String) endpoint.getProperty(CxfConstants.SERVICE_CLASS);
+        final AegisDatabinding aDB;
+        List<AegisDatabinding> list = (List<AegisDatabinding>) this.endpoint.getProperties().get(
+            CxfConstants.DATA_BINDING);
+        if (list != null && list.size() == 1)
+        {
+            aDB = list.get(0);
+        }
+        else
+        {
+            aDB = new AegisDatabinding();
+        }
+        ClientProxyFactoryBean cpf = new ClientProxyFactoryBean();
+        final Class serviceClass;
+        try
+        {
+            serviceClass = ClassUtils.loadClass(serviceClassString, getClass());
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new CreateException(CxfMessages.bothServiceClassAndWsdlUrlAreRequired(), e, this);
+        }
+        cpf.setServiceClass(serviceClass);
+        cpf.setDataBinding(aDB);
+        cpf.setAddress(endpoint.getEndpointURI().getAddress());
+        cpf.setBus(bus);
+
+        if (wsdlLocation != null)
+        {
+            cpf.setWsdlLocation(wsdlLocation);
+        }
+
+        this.client = ClientProxy.getClient(cpf.create());
     }
 
     protected void createClientProxy(Bus bus) throws Exception

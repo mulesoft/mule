@@ -11,6 +11,7 @@
 package org.mule.transport.cxf.wsdl;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.cxf.ClientWrapper;
 import org.mule.transport.cxf.CxfMessageDispatcher;
@@ -29,7 +30,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
 {
     private final static Object CLIENT_CREATION_LOCK = new Object();
     
-    public CxfWsdlMessageDispatcher(OutboundEndpoint endpoint)
+    public CxfWsdlMessageDispatcher(OutboundEndpoint endpoint) throws MalformedEndpointException
     {
         super(endpoint);
     }
@@ -89,7 +90,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
             
             try
             {
-                this.client = createClient(bus, wsdlUrl, serviceName, portName);
+                this.client = CxfWsdlMessageDispatcher.this.createClient(bus, wsdlUrl, serviceName, portName);
 
                 addMuleInterceptors();
             }

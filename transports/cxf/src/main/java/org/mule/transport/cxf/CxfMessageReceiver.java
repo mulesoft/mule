@@ -117,7 +117,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             {
                 svcCls = ProxyService.class;
                 targetCls = svcCls;
-                frontend = "simple";
+                frontend = CxfConstants.SIMPLE_FRONTEND;
             }
             else 
             {
@@ -140,9 +140,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             }
 
             ServerFactoryBean sfb;
-            if (CxfConstants.SIMPLE_FRONTEND.equals(frontend))
+            if (CxfConstants.SIMPLE_FRONTEND.equals(frontend) || CxfConstants.AEGIS_FRONTEND.equals(frontend))
             {
                 sfb = new ServerFactoryBean();
+
                 sfb.setDataBinding(new AegisDatabinding());
             }
             else if (CxfConstants.JAX_WS_FRONTEND.equals(frontend))
@@ -403,6 +404,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    @Override
     public void doConnect() throws Exception
     {
         super.doConnect();
@@ -412,6 +414,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
+    @Override
     public void doDisconnect() throws Exception
     {
         super.doDisconnect();

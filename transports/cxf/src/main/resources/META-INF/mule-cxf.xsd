@@ -159,22 +159,30 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="inboundEndpointAttributes">
+        <xsd:attribute name="serviceClass" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class CXF should use to construct its service model. This is optional, and by default it will use the implementation class of your component, on inbound cxf endpoint. But it is mandatory for outbound endpoint when using "aegis" frontend. 
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="frontend">
             <xsd:annotation>
                 <xsd:documentation>
-                    The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" frontend is also supported.  
+                    The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" and "aegis" frontend are also supported.  
                 </xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
                <xsd:restriction base="xsd:NMTOKEN">
                     <xsd:enumeration value="jaxws"/>
                     <xsd:enumeration value="simple"/>
+                    <xsd:enumeration value="aegis"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="inboundEndpointAttributes">
         <xsd:attribute name="bindingUri" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
@@ -193,13 +201,6 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The service namespace. (As of 2.2.1)
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="serviceClass" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The class CXF should use to construct its service model. This is optional, and by default it will use the implementation class of your component.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -294,6 +295,23 @@
                     The operation you want to invoke on the outbound endpoint.
                 </xsd:documentation>
             </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="payloadToArguments" default="nullPayloadAsParameter">
+            <xsd:annotation>
+                <xsd:documentation>
+                    This indicates how to treat the payload during the building of the parameters for the cxf call. 
+                    It has 2 possible values: "nullPayloadAsParameter" and "nullPayloadAsVoid". They only behave differently if
+                    the payload is of type NullPayload. This could change in the future if we add more possible values here.
+                    "nullPayloadAsParameter" is the default and indicates that if the payload is a NullPayload, it will be sent in the service call as a parameter.
+                    "nullPayloadAsVoid" indicates that if the payload is a NullPayload, then the call will be done as if no parameters were supplied.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="nullPayloadAsParameter" />
+                    <xsd:enumeration value="nullPayloadAsVoid" />
+                </xsd:restriction>
+            </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
 

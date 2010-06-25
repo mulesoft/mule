@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd"
+               >
+
+    <model>
+        <service name="greeterService">
+            <inbound>
+                <cxf:inbound-endpoint frontend="aegis"
+                    address="http://localhost:63081/services/greeter" />
+            </inbound>
+            <component>
+                <singleton-object
+                    class="org.apache.hello_world_soap_http.GreeterImpl" />
+            </component>
+        </service>
+        <service name="PopulateData">
+            <inbound>
+                <inbound-endpoint address="vm://test"
+                    synchronous="true" />
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent" />
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint
+                        address="http://localhost:63081/services/greeter"
+                        serviceClass="org.apache.hello_world_soap_http.Greeter"
+                        operation="greetMe" frontend="aegis">
+                        <!--
+                            Aegis will use file
+                            resources/org/apache/hello_world_soap_http/Greeter.aegis.xml
+                            to configure the call to the webservice.
+                        -->
+                        <cxf:databinding>
+                            <spring:bean
+                                class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+                                <spring:property name="configuration">
+                                    <spring:bean
+                                        class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                                </spring:property>
+                            </spring:bean>
+                        </cxf:databinding>
+                    </cxf:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
+

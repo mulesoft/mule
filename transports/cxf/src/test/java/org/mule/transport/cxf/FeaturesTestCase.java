@@ -10,17 +10,18 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.tck.FunctionalTestCase;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.feature.LoggingFeature;
 
 public class FeaturesTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "features-test.xml";
@@ -32,7 +33,7 @@ public class FeaturesTestCase extends FunctionalTestCase
         assertNotNull(endpoint);
         Map properties = endpoint.getProperties();
         assertNotNull(properties);
-        assertEquals(5, properties.size());
+        assertEquals(6, properties.size());
         assertNotNull(properties.get("features"));
         assertTrue(properties.get("features") instanceof List);
         List features = (List) properties.get("features");
