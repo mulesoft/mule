@@ -14,7 +14,7 @@
 
     <jdbc:connector name="jdbcConnector1" dataSource-ref="testDS1"/>
 
-    <jdbc:connector name="jdbcConnector2" dataSource-ref="testDS2"/>
+    <jdbc:connector name="jdbcConnector2" dataSource-ref="testDS2" queryTimeout="3"/>
 
     <jdbc:connector name="jdbcConnector3" dataSource-ref="testDS1">
         <jdbc:query key="getTest"
@@ -33,7 +33,7 @@
         <jdbc:sqlStatementStrategyFactory ref="sqlStatementStrategyFactory"/>
     </jdbc:connector>
 
-    <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+    <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3" queryTimeout="3">
         <jdbc:query key="getTest2" value="OVERRIDDEN VALUE" />
         <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
     </jdbc:endpoint>

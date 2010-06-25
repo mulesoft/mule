@@ -82,7 +82,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 }
 
                 //Perform actual query
-                result = connector.getQueryRunner().query(con, readStmt, 
+                result = connector.getQueryRunnerFor(endpoint).query(con, readStmt, 
                     connector.getResultSetHandler(), params);
                 
                 if (result != null)
@@ -124,7 +124,7 @@ public  class SelectSqlStatementStrategy implements SqlStatementStrategy
                 {
                     logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
                 }
-                int nbRows = connector.getQueryRunner().update(con, ackStmt, params);
+                int nbRows = connector.getQueryRunnerFor(endpoint).update(con, ackStmt, params);
                 if (nbRows != 1)
                 {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);

@@ -13,10 +13,13 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
+import org.mule.transport.jdbc.ExtendedQueryRunner;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcTransactionFactory;
 import org.mule.transport.jdbc.sqlstrategy.DefaultSqlStatementStrategyFactory;
 import org.mule.transport.jdbc.test.TestDataSource;
+
+import org.apache.commons.dbutils.QueryRunner;
 
 
 /**
@@ -36,7 +39,8 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);        
 
         assertTrue(c.getDataSource() instanceof TestDataSource);
-        assertNull(c.getQueries());       
+        assertNull(c.getQueries());
+        assertEquals(-1, c.getQueryTimeout());
     }
 
     public void testWithDataSourceViaJndi() throws Exception
@@ -48,6 +52,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNull(c.getQueries());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        assertEquals(3, c.getQueryTimeout());
     }
     
     public void testFullyConfigured() throws Exception
@@ -84,6 +89,11 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
         //Does not exist on either
         assertNull(c.getQuery(testJdbcEndpoint, "getTest4"));
+        assertEquals("3", testJdbcEndpoint.getProperty("queryTimeout"));
+        
+        QueryRunner queryRunner = c.getQueryRunnerFor(testJdbcEndpoint);
+        assertEquals(ExtendedQueryRunner.class, queryRunner.getClass());
+        assertEquals(3, ((ExtendedQueryRunner) queryRunner).getQueryTimeout());
     }
     
     public void testEndpointWithTransaction() throws Exception
@@ -95,6 +105,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
             endpoint.getTransactionConfig().getFactory().getClass());
         assertEquals(MuleTransactionConfig.ACTION_NONE, 
             endpoint.getTransactionConfig().getAction());
+        assertEquals("-1", endpoint.getProperty("queryTimeout"));
     }
     
     public void testEndpointWithXaTransaction() throws Exception

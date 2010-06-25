@@ -89,7 +89,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                
+                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The timeout in seconds that will be used as a query timeout for the SQL statement
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -109,6 +115,13 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The timeout in seconds that will be used as a query timeout for the SQL statement
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -128,6 +141,13 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The timeout in seconds that will be used as a query timeout for the SQL statement
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -141,6 +161,13 @@
                     <xsd:element ref="abstract-query" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="queryTimeout" type="xsd:int" default="-1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        The timeout in seconds that will be used as a query timeout for the SQL statement
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
