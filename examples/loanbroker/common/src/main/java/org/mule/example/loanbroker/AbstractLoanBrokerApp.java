@@ -198,7 +198,7 @@ public abstract class AbstractLoanBrokerApp
             client.dispatch("CustomerRequests", request, null);
             System.out.println(LocaleMessage.sentAsync());
             // let the request catch up
-            Thread.sleep(1500);
+            Thread.sleep(3000);
         }
         else
         {
