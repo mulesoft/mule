@@ -156,7 +156,7 @@
                             <tasks>
                                 <copy tofile="${MULE_HOME}/apps/echo-stdin/mule-config.xml" file="${basedir}/target/classes/echo-config.xml"/>
                                 <copy tofile="${MULE_HOME}/apps/echo-cxf/mule-config.xml" file="${basedir}/target/classes/echo-cxf-config.xml"/>
-                            </tasks>   
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>
