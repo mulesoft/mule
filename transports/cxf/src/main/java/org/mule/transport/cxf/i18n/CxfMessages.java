@@ -13,6 +13,10 @@ package org.mule.transport.cxf.i18n;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 public class CxfMessages extends MessageFactory
 {
     private static final CxfMessages factory = new CxfMessages();
@@ -103,6 +107,14 @@ public class CxfMessages extends MessageFactory
     public static Message invalidPayloadToArgumentsParameter(String nullPayloadParameterValue)
     {
         return factory.createMessage(BUNDLE_PATH, 24, nullPayloadParameterValue);
+    }
+
+    public static Message invalidOrMissingNamespace(QName serviceQName,
+                                                    List<QName> probableServices,
+                                                    List<QName> allServices)
+    {
+        return factory.createMessage(BUNDLE_PATH, 25, String.valueOf(serviceQName),
+            String.valueOf(probableServices), String.valueOf(allServices));
     }
 }
 

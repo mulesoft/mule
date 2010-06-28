@@ -10,13 +10,22 @@
 
 package org.mule.transport.cxf.support;
 
+import org.mule.transport.cxf.i18n.CxfMessages;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
+import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.factory.DefaultServiceConfiguration;
@@ -37,6 +46,7 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
      * 
      * @Override
      */
+    @Override
     public QName getEndpointName()
     {
         try
@@ -46,8 +56,8 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
                 Definition definition = getServiceFactory().getBus()
                     .getExtension(WSDLManager.class)
                     .getDefinition(getServiceFactory().getWsdlURL());
-                return new QName(getServiceNamespace(), ((Port) definition.getService(
-                    getServiceFactory().getServiceQName()).getPorts().values().iterator().next()).getName());
+                Service service = getServiceFromDefinition(definition);
+                return new QName(getServiceNamespace(), ((Port) service.getPorts().values().iterator().next()).getName());
             }
             else
             {
@@ -59,5 +69,68 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
         {
             throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), e);
         }
+    }
+
+    protected Service getServiceFromDefinition(Definition definition)
+    {
+        Service service = definition.getService(getServiceFactory().getServiceQName());
+        if (service == null)
+        {
+            List<QName> probableServices = getProbableServices(definition);
+            List<QName> allServices = getAllServices(definition);
+            throw new ComponentNotFoundRuntimeException(CxfMessages.invalidOrMissingNamespace(
+                getServiceFactory().getServiceQName(), probableServices, allServices));
+        }
+        return service;
+    }
+
+    /**
+     * This method returns a list of all the services defined in the definition. Its
+     * current purpose is only for generating a better error message when the service
+     * cannot be found.
+     * 
+     * @param definition
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected List<QName> getAllServices(Definition definition)
+    {
+        return new LinkedList<QName>(CollectionUtils.select(definition.getServices().keySet(),
+            new Predicate()
+            {
+                public boolean evaluate(Object object)
+                {
+                    return object instanceof QName;
+                }
+            }));
+    }
+
+    /**
+     * This method returns the list of services that matches with the local part of
+     * the service QName. Its current purpose is only for generating a better error
+     * message when the service cannot be found.
+     * 
+     * @param definition
+     * @return
+     */
+    protected List<QName> getProbableServices(Definition definition)
+    {
+        QName serviceQName = getServiceFactory().getServiceQName();
+        List<QName> probableServices = new LinkedList<QName>();
+        Map<?, ?> services = definition.getServices();
+        for (Iterator<?> iterator = services.keySet().iterator(); iterator.hasNext();)
+        {
+            Object key = iterator.next();
+            if (key instanceof QName)
+            {
+                QName qNameKey = (QName) key;
+                if (qNameKey.getLocalPart() != null
+                    && qNameKey.getLocalPart().equals(serviceQName.getLocalPart()))
+                {
+                    probableServices.add(qNameKey);
+                }
+            }
+        }
+        return probableServices;
     }
 }

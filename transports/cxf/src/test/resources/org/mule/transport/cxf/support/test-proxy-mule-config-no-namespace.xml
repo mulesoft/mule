@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	
+      xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+			http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+
+    <model name="CxfSimpleProxy">
+
+        <service name="Gateway">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:8088/TestProxy" 
+                                      synchronous="true" 
+                                      proxy="true" 
+                                      endpointName="TestPOJOComponentPort"
+                                      serviceName="TestPOJOComponent" 
+                                      wsdlLocation="./org/mule/transport/cxf/support/TestProxyImpl.wsdl"
+                />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <cxf:outbound-endpoint address="vm://TestProxyImpl" synchronous="true" proxy="true"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Component">
+            <inbound>
+                <cxf:inbound-endpoint address="vm://TestProxyImpl" synchronous="true" frontend="simple"/>                
+            </inbound>
+            <component class="org.mule.transport.cxf.support.someOtherPackage.TestPOJOComponent"/>
+        </service>
+        
+    </model>
+
+</mule>
