@@ -148,10 +148,9 @@
                             <tasks>
                                 <copy tofile="${MULE_HOME}/apps/hello-stdin/mule-config.xml" file="${basedir}/target/classes/hello-config.xml"/>
                                 <copy tofile="${MULE_HOME}/apps/hello-http/mule-config.xml" file="${basedir}/target/classes/hello-http-config.xml"/>
-                            </tasks>                            
+                            </tasks>
                         </configuration>
                     </execution>
-                                   
                 </executions>
             </plugin>
             <plugin>
@@ -197,7 +196,7 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
