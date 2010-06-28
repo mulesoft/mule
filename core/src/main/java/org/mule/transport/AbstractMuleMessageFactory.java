@@ -54,6 +54,8 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         {
             message = new DefaultMuleMessage(payload, muleContext);
         }
+
+        message.setEncoding(encoding);
         addProperties(message, transportMessage);
         addAttachments(message, transportMessage);
         return message;
