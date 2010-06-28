@@ -118,17 +118,6 @@
     <build>
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>
-
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -163,27 +152,24 @@
                 overwriting the previous one. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.2</version>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
                         <phase>install</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}</outputDirectory>                            
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/classes</directory>
-                                    <includes>
-                                        <include>*.xml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
+                            <tasks>
+                                <copy file="${basedir}/conf/change-machine.xml" tofile="${MULE_HOME}/apps/scripting-groovy/mule-config.xml"/>
+                                <copy file="${basedir}/conf/greedy.groovy" tofile="${MULE_HOME}/apps/scripting-groovy/classes/greedy.groovy"/>
+                                <copy file="${basedir}/conf/groovy-usd.properties" tofile="${MULE_HOME}/apps/scripting-groovy/classes/default-config.properties"/>
+
+                                <copy file="${basedir}/conf/change-machine.xml" tofile="${MULE_HOME}/apps/scripting-python/mule-config.xml"/>
+                                <copy file="${basedir}/conf/greedy.py" tofile="${MULE_HOME}/apps/scripting-python/classes/greedy.py"/>
+                                <copy file="${basedir}/conf/python-gbp.properties" tofile="${MULE_HOME}/apps/scripting-python/classes/default-config.properties"/>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>
@@ -191,15 +177,36 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
                 <executions>
                     <execution>
-                        <id>copy-artifact</id>
+                        <id>copy-groovy-artifacts</id>
                         <phase>install</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/${artifactId}/lib</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/scripting-groovy/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-python-artifacts</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/apps/scripting-python/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -213,12 +220,11 @@
                                     <groupId>javax.script</groupId>
                                     <artifactId>jython-engine</artifactId>
                                     <version>1.1</version>
-                                    <!-- we use our own retrotranslated version -->
                                     <classifier>jdk14</classifier>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.python</groupId>
-                                    <artifactId>jython</artifactId>
+                                    <artifactId>jython</artifactId>python
                                     <version>2.2.1</version>
                                 </artifactItem>
                             </artifactItems>

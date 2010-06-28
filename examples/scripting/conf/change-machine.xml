@@ -17,16 +17,16 @@
     <description>
         This example demonstrates invoking a JSR-223 script as the service component.
     </description>
-    
+
     <!--
     Adds the default configuration for the 'scriptfile' and 'currency' variables below.
     Users can override these values by passing them as VM parameters i.e. -Dcurrency=GBP.
     If running from the example shell script you will be prompted with options.
     -->
     <context:property-placeholder location="default-config.properties"/>
-    
+
     <configuration defaultSynchronousEndpoints="true"/>
-        
+
     <stdio:connector name="SystemStreamConnector"
                      promptMessage="How much more change do you need? (enter an amount such as 2.37)"
                      messageDelayTime="1000"/>
