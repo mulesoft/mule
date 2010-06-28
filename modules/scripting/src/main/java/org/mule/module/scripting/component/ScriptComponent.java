@@ -33,7 +33,6 @@ import javax.script.Bindings;
  */
 public class ScriptComponent extends AbstractComponent
 {
-
     protected BindingCollection bindingCollection = new DefaultBindingCollection();
 
     private Scriptable script;
@@ -53,7 +52,6 @@ public class ScriptComponent extends AbstractComponent
         {
             throw new InitialisationException(e, this);
         }
-
     }
 
     @Override
@@ -68,7 +66,6 @@ public class ScriptComponent extends AbstractComponent
         script.populateBindings(bindings, event);
         return script.runScript(bindings);
     }
-
 
     public Scriptable getScript()
     {
