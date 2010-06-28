@@ -55,6 +55,12 @@ public abstract class AbstractLoanBrokerApp
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
             muleContext = muleContextFactory.createMuleContext(getConfigBuilder());
+            // this is to support running within our test case framework, which
+            // starts the muleContext and with the qa framework which doesn't
+            if(!muleContext.isStarted() && !muleContext.isStarting())
+            {
+                muleContext.start();                
+            }
         }
 
         client = new MuleClient(muleContext);
