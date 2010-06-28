@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 
 /**
@@ -25,8 +27,9 @@ public class ExtendedQueryRunner extends QueryRunner
 {
     private int queryTimeout;
 
-    public ExtendedQueryRunner(int queryTimeout)
+    public ExtendedQueryRunner(DataSource ds, int queryTimeout)
     {
+    	super (ds);
         this.queryTimeout = queryTimeout;
     }
 
