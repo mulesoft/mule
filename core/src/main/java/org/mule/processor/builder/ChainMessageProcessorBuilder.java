@@ -99,7 +99,10 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
     public ChainMessageProcessorBuilder chain(Collection <MessageProcessor> processors)
     {
-        chain.addAll(processors);
+        if (processors != null)
+        {
+            chain.addAll(processors);
+        }
         return this;
     }
 
@@ -179,41 +182,6 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
             return firstInChain.process(event);
         }
 
-        @Override
-        public String toString()
-        {
-            StringBuffer string = new StringBuffer();
-            string.append("ChainedCompositeMessageProcessor [");
-            if (name != null)
-            {
-                string.append("name=\"");
-                string.append(name);
-                string.append("\", ");
-            }
-            string.append("processors=");
-            Iterator<MessageProcessor> mpIterator = allProcessors.iterator();
-            while (mpIterator.hasNext())
-            {
-                MessageProcessor mp = mpIterator.next();
-                if (mp instanceof ChainedCompositeMessageProcessor)
-                {
-                    string.append("ChainedCompositeMessageProcessor [name=\"");
-                    string.append(((ChainedCompositeMessageProcessor) mp).name);
-                    string.append("\"]");
-                }
-                else
-                {
-                    string.append(mp.getClass().getName());
-                }
-                if (mpIterator.hasNext())
-                {
-                    string.append(",");
-                }
-            }
-            string.append("]");
-            return string.toString();
-        }
-
         public void initialise() throws InitialisationException
         {
             for (MessageProcessor processor : allProcessors)
@@ -266,4 +234,40 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
             return event;
         }
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuffer string = new StringBuffer();
+        string.append("ChainedCompositeMessageProcessor [");
+        if (name != null)
+        {
+            string.append("name=\"");
+            string.append(name);
+            string.append("\", ");
+        }
+        string.append("processors=");
+        Iterator<MessageProcessor> mpIterator = chain.iterator();
+        while (mpIterator.hasNext())
+        {
+            MessageProcessor mp = mpIterator.next();
+            if (mp instanceof ChainedCompositeMessageProcessor)
+            {
+                string.append("ChainedCompositeMessageProcessor [name=\"");
+                string.append(((ChainedCompositeMessageProcessor) mp).name);
+                string.append("\"]");
+            }
+            else
+            {
+                string.append(mp.getClass().getName());
+            }
+            if (mpIterator.hasNext())
+            {
+                string.append(",");
+            }
+        }
+        string.append("]");
+        return string.toString();
+    }
+
 }

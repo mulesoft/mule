@@ -22,8 +22,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transport.tcp.TcpConnector;
 
 import java.io.UnsupportedEncodingException;
@@ -399,28 +397,4 @@ public class HttpConnector extends TcpConnector
         }
         return url;
     }
-    
-    @Override
-    public void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
-    {
-        builder.replaceMessageProcessor(InboundFilterMessageProcessor.class,
-            new InboundFilterMessageProcessor()
-            {
-                @Override
-                protected MuleMessage handleUnacceptedFilter(MuleMessage message, InboundEndpoint endpoint)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Message request '"
-                                     + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
-                                     + "' is being rejected since it does not match the filter on this endpoint: "
-                                     + endpoint);
-                    }
-                    message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
-                        String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
-                    return message;
-                }
-            });
-    }
-
 }

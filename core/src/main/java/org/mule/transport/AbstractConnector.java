@@ -27,7 +27,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpointDecorator;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -36,6 +35,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
@@ -60,31 +60,12 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
-import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
-import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
-import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
-import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
-import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
-import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
-import org.mule.endpoint.outbound.OutboundEndpointDecoratorMessageProcessor;
-import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
-import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
-import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
-import org.mule.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
-import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSecurityFilterMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
-import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.TransactionalInterceptingMessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
-import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -237,6 +218,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     private RetryPolicyTemplate retryPolicyTemplate;
 
     /**
+     * Factory used to create default message processors for this connector's endpoints.
+     */
+    protected volatile MessageProcessorsFactory messageProcessorsFactory;
+
+    /**
      * Optimise the handling of message notifications. If dynamic is set to false
      * then the cached notification handler implements a shortcut for message
      * notifications.
@@ -370,14 +356,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
         }
 
-        // Use lazy-init (in get() methods) for this instead.
-        // dispatcherThreadingProfile =
-        // muleContext.getDefaultMessageDispatcherThreadingProfile();
-        // requesterThreadingProfile =
-        // muleContext.getDefaultMessageRequesterThreadingProfile();
-        // receiverThreadingProfile =
-        // muleContext.getDefaultMessageReceiverThreadingProfile();
-
         // Initialise the structure of this connector
         this.initFromServiceDescriptor();
 
@@ -427,6 +405,18 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         catch (TransportServiceException tse)
         {
             throw new CreateException(CoreMessages.failedToCreate("MuleMessageFactory"), tse, this);
+        }
+    }
+
+    public MessageProcessorsFactory createMessageProcessorsFactory() throws CreateException
+    {
+        try
+        {
+            return serviceDescriptor.createMessageProcessorsFactory();
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new CreateException(CoreMessages.failedToCreate("MessageProcessorsFactory"), tse, this);
         }
     }
 
@@ -970,6 +960,15 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             muleMessageFactory = createMuleMessageFactory();
         }
         return muleMessageFactory;
+    }
+
+    public MessageProcessorsFactory getMessageProcessorsFactory() throws CreateException
+    {
+        if (messageProcessorsFactory == null)
+        {
+            messageProcessorsFactory = createMessageProcessorsFactory();
+        }
+        return messageProcessorsFactory;
     }
 
     /**
@@ -2460,132 +2459,64 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         requesters.setMaxWait(maxWait);
     }
 
-    /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createOutboundRequestMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    public MessageProcessor createAssertConnectorStartedMessageProcessor()
     {
-        return new MessageProcessor[] 
-        { 
-            // Log but don't proceed if connector is not started
-            new OutboundLoggingMessageProcessor(), 
-            new AssertConnectorStartedMessageProcessor(),
-    
-            // Everything is processed within TransactionTemplate
-            new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(), this, muleContext),
-    
-            new OutboundEventTimeoutMessageProcessor(),
-    
-            // Exception handling to preserve previous MuleSession level exception
-            // handling behaviour
-            new OutboundSimpleTryCatchMessageProcessor(),
-            new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this),
-    
-            new OutboundSessionHandlerMessageProcessor(getSessionHandler()),
-            new OutboundEndpointPropertyMessageProcessor(),
-    
-            // TODO MULE-4872
-            (endpoint instanceof OutboundEndpointDecorator ? 
-                 new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint) : 
-                 new ChainMessageProcessorBuilder.NullMessageProcesser()),
-    
-            new OutboundSecurityFilterMessageProcessor(endpoint),
-            new OutboundTryCatchMessageProcessor(endpoint),
-            new OutboundResponsePropertiesMessageProcessor(endpoint)
-        };
-    }
-    
-    /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new MessageProcessor[] 
-        { 
-            new TransformerMessageProcessor(endpoint.getResponseTransformers()),
-            new OutboundRewriteResponseEventMessageProcessor()
-        };
-    }
-    
-    /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createInboundRequestMessageProcessors(InboundEndpoint endpoint)
-    {
-        return new MessageProcessor[] 
-        { 
-            new InboundEndpointPropertyMessageProcessor(endpoint),
-            new InboundNotificationMessageProcessor(endpoint), 
-            new InboundLoggingMessageProcessor(endpoint),
-            new InboundFilterMessageProcessor(), 
-            new InboundSecurityFilterMessageProcessor(endpoint),
-            new TransformerMessageProcessor(endpoint.getTransformers()) 
-        };
-    }
-    
-    /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
-    {
-        return new MessageProcessor[] 
-        { 
-            new InboundExceptionDetailsMessageProcessor(this),
-            new TransformerMessageProcessor(endpoint.getResponseTransformers()) 
-        };
-    }
-
-    public void customizeInboundEndpointRequestChain(ChainMessageProcessorBuilder builder)
-    {
-        // Template method
-    }
-        
-    private class AssertConnectorStartedMessageProcessor implements MessageProcessor
-    {
-        public MuleEvent process(MuleEvent event) throws MuleException
+        return new MessageProcessor()
         {
-            if (!isStarted())
+            public MuleEvent process(MuleEvent event) throws MuleException
             {
-                throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
-                    lifecycleManager.getCurrentPhase()), this);
+                if (!isStarted())
+                {
+                    throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
+                        lifecycleManager.getCurrentPhase()), this);
+                }
+                return event;
             }
-            return event;
-        }
+        };
     }
 
-    public MessageProcessor getDispatcherMessageProcessor(OutboundEndpoint endpoint)
+    public MessageProcessor createAsyncInterceptingMessageProcessor() throws MuleException
     {
-        return new InternalDispatcherMessageProcessor(endpoint);
+        return new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this);
     }
     
-    private class InternalDispatcherMessageProcessor implements MessageProcessor
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint)
     {
-        private OutboundEndpoint endpoint;
-        private MessageProcessor notificationMessageProcessor;
-
-        public InternalDispatcherMessageProcessor(OutboundEndpoint endpoint)
+        return new MessageProcessor()
         {
-            this.endpoint = endpoint;
-            this.notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
-        }
+            private MessageProcessor notificationMessageProcessor;
 
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            MessageDispatcher dispatcher = null;
-            try
+            public MuleEvent process(MuleEvent event) throws MuleException
             {
-                dispatcher = getDispatcher(endpoint);
-                MuleEvent result = dispatcher.process(event);
-                // We need to invoke notification message processor with request
-                // message only after successful send/dispatch
-                notificationMessageProcessor.process(event);
-                return result;
+                OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
+                MessageDispatcher dispatcher = null;
+                try
+                {
+                    dispatcher = getDispatcher(endpoint);
+                    MuleEvent result = dispatcher.process(event);
+                    // We need to invoke notification message processor with request
+                    // message only after successful send/dispatch
+                    if (notificationMessageProcessor == null)
+                    {
+                        notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
+                    }
+                    notificationMessageProcessor.process(event);
+                    return result;
 
+                }
+                catch (DispatchException dex)
+                {
+                    throw dex;
+                }
+                catch (MuleException ex)
+                {
+                    throw new DispatchException(event.getMessage(), endpoint, ex);
+                }
+                finally
+                {
+                    returnDispatcher(endpoint, dispatcher);
+                }
             }
-            catch (DispatchException dex)
-            {
-                throw dex;
-            }
-            catch (MuleException ex)
-            {
-                throw new DispatchException(event.getMessage(), endpoint, ex);
-            }
-            finally
-            {
-                returnDispatcher(endpoint, dispatcher);
-            }
-        }
-    }
+        };
+    }    
 }

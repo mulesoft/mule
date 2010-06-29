@@ -19,6 +19,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -79,11 +80,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         }
     }
 
-//    public void unregisterListener() throws Exception
-//    {
-//        getConnector().unregisterListener(this);
-//    }
-
     public void setListener(MessageProcessor listener)
     {
         this.listener = listener;
@@ -115,28 +111,28 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 
     public MessageProcessor createMessageProcessorChain() throws MuleException
     {
+        MessageProcessorsFactory factory = ((AbstractConnector) getConnector()).getMessageProcessorsFactory();
+        
         // -- REQUEST CHAIN --
         ChainMessageProcessorBuilder requestChainBuilder = new ChainMessageProcessorBuilder();
         requestChainBuilder.setName("Inbound endpoint request pipeline");
         // Default MPs
-        requestChainBuilder.chain(((AbstractConnector) getConnector()).createInboundRequestMessageProcessors(this));
+        requestChainBuilder.chain(factory.createInboundMessageProcessors(this));
         // Configured MPs (if any)
         requestChainBuilder.chain(getMessageProcessors());
         
         // -- INVOKE SERVICE --
         if (listener == null)
         {
-            throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target has been set for this endpoint"));
+            throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
         }
         requestChainBuilder.chain(listener);
 
-        ((AbstractConnector) getConnector()).customizeInboundEndpointRequestChain(requestChainBuilder);
-        
         // -- RESPONSE CHAIN --
         ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
         responseChainBuilder.setName("Inbound endpoint response pipeline");
         // Default MPs
-        responseChainBuilder.chain(((AbstractConnector) getConnector()).createInboundResponseMessageProcessors(this));
+        responseChainBuilder.chain(factory.createInboundResponseMessageProcessors(this));
         // Configured MPs (if any)
         responseChainBuilder.chain(getResponseMessageProcessors());
 
@@ -153,5 +149,4 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         this.pattern = pattern;
     }
-
 }

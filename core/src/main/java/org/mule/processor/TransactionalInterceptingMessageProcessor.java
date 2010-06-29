@@ -11,7 +11,6 @@
 package org.mule.processor;
 
 import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -36,15 +35,12 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     protected final Log logger = LogFactory.getLog(getClass());
     protected TransactionConfig transactionConfig;
     protected ExceptionListener exceptionListener;
-    protected MuleContext muleContext;
 
     public TransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig,
-                                                     ExceptionListener exceptionListener,
-                                                     MuleContext muleContext)
+                                                     ExceptionListener exceptionListener)
     {
         this.transactionConfig = transactionConfig;
         this.exceptionListener = exceptionListener;
-        this.muleContext = muleContext;
     }
 
     public MuleEvent process(final MuleEvent event) throws MuleException
@@ -55,8 +51,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            TransactionTemplate tt = new TransactionTemplate(transactionConfig, exceptionListener,
-                muleContext);
+            TransactionTemplate tt = new TransactionTemplate(transactionConfig, exceptionListener, event.getMuleContext());
             TransactionCallback cb = new TransactionCallback()
             {
                 public Object doInTransaction() throws Exception

@@ -17,6 +17,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -87,22 +88,24 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     protected MessageProcessor createMessageProcessorChain() throws MuleException
     {
+        MessageProcessorsFactory factory = ((AbstractConnector) getConnector()).getMessageProcessorsFactory();
+        
         // -- REQUEST CHAIN --
         ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
         outboundChainBuilder.setName("Outbound endpoint request chain");
         // Default MPs
-        outboundChainBuilder.chain(((AbstractConnector) getConnector()).createOutboundRequestMessageProcessors(this));
+        outboundChainBuilder.chain(factory.createOutboundMessageProcessors(this));
         // Configured MPs (if any)
         outboundChainBuilder.chain(getMessageProcessors());
         
         // -- OUTBOUND ROUTER --
-        outboundChainBuilder.chain(((AbstractConnector) getConnector()).getDispatcherMessageProcessor(this));
+        outboundChainBuilder.chain(((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
         
         // -- RESPONSE CHAIN --
         ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
         responseChainBuilder.setName("Outbound endpoint response chain");
         // Default MPs
-        responseChainBuilder.chain(((AbstractConnector) getConnector()).createOutboundResponseMessageProcessors(this));
+        responseChainBuilder.chain(factory.createOutboundResponseMessageProcessors(this));
         // Configured MPs (if any)
         responseChainBuilder.chain(getResponseMessageProcessors());
 
