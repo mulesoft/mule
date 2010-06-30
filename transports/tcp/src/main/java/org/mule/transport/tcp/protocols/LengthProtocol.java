@@ -100,7 +100,6 @@ public class LengthProtocol extends DirectProtocol
             // only flush if the sizes don't match up
             dos.flush();
         }
-        dos.close();
     }
 
     /**
