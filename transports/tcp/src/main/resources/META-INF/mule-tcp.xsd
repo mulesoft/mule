@@ -209,8 +209,16 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="abstract-protocol" abstract="true" type="abstractProtocolType"/>
-    <xsd:complexType name="abstractProtocolType"/>
+    <xsd:element name="abstract-protocol" type="abstractProtocolType"/>
+    <xsd:complexType name="abstractProtocolType">
+        <xsd:attribute name="rethrowExceptionOnRead" type="mule:substitutableBoolean">
+            <xsd:annotation>
+            	<xsd:documentation>
+                	Rethrow the exception if read fails
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
 
     <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol">
         <xsd:annotation>

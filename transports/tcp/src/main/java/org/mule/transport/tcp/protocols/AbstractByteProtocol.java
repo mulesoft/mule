@@ -50,6 +50,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol
     public static final boolean STREAM_OK = true;
     public static final boolean NO_STREAM = false;
     private boolean streamOk;
+    private boolean rethrowExceptionOnRead = false;
 
     public AbstractByteProtocol(boolean streamOk)
     {
@@ -154,12 +155,26 @@ public abstract class AbstractByteProtocol implements TcpProtocol
         {
             // do not pollute the log with a stacktrace, log only the message
             logger.info("Socket exception occured: " + e.getMessage());
-            return EOF;
+            if (this.rethrowExceptionOnRead)
+            {
+                throw e;
+            }
+            else
+            {
+                return EOF;
+            }
         }
         catch (SocketTimeoutException e)
         {
             logger.debug("Socket timeout.");
-            return EOF;
+            if (this.rethrowExceptionOnRead)
+            {
+                throw e;
+            }
+            else
+            {
+                return EOF;
+            }
         }
     }
 
@@ -212,6 +227,16 @@ public abstract class AbstractByteProtocol implements TcpProtocol
     public ResponseOutputStream createResponse(Socket socket) throws IOException
     {
         return new ResponseOutputStream(socket, new ProtocolStream(this, streamOk, socket.getOutputStream()));
+    }
+
+    public boolean isRethrowExceptionOnRead()
+    {
+        return rethrowExceptionOnRead;
+    }
+
+    public void setRethrowExceptionOnRead(boolean rethrowExceptionOnRead)
+    {
+        this.rethrowExceptionOnRead = rethrowExceptionOnRead;
     }
 
 }
