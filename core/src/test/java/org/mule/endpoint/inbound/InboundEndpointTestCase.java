@@ -20,6 +20,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.FilterException;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.context.notification.EndpointMessageNotification;
@@ -107,12 +108,17 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         responseEvent = createTestResponseEvent(endpoint);
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
-        result = mpChain.process(requestEvent);
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Filter should have thrown a FilterException");
+        }
+        catch (FilterException e)
+        {
+            // expected
+        }
 
         assertMessageNotSent();
-        assertEquals(inMessage, result.getMessage());
-        assertNull(result.getMessage().getExceptionPayload());
-
     }
 
     public void testSecurityFilterAccept() throws Exception
@@ -169,13 +175,18 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         responseEvent = createTestResponseEvent(endpoint);
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
-        result = mpChain.process(requestEvent);
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Filter should have thrown a FilterException");
+        }
+        catch (FilterException e)
+        {
+            // expected
+        }
 
         assertFalse(securityFilter.wasCalled());
-
         assertMessageNotSent();
-        assertEquals(inMessage, result.getMessage());
-        assertNull(result.getMessage().getExceptionPayload());
     }
 
     /**

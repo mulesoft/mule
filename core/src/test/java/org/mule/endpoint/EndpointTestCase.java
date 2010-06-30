@@ -18,6 +18,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -68,6 +69,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final String endpointBuilderName = "builderName1";
         final MuleContext muleContext = mock(MuleContext.class);
         final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
+        final EndpointMessageProcessorsFactory messageProcessorsFactory = mock(EndpointMessageProcessorsFactory.class);
         final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
         final List<MessageProcessor> responseMessageProcessors = new ArrayList<MessageProcessor>();
 
@@ -107,7 +109,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         new AbstractEndpoint(mockConnector, uri, inputTransformers, outputTransformers, name, properties,
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
             synchronous, responseTimeout, initialState, endpointEncoding, endpointBuilderName, muleContext,
-            retryPolicyTemplate, messageProcessors, responseMessageProcessors)
+            retryPolicyTemplate, messageProcessorsFactory, messageProcessors, responseMessageProcessors)
         {
             @Override
             protected MessageProcessor createMessageProcessorChain() throws MuleException

@@ -35,7 +35,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
@@ -216,11 +215,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     protected volatile int numberOfConcurrentTransactedReceivers = DEFAULT_NUM_CONCURRENT_TX_RECEIVERS;
 
     private RetryPolicyTemplate retryPolicyTemplate;
-
-    /**
-     * Factory used to create default message processors for this connector's endpoints.
-     */
-    protected volatile MessageProcessorsFactory messageProcessorsFactory;
 
     /**
      * Optimise the handling of message notifications. If dynamic is set to false
@@ -405,18 +399,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         catch (TransportServiceException tse)
         {
             throw new CreateException(CoreMessages.failedToCreate("MuleMessageFactory"), tse, this);
-        }
-    }
-
-    public MessageProcessorsFactory createMessageProcessorsFactory() throws CreateException
-    {
-        try
-        {
-            return serviceDescriptor.createMessageProcessorsFactory();
-        }
-        catch (TransportServiceException tse)
-        {
-            throw new CreateException(CoreMessages.failedToCreate("MessageProcessorsFactory"), tse, this);
         }
     }
 
@@ -960,15 +942,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             muleMessageFactory = createMuleMessageFactory();
         }
         return muleMessageFactory;
-    }
-
-    public MessageProcessorsFactory getMessageProcessorsFactory() throws CreateException
-    {
-        if (messageProcessorsFactory == null)
-        {
-            messageProcessorsFactory = createMessageProcessorsFactory();
-        }
-        return messageProcessorsFactory;
     }
 
     /**

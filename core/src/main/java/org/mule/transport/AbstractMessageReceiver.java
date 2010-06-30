@@ -25,6 +25,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.filter.FilterException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
@@ -184,10 +185,29 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         MuleEvent muleEvent = createMuleEvent(message, synchronous, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 
-        MuleEvent resultEvent = listener.process(muleEvent);
+        MuleEvent resultEvent = null;
+        try
+        {
+            resultEvent = listener.process(muleEvent);
+        }
+        catch (FilterException e)
+        {
+            return handleUnacceptedFilter(muleEvent.getMessage());
+        }
 
         return resultEvent != null ? resultEvent.getMessage() : null;
+    }
 
+    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
+    {
+        if (logger.isDebugEnabled())
+        {
+            String messageId;
+            messageId = message.getUniqueId();
+            logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
+                         + ". Message is being ignored");
+        }
+        return message;
     }
 
     protected MuleEvent createMuleEvent(MuleMessage message, boolean synchronous, OutputStream outputStream)

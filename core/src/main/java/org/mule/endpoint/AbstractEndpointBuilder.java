@@ -21,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -32,6 +33,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.processor.DefaultEndpointMessageProcessorsFactory;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -79,6 +81,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Integer createConnector;
     protected RetryPolicyTemplate retryPolicyTemplate;
     protected String responsePropertiesList;
+    protected EndpointMessageProcessorsFactory messageProcessorsFactory;
     protected List<MessageProcessor> messageProcessors;
     protected List<MessageProcessor> responseMessageProcessors;
 
@@ -159,7 +162,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
                 name, muleContext, getRetryPolicyTemplate(connector), 
-                messageProcessors, responseMessageProcessors);
+                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors);
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -196,7 +199,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
                 getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
                 name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList, 
-                messageProcessors, responseMessageProcessors);
+                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors);
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
@@ -567,6 +570,16 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setTransformers(List<Transformer> transformers)
     {
         this.transformers = transformers;
+    }
+
+    protected EndpointMessageProcessorsFactory getMessageProcessorsFactory()
+    {
+        return messageProcessorsFactory != null ? messageProcessorsFactory : getDefaultMessageProcessorsFactory();
+    }
+
+    protected EndpointMessageProcessorsFactory getDefaultMessageProcessorsFactory()
+    {
+        return new DefaultEndpointMessageProcessorsFactory();
     }
 
     public void addResponseTransformer(Transformer transformer)

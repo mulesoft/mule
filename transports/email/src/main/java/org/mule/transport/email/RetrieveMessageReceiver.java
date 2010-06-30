@@ -347,4 +347,22 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         }
     }
 
+    @Override
+    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
+    {
+        super.handleUnacceptedFilter(message);
+        if (message.getPayload() instanceof Message)
+        {
+            Message msg = (Message) message.getPayload();
+            try
+            {
+                msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
+            }
+            catch (MessagingException e)
+            {
+                logger.error("failed to set message deleted: " + e.getMessage(), e);
+            }
+        }
+        return message;
+    }
 }

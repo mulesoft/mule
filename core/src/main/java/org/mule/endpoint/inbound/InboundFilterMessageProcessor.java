@@ -16,6 +16,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.routing.filter.FilterException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 public class InboundFilterMessageProcessor extends AbstractInterceptingMessageProcessor
@@ -26,18 +28,11 @@ public class InboundFilterMessageProcessor extends AbstractInterceptingMessagePr
         InboundEndpoint endpoint = (InboundEndpoint) event.getEndpoint();
 
         // Apply the endpoint filter if one is configured
-        if (endpoint.getFilter() != null)
+        if (endpoint.getFilter() != null && !endpoint.getFilter().accept(message))
         {
-            if (!endpoint.getFilter().accept(message))
-            {
-                message = handleUnacceptedFilter(message, endpoint);
-
-                MuleEvent result = new DefaultMuleEvent(message, event);
-                // We need to update event in RequestContext because MessageAwareTransformer's
-                // use this.
-                RequestContext.setEvent(result);
-                return result;
-            }
+            // We need to update event in RequestContext because MessageAwareTransformer's use this.
+            RequestContext.setEvent(new DefaultMuleEvent(message, event));            
+            throw new FilterException(CoreMessages.messageRejectedByFilter(), endpoint.getFilter());
         }
         return processNext(event);
     }

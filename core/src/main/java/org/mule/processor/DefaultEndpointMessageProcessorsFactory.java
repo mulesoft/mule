@@ -11,11 +11,13 @@
 package org.mule.processor;
 
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpointDecorator;
+import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorsFactory;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
@@ -36,10 +38,10 @@ import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
-public class DefaultMessageProcessorsFactory implements MessageProcessorsFactory
+public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageProcessorsFactory
 {
     /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createInboundMessageProcessors(InboundEndpoint endpoint)
+    protected MessageProcessor[] createInboundMessageProcessors(InboundEndpoint endpoint)
     {
         return new MessageProcessor[] 
         { 
@@ -53,7 +55,7 @@ public class DefaultMessageProcessorsFactory implements MessageProcessorsFactory
     }
     
     /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
+    protected MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
     {
         return new MessageProcessor[] 
         { 
@@ -63,7 +65,7 @@ public class DefaultMessageProcessorsFactory implements MessageProcessorsFactory
     }
     
     /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    protected MessageProcessor[] createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
         // TODO Need to clean this up the class hierarchy, but I'm not sure we want to put all these things in the Connector interface.
         AbstractConnector connector = ((AbstractConnector) endpoint.getConnector());
@@ -99,7 +101,7 @@ public class DefaultMessageProcessorsFactory implements MessageProcessorsFactory
     }
     
     /** Override this method to change the default MessageProcessors. */
-    public MessageProcessor[] createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    protected MessageProcessor[] createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
         return new MessageProcessor[] 
         { 
@@ -107,6 +109,72 @@ public class DefaultMessageProcessorsFactory implements MessageProcessorsFactory
             new OutboundRewriteResponseEventMessageProcessor()
         };
     }    
+    
+    public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, MessageProcessor target) throws MuleException
+    {
+        // -- REQUEST CHAIN --
+        ChainMessageProcessorBuilder requestChainBuilder = new ChainMessageProcessorBuilder();
+        requestChainBuilder.setName("Inbound endpoint request pipeline");
+        // Default MPs
+        requestChainBuilder.chain(createInboundMessageProcessors(endpoint));
+        // Configured MPs (if any)
+        requestChainBuilder.chain(endpoint.getMessageProcessors());
+        
+        // -- INVOKE SERVICE --
+        if (target == null)
+        {
+            throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
+        }
+        requestChainBuilder.chain(target);
+
+        // -- RESPONSE CHAIN --
+        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
+        responseChainBuilder.setName("Inbound endpoint response pipeline");
+        // Default MPs
+        responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
+        // Configured MPs (if any)
+        responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
+
+        // Compose request and response chains. We do this so that if the request
+        // chain returns early the response chain is still invoked.
+        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
+        compositeChainBuilder.setName("Inbound endpoint request/response composite pipeline");
+        compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
+        return compositeChainBuilder.build();
+    }
+
+    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException
+    {
+        // -- REQUEST CHAIN --
+        ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
+        outboundChainBuilder.setName("Outbound endpoint request chain");
+        // Default MPs
+        outboundChainBuilder.chain(createOutboundMessageProcessors(endpoint));
+        // Configured MPs (if any)
+        outboundChainBuilder.chain(endpoint.getMessageProcessors());
+        
+        // -- OUTBOUND ROUTER --
+        if (target == null)
+        {
+            throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
+        }
+        outboundChainBuilder.chain(target);
+        
+        // -- RESPONSE CHAIN --
+        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
+        responseChainBuilder.setName("Outbound endpoint response chain");
+        // Default MPs
+        responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
+        // Configured MPs (if any)
+        responseChainBuilder.chain(endpoint.getResponseMessageProcessors());
+
+        // Compose request and response chains. We do this so that if the request
+        // chain returns early the response chain is still invoked.
+        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
+        compositeChainBuilder.setName("Outbound endpoint request/response composite chain");
+        compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
+        return compositeChainBuilder.build();
+    }
 }
 
 

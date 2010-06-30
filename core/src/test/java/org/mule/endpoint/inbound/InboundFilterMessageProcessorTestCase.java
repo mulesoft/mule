@@ -13,7 +13,7 @@ package org.mule.endpoint.inbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
+import org.mule.api.routing.filter.FilterException;
 import org.mule.routing.filters.EqualsFilter;
 
 import org.junit.Test;
@@ -46,13 +46,16 @@ public class InboundFilterMessageProcessorTestCase extends AbstractInboundMessag
         mp.setListener(listner);
 
         MuleEvent inEvent = createTestInboundEvent(endpoint, true);
-        MuleEvent resultEvent = mp.process(inEvent);
+        try
+        {
+            MuleEvent resultEvent = mp.process(inEvent);
+            fail("Filter should have thrown a FilterException");
+        }
+        catch (FilterException e)
+        {
+            // expected
+        }
         assertNull(listner.sensedEvent);
-
-        // This behaviour is questionable isn't it? Should this MessageProcessor
-        // simply bounce the message back?
-        assertEquals(inEvent.getMessage(), resultEvent.getMessage());
-        assertNull(resultEvent.getMessage().getExceptionPayload());
     }
 
 }

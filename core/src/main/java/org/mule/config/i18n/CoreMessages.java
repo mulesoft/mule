@@ -1259,4 +1259,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 313, getEndpointDescription(endpoint));
     }
+
+    public static Message messageRejectedByFilter()
+    {
+        return factory.createMessage(BUNDLE_PATH, 314);
+    }
 }

@@ -16,14 +16,13 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
 
@@ -56,12 +55,14 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    String responsePropertiesList,
+                                   EndpointMessageProcessorsFactory messageProcessorsFactory,
                                    List <MessageProcessor> messageProcessors,
                                    List <MessageProcessor> responseMessageProcessors)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
                 deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessors, responseMessageProcessors);
+                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
+                messageProcessorsFactory, messageProcessors, responseMessageProcessors);
 
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
@@ -88,32 +89,8 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     protected MessageProcessor createMessageProcessorChain() throws MuleException
     {
-        MessageProcessorsFactory factory = ((AbstractConnector) getConnector()).getMessageProcessorsFactory();
-        
-        // -- REQUEST CHAIN --
-        ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
-        outboundChainBuilder.setName("Outbound endpoint request chain");
-        // Default MPs
-        outboundChainBuilder.chain(factory.createOutboundMessageProcessors(this));
-        // Configured MPs (if any)
-        outboundChainBuilder.chain(getMessageProcessors());
-        
-        // -- OUTBOUND ROUTER --
-        outboundChainBuilder.chain(((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
-        
-        // -- RESPONSE CHAIN --
-        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
-        responseChainBuilder.setName("Outbound endpoint response chain");
-        // Default MPs
-        responseChainBuilder.chain(factory.createOutboundResponseMessageProcessors(this));
-        // Configured MPs (if any)
-        responseChainBuilder.chain(getResponseMessageProcessors());
-
-        // Compose request and response chains. We do this so that if the request
-        // chain returns early the response chain is still invoked.
-        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
-        compositeChainBuilder.setName("Outbound endpoint request/response composite chain");
-        compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
-        return compositeChainBuilder.build();
+        EndpointMessageProcessorsFactory factory = getMessageProcessorsFactory();
+        return factory.createOutboundMessageProcessorChain(this, 
+            ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
     }
 }

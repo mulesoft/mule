@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -70,7 +71,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     private final List responseTransformers;
 
+    private final EndpointMessageProcessorsFactory messageProcessorsFactory;
+
     private final List <MessageProcessor> messageProcessors;
+    
     private final List <MessageProcessor> responseMessageProcessors;
     
     private MessageProcessor messageProcessorChain;
@@ -151,6 +155,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate,
+                            EndpointMessageProcessorsFactory messageProcessorsFactory,
                             List <MessageProcessor> messageProcessors,
                             List <MessageProcessor> responseMessageProcessors)
     {
@@ -191,6 +196,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
             this.synchronous = synchronous;
         }
 
+        this.messageProcessorsFactory = messageProcessorsFactory;
         if (messageProcessors == null)
         {
             this.messageProcessors = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
@@ -246,6 +252,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public String getName()
     {
         return name;
+    }
+
+    public EndpointMessageProcessorsFactory getMessageProcessorsFactory()
+    {
+        return messageProcessorsFactory;
     }
 
     public List <MessageProcessor> getMessageProcessors()

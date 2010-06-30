@@ -10,6 +10,7 @@
 
 package org.mule.processor;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;

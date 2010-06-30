@@ -15,7 +15,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
@@ -69,8 +68,6 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
 
     public List<Transformer> createResponseTransformers() throws TransportFactoryException;
 
-    public MessageProcessorsFactory createMessageProcessorsFactory() throws TransportServiceException;
-    
     public EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 
     public EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;

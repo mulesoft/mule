@@ -16,7 +16,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.MessageProcessorsFactory;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
@@ -30,7 +29,6 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.UrlEndpointURIBuilder;
-import org.mule.processor.DefaultMessageProcessorsFactory;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.util.ClassUtils;
@@ -59,7 +57,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String defaultOutboundTransformer;
     private String defaultResponseTransformer;
     private String endpointBuilder;
-    private String messageProcessorsFactory;
 
     private final AtomicReference inboundTransformer = new AtomicReference();
     private final AtomicReference outboundTransformer = new AtomicReference();
@@ -93,7 +90,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_META_ENDPOINT_BUILDER, props);
         endpointUriBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
-        messageProcessorsFactory = removeProperty(MuleProperties.CONNECTOR_MESSAGE_PROCESSORS_FACTORY, props);
     }
 
     public void setOverrides(Properties props)
@@ -113,7 +109,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, xaTransactedMessageReceiver);
         messageFactory = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_FACTORY, messageFactory);
         endpointBuilder = props.getProperty(MuleProperties.CONNECTOR_META_ENDPOINT_BUILDER, endpointBuilder);
-        messageProcessorsFactory = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_PROCESSORS_FACTORY, messageProcessorsFactory);
 
         String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
         if (temp != null)
@@ -184,22 +179,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         catch (Throwable e)
         {
             throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("SessionHandler", sessionHandler), e);
-        }
-    }
-
-    public MessageProcessorsFactory createMessageProcessorsFactory() throws TransportServiceException
-    {
-        if (messageProcessorsFactory == null)
-        {
-            messageProcessorsFactory = DefaultMessageProcessorsFactory.class.getName();
-        }
-        try
-        {
-            return (MessageProcessorsFactory) ClassUtils.instanciateClass(messageProcessorsFactory, ClassUtils.NO_ARGS, classLoader);
-        }
-        catch (Throwable e)
-        {
-            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("MessageProcessorsFactory", messageProcessorsFactory), e);
         }
     }
 
