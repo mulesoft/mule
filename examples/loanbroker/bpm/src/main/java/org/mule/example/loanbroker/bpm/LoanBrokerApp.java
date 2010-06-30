@@ -11,22 +11,29 @@
 package org.mule.example.loanbroker.bpm;
 
 import org.mule.example.loanbroker.AbstractLoanBrokerApp;
-import org.mule.tck.util.MuleDerbyTestUtils;
+//import org.mule.tck.util.MuleDerbyTestUtils;
 
 /**
- * Executes the LoanBroker BPM example.
+ * Executes the LoanBroker BPM example.  This is a standalone app which assumes Mule is running somewhere.
  */
 public class LoanBrokerApp extends AbstractLoanBrokerApp
 {
+    /*
     public LoanBrokerApp(String config) throws Exception
     {
         super(config);
     }
+    */
 
+    public LoanBrokerApp() throws Exception
+    {
+        super();
+    }    
+    
     public static void main(String[] args) throws Exception
     {
-        String configFile = "loan-broker-bpm-mule-config.xml";
-    
+        //String configFile = "loan-broker-bpm-mule-config.xml";
+    /*
         if (args != null && args.length > 0 
             // This is a hack for MULE-4082 which assumes that if the parameter is a 
             // Mule config file, it will contain a "." in the name
@@ -34,17 +41,21 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         {
             configFile = args[0];
         }
-        LoanBrokerApp loanBrokerApp = new LoanBrokerApp(configFile);
+    */
+        //LoanBrokerApp loanBrokerApp = new LoanBrokerApp(configFile);
+        LoanBrokerApp loanBrokerApp = new LoanBrokerApp();
         loanBrokerApp.run(false);
     }
 
     @Override
     protected void init() throws Exception
     {
+        /*
         String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
         System.getProperties().put("hibernate.dbURL", "jdbc:derby:" + dbName + ";sql.enforce_strict_size=true");
         // before initialisation occurs, the database must be cleaned and a new one created
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        */
         super.init();
     }
 }

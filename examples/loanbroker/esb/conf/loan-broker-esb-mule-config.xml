@@ -8,6 +8,7 @@
         xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
         xmlns:http="http://www.mulesoft.org/schema/mule/http"
         xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+        xmlns:client="http://www.mulesoft.org/schema/mule/client"
         xsi:schemaLocation="
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
@@ -16,12 +17,17 @@
                 http://www.mulesoft.org/schema/mule/ejb http://www.mulesoft.org/schema/mule/ejb/3.0/mule-ejb.xsd
                 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
                 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+                http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/3.0/mule-client.xsd
                 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <description>
         The Loan Broker ESB example implements the Loan Broker Example using an ESB topology. See
         http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
     </description>
+
+    <client:remote-dispatcher-agent>
+        <client:remote-endpoint address="tcp://localhost:5555" synchronous="true"/>        
+    </client:remote-dispatcher-agent>
 
     <!-- Import property placeholders -->
     <context:property-placeholder location="openejb.properties"/>

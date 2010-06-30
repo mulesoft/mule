@@ -3,16 +3,22 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:client="http://www.mulesoft.org/schema/mule/client"
         xsi:schemaLocation="
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+                http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/3.0/mule-client.xsd
                 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
-
+   
      <description>
      This loan broker example is modeled on the Enterprise integration Patterns book sample.
      This implementation differs in that this configuration uses a synchronous model where
      each component is invoked from the LoanBroker component.
      </description>
+
+    <client:remote-dispatcher-agent>
+        <client:remote-endpoint address="tcp://localhost:5555" synchronous="true"/>        
+    </client:remote-dispatcher-agent>
 
      <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
      <vm:connector name="syncVm"/>

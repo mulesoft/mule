@@ -10,16 +10,14 @@
 
 package org.mule.example.loanbroker;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.module.client.MuleClient;
+import org.mule.module.client.RemoteDispatcher;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ import java.util.Map;
 public abstract class AbstractLoanBrokerApp
 {
     private List<Customer> customers = new ArrayList<Customer>();
-    private MuleClient client = null;
+    private RemoteDispatcher remoteClient = null;
     private String config;
 
     public AbstractLoanBrokerApp() throws Exception
@@ -50,21 +48,8 @@ public abstract class AbstractLoanBrokerApp
 
     protected void init() throws Exception
     {
-        MuleContext muleContext = null;
-        if (config != null)
-        {
-            MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContext = muleContextFactory.createMuleContext(getConfigBuilder());
-            // this is to support running within our test case framework, which
-            // starts the muleContext and with the qa framework which doesn't
-            if(!muleContext.isStarted() && !muleContext.isStarting())
-            {
-                muleContext.start();                
-            }
-        }
-
-        client = new MuleClient(muleContext);
-
+        MuleClient muleClient = new MuleClient(true);
+        remoteClient = muleClient.getRemoteDispatcher("tcp://localhost:5555");
         customers.add(new Customer("Jenson Button", 123));
         customers.add(new Customer("Michael Schumacker", 456));
         customers.add(new Customer("Juan Pablo Montoya", 789));
@@ -84,7 +69,7 @@ public abstract class AbstractLoanBrokerApp
 
     protected void dispose() throws Exception
     {
-        client.dispose();
+        remoteClient.dispose();
     }
 
     protected void run(boolean synchronous) throws Exception
@@ -195,14 +180,15 @@ public abstract class AbstractLoanBrokerApp
     {
         if (!sync)
         {
-            client.dispatch("CustomerRequests", request, null);
+            remoteClient.dispatchRemote("CustomerRequests", request, null);
             System.out.println(LocaleMessage.sentAsync());
             // let the request catch up
             Thread.sleep(3000);
+            
         }
         else
         {
-            MuleMessage result = client.send("CustomerRequests", request, null);
+            MuleMessage result = remoteClient.sendRemote("CustomerRequests", request, null);
             if (result == null)
             {
                 System.out.println(LocaleMessage.requestError());
@@ -218,7 +204,7 @@ public abstract class AbstractLoanBrokerApp
     {
         for (int i = 0; i < number; i++)
         {
-            client.dispatch(endpoint, createRequest(), null);
+            remoteClient.dispatchRemote(endpoint, createRequest(), null);
         }
     }
 
@@ -232,7 +218,8 @@ public abstract class AbstractLoanBrokerApp
         List<Object> results = new ArrayList<Object>(number);
         for (int i = 0; i < number; i++)
         {
-            MuleMessage result = client.send(endpoint, createRequest(), properties);
+            MuleMessage result = remoteClient.sendRemote(endpoint, createRequest(), properties);
+            
             if (result != null)
             {
                 results.add(result.getPayload());
@@ -247,15 +234,17 @@ public abstract class AbstractLoanBrokerApp
         {
             List<Object> list = requestSend(number, "CustomerRequests");
             int i = 1;
+            System.out.println("sendRandomRequests");
             for (Iterator<Object> iterator = list.iterator(); iterator.hasNext(); i++)
             {
-                System.out.println(
+                System.out.println("sendRandomRequests results :" +
                     LocaleMessage.request(i, iterator.next().toString()));
             }
         }
         else
         {
             this.requestDispatch(number, "CustomerRequests");
+            System.out.println(LocaleMessage.sentAsync());
         }
     }
 
