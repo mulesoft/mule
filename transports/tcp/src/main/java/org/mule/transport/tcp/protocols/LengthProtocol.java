@@ -93,7 +93,14 @@ public class LengthProtocol extends DirectProtocol
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeInt(data.length);
         dos.write(data);
-        dos.flush();
+        // DataOutputStream size is SIZE_INT + the byte length, due to the writeInt call
+        // this should fix EE-1494
+        if (dos.size() != data.length + SIZE_INT)
+        {
+            // only flush if the sizes don't match up
+            dos.flush();
+        }
+        dos.close();
     }
 
     /**
