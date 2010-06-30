@@ -2297,7 +2297,7 @@
                     <xsd:element name="delete-message-property" type="keyType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Delete message properties matching a regular expression.
+                                Delete a message property.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

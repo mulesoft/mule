@@ -13,7 +13,7 @@ package org.mule.transformers.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
@@ -109,88 +109,20 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("Bar", transformed.getProperty("Baz"));
     }
 
-    public void testDeleteUsingPropertyName() throws Exception
+    public void testDelete() throws Exception
     {
-        final String expression = "badProperty";
-        final String[] validProperties = new String[] {"somethingnotsobad"};
-        final String[] invalidProperties = new String[] {"badProperty"};
-
-        doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
-    }
-
-    public void testDeletePropertiesStartingWithExpression() throws Exception
-    {
-        final String expression = "^bad.*";
-        final String[] validProperties = new String[] {"somethingnotsobad"};
-        final String[] invalidProperties = new String[] {"badProperty", "badThing"};
-
-        doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
-    }
-
-    public void testDeletePropertiesEndingWithExpression() throws Exception
-    {
-        final String expression = ".*bad$";
-        final String[] validProperties = new String[] {"badProperty", "badThing"};
-        final String[] invalidProperties = new String[] {"somethingnotsobad"};
-
-        doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
-    }
-
-    public void testDeletePropertiesContainingExpression() throws Exception
-    {
-        final String expression = ".*bad.*";
-        final String[] validProperties = new String[] {};
-        final String[] invalidProperties = new String[] {"badProperty", "badThing", "somethingnotsobad"};
-
-        doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
-    }
-
-    private void doTestMessageTransformationWithExpression(String expression, String[] validProperties, String[] invalidProperties)
-            throws TransformerException
-    {
-        MessagePropertiesTransformer t = createTransformerWithExpression(expression);
+        MessagePropertiesTransformer t = new MessagePropertiesTransformer();
+        t.setDeleteProperties(Collections.singletonList("badProperty"));
+        t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-
-        addPropertiesToMessage(validProperties, msg);
-        addPropertiesToMessage(invalidProperties, msg);
-
+        msg.setProperty("badProperty", "badValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
-        assertNotNull(transformed.getPropertyNames());
-        assertMessageContainsExpectedProperties(validProperties, invalidProperties, transformed);
-    }
-
-    private void assertMessageContainsExpectedProperties(String[] validProperties, String[] invalidProperties, DefaultMuleMessage transformed)
-    {
-        for (String property : validProperties)
-        {
-            assertTrue("Should contain property: " + property, transformed.getPropertyNames().contains(property));
-        }
-
-        for (String property : invalidProperties)
-        {
-            assertFalse("Should not contain property: " + property, transformed.getPropertyNames().contains(property));
-        }
-    }
-
-    private MessagePropertiesTransformer createTransformerWithExpression(String expression)
-    {
-        MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        t.setDeleteProperties(Collections.singletonList(expression));
-        t.setMuleContext(muleContext);
-        return t;
-    }
-
-    private void addPropertiesToMessage(String[] validProperties, DefaultMuleMessage msg)
-    {
-        for (String property : validProperties)
-        {
-            msg.setProperty(property, "defaultPropertyValue");
-        }
+        assertFalse(transformed.getPropertyNames().contains("badValue"));
     }
 
     public void testTransformerConfig() throws Exception
