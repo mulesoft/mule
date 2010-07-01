@@ -40,12 +40,16 @@ import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory
 {
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createInboundMessageProcessors(InboundEndpoint endpoint)
+    protected List<MessageProcessor> createInboundMessageProcessors(InboundEndpoint endpoint)
     {
-        return new MessageProcessor[] 
+        return Arrays.asList(new MessageProcessor[] 
         { 
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
@@ -53,63 +57,69 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundFilterMessageProcessor(), 
             new InboundSecurityFilterMessageProcessor(endpoint),
             new TransformerMessageProcessor(endpoint.getTransformers()) 
-        };
+        });
+        
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createInboundResponseMessageProcessors(InboundEndpoint endpoint)
+    protected List<MessageProcessor> createInboundResponseMessageProcessors(InboundEndpoint endpoint)
     {
-        return new MessageProcessor[] 
+        return Arrays.asList(new MessageProcessor[] 
         { 
             new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()),
             new TransformerMessageProcessor(endpoint.getResponseTransformers()) 
-        };
+        });
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    protected List<MessageProcessor> createOutboundMessageProcessors(OutboundEndpoint endpoint)
+        throws MuleException
     {
-        // TODO Need to clean this up the class hierarchy, but I'm not sure we want to put all these things in the Connector interface.
+        // TODO Need to clean this up the class hierarchy, but I'm not sure we want
+        // to put all these things in the Connector interface.
         AbstractConnector connector = ((AbstractConnector) endpoint.getConnector());
+
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+
+        // Log but don't proceed if connector is not started
+        list.add(new OutboundLoggingMessageProcessor());
+        list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleManager().getState()));
+
+        // Everything is processed within TransactionTemplate
+        list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(),
+            connector.getExceptionListener()));
+
+        list.add(new OutboundEventTimeoutMessageProcessor());
+
+        // Exception handling to preserve previous MuleSession level exception
+        // handling behaviour
+        list.add(new OutboundSimpleTryCatchMessageProcessor());
+
+        list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
+        list.add(new OutboundEndpointPropertyMessageProcessor());
+
+        // TODO MULE-4872
+        if (endpoint instanceof OutboundEndpointDecorator)
+        {
+            list.add(new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint));
+        }
         
-        return new MessageProcessor[] 
-        { 
-            // Log but don't proceed if connector is not started
-            new OutboundLoggingMessageProcessor(), 
-            new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleManager().getState()),
-    
-            // Everything is processed within TransactionTemplate
-            new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(), connector.getExceptionListener()),
-    
-            new OutboundEventTimeoutMessageProcessor(),
-    
-            // Exception handling to preserve previous MuleSession level exception
-            // handling behaviour
-            new OutboundSimpleTryCatchMessageProcessor(),
-            
-            new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()),
-            new OutboundEndpointPropertyMessageProcessor(),
-    
-            // TODO MULE-4872
-            (endpoint instanceof OutboundEndpointDecorator ? 
-                 new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint) : 
-                 new ChainMessageProcessorBuilder.NullMessageProcessor()),
-    
-            new OutboundSecurityFilterMessageProcessor(endpoint),
-            new OutboundTryCatchMessageProcessor(endpoint),
-            new OutboundResponsePropertiesMessageProcessor(endpoint)
-        };
+        list.add(new OutboundSecurityFilterMessageProcessor(endpoint));
+        list.add(new OutboundTryCatchMessageProcessor(endpoint));
+        list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
+
+        return list;
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected MessageProcessor[] createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
+    protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint)
+        throws MuleException
     {
-        return new MessageProcessor[] 
-        { 
+        return Arrays.asList(new MessageProcessor[]{
             new TransformerMessageProcessor(endpoint.getResponseTransformers()),
             new OutboundRewriteResponseEventMessageProcessor()
-        };
-    }    
+        });
+    }
     
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, MessageProcessor target) throws MuleException
     {
