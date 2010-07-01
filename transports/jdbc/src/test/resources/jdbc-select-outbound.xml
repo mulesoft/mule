@@ -11,11 +11,11 @@
     <model name="JdbcSelectOnOutbound">
         <service name="bridge">
             <inbound>
-                <inbound-endpoint address="vm://jdbc.test" synchronous="true"/>
+                <inbound-endpoint address="vm://jdbc.test" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint queryKey="getTest" synchronous="true">
+                    <jdbc:outbound-endpoint queryKey="getTest" exchange-pattern="request-response">
                         <!-- this is substituted in the SQL template defined in jdbc-connector.xml -->
                         <property key="type" value="1"/>
                     </jdbc:outbound-endpoint>
@@ -25,11 +25,11 @@
 
         <service name="bridgeA">
             <inbound>
-                <inbound-endpoint address="vm://terra" synchronous="true"/>
+                <inbound-endpoint address="vm://terra" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint address="jdbc://getTestPayload" synchronous="true"/>
+                    <jdbc:outbound-endpoint address="jdbc://getTestPayload" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
