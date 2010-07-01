@@ -16,7 +16,6 @@
     <custom-transformer name="mime-rfc822" class="org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray"/>
 
     <model name="main">
-
         <service name="source">
             <inbound>
                 <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002">
@@ -25,14 +24,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint synchronous="true" path="sink"/>
+                    <vm:outbound-endpoint exchange-pattern="request-response" path="sink"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="sink">
             <inbound>
-                <vm:inbound-endpoint synchronous="true" path="sink"/>
+                <vm:inbound-endpoint exchange-pattern="request-response" path="sink"/>
             </inbound>
             <outbound>
                 <multicasting-router>
@@ -43,7 +42,5 @@
                 </multicasting-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>
