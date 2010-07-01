@@ -21,7 +21,7 @@
     <model name="test">
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://test" synchronous="true">
+                <inbound-endpoint address="vm://test" exchange-pattern="request-response">
                     <jaas:jaas-security-filter/>
                 </inbound-endpoint>
             </inbound>
