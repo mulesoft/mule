@@ -10,12 +10,12 @@
 
 package org.mule.transport;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionTemplate;
@@ -40,24 +40,24 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     private boolean useMultipleReceivers = true;
 
     public TransactedPollingMessageReceiver(Connector connector,
-                                            Service service,
+                                            FlowConstruct flowConstruct,
                                             final InboundEndpoint endpoint) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted());
     }
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(Connector, Service, InboundEndpoint)}
+     *             {@link #TransactedPollingMessageReceiver(Connector, FlowConstruct, InboundEndpoint)}
      *             instead
      */
     public TransactedPollingMessageReceiver(Connector connector,
-                                            Service service,
+                                            FlowConstruct flowConstruct,
                                             final InboundEndpoint endpoint,
                                             long frequency) throws CreateException
     {
-        this(connector, service, endpoint);
+        this(connector, flowConstruct, endpoint);
         this.setFrequency(frequency);
     }
 

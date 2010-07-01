@@ -80,7 +80,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
 
                 
                 TransactionTemplate tt = new TransactionTemplate(outboundRouter.getTransactionConfig(),
-                    session.getService().getExceptionListener(), muleContext);
+                    event.getService().getExceptionListener(), muleContext);
                 
                 TransactionCallback cb = new TransactionCallback()
                 {
@@ -110,7 +110,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message did not match any routers on: "
-                        + session.getService().getName()
+                        + session.getFlowConstruct().getName()
                         + " invoking catch all strategy");
             }
             return catchAll(event);
@@ -118,7 +118,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                    + session.getService().getName()
+                    + session.getFlowConstruct().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message " + message);
         }
         return event;

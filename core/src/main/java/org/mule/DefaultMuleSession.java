@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -66,7 +67,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * <p/>
      * Note: This object uses custom serialization via the writeObject()/readObject() methods.
      */
-    private transient Service service = null;
+    private transient FlowConstruct flowConstruct = null;
 
     /**
      * Determines if the service is valid
@@ -97,12 +98,12 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this((Service) null, muleContext);
     }
 
-    public DefaultMuleSession(Service service, MuleContext muleContext)
+    public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         properties = new CaseInsensitiveHashMap/*<String, Object>*/();
         id = UUID.getUUID();
-        this.service = service;
+        this.flowConstruct = flowConstruct;
     }
 
     /**
@@ -118,7 +119,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             throw new IllegalArgumentException(
                     CoreMessages.propertiesNotSet("service").toString());
         }
-        this.service = service;
+        this.flowConstruct = service;
     }
 
     /**
@@ -164,7 +165,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this.muleContext = muleContext;
         this.id = session.getId();
         this.securityContext = session.getSecurityContext();
-        this.service = session.getService();
+        this.flowConstruct = session.getFlowConstruct();
         this.valid = session.isValid();
 
         this.properties = new HashMap<String, Object>();
@@ -176,18 +177,25 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     public void dispatchEvent(MuleMessage message) throws MuleException
     {
-        if (service == null)
+        if (flowConstruct == null)
         {
             throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
         }
-
-        OutboundRouterCollection router = service.getOutboundRouter();
-        if (router == null)
+        else if (!(flowConstruct instanceof Service))
         {
-            throw new EndpointNotFoundException(
-                    CoreMessages.noOutboundRouterSetOn(service.getName()));
+            throw new UnsupportedOperationException(
+                "MuleSession.dispatchEvent is only supported when flow constuct is a Service");
         }
-        router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+        else
+        {
+            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
+            if (router == null)
+            {
+                throw new EndpointNotFoundException(CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
+            }
+            router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+
+        }
     }
 
     public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
@@ -220,24 +228,32 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     public MuleMessage sendEvent(MuleMessage message) throws MuleException
     {
-        if (service == null)
+        if (flowConstruct == null)
         {
             throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
         }
-        OutboundRouterCollection router = service.getOutboundRouter();
-        if (router == null)
+        else if (!(flowConstruct instanceof Service))
         {
-            throw new EndpointNotFoundException(
-                    CoreMessages.noOutboundRouterSetOn(service.getName()));
-        }
-        MuleEvent result = router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
-        if (result != null)
-        {
-            return result.getMessage();
+            throw new UnsupportedOperationException(
+                "MuleSession.sendEvent is only supported when flow constuct is a Service");
         }
         else
         {
-            return null;
+            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
+            if (router == null)
+            {
+                throw new EndpointNotFoundException(
+                        CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
+            }
+            MuleEvent result = router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+            if (result != null)
+            {
+                return result.getMessage();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
@@ -264,19 +280,24 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             ((OutboundEndpoint) event.getEndpoint()).process(event);
         }
-        else if (service != null)
+        else if (flowConstruct == null)
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("dispatching event to service: " + service.getName()
-                        + ", event is: " + event);
-            }
-            service.dispatchEvent(event);
+            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
+                event.getEndpoint());
+
+        }
+        else if (!(flowConstruct instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "MuleSession.dispatchEvent is only supported when flow constuct is a Service");
         }
         else
         {
-            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                    event.getEndpoint());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("dispatching event to service: " + flowConstruct.getName() + ", event is: " + event);
+            }
+            ((Service) flowConstruct).dispatchEvent(event);
         }
     }
 
@@ -305,20 +326,24 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
                 return null;
             }
         }
-        else if (service != null)
+        else if (flowConstruct == null)
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("sending event to service: " + service.getName()
-                        + " event is: " + event);
-            }
-            return service.sendEvent(event);
-
+            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
+                event.getEndpoint());
+        }
+        else if (!(flowConstruct instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "MuleSession.sendEvent is only supported when flow constuct is a Service");
         }
         else
         {
-            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                    event.getEndpoint());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("sending event to service: " + flowConstruct.getName() + " event is: " + event);
+            }
+            return ((Service) flowConstruct).sendEvent(event);
+
         }
     }
 
@@ -371,7 +396,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             MuleEvent event;
             if (previousEvent != null)
             {
-                event = new DefaultMuleEvent(message, endpoint, service, previousEvent);
+                event = new DefaultMuleEvent(message, endpoint, flowConstruct, previousEvent);
             }
             else
             {
@@ -389,14 +414,14 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     /**
      * @return Returns the service.
      */
-    public Service getService()
+    public FlowConstruct getFlowConstruct()
     {
-        return service;
+        return flowConstruct;
     }
 
-    public void setService(Service service)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.service = service;
+        this.flowConstruct = flowConstruct;
     }
 
     /**
@@ -483,9 +508,9 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         out.defaultWriteObject();
         //Can be null if service call originates from MuleClient
-        if (getService() != null)
+        if (getFlowConstruct() != null)
         {
-            out.writeObject(getService() != null ? getService().getName() : "null");
+            out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
         }
     }
 
@@ -522,7 +547,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         //Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
-            service = muleContext.getRegistry().lookupService(serviceName);
+            flowConstruct = muleContext.getRegistry().lookupService(serviceName);
         }
         serializedData = null;
     }

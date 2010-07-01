@@ -201,9 +201,9 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(event.getSession().getId(), deserialized.getSession().getId());
 
         // Assert that deserialized event has service and that the service is the same instance
-        assertNotNull(deserialized.getSession().getService());
-        assertEquals(event.getSession().getService(), deserialized.getSession().getService());
-        assertSame(event.getSession().getService(), deserialized.getSession().getService());
+        assertNotNull(deserialized.getSession().getFlowConstruct());
+        assertEquals(event.getSession().getFlowConstruct(), deserialized.getSession().getFlowConstruct());
+        assertSame(event.getSession().getFlowConstruct(), deserialized.getSession().getFlowConstruct());
 
         // Assert that deserialized event has endpoint and that the endpoint is the same instance
         assertNotNull(deserialized.getEndpoint());    
@@ -251,13 +251,17 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         // Assert that deserialized event has service and that the service is the
         // same instance
-        assertNotNull(deserialized.getSession().getService());
+        assertNotNull(deserialized.getSession().getFlowConstruct());
+
+        Service service = (Service) event.getSession().getFlowConstruct();
+        Service deserializedService = (Service) deserialized.getSession().getFlowConstruct();
+        
         // Unable to test services for equality because of need for equals() everywhere.  See MULE-3720
         // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
-        assertEquals(event.getSession().getService().getName(), deserialized.getSession().getService().getName());
-        assertEquals(event.getSession().getService().getInitialState(), deserialized.getSession().getService().getInitialState());
-        assertEquals(event.getSession().getService().getExceptionListener().getClass(), deserialized.getSession().getService().getExceptionListener().getClass());
-        assertEquals(event.getSession().getService().getComponent().getClass(), deserialized.getSession().getService().getComponent().getClass());
+        assertEquals(service.getName(), deserializedService.getName());
+        assertEquals(service.getInitialState(), deserializedService.getInitialState());
+        assertEquals(service.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
+        assertEquals(service.getComponent().getClass(), deserializedService.getComponent().getClass());
         
         // Assert that deserialized event has endpoint and that the endpoint is the
         // same instance

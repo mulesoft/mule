@@ -64,7 +64,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
             addRouter(new InboundPassThroughRouter());
         }
 
-        String componentName = event.getSession().getService().getName();
+        String componentName = event.getService().getName();
 
         /*
             Event Map must be ordered: MULE-4229

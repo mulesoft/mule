@@ -47,7 +47,6 @@ public interface ResponseRouter extends Router
      * @return the response message sent back to the callee
      * @throws RoutingException
      * @see MuleMessage
-     * @see org.mule.api.service.Service
      */
     MuleEvent getResponse(MuleEvent message) throws RoutingException;
 

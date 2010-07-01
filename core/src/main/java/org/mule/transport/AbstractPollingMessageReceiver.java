@@ -10,10 +10,10 @@
 
 package org.mule.transport;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ObjectUtils;
@@ -48,10 +48,10 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     protected final List schedules = new LinkedList();
 
     public AbstractPollingMessageReceiver(Connector connector,
-                                          Service service,
+                                          FlowConstruct flowConstruct,
                                           final InboundEndpoint endpoint) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     protected void doStart() throws MuleException

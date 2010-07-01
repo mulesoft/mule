@@ -13,7 +13,6 @@ package org.mule.api;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.security.SecurityContext;
-import org.mule.api.service.Service;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -34,16 +33,16 @@ public interface MuleSession extends Serializable
      * Returns the Service associated with the session in its current execution
      * 
      * @return the Service associated with the session in its current execution
-     * @see org.mule.api.service.Service
+     * @see FlowConstruct
      */
-    Service getService();
+    FlowConstruct getFlowConstruct();
 
     /**
      * Sets the Service associated with the session in its current execution
      * 
-     * @see org.mule.api.service.Service
+     * @see FlowConstruct
      */
-    void setService(Service service);
+    void setFlowConstruct(FlowConstruct flowConstruct);
 
     /**
      * This will send an event via the configured outbound endpoint on the service

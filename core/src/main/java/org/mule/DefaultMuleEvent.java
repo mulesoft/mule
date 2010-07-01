@@ -26,7 +26,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -123,7 +122,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.message = message;
         this.id = generateEventId();
         this.session = previousEvent.getSession();
-        ((DefaultMuleSession) session).setService((Service) service);
+        ((DefaultMuleSession) session).setFlowConstruct(service);
         this.endpoint = endpoint;
         this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
@@ -174,7 +173,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((DefaultMuleSession) session).setService((Service) rewriteEvent.getService());
+        ((DefaultMuleSession) session).setFlowConstruct(rewriteEvent.getService());
         this.endpoint = rewriteEvent.getEndpoint();
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
@@ -469,7 +468,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public FlowConstruct getService()
     {
-        return session.getService();
+        return session.getFlowConstruct();
     }
 
     /**

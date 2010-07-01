@@ -157,8 +157,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
         if (destComponent != null)
         {
-            MuleSession session = 
-                new DefaultMuleSession(muleContext.getRegistry().lookupService(destComponent), muleContext);
+            Service service = muleContext.getRegistry().lookupService(destComponent);
+            MuleSession session = new DefaultMuleSession(service, muleContext);
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
@@ -172,14 +172,14 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
             if (context.isSynchronous())
             {
-                result = session.getService().sendEvent(event);
+                result = service.sendEvent(event);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());
                 return out.toByteArray();
             }
             else
             {
-                session.getService().dispatchEvent(event);
+                service.dispatchEvent(event);
                 return null;
             }
         }

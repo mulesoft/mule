@@ -200,7 +200,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             // if replyTo is set we'll probably want the correlationId set as
             // well
             message.setReplyTo(replyTo);
-            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, session.getService().getName());
+            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, session.getFlowConstruct().getName());
             if (logger.isDebugEnabled())
             {
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "

@@ -27,7 +27,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -84,7 +83,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      *            will listen on. The endpointUri can be anything and is specific to
      *            the receiver implementation i.e. an email address, a directory, a
      *            jms destination or port address.
-     * @see Service
+     * @see flowConstruct
      * @see InboundEndpoint
      */
     public AbstractMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
@@ -237,11 +236,11 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         }
         if (session != null)
         {
-            session.setService((Service) flowConstruct);
+            session.setFlowConstruct(flowConstruct);
         }
         else
         {
-            session = new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext());
+            session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
         }
         return new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
     }
