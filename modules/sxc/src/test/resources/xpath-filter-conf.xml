@@ -16,11 +16,11 @@
     
         <service name="proxy">
             <inbound>
-                <inbound-endpoint address="vm://in" synchronous="true"/>
+                <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
                     <sxc:filter pattern="//purchaseOrder[@country]"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
                 </sxc:filtering-router>
@@ -39,11 +39,11 @@
         
         <service name="andProxy">
             <inbound>
-                <inbound-endpoint address="vm://and-filter" synchronous="true"/>
+                <inbound-endpoint address="vm://and-filter" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
                     <and-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
@@ -54,11 +54,11 @@
     
         <service name="orProxy">
             <inbound>
-                <inbound-endpoint address="vm://or-filter" synchronous="true"/>
+                <inbound-endpoint address="vm://or-filter" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
                     <or-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <sxc:filter pattern="//purchaseOrder[@orderDate]"/>
@@ -69,11 +69,11 @@
     
         <service name="notProxy">
             <inbound>
-                <inbound-endpoint address="vm://not-filter" synchronous="true"/>
+                <inbound-endpoint address="vm://not-filter" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="vm://log" synchronous="true"/>
+                    <outbound-endpoint address="vm://log" exchange-pattern="request-response"/>
                     <and-filter>
                         <sxc:filter pattern="//purchaseOrder[@country]"/>
                         <not-filter>
@@ -86,7 +86,7 @@
     
         <service name="log">
             <inbound>
-                <inbound-endpoint address="vm://log" synchronous="true"/>
+                <inbound-endpoint address="vm://log" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.module.sxc.ReceiveComponent"/>
         </service>

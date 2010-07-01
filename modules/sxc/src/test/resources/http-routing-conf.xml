@@ -16,16 +16,16 @@
     
         <service name="proxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/proxy" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:63081/proxy" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true"/>
+                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response"/>
                     <sxc:filter pattern="//invalid"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
                 </sxc:filtering-router>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true">
+                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
                         <transformers>
                             <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                         </transformers>
@@ -35,7 +35,7 @@
                 </sxc:filtering-router>
                 
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" synchronous="true">
+                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
                         <transformers>
                             <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                         </transformers>
@@ -47,7 +47,7 @@
         
         <service name="echo">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/echo" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
