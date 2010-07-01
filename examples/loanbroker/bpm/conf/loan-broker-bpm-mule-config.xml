@@ -17,7 +17,7 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="tcp://localhost:5555" synchronous="true"/>        
+        <client:remote-endpoint address="tcp://localhost:5555" exchange-pattern="request-response"/>
     </client:remote-dispatcher-agent>
 
     <bpm:jbpm-connector name="jBpmConnector">
