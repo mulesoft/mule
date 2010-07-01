@@ -25,12 +25,12 @@
     <model name="receiveModel">
         <service name="relay">
             <inbound>
-                <file:inbound-endpoint ref="get" synchronous="true"/>
+                <file:inbound-endpoint ref="get" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <file:outbound-endpoint ref="put" synchronous="true"/>
+                    <file:outbound-endpoint ref="put" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
