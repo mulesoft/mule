@@ -13,6 +13,7 @@ package org.mule.module.client.remoting;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -207,7 +208,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             {
                 EndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
-                endpointBuilder.setSynchronous(true);
+                endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
                 endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)

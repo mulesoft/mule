@@ -12,6 +12,7 @@ package org.mule.endpoint.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -35,7 +36,6 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -92,7 +92,7 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         {
             endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
         }
-        endpointBuilder.setSynchronous(sync);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
         endpointBuilder.setTransactionConfig(txConfig);
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
         return endpoint;

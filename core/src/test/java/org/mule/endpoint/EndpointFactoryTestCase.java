@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
@@ -202,7 +203,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(endpointBuilder1.hashCode(), endpointBuilder2.hashCode());
 
         // Test creating an endpoint from endpointBuilder1
-        endpointBuilder1.setSynchronous(true);
+        endpointBuilder1.setExchangePattern(MessageExchangePattern.request_response);
         endpointBuilder1.setResponseTimeout(99);
         ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(endpointBuilder1);
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
@@ -212,7 +213,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(testConnector1, ep.getConnector());
 
         // Test creating an endpoint from endpointBuilder2
-        endpointBuilder2.setSynchronous(false);
+        endpointBuilder2.setExchangePattern(MessageExchangePattern.one_way);
         endpointBuilder2.setResponseTimeout(0);
         endpointBuilder2.setConnector(testConnector2);
         ImmutableEndpoint ep2 = endpointFactory.getInboundEndpoint(endpointBuilder2);

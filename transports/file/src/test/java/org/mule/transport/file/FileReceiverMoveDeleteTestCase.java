@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -189,7 +190,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         {
             endpointBuilder.addTransformer(new NoActionTransformer());
         }
-        endpointBuilder.setSynchronous(true);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
         service.getInboundRouter().addEndpoint(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
         final Latch latch = new Latch();

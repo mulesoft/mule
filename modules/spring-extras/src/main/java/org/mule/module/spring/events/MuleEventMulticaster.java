@@ -13,6 +13,7 @@ package org.mule.module.spring.events;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
@@ -715,7 +716,7 @@ public class MuleEventMulticaster
 
                 EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(subscription);
-                endpointBuilder.setSynchronous(!asynchronous);
+                endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(!asynchronous));
                 InboundEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder);
 
                 messageRouter.addEndpoint(endpoint);

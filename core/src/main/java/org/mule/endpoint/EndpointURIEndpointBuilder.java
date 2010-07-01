@@ -88,7 +88,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setFilter(source.getFilter());
         setSecurityFilter(source.getSecurityFilter());
         setRetryPolicyTemplate(source.getRetryPolicyTemplate());
-        setSynchronous(source.isSynchronous());
         setMuleContext(source.getMuleContext());
         setMessageProcessors(source.getMessageProcessors().isEmpty() ? null : source.getMessageProcessors());
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? null : source.getResponseMessageProcessors());

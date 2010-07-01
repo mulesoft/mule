@@ -12,6 +12,7 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -221,7 +222,7 @@ public class UniversalSender extends BasicHandler
             if (sync)
             {
                 EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
-                builder.setSynchronous(true);
+                builder.setExchangePattern(MessageExchangePattern.request_response);
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);

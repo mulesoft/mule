@@ -11,7 +11,7 @@
 package org.mule;
 
 public enum MessageExchangePattern
-{
+{    
     one_way
     {
         @Override
@@ -59,4 +59,16 @@ public enum MessageExchangePattern
     };
 
     public abstract boolean hasResponse();
+
+    public static MessageExchangePattern fromSyncFlag(boolean sync)
+    {
+        if (sync)
+        {
+            return request_response;
+        }
+        else
+        {
+            return one_way;
+        }
+    }
 }

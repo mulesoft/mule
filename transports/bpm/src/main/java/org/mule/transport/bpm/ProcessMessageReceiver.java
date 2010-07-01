@@ -12,6 +12,7 @@ package org.mule.transport.bpm;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -94,7 +95,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             //TODO should probably cache this
             EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry()
                 .lookupEndpointFactory().getEndpointBuilder(endpoint);
-            endpointBuilder.setSynchronous(synchronous);
+            endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
             OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
 
             DefaultMuleEvent event = new DefaultMuleEvent(message, ep, 

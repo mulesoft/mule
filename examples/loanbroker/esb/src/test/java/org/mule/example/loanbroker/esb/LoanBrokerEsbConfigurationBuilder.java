@@ -10,6 +10,7 @@
 
 package org.mule.example.loanbroker.esb;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -182,7 +183,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         //binding
         EndpointBuilder eb2 = (EndpointBuilder) CreditAgency.clone();
         eb2.addTransformer(LoanQuoteRequestToCreditProfileArgs);
-        eb2.setSynchronous(true);
+        eb2.setExchangePattern(MessageExchangePattern.request_response);
         List<Transformer> responseTransformers = new ArrayList<Transformer>();
         responseTransformers.add(CreditProfileXmlToCreditProfile);
         eb2.setResponseTransformers(responseTransformers);
@@ -216,7 +217,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         OutboundRouterCollection lenderGatewayServiceInboundOutbound = new DefaultOutboundRouterCollection();
         FilteringOutboundRouter lenderGatewayServiceInboundOutboundRouter = new FilteringOutboundRouter();
         EndpointBuilder eb3 = (EndpointBuilder) LenderService.clone();
-        eb3.setSynchronous(true);
+        eb3.setExchangePattern(MessageExchangePattern.request_response);
         lenderGatewayServiceInboundOutboundRouter.addEndpoint(eb3.buildOutboundEndpoint());
         EndpointBuilder eb4 = (EndpointBuilder) BankingGateway.clone();
         eb4.addTransformer(SetLendersAsRecipients);

@@ -13,6 +13,7 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -113,7 +114,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // Must not use transformers
             endpointBuilder.setTransformers(Collections.EMPTY_LIST);
             endpointBuilder.setResponseTransformers(Collections.EMPTY_LIST);
-            endpointBuilder.setSynchronous(true);
+            endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }

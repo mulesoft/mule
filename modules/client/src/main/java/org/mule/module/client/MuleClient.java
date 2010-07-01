@@ -13,6 +13,7 @@ package org.mule.module.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -59,6 +60,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -801,7 +803,7 @@ public class MuleClient implements Disposable
             EndpointBuilder endpointBuilder = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getEndpointBuilder(uri);
-            endpointBuilder.setSynchronous(synchronous);
+            endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
             if (responseTimeout != null && responseTimeout > 0)
             {
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
@@ -914,6 +916,7 @@ public class MuleClient implements Disposable
      * @deprecated Use the RegistryContext to get the registry and register the
      *             service there
      */
+    @Deprecated
     public void registerComponent(Object component, String name, EndpointURI listenerEndpoint)
         throws MuleException
     {
@@ -937,6 +940,7 @@ public class MuleClient implements Disposable
      * @deprecated Use the RegistryContext to get the registry and register the
      *             service there
      */
+    @Deprecated
     public void registerComponent(Object component,
                                   String name,
                                   MuleEndpointURI listenerEndpoint,
@@ -983,6 +987,7 @@ public class MuleClient implements Disposable
      * @deprecated Use the RegistryContext to get the registry and unregister the
      *             service there
      */
+    @Deprecated
     public void unregisterComponent(String name) throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");

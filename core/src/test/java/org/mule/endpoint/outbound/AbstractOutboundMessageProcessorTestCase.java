@@ -12,6 +12,7 @@ package org.mule.endpoint.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -100,7 +101,7 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         {
             endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
         }
-        endpointBuilder.setSynchronous(sync);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
         endpointBuilder.setTransactionConfig(txConfig);
         customizeEndpointBuilder(endpointBuilder);
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();

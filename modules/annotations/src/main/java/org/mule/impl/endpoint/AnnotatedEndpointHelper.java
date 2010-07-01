@@ -9,6 +9,7 @@
  */
 package org.mule.impl.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -135,8 +136,7 @@ public class AnnotatedEndpointHelper
             endpointBuilder.setName(parsePlaceholderValues(epData.getName()));
         }
 
-
-        endpointBuilder.setSynchronous(epData.isSynchronous());
+        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(epData.isSynchronous()));
 
         if (epData.getType() == ChannelType.Inbound)
         {

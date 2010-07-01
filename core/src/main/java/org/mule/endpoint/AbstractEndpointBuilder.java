@@ -820,10 +820,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             builder.setDeleteUnacceptedMessages(deleteUnacceptedMessages.booleanValue());
         }
-        if (synchronous != null)
-        {
-            builder.setSynchronous(synchronous.booleanValue());
-        }
         if (messageExchangePattern != null)
         {
             builder.setExchangePattern(messageExchangePattern);

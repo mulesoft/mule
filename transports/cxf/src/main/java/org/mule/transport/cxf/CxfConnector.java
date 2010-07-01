@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.ServiceNotificationListener;
@@ -259,7 +260,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
 
         EndpointBuilder protocolEndpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        protocolEndpointBuilder.setSynchronous(sync);
+        protocolEndpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
         protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
         protocolEndpointBuilder.setTransactionConfig(originalEndpoint.getTransactionConfig());
 

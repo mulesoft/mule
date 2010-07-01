@@ -10,6 +10,7 @@
 
 package org.mule.module.jca;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -303,9 +304,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
             muleActivationSpec.getEndpoint(), muleContext));
 
-        // Use asynchronous endpoint as we need to dispatch to service
-        // rather than send.
-        endpointBuilder.setSynchronous(false);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.one_way);
 
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
     }

@@ -10,6 +10,7 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -164,6 +165,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         }
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         axisTransportProtocols = new HashMap();
@@ -300,6 +302,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
      * @return the key to store the newly created receiver against. In this case it
      *         is the component name, which is equivalent to the Axis service name.
      */
+    @Override
     protected Object getReceiverKey(Service component, InboundEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
@@ -381,7 +384,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         boolean sync = receiver.getEndpoint().isSynchronous();
         
         EndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        serviceEndpointbuilder.setSynchronous(sync);
+        serviceEndpointbuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
         serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers().isEmpty() ? null
@@ -462,6 +465,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
      *
      * @throws org.mule.api.MuleException if the method fails
      */
+    @Override
     protected void doStart() throws MuleException
     {
         axis.start();
@@ -472,6 +476,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
      *
      * @throws org.mule.api.MuleException if the method fails
      */
+    @Override
     protected void doStop() throws MuleException
     {
         axis.stop();
@@ -479,16 +484,19 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // model.unregisterComponent(model.getDescriptor(AXIS_SERVICE_COMPONENT_NAME));
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
@@ -666,6 +674,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         }
     }
     
+    @Override
     public boolean isSyncEnabled(String protocol)
     {
         protocol = protocol.toLowerCase();

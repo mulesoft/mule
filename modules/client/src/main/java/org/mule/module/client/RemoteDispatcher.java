@@ -13,6 +13,7 @@ package org.mule.module.client;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
@@ -97,7 +98,7 @@ public class RemoteDispatcher implements Disposable
         asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
 
         EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
-        endpointBuilder.setSynchronous(true);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
         syncServerEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 

@@ -11,6 +11,7 @@
 package org.mule.transport.http.components;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -203,7 +204,7 @@ public class RestServiceWrapper extends AbstractComponent
         event.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
-        endpointBuilder.setSynchronous(true);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
         OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
         result = RequestContext.getEventContext().sendEvent(

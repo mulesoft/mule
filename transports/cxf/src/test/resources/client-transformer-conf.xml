@@ -13,7 +13,7 @@
     
     <cxf:endpoint 
         name="payloadTransformerClient" 
-        address="vm://in?synchronous=false"
+        address="vm://in?exchange-pattern=one-way"
         proxy="true"
         applyTransformersToProtocol="false"
         exchange-pattern="one-way">
@@ -24,7 +24,7 @@
     
     <cxf:endpoint 
         name="protocolTransformerClient" 
-        address="vm://in?synchronous=false"
+        address="vm://in?exchange-pattern=one-way"
         proxy="true"
         applyTransformersToProtocol="true"
         exchange-pattern="one-way">
