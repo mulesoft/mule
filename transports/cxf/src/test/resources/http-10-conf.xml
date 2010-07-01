@@ -21,7 +21,7 @@
       wsdlPort="SoapPort" 
       wsdlLocation="classpath:/wsdl/hello_world.wsdl"
       operation="greetMe"
-      synchronous="true"
+      exchange-pattern="request-response"
       applyTransformersToProtocol="false">
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
@@ -42,7 +42,7 @@
       wsdlPort="SoapPort" 
       wsdlLocation="classpath:/wsdl/hello_world.wsdl"
       operation="greetMe"
-      synchronous="true"
+      exchange-pattern="request-response"
       applyTransformersToProtocol="true">
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
@@ -54,7 +54,7 @@
     <service name="greeterService">
       <inbound>
           <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" 
-                                synchronous="true"/>
+                                exchange-pattern="request-response"/>
       </inbound>
       <component>
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>

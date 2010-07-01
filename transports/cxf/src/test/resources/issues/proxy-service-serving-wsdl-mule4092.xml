@@ -11,7 +11,7 @@
           <service name="OnlineStoreGateway">
                <inbound>
                     <cxf:inbound-endpoint address="http://localhost:8777/services/onlinestore"
-                         proxy="true" synchronous="true"
+                         proxy="true" exchange-pattern="request-response"
                          wsdlLocation="issues/test.wsdl"
                          serviceName="OnlineStoreService">
                     </cxf:inbound-endpoint>

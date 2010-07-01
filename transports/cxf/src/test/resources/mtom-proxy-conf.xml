@@ -26,7 +26,7 @@
                     <cxf:outbound-endpoint address="http://localhost:63081/services/mtom2"  
                                            mtomEnabled="true"
                                            proxy="true"
-                                           synchronous="true"/>
+                                           exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

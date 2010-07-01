@@ -22,7 +22,7 @@
         <service name="PopulateData">
             <inbound>
                 <inbound-endpoint address="vm://test"
-                    synchronous="true" />
+                    exchange-pattern="request-response" />
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
             <outbound>

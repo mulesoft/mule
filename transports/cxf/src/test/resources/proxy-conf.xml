@@ -66,7 +66,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/greeter"
                         proxy="true"
-                        synchronous="true"/>
+                        exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -90,14 +90,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="test" synchronous="true"/>
+                    <vm:outbound-endpoint path="test" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="vm://test" synchronous="true"/>
+                <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
@@ -117,7 +117,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        synchronous="true"/>
+                        exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -133,7 +133,7 @@
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
                         payload="envelope"
-                        synchronous="true"/>
+                        exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -152,7 +152,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        synchronous="true">
+                        exchange-pattern="request-response">
                     </cxf:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -172,7 +172,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        synchronous="true">
+                        exchange-pattern="request-response">
                     </cxf:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -187,7 +187,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
-                        synchronous="true">
+                        exchange-pattern="request-response">
                          <response-transformers>
                              <transformer ref="TestXslt"/>
                          </response-transformers>
@@ -203,7 +203,7 @@
                         <cxf-core:logging/>
                     </cxf:features>
                 </cxf:inbound-endpoint>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapActionAsync" proxy="true" synchronous="false">
+                <cxf:inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapActionAsync" proxy="true" exchange-pattern="one-way">
                     <cxf:features>
                         <cxf-core:logging/>
                     </cxf:features>
@@ -213,13 +213,13 @@
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
                         proxy="true"
-                        synchronous="true"/>
+                        exchange-pattern="request-response"/>
                     <message-property-filter pattern="SOAPAction=http://acme.com/no-transform"/>
                 </filtering-router>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
                         proxy="true"
-                        synchronous="true">
+                        exchange-pattern="request-response">
                          <response-transformers>
                              <transformer ref="TestXslt"/>
                          </response-transformers>
@@ -229,7 +229,7 @@
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/oneway" 
                         proxy="true"
-                        synchronous="true" responseTimeout="2000"/>
+                        exchange-pattern="request-response" responseTimeout="2000"/>
                     <message-property-filter pattern="SOAPAction=http://acme.com/oneway"/>
                 </filtering-router>
             </outbound>

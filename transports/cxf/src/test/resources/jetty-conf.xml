@@ -13,13 +13,13 @@
       clientClass="org.apache.hello_world_soap_http.SOAPService" 
       wsdlPort="SoapPort" 
       wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-      synchronous="true"/>
+      exchange-pattern="request-response"/>
       
   <model name="TestCxfModel">
   
     <service name="greeterService">
       <inbound>
-          <cxf:inbound-endpoint address="jetty://localhost:63081/services/greeter" synchronous="true" />
+          <cxf:inbound-endpoint address="jetty://localhost:63081/services/greeter" exchange-pattern="request-response" />
       </inbound>
       <component>
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>

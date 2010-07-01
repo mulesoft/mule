@@ -35,7 +35,7 @@
 
         <service name="mycomponent4">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:62110/mycomponent4" synchronous="false" serviceClass="org.mule.api.lifecycle.Callable"/>
+                <cxf:inbound-endpoint address="http://localhost:62110/mycomponent4" exchange-pattern="one-way" serviceClass="org.mule.api.lifecycle.Callable"/>
             </inbound>
             <test:web-service-component/>            
         </service>
