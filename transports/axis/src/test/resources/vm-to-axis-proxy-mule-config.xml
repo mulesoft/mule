@@ -11,7 +11,7 @@
     <model name="test">
         <service name="proxy">
             <inbound>
-                <inbound-endpoint address="vm://proxy" synchronous="true"/>
+                <inbound-endpoint address="vm://proxy" exchange-pattern="request-response"/>
             </inbound>
             <bridge-component/>
             <outbound>

@@ -16,14 +16,14 @@
 
         <service name="WebServiceSample1">
             <inbound>
-                <vm:inbound-endpoint path="testin" synchronous="true"/>
+                <vm:inbound-endpoint path="testin" exchange-pattern="request-response"/>
             </inbound>
             <axis:wrapper-component address="http://localhost:65081/services/TestUMO?method=receive" style="WRAPPED" use="LITERAL"/>
         </service>
         
         <service name="WebServiceSample2">
             <inbound>
-                <vm:inbound-endpoint path="testin2" synchronous="true"/>
+                <vm:inbound-endpoint path="testin2" exchange-pattern="request-response"/>
             </inbound>
             <axis:wrapper-component addressFromMessage="true" style="WRAPPED" use="LITERAL"/>
         </service>

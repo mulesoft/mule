@@ -41,7 +41,7 @@
 
         <service name="mycomponent4">
             <inbound>
-                <inbound-endpoint address="axis:vm://mycomponent4" synchronous="true"/>
+                <inbound-endpoint address="axis:vm://mycomponent4" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>

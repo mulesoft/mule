@@ -17,7 +17,7 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <axis:inbound-endpoint address="servlet://mycomponent" synchronous="true"/>
+                <axis:inbound-endpoint address="servlet://mycomponent" exchange-pattern="request-response"/>
             </inbound>
             <test:web-service-component/>
         </service>

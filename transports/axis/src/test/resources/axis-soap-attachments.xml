@@ -17,7 +17,7 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:60198/mule/services" synchronous="true"/>
+                <inbound-endpoint address="axis:http://localhost:60198/mule/services" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <outbound>
