@@ -67,6 +67,12 @@ public class DefaultAppBloodhound implements AppBloodhound
         final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
 
         File appDir = new File(String.format("%s/apps/%s", muleHome, appName));
+        if(!appDir.exists())
+        {
+            throw new MuleRuntimeException(
+                    MessageFactory.createStaticMessage(
+                            String.format("Application directory does not exist '%s'", appName)));
+        }
         // list mule-deploy.* files
         @SuppressWarnings("unchecked")
         Collection<File> deployFiles = FileUtils.listFiles(appDir, new WildcardFileFilter("mule-deploy.*"), null);
