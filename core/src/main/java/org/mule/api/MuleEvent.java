@@ -12,7 +12,6 @@ package org.mule.api;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
@@ -171,7 +170,7 @@ public interface MuleEvent
      * 
      * @return the service for the event
      */
-    Service getService();
+    FlowConstruct getService();
 
     /**
      * Determines whether the default processing for this event will be executed. By

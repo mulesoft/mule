@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.service.Service;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.routing.AggregationException;
 import org.mule.routing.CollectionCorrelatorCallback;
@@ -53,9 +54,15 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
         MuleMessage result = super.aggregateEvents(events);
         MuleEvent event = new DefaultMuleEvent(result, receivedEvent.getEndpoint(), receivedEvent.getService(), receivedEvent);
 
+        if (!(event.getService() instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "CollectionResponseWithCallbackCorrelator is only supported with Service");
+        }
+        
         try
         {
-            return event.getService().getComponent().process(event).getMessage();
+            return ((Service) event.getService()).getComponent().process(event).getMessage();
         }
         catch (MuleException e)
         {

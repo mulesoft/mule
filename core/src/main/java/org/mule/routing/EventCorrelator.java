@@ -11,6 +11,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -40,7 +41,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
@@ -570,8 +570,13 @@ public class EventCorrelator
                         eventGroups.remove(group.getGroupId());
                         locks.remove(group.getGroupId());
 
-                        final Service service = group.toArray()[0].getService();
+                        final FlowConstruct service = group.toArray()[0].getService();
 
+                        if (!(service instanceof Service))
+                        {
+                            throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+                        }
+                        
                         if (isFailOnTimeout())
                         {
                             context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
@@ -596,12 +601,12 @@ public class EventCorrelator
                                 {
                                     MuleMessage msg = callback.aggregateEvents(group);
                                     MuleEvent newEvent = new DefaultMuleEvent(msg, group.toArray()[0].getEndpoint(),
-                                                                              new DefaultMuleSession(service, context), false);
+                                                                              new DefaultMuleSession((Service) service, context), false);
 
                                     if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
                                     {
                                         // TODO which use cases would need a sync reply event returned?
-                                        service.dispatchEvent(newEvent);
+                                        ((Service) service).dispatchEvent(newEvent);
                                         expiredAndDispatchedGroups.put(group.getGroupId(), group.getCreated());
                                     }
                                     else

@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
@@ -124,7 +125,10 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
-            event.getService().getStatistics().incSentReplyToEvent();
+            if (event.getService() instanceof Service)
+            {
+                ((Service) event.getService()).getStatistics().incSentReplyToEvent();
+            }
 
             final ImmutableEndpoint endpoint = event.getEndpoint();
             if (ttlString == null && priorityString == null && persistentDeliveryString == null)

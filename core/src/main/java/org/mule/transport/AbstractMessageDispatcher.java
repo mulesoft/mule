@@ -19,6 +19,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 
@@ -130,9 +131,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             if (remoteSync)
             {
                 // service will be null for client calls
-                if (event.getService() != null)
+                if (event.getService() != null && event.getService() instanceof Service)
                 {
-                    ResponseRouterCollection responseRouters = event.getService().getResponseRouter();
+                    ResponseRouterCollection responseRouters = ((Service) event.getService()).getResponseRouter();
                     if (responseRouters != null && responseRouters.hasEndpoints())
                     {
                         remoteSync = false;

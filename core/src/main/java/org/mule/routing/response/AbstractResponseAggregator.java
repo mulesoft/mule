@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.routing.EventCorrelator;
 import org.mule.routing.EventCorrelatorCallback;
 import org.mule.routing.inbound.EventGroup;
@@ -56,6 +57,11 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     public void process(MuleEvent event) throws RoutingException
     {
+        if (!(event.getService() instanceof Service))
+        {
+            throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+        }
+        
         eventCorrelator.addEvent(event);
     }
 

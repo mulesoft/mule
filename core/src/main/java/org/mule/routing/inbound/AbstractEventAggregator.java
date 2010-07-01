@@ -15,6 +15,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.routing.EventCorrelator;
 import org.mule.routing.EventCorrelatorCallback;
 
@@ -60,6 +61,11 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
+        if (!(event.getService() instanceof Service))
+        {
+            throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+        }
+        
         MuleMessage msg = eventCorrelator.process(event);
         if (msg == null)
         {

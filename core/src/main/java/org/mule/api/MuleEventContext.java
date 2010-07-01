@@ -13,7 +13,6 @@ package org.mule.api;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.TransformerException;
@@ -360,7 +359,7 @@ public interface MuleEventContext
      */
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
-    Service getService();
+    FlowConstruct getService();
 
     /**
      * Determines whether the default processing for this event will be executed. By

@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -21,7 +22,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.TransformerException;
@@ -30,6 +30,7 @@ import org.mule.transaction.TransactionCoordination;
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -534,7 +535,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * @return the service descriptor of the service that received this event
      */
-    public Service getService()
+    public FlowConstruct getService()
     {
         return event.getService();
     }

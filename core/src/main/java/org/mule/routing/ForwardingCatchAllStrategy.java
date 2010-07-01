@@ -14,7 +14,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.routing.ServiceRoutingException;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -44,8 +43,8 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
     {
         if (getEndpoint() == null)
         {
-            throw new ServiceRoutingException(CoreMessages.noCatchAllEndpointSet(), event.getMessage(),
-                getEndpoint(), event.getService());
+            throw new RoutingException(CoreMessages.noCatchAllEndpointSet(), event.getMessage(),
+                getEndpoint());
         }
         try
         {

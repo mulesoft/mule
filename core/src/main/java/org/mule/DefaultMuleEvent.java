@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.DefaultMuleException;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -115,14 +116,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
-                            Service service,
+                            FlowConstruct service,
                             MuleEvent previousEvent)
     {
         super(message.getPayload());
         this.message = message;
         this.id = generateEventId();
         this.session = previousEvent.getSession();
-        ((DefaultMuleSession) session).setService(service);
+        ((DefaultMuleSession) session).setService((Service) service);
         this.endpoint = endpoint;
         this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
@@ -173,7 +174,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((DefaultMuleSession) session).setService(rewriteEvent.getService());
+        ((DefaultMuleSession) session).setService((Service) rewriteEvent.getService());
         this.endpoint = rewriteEvent.getEndpoint();
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
@@ -466,7 +467,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     /**
      * Gets the recipient service of this event
      */
-    public Service getService()
+    public FlowConstruct getService()
     {
         return session.getService();
     }

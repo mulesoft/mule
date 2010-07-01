@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.CollectionUtils;
 
@@ -83,15 +84,15 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
             //logger.fatal("The error is: " + t.getMessage(), t);
             return null;
         }
-        else if(event.getService()==null)
+        else if(event.getService()!=null && event.getService() instanceof Service)
+        {
+            return ((Service) event.getService()).getStatistics();
+        }
+        else
         {
             //this will ever happen, but JIC
             logger.fatal("The Default Service Exception Strategy has been invoked but there is no current service on the context. Please report this to dev@mule.codehaus.org");            
             return null;
-        }
-        else
-        {
-            return event.getService().getStatistics();
         }
     }
 }

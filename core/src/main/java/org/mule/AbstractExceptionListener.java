@@ -314,12 +314,7 @@ public abstract class AbstractExceptionListener
                     exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage(), muleContext);
                 }
 
-                Service service = null;
-                if (ctx != null)
-                {
-                    service = ctx.getService();
-                }
-                if (service != null)
+                if (ctx != null && ctx.getService() != null && ctx.getService() instanceof Service)
                 {
                     OutboundRouter router = createOutboundRouter();
                     router.process(new DefaultMuleEvent(exceptionMessage, RequestContext.getEvent()));

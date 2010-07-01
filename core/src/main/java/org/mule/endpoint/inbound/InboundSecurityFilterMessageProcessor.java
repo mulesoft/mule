@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -41,8 +40,7 @@ public class InboundSecurityFilterMessageProcessor extends AbstractInterceptingM
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        Service service = event.getService();
-        MessageReceiver receiver = ((AbstractConnector) connector).getReceiver(service, endpoint);
+        MessageReceiver receiver = ((AbstractConnector) connector).getReceiver(event.getService(), endpoint);
         MuleEvent resultEvent = null;
 
         // Apply Security filter if one is set

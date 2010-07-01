@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
@@ -28,7 +29,12 @@ public class ForwardingConsumer extends SelectiveConsumer
     {
         if (super.process(event) != null)
         {
-            OutboundRouterCollection router = event.getService().getOutboundRouter();
+            if (!(event.getService() instanceof Service))
+            {
+                throw new UnsupportedOperationException("ForwardingConsumer is only supported with Service");
+            }
+
+            OutboundRouterCollection router = ((Service) event.getService()).getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
             // DefaultInboundRouterCollection not to route these events to the service

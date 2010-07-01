@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.routing.ServiceRoutingException;
+import org.mule.api.service.Service;
 
 /**
  * <code>ServiceCatchAllStrategy</code> is used to catch any events and forward the
@@ -26,13 +26,19 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
     public synchronized MuleEvent doCatchMessage(MuleEvent event)
         throws RoutingException
     {
+        if (!(event.getService() instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "CollectionResponseWithCallbackCorrelator is only supported with Service");
+        }
+
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
             if (event.isSynchronous())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                MuleMessage responseMessage = event.getService().sendEvent(event);
+                MuleMessage responseMessage = ((Service) event.getService()).sendEvent(event);
                 if (responseMessage != null)
                 {
                     return new DefaultMuleEvent(responseMessage, event);
@@ -45,14 +51,13 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
             else
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                event.getService().dispatchEvent(event);
+                ((Service) event.getService()).dispatchEvent(event);
                 return null;
             }
         }
         catch (MuleException e)
         {
-            throw new ServiceRoutingException(event.getMessage(), event.getEndpoint(),
-                event.getService(), e);
+            throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 }

@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.annotations.i18n.AnnotationsMessages;
 import org.mule.routing.EventCorrelatorCallback;
@@ -77,13 +78,20 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
     public MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         MuleEvent event = (MuleEvent) events.iterator().next();
+        
+        if (!(event.getService() instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "CollectionResponseWithCallbackCorrelator is only supported with Service");
+        }
+
         //Setting a callback is optional
         if(callback!=null)
         {
             event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, callback, PropertyScope.INVOCATION);
             try
             {
-                return event.getService().getComponent().process(event).getMessage();
+                return ((Service) event.getService()).getComponent().process(event).getMessage();
             }
             catch (MuleException e)
             {

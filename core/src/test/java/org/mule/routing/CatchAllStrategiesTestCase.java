@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.ServiceRoutingException;
+import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.endpoint.MuleEndpointURI;
@@ -88,7 +88,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             strategy.process(event);
             fail();
         }
-        catch (ServiceRoutingException sre)
+        catch (RoutingException sre)
         {
             // we expected this exception
         }
