@@ -17,7 +17,6 @@
     <http:connector name="HttpConnector"/>
 
     <model name="main">
-
         <!-- singleton for easier testing only -->
         <custom-service name="Test" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
@@ -34,13 +33,11 @@
 
         <service name="TestServer">
             <inbound>
-                <inbound-endpoint address="http://localhost:60206" synchronous="true" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:60206" exchange-pattern="request-response" connector-ref="HttpConnector"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.transport.http.functional.ETagComponent"/>
             </component>
         </service>
-
     </model>
-
 </mule>

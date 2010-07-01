@@ -19,7 +19,6 @@
     <vm:connector name="vmQueue"/>
 
     <model name="http polling test model">
-
         <service name="pollingUMO">
             <inbound>
                 <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
@@ -35,13 +34,12 @@
 
         <service name="polledUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:61205" synchronous="true" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:61205" exchange-pattern="request-response" 
+                    connector-ref="HttpConnector"/>
             </inbound>
             <test:component>
                 <test:return-data>foo</test:return-data>
             </test:component>
         </service>
-
     </model>
-
 </mule>

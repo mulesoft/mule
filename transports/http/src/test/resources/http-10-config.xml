@@ -13,7 +13,7 @@
     <model>
         <service name="Streaming">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60232/streaming" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60232/streaming" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.transport.http.components.StreamingResponseComponent"/>

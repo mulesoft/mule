@@ -13,7 +13,7 @@
     <model>        
         <service name="PersistentQueueAsync">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="63083" path="services/Echo" synchronous="false"/>
+                <http:inbound-endpoint host="localhost" port="63083" path="services/Echo" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
         </service>

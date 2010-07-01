@@ -14,10 +14,9 @@
     <http:connector name="httpConnector" keepAlive="false"/>
 
     <model name="test">
-
         <service name="mycomponent1">
             <inbound>
-                <inbound-endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60211/mycomponent1" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>mycomponent1</test:return-data>
@@ -27,13 +26,11 @@
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60211/mycomponent2" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>mycomponent2</test:return-data>
             </test:component>
         </service>
-
     </model>
-
 </mule>

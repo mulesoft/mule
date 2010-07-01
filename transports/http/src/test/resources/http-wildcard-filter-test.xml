@@ -11,7 +11,7 @@
     <model>
         <service name="httpIn">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60201" synchronous="true">
+                <http:inbound-endpoint host="localhost" port="60201" exchange-pattern="request-response">
                     <not-filter>
                         <http:request-wildcard-filter pattern="*xyz*"/>
                     </not-filter>
@@ -22,7 +22,7 @@
 
         <service name="reference">
             <inbound>
-                <inbound-endpoint address="http://localhost:60225" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60225" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

@@ -13,11 +13,11 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <!-- Try diffent variations of endpoint config -->
-    <endpoint name="base" address="http://localhost:60222" synchronous="true"/>
+    <endpoint name="base" address="http://localhost:60222" exchange-pattern="request-response"/>
 
-    <http:endpoint name="response" address="http://localhost:60233" synchronous="true"/>
+    <http:endpoint name="response" address="http://localhost:60233" exchange-pattern="request-response"/>
 
-    <http:endpoint name="both" host="localhost" port="60234" synchronous="true"/>
+    <http:endpoint name="both" host="localhost" port="60234" exchange-pattern="request-response"/>
 
     <append-string-transformer name="appendString" message=" transformed"/>
     <append-string-transformer name="appendString2" message=" transformed 2"/>
@@ -37,14 +37,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://echo1" synchronous="true"/>
+                    <outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="baseService2">
             <inbound>
-                <vm:inbound-endpoint path="echo1" synchronous="true">
+                <vm:inbound-endpoint path="echo1" exchange-pattern="request-response">
                     <object-to-string-transformer/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -62,14 +62,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="echo2" synchronous="true"/>
+                    <vm:outbound-endpoint path="echo2" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="responseService2">
             <inbound>
-                <vm:inbound-endpoint path="echo2" synchronous="true" responseTransformer-refs="appendResponse2">
+                <vm:inbound-endpoint path="echo2" exchange-pattern="request-response" responseTransformer-refs="appendResponse2">
                     <object-to-string-transformer />
                 </vm:inbound-endpoint>
             </inbound>
@@ -91,14 +91,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://echo3" synchronous="true"/>
+                    <outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="bothService2">
             <inbound>
-                <vm:inbound-endpoint address="vm://echo3" synchronous="true"
+                <vm:inbound-endpoint address="vm://echo3" exchange-pattern="request-response"
                                   responseTransformer-refs="appendResponse2">
                   <object-to-string-transformer />
                   <transformer ref="appendString2" />

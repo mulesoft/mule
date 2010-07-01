@@ -18,29 +18,29 @@
         
         <service name="TestDecreaseTimeout">
             <inbound>
-                <vm:inbound-endpoint path="decreaseTimeoutRequest" synchronous="true"/>
+                <vm:inbound-endpoint path="decreaseTimeoutRequest" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60216/DelayService" synchronous="true" responseTimeout="1000"/>
+                    <http:outbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response" responseTimeout="1000"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="TestIncreaseTimeout">
             <inbound>
-                <vm:inbound-endpoint path="increaseTimeoutRequest" synchronous="true"/>
+                <vm:inbound-endpoint path="increaseTimeoutRequest" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60216/DelayService" synchronous="true" responseTimeout="3000"/>
+                    <http:outbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response" responseTimeout="3000"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="DelayService">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60216/DelayService" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response"/>
             </inbound>
             <test:component waitTime="2500" appendString=" processed"/>
         </service>

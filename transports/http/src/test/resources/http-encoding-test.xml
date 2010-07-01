@@ -16,7 +16,7 @@
         <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
     </message-properties-transformer>
 
-    <http:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
+    <http:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="testComponent">
@@ -26,5 +26,4 @@
             <test:component appendString=" Received"/>
         </service>
     </model>
-
 </mule>

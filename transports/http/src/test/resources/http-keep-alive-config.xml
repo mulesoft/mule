@@ -16,14 +16,14 @@
     <model>
         <service name="WithoutEndpointOverride">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60213/http-in" synchronous="true"/>
+                <http:inbound-endpoint address="http://localhost:60213/http-in" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
         
         <service name="WithEndpointOverride">
             <inbound>
-               <http:inbound-endpoint address="http://localhost:60216/http-in" keep-alive="true" synchronous="true"/>
+               <http:inbound-endpoint address="http://localhost:60216/http-in" keep-alive="true" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

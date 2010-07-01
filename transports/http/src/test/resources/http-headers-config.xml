@@ -14,8 +14,8 @@
 
     <vm:connector name="vm"/>
 
-    <http:endpoint name="clientEndpoint" host="localhost" port="60227" synchronous="true"/>
-    <http:endpoint name="serverEndpoint" host="localhost" port="60227" synchronous="true"/>
+    <http:endpoint name="clientEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
+    <http:endpoint name="serverEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
 
     <http:endpoint name="clientEndpoint2" host="localhost" port="60204" contentType="application/xml">
         <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
@@ -26,7 +26,7 @@
     <model name="Test">
         <service name="ProductDataSourceRepository">
             <inbound>
-                <http:inbound-endpoint ref="serverEndpoint" synchronous="true" contentType="application/x-download">
+                <http:inbound-endpoint ref="serverEndpoint" exchange-pattern="request-response" contentType="application/x-download">
                     <properties>
                         <spring:entry key="Content-Disposition" value="attachment; filename=foo.zip"/>
                         <spring:entry key="Content-Type" value="application/x-download"/>

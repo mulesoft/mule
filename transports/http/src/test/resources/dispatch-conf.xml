@@ -18,7 +18,8 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="63081" path="services/Echo" synchronous="true" keep-alive="true"/>
+                <http:inbound-endpoint host="localhost" port="63081" path="services/Echo" 
+                    exchange-pattern="request-response" keep-alive="true"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
         </service>

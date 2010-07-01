@@ -11,10 +11,9 @@
     <model name="main">
         <service name="httpIn">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60228" synchronous="true"/>
+                <http:inbound-endpoint host="localhost" port="60228" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
     </model>
-
 </mule>
