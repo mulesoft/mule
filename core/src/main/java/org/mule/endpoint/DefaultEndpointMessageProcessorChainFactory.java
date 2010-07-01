@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.endpoint;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
@@ -35,11 +35,12 @@ import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
 import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
+import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
-public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageProcessorChainFactory
+public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory
 {
     /** Override this method to change the default MessageProcessors. */
     protected MessageProcessor[] createInboundMessageProcessors(InboundEndpoint endpoint)

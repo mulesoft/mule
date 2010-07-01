@@ -34,7 +34,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.processor.DefaultEndpointMessageProcessorsFactory;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -599,7 +598,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected EndpointMessageProcessorChainFactory getDefaultMessageProcessorsFactory()
     {
-        return new DefaultEndpointMessageProcessorsFactory();
+        return new DefaultEndpointMessageProcessorChainFactory();
     }
 
     public void addResponseTransformer(Transformer transformer)
