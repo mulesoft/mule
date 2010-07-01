@@ -13,30 +13,30 @@
     <model name="Tcp_with_remote_sync">
         <service name="Echo1">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="6161" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="6161" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="6162" synchronous="true"/>
+                    <tcp:outbound-endpoint host="localhost" port="6162" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="Echo2">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="6163" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="6163" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="sync" synchronous="true"/>
+                    <vm:outbound-endpoint path="sync" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="testComponent">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="6162" synchronous="true"/>
-                <vm:inbound-endpoint path="sync" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="6162" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="sync" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>

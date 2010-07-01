@@ -11,8 +11,8 @@
     <tcp:connector name="tcp" reuseAddress="true" keepSendSocketOpen="true">
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
-    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
-    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
+    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="testComponent1">
@@ -31,5 +31,4 @@
             </test:component>
         </service>
     </model>
-
 </mule>

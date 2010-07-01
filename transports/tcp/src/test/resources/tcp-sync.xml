@@ -20,7 +20,7 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <tcp:inbound-endpoint address="${test.endpoint}" synchronous="true"/>
+                <tcp:inbound-endpoint address="${test.endpoint}" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

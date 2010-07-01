@@ -12,7 +12,7 @@
         <tcp:length-protocol payloadOnly="false"/>
     </tcp:connector>
 
-    <tcp:endpoint host="localhost" port="60198" synchronous="true" name="clientEndpoint"/>
+    <tcp:endpoint host="localhost" port="60198" exchange-pattern="request-response" name="clientEndpoint"/>
 
     <model name="main">
         <service name="testComponent">
@@ -22,5 +22,4 @@
             <test:component appendString=" Received"/>
         </service>
     </model>
-
 </mule>

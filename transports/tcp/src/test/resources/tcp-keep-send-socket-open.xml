@@ -19,7 +19,7 @@
     </tcp:connector>
 
     <tcp:endpoint host="localhost" port="60189"
-                  connector-ref="openConnector" name="clientEndpoint" synchronous="true"/>
+                  connector-ref="openConnector" name="clientEndpoint" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="testComponent">
@@ -30,5 +30,4 @@
             <test:component appendString=" Received"/>
         </service>
     </model>
-
 </mule>
