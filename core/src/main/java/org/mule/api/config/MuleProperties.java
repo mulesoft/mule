@@ -139,6 +139,7 @@ public class MuleProperties
      * default value is 'false'.
      */
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
+    public static final String MESSAGE_EXCHANGE_PATTERN = "message-exchange-pattern";
 
     /**
      * The prefix for any Mule-specific properties set in the system properties

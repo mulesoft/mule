@@ -1749,12 +1749,20 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
-        <xsd:attribute name="synchronous" type="substitutableBoolean">
+        <xsd:attribute name="exchange-pattern" default="one-way">
             <xsd:annotation>
                 <xsd:documentation>
-                    If true, the result from the component processing the incoming message will be returned as a response.
                 </xsd:documentation>
             </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="one-way"/>
+                    <xsd:enumeration value="request-response"/>
+                    <xsd:enumeration value="request-optional-response"/>
+                    <xsd:enumeration value="request-ack"/> 
+                    <xsd:enumeration value="request-response-ack"/>
+                </xsd:restriction>
+            </xsd:simpleType>
         </xsd:attribute>
 
         <xsd:attribute name="responseTimeout" type="substitutableInt">

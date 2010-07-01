@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -75,6 +76,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Boolean deleteUnacceptedMessages;
     protected EndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
+    protected MessageExchangePattern messageExchangePattern;
     protected Integer responseTimeout;
     protected String initialState = ImmutableEndpoint.INITIAL_STATE_STARTED;
     protected String encoding;
@@ -204,6 +206,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
     {
+        // MEP overrides the sync flag
+        if (messageExchangePattern != null)
+        {
+            return messageExchangePattern.hasResponse();
+        }
+        
+        // TODO this will go away once all configs are updated to use MEPs
         return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector,
                 endpointURI.getScheme());
     }
@@ -685,6 +694,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setSynchronous(boolean synchronous)
     {
         this.synchronous = Boolean.valueOf(synchronous);
+    }
+    
+    public void setExchangePattern(String epString)
+    {
+        epString = epString.replace('-', '_');
+        messageExchangePattern = MessageExchangePattern.valueOf(epString);
     }
 
     public void setResponseTimeout(int responseTimeout)
