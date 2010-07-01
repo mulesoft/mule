@@ -48,6 +48,7 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
     */
     public static final String GLOBAL_RESPONSE = LOCAL_RESPONSE + " response";
 
+    @Override
     protected String getConfigResources()
     {
         return "issues/response-transformer-mule-2165-test.xml";

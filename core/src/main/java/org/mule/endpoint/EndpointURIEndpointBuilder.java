@@ -47,6 +47,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         deleteUnacceptedMessages = global.deleteUnacceptedMessages;
         securityFilter = global.securityFilter;
         synchronous = global.synchronous;
+        messageExchangePattern = global.messageExchangePattern;
         responseTimeout = global.responseTimeout;
         encoding = global.encoding;
         retryPolicyTemplate = global.retryPolicyTemplate;

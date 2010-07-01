@@ -104,6 +104,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected void setPropertiesFromProperties(Map<Object, Object> properties)
     {
         synchronous = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
+
+        String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN);
+        if (mepString != null)
+        {
+            setExchangePattern(mepString);
+        }
+        
         responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
         responsePropertiesList = (String) properties.get(PROPERTY_RESPONSE_PROPERTIES);
     }
@@ -225,6 +232,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         else
         {
+            // default MEP is one-way
+//             MessageExchangePattern.one_way.hasResponse();
             return muleContext.getConfiguration().isDefaultSynchronousEndpoints();
         }
     }
@@ -696,6 +705,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.synchronous = Boolean.valueOf(synchronous);
     }
     
+    // TODO BL-76: use a Spring TypeConverter to map from the string in config to the enum
+//  public void setExchangePattern(MessageExchangePattern mep)
+//  {
+//      messageExchangePattern = mep;
+//  }
+
     public void setExchangePattern(String epString)
     {
         epString = epString.replace('-', '_');
@@ -750,9 +765,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     @Override
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, deleteUnacceptedMessages,
-                encoding, uriBuilder, filter, initialState, name, properties, responseTimeout,
-                responseTransformers, securityFilter, synchronous, transactionConfig, transformers});
+        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
+            deleteUnacceptedMessages, encoding, uriBuilder, filter, initialState, name, properties, 
+            responseTimeout, responseTransformers, securityFilter, synchronous, 
+            messageExchangePattern, transactionConfig, transformers});
     }
 
     @Override
@@ -777,6 +793,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 && equal(responseTimeout, other.responseTimeout)
                 && equal(responseTransformers, other.responseTransformers)
                 && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
+                && equal(messageExchangePattern, other.messageExchangePattern)
                 && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
@@ -811,6 +828,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         if (synchronous != null)
         {
             builder.setSynchronous(synchronous.booleanValue());
+        }
+        if (messageExchangePattern != null)
+        {
+            // TODO BL-76: once a TypeConverter is in place the parameter can become a MEP instance
+            builder.setExchangePattern(messageExchangePattern.name());
         }
 
         if (responseTimeout != null)

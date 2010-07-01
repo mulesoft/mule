@@ -1749,7 +1749,8 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
-        <xsd:attribute name="exchange-pattern" default="one-way">
+<!--        <xsd:attribute name="exchange-pattern" default="one-way">-->
+        <xsd:attribute name="exchange-pattern">
             <xsd:annotation>
                 <xsd:documentation>
                 </xsd:documentation>

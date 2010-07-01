@@ -42,7 +42,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
-            new String[]{MuleProperties.SYNCHRONOUS_PROPERTY, "message-exchange-pattern",
+            new String[]{MuleProperties.EXCHANGE_PATTERN, 
                     AbstractEndpointBuilder.PROPERTY_RESPONSE_TIMEOUT, "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer"};
 

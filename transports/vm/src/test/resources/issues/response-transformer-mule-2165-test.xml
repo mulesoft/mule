@@ -25,19 +25,19 @@
     <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer"
                  connector-ref="queue"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default"
-                 responseTransformer-refs="response" synchronous="true"/>
+                 responseTransformer-refs="response" exchange-pattern="request-response"/>
 
     <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" connector-ref="default"/>
     <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" connector-ref="queue"/>
     <vm:endpoint name="global-name-url-transformer" path="global-name-url-transformer?responseTransformers=response"
-                 connector-ref="default" synchronous="true"/>
+                 connector-ref="default" exchange-pattern="request-response"/>
 
     <vm:endpoint name="in-global-name-local-transformer" path="in-global-name-local-transformer"
                  connector-ref="default"/>
     <vm:endpoint name="out-global-name-local-transformer" path="out-global-name-local-transformer"
                  connector-ref="queue"/>
     <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer" connector-ref="default"
-                 synchronous="true"/>
+                 exchange-pattern="request-response"/>
 
     <vm:endpoint name="in-local-name-local-transformer" path="in-local-name-local-transformer" connector-ref="default"/>
     <vm:endpoint name="out-local-name-local-transformer" path="out-local-name-local-transformer" connector-ref="queue"/>
@@ -46,7 +46,6 @@
     <vm:endpoint name="out-local-name-url-transformer" path="out-local-name-url-transformer" connector-ref="queue"/>
 
     <model name="response transformer tests">
-
         <service name="gngt">
             <inbound>
                 <inbound-endpoint ref="in-global-name-global-transformer"/>
@@ -115,7 +114,7 @@
             <outbound>
                 <chaining-router>
                     <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-refs="response"
-                                          synchronous="true" connector-ref="default"/>
+                                          exchange-pattern="request-response" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-local-transformer"/>
                 </chaining-router>
             </outbound>
@@ -136,7 +135,7 @@
             <outbound>
                 <chaining-router>
                     <vm:outbound-endpoint path="local-name-url-transformer?responseTransformers=response"
-                                          synchronous="true" connector-ref="default"/>
+                                          exchange-pattern="request-response" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-url-transformer"/>
                 </chaining-router>
             </outbound>
@@ -148,7 +147,5 @@
             </inbound>
             <echo-component/>
         </service>
-
     </model>
-
 </mule>

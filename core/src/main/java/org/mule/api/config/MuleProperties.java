@@ -138,8 +138,9 @@ public class MuleProperties
      * mule-model can only process one message at a time, or asynchronously. The
      * default value is 'false'.
      */
+    // TODO BL-76: remove me!
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
-    public static final String MESSAGE_EXCHANGE_PATTERN = "message-exchange-pattern";
+    public static final String EXCHANGE_PATTERN = "exchange-pattern";
 
     /**
      * The prefix for any Mule-specific properties set in the system properties

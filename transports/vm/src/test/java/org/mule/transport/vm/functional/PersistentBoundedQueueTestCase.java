@@ -16,10 +16,10 @@ import org.mule.tck.FunctionalTestCase;
 
 public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 {
-    private static final int RECEIVE_TIMEOUT = 5000;
     // add some sizeable delat, as queue store ordering won't be guaranteed
     private static final int SLEEP = 100;
 
+    @Override
     protected String getConfigResources()
     {
         return "vm/persistent-bounded-vm-queue-test.xml";

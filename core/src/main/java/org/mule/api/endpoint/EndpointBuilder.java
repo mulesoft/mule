@@ -74,6 +74,8 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setSecurityFilter(EndpointSecurityFilter securityFilter);
 
     void setSynchronous(boolean synchronous);
+    
+    void setExchangePattern(String mep);
 
     void setResponseTimeout(int responseTimeout);
 
