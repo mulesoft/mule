@@ -62,6 +62,7 @@ import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
@@ -2432,14 +2433,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         requesters.setMaxWait(maxWait);
     }
 
-    public MessageProcessor createAsyncInterceptingMessageProcessor() throws MuleException
+    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        return new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this);
-    }
-    
-    public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint)
-    {
-        return new MessageProcessor()
+        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        builder.chain(new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this));
+        builder.chain(new MessageProcessor()
         {
             private MessageProcessor notificationMessageProcessor;
 
@@ -2474,6 +2472,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     returnDispatcher(endpoint, dispatcher);
                 }
             }
-        };
-    }    
+        });
+        return builder.build();
+    }
 }

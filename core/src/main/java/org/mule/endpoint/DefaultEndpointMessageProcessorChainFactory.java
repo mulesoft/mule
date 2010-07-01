@@ -86,7 +86,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             // Exception handling to preserve previous MuleSession level exception
             // handling behaviour
             new OutboundSimpleTryCatchMessageProcessor(),
-            connector.createAsyncInterceptingMessageProcessor(),
             
             new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()),
             new OutboundEndpointPropertyMessageProcessor(),
