@@ -28,7 +28,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" synchronous="true"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -41,5 +41,4 @@
             <test:component appendString=" Received"/>
         </service>
     </model>
-    
 </mule>

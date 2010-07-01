@@ -13,21 +13,21 @@
     <model name="main">
         <service name="dispatchService">
             <inbound>
-                <vm:inbound-endpoint address="vm://dispatchIn" synchronous="false"/>
+                <vm:inbound-endpoint address="vm://dispatchIn" exchange-pattern="one-way"/>
             </inbound>
 
             <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out" synchronous="false"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="sendRequestService">
             <inbound>
-                <vm:inbound-endpoint address="vm://sendRequestIn" synchronous="true">
+                <vm:inbound-endpoint address="vm://sendRequestIn" exchange-pattern="request-response">
                     <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
             </inbound>

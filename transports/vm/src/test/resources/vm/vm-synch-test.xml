@@ -11,26 +11,23 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <model name="synchTestModel">
-
         <service name="bridge">
             <inbound>
-                <vm:inbound-endpoint path="bridge" synchronous="true"/>
+                <vm:inbound-endpoint path="bridge" exchange-pattern="request-response"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://responder" synchronous="true"/>
+                    <outbound-endpoint address="vm://responder" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
        <service name="responder">
             <inbound>
-                <vm:inbound-endpoint path="responder" synchronous="true"/>
+                <vm:inbound-endpoint path="responder" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
-
     </model>
-
 </mule>

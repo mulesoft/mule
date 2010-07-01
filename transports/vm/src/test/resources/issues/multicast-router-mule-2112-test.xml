@@ -8,9 +8,9 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:endpoint name="inbound" path="inbound" synchronous="true"/>
-    <vm:endpoint name="endpointHop1" path="hop1" synchronous="true"/>
-    <vm:endpoint name="endpointHop2" path="hop2" synchronous="true"/>
+    <vm:endpoint name="inbound" path="inbound" exchange-pattern="request-response"/>
+    <vm:endpoint name="endpointHop1" path="hop1" exchange-pattern="request-response"/>
+    <vm:endpoint name="endpointHop2" path="hop2" exchange-pattern="request-response"/>
 
     <model name="main">
         <custom-service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
@@ -40,5 +40,4 @@
             <test:component appendString=" Received"/>
         </custom-service>
     </model>
-
 </mule>

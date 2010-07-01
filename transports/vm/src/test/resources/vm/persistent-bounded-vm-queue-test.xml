@@ -8,19 +8,16 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-
     <vm:connector name="vmConnector">
         <receiver-threading-profile maxThreadsActive="1"/>
         <dispatcher-threading-profile maxThreadsActive="1"/>
         <vm:queue-profile persistent="true" maxOutstandingMessages="2"/>
     </vm:connector>
 
-
     <model>
-
         <service name="vmService">
             <inbound>
-                <vm:inbound-endpoint path="in" synchronous="true"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -29,8 +26,6 @@
             </outbound>
             <threading-profile maxThreadsActive="1"/>
         </service>
-
     </model>
-
 </mule>
 
