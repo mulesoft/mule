@@ -12,10 +12,10 @@ package org.mule.processor;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpointDecorator;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
@@ -39,7 +39,7 @@ import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
-public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageProcessorsFactory
+public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageProcessorChainFactory
 {
     /** Override this method to change the default MessageProcessors. */
     protected MessageProcessor[] createInboundMessageProcessors(InboundEndpoint endpoint)

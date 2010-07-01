@@ -14,9 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -55,7 +55,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    String responsePropertiesList,
-                                   EndpointMessageProcessorsFactory messageProcessorsFactory,
+                                   EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                    List <MessageProcessor> messageProcessors,
                                    List <MessageProcessor> responseMessageProcessors)
     {
@@ -89,7 +89,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     protected MessageProcessor createMessageProcessorChain() throws MuleException
     {
-        EndpointMessageProcessorsFactory factory = getMessageProcessorsFactory();
+        EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         return factory.createOutboundMessageProcessorChain(this, 
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
     }

@@ -12,9 +12,9 @@ package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -71,7 +71,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     private final List responseTransformers;
 
-    private final EndpointMessageProcessorsFactory messageProcessorsFactory;
+    private final EndpointMessageProcessorChainFactory messageProcessorsFactory;
 
     private final List <MessageProcessor> messageProcessors;
     
@@ -155,7 +155,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate,
-                            EndpointMessageProcessorsFactory messageProcessorsFactory,
+                            EndpointMessageProcessorChainFactory messageProcessorsFactory,
                             List <MessageProcessor> messageProcessors,
                             List <MessageProcessor> responseMessageProcessors)
     {
@@ -254,7 +254,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return name;
     }
 
-    public EndpointMessageProcessorsFactory getMessageProcessorsFactory()
+    public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
     {
         return messageProcessorsFactory;
     }

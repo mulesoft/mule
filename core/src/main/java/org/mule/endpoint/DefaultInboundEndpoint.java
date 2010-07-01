@@ -14,10 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.Pattern;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -53,7 +53,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   String endpointBuilderName,
                                   MuleContext muleContext,
                                   RetryPolicyTemplate retryPolicyTemplate,
-                                  EndpointMessageProcessorsFactory messageProcessorsFactory,
+                                  EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                   List <MessageProcessor> messageProcessors,
                                   List <MessageProcessor> responseMessageProcessors)
     {
@@ -109,7 +109,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 
     public MessageProcessor createMessageProcessorChain() throws MuleException
     {
-        EndpointMessageProcessorsFactory factory = getMessageProcessorsFactory();
+        EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         return factory.createInboundMessageProcessorChain(this, listener);
     }
 

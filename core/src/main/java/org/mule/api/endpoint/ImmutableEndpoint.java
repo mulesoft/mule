@@ -11,7 +11,6 @@
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleContext;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -163,7 +162,7 @@ public interface ImmutableEndpoint extends Serializable
      */
     EndpointSecurityFilter getSecurityFilter();
 
-    EndpointMessageProcessorsFactory getMessageProcessorsFactory();
+    EndpointMessageProcessorChainFactory getMessageProcessorsFactory();
 
     List <MessageProcessor> getMessageProcessors();
     

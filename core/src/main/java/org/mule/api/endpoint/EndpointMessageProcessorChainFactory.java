@@ -8,13 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor;
+package org.mule.api.endpoint;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 
-public interface EndpointMessageProcessorsFactory
+public interface EndpointMessageProcessorChainFactory
 {
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, MessageProcessor target) throws MuleException;
     

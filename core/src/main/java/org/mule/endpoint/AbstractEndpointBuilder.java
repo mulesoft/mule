@@ -17,12 +17,12 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.EndpointMessageProcessorsFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -84,7 +84,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Integer createConnector;
     protected RetryPolicyTemplate retryPolicyTemplate;
     protected String responsePropertiesList;
-    protected EndpointMessageProcessorsFactory messageProcessorsFactory;
+    protected EndpointMessageProcessorChainFactory messageProcessorsFactory;
     protected List<MessageProcessor> messageProcessors;
     protected List<MessageProcessor> responseMessageProcessors;
 
@@ -592,12 +592,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.transformers = transformers;
     }
 
-    protected EndpointMessageProcessorsFactory getMessageProcessorsFactory()
+    protected EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
     {
         return messageProcessorsFactory != null ? messageProcessorsFactory : getDefaultMessageProcessorsFactory();
     }
 
-    protected EndpointMessageProcessorsFactory getDefaultMessageProcessorsFactory()
+    protected EndpointMessageProcessorChainFactory getDefaultMessageProcessorsFactory()
     {
         return new DefaultEndpointMessageProcessorsFactory();
     }
