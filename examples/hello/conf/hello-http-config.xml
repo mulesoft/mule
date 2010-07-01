@@ -63,34 +63,34 @@
                   Note: the REST endpoint currently only works on the servlet transport only
                   since the HttpRequestToParameter transformer only supports servlets.
                  -->
-                <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" synchronous="true">
+                <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>
                 
                 <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" synchronous="true">
+                <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>
-                <inbound-endpoint address="servlet://rest" transformer-refs="HttpRequestToParameter StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" synchronous="true"/>
+                <inbound-endpoint address="servlet://rest" transformer-refs="HttpRequestToParameter StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" exchange-pattern="request-response"/>
 
                 <!-- Incoming VM requests -->
-                <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" synchronous="true"/>
+                <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
             </inbound>
 
             <component class="org.mule.example.hello.Greeter"/>
 
             <outbound>
                 <filtering-router>
-                    <vm:outbound-endpoint path="chitchatter" synchronous="true"/>
+                    <vm:outbound-endpoint path="chitchatter" exchange-pattern="request-response"/>
                     <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
                 </filtering-router>
 
                 <filtering-router>
-                    <vm:outbound-endpoint path="userErrorHandler" synchronous="true"/>
+                    <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="request-response"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
             </outbound>
@@ -105,7 +105,7 @@
         the transformer will transform the result event and pass it back as the http response -->
         <service name="ChitChatUMO">
             <inbound>
-                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" synchronous="true"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.example.hello.ChitChatter"/>
         </service>
@@ -114,7 +114,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound>
-                <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" synchronous="true"/>
+                <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" exchange-pattern="request-response"/>
             </inbound>
         </service>
 
@@ -122,7 +122,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
             <inbound>
-                <vm:inbound-endpoint path="systemErrorHandler" synchronous="true"/>
+                <vm:inbound-endpoint path="systemErrorHandler" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>

@@ -35,9 +35,9 @@
 	<!-- Final loan quote to the customer -->
 	<jms:endpoint name="CustomerResponses" queue="customer.responses" />
     <!-- Bigger banks handle bigger loans.  -->
-    <vm:endpoint name="BigBank" path="big.bank" synchronous="true" />
-    <vm:endpoint name="MediumBank" path="medium.bank" synchronous="true" />
-    <vm:endpoint name="SmallBank" path="small.bank" synchronous="true" />
+    <vm:endpoint name="BigBank" path="big.bank" exchange-pattern="request-response" />
+    <vm:endpoint name="MediumBank" path="medium.bank" exchange-pattern="request-response" />
+    <vm:endpoint name="SmallBank" path="small.bank" exchange-pattern="request-response" />
 
     <model name="loan-broker">
 
