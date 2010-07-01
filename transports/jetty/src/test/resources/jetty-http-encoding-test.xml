@@ -17,11 +17,11 @@
         <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
     </message-properties-transformer>
 
-    <jetty:endpoint name="serverEndpoint" address="http://localhost:60198/" synchronous="true"/>
-    <jetty:endpoint name="serverEndpoint2" address="http://localhost:60198/test2" synchronous="true"/>
+    <jetty:endpoint name="serverEndpoint" address="http://localhost:60198/" exchange-pattern="request-response"/>
+    <jetty:endpoint name="serverEndpoint2" address="http://localhost:60198/test2" exchange-pattern="request-response"/>
     
-    <http:endpoint name="clientEndpoint" address="http://localhost:60198/" synchronous="true"/>
-    <http:endpoint name="clientEndpoint2" host="localhost" port="60198" path="test2" synchronous="true"/>
+    <http:endpoint name="clientEndpoint" address="http://localhost:60198/" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint2" host="localhost" port="60198" path="test2" exchange-pattern="request-response"/>
 
     <model name="main">
         <custom-service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">

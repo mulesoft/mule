@@ -12,10 +12,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
-    <http:endpoint name="clientEndpoint1" host="localhost" port="60199" path="test1?foo=boo&amp;far=bar" synchronous="true"/>
-    <http:endpoint name="clientEndpoint2" host="localhost" port="60199" path="test1?foo=%23[header:foo]&amp;far=%23[header:far]" synchronous="true"/>
+    <http:endpoint name="clientEndpoint1" host="localhost" port="60199" path="test1?foo=boo&amp;far=bar" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint2" host="localhost" port="60199" path="test1?foo=%23[header:foo]&amp;far=%23[header:far]" exchange-pattern="request-response"/>
 
-    <jetty:endpoint name="serverEndpoint1" address="http://localhost:60199/test1" synchronous="true">
+    <jetty:endpoint name="serverEndpoint1" address="http://localhost:60199/test1" exchange-pattern="request-response">
         <expression-transformer>
             <return-argument evaluator="header" expression="foo"/>
             <return-argument evaluator="header" expression="far"/>
@@ -30,5 +30,4 @@
             <component class="org.mule.tck.services.MultiParamComponent"/>
         </service>
     </model>
-
 </mule>

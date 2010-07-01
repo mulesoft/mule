@@ -15,21 +15,21 @@
     <model name="main">
         <service name="httpIn">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60230/foo" synchronous="true"/>
+                <jetty:inbound-endpoint address="http://localhost:60230/foo" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World"/>
         </service>
 
         <service name="httpBestMatch">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60230/foo/bestmatch" synchronous="true"/>
+                <jetty:inbound-endpoint address="http://localhost:60230/foo/bestmatch" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World Best Match"/>
         </service>
         
         <service name="httpDifferentPort">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60231/foo/bestmatch" synchronous="true"/>
+                <jetty:inbound-endpoint address="http://localhost:60231/foo/bestmatch" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" World Best Match 2"/>
         </service>

@@ -12,8 +12,8 @@
 
     <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
          we still use the http transport on the client side-->
-    <http:endpoint address="http://localhost:60203/rest/Echo" name="clientEndpoint" synchronous="true"/>
-    <jetty:endpoint address="rest://localhost:60203/rest/Echo" name="serverEndpoint" synchronous="true"/>
+    <http:endpoint address="http://localhost:60203/rest/Echo" name="clientEndpoint" exchange-pattern="request-response"/>
+    <jetty:endpoint address="rest://localhost:60203/rest/Echo" name="serverEndpoint" exchange-pattern="request-response"/>
 
     <model name="main">
         <custom-service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
@@ -23,5 +23,4 @@
             <test:component appendString=" Received"/>
         </custom-service>
     </model>
-
 </mule>
