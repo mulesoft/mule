@@ -21,14 +21,14 @@
         <service name="Test" >
             <inbound>
                 <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                                  address="http://localhost:60206/TestServer" synchronous="true"/>
+                                  address="http://localhost:60206/TestServer" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" synchronous="true"/>
+                    <outbound-endpoint address="stdio://System.out" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
