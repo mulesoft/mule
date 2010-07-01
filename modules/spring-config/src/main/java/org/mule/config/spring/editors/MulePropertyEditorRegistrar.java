@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.editors;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.Connector;
@@ -33,5 +34,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     {
         registry.registerCustomEditor(Connector.class, new ConnectorPropertyEditor(muleContext));
         registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor(muleContext));
+        registry.registerCustomEditor(MessageExchangePattern.class, 
+            new MessageExchangePatternPropertyEditor());
     }
 }

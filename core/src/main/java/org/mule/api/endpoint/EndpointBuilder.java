@@ -10,6 +10,7 @@
 
 package org.mule.api.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
@@ -75,7 +76,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setSynchronous(boolean synchronous);
     
-    void setExchangePattern(String mep);
+    void setExchangePattern(MessageExchangePattern mep);
 
     void setResponseTimeout(int responseTimeout);
 

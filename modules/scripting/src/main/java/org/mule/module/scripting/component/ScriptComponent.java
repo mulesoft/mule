@@ -64,7 +64,17 @@ public class ScriptComponent extends AbstractComponent
             bindings.putAll(proxies);
         }
         script.populateBindings(bindings, event);
-        return script.runScript(bindings);
+        try
+        {
+            return script.runScript(bindings);
+        }
+        catch (Exception e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            
+            throw e;
+        }
     }
 
     public Scriptable getScript()

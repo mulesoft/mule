@@ -44,6 +44,7 @@ import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
+import org.mule.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,9 +107,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         synchronous = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
 
         String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN);
-        if (mepString != null)
+        if (StringUtils.isNotEmpty(mepString))
         {
-            setExchangePattern(mepString);
+            mepString = mepString.replace('-', '_');
+            setExchangePattern(MessageExchangePattern.valueOf(mepString));
         }
         
         responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
@@ -705,16 +707,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.synchronous = Boolean.valueOf(synchronous);
     }
     
-    // TODO BL-76: use a Spring TypeConverter to map from the string in config to the enum
-//  public void setExchangePattern(MessageExchangePattern mep)
-//  {
-//      messageExchangePattern = mep;
-//  }
-
-    public void setExchangePattern(String epString)
+    public void setExchangePattern(MessageExchangePattern mep)
     {
-        epString = epString.replace('-', '_');
-        messageExchangePattern = MessageExchangePattern.valueOf(epString);
+        messageExchangePattern = mep;
     }
 
     public void setResponseTimeout(int responseTimeout)
@@ -831,8 +826,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         if (messageExchangePattern != null)
         {
-            // TODO BL-76: once a TypeConverter is in place the parameter can become a MEP instance
-            builder.setExchangePattern(messageExchangePattern.name());
+            builder.setExchangePattern(messageExchangePattern);
         }
 
         if (responseTimeout != null)
