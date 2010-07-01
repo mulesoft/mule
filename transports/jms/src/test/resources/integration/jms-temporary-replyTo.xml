@@ -18,7 +18,7 @@
 
         <service name="JMSService1">
             <inbound>
-                <vm:inbound-endpoint path="in1" synchronous="true"/>
+                <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -30,19 +30,19 @@
         
         <service name="JMSService1Sync">
             <inbound>
-                <vm:inbound-endpoint path="in1Sync" synchronous="true"/>
+                <vm:inbound-endpoint path="in1Sync" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1" />
+                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="JMSService2">
             <inbound>
-                <vm:inbound-endpoint path="in2" synchronous="true"/>
+                <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -56,12 +56,12 @@
         
         <service name="JMSService2Sync">
             <inbound>
-                <vm:inbound-endpoint path="in2Sync" synchronous="true"/>
+                <vm:inbound-endpoint path="in2Sync" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" synchronous="true">
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" exchange-pattern="request-response">
                         <property key="disableTemporaryReplyToDestinations" value="true"/>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -70,7 +70,7 @@
 
         <service name="JMSService3">
             <inbound>
-                <vm:inbound-endpoint path="in3" synchronous="true"/>
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -82,7 +82,7 @@
 
         <service name="JMSService4">
             <inbound>
-                <vm:inbound-endpoint path="in4" synchronous="true"/>
+                <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -98,7 +98,7 @@
 
         <service name="TestService1">
             <inbound>
-                <inbound-endpoint address="${outbound.destination}" synchronous="true" connector-ref="jmsConnector1"/>
+                <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
             </inbound>
             <test:component appendString=" #[mule:context.serviceName]"/>
         </service>

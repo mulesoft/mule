@@ -10,15 +10,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <endpoint name="out" synchronous="true" address="${outbound.destination}"/>
+    <endpoint name="out" exchange-pattern="request-response" address="${outbound.destination}"/>
 
     <vm:connector name="vmConnector"/>
 
     <model name="Model">
-
         <service name="JmsQueueComponent">
             <inbound>
-                <inbound-endpoint address="vm://in" synchronous="true"/>
+                <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
             </inbound>
             <bridge-component/>
             <outbound>
@@ -34,6 +33,5 @@
             </inbound>
             <test:component appendString=" Received"/>
         </service>
-
     </model>
 </mule>
