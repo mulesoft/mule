@@ -49,7 +49,7 @@ public interface ResponseRouter extends Router
      * @see MuleMessage
      * @see org.mule.api.service.Service
      */
-    MuleMessage getResponse(MuleMessage message) throws RoutingException;
+    MuleEvent getResponse(MuleEvent message) throws RoutingException;
 
     /**
      * Sets the timeout delay that the response router should wait for a response for

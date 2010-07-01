@@ -12,7 +12,6 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
@@ -25,20 +24,24 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
     implements ExceptionListener
 {
 
+    protected MessageProcessor messageProcessor;
+    protected TestListener target = new TestListener();
     protected Exception exceptionThrown;
     protected Latch latch = new Latch();;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        messageProcessor = createAsyncInterceptingMessageProcessor(target);
+    }
 
     public void testProcessSync() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestOutboundEndpoint("",
             "test://test?synchronous=true"));
 
-        TestListener target = new TestListener();
-        InterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(muleContext.getWorkManager(),
-            this);
-        mp.setListener(target);
-
-        MuleEvent result = mp.process(event);
+        MuleEvent result = messageProcessor.process(event);
 
         assertSame(event, target.sensedEvent);
         assertSame(event, result);
@@ -46,13 +49,9 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
 
     public void testProcessAsync() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        TestListener target = new TestListener();
-        InterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(muleContext.getWorkManager(),
-            this);
-        mp.setListener(target);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(false), false);
 
-        MuleEvent result = mp.process(event);
+        MuleEvent result = messageProcessor.process(event);
 
         latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
         assertNotNull(target.sensedEvent);
@@ -63,6 +62,15 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
 
         assertNull(result);
         assertNull(exceptionThrown);
+    }
+
+    protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
+        throws Exception
+    {
+        AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
+            muleContext.getWorkManager(), this);
+        mp.setListener(listener);
+        return mp;
     }
 
     class TestListener implements MessageProcessor

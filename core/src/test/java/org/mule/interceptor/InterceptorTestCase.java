@@ -10,12 +10,10 @@
 
 package org.mule.interceptor;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.interceptor.Invocation;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -40,58 +38,61 @@ public class InterceptorTestCase extends AbstractMuleTestCase
 
     public void testSingleInterceptor() throws Exception
     {
-        Service service = getTestService();
-        TestComponent component = new TestComponent();
-        service.setComponent(component);
+        Service service = createUninitializedService();
+        TestComponent component = (TestComponent) service.getComponent();
+
         List interceptors = new ArrayList();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         component.setInterceptors(interceptors);
+        service.initialise();
         service.start();
 
-        MuleMessage result = service.sendEvent(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestInboundEvent(""));
 
-        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getPayloadAsString());
+        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
     public void testMultipleInterceptor() throws Exception
     {
-        Service service = getTestService();
-        TestComponent component = new TestComponent();
-        service.setComponent(component);
+        Service service = createUninitializedService();
+        TestComponent component = (TestComponent) service.getComponent();
+
         List interceptors = new ArrayList();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         component.setInterceptors(interceptors);
+        service.initialise();
         service.start();
 
-        MuleMessage result = service.sendEvent(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestInboundEvent(""));
 
-        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getPayloadAsString());
+        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
     public void testSingleInterceptorStack() throws Exception
     {
-        Service service = getTestService();
-        TestComponent component = new TestComponent();
-        service.setComponent(component);
+        Service service = createUninitializedService();
+        TestComponent component = (TestComponent) service.getComponent();
+
         List interceptors = new ArrayList();
         List stackInterceptors = new ArrayList();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
+        service.initialise();
         service.start();
 
-        MuleMessage result = service.sendEvent(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestInboundEvent(""));
 
-        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getPayloadAsString());
+        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
     public void testMultipleInterceptorStack() throws Exception
     {
-        Service service = getTestService();
-        TestComponent component = new TestComponent();
-        service.setComponent(component);
+        Service service = createUninitializedService();
+        TestComponent component = (TestComponent) service.getComponent();
+
         List interceptors = new ArrayList();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         List stackInterceptors = new ArrayList();
@@ -99,18 +100,19 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
+        service.initialise();
         service.start();
 
-        MuleMessage result = service.sendEvent(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestInboundEvent(""));
 
-        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getPayloadAsString());
+        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
     public void testMultipleInterceptorStack2() throws Exception
     {
-        Service service = getTestService();
-        TestComponent component = new TestComponent();
-        service.setComponent(component);
+        Service service = createUninitializedService();
+        TestComponent component = (TestComponent) service.getComponent();
+
         List interceptors = new ArrayList();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
@@ -121,15 +123,16 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
+        service.initialise();
         service.start();
 
-        MuleMessage result = service.sendEvent(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestInboundEvent(""));
 
         assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
                      + INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
                      + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE
                      + AFTER + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE + AFTER,
-            result.getPayloadAsString());
+            result.getMessageAsString());
     }
 
     class TestInterceptor extends EnvelopeInterceptor
@@ -143,34 +146,44 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public void after(Invocation invocation)
+        public MuleEvent after(MuleEvent event)
         {
             try
             {
-                invocation.setMessage(new DefaultMuleMessage(invocation.getMessage().getPayloadAsString()
-                                                             + name + AFTER, muleContext));
+                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + name + AFTER);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
                 fail(e.getMessage());
             }
+            return event;
         }
 
         @Override
-        public void before(Invocation invocation)
+        public MuleEvent before(MuleEvent event)
         {
             try
             {
-                invocation.setMessage(new DefaultMuleMessage(invocation.getMessage().getPayloadAsString()
-                                                             + name + BEFORE, muleContext));
+                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + name + BEFORE);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
                 fail(e.getMessage());
             }
+            return event;
         }
+    }
+
+    protected Service createUninitializedService() throws Exception
+    {
+        TestComponent component = new TestComponent();
+        Service service = new SedaService(muleContext);
+        service.setName("name");
+        service.setComponent(component);
+        service.setModel(muleContext.getRegistry().lookupSystemModel());
+        return service;
     }
 
     class TestComponent extends AbstractComponent

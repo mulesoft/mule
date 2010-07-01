@@ -11,7 +11,6 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -47,7 +46,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         // Just test it works without failure
         MuleEvent event = getTestEvent("UncaughtEvent");
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
-        strategy.catchMessage(event.getMessage(), null);
+        strategy.process(event);
     }
 
     public void testForwardingStrategy() throws Exception
@@ -59,14 +58,13 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         MuleEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
 
-        endpoint.expectAndReturn("isSynchronous", true);
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("process", C.isA(DefaultMuleEvent.class));
 
-        strategy.catchMessage(event.getMessage(), null);
+        strategy.process(event);
 
         endpoint.verify();
         dispatcher.verify();
@@ -87,7 +85,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         try
         {
-            strategy.catchMessage(event.getMessage(), session);
+            strategy.process(event);
             fail();
         }
         catch (ServiceRoutingException sre)
@@ -122,7 +120,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
-        endpoint.expectAndReturn("isSynchronous", true);
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
@@ -139,7 +136,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
             }
         });
 
-        strategy.catchMessage(event.getMessage(), null);
+        strategy.process(event);
 
         endpoint.verify();
         dispatcher.verify();
@@ -184,7 +181,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {
             @Override
-            public MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
+            public MuleEvent doCatchMessage(MuleEvent event)
             {
                 catchAllCount[0]++;
                 return null;
@@ -194,17 +191,17 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         MuleSession session = getTestSession(getTestService(), muleContext);
 
-        messageRouter.route(new DefaultMuleMessage("hello", muleContext), session);
+        messageRouter.process(getTestEvent("hello"));
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new StringBuffer(), muleContext), session);
+        messageRouter.process(getTestEvent(new StringBuffer()));
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new DefaultMuleMessage(new Exception(), muleContext), session);
+        messageRouter.process(getTestEvent(new Exception()));
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);

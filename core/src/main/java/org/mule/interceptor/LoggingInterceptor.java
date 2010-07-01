@@ -10,7 +10,7 @@
 
 package org.mule.interceptor;
 
-import org.mule.api.interceptor.Invocation;
+import org.mule.api.MuleEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,21 +26,23 @@ public class LoggingInterceptor extends EnvelopeInterceptor
      */
     private static Log logger = LogFactory.getLog(LoggingInterceptor.class);
 
-    public void before(Invocation event)
+    public MuleEvent before(MuleEvent event)
     {
         if (logger.isInfoEnabled())
         {
             logger.info("About to process event for " + event.getService().getName());
         }
+        return event;
 
     }
 
-    public void after(Invocation event)
+    public MuleEvent after(MuleEvent event)
     {
         if (logger.isInfoEnabled())
         {
             logger.info("Processed event for " + event.getService().getName());
         }
+        return event;
     }
 
 }

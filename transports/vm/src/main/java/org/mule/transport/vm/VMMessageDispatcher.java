@@ -40,7 +40,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(final MuleEvent event) throws Exception
     {
-        EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        EndpointURI endpointUri = endpoint.getEndpointURI();
         // Apply any outbound transformers on this event before we dispatch
         event.transformMessage();
 

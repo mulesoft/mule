@@ -50,6 +50,7 @@ public class StartablePatternAwareCompositeMessageSource
     protected AtomicBoolean started = new AtomicBoolean(false);
     private MessageProcessor internalListener = new InternalMessageProcessor();
     private List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
+    private AtomicBoolean starting = new AtomicBoolean(false);
     private Pattern pattern;
 
     public void addSource(MessageSource source) throws MuleException
@@ -88,6 +89,7 @@ public class StartablePatternAwareCompositeMessageSource
         
         synchronized (sources)
         {
+            starting.set(true);
             for (MessageSource source : sources)
             {
                 if (source instanceof PatternAware)
@@ -101,6 +103,7 @@ public class StartablePatternAwareCompositeMessageSource
             }
             
             started.set(true);
+            starting.set(false);
         }
     }
 
@@ -147,7 +150,7 @@ public class StartablePatternAwareCompositeMessageSource
         
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            if (started.get())
+            if (started.get() || starting.get())
             {
                 return listener.process(event);
             }

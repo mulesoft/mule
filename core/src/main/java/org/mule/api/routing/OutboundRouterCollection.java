@@ -10,25 +10,14 @@
 
 package org.mule.api.routing;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.processor.MessageProcessor;
 
 /**
  * <code>OutboundRouterCollection</code> is responsible for holding all outbound routers for a service service.
  */
 
-public interface OutboundRouterCollection extends RouterCollection
+public interface OutboundRouterCollection extends RouterCollection, MessageProcessor
 {
-    /**
-     * Prepares one or more events to be dispached by a Message Dispatcher.
-     * 
-     * @param message The source Message
-     * @param session The current session
-     * @return a list containing 0 or events to be dispatched
-     * @throws RoutingException If any of the events cannot be created.
-     */
-    MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException;
 
     /**
      * Determines if any endpoints have been set on this router.

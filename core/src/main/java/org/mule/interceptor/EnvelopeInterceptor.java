@@ -10,37 +10,36 @@
 
 package org.mule.interceptor;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.interceptor.Invocation;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 /**
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after
  * an event is received.
  */
-public abstract class EnvelopeInterceptor implements Interceptor
+public abstract class EnvelopeInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
 {
     /**
      * This method is invoked before the event is processed
      * 
      * @param invocation the message invocation being processed
      */
-    public abstract void before(Invocation invocation) throws MuleException;
+    public abstract MuleEvent before(MuleEvent event) throws MuleException;
 
     /**
      * This method is invoked after the event has been processed
      * 
      * @param invocation the message invocation being processed
      */
-    public abstract void after(Invocation invocation) throws MuleException;
+    public abstract MuleEvent after(MuleEvent event) throws MuleException;
 
-    public final MuleMessage intercept(Invocation invocation) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        before(invocation);
-        MuleMessage message = invocation.invoke();
-        invocation.setMessage(message);
-        after(invocation);
-        return invocation.getMessage();
+        MuleEvent resultEvent = before(event);
+        resultEvent = processNext(resultEvent);
+        resultEvent = after(resultEvent);
+        return resultEvent;
     }
 }

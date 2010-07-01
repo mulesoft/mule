@@ -625,6 +625,16 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
 
+    public static OutboundEndpoint getTestOutboundEndpoint(boolean sync) throws Exception
+    {
+        return MuleTestUtils.getTestOutboundEndpoint(sync, muleContext);
+    }
+
+    public static InboundEndpoint getTestInboundEndpoint(boolean sync) throws Exception
+    {
+        return MuleTestUtils.getTestInboundEndpoint(sync, muleContext);
+    }
+
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null);
@@ -668,6 +678,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public static MuleEvent getTestEvent(Object data) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, muleContext);
+    }
+
+    public static MuleEvent getTestInboundEvent(Object data, MuleSession session) throws Exception
+    {
+        return MuleTestUtils.getTestInboundEvent(data, session, muleContext);
     }
 
     public static MuleEvent getTestInboundEvent(Object data) throws Exception

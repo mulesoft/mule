@@ -48,7 +48,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         aggregator.initialise();
         aggregator.process(event);
 
-        aggregator.getResponse(message);
+        aggregator.getResponse(event);
 
         Map responseEvents = aggregator.getResponseEvents();
         assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());

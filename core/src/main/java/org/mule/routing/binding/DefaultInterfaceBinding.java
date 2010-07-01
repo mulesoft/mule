@@ -10,7 +10,10 @@
 
 package org.mule.routing.binding;
 
-import org.mule.api.MessagingException;
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
@@ -44,9 +47,18 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_BINDING));
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
+    public MuleMessage route(MuleMessage message, MuleSession session) throws MuleException
     {
-        return outboundRouter.route(message, session);
+        OptimizedRequestContext.unsafeRewriteEvent(message);
+        MuleEvent responseEvent = outboundRouter.process(RequestContext.getEvent());
+        if (responseEvent != null)
+        {
+            return responseEvent.getMessage();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public void setInterface(Class<?> interfaceClass)

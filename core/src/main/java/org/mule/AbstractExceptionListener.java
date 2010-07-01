@@ -40,7 +40,6 @@ import org.mule.message.ExceptionMessage;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 
@@ -323,7 +322,7 @@ public abstract class AbstractExceptionListener
                 if (service != null)
                 {
                     OutboundRouter router = createOutboundRouter();
-                    router.route(exceptionMessage, new DefaultMuleSession(ctx.getService(), muleContext));
+                    router.process(new DefaultMuleEvent(exceptionMessage, RequestContext.getEvent()));
                 }
                 else
                 {

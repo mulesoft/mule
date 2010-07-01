@@ -61,7 +61,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
 
     protected PoolableObjectFactory getPooledObjectFactory()
     {
-        return new LifecycleEnabledPoolabeObjectFactoryAdaptor();
+        return new LifecycleEnabledPoolabeObjectFactoryAdapter();
     }
 
     public void start() throws MuleException
@@ -91,7 +91,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
     /**
      * Wraps org.mule.object.ObjectFactory with commons-pool PoolableObjectFactory
      */
-    class LifecycleEnabledPoolabeObjectFactoryAdaptor implements PoolableObjectFactory
+    class LifecycleEnabledPoolabeObjectFactoryAdapter implements PoolableObjectFactory
     {
 
         public void activateObject(Object obj) throws Exception

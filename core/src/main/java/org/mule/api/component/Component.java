@@ -11,9 +11,8 @@
 package org.mule.api.component;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ComponentStatistics;
@@ -27,17 +26,8 @@ import org.mule.management.stats.ComponentStatistics;
  * implement component instance pooling or implement <em>bindings</em> which allow
  * for service composition.
  */
-public interface Component extends Lifecycle
+public interface Component extends Lifecycle, MessageProcessor
 {
-
-    /**
-     * Invokes the component
-     * 
-     * @param event the event used to invoke the component
-     * @return the return event from the component
-     * @throws MuleException if the call fails
-     */
-    MuleMessage invoke(MuleEvent event) throws MuleException;
 
     /**
      * Component statistics are used to gather component statistics such as

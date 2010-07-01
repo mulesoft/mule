@@ -26,7 +26,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -42,7 +41,6 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
@@ -168,6 +166,29 @@ public final class MuleTestUtils
         });
     }
     
+    public static OutboundEndpoint getTestOutboundEndpoint(final boolean sync, final MuleContext context) throws Exception
+    {
+        return (OutboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                builder.setSynchronous(sync);
+                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
+
+    public static InboundEndpoint getTestInboundEndpoint(final boolean sync, final MuleContext context) throws Exception
+    {
+        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                builder.setSynchronous(sync);
+                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            }
+        });
+    }
 
     private static ImmutableEndpoint getTestEndpoint(String name,
                                                      String uri,
@@ -326,6 +347,16 @@ public final class MuleTestUtils
         
         return new DefaultMuleEvent(message, endpoint, session, synchronous);
     }
+    
+    public static MuleEvent getTestInboundEvent(Object data, MuleSession session, MuleContext context) throws Exception
+    {
+        InboundEndpoint endpoint = getTestInboundEndpoint("test1", context);
+        MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
+        MuleMessage message = factory.create(data, endpoint.getEncoding());
+        
+        return new DefaultMuleEvent(message, endpoint, session, true);
+    }
+    
 
     public static MuleEventContext getTestEventContext(Object data, MuleContext context) throws Exception
     {
@@ -397,9 +428,6 @@ public final class MuleTestUtils
         if (initialize)
         {
             context.getRegistry().registerService(service);
-            //TODO Why is this necessary
-            OutboundRouter router = new OutboundPassThroughRouter();
-            service.getOutboundRouter().addRouter(router);
         }
 
         return service;
@@ -466,6 +494,5 @@ public final class MuleTestUtils
     {
         return new Mock(TransactionFactory.class, "umoTransactionFactory");
     }
-
 
 }

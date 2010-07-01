@@ -10,17 +10,16 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.source.CompositeMessageSource;
+import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.source.StartablePatternAwareCompositeMessageSource;
@@ -44,12 +43,12 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
     implements InboundRouterCollection
 {
     
-    protected CompositeMessageSource sourceAggregator = new StartablePatternAwareCompositeMessageSource();
+    protected CompositeMessageSource compositeMessageSource = new StartablePatternAwareCompositeMessageSource();
     
     @SuppressWarnings("unchecked")
-    private final List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();
+    protected final List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();
 
-    private MessageProcessor listener;
+    protected MessageProcessor listener;
 
     public DefaultInboundRouterCollection()
     {
@@ -127,16 +126,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
                         {
                             getStatistics().incrementCaughtMessage();
                         }
-                        MuleMessage result = getCatchAllStrategy().catchMessage(event.getMessage(),
-                            event.getSession());
-                        if (result != null)
-                        {
-                            return new DefaultMuleEvent(result, event);
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        return getCatchAllStrategy().process(event);
                     }
                     else
                     {
@@ -203,16 +193,6 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
 
     }
 
-    public void dispatch(MuleEvent event) throws MuleException
-    {
-        event.getSession().dispatchEvent(event);
-    }
-
-    public MuleMessage send(MuleEvent event) throws MuleException
-    {
-        return event.getSession().sendEvent(event);
-    }
-
     public void addRouter(InboundRouter router)
     {
         routers.add(router);
@@ -233,12 +213,12 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
     public void addEndpoint(InboundEndpoint endpoint) throws MuleException
     {
         endpoints.add(endpoint);
-        sourceAggregator.addSource(endpoint);
+        compositeMessageSource.addSource(endpoint);
     }
 
     public boolean removeEndpoint(InboundEndpoint endpoint) throws MuleException
     {
-        sourceAggregator.removeSource(endpoint);
+        compositeMessageSource.removeSource(endpoint);
         return endpoints.remove(endpoint);
     }
 
@@ -290,8 +270,8 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
         this.listener = listener;
     }
 
-    public CompositeMessageSource getSourceAggregator()
+    public MessageSource getMessageSource()
     {
-        return sourceAggregator;
+        return compositeMessageSource;
     }    
 }

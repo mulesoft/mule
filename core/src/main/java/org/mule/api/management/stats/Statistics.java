@@ -23,12 +23,4 @@ public interface Statistics extends Serializable
      */
     boolean isEnabled();
 
-    /**
-     * Enable statistics logs (this is a dynamic parameter)
-     */
-    void setEnabled(boolean b);
-
-    void clear();
-
-    void logSummary();
 }

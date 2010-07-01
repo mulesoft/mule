@@ -26,9 +26,6 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
  * schedule asynchronous processing of the next {@link MessageProcessor}. The next
@@ -39,8 +36,6 @@ import org.apache.commons.logging.LogFactory;
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements WorkListener
 {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     protected WorkManager workManager;
     protected ExceptionListener exceptionListener;
 
@@ -59,7 +54,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         else if (event.getEndpoint().isSynchronous()
                  || event.getEndpoint().getTransactionConfig().isTransacted())
         {
-            return next.process(event);
+            return processNext(event);
         }
         else
         {
@@ -153,7 +148,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             try
             {
-                next.process(event);
+                processNext(event);
             }
             catch (MuleException e)
             {

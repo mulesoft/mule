@@ -11,8 +11,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.api.routing.RoutingException;
 
 import org.apache.commons.logging.Log;
@@ -20,19 +19,18 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>LoggingCatchAllStrategy</code> is a simple strategy that only logs any
- * events not caught by the router associated with this strategy. This should <b>not</b>
- * be used in production unless it is acceptable for events to be lost.
+ * events not caught by the router associated with this strategy. This should
+ * <b>not</b> be used in production unless it is acceptable for events to be lost.
  */
 
 public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 {
     private static final Log logger = LogFactory.getLog(DefaultMuleEvent.class);
 
-
-    public MuleMessage doCatchMessage(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleEvent doCatchMessage(MuleEvent event) throws RoutingException
     {
-        logger.warn("Message: " + message + " was not dispatched on session: " + session
+        logger.warn("Message: " + event.getMessage() + " was not dispatched."
                     + ". No routing path was defined for it.");
-        return message;
+        return event;
     }
 }

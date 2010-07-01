@@ -10,10 +10,6 @@
 
 package org.mule.service;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,10 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.PatternAware;
 import org.mule.api.component.Component;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -38,25 +31,22 @@ import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
-import org.mule.api.service.ServiceException;
-import org.mule.api.source.CompositeMessageSource;
-import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.ReplyToHandler;
+import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.routing.AbstractRouterCollection;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
-import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.response.DefaultResponseRouterCollection;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractService implements Service
 {
-    
+
     /**
      * logger used by this class
      */
@@ -103,10 +93,12 @@ public abstract class AbstractService implements Service
     protected OutboundRouterCollection outboundRouter = new DefaultOutboundRouterCollection();
 
     protected ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
-    
-    protected CompositeMessageSource inboundSourceAggregator;
 
-    protected CompositeMessageSource responseSourceAggregator;
+    protected MessageSource inboundMessageSource;
+    protected MessageSource asyncReplyMessageSource;
+
+    protected MessageProcessor messageProcessorChain;
+    protected MessageProcessor serviceOnlyMessageProcessorChain;
 
     /**
      * Determines the initial state of this service when the model starts. Can be
@@ -120,14 +112,15 @@ public abstract class AbstractService implements Service
     private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
 
     // Default component to use if one is not configured.
-    // TODO MULE-3113 This should not really be needed as to implement bridging we should
+    // TODO MULE-3113 This should not really be needed as to implement bridging we
+    // should
     // should just increment a 'bridged' counter and sent the event straight to
     // outbound router collection. Currently it's the Component that routes events
     // onto the outbound router collection so this default implementation is needed.
     // It would be beneficial to differenciate between component invocations and
     // events that are bridged but currently everything is an invocation.
     protected Component component = new PassThroughComponent();
-    
+
     public AbstractService(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -139,71 +132,44 @@ public abstract class AbstractService implements Service
         {
             throw new MuleRuntimeException(CoreMessages.failedToCreate("Service Lifecycle Manager"), e);
         }
-        
+
     }
 
     /**
      * Initialise the service. The service will first create a component from the
      * ServiceDescriptor and then initialise a pool based on the attributes in the
      * ServiceDescriptor .
-     *
+     * 
      * @see org.mule.api.registry.ServiceDescriptor
-     * @throws org.mule.api.lifecycle.InitialisationException
-     *          if the service fails
-     *          to initialise
+     * @throws org.mule.api.lifecycle.InitialisationException if the service fails to
+     *             initialise
      */
     public final synchronized void initialise() throws InitialisationException
     {
-        if (inboundRouter == null)
-        {
-            // Create Default routes that route to the default inbound and
-            // outbound endpoints
-            inboundRouter = new DefaultInboundRouterCollection();
-            // TODO MULE-2102 This should be configured in the default template.
-            inboundRouter.addRouter(new InboundPassThroughRouter());
-        }
-        if (outboundRouter == null)
-        {
-            outboundRouter = new DefaultOutboundRouterCollection();
-            // TODO MULE-2102 This should be configured in the default template.
-            outboundRouter.addRouter(new OutboundPassThroughRouter());
-        }
-        if (responseRouter == null)
-        {
-            responseRouter = new DefaultResponseRouterCollection();
-        }
+        ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
 
         if (exceptionListener == null)
         {
-            //By default us the model Exception Listener
+            // By default us the model Exception Listener
+            // TODO MULE-2102 This should be configured in the default template.
             exceptionListener = getModel().getExceptionListener();
-//            // TODO MULE-2102 This should be configured in the default template.
-//            exceptionListener = new DefaultServiceExceptionStrategy(this);
-//            ((MuleContextAware) exceptionListener).setMuleContext(muleContext);
-//            ((Initialisable) exceptionListener).initialise();
         }
 
-        inboundSourceAggregator = ((DefaultInboundRouterCollection) inboundRouter).getSourceAggregator();
-        inboundSourceAggregator.setListener(inboundRouter);
-        if (inboundSourceAggregator instanceof PatternAware)
+        inboundMessageSource = (((DefaultInboundRouterCollection) inboundRouter).getMessageSource());
+        asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
+        if (inboundMessageSource instanceof PatternAware)
         {
-            ((PatternAware) inboundSourceAggregator).setPattern(this);
+            ((PatternAware) inboundMessageSource).setPattern(this);
         }
-        responseSourceAggregator = ((DefaultInboundRouterCollection) responseRouter).getSourceAggregator();
-        responseSourceAggregator.setListener(responseRouter);
-        if (responseSourceAggregator instanceof PatternAware)
+        if (asyncReplyMessageSource instanceof PatternAware)
         {
-            ((PatternAware) responseSourceAggregator).setPattern(this);
+            ((PatternAware) asyncReplyMessageSource).setPattern(this);
         }
-
-        inboundRouter.setListener(new InternalServiceMessageProcessor());
-        
         // Ensure Component has service instance and is initialised. If the component
         // was configured with spring and is therefore in the registry it will get
         // started automatically, if it was set on the service directly then it won't
         // be started automatically. So to be sure we start it here.
         component.setService(this);
-        component.initialise();
 
         try
         {
@@ -213,16 +179,32 @@ public abstract class AbstractService implements Service
         {
             throw new InitialisationException(e, this);
         }
-
-        // initialise statistics
-        stats = createStatistics();
-
-        stats.setEnabled(muleContext.getStatistics().isEnabled());
-        muleContext.getStatistics().add(stats);
-        stats.setOutboundRouterStat(outboundRouter.getStatistics());
-        stats.setInboundRouterStat(inboundRouter.getStatistics());
-        stats.setComponentStat(component.getStatistics());
     }
+
+    protected void buildServiceMessageProcessorChain()
+    {
+        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        builder.chain(getServiceStartedAssertingMessageProcessor());
+        addMessageProcessors(builder);
+
+        // Used by deprecated send() and dispatch() methods only
+        serviceOnlyMessageProcessorChain = builder.build();
+
+        builder.chainBefore(inboundRouter);
+        messageProcessorChain = builder.build();
+
+        if (messageProcessorChain instanceof PatternAware)
+        {
+            ((PatternAware) messageProcessorChain).setPattern(this);
+        }
+    }
+
+    protected MessageProcessor getServiceStartedAssertingMessageProcessor()
+    {
+        return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
+    }
+
+    protected abstract void addMessageProcessors(ChainMessageProcessorBuilder builder);
 
     protected ServiceStatistics createStatistics()
     {
@@ -231,34 +213,25 @@ public abstract class AbstractService implements Service
 
     public void forceStop() throws MuleException
     {
-        //Kepping this here since I don't understand why this method exists.  AFAICS this just says the service is stopped
-        //without actually stopping it
-//        if (!stopped.get())
-//        {
-//            logger.debug("Stopping Service");
-//            stopping.set(true);
-//            fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
-//            doForceStop();
-//            stopped.set(true);
-//            stopping.set(false);
-//            fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
-//        }
+        // Kepping this here since I don't understand why this method exists. AFAICS
+        // this just says the service is stopped
+        // without actually stopping it
+        // if (!stopped.get())
+        // {
+        // logger.debug("Stopping Service");
+        // stopping.set(true);
+        // fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
+        // doForceStop();
+        // stopped.set(true);
+        // stopping.set(false);
+        // fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
+        // }
         doForceStop();
         stop();
     }
 
     public void stop() throws MuleException
     {
-        if (inboundSourceAggregator instanceof Stoppable)
-        {
-            ((Stoppable) inboundSourceAggregator).stop();
-        }
-        if (responseSourceAggregator instanceof Stoppable)
-        {
-            ((Stoppable) responseSourceAggregator).stop();
-        }
-        // Stop component.  We do this here in case there are any queues that need to be consumed first.
-        component.stop();
         lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
     }
 
@@ -273,22 +246,6 @@ public abstract class AbstractService implements Service
             return;
         }
 
-        // Ensure Component is started. If component was configured with spring and
-        // is therefore in the registry it will get started automatically, if it was
-        // set on the service directly then it won't be started automatically. So to
-        // be sure we start it here.
-        component.start();
-
-        // Now component is started, start message sources
-        if (inboundSourceAggregator instanceof Startable)
-        {
-            ((Startable) inboundSourceAggregator).start();
-        }
-        if (responseSourceAggregator instanceof Startable)
-        {
-            ((Startable) responseSourceAggregator).start();
-        }
-
         if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
         {
             lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
@@ -300,10 +257,10 @@ public abstract class AbstractService implements Service
             lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
             logger.info("Service " + name + " has been started successfully");
         }
+
         beyondInitialState.set(true);
 
     }
-
 
     /**
      * Pauses event processing for a single Mule Service. Unlike stop(), a paused
@@ -326,7 +283,7 @@ public abstract class AbstractService implements Service
 
     /**
      * Determines if the service is in a paused state
-     *
+     * 
      * @return True if the service is in a paused state, false otherwise
      */
     public boolean isPaused()
@@ -338,7 +295,7 @@ public abstract class AbstractService implements Service
      * Custom components can execute code necessary to put the service in a paused
      * state here. If a developer overloads this method the doResume() method MUST
      * also be overloaded to avoid inconsistent state in the service
-     *
+     * 
      * @throws MuleException
      */
     protected void doPause() throws MuleException
@@ -350,7 +307,7 @@ public abstract class AbstractService implements Service
      * Custom components can execute code necessary to resume a service once it has
      * been paused If a developer overloads this method the doPause() method MUST
      * also be overloaded to avoid inconsistent state in the service
-     *
+     * 
      * @throws MuleException
      */
     protected void doResume() throws MuleException
@@ -368,8 +325,6 @@ public abstract class AbstractService implements Service
         {
             logger.error("Failed to stop service: " + name, e);
         }
-        component.dispose();
-        muleContext.getStatistics().remove(stats);
     }
 
     public ServiceStatistics getStatistics()
@@ -377,91 +332,23 @@ public abstract class AbstractService implements Service
         return stats;
     }
 
+    @Deprecated
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
-        if (!isStarted() && !isPaused())
-        {
-            throw new ServiceException( CoreMessages.componentIsStopped(name), event.getMessage(), this);
-        }
-
-        // Dispatching event to an inbound endpoint
-        // in the DefaultMuleSession#dispatchEvent
-        ImmutableEndpoint endpoint = event.getEndpoint();
-
-        if (endpoint instanceof OutboundEndpoint)
-        {
-            try
-            {
-                ((OutboundEndpoint) endpoint).process(event);
-            }
-            catch (Exception e)
-            {
-                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-            }
-
-            return;
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Service: " + name + " has received asynchronous event on: "
-                    + event.getEndpoint().getEndpointURI());
-        }
-
-        // Dispatching event to the service
-        if (stats.isEnabled())
-        {
-            stats.incReceivedEventASync();
-        }
-        doDispatch(event);
+        serviceOnlyMessageProcessorChain.process(event);
     }
 
+    @Deprecated
     public MuleMessage sendEvent(MuleEvent event) throws MuleException
     {
-        if (!isStarted() && !isPaused())
+        MuleEvent resultEvent = serviceOnlyMessageProcessorChain.process(event);
+        if (resultEvent != null)
         {
-            throw new ServiceException( CoreMessages.componentIsStopped(name), event.getMessage(), this);
+            return resultEvent.getMessage();
         }
-
-        try
+        else
         {
-            waitIfPaused(event);
-        }
-        catch (InterruptedException e)
-        {
-            throw new ServiceException(event.getMessage(), this, e);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Service: " + name + " has received synchronous event on: "
-                    + event.getEndpoint().getEndpointURI());
-        }
-        if (stats.isEnabled())
-        {
-            stats.incReceivedEventSync();
-        }
-        event = OptimizedRequestContext.unsafeSetEvent(event);
-        return doSend(event);
-    }
-
-    /**
-     * Called before an event is sent or dispatched to a service, it will block
-     * until resume() is called. Users can override this method if they want to
-     * handle pausing differently e.g. implement a store and forward policy
-     *
-     * @param event the current event being passed to the service
-     * @throws InterruptedException if the thread is interrupted
-     */
-    protected void waitIfPaused(MuleEvent event) throws InterruptedException
-    {
-        if (logger.isDebugEnabled() && lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME))
-        {
-            logger.debug("Service: " + name + " is paused. Blocking call until resume is called");
-        }
-        while(lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME))
-        {
-            Thread.sleep(500);
+            return null;
         }
     }
 
@@ -501,22 +388,86 @@ public abstract class AbstractService implements Service
 
     protected void doStop() throws MuleException
     {
-        // template method
+        if (inboundMessageSource instanceof Stoppable)
+        {
+            ((Stoppable) inboundMessageSource).stop();
+        }
+        if (asyncReplyMessageSource instanceof Stoppable)
+        {
+            ((Stoppable) asyncReplyMessageSource).stop();
+        }
+        
+        // Component is not in chain
+        component.stop();
+
+        if (messageProcessorChain instanceof Stoppable)
+        {
+            ((Stoppable) messageProcessorChain).stop();
+        }
     }
 
     protected void doStart() throws MuleException
     {
-        // template method
+        // Component is not in chain
+        component.start();
+
+        if (messageProcessorChain instanceof Startable)
+        {
+            ((Startable) messageProcessorChain).start();
+        }
+
+        if (inboundMessageSource instanceof Startable)
+        {
+            ((Startable) inboundMessageSource).start();
+        }
+        if (asyncReplyMessageSource instanceof Startable)
+        {
+            ((Startable) asyncReplyMessageSource).start();
+        }
     }
 
     protected void doDispose()
     {
-        // template method
+        // Component is not in chain
+        component.dispose();
+
+        if (messageProcessorChain instanceof Disposable)
+        {
+            ((Disposable) messageProcessorChain).dispose();
+        }
+        responseRouter.dispose();
+        inboundRouter.dispose();
+        muleContext.getStatistics().remove(stats);
     }
 
     protected void doInitialise() throws InitialisationException
     {
-        // template method
+        // initialise statistics
+        stats = createStatistics();
+        stats.setEnabled(muleContext.getStatistics().isEnabled());
+        muleContext.getStatistics().add(stats);
+        if (outboundRouter != null)
+        {
+            stats.setOutboundRouterStat(outboundRouter.getStatistics());
+        }
+        stats.setInboundRouterStat(inboundRouter.getStatistics());
+        stats.setComponentStat(component.getStatistics());
+
+        buildServiceMessageProcessorChain();
+        inboundMessageSource.setListener(messageProcessorChain);
+        asyncReplyMessageSource.setListener(getResponseRouter());
+
+        // Component is not in chain
+        component.initialise();
+        
+        if (messageProcessorChain instanceof Initialisable)
+        {
+            ((Initialisable) messageProcessorChain).initialise();
+        }
+        ((AbstractRouterCollection) responseRouter).setMuleContext(muleContext);
+        responseRouter.initialise();
+        ((AbstractRouterCollection) inboundRouter).setMuleContext(muleContext);
+        inboundRouter.initialise();
     }
 
     public boolean isStarted()
@@ -524,10 +475,6 @@ public abstract class AbstractService implements Service
         return lifecycleManager.getState().isStarted();
     }
 
-    protected abstract MuleMessage doSend(MuleEvent event) throws MuleException;
-
-    protected abstract void doDispatch(MuleEvent event) throws MuleException;
-    
     // /////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     // /////////////////////////////////////////////////////////////////////////////////////////
@@ -608,113 +555,6 @@ public abstract class AbstractService implements Service
         this.component.setService(this);
     }
 
-    protected void processReplyTo(MuleEvent event, MuleMessage result, ReplyToHandler replyToHandler, Object replyTo)
-        throws MuleException
-    {
-        if (result != null && replyToHandler != null)
-        {
-            String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-            if ((requestor != null && !requestor.equals(getName())) || requestor == null)
-            {
-                replyToHandler.processReplyTo(event, result, replyTo);
-            }
-        }
-    }
-
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
-    {
-        Object replyTo = message.getReplyTo();
-        ReplyToHandler replyToHandler = null;
-        if (replyTo != null)
-        {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
-            // Use the response transformer for the event if one is set
-            if (endpoint.getResponseTransformers() != null)
-            {
-                replyToHandler.setTransformers(endpoint.getResponseTransformers());
-            }
-        }
-        return replyToHandler;
-    }
-
-    // This method is used when the service invoked asynchronously. It should really
-    // be used independently of if the service is invoked asynchronously when we are
-    // using an out-in or out-optional-in outbound message exchange pattern
-    protected void dispatchToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
-    {
-        if (event.isStopFurtherProcessing())
-        {
-            logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
-        }
-        if (result != null && !event.isStopFurtherProcessing())
-        {
-            if (getOutboundRouter().hasEndpoints())
-            {
-                // Here we can use the same message instance because there is no inbound response.
-                if (stats.isEnabled())
-                {
-                    stats.incSentEventASync();
-                }
-                getOutboundRouter().route(result, event.getSession());
-            }
-        }
-    }
-
-    // This method is used when the service invoked synchronously. It should really
-    // be used independantly of if the service is invoked synchronously when we are
-    // using an out-only outbound message exchange pattern
-    protected MuleMessage sendToOutboundRouter(MuleEvent event, MuleMessage result) throws MessagingException
-    {
-        if (event.isStopFurtherProcessing())
-        {
-            logger.debug("MuleEvent stop further processing has been set, no outbound routing will be performed.");
-        }
-        if (result != null && !event.isStopFurtherProcessing() && !(result.getPayload() instanceof NullPayload))
-        {
-            if (getOutboundRouter().hasEndpoints())
-            {
-                // Here we need to use a copy of the message instance because there
-                // is an inbound response so that transformers executed as part of
-                // the outbound phase do not affect the inbound response. MULE-3307
-                if (stats.isEnabled())
-                {
-                    stats.incSentEventSync();
-                }
-                MuleMessage outboundReturnMessage = getOutboundRouter().route(new DefaultMuleMessage(result.getPayload(), result, muleContext), event.getSession());
-                if (outboundReturnMessage != null)
-                {
-                    result = outboundReturnMessage;
-                }
-                else if (getComponent() instanceof PassThroughComponent)
-                {
-                    // If there was no component, then we really want to return the response from
-                    // the outbound router as the actual payload - even if it's null.
-                    return new DefaultMuleMessage(NullPayload.getInstance(), result, muleContext);
-                }
-            }
-            else
-            {
-                logger.debug("Outbound router on service '" + getName() + "' doesn't have any endpoints configured.");
-            }
-        }
-        return result;
-    }
-
-    protected MuleMessage processAsyncReplyRouter(MuleMessage result) throws MuleException
-    {
-        if (result != null && getResponseRouter() != null)
-        {
-            logger.debug("Waiting for response router message");
-            result = getResponseRouter().getResponse(result);
-        }
-        return result;
-    }
-    
-    protected MuleMessage invokeComponent(MuleEvent event) throws MuleException
-    {
-        return component.invoke(event);
-    }
-
     public MuleContext getMuleContext()
     {
         return muleContext;
@@ -724,29 +564,5 @@ public abstract class AbstractService implements Service
     {
         return lifecycleManager;
     }
-    
-    class InternalServiceMessageProcessor implements MessageProcessor
-    {
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            if (event.isSynchronous())
-            {
-                MuleMessage result = sendEvent(event);
-                if (result != null)
-                {
-                    return new DefaultMuleEvent(result, event);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                dispatchEvent(event);
-                return null;
-            }
-        }
-    }
-    
+
 }

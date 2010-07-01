@@ -10,8 +10,7 @@
 
 package org.mule.routing;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.api.routing.RoutingException;
 import org.mule.management.stats.RouterStatistics;
@@ -60,14 +59,12 @@ public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
      * This method will be invoked when an event is received or being sent where the criteria of the router(s) do not
      * match the current event.
      *
-     * @param message the current message being processed
-     * @param session the current session
      * @return A result message from this processing. Depending on the messaging style being used this might become the
      *         response message to a client or remote service call.
      * @throws org.mule.api.routing.RoutingException
      *          if there is a failure while processing this message.
      */
-    public final MuleMessage catchMessage(MuleMessage message, MuleSession session) throws RoutingException
+    public final MuleEvent process(MuleEvent event) throws RoutingException
     {
         if(getStatistics()!=null)
         {
@@ -77,9 +74,9 @@ public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
         {
             logger.warn("Routing statistics not set on catch all strategy, this invocation will not be recorded.");
         }
-        return doCatchMessage(message, session);
+        return doCatchMessage(event);
     }
 
-    public abstract MuleMessage doCatchMessage(MuleMessage message, MuleSession session) throws RoutingException;
+    public abstract MuleEvent doCatchMessage(MuleEvent event) throws RoutingException;
 
 }

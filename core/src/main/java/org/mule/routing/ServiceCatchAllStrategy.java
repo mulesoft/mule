@@ -10,11 +10,10 @@
 
 package org.mule.routing;
 
-import org.mule.RequestContext;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.ServiceRoutingException;
 
@@ -24,29 +23,36 @@ import org.mule.api.routing.ServiceRoutingException;
  */
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    public synchronized MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
+    public synchronized MuleEvent doCatchMessage(MuleEvent event)
         throws RoutingException
     {
-        MuleEvent event = RequestContext.getEvent();
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
             if (event.isSynchronous())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                return session.getService().sendEvent(event);
+                MuleMessage responseMessage = event.getService().sendEvent(event);
+                if (responseMessage != null)
+                {
+                    return new DefaultMuleEvent(responseMessage, event);
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                session.getService().dispatchEvent(event);
+                event.getService().dispatchEvent(event);
                 return null;
             }
         }
         catch (MuleException e)
         {
             throw new ServiceRoutingException(event.getMessage(), event.getEndpoint(),
-                session.getService(), e);
+                event.getService(), e);
         }
     }
 }

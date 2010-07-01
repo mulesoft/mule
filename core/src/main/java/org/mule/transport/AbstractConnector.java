@@ -2432,22 +2432,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         requesters.setMaxWait(maxWait);
     }
 
-    public MessageProcessor createAssertConnectorStartedMessageProcessor()
-    {
-        return new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                if (!isStarted())
-                {
-                    throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
-                        lifecycleManager.getCurrentPhase()), this);
-                }
-                return event;
-            }
-        };
-    }
-
     public MessageProcessor createAsyncInterceptingMessageProcessor() throws MuleException
     {
         return new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this);

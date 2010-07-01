@@ -10,12 +10,16 @@
 package org.mule.lifecycle.phases;
 
 import org.mule.api.agent.Agent;
+import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
+import org.mule.api.routing.Router;
+import org.mule.api.routing.RouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
@@ -62,5 +66,6 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         //Can call dispose from all lifecycle Phases
         registerSupportedPhase(LifecyclePhase.ALL_PHASES);
         setOrderedLifecycleObjects(stopOrderedObjects);
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, RouterCollection.class, Router.class});
     }
 }

@@ -11,11 +11,14 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
+import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
+import org.mule.api.routing.Router;
+import org.mule.api.routing.RouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
@@ -50,7 +53,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
 {
     public MuleContextStopPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class});
+        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, Component.class, RouterCollection.class, Router.class});
     }
 
     public MuleContextStopPhase(Class<?>[] ignorredObjects)

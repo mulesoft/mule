@@ -10,8 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.api.routing.RoutingException;
@@ -33,7 +32,7 @@ public class TestCatchAllStrategy implements RouterCatchAllStrategy
         return endpoint;
     }
 
-    public MuleMessage catchMessage(MuleMessage message, MuleSession session)
+    public MuleEvent process(MuleEvent event)
         throws RoutingException
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Caught an event in the router!", '*', 40));

@@ -83,7 +83,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
             event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, callback, PropertyScope.INVOCATION);
             try
             {
-                return event.getService().getComponent().invoke(event);
+                return event.getService().getComponent().process(event).getMessage();
             }
             catch (MuleException e)
             {

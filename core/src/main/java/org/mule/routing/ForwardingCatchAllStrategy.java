@@ -12,8 +12,6 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.ServiceRoutingException;
@@ -42,41 +40,34 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         return endpoint;
     }
 
-    public MuleMessage doCatchMessage(MuleMessage message, MuleSession session)
-        throws RoutingException
+    public MuleEvent doCatchMessage(MuleEvent event) throws RoutingException
     {
         if (getEndpoint() == null)
         {
-            throw new ServiceRoutingException(CoreMessages.noCatchAllEndpointSet(), message,
-                getEndpoint(), session.getService());
+            throw new ServiceRoutingException(CoreMessages.noCatchAllEndpointSet(), event.getMessage(),
+                getEndpoint(), event.getService());
         }
         try
         {
             OutboundEndpoint endpoint = getEndpoint();
             if (sendTransformed && endpoint.getTransformers() != null)
             {
-                message.applyTransformers(endpoint.getTransformers());
+                event.getMessage().applyTransformers(endpoint.getTransformers());
             }
 
-            MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, getEndpoint().isSynchronous());
-
-            MuleEvent result = endpoint.process(newEvent);
+            // Recreate event with outbound endpoint incase anything uses event
+            // endpoint down the line
+            event = new DefaultMuleEvent(event.getMessage(), endpoint, event.getService(), event);
+            MuleEvent result = endpoint.process(event);
             if (statistics != null)
             {
                 statistics.incrementRoutedMessage(getEndpoint());
             }
-            if (result != null)
-            {
-                return result.getMessage();
-            }
-            else
-            {
-                return null;
-            }
+            return result;
         }
         catch (Exception e)
         {
-            throw new RoutingException(message, getEndpoint(), e);
+            throw new RoutingException(event.getMessage(), getEndpoint(), e);
 
         }
     }

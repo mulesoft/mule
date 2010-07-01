@@ -12,6 +12,8 @@ package org.mule.processor.builder;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.Pattern;
+import org.mule.api.PatternAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -55,7 +57,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
     {
         if (chain.isEmpty())
         {
-            return new NullMessageProcesser();
+            return new NullMessageProcessor();
         }
 
         InterceptingMessageProcessor first = createInterceptingMessageProcessor(chain.get(0));
@@ -84,7 +86,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         }
         else
         {
-            return new InterceptingMessageProcesserAdaptor(processor);
+            return new InterceptingMessageProcessorAdapter(processor);
         }
     }
 
@@ -106,6 +108,12 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         return this;
     }
 
+    public ChainMessageProcessorBuilder chainBefore(MessageProcessor processor)
+    {
+        chain.add(0, processor);
+        return this;
+    }
+    
     // TODO BL-23 Temporary until inbound chain customization is implemented
     @Deprecated
     public void replaceMessageProcessor(Class processorClass, MessageProcessor replacement)
@@ -119,26 +127,18 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         }
     }
 
-    static class InterceptingMessageProcesserAdaptor extends AbstractInterceptingMessageProcessor
+    static class InterceptingMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     {
         private MessageProcessor delegate;
 
-        public InterceptingMessageProcesserAdaptor(MessageProcessor mp)
+        public InterceptingMessageProcessorAdapter(MessageProcessor mp)
         {
             this.delegate = mp;
         }
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            MuleEvent delegateResult = delegate.process(event);
-            if (next != null)
-            {
-                return processNext(delegateResult);
-            }
-            else
-            {
-                return delegateResult;
-            }
+            return processNext(delegate.process(event));
         }
 
         public void setNext(MessageProcessor next)
@@ -149,7 +149,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         @Override
         public String toString()
         {
-            return "InterceptingMessageProcesserAdaptor[" + delegate.getClass().getName() + "]";
+            return "InterceptingMessageProcessorAdapter[" + delegate.getClass().getName() + "]";
         }
     }
 
@@ -159,7 +159,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
      * MessageProcessor in the parent chain is not injected into the first in the
      * nested chain.
      */
-    static class ChainedCompositeMessageProcessor implements MessageProcessor, Lifecycle
+    static class ChainedCompositeMessageProcessor implements MessageProcessor, Lifecycle, PatternAware
     {
         private Log log;
         private String name;
@@ -225,9 +225,20 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
                 }
             }
         }
+
+        public void setPattern(Pattern pattern)
+        {
+            for (MessageProcessor processor : allProcessors)
+            {
+                if (processor instanceof PatternAware)
+                {
+                    ((PatternAware) processor).setPattern(pattern);
+                }
+            }
+        }
     }
 
-    public static class NullMessageProcesser implements MessageProcessor
+    public static class NullMessageProcessor implements MessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException
         {

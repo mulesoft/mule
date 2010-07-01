@@ -13,7 +13,6 @@ package org.mule.routing.response;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -66,9 +65,9 @@ public class DefaultResponseRouterCollection extends DefaultInboundRouterCollect
         return null;
     }
 
-    public MuleMessage getResponse(MuleMessage message) throws RoutingException
+    public MuleEvent getResponse(MuleEvent message) throws RoutingException
     {
-        MuleMessage result = null;
+        MuleEvent result = null;
         if (routers.size() == 0)
         {
             if (logger.isDebugEnabled())
@@ -99,7 +98,7 @@ public class DefaultResponseRouterCollection extends DefaultInboundRouterCollect
             // receiver thread (or the senders dispatcher thread in case of vm
             // with queueEvents="false") and the current thread may need to mutate
             // the even. See MULE-4370
-            return OptimizedRequestContext.unsafeRewriteEvent(result);
+            return OptimizedRequestContext.criticalSetEvent(result);
         }
 
         return result;

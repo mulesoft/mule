@@ -11,8 +11,8 @@
 package org.mule.test.components;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
-import org.mule.api.service.ServiceException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
@@ -106,7 +106,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
             c.dispatchEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (ServiceException e)
+        catch (LifecycleException e)
         {
             // expected
         }
@@ -116,7 +116,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
             c.sendEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (ServiceException e)
+        catch (LifecycleException e)
         {
             // expected
         }

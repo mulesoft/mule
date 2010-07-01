@@ -685,7 +685,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 166, string);
     }
 
-    public static Message componentIsStopped(String name)
+    public static Message isStopped(String name)
     {
         return factory.createMessage(BUNDLE_PATH, 167, name);
     }
@@ -1158,9 +1158,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 273, what);
     }
 
-    public static Message stopPausedSedaServiceNonPeristentQueueMessageLoss(int num, Service service)
+    public static Message stopPausedSedaStageNonPeristentQueueMessageLoss(int num, String name)
     {
-        return factory.createMessage(BUNDLE_PATH, 274, num, service.getName());
+        return factory.createMessage(BUNDLE_PATH, 274, num, name);
     }
 
     public static Message splitMessageNoEndpointMatch(List endpoints, Object messagePart)
@@ -1263,5 +1263,10 @@ public class CoreMessages extends MessageFactory
     public static Message messageRejectedByFilter()
     {
         return factory.createMessage(BUNDLE_PATH, 314);
+    }
+    
+    public static Message interruptedWaitingForPaused(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 315, name);
     }
 }

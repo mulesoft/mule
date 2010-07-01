@@ -14,7 +14,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
@@ -51,7 +50,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        testEvent = getTestInboundEvent("TEST_MESSAGE");
+        testEvent = getTestEvent("TEST_MESSAGE", getTestInboundEndpoint(true));
         testService = createService();
         outboundRouter = new TestOutboundRouterCollection();
         testService.setOutboundRouter(outboundRouter);
@@ -413,10 +412,10 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
+        public MuleEvent process(MuleEvent event) throws MessagingException
         {
-            originalMessage = message;
-            return super.route(message, session);
+            originalMessage = event.getMessage();
+            return super.process(event);
         }
     }
 }

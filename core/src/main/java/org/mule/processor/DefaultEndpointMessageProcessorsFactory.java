@@ -34,6 +34,7 @@ import org.mule.endpoint.outbound.OutboundSecurityFilterMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
 import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
+import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
@@ -74,7 +75,7 @@ public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageP
         { 
             // Log but don't proceed if connector is not started
             new OutboundLoggingMessageProcessor(), 
-            connector.createAssertConnectorStartedMessageProcessor(),
+            new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleManager().getState()),
     
             // Everything is processed within TransactionTemplate
             new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(), connector.getExceptionListener()),
@@ -92,7 +93,7 @@ public class DefaultEndpointMessageProcessorsFactory implements EndpointMessageP
             // TODO MULE-4872
             (endpoint instanceof OutboundEndpointDecorator ? 
                  new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint) : 
-                 new ChainMessageProcessorBuilder.NullMessageProcesser()),
+                 new ChainMessageProcessorBuilder.NullMessageProcessor()),
     
             new OutboundSecurityFilterMessageProcessor(endpoint),
             new OutboundTryCatchMessageProcessor(endpoint),

@@ -187,7 +187,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             throw new EndpointNotFoundException(
                     CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
-        router.route(message, this);
+        router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
     }
 
     public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
@@ -230,8 +230,15 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             throw new EndpointNotFoundException(
                     CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
-        MuleMessage result = router.route(message, this);
-        return result;
+        MuleEvent result = router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+        if (result != null)
+        {
+            return result.getMessage();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException

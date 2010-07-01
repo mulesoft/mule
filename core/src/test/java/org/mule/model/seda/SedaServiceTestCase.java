@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.lifecycle.Callable;
@@ -30,10 +29,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkException;
-
 import junit.framework.AssertionFailedError;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -42,17 +37,17 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 {
     private SedaService service;
 
-     @Override
+    @Override
     protected void doSetUp() throws Exception
-     {
-         service = new SedaService(muleContext);
-         service.setName("test");
-         PrototypeObjectFactory factory = new PrototypeObjectFactory(Object.class);
-         service.setComponent(new DefaultJavaComponent(factory));
-         service.setModel(new SedaModel());
-         service.getModel().setMuleContext(muleContext);
-         service.getModel().initialise();
-     }
+    {
+        service = new SedaService(muleContext);
+        service.setName("test");
+        PrototypeObjectFactory factory = new PrototypeObjectFactory(Object.class);
+        service.setComponent(new DefaultJavaComponent(factory));
+        service.setModel(new SedaModel());
+        service.getModel().setMuleContext(muleContext);
+        service.getModel().initialise();
+    }
 
     @Override
     protected Service getService()
@@ -75,12 +70,12 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 
         QueueManager mockTransactionalQueueManager = mock(QueueManager.class);
         when(mockTransactionalQueueManager.getQueueSession()).thenReturn(queueManager.getQueueSession());
-        
+
         // Replace queueManager instance with mock via registry as it cannot be set
         // once muleContext is initialized.
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, 
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
             mockTransactionalQueueManager);
-        
+
         service.setQueueProfile(new QueueProfile(capacity, persistent));
 
         try
@@ -98,8 +93,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
                 throw e;
             }
         }
-
-        assertEquals(queueName, service.queue.getName());
     }
 
     public void testSedaModelEventTimeoutDefault() throws Exception
@@ -108,20 +101,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 
         assertNotNull(service.getQueueTimeout());
         assertTrue(service.getQueueTimeout().intValue() != 0);
-    }
-
-    public void testSpiWorkThrowableHandling() throws Exception
-    {
-        try
-        {
-            service.handleWorkException(getTestWorkEvent(), "workRejected");
-        }
-        catch (MuleRuntimeException mrex)
-        {
-            assertNotNull(mrex);
-            assertTrue(mrex.getCause().getClass() == Throwable.class);
-            assertEquals("testThrowable", mrex.getCause().getMessage());
-        }
     }
 
     /**
@@ -134,7 +113,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.initialise();
         service.start();
         service.pause();
-        service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext, false));
 
         // This test will timeout and fail if dispatch() blocks
 
@@ -202,7 +181,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         muleContext.getRegistry().registerService(service);
         service.start();
 
-        service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext, false));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 
@@ -242,25 +221,4 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 
     }
 
-    private WorkEvent getTestWorkEvent()
-    {
-        return new WorkEvent(this, // source
-            WorkEvent.WORK_REJECTED, getTestWork(), new WorkException(new Throwable("testThrowable")));
-    }
-
-    private Work getTestWork()
-    {
-        return new Work()
-        {
-            public void release()
-            {
-                // noop
-            }
-
-            public void run()
-            {
-                // noop
-            }
-        };
-    }
 }

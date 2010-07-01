@@ -10,9 +10,13 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.api.MuleContext;
+import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.routing.Router;
+import org.mule.api.routing.RouterCollection;
+import org.mule.api.source.MessageSource;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
@@ -258,17 +262,18 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
         builder.setScope(isSingleton() ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 
-        List interfaces = ClassUtils.getAllInterfaces(beanClass);
-        
-        //Marker for MULE-4813
-        if(interfaces!=null)
+        // Marker for MULE-4813
+        // We don't want lifcycle for the following from spring
+        if (!Component.class.isAssignableFrom(beanClass) && !MessageSource.class.isAssignableFrom(beanClass)
+            && !RouterCollection.class.isAssignableFrom(beanClass)
+            && !Router.class.isAssignableFrom(beanClass))
         {
-            if(interfaces.contains(Initialisable.class))
+            if (Initialisable.class.isAssignableFrom(beanClass))
             {
                 builder.setInitMethodName(Initialisable.PHASE_NAME);
             }
 
-            if(interfaces.contains(Disposable.class))
+            if (Disposable.class.isAssignableFrom(beanClass))
             {
                 builder.setDestroyMethodName(Disposable.PHASE_NAME);
             }

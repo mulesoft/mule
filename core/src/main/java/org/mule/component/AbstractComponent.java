@@ -10,6 +10,7 @@
 
 package org.mule.component;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidResult;
@@ -23,9 +24,11 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.interceptor.Invocation;
 import org.mule.api.lifecycle.DisposeException;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transformer.Transformer;
@@ -35,6 +38,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -48,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component, Interceptor, MuleContextAware
+public abstract class AbstractComponent implements Component, MuleContextAware
 {
 
     /**
@@ -60,7 +64,8 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
     protected ComponentStatistics statistics = null;
     //protected LifecycleState lifecycleState;
     protected ServerNotificationHandler notificationHandler;
-    protected List interceptors = new ArrayList();
+    protected List<Interceptor> interceptors = new ArrayList<Interceptor>();
+    protected MessageProcessor interceptorChain;
     protected MuleContext muleContext;
 
 
@@ -84,12 +89,7 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
         statistics = new ComponentStatistics();
     }
 
-    public MuleMessage intercept(Invocation invocation) throws MuleException
-    {
-        return invokeInternal(invocation.getEvent());
-    }
-
-    private MuleMessage invokeInternal(MuleEvent event)
+    private MuleEvent invokeInternal(MuleEvent event)
         throws DisposeException, DefaultMuleException, MuleException, ServiceException
     {
         // Ensure we have event in ThreadLocal
@@ -108,7 +108,7 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
         }
         if (service.getLifecycleManager().getState().isStopping() || !service.getLifecycleManager().getState().isStarted())
         {
-            throw new DefaultMuleException(CoreMessages.componentIsStopped(service.getName()));
+            throw new LifecycleException(CoreMessages.isStopped(service.getName()), this);
         }
 
         // Invoke component implementation and gather statistics
@@ -130,11 +130,11 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
                 statistics.addExecutionTime(System.currentTimeMillis() - startTime);
             }
 
-            MuleMessage resultMessage = createResultMessage(event, result);
+            MuleEvent resultEvent = createResultEvent(event, result);
 
-            fireComponentNotification(resultMessage, ComponentMessageNotification.COMPONENT_POST_INVOKE);
+            fireComponentNotification(resultEvent.getMessage(), ComponentMessageNotification.COMPONENT_POST_INVOKE);
 
-            return resultMessage;
+            return resultEvent;
         }
         catch (MuleException me)
         {
@@ -147,39 +147,39 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
         }
     }
 
-    public MuleMessage invoke(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (interceptors.isEmpty())
+        if (interceptorChain == null)
         {
             return invokeInternal(event);
         }
         else
         {
-            return new ComponentInterceptorInvoker(this, interceptors, event).invoke();
+            return interceptorChain.process(event);
         }
     }
 
-    protected MuleMessage createResultMessage(MuleEvent event, Object result) throws TransformerException
+    protected MuleEvent createResultEvent(MuleEvent event, Object result) throws TransformerException
     {
         if (result instanceof MuleMessage)
         {
-            return (MuleMessage) result;
+            return new DefaultMuleEvent((MuleMessage) result, event);
         }
         else if (result instanceof VoidResult)
         {
             event.transformMessage();
-            return event.getMessage();
+            return event;
         }
         else if (result != null)
         {
             event.getMessage().applyTransformers(
                     Collections.<Transformer>singletonList(new TransformerTemplate(
                         new TransformerTemplate.OverwitePayloadCallback(result))));
-            return event.getMessage();
+            return event;
         }
         else
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), event);
         }
     }
 
@@ -247,6 +247,24 @@ public abstract class AbstractComponent implements Component, Interceptor, MuleC
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
                 this);
+        }
+        
+        ChainMessageProcessorBuilder chainBuilder = new ChainMessageProcessorBuilder();
+        for (Interceptor interceptor : interceptors)
+        {
+            chainBuilder.chain(interceptor);
+        }
+        chainBuilder.chain(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return invokeInternal(event);
+            }
+        });
+        interceptorChain = chainBuilder.build();
+        if (interceptorChain instanceof Initialisable)
+        {
+            ((Initialisable) interceptorChain).initialise();
         }
         doInitialise();
     }

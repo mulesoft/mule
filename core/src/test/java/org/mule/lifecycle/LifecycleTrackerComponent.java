@@ -12,7 +12,6 @@ package org.mule.lifecycle;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -55,9 +54,9 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker implemen
         return Mockito.mock(ComponentStatistics.class);
     }
 
-    public MuleMessage invoke(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return event.getMessage();
+        return event;
     }
 
     @Override

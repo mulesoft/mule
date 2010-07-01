@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.routing.OutboundRouter;
@@ -40,10 +41,12 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         super(RouterStatistics.TYPE_OUTBOUND);
     }
 
-    public MuleMessage route(final MuleMessage message, final MuleSession session)
+    public MuleEvent process(final MuleEvent event)
             throws MessagingException
     {
-        MuleMessage result;
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
+        MuleEvent result;
         boolean matchfound = false;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
@@ -83,12 +86,12 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 {
                     public Object doInTransaction() throws Exception
                     {
-                        return router.route(outboundRouterMessage, session);
+                        return router.process(event);
                     }
                 };
                 try
                 {
-                    result = (MuleMessage) tt.execute(cb);
+                    result = (MuleEvent) tt.execute(cb);
                 }
                 catch (Exception e)
                 {
@@ -110,7 +113,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                         + session.getService().getName()
                         + " invoking catch all strategy");
             }
-            return catchAll(message, session);
+            return catchAll(event);
         }
         else if (!matchfound)
         {
@@ -118,10 +121,10 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                     + session.getService().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message " + message);
         }
-        return message;
+        return event;
     }
 
-    protected MuleMessage catchAll(MuleMessage message, MuleSession session)
+    protected MuleEvent catchAll(MuleEvent event)
             throws RoutingException
     {
         if (getStatistics().isEnabled())
@@ -129,7 +132,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             getStatistics().incrementCaughtMessage();
         }
 
-        return getCatchAllStrategy().catchMessage(message, session);
+        return getCatchAllStrategy().process(event);
     }
 
     public boolean hasEndpoints()

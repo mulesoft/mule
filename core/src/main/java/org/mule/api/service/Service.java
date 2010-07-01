@@ -38,6 +38,7 @@ public interface Service extends Serializable, Pattern
      * 
      * @param event the event to consume
      * @throws MuleException if the event fails to be processed
+     * @deprecated
      */
     void dispatchEvent(MuleEvent event) throws MuleException;
 
@@ -48,6 +49,7 @@ public interface Service extends Serializable, Pattern
      * @param event the event to consume
      * @return a MuleMessage containing the resulting message and properties
      * @throws MuleException if the event fails to be processed
+     * @deprecated
      */
     MuleMessage sendEvent(MuleEvent event) throws MuleException;
 

@@ -94,7 +94,7 @@ public class CommonsPoolObjectPool implements ObjectPool
      */
     protected PoolableObjectFactory getPooledObjectFactory()
     {
-        return new PoolabeObjectFactoryAdaptor();
+        return new PoolabeObjectFactoryAdapter();
     }
 
     protected void applyInitialisationPolicy() throws Exception
@@ -233,7 +233,7 @@ public class CommonsPoolObjectPool implements ObjectPool
     /**
      * Wraps org.mule.object.ObjectFactory with commons-pool PoolableObjectFactory
      */
-    class PoolabeObjectFactoryAdaptor implements PoolableObjectFactory
+    class PoolabeObjectFactoryAdapter implements PoolableObjectFactory
     {
         public void activateObject(Object obj) throws Exception
         {

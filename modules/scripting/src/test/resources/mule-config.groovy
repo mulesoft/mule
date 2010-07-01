@@ -5,6 +5,7 @@ import org.mule.api.config.ThreadingProfile
 import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
+import org.mule.api.routing.ResponseRouter
 import org.mule.api.service.Service
 import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
@@ -195,6 +196,7 @@ service.component.bindingCollection = bindingCollection
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()
+outboundRouter.muleContext = muleContext
 epBuilder = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("appleInEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
@@ -205,7 +207,9 @@ service.outboundRouter.addRouter(outboundRouter)
 responseRouter = new DefaultResponseRouterCollection();
 responseRouter.addEndpoint(createInboundEndpoint("test://response1", null));
 responseRouter.addEndpoint(appleResponseEndpoint);
-responseRouter.addRouter(new TestResponseAggregator());
+ResponseRouter responseAggregator = new TestResponseAggregator()
+responseAggregator.muleContext=muleContext
+responseRouter.addRouter(responseAggregator);
 responseRouter.timeout = 10001
 service.responseRouter = responseRouter
 

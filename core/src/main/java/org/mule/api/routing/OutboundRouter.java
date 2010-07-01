@@ -11,9 +11,11 @@
 package org.mule.api.routing;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionConfig;
 
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.List;
  * @see OutboundRouterCollection
  */
 
-public interface OutboundRouter extends Router
+public interface OutboundRouter extends Router, MessageProcessor
 {
     /**
      * Sets a list of Endpoint instances associated with this router
@@ -59,28 +61,22 @@ public interface OutboundRouter extends Router
     boolean removeEndpoint(OutboundEndpoint endpoint);
 
     /**
-     * This method is responsible for routing the Message via the MuleSession. The logic
-     * for this method will change for each type of router depending on expected
-     * behaviour. For example, a MulticastingRouter might just iterate through the
-     * list of assoaciated endpoints sending the message. Another type of router such
-     * as the ExceptionBasedRouter will hit the first endpoint, if it fails try the
-     * second, and so on. Most router implementations will extends the
+     * This method is responsible for routing the Message. The logic for this method
+     * will change for each type of router depending on expected behaviour. For
+     * example, a MulticastingRouter might just iterate through the list of
+     * assoaciated endpoints sending the message. Another type of router such as the
+     * ExceptionBasedRouter will hit the first endpoint, if it fails try the second,
+     * and so on. Most router implementations will extends the
      * FilteringOutboundRouter which implements all the common logic need for a
      * router.
      * 
-     * @param message the message to send via one or more endpoints on this router
-     * @param session the session used to actually send the event
-     * @return a result message if any from the invocation. If the synchronous flag
-     *         is false a null result will always be returned.
+     * @param event the event to send via one or more endpoints on this router
      * @throws MessagingException if any errors occur during the sending of messages
      * @see org.mule.routing.outbound.FilteringOutboundRouter
      * @see org.mule.routing.outbound.ExceptionBasedRouter
      * @see org.mule.routing.outbound.MulticastingRouter
-     *
-     * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint
-     * you are dispatching to.
      */
-    MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException;
+    public MuleEvent process(MuleEvent event) throws MuleException;
 
     /**
      * Determines if the event should be processed by this router. Routers can be

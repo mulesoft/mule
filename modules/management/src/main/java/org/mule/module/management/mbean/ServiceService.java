@@ -62,7 +62,7 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         Service c = getComponent();
         if (c instanceof SedaService)
         {
-            return ((SedaService)c).getQueueSize();
+            return (int) c.getStatistics().getQueuedEvents();
         }
         else
         {

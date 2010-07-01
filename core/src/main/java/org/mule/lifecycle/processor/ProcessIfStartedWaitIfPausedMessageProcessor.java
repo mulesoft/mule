@@ -1,0 +1,67 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.lifecycle.processor;
+
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.LifecycleState;
+import org.mule.api.lifecycle.Startable;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.service.Pausable;
+
+public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStartedMessageProcessor
+{
+
+    public ProcessIfStartedWaitIfPausedMessageProcessor(Startable startable, LifecycleState lifecycleState)
+    {
+        super(startable, lifecycleState);
+    }
+
+    @Override
+    protected MuleEvent processNext(MuleEvent event) throws MuleException
+    {
+        if (isPaused())
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
+                                 + " is paused. Blocking call until resumd");
+                }
+                while (isPaused())
+                {
+                    Thread.sleep(500);
+                }
+            }
+            catch (InterruptedException e)
+            {
+                throw new MessagingException(
+                    CoreMessages.interruptedWaitingForPaused(getStartableName(startable)),
+                    event.getMessage(), e);
+            }
+        }
+        return super.processNext(event);
+    }
+
+    @Override
+    protected boolean accept()
+    {
+        return lifecycleState.isStarted() || isPaused();
+    }
+
+    protected boolean isPaused()
+    {
+        return lifecycleState.isPhaseComplete(Pausable.PHASE_NAME);
+    }
+
+}

@@ -55,7 +55,7 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
 
         try
         {
-            return event.getService().getComponent().invoke(event);
+            return event.getService().getComponent().process(event).getMessage();
         }
         catch (MuleException e)
         {

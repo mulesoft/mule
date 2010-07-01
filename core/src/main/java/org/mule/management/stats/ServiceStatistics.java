@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-public class ServiceStatistics implements Statistics
+public class ServiceStatistics implements Statistics, QueueStatistics
 {
     private static final long serialVersionUID = -2086999226732861675L;
 

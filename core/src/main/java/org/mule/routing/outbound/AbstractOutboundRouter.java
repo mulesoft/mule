@@ -10,12 +10,13 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
@@ -64,6 +65,21 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     protected TransactionConfig transactionConfig;
 
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
+
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleMessage responseMessage = route(event.getMessage(), event.getSession());
+        if (responseMessage != null)
+        {
+            return new DefaultMuleEvent(responseMessage, event);
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    protected abstract MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException, MessagingException;
 
     protected void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
     {

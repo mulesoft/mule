@@ -12,13 +12,13 @@ package org.mule.interceptor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.interceptor.Invocation;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -26,10 +26,12 @@ import java.util.List;
 /**
  * Maintains a list of interceptors that can be applied to components.
  */
-public class InterceptorStack implements Interceptor, Initialisable, Disposable
+public class InterceptorStack extends AbstractInterceptingMessageProcessor
+    implements Interceptor, Initialisable, Disposable
 {
 
-    private List interceptors;
+    private List<Interceptor> interceptors;
+    private MessageProcessor chain;
 
     public InterceptorStack()
     {
@@ -41,56 +43,9 @@ public class InterceptorStack implements Interceptor, Initialisable, Disposable
         this.interceptors = interceptors;
     }
 
-    public MuleMessage intercept(Invocation invocation) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return new Invoc(invocation).invoke();
-    }
-
-    private class Invoc implements Invocation
-    {
-        private int cursor = 0;
-        private Invocation invocation;
-
-        public Invoc(Invocation invocation)
-        {
-            this.invocation = invocation;
-        }
-
-        public MuleMessage invoke() throws MuleException
-        {
-            if (interceptors != null && cursor < interceptors.size())
-            {
-                Interceptor interceptor = (Interceptor) interceptors.get(cursor);
-                cursor++;
-                setMessage(interceptor.intercept(this));
-            }
-            else
-            {
-                invocation.setMessage(getMessage());
-                setMessage(invocation.invoke());
-            }
-            return getMessage();
-        }
-
-        public MuleEvent getEvent()
-        {
-            return invocation.getEvent();
-        }
-
-        public MuleMessage getMessage()
-        {
-            return invocation.getMessage();
-        }
-
-        public Service getService()
-        {
-            return invocation.getService();
-        }
-
-        public void setMessage(MuleMessage message)
-        {
-            invocation.setMessage(message);
-        }
+        return chain.process(event);
     }
 
     public List getInterceptors()
@@ -105,14 +60,20 @@ public class InterceptorStack implements Interceptor, Initialisable, Disposable
 
     public void initialise() throws InitialisationException
     {
-        for (Iterator it = interceptors.iterator(); it.hasNext();)
+        ChainMessageProcessorBuilder chainBuilder = new ChainMessageProcessorBuilder();
+        for (Interceptor interceptor : interceptors)
         {
-            Interceptor interceptor = (Interceptor) it.next();
             if (interceptor instanceof Initialisable)
             {
                 ((Initialisable) interceptor).initialise();
             }
+            chainBuilder.chain(interceptor);
         }
+        if (next != null)
+        {
+            chainBuilder.chain(next);
+        }
+        chain = chainBuilder.build();
     }
 
     public void dispose()

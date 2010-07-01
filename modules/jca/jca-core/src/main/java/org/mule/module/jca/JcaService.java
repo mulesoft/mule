@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.service.ServiceException;
 import org.mule.module.jca.i18n.JcaMessages;
+import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.service.AbstractService;
 
 /**
@@ -72,18 +73,10 @@ public class JcaService extends AbstractService
         throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
 
-    protected void doDispatch(MuleEvent event) throws MuleException
+    @Override
+    protected void addMessageProcessors(ChainMessageProcessorBuilder builder)
     {
-        component.invoke(event);
-    }
-
-    /**
-     * Implementation of template method which is never call because send() is
-     * overwritten
-     */
-    protected MuleMessage doSend(MuleEvent event) throws MuleException
-    {
-        return null;
+        builder.chain(component);
     }
 
 }
