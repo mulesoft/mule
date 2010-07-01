@@ -51,13 +51,13 @@
         -->
         <service name="blobEventPublisher">
             <inbound>
-                <inbound-endpoint ref="quartz.in" synchronous="true"/>
+                <inbound-endpoint ref="quartz.in" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.module.atom.event.BlobEventPublisher"/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:9002/events" connector-ref="HttpConnector"
-                                       synchronous="true">
+                                       exchange-pattern="request-response">
                         <properties>
                             <s:entry key="Content-Type" value="text/plain"/>
                             <s:entry key="http.custom.headers">
@@ -73,14 +73,14 @@
 
         <service name="atomPubEventStore">
             <inbound>
-                <inbound-endpoint address="http://localhost:9002" synchronous="true" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response" connector-ref="HttpConnector"/>
             </inbound>
             <atom:component provider-ref="provider"/>
         </service>
 
         <service name="eventConsumer">
             <inbound>
-                <inbound-endpoint address="http://localhost:9002/events" synchronous="true"
+                <inbound-endpoint address="http://localhost:9002/events" exchange-pattern="request-response"
                                   connector-ref="PollingHttpConnector"/>
             </inbound>
             <component class="org.mule.module.atom.event.EventReceiver"/>

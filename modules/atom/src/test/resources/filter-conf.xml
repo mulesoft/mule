@@ -19,16 +19,16 @@
 
         <service name="customerService">
             <inbound>
-                <inbound-endpoint address="http://localhost:9002" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://queue1" synchronous="true"/>
+                    <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
                     <atom:route-filter route="/bar/:foo"/>
 
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint address="vm://queue1" synchronous="true"/>
+                    <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
                     <atom:route-filter route="/baz"/>
                 </filtering-router>
             </outbound>
@@ -36,7 +36,7 @@
 
         <service name="queue">
             <inbound>
-                <inbound-endpoint address="vm://queue1" synchronous="true"/>
+                <inbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" received"/>
         </service>

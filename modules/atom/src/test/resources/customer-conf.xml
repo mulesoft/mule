@@ -27,7 +27,7 @@
 
         <mule:service name="customerService">
             <mule:inbound>
-                <mule:inbound-endpoint address="http://localhost:9002" synchronous="true"/>
+                <mule:inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
             </mule:inbound>
             <atom:component provider-ref="customerProvider"/>
         </mule:service>
