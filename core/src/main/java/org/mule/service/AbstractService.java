@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.PatternAware;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -157,13 +157,13 @@ public abstract class AbstractService implements Service
 
         inboundMessageSource = (((DefaultInboundRouterCollection) inboundRouter).getMessageSource());
         asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
-        if (inboundMessageSource instanceof PatternAware)
+        if (inboundMessageSource instanceof FlowConstructAware)
         {
-            ((PatternAware) inboundMessageSource).setPattern(this);
+            ((FlowConstructAware) inboundMessageSource).setFlowConstruct(this);
         }
-        if (asyncReplyMessageSource instanceof PatternAware)
+        if (asyncReplyMessageSource instanceof FlowConstructAware)
         {
-            ((PatternAware) asyncReplyMessageSource).setPattern(this);
+            ((FlowConstructAware) asyncReplyMessageSource).setFlowConstruct(this);
         }
         // Ensure Component has service instance and is initialised. If the component
         // was configured with spring and is therefore in the registry it will get
@@ -193,9 +193,9 @@ public abstract class AbstractService implements Service
         builder.chainBefore(inboundRouter);
         messageProcessorChain = builder.build();
 
-        if (messageProcessorChain instanceof PatternAware)
+        if (messageProcessorChain instanceof FlowConstructAware)
         {
-            ((PatternAware) messageProcessorChain).setPattern(this);
+            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
         }
     }
 

@@ -13,7 +13,7 @@ package org.mule.transport.http;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -181,7 +181,7 @@ public class HttpConnector extends TcpConnector
      * @see Connector#registerListener(Service, InboundEndpoint)
      */
     @Override
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern) throws Exception
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception
     {
         if (endpoint != null)
         {
@@ -208,7 +208,7 @@ public class HttpConnector extends TcpConnector
             }
         }
         // proceed as usual
-        super.registerListener(endpoint, listener, pattern);
+        super.registerListener(endpoint, listener, flowConstruct);
     }
 
     /**

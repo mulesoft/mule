@@ -13,7 +13,7 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -34,7 +34,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 {
     private static final long serialVersionUID = -4752772777414636142L;
     private MessageProcessor listener;
-    private Pattern pattern;
+    private FlowConstruct flowConstruct;
 
     public DefaultInboundEndpoint(Connector connector,
                                   EndpointURI endpointUri,
@@ -87,7 +87,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         try
         {
-            getConnector().registerListener(this, getMessageProcessorChain(), pattern);
+            getConnector().registerListener(this, getMessageProcessorChain(), flowConstruct);
         }
         catch (Exception e)
         {
@@ -113,8 +113,8 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         return factory.createInboundMessageProcessorChain(this, listener);
     }
 
-    public void setPattern(Pattern pattern)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.pattern = pattern;
+        this.flowConstruct = flowConstruct;
     }
 }

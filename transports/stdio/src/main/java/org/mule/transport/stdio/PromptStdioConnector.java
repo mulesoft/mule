@@ -10,10 +10,10 @@
 
 package org.mule.transport.stdio;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -197,14 +197,14 @@ public class PromptStdioConnector extends StdioConnector
         return this;
     }
 
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern) throws Exception
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception
     {
         if (receivers.size() > 0)
         {
             throw new UnsupportedOperationException(
                 "You can only register one listener per system stream connector");
         }
-        super.registerListener(endpoint, listener, pattern);
+        super.registerListener(endpoint, listener, flowConstruct);
     }
 
     public long getMessageDelayTime()

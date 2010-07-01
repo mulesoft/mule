@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
-import org.mule.api.Pattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -49,7 +49,7 @@ public interface Connector extends Lifecycle, NamedObject
      *            for use as context for logging, notifications and error handling.
      * @throws Exception
      */
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, Pattern pattern)
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct pattern)
         throws Exception;
 
     /**

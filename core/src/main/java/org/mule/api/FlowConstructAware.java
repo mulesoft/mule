@@ -10,9 +10,9 @@
 
 package org.mule.api;
 /**
-* Implemented by objects that require the {@link Pattern} to be injected.
+* Implemented by objects that require the {@link FlowConstruct} to be injected.
 */
-public interface PatternAware
+public interface FlowConstructAware
 {
-    void setPattern(Pattern pattern);
+    void setFlowConstruct(FlowConstruct flowConstruct);
 }

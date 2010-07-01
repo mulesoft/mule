@@ -10,10 +10,10 @@
 
 package org.mule.endpoint;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -40,7 +40,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     private InboundEndpoint endpoint;
     private EndpointURI dynamicEndpointURI;
     private MessageProcessor listener;
-    private Pattern pattern;
+    private FlowConstruct flowConstruct;
 
     public DynamicURIInboundEndpoint(InboundEndpoint endpoint)
     {
@@ -249,7 +249,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         try
         {
-            getConnector().registerListener(this, listener, pattern);
+            getConnector().registerListener(this, listener, flowConstruct);
         }
         catch (Exception e)
         {
@@ -269,9 +269,9 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         }
     }
 
-    public void setPattern(Pattern pattern)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.pattern = pattern;
+        this.flowConstruct = flowConstruct;
     }
 
     public void setListener(MessageProcessor listener)

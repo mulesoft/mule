@@ -12,8 +12,8 @@ package org.mule.source;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.Pattern;
-import org.mule.api.PatternAware;
+import org.mule.api.FlowConstruct;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Implementation of {@link CompositeMessageSource} that propagates both injection of
- * {@link Pattern} and lifecycle to nested {@link MessageSource}s.
+ * {@link FlowConstruct} and lifecycle to nested {@link MessageSource}s.
  * <p>
  * <li>This message source cannot be started without a listener set.
  * <li>If sources are added when this composie is started they will be started as well.
@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  * <li>Message will only be received from endpoints if the connector is also started.
  */
 public class StartablePatternAwareCompositeMessageSource
-    implements CompositeMessageSource, Startable, Stoppable, PatternAware
+    implements CompositeMessageSource, Startable, Stoppable, FlowConstructAware
 {
     protected static final Log log = LogFactory.getLog(StartablePatternAwareCompositeMessageSource.class);
 
@@ -51,7 +51,7 @@ public class StartablePatternAwareCompositeMessageSource
     private MessageProcessor internalListener = new InternalMessageProcessor();
     private List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
     private AtomicBoolean starting = new AtomicBoolean(false);
-    private Pattern pattern;
+    private FlowConstruct flowConstruct;
 
     public void addSource(MessageSource source) throws MuleException
     {
@@ -60,9 +60,9 @@ public class StartablePatternAwareCompositeMessageSource
         
         if (started.get())
         {
-            if (source instanceof PatternAware)
+            if (source instanceof FlowConstructAware)
             {
-                ((PatternAware) source).setPattern(pattern);
+                ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
             }
             if (source instanceof Startable)
             {
@@ -92,9 +92,9 @@ public class StartablePatternAwareCompositeMessageSource
             starting.set(true);
             for (MessageSource source : sources)
             {
-                if (source instanceof PatternAware)
+                if (source instanceof FlowConstructAware)
                 {
-                    ((PatternAware) source).setPattern(pattern);
+                    ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
                 }
                 if (source instanceof Startable)
                 {
@@ -128,9 +128,9 @@ public class StartablePatternAwareCompositeMessageSource
         this.listener = listener;
     }
 
-    public void setPattern(Pattern pattern)
+    public void setFlowConstruct(FlowConstruct pattern)
     {
-        this.pattern = pattern;
+        this.flowConstruct = pattern;
 
     }
 

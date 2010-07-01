@@ -13,8 +13,6 @@ package org.mule.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
-import org.mule.api.PatternAware;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.ReplyToHandler;
@@ -27,9 +25,7 @@ import org.apache.commons.lang.BooleanUtils;
  * Need to be configured at the beginning of the chain
  */
 public class AsyncReplySendInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements PatternAware
 {
-    protected Pattern pattern;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -75,16 +71,11 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
         if (result != null && replyToHandler != null)
         {
             String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-            if ((requestor != null && !requestor.equals(pattern.getName())) || requestor == null)
+            if ((requestor != null && !requestor.equals(event.getService().getName())) || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
             }
         }
-    }
-
-    public void setPattern(Pattern pattern)
-    {
-        this.pattern = pattern;
     }
 
 }

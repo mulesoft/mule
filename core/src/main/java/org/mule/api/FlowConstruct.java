@@ -10,11 +10,9 @@
 
 package org.mule.api;
 
-import org.mule.api.lifecycle.Lifecycle;
-
 import java.beans.ExceptionListener;
 
-public interface Pattern extends NamedObject, Lifecycle
+public interface FlowConstruct extends NamedObject
 {
     /**
      * The exception strategy to use to handle exceptions in the Mule component.

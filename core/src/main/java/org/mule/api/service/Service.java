@@ -14,8 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.Pattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.component.Component;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
@@ -31,7 +32,7 @@ import java.io.Serializable;
  * well as managing pooled resources.
  */
 
-public interface Service extends Serializable, Pattern
+public interface Service extends Serializable, FlowConstruct, Lifecycle
 {
     /**
      * Makes an asynchronous event call to the service.

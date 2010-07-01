@@ -11,12 +11,12 @@
 package org.mule.transport;
 
 import org.mule.DefaultExceptionStrategy;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.Pattern;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
@@ -188,7 +188,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     @SuppressWarnings("unchecked")
     protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
 
-    protected final Map<String, Pattern> patternByEndpoint = new HashMap<String, Pattern>();
+    protected final Map<String, FlowConstruct> flowConstructByEndpoint = new HashMap<String, FlowConstruct>();
     
     /**
      * Defines the dispatcher threading profile
@@ -1213,7 +1213,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     }
 
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor messageProcessorChain, Pattern pattern) throws Exception
+    public void registerListener(InboundEndpoint endpoint,
+                                 MessageProcessor messageProcessorChain,
+                                 FlowConstruct flowConstruct) throws Exception
     {
         if (endpoint == null)
         {
@@ -1224,11 +1226,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         {
             throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
         }
-        
+
         Service service = null;
-        if (pattern != null && pattern instanceof Service)
+        if (flowConstruct != null && flowConstruct instanceof Service)
         {
-            service = (Service) pattern;
+            service = (Service) flowConstruct;
         }
         else
         {
@@ -1257,7 +1259,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // Since we're managing the creation we also need to initialise
         receiver.initialise();
         receivers.put(receiverKey, receiver);
-        patternByEndpoint.put(endpoint.getName(), pattern);
+        flowConstructByEndpoint.put(endpoint.getName(), flowConstruct);
         if (endpoint instanceof InboundEndpointDecorator)
         {
             ((InboundEndpointDecorator) endpoint).onListenerAdded(service);
@@ -1294,7 +1296,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             throw new IllegalArgumentException("The endpoint must not be null when you unregister a listener");
         }
 
-        Service service = (Service) patternByEndpoint.remove(endpoint.getName());
+        Service service = (Service) flowConstructByEndpoint.remove(endpoint.getName());
         
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)

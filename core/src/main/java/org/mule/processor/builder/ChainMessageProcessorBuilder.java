@@ -10,10 +10,10 @@
 
 package org.mule.processor.builder;
 
+import org.mule.api.FlowConstruct;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.Pattern;
-import org.mule.api.PatternAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -159,7 +159,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
      * MessageProcessor in the parent chain is not injected into the first in the
      * nested chain.
      */
-    static class ChainedCompositeMessageProcessor implements MessageProcessor, Lifecycle, PatternAware
+    static class ChainedCompositeMessageProcessor implements MessageProcessor, Lifecycle, FlowConstructAware
     {
         private Log log;
         private String name;
@@ -226,13 +226,13 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
             }
         }
 
-        public void setPattern(Pattern pattern)
+        public void setFlowConstruct(FlowConstruct flowConstruct)
         {
             for (MessageProcessor processor : allProcessors)
             {
-                if (processor instanceof PatternAware)
+                if (processor instanceof FlowConstructAware)
                 {
-                    ((PatternAware) processor).setPattern(pattern);
+                    ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
                 }
             }
         }
