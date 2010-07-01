@@ -31,10 +31,10 @@
                     return CalloutService.doSomethingElse(msg)
                 </script:script>
                 <script:java-interface-binding interface="org.mule.components.script.CalloutService" method="doSomething">
-                    <outbound-endpoint ref="callout_1" synchronous="true"/>
+                    <outbound-endpoint ref="callout_1" exchange-pattern="request-response"/>
                 </script:java-interface-binding>
                 <script:java-interface-binding interface="org.mule.components.script.CalloutService" method="doSomethingElse">
-                    <outbound-endpoint ref="callout_2" synchronous="true"/>
+                    <outbound-endpoint ref="callout_2" exchange-pattern="request-response"/>
                 </script:java-interface-binding>
             </script:component>
             <outbound>

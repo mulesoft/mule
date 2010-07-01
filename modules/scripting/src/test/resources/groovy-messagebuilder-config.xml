@@ -8,9 +8,9 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd">
 
-    <endpoint name="groovy1.endpoint" address="vm://groovy.1" synchronous="true"/>
-    <endpoint name="groovy2.endpoint" address="vm://groovy.2" synchronous="true"/>
-    <endpoint name="groovy3.endpoint" address="vm://groovy.3" synchronous="true"/>
+    <endpoint name="groovy1.endpoint" address="vm://groovy.1" exchange-pattern="request-response"/>
+    <endpoint name="groovy2.endpoint" address="vm://groovy.2" exchange-pattern="request-response"/>
+    <endpoint name="groovy3.endpoint" address="vm://groovy.3" exchange-pattern="request-response"/>
 
     <script:script name="myScript" engine="groovy">
         import org.mule.api.MuleMessage
