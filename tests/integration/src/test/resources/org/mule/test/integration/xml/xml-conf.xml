@@ -36,15 +36,15 @@
         <service name="xmlReceiver">
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/xml-parse"
-                    transformer-refs="InputStreamToDOM" synchronous="true">
+                    transformer-refs="InputStreamToDOM" exchange-pattern="request-response">
                     <filter ref="XPathFilter" />
                 </inbound-endpoint>
                 <inbound-endpoint
                     address="http://localhost:63081/xml-xslt-parse"
-                    transformer-refs="InputStreamToDOM TestXslTransformer" synchronous="true">
+                    transformer-refs="InputStreamToDOM TestXslTransformer" exchange-pattern="request-response">
                     <filter ref="XPathFilter" />
                 </inbound-endpoint>
-                <inbound-endpoint address="http://localhost:63081/validate" synchronous="true" >
+                <inbound-endpoint address="http://localhost:63081/validate" exchange-pattern="request-response" >
                     <transformer ref="InputStreamToDOM"/>
                     <mule-xml:schema-validation-filter schemaLocations="org/mule/test/integration/xml/schema1.xsd, org/mule/test/integration/xml/schema2.xsd"/>
                 </inbound-endpoint>

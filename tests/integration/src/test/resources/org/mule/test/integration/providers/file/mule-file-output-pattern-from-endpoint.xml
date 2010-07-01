@@ -7,14 +7,14 @@
     <model name="model">
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://filesend" synchronous="true"/>
+                <inbound-endpoint address="vm://filesend" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <outbound-endpoint address="file://FirstWrite"  synchronous="true">
+                    <outbound-endpoint address="file://FirstWrite"  exchange-pattern="request-response">
                         <property key="outputPattern" value="export.txt"/>
                     </outbound-endpoint>
-                    <outbound-endpoint address="file://SecondWrite"  synchronous="true">
+                    <outbound-endpoint address="file://SecondWrite"  exchange-pattern="request-response">
                         <property key="outputPattern" value="export.txt.OK"/>
                     </outbound-endpoint>
                 </multicasting-router>

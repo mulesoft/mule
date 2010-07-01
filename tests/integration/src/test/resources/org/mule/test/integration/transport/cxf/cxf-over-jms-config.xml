@@ -21,7 +21,7 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="vm://test" synchronous="true"/>
+                    <outbound-endpoint address="vm://test" exchange-pattern="request-response"/>
                     <jms:outbound-endpoint address="jms://testout"/>
                 </chaining-router>
             </outbound>
@@ -29,7 +29,7 @@
         
         <service name="TestComponent">
             <inbound>
-                <cxf:inbound-endpoint address="vm://test" frontend="simple" synchronous="true"/>
+                <cxf:inbound-endpoint address="vm://test" frontend="simple" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
@@ -48,18 +48,18 @@
         
         <service name="TestCxfJmsProxy">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/testBridge" proxy="true" synchronous="true"/>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/testBridge" proxy="true" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="jms://testEcho" proxy="true" synchronous="true"/>
+                    <cxf:outbound-endpoint address="jms://testEcho" proxy="true" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="TestEcho">
             <inbound>
-                <cxf:inbound-endpoint address="jms://testEcho" frontend="simple" synchronous="true" proxy="true"/>
+                <cxf:inbound-endpoint address="jms://testEcho" frontend="simple" exchange-pattern="request-response" proxy="true"/>
             </inbound>
             <echo-component/>
         </service>

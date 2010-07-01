@@ -16,18 +16,18 @@
 
         <service name="Distributor">
             <inbound>
-                <vm:inbound-endpoint path="distributor.queue" synchronous="true"/>
+                <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <!-- FruitBowl.getFruit() List -->
                 <expression-splitter-router evaluator="bean" expression="fruit">
-                    <vm:outbound-endpoint path="service1.queue" synchronous="true">
+                    <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service2.queue" synchronous="true">
+                    <vm:outbound-endpoint path="service2.queue" exchange-pattern="request-response">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service3.queue" synchronous="true">
+                    <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange"/>
                     </vm:outbound-endpoint>
                 </expression-splitter-router>

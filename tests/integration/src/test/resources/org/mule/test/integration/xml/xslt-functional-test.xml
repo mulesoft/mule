@@ -53,7 +53,7 @@
         <service name="Echo">
             <inbound>
                 <!-- this endpoint is used by the functional test -->
-                <vm:inbound-endpoint path="test.in" transformer-refs="xslt" synchronous="true"/>
+                <vm:inbound-endpoint path="test.in" transformer-refs="xslt" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>

@@ -33,7 +33,7 @@
             <test:component appendString=":service1" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="service2" synchronous="true">
+                    <vm:outbound-endpoint path="service2" exchange-pattern="request-response">
                         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="E" />
                         </custom-message-processor>
@@ -75,7 +75,7 @@
             <test:component appendString=":service1" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" synchronous="false">
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way">
                         <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="E" />
                         </custom-message-processor>

@@ -14,7 +14,7 @@
     <vm:endpoint name="testin" path="in" />
 
     <vm:endpoint name="vmExceptionEndpoint" path="errProxy"
-        synchronous="false" />
+        exchange-pattern="one-way" />
 
     <model>
 

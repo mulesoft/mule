@@ -15,7 +15,7 @@
 
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="tcp://localhost:25551" synchronous="true" responseTimeout="10000"/>
+        <client:remote-endpoint address="tcp://localhost:25551" exchange-pattern="request-response" responseTimeout="10000"/>
     </client:remote-dispatcher-agent>
 
     <model name="model">

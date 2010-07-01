@@ -15,7 +15,7 @@
     <model name="main">
         <service name="default config">
             <inbound>
-                <vm:inbound-endpoint path="in-default" synchronous="true"/>
+                <vm:inbound-endpoint path="in-default" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <exception-based-router>
@@ -26,5 +26,4 @@
             </outbound>
         </service>
     </model>
-
 </mule>

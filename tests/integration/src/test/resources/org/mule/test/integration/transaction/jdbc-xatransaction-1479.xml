@@ -67,7 +67,7 @@
                     <jdbc:outbound-endpoint queryKey="insertRecord">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </jdbc:outbound-endpoint>
-                    <jms:outbound-endpoint queue="queue.out" synchronous="true">
+                    <jms:outbound-endpoint queue="queue.out" exchange-pattern="request-response">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="ALWAYS_BEGIN"/>

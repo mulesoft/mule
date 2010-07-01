@@ -34,7 +34,7 @@
         <!-- Send old format, receive old format -->
         <service name="s1">
             <inbound>
-                <vm:inbound-endpoint path="in1" synchronous="false" />
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way" />
             </inbound>
             <script:component script-ref="SetProperty" />
             <outbound>
@@ -50,7 +50,7 @@
             <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out1" synchronous="false" />
+                    <vm:outbound-endpoint path="out1" exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -58,7 +58,7 @@
         <!-- Send old format, receive new format -->
         <service name="s2">
             <inbound>
-                <vm:inbound-endpoint path="in2" synchronous="false" />
+                <vm:inbound-endpoint path="in2" exchange-pattern="one-way" />
             </inbound>
             <script:component script-ref="SetProperty" />
             <outbound>
@@ -74,7 +74,7 @@
             <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out2" synchronous="false" />
+                    <vm:outbound-endpoint path="out2" exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -82,7 +82,7 @@
         <!-- Send new format, receive old format -->
         <service name="s3">
             <inbound>
-                <vm:inbound-endpoint path="in3" synchronous="false" />
+                <vm:inbound-endpoint path="in3" exchange-pattern="one-way" />
             </inbound>
             <script:component script-ref="SetProperty" />
             <outbound>
@@ -98,7 +98,7 @@
             <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out3" synchronous="false" />
+                    <vm:outbound-endpoint path="out3" exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -106,7 +106,7 @@
         <!-- Send new format, receive new format -->
         <service name="s4">
             <inbound>
-                <vm:inbound-endpoint path="in4" synchronous="false" />
+                <vm:inbound-endpoint path="in4" exchange-pattern="one-way" />
             </inbound>
             <script:component script-ref="SetProperty" />
             <outbound>
@@ -122,7 +122,7 @@
             <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out4" synchronous="false" />
+                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>

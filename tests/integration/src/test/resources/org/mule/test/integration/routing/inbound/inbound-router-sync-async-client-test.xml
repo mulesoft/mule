@@ -33,12 +33,12 @@
 
         <service name="SyncAsync">
             <inbound>
-                <vm:inbound-endpoint path="singleSyncAsyncEntry" synchronous="true"/>
+                <vm:inbound-endpoint path="singleSyncAsyncEntry" exchange-pattern="request-response"/>
                 <selective-consumer-router>
                     <message-property-filter pattern="messageType=sync"/>
                 </selective-consumer-router>
                 <forwarding-catch-all-strategy>
-                    <vm:outbound-endpoint path="async" synchronous="false"/>
+                    <vm:outbound-endpoint path="async" exchange-pattern="one-way"/>
                 </forwarding-catch-all-strategy>
             </inbound>
             <scripting:component script-ref="testComponent"/>

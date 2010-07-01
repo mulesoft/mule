@@ -16,25 +16,25 @@
 
       <service name="Part2Service" initialState="started">
          <inbound>
-            <inbound-endpoint address="vm://in" synchronous="true"/>
+            <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
          </inbound>
          <outbound>
             <custom-outbound-router class="org.mule.routing.outbound.ChainingRouter">
-               <outbound-endpoint address="jms://out1" synchronous="true"/>
-               <outbound-endpoint address="vm://out2" synchronous="true"/>
+               <outbound-endpoint address="jms://out1" exchange-pattern="request-response"/>
+               <outbound-endpoint address="vm://out2" exchange-pattern="request-response"/>
             </custom-outbound-router>
          </outbound>
       </service>
       
       <service name="Part2ServiceLastEndpointDispatch" initialState="started">
          <inbound>
-            <inbound-endpoint address="vm://in2" synchronous="true"/>
+            <inbound-endpoint address="vm://in2" exchange-pattern="request-response"/>
          </inbound>
          <outbound>
             <custom-outbound-router class="org.mule.routing.outbound.ChainingRouter">
-               <outbound-endpoint address="jms://out1" synchronous="true"/>
-               <outbound-endpoint address="vm://out2" synchronous="true"/>
-               <outbound-endpoint address="jms://out2" synchronous="false"/>
+               <outbound-endpoint address="jms://out1" exchange-pattern="request-response"/>
+               <outbound-endpoint address="vm://out2" exchange-pattern="request-response"/>
+               <outbound-endpoint address="jms://out2" exchange-pattern="one-way"/>
             </custom-outbound-router>
          </outbound>
       </service>

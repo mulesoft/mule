@@ -15,7 +15,7 @@
     <model name="Asynchronous_Message_Pattern">
         <service name="AsynchronousService">
             <inbound>
-                <jms:inbound-endpoint queue="test.in" synchronous="false"/>
+                <jms:inbound-endpoint queue="test.in" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

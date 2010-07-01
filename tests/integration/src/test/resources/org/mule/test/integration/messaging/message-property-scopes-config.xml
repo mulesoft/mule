@@ -25,31 +25,31 @@
     <model>
         <service name="InService1">
             <inbound>
-                <vm:inbound-endpoint path="in1" transformer-refs="SetSessionProperty" synchronous="true"/>
+                <vm:inbound-endpoint path="in1" transformer-refs="SetSessionProperty" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                     <vm:outbound-endpoint path="middle" synchronous="true"/>
+                     <vm:outbound-endpoint path="middle" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="InService2">
             <inbound>
-                <vm:inbound-endpoint path="in2" transformer-refs="SetInvocationProperty" synchronous="true"/>
+                <vm:inbound-endpoint path="in2" transformer-refs="SetInvocationProperty" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                     <vm:outbound-endpoint path="middle" synchronous="true"/>
+                     <vm:outbound-endpoint path="middle" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="ResponseService">
             <inbound>
-                <vm:inbound-endpoint path="middle" transformer-refs="RetrieveProperty" synchronous="true" />
+                <vm:inbound-endpoint path="middle" transformer-refs="RetrieveProperty" exchange-pattern="request-response" />
             </inbound>
         </service>
     </model>

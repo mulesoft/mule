@@ -35,7 +35,7 @@
     <service name="Echo">
         <inbound>
             <!-- this endpoint is used by the functional test -->
-            <vm:inbound-endpoint path="test.in" transformer-refs="xquery" synchronous="true"/>
+            <vm:inbound-endpoint path="test.in" transformer-refs="xquery" exchange-pattern="request-response"/>
         </inbound>
 
         <echo-component/>

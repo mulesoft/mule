@@ -18,7 +18,7 @@
             <component class="org.mule.test.components.ComponentStoppingEventFlowTestCase$ComponentStoppingFlow"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="next" synchronous="true"/>
+                    <vm:outbound-endpoint path="next" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

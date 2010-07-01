@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <endpoint address="http://localhost:60505" name="remoteEndpoint" synchronous="true"/>
+    <endpoint address="http://localhost:60505" name="remoteEndpoint" exchange-pattern="request-response"/>
 
 </mule>
 

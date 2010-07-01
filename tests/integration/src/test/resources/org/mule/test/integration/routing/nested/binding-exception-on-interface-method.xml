@@ -23,12 +23,12 @@
 
         <service name="InvokerComponent">
             <inbound>
-                <vm:inbound-endpoint path="invoker.in" synchronous="true"/>
+                <vm:inbound-endpoint path="invoker.in" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.BindingExceptionOnInterfaceMethodTestCase$Component" />
                 <binding interface="org.mule.test.integration.routing.nested.BindingExceptionOnInterfaceMethodTestCase$BindigInterface">
-                    <outbound-endpoint address="vm://hello.in" synchronous="true" />
+                    <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
             <outbound>

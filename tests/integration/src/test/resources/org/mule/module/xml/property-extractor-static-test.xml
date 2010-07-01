@@ -24,7 +24,7 @@
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="vm://unreliable" connector-ref="default" synchronous="true"/>
+                    <outbound-endpoint address="vm://unreliable" connector-ref="default" exchange-pattern="request-response"/>
                     <vm:outbound-endpoint path="error" connector-ref="queue"/>
                 </exception-based-router>
             </outbound>

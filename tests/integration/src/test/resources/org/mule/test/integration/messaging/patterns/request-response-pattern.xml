@@ -15,7 +15,7 @@
     <model name="Request-Response_Message_Pattern">
         <service name="SynchronousService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" synchronous="true"/>
+                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
         </service>

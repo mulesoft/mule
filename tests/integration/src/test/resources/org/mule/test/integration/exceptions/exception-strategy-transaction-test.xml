@@ -21,24 +21,24 @@
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
     <object-to-string-transformer name="ObjectToString"/>
     
-    <jms:endpoint name="InputQueueClient" queue="InputQueue" synchronous="true"/>
-    <jms:endpoint name="InputQueueClient2" queue="InputQueue2" synchronous="true"/>
+    <jms:endpoint name="InputQueueClient" queue="InputQueue" exchange-pattern="request-response"/>
+    <jms:endpoint name="InputQueueClient2" queue="InputQueue2" exchange-pattern="request-response"/>
     
-    <jms:endpoint name="InputQueue" queue="InputQueue" synchronous="true">
+    <jms:endpoint name="InputQueue" queue="InputQueue" exchange-pattern="request-response">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </jms:endpoint>
-    <jms:endpoint name="InputQueue2" queue="InputQueue2" synchronous="true">
+    <jms:endpoint name="InputQueue2" queue="InputQueue2" exchange-pattern="request-response">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </jms:endpoint>
     
-    <jms:endpoint name="RequestQueue" queue="RequestQueue" synchronous="true">
+    <jms:endpoint name="RequestQueue" queue="RequestQueue" exchange-pattern="request-response">
         <jms:transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
-    <jms:endpoint name="RequestQueue2" queue="RequestQueue2" synchronous="true">
+    <jms:endpoint name="RequestQueue2" queue="RequestQueue2" exchange-pattern="request-response">
         <jms:transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
     
-    <jms:endpoint name="ExceptionQueue" queue="ExceptionQueue" synchronous="false">
+    <jms:endpoint name="ExceptionQueue" queue="ExceptionQueue" exchange-pattern="one-way">
         <jms:transaction action="NONE"/>
     </jms:endpoint>
     
@@ -73,7 +73,7 @@
             </outbound>
             <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase$AssertRollbackServiceExceptionStrategy">
                 <rollback-transaction exception-pattern="*"/>
-                <vm:outbound-endpoint path="nonexistant" synchronous="true">
+                <vm:outbound-endpoint path="nonexistant" exchange-pattern="request-response">
                     <vm:transaction action="NONE"/>
                 </vm:outbound-endpoint>
             </custom-exception-strategy>  

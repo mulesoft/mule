@@ -16,7 +16,7 @@
         <service name="Echo">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
-                    serviceClass="org.mule.transport.cxf.testmodels.Echo" synchronous="true"/>
+                    serviceClass="org.mule.transport.cxf.testmodels.Echo" exchange-pattern="request-response"/>
                 <wire-tap-router>
                     <vm:outbound-endpoint path="ToTapper"/>
                 </wire-tap-router>

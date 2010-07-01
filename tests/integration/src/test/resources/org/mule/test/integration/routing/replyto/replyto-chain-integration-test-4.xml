@@ -15,24 +15,24 @@
     <model name="InjectionProblem">
         <service name="pojo1">
             <inbound>
-                <vm:inbound-endpoint path="pojo1" synchronous="true" responseTimeout="10000"/>
+                <vm:inbound-endpoint path="pojo1" exchange-pattern="request-response" responseTimeout="10000"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo2" synchronous="true"/>
+                    <jms:outbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="pojo2">
             <inbound>
-                <jms:inbound-endpoint queue="pojo2" synchronous="true"/>
+                <jms:inbound-endpoint queue="pojo2" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="pojo3" synchronous="true"/>
+                    <vm:outbound-endpoint path="pojo3" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

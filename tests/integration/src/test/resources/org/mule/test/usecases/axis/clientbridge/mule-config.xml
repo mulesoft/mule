@@ -19,7 +19,7 @@
 
         <mule-descriptor name="doSomeWork" implementation="org.mule.test.usecases.axis.clientbridge.DoSomeWork">
             <inbound-router>
-                <endpoint address="axis:http://localhost:8002/axisService" synchronous="true"/>
+                <endpoint address="axis:http://localhost:8002/axisService" exchange-pattern="request-response"/>
             </inbound-router>
             <!--<outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

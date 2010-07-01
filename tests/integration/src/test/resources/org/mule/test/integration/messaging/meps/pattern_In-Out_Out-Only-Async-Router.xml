@@ -24,9 +24,9 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
-    <jms:endpoint queue="test.external.app" name="externalEndpoint" synchronous="false"/>
-    <jms:endpoint queue="test.reply" name="replyEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
+    <jms:endpoint queue="test.external.app" name="externalEndpoint" exchange-pattern="one-way"/>
+    <jms:endpoint queue="test.reply" name="replyEndpoint" exchange-pattern="one-way"/>
 
     <model>
         <service name="In-Out_Out-Only-Async-Service">

@@ -16,13 +16,13 @@
 
         <service name="Distributor">
             <inbound>
-                <vm:inbound-endpoint path="distributor.queue" synchronous="true"/>
+                <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <vm:outbound-endpoint path="service1.queue" synchronous="true"/>
-                    <vm:outbound-endpoint path="service2.queue" synchronous="false"/>
-                    <vm:outbound-endpoint path="service3.queue" synchronous="true"/>
+                    <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
+                    <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
                 </multicasting-router>
             </outbound>
         </service>

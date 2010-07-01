@@ -13,7 +13,7 @@
 	<model name="testModel">
 		<service name="testService">
 			<inbound>
-				<vm:inbound-endpoint path="in" synchronous="true">
+				<vm:inbound-endpoint path="in" exchange-pattern="request-response">
 					<transformers>
 						<message-properties-transformer>
 							<add-message-property key="method" value="transformMessage" />

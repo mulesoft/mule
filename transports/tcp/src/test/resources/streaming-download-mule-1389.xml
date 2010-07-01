@@ -22,13 +22,12 @@
                 we can't send any headers with the TCP transport unless we use a customised protocol. In http the
                 REMOTE_SYNC header is set since the MuleClient.send(...) will automatically set it for us.
                  (REMOTE_SYNC from the client implies 'synchronsous' on the server)-->
-                <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
+                <tcp:inbound-endpoint host="localhost" port="65432" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.transport.tcp.issues.InputStreamSource"/>
             </component>
         </service>
     </model>
-
 </mule>
         

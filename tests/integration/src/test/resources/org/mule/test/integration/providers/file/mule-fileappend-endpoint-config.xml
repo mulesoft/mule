@@ -14,7 +14,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="file://myout" synchronous="true">
+                    <outbound-endpoint address="file://myout" exchange-pattern="request-response">
                         <property key="outputAppend" value="true"/>
                         <property key="outputPattern" value="out.txt"/>
                     </outbound-endpoint>

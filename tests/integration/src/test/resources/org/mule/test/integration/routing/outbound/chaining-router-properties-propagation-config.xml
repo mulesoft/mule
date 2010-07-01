@@ -15,9 +15,9 @@
         <add-message-property key="TTL" value="10000"/>
     </message-properties-transformer>
 
-    <endpoint name="inboundEndpoint" address="vm://inbound" synchronous="true"/>
-    <endpoint name="hop1Endpoint" address="vm://hop1" synchronous="true"/>
-    <endpoint name="hop2Endpoint" address="vm://hop2" synchronous="true"/>
+    <endpoint name="inboundEndpoint" address="vm://inbound" exchange-pattern="request-response"/>
+    <endpoint name="hop1Endpoint" address="vm://hop1" exchange-pattern="request-response"/>
+    <endpoint name="hop2Endpoint" address="vm://hop2" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="chainingComponent">

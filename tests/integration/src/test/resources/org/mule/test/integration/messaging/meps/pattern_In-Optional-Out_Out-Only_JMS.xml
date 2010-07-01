@@ -25,9 +25,9 @@
     <vm:connector name="vmConnector"/>
     <jms:activemq-connector name="jmsConnector" brokerURL="tcp://localhost:61616"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
-    <jms:endpoint queue="test.header.received" name="receivedEndpoint" synchronous="false"/>
-    <jms:endpoint queue="test.header.notreceived" name="notReceivedEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
+    <jms:endpoint queue="test.header.received" name="receivedEndpoint" exchange-pattern="one-way"/>
+    <jms:endpoint queue="test.header.notreceived" name="notReceivedEndpoint" exchange-pattern="one-way"/>
 
     <model>
         <service name="In-Optional-Out_Out-Only-Service">

@@ -13,9 +13,9 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <http:endpoint name="httpEndpoint" address="http://localhost:18080/RemoteService"
-                   synchronous="true" contentType="text/plain"/>
-    <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" synchronous="true"/>
-    <endpoint name="vmEndpoint" address="vm://LocalService" synchronous="true"/>
+                   exchange-pattern="request-response" contentType="text/plain"/>
+    <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" exchange-pattern="request-response"/>
+    <endpoint name="vmEndpoint" address="vm://LocalService" exchange-pattern="request-response"/>
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
     <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>

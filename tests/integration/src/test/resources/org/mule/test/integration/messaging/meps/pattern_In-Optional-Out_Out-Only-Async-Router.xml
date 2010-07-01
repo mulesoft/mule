@@ -35,9 +35,9 @@
 
     <vm:connector name="vmConnector"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
-    <vm:endpoint path="test.external.app" name="externalEndpoint" synchronous="false"/>
-    <vm:endpoint path="test.reply" name="replyEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
+    <vm:endpoint path="test.external.app" name="externalEndpoint" exchange-pattern="one-way"/>
+    <vm:endpoint path="test.reply" name="replyEndpoint" exchange-pattern="one-way"/>
 
     <model>
         <service name="In-Out_Out-Only-Async-Service">

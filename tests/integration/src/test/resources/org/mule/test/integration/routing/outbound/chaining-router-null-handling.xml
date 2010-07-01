@@ -19,8 +19,8 @@
 
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="vm://component1" synchronous="true"/>
-                    <outbound-endpoint address="vm://component2Pass" synchronous="true"/>
+                    <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
+                    <outbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
                 </chaining-router>
             </outbound>
         </service>
@@ -35,8 +35,8 @@
 
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="vm://component1" synchronous="true"/>
-                    <outbound-endpoint address="vm://component2Fail" synchronous="true"/>
+                    <outbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
+                    <outbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
                 </chaining-router>
             </outbound>
         </service>
@@ -51,7 +51,7 @@
 
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint address="vm://component1Fail" synchronous="true"/>
+                    <outbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
                     <outbound-endpoint address="vm://component2Pass"/>
                 </chaining-router>
             </outbound>

@@ -23,7 +23,7 @@
     <vm:connector name="vmRemoteConnector"/>
 
     <endpoint address="vm://remote.queue" name="remoteVmQueue"/>
-    <endpoint address="vm://remote.endpoint" name="testVmEndpoint" connector-ref="vmRemoteConnector" synchronous="true"/>
+    <endpoint address="vm://remote.endpoint" name="testVmEndpoint" connector-ref="vmRemoteConnector" exchange-pattern="request-response"/>
 
     <model name="model">
         <service name="TestReceiverUMO">

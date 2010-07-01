@@ -13,7 +13,7 @@
         <client:xml-wire-format/>
     </client:remote-dispatcher-agent>
 
-    <endpoint name="remoteEndpoint" address="tcp://localhost:38100" synchronous="true"/>
+    <endpoint name="remoteEndpoint" address="tcp://localhost:38100" exchange-pattern="request-response"/>
 
     <model name="test">
         <service name="mycomponent">

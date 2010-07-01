@@ -11,11 +11,11 @@
     <model>
         <service name="InputService">
             <inbound>
-                <vm:inbound-endpoint path="in" synchronous="true" />
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="badService" synchronous="true"/>
+                    <vm:outbound-endpoint path="badService" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

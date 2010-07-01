@@ -14,7 +14,7 @@
     <model>
         <service name="ComponentException">
             <inbound>
-                <vm:inbound-endpoint synchronous="true" path="in1" />
+                <vm:inbound-endpoint exchange-pattern="request-response" path="in1" />
             </inbound>
                <!-- Component throws an exception -->
             <test:component throwException="true" />
@@ -22,12 +22,12 @@
 
         <service name="OutboundRoutingException">
             <inbound>
-                <vm:inbound-endpoint synchronous="true" path="in2" />
+                <vm:inbound-endpoint exchange-pattern="request-response" path="in2" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <!-- Router throws an exception -->
-                    <outbound-endpoint address="vm://service999" synchronous="true" />
+                    <outbound-endpoint address="vm://service999" exchange-pattern="request-response" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -35,38 +35,38 @@
         <service name="InboundTransformerException">
             <inbound>
                    <!-- Transformer throws an exception -->
-                <vm:inbound-endpoint synchronous="true" path="in3" transformer-refs="validateResponse" />
+                <vm:inbound-endpoint exchange-pattern="request-response" path="in3" transformer-refs="validateResponse" />
             </inbound>
             <test:component />
         </service>
 
         <service name="OutboundTransformerException">
             <inbound>
-                <vm:inbound-endpoint synchronous="true" path="in4" />
+                <vm:inbound-endpoint exchange-pattern="request-response" path="in4" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <!-- Transformer throws an exception -->
-                    <outbound-endpoint address="vm://service1" synchronous="true" transformer-refs="validateResponse" />
+                    <outbound-endpoint address="vm://service1" exchange-pattern="request-response" transformer-refs="validateResponse" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ResponseTransformerException">
             <inbound>
-                <vm:inbound-endpoint synchronous="true" path="in5" />
+                <vm:inbound-endpoint exchange-pattern="request-response" path="in5" />
             </inbound>
             <outbound>
                 <pass-through-router>
                     <!-- Response transformer throws an exception -->
-                    <outbound-endpoint address="vm://service1" synchronous="true" responseTransformer-refs="validateResponse" />
+                    <outbound-endpoint address="vm://service1" exchange-pattern="request-response" responseTransformer-refs="validateResponse" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="Service1">
             <inbound>
-                <inbound-endpoint synchronous="true" address="vm://service1" />
+                <inbound-endpoint exchange-pattern="request-response" address="vm://service1" />
             </inbound>
             <echo-component />
         </service>

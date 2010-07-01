@@ -11,7 +11,7 @@
     <model name="main">
         <service name="AsyncRequest">
             <inbound>
-                <vm:inbound-endpoint path="async" synchronous="false">
+                <vm:inbound-endpoint path="async" exchange-pattern="one-way">
                 </vm:inbound-endpoint>
                 <selective-consumer-router >
                     <custom-filter class="org.mule.test.filters.FilterCounter"/>                    

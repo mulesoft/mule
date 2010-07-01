@@ -17,7 +17,7 @@
     <model name="synchTestModel">
         <service name="mySynchService">
             <inbound>
-                <vm:inbound-endpoint path="s-in" synchronous="true"/>
+                <vm:inbound-endpoint path="s-in" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>Polo</test:return-data>

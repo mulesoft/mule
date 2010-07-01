@@ -18,7 +18,7 @@
 
         <service name="HttpWithoutRemoteSynch">
             <inbound>
-                <inbound-endpoint address="http://localhost:8999" synchronous="true">
+                <inbound-endpoint address="http://localhost:8999" exchange-pattern="request-response">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>
@@ -27,7 +27,7 @@
 
         <service name="HttpWithRemoteSynch">
             <inbound>
-                <inbound-endpoint address="http://localhost:8989" synchronous="true">
+                <inbound-endpoint address="http://localhost:8989" exchange-pattern="request-response">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>
@@ -36,7 +36,7 @@
         
         <service name="HttpWithChunking">
             <inbound>
-                <inbound-endpoint address="http://localhost:8988" synchronous="true">
+                <inbound-endpoint address="http://localhost:8988" exchange-pattern="request-response">
                     <response-transformers>
                         <message-properties-transformer>
                             <add-message-property key="Transfer-Encoding" value="chunked"/>
@@ -49,7 +49,7 @@
         
         <service name="HttpWithNoChunking">
             <inbound>
-                <inbound-endpoint address="http://localhost:8987" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:8987" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

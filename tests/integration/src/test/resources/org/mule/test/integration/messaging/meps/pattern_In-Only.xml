@@ -19,7 +19,7 @@
         ignored.
     </description>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="one-way"/>
 
     <model>
         <service name="In-Only-Service">

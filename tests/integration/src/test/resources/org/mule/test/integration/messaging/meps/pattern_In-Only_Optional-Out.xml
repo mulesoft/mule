@@ -23,9 +23,9 @@
 
     <vm:connector name="vmConnector"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="false"/>
-    <vm:endpoint path="test.header.received" name="receivedEndpoint" synchronous="false"/>
-    <vm:endpoint path="test.header.notreceived" name="notReceivedEndpoint" synchronous="false"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="one-way"/>
+    <vm:endpoint path="test.header.received" name="receivedEndpoint" exchange-pattern="one-way"/>
+    <vm:endpoint path="test.header.notreceived" name="notReceivedEndpoint" exchange-pattern="one-way"/>
 
     <model>
         <service name="In-Only_Optional-Out--Service">

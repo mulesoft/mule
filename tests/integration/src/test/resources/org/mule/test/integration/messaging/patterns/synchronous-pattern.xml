@@ -15,7 +15,7 @@
     <model name="Synchronous_Message_Pattern">
         <service name="SynchronousService">
             <inbound>
-                <jms:inbound-endpoint queue="test.in" synchronous="true"/>
+                <jms:inbound-endpoint queue="test.in" exchange-pattern="request-response"/>
             </inbound>
 
             <test:component/>

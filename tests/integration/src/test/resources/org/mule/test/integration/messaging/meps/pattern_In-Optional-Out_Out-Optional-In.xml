@@ -27,9 +27,9 @@
 
     <vm:connector name="vmConnector"/>
 
-    <vm:endpoint path="test.inbound" name="inboundEndpoint" synchronous="true"/>
+    <vm:endpoint path="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
 
-    <jms:endpoint queue="external.app" name="ExternalEndpoint" synchronous="true" responseTimeout="3000"/>
+    <jms:endpoint queue="external.app" name="ExternalEndpoint" exchange-pattern="request-response" responseTimeout="3000"/>
 
     <model>
         <service name="In-Optional-Out_Out-Optional-In-Service">

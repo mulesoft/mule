@@ -25,7 +25,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$Component" />
                 <binding interface="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$BindigInterface">
-                    <outbound-endpoint address="vm://hello.in" synchronous="true" />
+                    <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
             <outbound>

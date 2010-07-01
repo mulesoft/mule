@@ -19,15 +19,15 @@
     <model name="Async_Request-Response_Message_Pattern">
         <service name="AsyncRequestResponseService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" synchronous="true"/>
+                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" exchange-pattern="request-response"/>
             </inbound>
 
             <test:component/>
 
             <outbound>
                 <multicasting-router>
-                    <jms:outbound-endpoint queue="service1" synchronous="false"/>
-                    <jms:outbound-endpoint queue="service2" synchronous="false"/>
+                    <jms:outbound-endpoint queue="service1" exchange-pattern="one-way"/>
+                    <jms:outbound-endpoint queue="service2" exchange-pattern="one-way"/>
                     <reply-to address="jms://reply.queue"/>
                 </multicasting-router>
             </outbound>

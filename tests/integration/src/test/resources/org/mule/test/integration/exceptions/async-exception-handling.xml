@@ -14,18 +14,18 @@
     http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
     http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
     
-    <endpoint name="search.inbound.endpoint"  address="http://localhost:8888/searchin" synchronous="true"/>
-    <endpoint name="search.outbound.endpoint" address="http://localhost:8899/searchout" synchronous="true"/>
+    <endpoint name="search.inbound.endpoint"  address="http://localhost:8888/searchin" exchange-pattern="request-response"/>
+    <endpoint name="search.outbound.endpoint" address="http://localhost:8899/searchout" exchange-pattern="request-response"/>
     
     <model name="TestAsync">
         
         <service name="SearchWebServiceBridge">
             <inbound>
-                <inbound-endpoint  ref="search.inbound.endpoint" synchronous="true"/>
+                <inbound-endpoint  ref="search.inbound.endpoint" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="request-channel" synchronous="false"/>
+                    <vm:outbound-endpoint path="request-channel" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
             <async-reply timeout="0">
@@ -36,7 +36,7 @@
         
         <service name="RequestFlow">
             <inbound>
-                <vm:inbound-endpoint path="request-channel" synchronous="false"/>
+                <vm:inbound-endpoint path="request-channel" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
             <outbound>
@@ -51,11 +51,11 @@
         
         <service name="ResponseFlow">
             <inbound>
-                <vm:inbound-endpoint path="response-channel" synchronous="false"/>
+                <vm:inbound-endpoint path="response-channel" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="back-channel" synchronous="false"/>
+                    <vm:outbound-endpoint path="back-channel" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -66,7 +66,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="back-channel" synchronous="false"/>
+                    <vm:outbound-endpoint path="back-channel" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

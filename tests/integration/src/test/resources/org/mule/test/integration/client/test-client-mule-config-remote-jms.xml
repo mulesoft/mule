@@ -13,6 +13,6 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector" specification="1.1" />
 
-    <endpoint address="jms://mule.sys.queue" name="remoteEndpoint" synchronous="true"/>
+    <endpoint address="jms://mule.sys.queue" name="remoteEndpoint" exchange-pattern="request-response"/>
 
 </mule>

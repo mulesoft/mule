@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="tcp://localhost:60504" synchronous="true"/>
+        <client:remote-endpoint address="tcp://localhost:60504" exchange-pattern="request-response"/>
     </client:remote-dispatcher-agent>
     
     <model name="main">

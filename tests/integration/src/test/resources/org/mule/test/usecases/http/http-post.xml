@@ -10,13 +10,13 @@
 
     <http:endpoint name="httpRequest"
                    address="http://localhost:18080/RemoteService"
-                   synchronous="true"
+                   exchange-pattern="request-response"
                    method="POST">
         <property key="http.post.body.param" value="IncidentData"/>
     </http:endpoint>
     <endpoint name="httpService"
               address="http://localhost:18080/RemoteService"
-              synchronous="true"/>
+              exchange-pattern="request-response"/>
 
     <model name="model">
         <service name="HttpService">

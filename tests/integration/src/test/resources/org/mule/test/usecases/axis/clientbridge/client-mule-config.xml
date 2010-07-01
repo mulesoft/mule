@@ -15,7 +15,7 @@
     <model name="main">
         <service name="test">
             <inbound>
-                <inbound-endpoint address="vm://complexRequest" synchronous="true"/>
+                <inbound-endpoint address="vm://complexRequest" exchange-pattern="request-response"/>
                 <forwarding-router/>
             </inbound>
             <outbound>

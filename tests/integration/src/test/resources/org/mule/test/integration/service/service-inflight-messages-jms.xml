@@ -16,7 +16,7 @@
 
     <jms:activemq-connector name="jmsConnector" persistentDelivery="true"/>
 
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector" synchronous="false"/>
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector" exchange-pattern="one-way"/>
 
     <model name="TestModel">
 

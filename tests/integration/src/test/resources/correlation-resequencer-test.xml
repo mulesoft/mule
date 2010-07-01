@@ -21,7 +21,7 @@
             </inbound>
             <outbound>
                 <list-message-splitter-router>
-                    <vm:outbound-endpoint path="resequencer" synchronous="true"/>
+                    <vm:outbound-endpoint path="resequencer" exchange-pattern="request-response"/>
                 </list-message-splitter-router>
             </outbound>
         </service>
@@ -33,7 +33,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="sorted" synchronous="true"/>
+                    <vm:outbound-endpoint path="sorted" exchange-pattern="request-response"/>
                 </pass-through-router>
 
             </outbound>
@@ -48,7 +48,5 @@
             <test:component/>
 
         </service>
-
     </model>
-
 </mule>

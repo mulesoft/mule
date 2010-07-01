@@ -25,33 +25,33 @@
     <model>
         <service name="httpService1">
             <inbound>
-                <vm:inbound-endpoint path="httpService1" synchronous="true" />
+                <vm:inbound-endpoint path="httpService1" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="httpService" synchronous="true" />
+                    <outbound-endpoint ref="httpService" exchange-pattern="request-response" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="cxfService1">
             <inbound>
-                <vm:inbound-endpoint path="cxfService1" synchronous="true" />
+                <vm:inbound-endpoint path="cxfService1" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="cxfService" synchronous="true" />
+                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response" />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="httpService2">
             <inbound>
-                <vm:inbound-endpoint path="httpService2" synchronous="true" />
+                <vm:inbound-endpoint path="httpService2" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="httpService" synchronous="true">
+                    <outbound-endpoint ref="httpService" exchange-pattern="request-response">
                         <property key="responseProperties" value="some,other" />
                        </outbound-endpoint>
                 </pass-through-router>
@@ -60,11 +60,11 @@
 
         <service name="cxfService2">
             <inbound>
-                <vm:inbound-endpoint path="cxfService2" synchronous="true" />
+                <vm:inbound-endpoint path="cxfService2" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="cxfService" synchronous="true">
+                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
                         <property key="responseProperties" value="some,other" />
                        </outbound-endpoint>
                 </pass-through-router>

@@ -29,7 +29,7 @@
     <model>
         <service name="Service1">
             <inbound>
-                <vm:inbound-endpoint path="in" synchronous="true">
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response">
                     <message-properties-transformer scope="session">
                         <add-message-property key="foo" value-ref="nonSerializable" />
                     </message-properties-transformer>
@@ -37,9 +37,9 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <cxf:outbound-endpoint synchronous="true" 
+                    <cxf:outbound-endpoint exchange-pattern="request-response" 
                         address="http://localhost:65082/services/EchoUMO" operation="echo" />
-                    <vm:outbound-endpoint path="service3" synchronous="true">
+                    <vm:outbound-endpoint path="service3" exchange-pattern="request-response">
                         <custom-transformer class="org.mule.transformer.simple.MessagePropertiesTransformer">
                             <spring:property name="getProperty" value="foo" />
                             <spring:property name="scopeName" value="session" />
@@ -51,7 +51,7 @@
 
         <service name="Service2">
             <inbound>
-                <cxf:inbound-endpoint synchronous="true"
+                <cxf:inbound-endpoint exchange-pattern="request-response"
                     address="http://localhost:65082/services/EchoUMO"
                     serviceClass="org.mule.test.integration.tck.Echo" />
             </inbound>
@@ -60,7 +60,7 @@
 
         <service name="Service3">
             <inbound>
-                <vm:inbound-endpoint path="service3" synchronous="true" />
+                <vm:inbound-endpoint path="service3" exchange-pattern="request-response" />
             </inbound>
             <echo-component />
         </service>

@@ -31,7 +31,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <outbound-endpoint address="vm://hello.in" synchronous="true" />
+                    <outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
             <outbound>
@@ -48,7 +48,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <outbound-endpoint address="jms://hello.in" synchronous="true" />
+                    <outbound-endpoint address="jms://hello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
             <outbound>
@@ -65,7 +65,7 @@
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <outbound-endpoint address="jms://topic:thello.in" synchronous="true" />
+                    <outbound-endpoint address="jms://topic:thello.in" exchange-pattern="request-response" />
                 </binding>
             </component>
             <outbound>

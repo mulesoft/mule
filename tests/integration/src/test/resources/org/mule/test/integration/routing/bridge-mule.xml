@@ -9,18 +9,18 @@
     <model name="test">
        <service name="bridge">
            <inbound>
-               <inbound-endpoint address="vm://bridge.inbound" synchronous="true"/>
+               <inbound-endpoint address="vm://bridge.inbound" exchange-pattern="request-response"/>
            </inbound>
            <outbound>
                <pass-through-router>
-                   <outbound-endpoint address="vm://bridge.outbound" synchronous="true"/>
+                   <outbound-endpoint address="vm://bridge.outbound" exchange-pattern="request-response"/>
                </pass-through-router>
            </outbound>
         </service>
 
        <service name="Receiver">
            <inbound>
-               <inbound-endpoint address="vm://bridge.outbound" synchronous="true"/>
+               <inbound-endpoint address="vm://bridge.outbound" exchange-pattern="request-response"/>
            </inbound>
            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

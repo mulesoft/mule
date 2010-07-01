@@ -51,7 +51,7 @@
 
         <service name="mycomponent4">
             <inbound>
-                <inbound-endpoint address="cxf:vm://mycomponent4" synchronous="false"/>
+                <inbound-endpoint address="cxf:vm://mycomponent4" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
@@ -60,7 +60,7 @@
         
         <service name="httpBridge">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/test" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:63081/test" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>

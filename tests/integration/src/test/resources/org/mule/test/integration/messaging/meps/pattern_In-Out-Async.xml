@@ -23,7 +23,7 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:endpoint queue="test.inbound" name="inboundEndpoint" synchronous="true"/>
+    <jms:endpoint queue="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
 
     <model>
         <service name="In-Out-Async-Service">
