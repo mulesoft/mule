@@ -15,10 +15,9 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <ssl:endpoint name="in" host="localhost" port="60195" synchronous="true"/>
+    <ssl:endpoint name="in" host="localhost" port="60195" exchange-pattern="request-response"/>
 
     <model name="main">
-
         <custom-service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <ssl:inbound-endpoint ref="in"/>
@@ -27,7 +26,5 @@
                 <test:callback class="org.mule.transport.ssl.SaveCertificatesCallback"/>
             </test:component>
         </custom-service>
-
     </model>
-
 </mule>

@@ -15,14 +15,13 @@
         <tls:server path="trustStore" storePassword="mulepassword"/>
     </tls:connector>
 
-    <tls:endpoint name="sendEndpoint" connector-ref="tlsConnector" address="tls://localhost:60198" synchronous="true"/>
+    <tls:endpoint name="sendEndpoint" connector-ref="tlsConnector" address="tls://localhost:60198" exchange-pattern="request-response"/>
 
-    <endpoint name="sendManyEndpoint" connector-ref="tlsConnector" address="tls://localhost:60197" synchronous="true"/>
+    <endpoint name="sendManyEndpoint" connector-ref="tlsConnector" address="tls://localhost:60197" exchange-pattern="request-response"/>
 
-    <tls:endpoint name="asyncEndpoint" connector-ref="tlsConnector" host="localhost" port="60196" synchronous="false"/>
+    <tls:endpoint name="asyncEndpoint" connector-ref="tlsConnector" host="localhost" port="60196" exchange-pattern="one-way"/>
 
     <model name="main">
-
         <custom-service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <tls:inbound-endpoint ref="sendEndpoint"/>
@@ -49,7 +48,5 @@
                 <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
             </test:component>
         </custom-service>
-
     </model>
-
 </mule>

@@ -16,17 +16,14 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <ssl:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
+    <ssl:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
 
     <model name="main">
-
         <service name="testComponent1">
             <inbound>
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
-
     </model>
-
 </mule>
