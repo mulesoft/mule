@@ -45,7 +45,7 @@
         <service name="serviceProxy">
             <inbound>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject" synchronous="true"/>
+                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject" exchange-pattern="request-response"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
