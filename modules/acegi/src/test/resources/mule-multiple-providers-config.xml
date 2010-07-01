@@ -56,42 +56,42 @@
     <model name="sample-mule-app">
         <service name="flow">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4445" synchronous="true">
+                <http:inbound-endpoint address="http://localhost:4445" exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
                 </pass-through-router>    
             </outbound>
         </service>
         
         <service name="flow2">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4446" synchronous="true">
+                <http:inbound-endpoint address="http://localhost:4446" exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2"/>
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
                 </pass-through-router>    
             </outbound>
         </service>
         
         <service name="flow3">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:4447" synchronous="true">
+                <http:inbound-endpoint address="http://localhost:4447" exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm" 
                         securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" synchronous="true"/>
+                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
                 </pass-through-router>    
             </outbound>
         </service>
@@ -100,7 +100,7 @@
     <model name="vm-model">
         <service name="vm-service">
             <inbound>
-                <vm:inbound-endpoint path="vmtest" synchronous="true"/>
+                <vm:inbound-endpoint path="vmtest" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
