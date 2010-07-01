@@ -353,7 +353,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                            connector.getMuleContext()), endpoint, new DefaultMuleSession(service,
+                            connector.getMuleContext()), endpoint, new DefaultMuleSession((Service) flowConstruct,
                             connector.getMuleContext()), true);
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected));
@@ -377,7 +377,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
             RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
-                    new DefaultMuleSession(service, connector.getMuleContext()), true));
+                    new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext()), true));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
         }

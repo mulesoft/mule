@@ -51,7 +51,7 @@ public class EndpointService implements EndpointServiceMBean
         }
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
-        this.componentName = receiver.getService().getName();
+        this.componentName = receiver.getFlowConstruct().getName();
         init();
     }
 

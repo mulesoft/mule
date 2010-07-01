@@ -10,13 +10,13 @@
 
 package org.mule.transport.vm;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageReceiver;
@@ -103,13 +103,13 @@ public class VMConnector extends AbstractConnector
     }
 
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         if (!endpoint.isSynchronous())
         {
             queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }
-        return serviceDescriptor.createMessageReceiver(this, service, endpoint);
+        return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint);
     }
 
     public String getProtocol()

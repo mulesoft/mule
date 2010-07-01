@@ -80,13 +80,21 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     protected void create() throws Exception
     {
+        if (!(flowConstruct instanceof Service))
+        {
+            throw new IllegalArgumentException(
+                "Only the Service flow constuct is supported by the axis transport");
+        }
+        Service service = (Service) flowConstruct;
+        
+        
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
         String style = (String) endpoint.getProperties().get(AxisConnector.STYLE);
         String use = (String) endpoint.getProperties().get(AxisConnector.USE);
         String doc = (String) endpoint.getProperties().get("documentation");
 
         EndpointURI uri = endpoint.getEndpointURI();
-        String serviceName = service.getName();
+        String serviceName = flowConstruct.getName();
 
         SOAPService existing = this.connector.getAxis().getService(serviceName);
         if (existing != null)

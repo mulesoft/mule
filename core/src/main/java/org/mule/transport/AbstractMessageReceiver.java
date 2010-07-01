@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
 import org.mule.OptimizedRequestContext;
 import org.mule.ResponseOutputStream;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -48,7 +49,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     /**
      * The Service with which this receiver is associated with
      */
-    protected Service service = null;
+    protected FlowConstruct flowConstruct;
 
     /**
      * {@link MessageProcessor} chain used to process messages once the transport
@@ -86,16 +87,16 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * @see Service
      * @see InboundEndpoint
      */
-    public AbstractMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public AbstractMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
     {
         super(endpoint);
 
-        if (service == null)
+        if (flowConstruct == null)
         {
-            throw new IllegalArgumentException("Service cannot be null");
+            throw new IllegalArgumentException("FlowConstruct cannot be null");
         }
-        this.service = service;
+        this.flowConstruct = flowConstruct;
     }
 
     /**
@@ -135,10 +136,9 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         }
     }
 
-    // TODO BL-46 Service dependency
-    public Service getService()
+    public FlowConstruct getFlowConstruct()
     {
-        return service;
+        return flowConstruct;
     }
 
     public final MuleMessage routeMessage(MuleMessage message) throws MuleException
@@ -237,11 +237,11 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         }
         if (session != null)
         {
-            session.setService(service);
+            session.setService((Service) flowConstruct);
         }
         else
         {
-            session = new DefaultMuleSession(service, connector.getMuleContext());
+            session = new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext());
         }
         return new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
     }

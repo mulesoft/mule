@@ -9,6 +9,7 @@
  */
 package org.mule.transport.ajax.embedded;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -17,7 +18,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
@@ -206,9 +206,9 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     }
 
     @Override
-    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    protected MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception
     {
-        MessageReceiver receiver =  super.createReceiver(service, endpoint);
+        MessageReceiver receiver =  super.createReceiver(flowConstuct, endpoint);
         BayeuxHolder holder = registerBayeuxEndpoint(receiver.getEndpoint());
         ((AjaxMessageReceiver) receiver).setBayeux(holder.getBayeux());
         return receiver;

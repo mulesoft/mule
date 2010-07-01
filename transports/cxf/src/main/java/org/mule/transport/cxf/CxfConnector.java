@@ -11,6 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.ServiceNotificationListener;
@@ -222,13 +223,13 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     {
         CxfMessageReceiver cxfReceiver = (CxfMessageReceiver) receiver;
         Server server = cxfReceiver.getServer();
-        Service service = cxfReceiver.getService();
+        String flowConstruct = cxfReceiver.getFlowConstruct().getName();
         
         uriToServer.put(server.getEndpoint().getEndpointInfo().getAddress(), server);
 
         // TODO MULE-2228 Simplify this API
         SedaService outerProtocolService = new SedaService(muleContext);
-        outerProtocolService.setName(service.getName() + "_cxfComponent");
+        outerProtocolService.setName(flowConstruct + "_cxfComponent");
         outerProtocolService.setModel(muleContext.getRegistry().lookupSystemModel());
 
         CxfServiceComponent svcComponent = new CxfServiceComponent(this, (CxfMessageReceiver) receiver);
@@ -338,11 +339,11 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
 
         // Add outer services to map so that we can easily look them on on user
         // service lifecycle notifications
-        if (!serviceToProtocolServices.containsKey(receiver.getService().getName()))
+        if (!serviceToProtocolServices.containsKey(flowConstruct))
         {
-            serviceToProtocolServices.put(receiver.getService().getName(), new HashSet());
+            serviceToProtocolServices.put(flowConstruct, new HashSet());
         }
-        serviceToProtocolServices.get(receiver.getService().getName()).add(outerProtocolService);
+        serviceToProtocolServices.get(flowConstruct).add(outerProtocolService);
 
     }
 
@@ -355,11 +356,11 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
      *         is the service name, which is equivilent to the Axis service name.
      */
     @Override
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
-        if (service.getName().startsWith(CXF_SERVICE_COMPONENT_NAME))
+        if (flowConstruct.getName().startsWith(CXF_SERVICE_COMPONENT_NAME))
         {
-            return service.getName();
+            return flowConstruct.getName();
         }
         else
         {
@@ -437,7 +438,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
     }
 
     @Override
-    protected void doUnregisterListener(Service service, InboundEndpoint endpoint, MessageReceiver receiver)
+    protected void doUnregisterListener(FlowConstruct flowConstruct, InboundEndpoint endpoint, MessageReceiver receiver)
     {
         uriToServer.remove(((CxfMessageReceiver) receiver).getServer().getEndpoint().getEndpointInfo().getAddress());
     }

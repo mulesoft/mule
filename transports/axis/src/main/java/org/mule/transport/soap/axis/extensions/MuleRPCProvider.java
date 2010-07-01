@@ -74,7 +74,14 @@ public class MuleRPCProvider extends RPCProvider
         {
             throw new AxisFault("Could not find Mule registered service: " + s);
         }
-        Class[] classes = AxisServiceProxy.getInterfacesForComponent(receiver.getService());
+        
+        if (!(receiver.getFlowConstruct() instanceof Service))
+        {
+            throw new IllegalArgumentException(
+                "Only the Service flow constuct is supported by the axis transport");
+        }
+        Service service = (Service) receiver.getFlowConstruct();
+        Class[] classes = AxisServiceProxy.getInterfacesForComponent(service);
         return AxisServiceProxy.createProxy(receiver, true, classes);
     }
 

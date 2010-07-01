@@ -90,6 +90,13 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         super.doInitialise();
         
+        if (!(flowConstruct instanceof Service))
+        {
+            throw new IllegalArgumentException(
+                "Only the Service flow constuct is supported by the axis transport");
+        }
+        Service service = (Service) flowConstruct;
+        
         try
         {
             Map endpointProps = getEndpoint().getProperties();
@@ -131,7 +138,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                     svcCls = ClassUtils.loadClass(serviceClassName, getClass());
                 } 
                 
-                targetCls = getTargetClass(svcCls);
+                targetCls = getTargetClass(svcCls, service);
                 
                 if (svcCls == null)
                 {
@@ -379,7 +386,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    private Class<?> getTargetClass(Class<?> svcCls) throws MuleException, ClassNotFoundException
+    private Class<?> getTargetClass(Class<?> svcCls, Service service) throws MuleException, ClassNotFoundException
     {
         Component component = service.getComponent();
         if (!(component instanceof JavaComponent)) 

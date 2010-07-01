@@ -10,9 +10,9 @@
 
 package org.mule.transport.stdio;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -43,9 +43,9 @@ public abstract class StdioConnector extends AbstractConnector
     }
     
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        return serviceDescriptor.createMessageReceiver(this, service, endpoint,
+        return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint,
             new Object[]{ Long.valueOf(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY) });
     }
 

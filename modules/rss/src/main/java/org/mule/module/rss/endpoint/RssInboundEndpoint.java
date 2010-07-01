@@ -9,6 +9,7 @@
  */
 package org.mule.module.rss.endpoint;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -85,8 +86,14 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint implements Inboun
     }
 
 
-    public void onListenerAdded(Service service) throws MuleException
+    public void onListenerAdded(FlowConstruct flowConstruct) throws MuleException
     {
+        if (!(flowConstruct instanceof Service))
+        {
+            throw new IllegalArgumentException(
+                "Only the Service flow constuct is supported by the axis transport");
+        }
+        Service service = (Service) flowConstruct;
         if (isSplitFeed())
         {
             Filter filter = new EntryLastUpdatedFilter(getLastUpdate());

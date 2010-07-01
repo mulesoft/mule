@@ -9,10 +9,10 @@
  */
 package org.mule.transport.ajax.container;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.transport.AbstractConnector;
@@ -236,9 +236,9 @@ public class AjaxServletConnector extends ServletConnector
     }
 
     @Override
-    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        AjaxMessageReceiver receiver = (AjaxMessageReceiver) super.createReceiver(service, endpoint);
+        AjaxMessageReceiver receiver = (AjaxMessageReceiver) super.createReceiver(flowConstruct, endpoint);
         receiver.setBayeux(getBayeux());
         return receiver;
     }

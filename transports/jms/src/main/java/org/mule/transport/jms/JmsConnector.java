@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
@@ -19,7 +20,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.lifecycle.StopException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.ReplyToHandler;
@@ -559,9 +559,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     @Override
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
-        return service.getName() + "~" + endpoint.getEndpointURI().getAddress();
+        return flowConstruct.getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
     public Session getSessionFromTransaction()

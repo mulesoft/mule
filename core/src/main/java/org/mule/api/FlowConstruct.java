@@ -22,7 +22,6 @@ public interface FlowConstruct extends NamedObject
      */
     ExceptionListener getExceptionListener();
 
-    
     /**
      * The exception strategy to use to handle exceptions in the Mule component.
      * 
@@ -30,5 +29,7 @@ public interface FlowConstruct extends NamedObject
      *            argument is null a default
      */
     void setExceptionListener(ExceptionListener listener);
+
+    boolean isStarted();
 
 }

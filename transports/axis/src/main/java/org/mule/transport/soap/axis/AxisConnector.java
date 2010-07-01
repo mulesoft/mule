@@ -11,6 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -303,15 +304,15 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
      *         is the component name, which is equivalent to the Axis service name.
      */
     @Override
-    protected Object getReceiverKey(Service component, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {
-            return component.getName();
+            return flowConstruct.getName();
         }
         else
         {
-            return endpoint.getEndpointURI().getAddress() + "/" + component.getName();
+            return endpoint.getEndpointURI().getAddress() + "/" + flowConstruct.getName();
         }
     }
 
@@ -336,7 +337,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             catch (Exception e)
             {
                 logger.error("Failed to unregister Axis endpoint: " + endpointKey + " for service: "
-                        + receiver.getService().getName() + ". Error is: "
+                        + receiver.getFlowConstruct().getName() + ". Error is: "
                         + e.getMessage(), e);
             }
         }

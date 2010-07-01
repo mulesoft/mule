@@ -68,7 +68,7 @@ import org.w3c.dom.Document;
  * <code>AxisServiceComponent</code> is a Mule component implementation of the Axis
  * servlet. This component supports all the features of the Axis servlet except -
  * <ol>
- * <li>Jws class services are not supported as they don't add any value to the Mule
+ * <li>Jws class services are not supported as they don't add any value to the Mule¯
  * model</li>
  * <li>Currently there is no HttpSession support. This will be fixed when MuleSession
  * support is added to the Http Connector</li>

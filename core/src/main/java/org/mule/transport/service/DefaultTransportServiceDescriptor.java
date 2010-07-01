@@ -10,6 +10,7 @@
 
 package org.mule.transport.service;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -17,7 +18,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.AbstractServiceDescriptor;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -183,16 +183,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                 Service service,
+                                                 FlowConstruct flowConstruct,
                                                  InboundEndpoint endpoint) throws MuleException
     {
 
-        MessageReceiver mr = createMessageReceiver(connector, service, endpoint, null);
+        MessageReceiver mr = createMessageReceiver(connector, flowConstruct, endpoint, null);
         return mr;
     }
 
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                 Service service,
+                                                 FlowConstruct flowConstruct,
                                                  InboundEndpoint endpoint,
                                                  Object[] args) throws MuleException
     {
@@ -226,7 +226,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
 
             newArgs[0] = connector;
-            newArgs[1] = service;
+            newArgs[1] = flowConstruct;
             newArgs[2] = endpoint;
 
             if (args != null && args.length != 0)

@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -18,7 +19,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MuleMessageFactory;
@@ -143,7 +143,7 @@ public class FileConnector extends AbstractConnector
     }
 
     @Override
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         if (endpoint.getFilter() != null && endpoint.getFilter() instanceof FilenameWildcardFilter)
         {
@@ -164,7 +164,7 @@ public class FileConnector extends AbstractConnector
      * </ul>
      */
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
         if (null != getReadFromDirectory())
@@ -232,7 +232,7 @@ public class FileConnector extends AbstractConnector
 
         try
         {
-            return serviceDescriptor.createMessageReceiver(this, service, endpoint, new Object[]{readDir,
+            return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint, new Object[]{readDir,
                     moveTo, moveToPattern, new Long(polling)});
 
         }

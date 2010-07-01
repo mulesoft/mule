@@ -10,6 +10,7 @@
 
 package org.mule.transport.rmi;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,7 +19,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
@@ -185,10 +185,10 @@ public class RmiConnector extends AbstractJndiConnector
     }
 
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         final Object[] args = new Object[]{new Long(pollingFrequency)};
-        return getServiceDescriptor().createMessageReceiver(this, service, endpoint, args);
+        return getServiceDescriptor().createMessageReceiver(this, flowConstruct, endpoint, args);
     }
 
     /**

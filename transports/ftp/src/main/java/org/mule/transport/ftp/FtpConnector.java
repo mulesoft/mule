@@ -10,6 +10,7 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -18,7 +19,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
@@ -97,10 +97,10 @@ public class FtpConnector extends AbstractConnector
     }
 
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         List args = getReceiverArguments(endpoint.getProperties());
-        return serviceDescriptor.createMessageReceiver(this, service, endpoint, args.toArray());
+        return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint, args.toArray());
     }
 
     protected List getReceiverArguments(Map endpointProperties)

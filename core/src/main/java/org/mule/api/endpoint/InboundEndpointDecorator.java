@@ -9,8 +9,8 @@
  */
 package org.mule.api.endpoint;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
-import org.mule.api.service.Service;
 
 /**
  * Used on custom endpoints that provide additional processing to service or message to handle the way certain
@@ -27,6 +27,6 @@ public interface InboundEndpointDecorator extends OutboundEndpointDecorator
      * @param service the service that the endpoint was registered with
      * @throws org.mule.api.MuleException if something fails while manipulating the service
      */
-    void onListenerAdded(Service service) throws MuleException;
+    void onListenerAdded(FlowConstruct flowConstruct) throws MuleException;
 
 }

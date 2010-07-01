@@ -99,7 +99,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
 
             DefaultMuleEvent event = new DefaultMuleEvent(message, ep, 
-                new DefaultMuleSession(service, connector.getMuleContext()), synchronous);
+                new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext()), synchronous);
             if (synchronous)
             {
                 MuleEvent resultEvent = ep.process(event);

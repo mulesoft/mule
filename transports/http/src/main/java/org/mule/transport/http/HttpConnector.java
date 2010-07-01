@@ -10,10 +10,10 @@
 
 package org.mule.transport.http;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -219,7 +219,7 @@ public class HttpConnector extends TcpConnector
      * @return the key to store the newly created receiver against
      */
     @Override
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         String key = endpoint.getEndpointURI().toString();
         int i = key.indexOf('?');

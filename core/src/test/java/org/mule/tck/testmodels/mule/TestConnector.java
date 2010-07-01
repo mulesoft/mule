@@ -10,13 +10,13 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.AbstractEndpoint;
@@ -106,9 +106,9 @@ public class TestConnector extends AbstractConnector
     }
 
     @Override
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception
     {
-        MessageReceiver receiver = new AbstractMessageReceiver(this, service, endpoint)
+        MessageReceiver receiver = new AbstractMessageReceiver(this, flowConstuct, endpoint)
         {
 
             @Override

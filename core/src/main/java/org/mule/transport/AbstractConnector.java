@@ -40,7 +40,6 @@ import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
@@ -488,7 +487,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                         logger.debug("Starting receiver on endpoint: "
                                      + receiver.getEndpoint().getEndpointURI());
                     }
-                    if (receiver.getService().isStarted())
+                    if (receiver.getFlowConstruct().isStarted())
                     {
                         receiver.start();
                     }
@@ -1227,34 +1226,24 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             throw new IllegalArgumentException("The messageProcessorChain cannot be null when registering a listener");
         }
 
-        Service service = null;
-        if (flowConstruct != null && flowConstruct instanceof Service)
-        {
-            service = (Service) flowConstruct;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Only 'Service' pattern is currently supported");
-        }
-
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
         {
             throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
         }
 
-        logger.info("Registering listener: " + service.getName() + " on endpointUri: "
+        logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
                     + endpointUri.toString());
 
-        if (getReceiver(service, endpoint) != null)
+        if (getReceiver(flowConstruct, endpoint) != null)
         {
             throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
         }
 
-        MessageReceiver receiver = createReceiver(service, endpoint);
+        MessageReceiver receiver = createReceiver(flowConstruct, endpoint);
         receiver.setListener(messageProcessorChain);
 
-        Object receiverKey = getReceiverKey(service, endpoint);
+        Object receiverKey = getReceiverKey(flowConstruct, endpoint);
         receiver.setReceiverKey(receiverKey.toString());
         // Since we're managing the creation we also need to initialise
         receiver.initialise();
@@ -1262,7 +1251,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         flowConstructByEndpoint.put(endpoint.getName(), flowConstruct);
         if (endpoint instanceof InboundEndpointDecorator)
         {
-            ((InboundEndpointDecorator) endpoint).onListenerAdded(service);
+            ((InboundEndpointDecorator) endpoint).onListenerAdded(flowConstruct);
         }
         
         if (isConnected())
@@ -1283,7 +1272,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(),
             endpoint.getEndpointURI().getAddress());
@@ -1296,7 +1285,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             throw new IllegalArgumentException("The endpoint must not be null when you unregister a listener");
         }
 
-        Service service = (Service) flowConstructByEndpoint.remove(endpoint.getName());
+        FlowConstruct flowConstruct = (FlowConstruct) flowConstructByEndpoint.remove(endpoint.getName());
         
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
@@ -1312,7 +1301,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
         if (receivers != null && !receivers.isEmpty())
         {
-            MessageReceiver receiver = receivers.remove(getReceiverKey(service, endpoint));
+            MessageReceiver receiver = receivers.remove(getReceiverKey(flowConstruct, endpoint));
             if (receiver != null)
             {
                 if (isConnected())
@@ -1325,12 +1314,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     receiver.stop();
                 }
                 destroyReceiver(receiver, endpoint);
-                doUnregisterListener(service, endpoint, receiver);
+                doUnregisterListener(flowConstruct, endpoint, receiver);
             }
         }
     }
 
-    protected void doUnregisterListener(Service service, InboundEndpoint endpoint, MessageReceiver receiver)
+    protected void doUnregisterListener(FlowConstruct flowConstruct, InboundEndpoint endpoint, MessageReceiver receiver)
     {
         // Template method
     }
@@ -1493,11 +1482,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         return false;
     }
 
-    public MessageReceiver getReceiver(Service service, InboundEndpoint endpoint)
+    public MessageReceiver getReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         if (receivers != null)
         {
-            Object key = getReceiverKey(service, endpoint);
+            Object key = getReceiverKey(flowConstruct, endpoint);
             if (key != null)
             {
                 return receivers.get(key);
@@ -2292,9 +2281,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      *             really depends on the underlying transport, thus any exception
      *             could be thrown
      */
-    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        return getServiceDescriptor().createMessageReceiver(this, service, endpoint);
+        return getServiceDescriptor().createMessageReceiver(this, flowConstruct, endpoint);
     }
 
     /**

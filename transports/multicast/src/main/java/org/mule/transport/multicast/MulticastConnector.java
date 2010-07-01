@@ -10,10 +10,10 @@
 
 package org.mule.transport.multicast;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.transport.udp.UdpConnector;
 
 /**
@@ -71,10 +71,10 @@ public class MulticastConnector extends UdpConnector
 
 
     @Override
-    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         //you can have multiple Multicast sockets bound to a single port,
         // so store listeners with the service name too
-        return endpoint.getEndpointURI().getAddress() + "/" + service.getName();
+        return endpoint.getEndpointURI().getAddress() + "/" + flowConstruct.getName();
     }
 }
