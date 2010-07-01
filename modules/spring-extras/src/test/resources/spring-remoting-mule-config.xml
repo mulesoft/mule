@@ -42,7 +42,7 @@
                     address="http://localhost:8003/springService"
                     transformer-refs="springInputXform"
                     responseTransformer-refs="springOutputXform"
-                    synchronous="true" />
+                    exchange-pattern="request-response" />
             </inbound>
 
             <pooled-component>
