@@ -28,23 +28,20 @@
                   method="reverseString" methodArgumentTypes="java.lang.StringBuffer"/>
 
     <model name="sample">
-
         <service name="TestUMO">
             <inbound>
-                <inbound-endpoint address="vm://testin" synchronous="true"/>
+                <inbound-endpoint address="vm://testin" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <jnp:outbound-endpoint ref="Sender" synchronous="true"/>
+                    <jnp:outbound-endpoint ref="Sender" exchange-pattern="request-response"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender2" synchronous="true"/>
+                    <outbound-endpoint ref="Sender2" exchange-pattern="request-response"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>
