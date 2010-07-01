@@ -28,12 +28,12 @@
     <model>
         <service name="Test">
             <inbound>
-                <vm:inbound-endpoint path="in" synchronous="true"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.ejb.TestComponentWithBinding">
                 <binding interface="org.mule.container.DummyEjb" method="reverseString">
                     <!-- there should be no need to set the method on the binding and the endpooint -->
-                    <outbound-endpoint address="ejb://localhost/TestService" synchronous="true"/>
+                    <outbound-endpoint address="ejb://localhost/TestService" exchange-pattern="request-response"/>
                 </binding>
             </component>
         </service>
