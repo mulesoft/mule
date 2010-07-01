@@ -17,12 +17,12 @@
     <model>
         <service name="sendViaMuc">
             <inbound>
-                <vm:inbound-endpoint path="in" synchronous="true"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
                     <xmpp:outbound-endpoint type="GROUPCHAT" recipient="${chatroom}"
-                        nickname="muley" synchronous="true"/>
+                        nickname="muley" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -32,7 +32,7 @@
         -->
         <service name="receiveFromJabber" initialState="stopped">
             <inbound>
-                <xmpp:inbound-endpoint type="GROUPCHAT" from="${chatroom}" synchronous="true"/>
+                <xmpp:inbound-endpoint type="GROUPCHAT" from="${chatroom}" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
         </service>
