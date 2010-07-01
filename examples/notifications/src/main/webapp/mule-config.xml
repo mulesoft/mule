@@ -32,7 +32,7 @@
     <model>
         <service name="TestEchoService">
             <inbound>
-                <ajax:servlet-inbound-endpoint path="/services/echo" synchronous="true">
+                <ajax:servlet-inbound-endpoint path="/services/echo" exchange-pattern="request-response">
                     <custom-security-filter class="org.mule.example.notifications.DummySecurityFilter"/>
                 </ajax:servlet-inbound-endpoint>
             </inbound>
