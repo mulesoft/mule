@@ -42,7 +42,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Object payload = Arrays.asList(new Integer[]{new Integer(42)});
+        Object payload = Arrays.asList(42);
         MuleMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
@@ -54,7 +54,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     public void testBinaryWithBridge() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Object payload = Arrays.asList(new Integer[]{new Integer(42)});
+        Object payload = Arrays.asList(42);
         MuleMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
