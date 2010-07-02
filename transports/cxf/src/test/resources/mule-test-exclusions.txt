@@ -24,5 +24,5 @@ org.mule.transport.cxf.WSProxyTestCase
 # MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
 
-# CI build MULE-MULE3JDK5-1151
+# MULE-4931 / CI build MULE-MULE3JDK5-1151
 org.mule.transport.cxf.issues.LargeProxyTestCase
