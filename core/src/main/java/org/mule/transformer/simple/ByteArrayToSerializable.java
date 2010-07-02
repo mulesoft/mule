@@ -14,11 +14,10 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.SerializationUtils;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.InputStream;
-
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object
@@ -45,11 +44,11 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
             final Object result;
             if (src instanceof byte[])
             {
-                result = SerializationUtils.deserialize((byte[]) src);
+                result = SerializationUtils.deserialize((byte[]) src, muleContext.getExecutionClassLoader());
             }
             else
             {
-                result = SerializationUtils.deserialize((InputStream) src);
+                result = SerializationUtils.deserialize((InputStream) src, muleContext.getExecutionClassLoader());
             }
             if (result instanceof DeserializationPostInitialisable)
             {

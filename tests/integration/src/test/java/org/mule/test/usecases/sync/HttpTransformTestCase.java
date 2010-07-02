@@ -46,6 +46,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
+        bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
         assertEquals(payload, result);
@@ -58,6 +59,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
+        bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
         assertEquals(payload, result);
