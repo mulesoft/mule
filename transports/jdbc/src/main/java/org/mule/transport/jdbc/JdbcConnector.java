@@ -10,6 +10,7 @@
 
 package org.mule.transport.jdbc;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -18,7 +19,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageReceiver;
@@ -35,7 +35,6 @@ import org.mule.util.TemplateParser;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -112,7 +111,7 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         Map props = endpoint.getProperties();
         if (props != null)
@@ -130,7 +129,7 @@ public class JdbcConnector extends AbstractConnector
         }
 
         String[] params = getReadAndAckStatements(endpoint);
-        return getServiceDescriptor().createMessageReceiver(this, service, endpoint, params);
+        return getServiceDescriptor().createMessageReceiver(this, flowConstruct, endpoint, params);
     }
 
     public String[] getReadAndAckStatements(ImmutableEndpoint endpoint)

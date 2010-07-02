@@ -10,9 +10,9 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 
 import java.util.Properties;
@@ -77,7 +77,7 @@ public class SmtpConnector extends AbstractMailConnector
         return "smtp";
     }
 
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         throw new UnsupportedOperationException("Listeners cannot be registered on a SMTP endpoint");
     }
