@@ -284,22 +284,18 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
     protected String getStageName()
     {
-        StringBuffer buffer = new StringBuffer();
         if (name != null)
         {
-            buffer.append(name);
+            return name;
         }
         else if (next instanceof NamedObject)
         {
-            buffer.append(((NamedObject) next).getName());
+            return ((NamedObject) next).getName();
         }
-        else if (next != null)
+        else
         {
-            buffer.append(next.getClass().getName());
-            buffer.append(":");
-            buffer.append(next.hashCode());
+            return String.format("%s.%s", next.getClass().getName(), next.hashCode());
         }
-        return buffer.toString();
     }
 
     protected String getStageDescription()
