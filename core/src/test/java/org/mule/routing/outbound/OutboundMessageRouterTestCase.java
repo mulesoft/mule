@@ -39,7 +39,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     public void testOutboundMessageRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
         
         DefaultOutboundRouterCollection messageRouter = createObject(DefaultOutboundRouterCollection.class);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
@@ -84,7 +84,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         event = getTestInboundEvent(new IllegalArgumentException(), (MuleSession) session.proxy());
         
-        session.expectAndReturn("getService", getTestService());
+        session.expectAndReturn("getFlowConstruct", getTestService());
         session.expect("dispatchEvent", C.eq(event.getMessage(), endpoint2));
         messageRouter.process(event);
         session.verify();
@@ -98,8 +98,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         // now the message should be routed twice to different endpoints
         event = getTestInboundEvent("testing multiple routing", (MuleSession) session.proxy());
-        session.expectAndReturn("getService", getTestService());
-        session.expectAndReturn("getService", getTestService());
+        session.expectAndReturn("getFlowConstruct", getTestService());
+        session.expectAndReturn("getFlowConstruct", getTestService());
 
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));

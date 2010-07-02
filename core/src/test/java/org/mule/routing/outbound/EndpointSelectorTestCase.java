@@ -44,7 +44,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         super.doSetUp();
         session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
         dest1 = getTestOutboundEndpoint("dest1");
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");

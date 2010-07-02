@@ -66,7 +66,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
-        session.matchAndReturn("getService", getTestService("TEST", Apple.class));
+        session.matchAndReturn("getFlowConstruct", getTestService("TEST", Apple.class));
     }
 
     public void testChainingOutboundRouterSynchronous() throws Exception

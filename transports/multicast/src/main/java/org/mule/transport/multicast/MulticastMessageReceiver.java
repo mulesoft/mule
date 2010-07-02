@@ -10,9 +10,9 @@
 
 package org.mule.transport.multicast;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.udp.UdpMessageReceiver;
 
@@ -28,10 +28,10 @@ import javax.resource.spi.work.Work;
 public class MulticastMessageReceiver extends UdpMessageReceiver
 {
 
-    public MulticastMessageReceiver(AbstractConnector connector, Service service, InboundEndpoint endpoint)
+    public MulticastMessageReceiver(AbstractConnector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     protected DatagramSocket createSocket(URI uri, InetAddress inetAddress) throws IOException

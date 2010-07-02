@@ -10,19 +10,19 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 
 public class TestMessageReceiver extends AbstractMessageReceiver
 {
 
-    public TestMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint) throws CreateException
+    public TestMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     protected void doConnect() throws Exception

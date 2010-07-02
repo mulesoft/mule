@@ -10,12 +10,12 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -57,10 +57,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     private final JmsConnector jmsConnector;
 
-    public MultiConsumerJmsMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
 
         jmsConnector = (JmsConnector) connector;
 

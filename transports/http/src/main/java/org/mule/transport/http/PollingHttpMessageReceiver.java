@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -44,11 +45,11 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     private OutboundEndpoint outboundEndpoint;
 
     public PollingHttpMessageReceiver(Connector connector,
-                                      Service service,
+                                      FlowConstruct flowConstruct,
                                       final InboundEndpoint endpoint) throws CreateException
     {
 
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
 
         HttpPollingConnector pollingConnector;
 

@@ -10,19 +10,18 @@
 package org.mule.transport.ajax;
 
 import org.mule.RequestContext;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 
 import org.cometd.Bayeux;
 import org.cometd.Client;
-
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.BayeuxService;
 
@@ -38,10 +37,10 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
     @SuppressWarnings("unused")
     private ReceiverService service;
 
-    public AjaxMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public AjaxMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint); 
+        super(connector, flowConstruct, endpoint); 
     }
 
     public class ReceiverService extends BayeuxService

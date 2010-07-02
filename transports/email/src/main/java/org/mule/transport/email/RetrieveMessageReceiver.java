@@ -10,12 +10,12 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ReceiveException;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -54,13 +54,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     private String backupFolder = null;
 
     public RetrieveMessageReceiver(Connector connector,
-                                   Service service,
+                                   FlowConstruct flowConstruct,
                                    InboundEndpoint endpoint,
                                    long checkFrequency,
                                    boolean backupEnabled,
                                    String backupFolder) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
         this.backupFolder = backupFolder;
         this.backupEnabled = backupEnabled;
         this.setFrequency(checkFrequency);

@@ -10,10 +10,10 @@
 
 package org.mule.transport.jms.websphere;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.jms.XaTransactedJmsMessageReceiver;
 
@@ -21,10 +21,10 @@ import javax.jms.Session;
 
 public class WebsphereTransactedJmsMessageReceiver extends XaTransactedJmsMessageReceiver
 {
-    public WebsphereTransactedJmsMessageReceiver(Connector connector, Service service, 
+    public WebsphereTransactedJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, 
         InboundEndpoint endpoint) throws InitialisationException, CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
     
     protected void doConnect() throws Exception

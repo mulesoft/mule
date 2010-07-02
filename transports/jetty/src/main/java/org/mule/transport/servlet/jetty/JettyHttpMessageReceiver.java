@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -34,10 +35,16 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
     public static final String JETTY_SERVLET_CONNECTOR_NAME = "_jettyConnector";
 
-    public JettyHttpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public JettyHttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
+
+        if (!(flowConstruct instanceof Service))
+        {
+            throw new UnsupportedOperationException("JettyHttpMessageReceiver is only supported with Service");
+        }
+        Service service = (Service) flowConstruct;
 
         if ("rest".equals(endpoint.getEndpointURI().getScheme()))
         {

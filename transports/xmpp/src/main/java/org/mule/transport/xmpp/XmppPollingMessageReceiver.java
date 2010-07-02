@@ -10,11 +10,11 @@
 
 package org.mule.transport.xmpp;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
@@ -25,10 +25,10 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
     private final XmppConnector connector;
     private XmppConversation conversation;
 
-    public XmppPollingMessageReceiver(Connector conn, Service service, InboundEndpoint endpoint)
+    public XmppPollingMessageReceiver(Connector conn, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
     {
-        super(conn, service, endpoint);
+        super(conn, flowConstruct, endpoint);
         connector = (XmppConnector) conn;
         conversation = connector.getConversationFactory().create(endpoint);
     }

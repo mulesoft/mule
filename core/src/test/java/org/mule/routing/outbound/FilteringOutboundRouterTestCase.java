@@ -39,7 +39,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
     public void testFilteringOutboundRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
         
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         assertNotNull(endpoint1);
@@ -87,7 +87,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
     public void testFilteringOutboundRouterSync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);

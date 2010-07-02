@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
@@ -77,10 +78,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     private boolean enableHeaders;
     private String payload;
     
-    public CxfMessageReceiver(Connector connector, Service service, InboundEndpoint Endpoint)
+    public CxfMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint Endpoint)
         throws CreateException
     {
-        super(connector, service, Endpoint);
+        super(connector, flowConstruct, Endpoint);
         this.connector = (CxfConnector) connector;
     }
 

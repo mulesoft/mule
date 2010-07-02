@@ -10,6 +10,7 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
@@ -60,11 +61,11 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected AxisConnector connector;
     protected SOAPService soapService;
 
-    public AxisMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public AxisMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
 
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
 
         this.connector = (AxisConnector) connector;
         try

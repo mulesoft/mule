@@ -10,10 +10,10 @@
 
 package org.mule.transport.ssl;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.tcp.TcpMessageReceiver;
@@ -44,10 +44,10 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
 
-    public SslMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public SslMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     protected Work createWork(Socket socket) throws IOException

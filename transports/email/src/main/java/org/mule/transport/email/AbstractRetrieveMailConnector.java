@@ -10,9 +10,9 @@
 
 package org.mule.transport.email;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 
 /**
@@ -88,10 +88,10 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
     /**
      * @see org.mule.api.transport.Connector#registerListener(org.mule.api.service.Service, org.mule.api.endpoint.InboundEndpoint) 
      */
-    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         Object[] args = {checkFrequency, isBackupEnabled(), backupFolder};
-        return serviceDescriptor.createMessageReceiver(this, service, endpoint, args);
+        return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint, args);
     }
 
     public boolean isDeleteReadMessages()

@@ -9,6 +9,7 @@
  */
 package org.mule.transport.tcp;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -18,7 +19,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -59,10 +59,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected final AtomicBoolean disposing = new AtomicBoolean(false);
     
-    public TcpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public TcpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
         
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
@@ -71,7 +71,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouterSync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);

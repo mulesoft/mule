@@ -10,10 +10,10 @@
 
 package org.mule.transport.stdio;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 
@@ -39,11 +39,11 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     private boolean sendStream;
 
     public StdioMessageReceiver(Connector connector,
-                                Service service,
+                                FlowConstruct flowConstruct,
                                 InboundEndpoint endpoint,
                                 long checkFrequency) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
         this.setFrequency(checkFrequency);
 
         this.connector = (StdioConnector) connector;

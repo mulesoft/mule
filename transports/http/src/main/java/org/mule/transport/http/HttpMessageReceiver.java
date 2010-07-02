@@ -15,6 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -61,10 +62,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public HttpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public HttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     @Override

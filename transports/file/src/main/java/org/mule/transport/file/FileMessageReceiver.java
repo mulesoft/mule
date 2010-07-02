@@ -12,12 +12,12 @@ package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
 
@@ -64,14 +62,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FileFilter fileFilter = null;
 
     public FileMessageReceiver(Connector connector,
-                               Service service,
+                               FlowConstruct flowConstruct,
                                InboundEndpoint endpoint,
                                String readDir,
                                String moveDir,
                                String moveToPattern,
                                long frequency) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
         this.setFrequency(frequency);
 
         this.readDir = readDir;

@@ -11,10 +11,10 @@
 package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionCoordination;
@@ -45,12 +45,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     private volatile boolean aggregateResult;
     
     public JdbcMessageReceiver(Connector connector,
-                               Service service,
+                               FlowConstruct flowConstruct,
                                InboundEndpoint endpoint,
                                String readStmt,
                                String ackStmt) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
         this.setFrequency(((JdbcConnector) connector).getPollingFrequency());
 
         boolean transactedEndpoint = endpoint.getTransactionConfig().isTransacted();

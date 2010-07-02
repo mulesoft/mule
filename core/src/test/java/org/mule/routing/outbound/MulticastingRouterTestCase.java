@@ -36,7 +36,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
         RegExFilter filter = new RegExFilter("(.*) Message");
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test1", null, filter, null);
@@ -66,7 +66,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouterSync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);
@@ -100,7 +100,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouterMixedSyncAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getService", getTestService());
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);

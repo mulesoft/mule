@@ -11,9 +11,9 @@
 package org.mule.transport.tcp;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.tcp.i18n.TcpMessages;
@@ -34,10 +34,10 @@ public class PollingTcpMessageReceiver extends AbstractPollingMessageReceiver
 
     private PollingTcpConnector connector;
 
-    public PollingTcpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public PollingTcpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
 
         if (connector instanceof PollingTcpConnector)
         {
