@@ -5,23 +5,25 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker Common Tests" default="setup">
+<project name="Mule Examples: Loan Broker Common Tests" default="deploy">
 
     <property name="app.name" value="mule-example-loanbroker-common-tests"/>
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
-
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common" value="../common"/>
+    <property name="domain" value="loanbroker"/>
 
     <target name="clean"
-            description="Clean the output directory (start from scratch).">
+            description="Clean the output directory (start from scratch)."
+            depends="setup,ifMuleBase,ifMuleHome">
         <delete dir="${dir.build}"/>
+        <delete dir="${dir.deploy}"/>
     </target>
 
-    <target name="init">
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome">
        <ant dir="${dir.common}" antfile="build.xml" inheritAll="false" />  
          
         <!-- Create the build directory if it doesn't exist -->
@@ -80,12 +82,10 @@
            depends="package" 
            description="Deploy the application to the Mule server">
         <!-- Don't deploy this jar -->
-        <!--
         <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
+              todir="${dir.deploy}" 
               overwrite="true"
               verbose="true"/>
-        -->
    </target>
 
    <target name="setup">
@@ -100,20 +100,17 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
    </target>
 </project>
