@@ -131,9 +131,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             if (remoteSync)
             {
                 // service will be null for client calls
-                if (event.getService() != null && event.getService() instanceof Service)
+                if (event.getFlowConstruct() != null && event.getFlowConstruct() instanceof Service)
                 {
-                    ResponseRouterCollection responseRouters = ((Service) event.getService()).getResponseRouter();
+                    ResponseRouterCollection responseRouters = ((Service) event.getFlowConstruct()).getResponseRouter();
                     if (responseRouters != null && responseRouters.hasEndpoints())
                     {
                         remoteSync = false;

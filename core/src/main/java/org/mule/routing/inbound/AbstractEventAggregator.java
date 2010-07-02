@@ -61,7 +61,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
-        if (!(event.getService() instanceof Service))
+        if (!(event.getFlowConstruct() instanceof Service))
         {
             throw new UnsupportedOperationException("EventAggregator is only supported with Service");
         }

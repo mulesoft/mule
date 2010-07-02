@@ -359,7 +359,7 @@ public interface MuleEventContext
      */
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
-    FlowConstruct getService();
+    FlowConstruct getFlowConstruct();
 
     /**
      * Determines whether the default processing for this event will be executed. By

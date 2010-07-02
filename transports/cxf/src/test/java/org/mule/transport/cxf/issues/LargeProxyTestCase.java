@@ -88,6 +88,6 @@ public class LargeProxyTestCase extends FunctionalTestCase
             new Thread(runnable).start();
         }
 
-        latch.await(60000, TimeUnit.SECONDS);
+        latch.await(50000, TimeUnit.SECONDS);
     }
 }

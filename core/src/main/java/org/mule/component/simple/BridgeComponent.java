@@ -40,7 +40,7 @@ public class BridgeComponent implements ServiceAware, Callable
     {
         throw new UnsupportedOperationException(
             "A bridge should not ever receive an event, instead the event should be directly dispatched from the inbound endpoint to the outbound router. Service is: "
-                            + context.getService().getName());
+                            + context.getFlowConstruct().getName());
     }
 
     public void setService(Service service)

@@ -570,7 +570,7 @@ public class EventCorrelator
                         eventGroups.remove(group.getGroupId());
                         locks.remove(group.getGroupId());
 
-                        final FlowConstruct service = group.toArray()[0].getService();
+                        final FlowConstruct service = group.toArray()[0].getFlowConstruct();
 
                         if (!(service instanceof Service))
                         {

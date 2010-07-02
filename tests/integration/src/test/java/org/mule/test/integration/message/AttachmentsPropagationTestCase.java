@@ -58,7 +58,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
     {
         MuleMessage message = context.getMessage();
         // add an attachment, named after the componentname...
-        message.addAttachment(context.getService().getName(), new DataHandler(
+        message.addAttachment(context.getFlowConstruct().getName(), new DataHandler(
             new PlainTextDataSource("text/plain", "<content>")));
 
         // return the list of attachment names

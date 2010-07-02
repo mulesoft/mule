@@ -23,7 +23,7 @@ public class NullComponent implements Callable
     public Object onCall(MuleEventContext context) throws Exception
     {
         throw new UnsupportedOperationException("This service cannot receive messages. Service is: "
-                                                + context.getService().getName());
+                                                + context.getFlowConstruct().getName());
     }
 
 }

@@ -169,7 +169,7 @@ public class FunctionalStreamingTestComponent implements Callable
         summary = result.toString();
 
         String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
-                + context.getService().getName() + ". " + summary
+                + context.getFlowConstruct().getName() + ". " + summary
                 + "\n callback: " + eventCallback,
                 '*', 80);
 

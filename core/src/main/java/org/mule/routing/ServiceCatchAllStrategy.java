@@ -26,7 +26,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
     public synchronized MuleEvent doCatchMessage(MuleEvent event)
         throws RoutingException
     {
-        if (!(event.getService() instanceof Service))
+        if (!(event.getFlowConstruct() instanceof Service))
         {
             throw new UnsupportedOperationException(
                 "CollectionResponseWithCallbackCorrelator is only supported with Service");
@@ -38,7 +38,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
             if (event.isSynchronous())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                MuleMessage responseMessage = ((Service) event.getService()).sendEvent(event);
+                MuleMessage responseMessage = ((Service) event.getFlowConstruct()).sendEvent(event);
                 if (responseMessage != null)
                 {
                     return new DefaultMuleEvent(responseMessage, event);
@@ -51,7 +51,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
             else
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                ((Service) event.getService()).dispatchEvent(event);
+                ((Service) event.getFlowConstruct()).dispatchEvent(event);
                 return null;
             }
         }

@@ -46,7 +46,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     {
         if (assignedComponentName == null)
         {
-            this.assignedComponentName = event.getService().getName();
+            this.assignedComponentName = event.getFlowConstruct().getName();
         }
         if (store == null)
         {
@@ -105,7 +105,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
-        String eventComponentName = event.getService().getName();
+        String eventComponentName = event.getFlowConstruct().getName();
         if (!assignedComponentName.equals(eventComponentName))
         {
             IllegalArgumentException iex = new IllegalArgumentException(

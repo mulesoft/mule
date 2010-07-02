@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +56,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Method getMethodByName(String methodName, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getService().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getFlowConstruct().getName())
                 .append(".").append(methodName);
         Method method = (Method) methodCache.get(key.toString());
         return method;
@@ -63,7 +64,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Method addMethodByName(Method method, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getService().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getFlowConstruct().getName())
                 .append(".").append(method.getName());
         Method previousMethod = (Method) methodCache.putIfAbsent(key.toString(), method);
         return (previousMethod != null ? previousMethod : method);

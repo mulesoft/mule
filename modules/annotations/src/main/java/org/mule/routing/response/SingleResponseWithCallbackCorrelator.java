@@ -79,7 +79,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
     {
         MuleEvent event = (MuleEvent) events.iterator().next();
         
-        if (!(event.getService() instanceof Service))
+        if (!(event.getFlowConstruct() instanceof Service))
         {
             throw new UnsupportedOperationException(
                 "CollectionResponseWithCallbackCorrelator is only supported with Service");
@@ -91,7 +91,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
             event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, callback, PropertyScope.INVOCATION);
             try
             {
-                return ((Service) event.getService()).getComponent().process(event).getMessage();
+                return ((Service) event.getFlowConstruct()).getComponent().process(event).getMessage();
             }
             catch (MuleException e)
             {

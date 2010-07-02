@@ -170,7 +170,7 @@ public interface MuleEvent
      * 
      * @return the service for the event
      */
-    FlowConstruct getService();
+    FlowConstruct getFlowConstruct();
 
     /**
      * Determines whether the default processing for this event will be executed. By

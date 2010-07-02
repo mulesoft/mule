@@ -55,7 +55,7 @@ public class FunctionalTestNotification extends CustomNotification
         super(message, action);
         this.replyMessage = null;
         this.eventContext = RequestContext.getEventContext();
-        resourceIdentifier = eventContext.getService().getName();
+        resourceIdentifier = eventContext.getFlowConstruct().getName();
 
     }
 
@@ -63,7 +63,7 @@ public class FunctionalTestNotification extends CustomNotification
             throws TransformerException
     {
         super(context.getMessage().getPayload(), action);
-        resourceIdentifier = context.getService().getName();
+        resourceIdentifier = context.getFlowConstruct().getName();
         this.replyMessage = replyMessage;
         this.eventContext = context;
     }

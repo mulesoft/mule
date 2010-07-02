@@ -38,9 +38,9 @@ public class OutboundNotificationMessageProcessor extends AbstractMessageObserve
         if (connector.isEnableMessageEvents())
         {
             String component = null;
-            if (event.getService() != null)
+            if (event.getFlowConstruct() != null)
             {
-                component = event.getService().getName();
+                component = event.getFlowConstruct().getName();
             }
 
             int notificationAction;

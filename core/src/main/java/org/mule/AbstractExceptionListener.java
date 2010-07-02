@@ -280,9 +280,9 @@ public abstract class AbstractExceptionListener
                 EndpointURI endpointUri = null;
                 if (ctx != null)
                 {
-                    if (ctx.getService() != null)
+                    if (ctx.getFlowConstruct() != null)
                     {
-                        component = ctx.getService().getName();
+                        component = ctx.getFlowConstruct().getName();
                     }
                     endpointUri = ctx.getEndpointURI();
                 }
@@ -314,7 +314,7 @@ public abstract class AbstractExceptionListener
                     exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage(), muleContext);
                 }
 
-                if (ctx != null && ctx.getService() != null && ctx.getService() instanceof Service)
+                if (ctx != null && ctx.getFlowConstruct() != null && ctx.getFlowConstruct() instanceof Service)
                 {
                     OutboundRouter router = createOutboundRouter();
                     router.process(new DefaultMuleEvent(exceptionMessage, RequestContext.getEvent()));

@@ -29,12 +29,12 @@ public class ForwardingConsumer extends SelectiveConsumer
     {
         if (super.process(event) != null)
         {
-            if (!(event.getService() instanceof Service))
+            if (!(event.getFlowConstruct() instanceof Service))
             {
                 throw new UnsupportedOperationException("ForwardingConsumer is only supported with Service");
             }
 
-            OutboundRouterCollection router = ((Service) event.getService()).getOutboundRouter();
+            OutboundRouterCollection router = ((Service) event.getFlowConstruct()).getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
             // DefaultInboundRouterCollection not to route these events to the service

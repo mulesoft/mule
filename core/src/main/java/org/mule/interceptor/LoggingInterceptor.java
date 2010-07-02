@@ -30,7 +30,7 @@ public class LoggingInterceptor extends EnvelopeInterceptor
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("About to process event for " + event.getService().getName());
+            logger.info("About to process event for " + event.getFlowConstruct().getName());
         }
         return event;
 
@@ -40,7 +40,7 @@ public class LoggingInterceptor extends EnvelopeInterceptor
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Processed event for " + event.getService().getName());
+            logger.info("Processed event for " + event.getFlowConstruct().getName());
         }
         return event;
     }

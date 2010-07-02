@@ -125,9 +125,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
-            if (event.getService() instanceof Service)
+            if (event.getFlowConstruct() instanceof Service)
             {
-                ((Service) event.getService()).getStatistics().incSentReplyToEvent();
+                ((Service) event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
             }
 
             final ImmutableEndpoint endpoint = event.getEndpoint();

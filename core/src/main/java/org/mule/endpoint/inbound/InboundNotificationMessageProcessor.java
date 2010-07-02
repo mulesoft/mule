@@ -35,7 +35,7 @@ public class InboundNotificationMessageProcessor extends AbstractMessageObserver
         if (connector.isEnableMessageEvents())
         {
             connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
-                event.getService().getName(), EndpointMessageNotification.MESSAGE_RECEIVED));
+                event.getFlowConstruct().getName(), EndpointMessageNotification.MESSAGE_RECEIVED));
         }
     }
 }

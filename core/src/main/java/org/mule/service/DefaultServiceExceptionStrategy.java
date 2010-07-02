@@ -84,9 +84,9 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
             //logger.fatal("The error is: " + t.getMessage(), t);
             return null;
         }
-        else if(event.getService()!=null && event.getService() instanceof Service)
+        else if(event.getFlowConstruct()!=null && event.getFlowConstruct() instanceof Service)
         {
-            return ((Service) event.getService()).getStatistics();
+            return ((Service) event.getFlowConstruct()).getStatistics();
         }
         else
         {

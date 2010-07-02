@@ -81,7 +81,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // dispatch the event
         try
         {
-            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
+            ((AbstractService) event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
             endpoint.process(replyToEvent);
             if (logger.isInfoEnabled())
             {

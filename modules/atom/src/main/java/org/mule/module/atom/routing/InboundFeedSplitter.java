@@ -82,7 +82,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
                     continue;
                 }
                 m.setProperty(FEED_PROPERTY, feed, PropertyScope.INVOCATION);
-                MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getService(), muleEvent);
+                MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getFlowConstruct(), muleEvent);
                 events.add(e);
             }
             return events.toArray(new MuleEvent[]{});

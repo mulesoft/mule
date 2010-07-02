@@ -535,9 +535,9 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * @return the service descriptor of the service that received this event
      */
-    public FlowConstruct getService()
+    public FlowConstruct getFlowConstruct()
     {
-        return event.getService();
+        return event.getFlowConstruct();
     }
 
     /**

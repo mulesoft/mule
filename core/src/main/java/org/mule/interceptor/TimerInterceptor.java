@@ -38,7 +38,7 @@ public class TimerInterceptor extends AbstractInterceptingMessageProcessor imple
         if (logger.isInfoEnabled())
         {
             long executionTime = System.currentTimeMillis() - startTime;
-            logger.info(resultEvent.getService().getName() + " took " + executionTime
+            logger.info(resultEvent.getFlowConstruct().getName() + " took " + executionTime
                         + "ms to process event [" + resultEvent.getId() + "]");
         }
 

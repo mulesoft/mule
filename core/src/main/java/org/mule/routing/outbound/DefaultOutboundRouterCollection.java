@@ -80,7 +80,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
 
                 
                 TransactionTemplate tt = new TransactionTemplate(outboundRouter.getTransactionConfig(),
-                    event.getService().getExceptionListener(), muleContext);
+                    event.getFlowConstruct().getExceptionListener(), muleContext);
                 
                 TransactionCallback cb = new TransactionCallback()
                 {

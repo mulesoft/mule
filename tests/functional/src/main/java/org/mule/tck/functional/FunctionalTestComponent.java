@@ -27,6 +27,7 @@ import org.mule.util.SystemUtils;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -191,7 +192,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         if (logger.isInfoEnabled())
         {
             String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
-                    + context.getService().getName() + ". Content is: "
+                    + context.getFlowConstruct().getName() + ". Content is: "
                     + StringMessageUtils.truncate(data.toString(), 100, true), '*', 80);
 
             logger.info(msg);

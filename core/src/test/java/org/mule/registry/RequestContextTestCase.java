@@ -13,6 +13,7 @@ package org.mule.registry;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,7 +22,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.message.DefaultExceptionPayload;
@@ -177,7 +177,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return null;  
         }
 
-        public Service getService()
+        public FlowConstruct getFlowConstruct()
         {
             return null;  
         }

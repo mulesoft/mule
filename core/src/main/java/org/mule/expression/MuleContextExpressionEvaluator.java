@@ -55,13 +55,13 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator, Mule
     {
         if (expression.equals("serviceName"))
         {
-            return getEventContext().getService().getName();
+            return getEventContext().getFlowConstruct().getName();
         }
         else if (expression.equals("modelName"))
         {
-            if (getEventContext().getService() instanceof Service)
+            if (getEventContext().getFlowConstruct() instanceof Service)
             {
-                return ((Service) getEventContext().getService()).getModel().getName();
+                return ((Service) getEventContext().getFlowConstruct()).getModel().getName();
             }
             else
             {

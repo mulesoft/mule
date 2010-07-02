@@ -338,9 +338,9 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
                                    + endpointURI.getHost()
                                    + (endpointURI.getPort() > -1
                                                    ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-        if (event.getService() != null)
+        if (event.getFlowConstruct() != null)
         {
-            properties.put("serviceName", event.getService().getName());
+            properties.put("serviceName", event.getFlowConstruct().getName());
         }
 
         soapAction = soapActionTemplateParser.parse(properties, soapAction);

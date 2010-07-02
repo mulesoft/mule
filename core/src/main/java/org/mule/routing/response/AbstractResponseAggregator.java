@@ -57,7 +57,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     public void process(MuleEvent event) throws RoutingException
     {
-        if (!(event.getService() instanceof Service))
+        if (!(event.getFlowConstruct() instanceof Service))
         {
             throw new UnsupportedOperationException("EventAggregator is only supported with Service");
         }

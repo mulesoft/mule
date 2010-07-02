@@ -39,7 +39,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);
-        event.getService().setName("myService");
+        event.getFlowConstruct().setName("myService");
         String result = dispatcher.parseSoapAction("#[scheme]://#[host]:#[port]/#[serviceName]/#[method]",
             new QName("foo"), event);
 

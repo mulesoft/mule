@@ -52,9 +52,9 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
     {
         MuleEvent receivedEvent = (MuleEvent) events.iterator().next();
         MuleMessage result = super.aggregateEvents(events);
-        MuleEvent event = new DefaultMuleEvent(result, receivedEvent.getEndpoint(), receivedEvent.getService(), receivedEvent);
+        MuleEvent event = new DefaultMuleEvent(result, receivedEvent.getEndpoint(), receivedEvent.getFlowConstruct(), receivedEvent);
 
-        if (!(event.getService() instanceof Service))
+        if (!(event.getFlowConstruct() instanceof Service))
         {
             throw new UnsupportedOperationException(
                 "CollectionResponseWithCallbackCorrelator is only supported with Service");
@@ -62,7 +62,7 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
         
         try
         {
-            return ((Service) event.getService()).getComponent().process(event).getMessage();
+            return ((Service) event.getFlowConstruct()).getComponent().process(event).getMessage();
         }
         catch (MuleException e)
         {

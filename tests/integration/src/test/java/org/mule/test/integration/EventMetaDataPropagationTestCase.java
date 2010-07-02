@@ -58,7 +58,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 
         public Object onCall(MuleEventContext context) throws Exception
         {
-            if ("component1".equals(context.getService().getName()))
+            if ("component1".equals(context.getFlowConstruct().getName()))
             {
                 Map props = new HashMap();
                 props.put("stringParam", "param1");
