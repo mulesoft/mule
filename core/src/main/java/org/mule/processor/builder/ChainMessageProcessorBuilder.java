@@ -114,19 +114,6 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         return this;
     }
     
-    // TODO BL-23 Temporary until inbound chain customization is implemented
-    @Deprecated
-    public void replaceMessageProcessor(Class processorClass, MessageProcessor replacement)
-    {
-        for (int i = 1; i < chain.size(); i++)
-        {
-            if (chain.get(i).getClass().equals(processorClass))
-            {
-                chain.set(i, replacement);
-            }
-        }
-    }
-
     static class InterceptingMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
     {
         private MessageProcessor delegate;
