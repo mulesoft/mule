@@ -279,11 +279,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
     protected String getQueueName()
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(QUEUE_NAME_PREFIX);
-        buffer.append(":");
-        buffer.append(getStageName());
-        return buffer.toString();
+        return String.format("%s(%s)", QUEUE_NAME_PREFIX, getStageName());
     }
 
     protected String getStageName()
