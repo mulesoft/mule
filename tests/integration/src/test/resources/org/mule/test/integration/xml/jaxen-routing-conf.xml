@@ -16,7 +16,6 @@
       <inbound>
         <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
       </inbound>
-      <bridge-component/>
       <outbound>
         <filtering-router>
           <outbound-endpoint address="vm://echo" exchange-pattern="request-response"/>

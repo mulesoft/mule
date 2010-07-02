@@ -95,7 +95,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
     public DefaultMuleSession(MuleContext muleContext)
     {
-        this((Service) null, muleContext);
+        this((FlowConstruct) null, muleContext);
     }
 
     public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
@@ -110,16 +110,17 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @deprecated Use DefaultMuleSession(Service service, MuleContext muleContext) instead
      */
     @Deprecated
-    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service, MuleContext muleContext)
-            throws MuleException
+    public DefaultMuleSession(MuleMessage message,
+                              SessionHandler requestSessionHandler,
+                              FlowConstruct flowConstruct,
+                              MuleContext muleContext) throws MuleException
     {
         this(message, requestSessionHandler, muleContext);
-        if (service == null)
+        if (flowConstruct == null)
         {
-            throw new IllegalArgumentException(
-                    CoreMessages.propertiesNotSet("service").toString());
+            throw new IllegalArgumentException(CoreMessages.propertiesNotSet("flowConstruct").toString());
         }
-        this.flowConstruct = service;
+        this.flowConstruct = flowConstruct;
     }
 
     /**
@@ -179,7 +180,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         if (flowConstruct == null)
         {
-            throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
+            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
         }
         else if (!(flowConstruct instanceof Service))
         {
@@ -230,7 +231,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         if (flowConstruct == null)
         {
-            throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
+            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
         }
         else if (!(flowConstruct instanceof Service))
         {

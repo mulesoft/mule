@@ -29,6 +29,7 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.AbstractService;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
 
@@ -104,7 +105,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
     public Service initialiseService(byte txBeginAction, EventCallback callback) throws Exception
     {
         Service service = new SedaService(muleContext);
-        service.setExceptionListener(new DefaultExceptionStrategy());
+        ((AbstractService) service).setExceptionListener(new DefaultExceptionStrategy());
         service.setName("testComponent");
         service.setComponent(new DefaultJavaComponent(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class)));
 

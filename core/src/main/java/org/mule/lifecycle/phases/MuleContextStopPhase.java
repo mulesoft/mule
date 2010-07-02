@@ -9,6 +9,7 @@
  */
 package org.mule.lifecycle.phases;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
@@ -19,7 +20,6 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RouterCollection;
-import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.MuleContextNotification;
@@ -62,7 +62,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
 
         Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
         // Stop in the opposite order to start
-        stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, MuleContextNotification.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));

@@ -23,7 +23,6 @@
             <inbound>
                 <vm:inbound-endpoint path="receiver"/>
             </inbound>
-            <bridge-component/>
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="echo">

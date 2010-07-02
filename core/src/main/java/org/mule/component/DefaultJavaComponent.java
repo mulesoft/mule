@@ -18,6 +18,7 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.ModelException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.BindingCollection;
+import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 
@@ -30,6 +31,13 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     protected LifecycleAdapter singletonComponentLifecycleAdapter;
 
+    
+    
+    public void setService(Service service){
+        int i=1;
+        i++;
+    }
+    
     /**
      * For spring only
      */
@@ -84,7 +92,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
                 }
                 catch (Exception e)
                 {
-                    throw new ModelException(CoreMessages.failedToStart("Service '" + service.getName() + "'"), e);
+                    throw new ModelException(CoreMessages.failedToStart("Service '" + flowConstruct.getName() + "'"), e);
                 }
             }
         }
@@ -104,7 +112,7 @@ public class DefaultJavaComponent extends AbstractJavaComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
+                throw new ModelException(CoreMessages.failedToStop("Service '" + flowConstruct.getName() + "'"), e);
             }
         }
     }

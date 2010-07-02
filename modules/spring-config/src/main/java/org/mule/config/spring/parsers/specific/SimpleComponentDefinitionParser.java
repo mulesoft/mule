@@ -29,7 +29,6 @@ import org.w3c.dom.Node;
 
 /**
  * Used to parse shortcut elements for simple built-in components such as
- * {@link org.mule.component.simple.BridgeComponent},
  * {@link org.mule.component.simple.EchoComponent} and
  * {@link org.mule.component.simple.LogComponent}. This allows shortcuts like
  * for example <i>&lt;mule:bridge-service/&gt;</i> to be used instead of having to
@@ -72,7 +71,7 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
     {
         Element parent = (Element) element.getParentNode();
         String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("service", serviceName);
+        builder.addPropertyReference("flowConstruct", serviceName);
         builder.addDependsOn(serviceName);
 
         // Create a BeanDefinition for the nested object factory and set it a

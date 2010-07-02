@@ -10,6 +10,8 @@
 
 package org.mule.object;
 
+import org.mule.api.FlowConstruct;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
@@ -32,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * Creates object instances based on the class and sets any properties.  This factory is also responsible for applying
  * any object processors on the object before the lifecycle callbacks are called.
  */
-public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAware
+public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstructAware
 {
     public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
@@ -41,7 +43,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
     protected SoftReference<Class<?>> objectClass = null;
     protected Map properties = null;
     protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
-    protected Service service;
+    protected FlowConstruct flowConstruct;
     protected boolean disposed = false;
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -92,9 +94,9 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
         }
     }
 
-    public void setService(Service service)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.service = service;
+        this.flowConstruct = flowConstruct;
     }
 
     public void initialise() throws InitialisationException
@@ -141,9 +143,14 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
             BeanUtils.populateWithoutFail(object, properties, true);
         }
 
-        if(object instanceof ServiceAware)
+        if(object instanceof FlowConstructAware)
         {
-            ((ServiceAware)object).setService(service);
+            ((FlowConstructAware)object).setFlowConstruct(flowConstruct);
+        }
+        
+        if(object instanceof ServiceAware && flowConstruct instanceof Service)
+        {
+            ((ServiceAware)object).setService((Service) flowConstruct);
         }
 
         if(isAutoWireObject())

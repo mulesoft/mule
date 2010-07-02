@@ -10,9 +10,9 @@
 
 package org.mule.component;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.JavaComponent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 
@@ -26,11 +26,12 @@ public class NullLifecycleAdapter extends DefaultComponentLifecycleAdapter
 {
 
     public NullLifecycleAdapter(Object componentObject,
-                                JavaComponent component,
+                                AbstractJavaComponent component,
+                                FlowConstruct flowConstruct,
                                 EntryPointResolverSet entryPointResolver,
                                 MuleContext muleContext) throws MuleException
     {
-        super(componentObject, component, entryPointResolver, muleContext);
+        super(componentObject, component, flowConstruct, entryPointResolver, muleContext);
     }
 
     @Override

@@ -10,12 +10,11 @@
 
 package org.mule.lifecycle;
 
+import org.mule.api.FlowConstruct;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.management.stats.ComponentStatistics;
 
 import org.mockito.Mockito;
@@ -23,10 +22,10 @@ import org.mockito.Mockito;
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements ServiceAware, Component
+public class LifecycleTrackerComponent extends AbstractLifecycleTracker implements FlowConstructAware, Component
 {
 
-    private Service service;
+    private FlowConstruct flowConstruct;
 
     public void springInitialize()
     {
@@ -38,15 +37,15 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker implemen
         getTracker().add("springDestroy");
     }
 
-    public void setService(final Service service)
+    public void setFlowConstruct(final FlowConstruct flowConstruct)
     {
         getTracker().add("setService");
-        this.service = service;
+        this.flowConstruct = flowConstruct;
     }
 
-    public Service getService()
+    public FlowConstruct getFlowConstruct()
     {
-        return service;
+        return flowConstruct;
     }
 
     public ComponentStatistics getStatistics()
@@ -58,17 +57,4 @@ public class LifecycleTrackerComponent extends AbstractLifecycleTracker implemen
     {
         return event;
     }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        // Mirror behaviour in AbstractComponent
-        if (service != null && service.getLifecycleManager() != null
-            && service.getLifecycleManager().getState().isInitialised())
-        {
-            return;
-        }
-        super.initialise();
-    }
-
 }

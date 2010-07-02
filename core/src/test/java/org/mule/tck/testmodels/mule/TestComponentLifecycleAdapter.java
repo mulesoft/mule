@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -19,17 +20,21 @@ import org.mule.component.DefaultComponentLifecycleAdapter;
 /** <code>TestComponentLifecycleAdapter</code> TODO document */
 public class TestComponentLifecycleAdapter extends DefaultComponentLifecycleAdapter
 {
-    public TestComponentLifecycleAdapter(Object pojoService, JavaComponent service, MuleContext muleContext) throws MuleException
+    public TestComponentLifecycleAdapter(Object pojoService,
+                                         JavaComponent service,
+                                         FlowConstruct flowConstruct,
+                                         MuleContext muleContext) throws MuleException
     {
-        super(pojoService, service, muleContext);
+        super(pojoService, service, flowConstruct, muleContext);
     }
 
     public TestComponentLifecycleAdapter(Object pojoService,
                                        JavaComponent service,
+                                       FlowConstruct flowConstruct,
                                        EntryPointResolverSet epResolver,
                                        MuleContext muleContext) throws MuleException
     {
-        super(pojoService, service, epResolver, muleContext);
+        super(pojoService, service, flowConstruct, epResolver, muleContext);
     }
 
 }

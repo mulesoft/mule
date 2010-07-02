@@ -36,7 +36,7 @@ public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
     {
         Element parent = (Element) element.getParentNode();
         String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("service", serviceName);
+        builder.addPropertyReference("flowConstruct", serviceName);
 
         String className = element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS).getValue();
 

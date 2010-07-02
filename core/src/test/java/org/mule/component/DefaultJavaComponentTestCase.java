@@ -42,7 +42,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
     public void testLifecycle() throws Exception
     {
         DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
-        component.setService(getTestService());
+        component.setFlowConstruct(getTestService());
         component.setMuleContext(muleContext);
         component.initialise();
         component.start();
@@ -67,7 +67,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         DefaultJavaComponent component = new DefaultJavaComponent(
             createObjectFactory());
         
-        component.setService(getTestService());
+        component.setFlowConstruct(getTestService());
         component.setMuleContext(muleContext);
         component.initialise();
         component.start();

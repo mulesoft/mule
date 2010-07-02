@@ -10,23 +10,20 @@
 
 package org.mule.api.component;
 
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InboundRouterCollection;
-import org.mule.api.service.Service;
 import org.mule.management.stats.ComponentStatistics;
 
 /**
- * A <code>Component</code> is a invoked by a {@link Service} for each incoming
- * {@link MuleEvent} routed on by the {@link InboundRouterCollection}. A component
- * processes a {@link MuleEvent} by invoking the component instance that has been
- * configured, optionally returning a result. <p/> Implementations of
- * <code>Component</code> can use different types of component implementation,
- * implement component instance pooling or implement <em>bindings</em> which allow
- * for service composition.
+ * A <code>Component</code> component processes a {@link MuleEvent} by invoking the
+ * component instance that has been configured, optionally returning a result.
+ * <p/>
+ * Implementations of <code>Component</code> can use different types of component
+ * implementation, implement component instance pooling or implement
+ * <em>bindings</em> which allow for service composition.
  */
-public interface Component extends Lifecycle, MessageProcessor
+public interface Component extends MessageProcessor, FlowConstructAware
 {
 
     /**
@@ -34,9 +31,5 @@ public interface Component extends Lifecycle, MessageProcessor
      * sync/async invocation counts and total and average execution time.
      */
     ComponentStatistics getStatistics();
-
-    void setService(Service service);
-
-    Service getService();
 
 }

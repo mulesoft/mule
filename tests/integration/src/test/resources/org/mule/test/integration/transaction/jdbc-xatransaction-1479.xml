@@ -42,7 +42,6 @@
             <inbound>
                 <vm:inbound-endpoint path="in"/>
             </inbound>
-            <bridge-component/>
             <outbound>
                 <multicasting-router>
                     <jdbc:outbound-endpoint queryKey="insertRecord">
@@ -61,7 +60,6 @@
             <inbound>
                 <vm:inbound-endpoint path="in1"/>
             </inbound>
-            <bridge-component/>
             <outbound>
                 <multicasting-router>
                     <jdbc:outbound-endpoint queryKey="insertRecord">

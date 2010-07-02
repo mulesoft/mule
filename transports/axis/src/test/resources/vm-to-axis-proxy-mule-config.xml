@@ -13,7 +13,6 @@
             <inbound>
                 <inbound-endpoint address="vm://proxy" exchange-pattern="request-response"/>
             </inbound>
-            <bridge-component/>
             <outbound>
                 <pass-through-router>
                     <axis:outbound-endpoint address="http://localhost:62080/mule-tests-external-cxf/services/TestService?method=getTest"

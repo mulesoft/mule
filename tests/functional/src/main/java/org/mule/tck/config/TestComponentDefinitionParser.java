@@ -67,7 +67,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
     {
         Element parent = (Element) element.getParentNode();
         String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("service", serviceName);
+        builder.addPropertyReference("flowConstruct", serviceName);
 
         // Create a BeanDefinition for the nested object factory and set it a
         // property value for the component

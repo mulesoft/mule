@@ -19,7 +19,6 @@
             <inbound>
                 <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
             </inbound>
-            <bridge-component/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="out"/>

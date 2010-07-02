@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -24,10 +25,13 @@ public class TestComponentLifecycleAdapterFactory implements LifecycleAdapterFac
         super();
     }
 
-    public LifecycleAdapter create(Object pojoService, JavaComponent service, EntryPointResolverSet resolver, MuleContext muleContext)
-        throws MuleException
+    public LifecycleAdapter create(Object pojoService,
+                                   JavaComponent service,
+                                   FlowConstruct flowConstruct,
+                                   EntryPointResolverSet resolver,
+                                   MuleContext muleContext) throws MuleException
     {
-        return new TestComponentLifecycleAdapter(pojoService, service, resolver, muleContext);
+        return new TestComponentLifecycleAdapter(pojoService, service, flowConstruct, resolver, muleContext);
     }
 
 }

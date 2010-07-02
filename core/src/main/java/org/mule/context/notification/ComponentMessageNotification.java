@@ -10,6 +10,7 @@
 
 package org.mule.context.notification;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.api.context.notification.ServerNotification;
@@ -36,10 +37,10 @@ public class ComponentMessageNotification extends ServerNotification
      * @param message
      * @param action
      */
-    public ComponentMessageNotification(MuleMessage message, Component component, int action)
+    public ComponentMessageNotification(MuleMessage message, Component component, FlowConstruct flowConstruct, int action)
     {
         super(cloneMessage(message), action);
-        resourceIdentifier = component.getService().getName();
+        resourceIdentifier = flowConstruct.getName();
 
     }
 

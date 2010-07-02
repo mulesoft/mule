@@ -10,12 +10,12 @@
 
 package org.mule.service;
 
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
@@ -169,7 +170,7 @@ public abstract class AbstractService implements Service
         // was configured with spring and is therefore in the registry it will get
         // started automatically, if it was set on the service directly then it won't
         // be started automatically. So to be sure we start it here.
-        component.setService(this);
+        component.setFlowConstruct(this);
 
         try
         {
@@ -398,8 +399,10 @@ public abstract class AbstractService implements Service
         }
         
         // Component is not in chain
-        component.stop();
-
+        if (component instanceof Stoppable)
+        {
+            ((Stoppable) component).stop();
+        }
         if (messageProcessorChain instanceof Stoppable)
         {
             ((Stoppable) messageProcessorChain).stop();
@@ -409,8 +412,10 @@ public abstract class AbstractService implements Service
     protected void doStart() throws MuleException
     {
         // Component is not in chain
-        component.start();
-
+        if (component instanceof Startable)
+        {
+            ((Startable) component).start();
+        }
         if (messageProcessorChain instanceof Startable)
         {
             ((Startable) messageProcessorChain).start();
@@ -429,8 +434,10 @@ public abstract class AbstractService implements Service
     protected void doDispose()
     {
         // Component is not in chain
-        component.dispose();
-
+        if (component instanceof Disposable)
+        {
+            ((Disposable) component).dispose();
+        }
         if (messageProcessorChain instanceof Disposable)
         {
             ((Disposable) messageProcessorChain).dispose();
@@ -458,8 +465,10 @@ public abstract class AbstractService implements Service
         asyncReplyMessageSource.setListener(getResponseRouter());
 
         // Component is not in chain
-        component.initialise();
-        
+        if (component instanceof Initialisable)
+        {
+            ((Initialisable) component).initialise();
+        }
         if (messageProcessorChain instanceof Initialisable)
         {
             ((Initialisable) messageProcessorChain).initialise();
@@ -473,6 +482,11 @@ public abstract class AbstractService implements Service
     public boolean isStarted()
     {
         return lifecycleManager.getState().isStarted();
+    }
+    
+    public LifecycleState getLifecycleState()
+    {
+        return lifecycleManager.getState();
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////
@@ -552,7 +566,7 @@ public abstract class AbstractService implements Service
     public void setComponent(Component component)
     {
         this.component = component;
-        this.component.setService(this);
+        this.component.setFlowConstruct(this);
     }
 
     public MuleContext getMuleContext()

@@ -17,9 +17,6 @@
             <inbound>
                 <inbound-endpoint address="tcp://localhost:60209"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.component.simple.BridgeComponent"/>
-            </component>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:60210"/>

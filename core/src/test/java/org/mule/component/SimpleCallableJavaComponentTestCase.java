@@ -88,7 +88,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
     {
         SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
             new Apple());
-        component.setService(getTestService());
+        component.setFlowConstruct(getTestService());
         component.initialise();
         component.start();
 

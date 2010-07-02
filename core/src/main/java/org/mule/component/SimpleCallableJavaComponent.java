@@ -101,7 +101,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(CoreMessages.failedToStart("Service '" + service.getName() + "'"), e);
+                throw new ModelException(CoreMessages.failedToStart("Service '" + flowConstruct.getName() + "'"), e);
             }
         }
     }
@@ -118,7 +118,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
+                throw new ModelException(CoreMessages.failedToStop("Service '" + flowConstruct.getName() + "'"), e);
             }
         }
     }

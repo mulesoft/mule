@@ -15,6 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidResult;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,9 +28,9 @@ import org.mule.api.interceptor.Interceptor;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -52,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
  */
-public abstract class AbstractComponent implements Component, MuleContextAware
+public abstract class AbstractComponent implements Component, MuleContextAware, Lifecycle
 {
 
     /**
@@ -60,7 +61,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
      */
     protected final Log logger = LogFactory.getLog(this.getClass());
 
-    protected Service service;
+    protected FlowConstruct flowConstruct;
     protected ComponentStatistics statistics = null;
     //protected LifecycleState lifecycleState;
     protected ServerNotificationHandler notificationHandler;
@@ -98,7 +99,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
         if (logger.isTraceEnabled())
         {
             logger.trace("Invoking " + this.getClass().getName() + "component for service "
-                         + service.getName());
+                         + flowConstruct.getName());
         }
 
         if (!(event.getEndpoint() instanceof InboundEndpoint))
@@ -106,9 +107,9 @@ public abstract class AbstractComponent implements Component, MuleContextAware
             throw new IllegalStateException(
                 "Unable to process outbound event, components only process incoming events.");
         }
-        if (service.getLifecycleManager().getState().isStopping() || !service.getLifecycleManager().getState().isStarted())
+        if (!flowConstruct.getLifecycleState().isStarted() || flowConstruct.getLifecycleState().isStopping())
         {
-            throw new LifecycleException(CoreMessages.isStopped(service.getName()), this);
+            throw new LifecycleException(CoreMessages.isStopped(flowConstruct.getName()), this);
         }
 
         // Invoke component implementation and gather statistics
@@ -142,8 +143,8 @@ public abstract class AbstractComponent implements Component, MuleContextAware
         }
         catch (Exception e)
         {
-            throw new ServiceException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(),
-                service, e);
+            throw new ComponentException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(),
+                this, e);
         }
     }
 
@@ -190,9 +191,9 @@ public abstract class AbstractComponent implements Component, MuleContextAware
     {
         StringBuilder buf = new StringBuilder(this.getClass().getName());
         
-        if (service != null)
+        if (flowConstruct != null)
         {
-            buf.append(" component for: ").append(service.toString());
+            buf.append(" component for: ").append(flowConstruct.toString());
         }
         else
         {
@@ -212,37 +213,30 @@ public abstract class AbstractComponent implements Component, MuleContextAware
         return statistics;
     }
 
-    public void setService(Service service)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.service = service;
+        this.flowConstruct = flowConstruct;
 
         // propagate MuleContext from the enclosing service if provided
-        if (this.muleContext == null && service.getMuleContext() != null)
+        if (this.muleContext == null && flowConstruct.getMuleContext() != null)
         {
-            this.muleContext = service.getMuleContext();
+            this.muleContext = flowConstruct.getMuleContext();
         }
         //lifecycleState = service.getLifecycleManager().getState();
     }
 
-    public Service getService()
+    public FlowConstruct getFlowConstruct()
     {
-        return service;
+        return flowConstruct;
     }
 
     public final void initialise() throws InitialisationException
     {
-        //TODO with spring controlling lifecycle the component gets initialised before the service, even though there is an
-        //explicit dependency
-        if(service!=null && service.getLifecycleManager()!=null && service.getLifecycleManager().getState().isInitialised())
-        {
-            return;
-        }
-
         if (logger.isInfoEnabled())
         {
             logger.info("Initialising: " + this);
         }
-        if (service == null)
+        if (flowConstruct == null)
         {
             throw new InitialisationException(
                 MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
@@ -276,31 +270,32 @@ public abstract class AbstractComponent implements Component, MuleContextAware
 
     public void dispose()
     {
-        if(service.getLifecycleManager().getState().isDisposed())
+        if(flowConstruct.getLifecycleState().isDisposed())
         {
             return;
         }
-            try
+    
+        try
+        {
+            // TODO is this needed, doesn't the service manage this?
+            if (flowConstruct.getLifecycleState().isStarted())
             {
-                //TODO is this needed, doesn't the service manage this?
-                if (service.getLifecycleManager().getState().isStarted())
-                {
-                    stop();
-                }
+                stop();
             }
-            catch (MuleException e)
-            {
-                logger.error(CoreMessages.failedToStop(toString()));
-            }
-            try
-            {
-                doDispose();
+        }
+        catch (MuleException e)
+        {
+            logger.error(CoreMessages.failedToStop(toString()));
+        }
+        try
+        {
+            doDispose();
 
-            }
-            catch (Exception e)
-            {
-                logger.warn(CoreMessages.failedToDispose(toString()), e);
-            }
+        }
+        catch (Exception e)
+        {
+            logger.warn(CoreMessages.failedToDispose(toString()), e);
+        }
     }
 
     protected void doDispose()
@@ -310,7 +305,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
 
     public void stop() throws MuleException
     {
-        if(service.getLifecycleManager().getState().isStopped())
+        if(flowConstruct.getLifecycleState().isStopped())
         {
             return;
         }
@@ -328,7 +323,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
 
     public void start() throws MuleException
     {
-        if(service.getLifecycleManager().getState().isStarted())
+        if(flowConstruct.getLifecycleState().isStarted())
         {
             return;
         }
@@ -337,7 +332,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
         {
             logger.info("Starting: " + this);
         }
-        notificationHandler = new OptimisedNotificationHandler(service.getMuleContext()
+        notificationHandler = new OptimisedNotificationHandler(flowConstruct.getMuleContext()
             .getNotificationManager(), ComponentMessageNotification.class);
         doStart();
     }
@@ -351,7 +346,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware
     {
         if (notificationHandler.isNotificationEnabled(ComponentMessageNotification.class))
         {
-            notificationHandler.fireNotification(new ComponentMessageNotification(message, this, action));
+            notificationHandler.fireNotification(new ComponentMessageNotification(message, this, flowConstruct, action));
         }
     }
 

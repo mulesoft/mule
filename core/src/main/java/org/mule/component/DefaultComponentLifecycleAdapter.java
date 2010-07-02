@@ -13,6 +13,7 @@ package org.mule.component;
 import org.mule.DefaultMuleEventContext;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -28,7 +29,6 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.InterfaceBinding;
-import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
@@ -70,6 +70,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected JavaComponent component;
     protected EntryPointResolverSet entryPointResolver;
+    protected FlowConstruct flowConstruct;
 
     protected boolean isInitialisable = false;
     protected boolean isStartable = false;
@@ -81,7 +82,10 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected MuleContext muleContext;
 
-    public DefaultComponentLifecycleAdapter(Object componentObject, JavaComponent component, MuleContext muleContext) throws MuleException
+    public DefaultComponentLifecycleAdapter(Object componentObject,
+                                            JavaComponent component,
+                                            FlowConstruct flowConstruct,
+                                            MuleContext muleContext) throws MuleException
     {
         if (muleContext == null)
         {
@@ -98,21 +102,23 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         this.componentObject = new SoftReference<Object>(componentObject);
         this.component = component;
+        this.flowConstruct = flowConstruct;
 
         // save a ref for later disposal call
         this.muleContext = muleContext;
         registerComponentIfNecessary();
+        setLifecycleFlags();
+        configureBinding();
     }
 
     public DefaultComponentLifecycleAdapter(Object componentObject,
                                             JavaComponent component,
+                                            FlowConstruct flowConstruct,
                                             EntryPointResolverSet entryPointResolver, MuleContext muleContext) throws MuleException
     {
 
-        this(componentObject, component, muleContext);
+        this(componentObject, component, flowConstruct, muleContext);
         this.entryPointResolver = entryPointResolver;
-        setLifecycleFlags();
-        configureBinding();
     }
 
     protected void setLifecycleFlags()
@@ -168,7 +174,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
             catch (Exception e)
             {
                 throw new DefaultMuleException(CoreMessages.failedToStart("Service: "
-                        + component.getService().getName()), e);
+                                                                          + flowConstruct.getName()), e);
             }
         }
         else
@@ -194,7 +200,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
             catch (Exception e)
             {
                 throw new DefaultMuleException(CoreMessages.failedToStop("Service: "
-                        + component.getService().getName()), e);
+                                                                         + flowConstruct.getName()), e);
             }
         }
         else
@@ -230,7 +236,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            logger.error("failed to dispose: " + component.getService().getName(), e);
+            logger.error("failed to dispose: " + flowConstruct.getName(), e);
         }
         disposed = true;
     }
@@ -270,7 +276,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new ServiceException(RequestContext.getEventContext().getMessage(), component.getService(), e);
+            throw new ComponentException(RequestContext.getEventContext().getMessage(), component, e);
         }
 
         return result;
@@ -342,7 +348,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
      */
     protected String createRegistryHardRefName(Object object)
     {
-        return "_component.hardref." + component.getService().getName() + "." + System.identityHashCode(object);
+        return "_component.hardref." + flowConstruct.getName() + "." + System.identityHashCode(object);
     }
 
     /**

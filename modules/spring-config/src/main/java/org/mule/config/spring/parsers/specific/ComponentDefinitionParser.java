@@ -32,7 +32,7 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
     {
         Element parent = (Element) element.getParentNode();
         String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("service", serviceName);
+        builder.addPropertyReference("flowConstruct", serviceName);
         super.parseChild(element, parserContext, builder);
     }
 }

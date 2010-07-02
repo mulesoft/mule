@@ -10,6 +10,8 @@
 
 package org.mule.component;
 
+import org.mule.api.FlowConstruct;
+import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -21,7 +23,6 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.BindingCollection;
 import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.binding.DefaultBindingCollection;
@@ -117,7 +118,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         {
             // Custom lifecycleAdapterFactory set on component
             lifecycleAdapter = 
-                lifecycleAdapterFactory.create(object, this, entryPointResolverSet, muleContext);
+                lifecycleAdapterFactory.create(object, this, flowConstruct, entryPointResolverSet, muleContext);
         }
         else if (objectFactory.isExternallyManagedLifecycle())
         {
@@ -125,13 +126,18 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             // externally managed instance then use NullLifecycleAdapter so that lifecycle 
             // is not propagated
             lifecycleAdapter = 
-                new NullLifecycleAdapter(object, this, entryPointResolverSet, muleContext);
+                new NullLifecycleAdapter(object, this, flowConstruct, entryPointResolverSet, muleContext);
+        }
+        else if (flowConstruct instanceof Service)
+        {
+            // Inherit lifecycleAdapterFactory from model
+            lifecycleAdapter = ((Service) flowConstruct).getModel().getLifecycleAdapterFactory().create(
+                object, this, flowConstruct, entryPointResolverSet, muleContext);
         }
         else
         {
-            // Inherit lifecycleAdapterFactory from model
-            lifecycleAdapter = service.getModel().getLifecycleAdapterFactory().create(object,
-                this, entryPointResolverSet, muleContext);
+            lifecycleAdapter = new DefaultComponentLifecycleAdapterFactory().create(object, this,
+                flowConstruct, entryPointResolverSet, muleContext);
         }
         lifecycleAdapter.initialise();
         return lifecycleAdapter;
@@ -160,7 +166,14 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         // completed and model is still in null.
         if (entryPointResolverSet == null)
         {
-            entryPointResolverSet = service.getModel().getEntryPointResolverSet();
+            if (flowConstruct instanceof Service)
+            {
+                entryPointResolverSet = ((Service) flowConstruct).getModel().getEntryPointResolverSet();
+            }
+            else
+            {
+                entryPointResolverSet = new DefaultEntryPointResolverSet();
+            }
         }
     }
 
@@ -234,20 +247,22 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     }
 
     @Override
-    public void setService(Service service)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        super.setService(service);
+        super.setFlowConstruct(flowConstruct);
         injectService();
     }
 
     protected void injectService()
     {
-        if(objectFactory != null && objectFactory instanceof ServiceAware && service!=null)
+        if (objectFactory != null && objectFactory instanceof FlowConstructAware && flowConstruct != null)
         {
-            //The registry cannot inject the Service for this object since there is no way to tie the two together, so
-            //we set the service on the object factory, that way the factory is responsible for injecting all properties
-            //on the result object
-            ((ServiceAware)objectFactory).setService(service);
+            // The registry cannot inject the Service for this object since there is
+            // no way to tie the two together, so
+            // we set the service on the object factory, that way the factory is
+            // responsible for injecting all properties
+            // on the result object
+            ((FlowConstructAware) objectFactory).setFlowConstruct(flowConstruct);
         }
     }
 }

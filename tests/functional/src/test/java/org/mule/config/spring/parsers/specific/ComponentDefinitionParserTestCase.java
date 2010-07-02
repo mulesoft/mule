@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -263,7 +264,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 class TestLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
 
-    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
+    public LifecycleAdapter create(Object pojoService, JavaComponent component, FlowConstruct flowConstruct, EntryPointResolverSet resolver, MuleContext muleContext)
         throws MuleException
     {
         return null;

@@ -496,7 +496,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                         logger.debug("Starting receiver on endpoint: "
                                      + receiver.getEndpoint().getEndpointURI());
                     }
-                    if (receiver.getFlowConstruct().isStarted())
+                    if (receiver.getFlowConstruct().getLifecycleState().isStarted())
                     {
                         receiver.start();
                     }

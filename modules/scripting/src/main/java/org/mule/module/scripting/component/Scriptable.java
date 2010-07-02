@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.NullPayload;
@@ -218,7 +219,11 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("payload", event.getMessage().getPayload());
         bindings.put("eventContext", new DefaultMuleEventContext(event));
         bindings.put("id", event.getId());
-        bindings.put("service", event.getFlowConstruct());
+        bindings.put("flowConstruct", event.getFlowConstruct());
+        if (event.getFlowConstruct() instanceof Service)
+        {
+            bindings.put("service", (Service) event.getFlowConstruct());
+        }
     }
     
     public Object runScript(Bindings bindings) throws ScriptException

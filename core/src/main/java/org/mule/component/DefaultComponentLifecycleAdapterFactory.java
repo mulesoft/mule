@@ -10,6 +10,7 @@
 
 package org.mule.component;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -30,10 +31,13 @@ import org.mule.api.model.EntryPointResolverSet;
 public class DefaultComponentLifecycleAdapterFactory implements LifecycleAdapterFactory
 {
 
-    public LifecycleAdapter create(Object pojoService, JavaComponent component, EntryPointResolverSet resolver, MuleContext muleContext)
-        throws MuleException
+    public LifecycleAdapter create(Object pojoService,
+                                   JavaComponent component,
+                                   FlowConstruct flowConstruct,
+                                   EntryPointResolverSet resolver,
+                                   MuleContext muleContext) throws MuleException
     {
-        return new DefaultComponentLifecycleAdapter(pojoService, component, resolver, muleContext);
+        return new DefaultComponentLifecycleAdapter(pojoService, component, flowConstruct, resolver, muleContext);
     }
 
 }

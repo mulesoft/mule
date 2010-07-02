@@ -10,6 +10,7 @@
 
 package org.mule.lifecycle.phases;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
@@ -20,7 +21,6 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RouterCollection;
-import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.DefaultLifecyclePhase;
@@ -64,7 +64,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Model.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
+        startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
         setIgnoredObjectTypes(ignorredObjects);
