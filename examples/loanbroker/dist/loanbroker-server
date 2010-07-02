@@ -68,7 +68,7 @@ then
     fi
     if [ -z "$MISSING_LIB" ]
     then
-        exec "$MULE_BASE/bin/mule" -production -main org.mule.example.loanbroker.bpm.LoanBrokerApp
+        exec "$MULE_BASE/bin/mule" -app loanbroker-bpm
     fi
 fi
 

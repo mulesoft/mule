@@ -1,0 +1,38 @@
+#! /bin/sh
+
+# The variable is not actually needed to run the example, but it is needed to
+# build the example, and if you haven't built the example, you can't run it.
+if [ -z "$MULE_HOME" ] ; then
+  echo "You must set the environment variable MULE_HOME to the location of your Mule install in order to run this example."
+  exit 1
+fi
+
+# If MULE_BASE is not set, make it MULE_HOME
+if [ -z "$MULE_BASE" ] ; then
+  MULE_BASE="$MULE_HOME"
+  export MULE_BASE
+fi
+
+# This extends the classpath to include the configuration directory
+# Any changes to the files in ./conf will take precedence over those deployed
+# to $MULE_HOME/lib/user
+MULE_LIB=./conf
+export MULE_LIB
+
+echo "The Loan Broker example client is available in three flavors (TODO: we should be able to use just one client):"
+echo "  1. Loan Broker ESB"
+echo "  2. Loan Broker ESN"
+echo "  3. Loan Broker BPM"
+echo "Select the one you wish to execute and press Enter..."
+read i
+
+if [ 1 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -production -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="$MULE_HOME"
+elif [ 2 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -production -main org.mule.example.loanbroker.esn.LoanBrokerApp
+elif [ 3 = $i ]
+then
+    exec java -Djava.ext.dirs=$MULE_HOME/apps/loanbroker-bpm/lib:$MULE_HOME/lib/shared/loanbroker:$MULE_HOME/lib/boot:$MULE_HOME/lib/mule:$MULE_HOME/lib/opt org.mule.example.loanbroker.bpm.LoanBrokerApp
+fi

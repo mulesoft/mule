@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker BPM" default="setup">
+<project name="Mule Examples: Loan Broker BPM" default="deploy">
 
     <property name="app.name" value="mule-example-loanbroker-bpm"/>
     <property environment="env"/>
@@ -15,16 +15,19 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
+    <property name="instance.name" value="loanbroker-bpm"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
 
     <target name="clean"
-            description="Clean the output directory (start from scratch).">
+            description="Clean the output directory (start from scratch)."
+            depends="setup,ifMuleBase,ifMuleHome">
         <delete dir="${dir.build}"/>
+    	<delete dir="${dir.app}"/>
     </target>
 
     <!-- Download any additional libraries needed to run the application -->
-    <target name="get.libraries">
+    <target name="get.libraries" depends="setup,ifMuleBase,ifMuleHome">
         <get src="${url.maven.repo}/bsh/bsh/1.3.0/bsh-1.3.0.jar"
              dest="${dir.user.lib}/bsh-1.3.0.jar"
              verbose="true"
@@ -33,9 +36,11 @@
              dest="${dir.user.lib}/derby-10.3.1.4.jar"
              verbose="true"
              usetimestamp="true"/>
+        <get src="${url.maven.repo}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
+    	     dest="${dir.user.lib}/activemq-core-4.1.2.jar"/>
     </target>
 
-    <target name="init" depends="get.libraries">
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
        <ant dir="${dir.common.tests}" antfile="build.xml" />
 
         <!-- Create the build directory if it doesn't exist -->
@@ -93,20 +98,20 @@
                 <include name="**/*"/>
             </fileset>
             <fileset dir="${dir.conf}">
-                <include name="**/*"/>
+            	<!-- only include the jpd file -->
+                <include name="**/*process*"/>
             </fileset>
-
         </jar>
    </target>
 
    <target name="deploy"
-           depends="package"
+           depends="package, test"
            description="Deploy the application to the Mule server">
-
-        <copy file="${dir.build}/${app.name}.jar"
-              todir="${dir.user.lib}"
-              overwrite="true"
-              verbose="true"/>
+    <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
+    <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
+    <copy file="${dir.build}/${app.name}.jar" todir="${dir.app}/lib" overwrite="true" verbose="true"/>
+   	<copy file="${dir.conf}/loan-broker-bpm-mule-config.xml" tofile="${dir.app}/mule-config.xml" overwrite="true" verbose="true"/>
+   	<copy file="${dir.java}/main/resources/mule-deploy.properties" todir="${dir.app}" overwrite="true" verbose="true"/>
    </target>
 
    <target name="setup">
@@ -121,20 +126,33 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.app" value="${dir.mule.home}/apps/loanbroker-bpm"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+   	  <property name="dir.app" value="${dir.mule.home}/apps/loanbroker-bpm"/>
    </target>
+	
+    <target name="test" depends="compile">
+        <junit haltonerror="true" haltonfailure="true">
+            <classpath>
+                <pathelement location="${dir.build}/classes"/>
+                <pathelement location="${dir.java}/test/resources"/>
+                <path refid="classpath.mule"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest fork="yes" todir="${dir.build}">
+                <fileset dir="${dir.java}/test/java">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>	
 </project>

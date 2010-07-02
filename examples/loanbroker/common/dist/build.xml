@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker Common" default="setup">
+<project name="Mule Examples: Loan Broker Common" default="deploy">
 
     <property name="app.name" value="mule-example-loanbroker-common"/>
     <property environment="env"/>
@@ -14,13 +14,16 @@
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
+	<property name="domain" value="loanbroker"/>
 
     <target name="clean"
-            description="Clean the output directory (start from scratch).">
+            description="Clean the output directory (start from scratch)."
+        depends="setup,ifMuleBase,ifMuleHome">
         <delete dir="${dir.build}"/>
+        <delete dir="${dir.deploy}"/>
     </target>
 
-    <target name="init">
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -53,13 +56,6 @@
                target="1.5">
             <classpath refid="classpath.mule"/>
         </javac>
-        
-        <!-- Copy all resources to the output folder as well -->
-        <!--
-        <copy todir="${dir.classes}">
-            <fileset dir="${dir.conf}"/>
-        </copy>
-        -->
     </target>
 
    <target name="package" 
@@ -73,16 +69,15 @@
             <fileset dir="${dir.java}/main/resources">
                 <include name="**/*"/>
             </fileset>
-
         </jar>
    </target>
 
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">
-           
+        <mkdir dir="${dir.deploy}"/>
         <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
+              todir="${dir.deploy}" 
               overwrite="true"
               verbose="true"/>
    </target>
@@ -99,20 +94,15 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
    </target>
 </project>
