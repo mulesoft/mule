@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker ESB" default="setup">
+<project name="Mule Examples: Loan Broker ESB" default="deploy">
 
     <property name="app.name" value="mule-example-loanbroker-esb"/>
     <property environment="env"/>
@@ -15,13 +15,19 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
+    <property name="esb.instance.name" value="loanbroker-esb"/>
+    <property name="ejb.instance.name" value="loanbroker-ejb"/>
+    <property name="domain" value="loanbroker"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="https://maven.atlassian.com/repository/public/"/>
 
     <target name="clean"
-            description="Clean the output directory (start from scratch).">
+            description="Clean the output directory (start from scratch)."
+            depends="setup,ifMuleBase,ifMuleHome">        
         <delete dir="${dir.build}"/>
+        <delete dir="${dir.ejb.app}"/>
+        <delete dir="${dir.esb.app}"/>
     </target>
 
     <!-- Download any additional libraries needed to run the application -->
@@ -43,7 +49,7 @@
              usetimestamp="true"/>
     </target>
 
-    <target name="init" depends="get.libraries">
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
 
        <ant dir="${dir.common.tests}" antfile="build.xml" />   
            
@@ -110,11 +116,17 @@
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">
-           
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
-              overwrite="true"
-              verbose="true"/>
+
+       <mkdir dir="${dir.ejb.app}" />
+       <mkdir dir="${dir.esb.app}" />
+       <mkdir dir="${dir.common.deploy}" />       
+
+       <copy file="${dir.build}/${app.name}.jar" todir="${dir.common.deploy}" overwrite="true" verbose="true"/>
+       
+       <copy tofile="${dir.esb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.esb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
+       <copy tofile="${dir.esb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.esb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
    </target>
 
    <target name="setup">
@@ -129,20 +141,37 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
+      <property name="dir.ejb.app" value="${dir.mule.home}/apps/${ejb.instance.name}"/>
+      <property name="dir.esb.app" value="${dir.mule.home}/apps/${esb.instance.name}"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
+       <property name="dir.ejb.app" value="${dir.mule.home}/apps/${ejb.instance.name}"/>
+       <property name="dir.esb.app" value="${dir.mule.home}/apps/${esb.instance.name}"/>
    </target>
+    
+    <target name="test" depends="compile">
+        <junit haltonerror="true" haltonfailure="true">
+            <classpath>
+                <pathelement location="${dir.build}/classes"/>
+                <pathelement location="${dir.java}/test/resources"/>
+                <path refid="classpath.mule"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest fork="yes" todir="${dir.build}">
+                <fileset dir="${dir.java}/test/java">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>    
 </project>

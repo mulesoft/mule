@@ -19,20 +19,5 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-echo "The Loan Broker example client is available in three flavors (TODO: we should be able to use just one client):"
-echo "  1. Loan Broker ESB"
-echo "  2. Loan Broker ESN"
-echo "  3. Loan Broker BPM"
-echo "Select the one you wish to execute and press Enter..."
-read i
+exec java -Djava.ext.dirs=$MULE_HOME/apps/loanbroker-bpm/lib:$MULE_HOME/lib/shared/loanbroker:$MULE_HOME/lib/boot:$MULE_HOME/lib/mule:$MULE_HOME/lib/opt org.mule.example.loanbroker.bpm.LoanBrokerApp
 
-if [ 1 = $i ]
-then
-    exec "$MULE_BASE/bin/mule" -production -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="$MULE_HOME"
-elif [ 2 = $i ]
-then
-    exec "$MULE_BASE/bin/mule" -production -main org.mule.example.loanbroker.esn.LoanBrokerApp
-elif [ 3 = $i ]
-then
-    exec java -Djava.ext.dirs=$MULE_HOME/apps/loanbroker-bpm/lib:$MULE_HOME/lib/shared/loanbroker:$MULE_HOME/lib/boot:$MULE_HOME/lib/mule:$MULE_HOME/lib/opt org.mule.example.loanbroker.bpm.LoanBrokerApp
-fi

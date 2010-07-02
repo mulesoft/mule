@@ -30,5 +30,5 @@ refer to the following information.)
 +---------------------+
 | Running the example |
 +---------------------+
-Simply use the shell script (Unix/Linux) or batch file (Windows) provided in 
-this directory to run the example.
+This example has two parts: the server and client.  Once you have built the example, run the 'loanbroker-server' script and then the 'loanbroker-client' script in a different shell.  Make sure that you set the MULE_HOME environment variable in both.
+

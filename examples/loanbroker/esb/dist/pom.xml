@@ -99,6 +99,27 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy tofile="${MULE_HOME}/apps/loanbroker-esb/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config.xml"/>
+                                <copy todir="${MULE_HOME}/apps/loanbroker-esb" file="${basedir}/target/classes/mule-deploy.properties"/>
+                                <copy tofile="${MULE_HOME}/apps/loanbroker-ejb/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml"/>
+                                <copy todir="${MULE_HOME}/apps/loanbroker-ejb" file="${basedir}/target/classes/mule-deploy.properties"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
                 overwriting the previous one. -->
             <plugin>
@@ -112,7 +133,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/lib/shared/loanbroker</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -122,6 +143,20 @@
                                     <version>${version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>                                
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>                                
                                 <artifactItem>
                                     <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-core</artifactId>
@@ -139,7 +174,7 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
-                    </execution>
+                    </execution>                    
                 </executions>
             </plugin>
         </plugins>

@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker ESN" default="setup">
+<project name="Mule Examples: Loan Broker ESN" default="deploy">
 
     <property name="app.name" value="mule-example-loanbroker-esn"/>
     <property environment="env"/>
@@ -15,13 +15,19 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
+    <property name="async.instance.name" value="loanbroker-esn-async"/>
+    <property name="sync.instance.name" value="loanbroker-esn-sync"/>
+    <property name="domain" value="loanbroker"/>    
 
     <target name="clean"
-            description="Clean the output directory (start from scratch).">
+            description="Clean the output directory (start from scratch)."
+            depends="setup,ifMuleBase,ifMuleHome">     
         <delete dir="${dir.build}"/>
+        <delete dir="${dir.async.app}"/>
+        <delete dir="${dir.sync.app}"/>        
     </target>
 
-    <target name="init">
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome">
        <ant dir="${dir.common.tests}" antfile="build.xml" />   
            
         <!-- Create the build directory if it doesn't exist -->
@@ -85,11 +91,24 @@
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">
-           
+
+        <mkdir dir="${dir.common.deploy}" />       
+
         <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.user.lib}" 
+              todir="${dir.common.deploy}" 
               overwrite="true"
               verbose="true"/>
+
+       <mkdir dir="${dir.async.app}" />
+       <mkdir dir="${dir.sync.app}" />
+       
+       <copy file="${dir.build}/${app.name}.jar" todir="${dir.common.deploy}" overwrite="true" verbose="true"/>
+       
+       <copy tofile="${dir.async.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-async-config.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.async.app}" file="${basedir}/src/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
+       <copy tofile="${dir.sync.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-sync-config.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.sync.app}" file="${basedir}/src/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
+       
    </target>
 
    <target name="setup">
@@ -104,20 +123,21 @@
          </or>
         </condition>
       </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
    </target>
 
    <target name="ifMuleBase" if="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_BASE}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
+      <property name="dir.async.app" value="${dir.mule.home}/apps/${async.instance.name}"/>
+      <property name="dir.sync.app" value="${dir.mule.home}/apps/${sync.instance.name}"/>
    </target>
 
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
+      <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
+      <property name="dir.async.app" value="${dir.mule.home}/apps/${async.instance.name}"/>
+      <property name="dir.sync.app" value="${dir.mule.home}/apps/${sync.instance.name}"/>
    </target>
 </project>
