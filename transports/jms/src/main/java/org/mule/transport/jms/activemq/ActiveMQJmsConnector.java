@@ -22,6 +22,7 @@ import java.lang.reflect.Proxy;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 
 /**
  * ActiveMQ 4.x-specific JMS connector.
@@ -119,9 +120,20 @@ public class ActiveMQJmsConnector extends JmsConnector
                     cleanupMethod.invoke(connection, (Object[])null);
                 }
             }
+            catch (InvocationTargetException ex)
+            {
+                logger.warn("Exception cleaning up JMS connection", ex);        
+            }
             finally
             {
-                connection.close();
+                try
+                {
+                    connection.close();
+                }
+                catch (JMSException ex)
+                {
+                    logger.warn("Exception closing JMS connection", ex);
+                }
             }
         }
         catch (Exception e)

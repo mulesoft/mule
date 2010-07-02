@@ -28,6 +28,7 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
     public static final String FACTORY_CLASS = FACTORY + "-" + AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS;
     public static final String ACTION = "action";
     public static final String TIMEOUT = "timeout";
+    public static final String INTERACT_WTH_EXTERNAL = "interactWithExternal";
 
     public TransactionDefinitionParser()
     {
@@ -48,12 +49,14 @@ public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefin
                 .setIgnoredDefault(true)
                 .removeIgnored(FACTORY_REF)
                 .removeIgnored(ACTION)
-                .removeIgnored(TIMEOUT);
+                .removeIgnored(TIMEOUT)
+                .removeIgnored(INTERACT_WTH_EXTERNAL);
         addDelegateAsChild(new ChildDefinitionParser(FACTORY, factoryClass))
                 .setIgnoredDefault(false)
                 .addIgnored(FACTORY_REF)
                 .addIgnored(ACTION)
                 .addIgnored(TIMEOUT)
+                .addIgnored(INTERACT_WTH_EXTERNAL)
                 .addAlias(FACTORY_CLASS, AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)
                 // the ref is set on the parent
                 .registerPreProcessor(new BlockAttribute(FACTORY));

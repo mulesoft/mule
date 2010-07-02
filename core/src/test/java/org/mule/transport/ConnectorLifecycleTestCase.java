@@ -391,9 +391,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     public void testWorkManagerLifecycle() throws MuleException, WorkException
     {
-        assertNull(connector.getReceiverWorkManager());
-        assertNull(connector.getDispatcherWorkManager());
-        assertNull(connector.getRequesterWorkManager());
+        //ConnectorLifecycleTestCase These are now created in the "initialize" phase
+        //   assertNull(connector.getReceiverWorkManager());
+        //   assertNull(connector.getDispatcherWorkManager());
+        //   assertNull(connector.getRequesterWorkManager());
 
         connector.start();
         assertNotNull(connector.getReceiverWorkManager());

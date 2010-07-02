@@ -375,6 +375,14 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             ((DefaultExceptionStrategy) exceptionListener).initialise();
         }
 
+        try
+        {
+            initWorkManagers();
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     /**
@@ -473,7 +481,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
         initWorkManagers();
 
-        lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
+        if (!isStarted())
+            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
 
         if (receivers != null)
         {
@@ -649,7 +658,10 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
         if (dispatcherWorkManager.get() == null)
         {
-            WorkManager newWorkManager = this.getDispatcherThreadingProfile().createWorkManager(
+            ThreadingProfile dispatcherThreadingProfile = this.getDispatcherThreadingProfile();
+            if (dispatcherThreadingProfile.getMuleContext() == null)
+                dispatcherThreadingProfile.setMuleContext(muleContext);
+            WorkManager newWorkManager = dispatcherThreadingProfile.createWorkManager(
                 getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
@@ -1268,7 +1280,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * The method determines the key used to store the receiver against.
      * 
-     * @param service the service for which the endpoint is being registered
+     * @param flowConstruct the service for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
@@ -2271,7 +2283,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Create a Message receiver for this connector
      * 
-     * @param service the service that will receive events from this receiver, the
+     * @param flowConstruct the service that will receive events from this receiver, the
      *            listener
      * @param endpoint the endpoint that defies this inbound communication
      * @return an instance of the message receiver defined in this connectors'

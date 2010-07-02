@@ -179,4 +179,7 @@ public interface ThreadingProfile extends MuleContextAware
         WorkManager createWorkManager(ThreadingProfile profile, String name, int shutdownTimeout);
     }
 
+    MuleContext getMuleContext();
+
+    void setMuleContext(MuleContext muleContext);        
 }

@@ -48,7 +48,9 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     private ConstraintFilter constraint = null;
 
     private Integer timeout;
-    
+
+    private boolean interactWithExternal = false;
+
     public void setMuleContext(MuleContext context)
     {
         // override only if not set in config
@@ -81,6 +83,16 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     {
         this.action = action;
 
+    }
+
+    public boolean isInteractWithExternal()
+    {
+        return interactWithExternal;
+    }
+
+    public void setInteractWithExternal(boolean interactWithExternal)
+    {
+        this.interactWithExternal = interactWithExternal;
     }
 
     public void setActionAsString(String action)

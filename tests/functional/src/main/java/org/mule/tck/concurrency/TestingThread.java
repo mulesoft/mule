@@ -52,7 +52,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public abstract class TestingThread extends Thread implements Runnable
 {
     public static final long AWAIT_TIMEOUT = 10000;
-    
+    private static final long awaitTimeout = Long.getLong("mule.test.timeoutSecs", AWAIT_TIMEOUT/1000L) * 1000L;
     private final Latch done = new Latch();
     private volatile Throwable exception = null;        
 
@@ -85,7 +85,7 @@ public abstract class TestingThread extends Thread implements Runnable
      */
     public void await() throws InterruptedException
     {
-        done.await(AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        done.await(awaitTimeout, TimeUnit.MILLISECONDS);
     }
 
     /**

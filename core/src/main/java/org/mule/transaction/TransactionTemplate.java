@@ -10,17 +10,18 @@
 
 package org.mule.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
+import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.config.i18n.CoreMessages;
 
 import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class TransactionTemplate
 {
@@ -45,8 +46,21 @@ public class TransactionTemplate
             return callback.doInTransaction();
         }
 
+        Transaction joinedExternal = null;
         byte action = (config != null) ? config.getAction() : TransactionConfig.ACTION_DEFAULT;
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx == null && context != null && config != null && config.isInteractWithExternal())
+        {
+
+            TransactionFactory tmFactory = config.getFactory();
+            if (tmFactory instanceof ExternalTransactionAwareTransactionFactory)
+            {
+                ExternalTransactionAwareTransactionFactory extmFactory =
+                    (ExternalTransactionAwareTransactionFactory) tmFactory;
+                joinedExternal = tx = extmFactory.joinExternalTransaction(context);
+            }
+        }
+
         Transaction suspendedXATx = null;
         
         if (action == TransactionConfig.ACTION_NEVER && tx != null)
@@ -167,6 +181,11 @@ public class TransactionTemplate
                 tx.rollback();
             }
             throw e;
+        }
+        finally
+        {
+            if (joinedExternal != null)
+                TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
         }
     }
 

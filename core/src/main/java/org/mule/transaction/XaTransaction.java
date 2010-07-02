@@ -35,14 +35,14 @@ public class XaTransaction extends AbstractTransaction
     /**
      * The inner JTA transaction
      */
-    private Transaction transaction = null;
+    protected Transaction transaction = null;
 
     /**
      * Map of enlisted resources
      */
     private Map resources = new HashMap();
 
-    private TransactionManager txManager;
+    protected TransactionManager txManager;
 
     public XaTransaction(MuleContext context)
     {

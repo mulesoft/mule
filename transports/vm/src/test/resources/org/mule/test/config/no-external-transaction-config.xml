@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd"
+
+>
+
+    <jbossts:transaction-manager/>
+
+    <vm:connector name="vm-normal" />
+    <vm:connector name="vm-queue" />
+
+    <vm:endpoint name="queue" path="foo" connector-ref="vm-queue" exchange-pattern="request-response">
+        <xa-transaction action="ALWAYS_JOIN"/>
+    </vm:endpoint>
+    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal" exchange-pattern="request-response">
+    </vm:endpoint>
+
+    <model name="main">
+        <service name="testService">
+            <inbound>
+                <vm:inbound-endpoint path="entry" connector-ref="vm-normal"/>
+            </inbound>
+            <test:component appendString=" Received"/>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="queue">
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+
+</mule>

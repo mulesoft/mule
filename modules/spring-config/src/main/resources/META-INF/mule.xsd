@@ -1451,7 +1451,15 @@
     </xsd:element>
     <xsd:complexType name="xaTransactionType">
         <xsd:complexContent>
-            <xsd:extension base="baseTransactionType"/>
+            <xsd:extension base="baseTransactionType">
+                <xsd:attribute name="interactWithExternal" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If this is set to "true", Mule interacts with transactions begun outside of Mule.  E.g. if an external transaction is active, then BEGIN_OR_JOIN wil join it, and ALWAYS_BEGIN will cause an exception to be thrown. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
