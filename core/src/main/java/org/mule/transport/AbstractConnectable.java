@@ -191,7 +191,8 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
         if (disposed.get())
         {
-            throw new IllegalStateException("Requester/dispatcher has been disposed; cannot connect to resource");
+            throw new IllegalStateException(
+                "Requester/dispatcher has been disposed; cannot connect to resource:" + this);
         }
         
         if (!connecting.compareAndSet(false, true))

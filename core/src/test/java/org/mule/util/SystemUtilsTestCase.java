@@ -32,7 +32,7 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase
         if (SystemUtils.IS_OS_WINDOWS)
         {
             String term = (String) env.get("TERM");
-            if (term != null && term.equals("cygwin"))
+            if (term != null && term.contains("cygwin"))
             {
                 envVarToTest = "PATH";
             }

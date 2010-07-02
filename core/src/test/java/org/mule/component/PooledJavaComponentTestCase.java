@@ -172,7 +172,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         Object borrowed = component.borrowComponentLifecycleAdaptor();
         assertNotNull(borrowed);
         long totalTime = System.currentTimeMillis() - startTime;
-        assertTrue(totalTime > borrowerWait);
+        assertTrue(totalTime >= borrowerWait);
     }
     
     public void testGrowOnExhaust() throws Exception
