@@ -35,14 +35,20 @@ import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
 import org.mule.routing.binding.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
+import org.mule.util.annotation.AnnotationMetaData;
+import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.ref.SoftReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,6 +82,9 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     protected boolean isStartable = false;
     protected boolean isStoppable = false;
     protected boolean isDisposable = false;
+
+    protected Method initMethod;
+    protected Method disposeMethod;
 
     private boolean started = false;
     private boolean disposed = false;
@@ -123,10 +132,72 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected void setLifecycleFlags()
     {
-        isInitialisable = Initialisable.class.isInstance(componentObject.get());
+        initMethod = findInitMethod(componentObject.get());
+        disposeMethod = findDisposeMethod(componentObject.get());
+        isInitialisable = initMethod!=null;
+        //isInitialisable = Initialisable.class.isInstance(componentObject.get());
         isStartable = Startable.class.isInstance(componentObject.get());
         isStoppable = Stoppable.class.isInstance(componentObject.get());
-        isDisposable = Disposable.class.isInstance(componentObject.get());
+        //isDisposable = Disposable.class.isInstance(componentObject.get());
+        isDisposable = disposeMethod!=null;
+    }
+
+    protected Method findInitMethod(Object object)
+    {
+        if(object instanceof Initialisable)
+        {
+            try
+            {
+                return object.getClass().getMethod(Initialisable.PHASE_NAME);
+            }
+            catch (NoSuchMethodException e)
+            {
+                //ignore
+            }
+        }
+
+        List<AnnotationMetaData> metaData = AnnotationUtils.getMethodAnnotations(object.getClass(), PostConstruct.class);
+        if(metaData.size()==0)
+        {
+            return null;
+        }
+        else if(metaData.size() > 1)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectHasMoreThanOnePostConstructAnnotation(object.getClass()).getMessage());
+        }
+        else
+        {
+            return (Method) metaData.get(0).getMember();
+        }
+    }
+
+    protected Method findDisposeMethod(Object object)
+    {
+        if(object instanceof Disposable)
+        {
+            try
+            {
+                return object.getClass().getMethod(Disposable.PHASE_NAME);
+            }
+            catch (NoSuchMethodException e)
+            {
+                //ignore
+            }
+        }
+
+        List<AnnotationMetaData> metaData = AnnotationUtils.getMethodAnnotations(object.getClass(), PreDestroy.class);
+        if(metaData.size()==0)
+        {
+            return null;
+        }
+        else if(metaData.size() > 1)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectHasMoreThanOnePreDestroyAnnotation(object.getClass()).getMessage());
+        }
+        else
+        {
+            return (Method) metaData.get(0).getMember();
+        }
     }
 
     protected void registerComponentIfNecessary() throws RegistrationException
@@ -153,7 +224,19 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     {
         if (isInitialisable)
         {
-            ((Initialisable) componentObject.get()).initialise();
+            //((Initialisable)componentObject.get()).initialise();
+            try
+            {
+                initMethod.invoke(componentObject.get());
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw new InitialisationException(e.getTargetException(), this);
+            }
         }
     }
 
@@ -224,7 +307,16 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
                 Object o = componentObject.get();
                 if (o != null)
                 {
-                    ((Disposable) o).dispose();
+                    //((Disposable)o).dispose();
+                    try
+                    {
+                        disposeMethod.invoke(o);
+                    }
+                    catch (InvocationTargetException e)
+                    {
+                        //unwrap
+                        throw e.getTargetException();
+                    }
                 }
             }
 
@@ -234,7 +326,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
             componentObject.enqueue();
 
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             logger.error("failed to dispose: " + flowConstruct.getName(), e);
         }

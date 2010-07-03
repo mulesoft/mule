@@ -34,6 +34,7 @@ import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
@@ -1268,5 +1269,20 @@ public class CoreMessages extends MessageFactory
     public static Message interruptedWaitingForPaused(String name)
     {
         return factory.createMessage(BUNDLE_PATH, 315, name);
+    }
+
+    public static Message objectHasMoreThanOnePostConstructAnnotation(Class clazz)
+    {
+        return factory.createMessage(BUNDLE_PATH, 316, clazz.getName());
+    }
+
+    public static Message objectHasMoreThanOnePreDestroyAnnotation(Class clazz)
+    {
+        return factory.createMessage(BUNDLE_PATH, 317, clazz.getName());        
+    }
+
+    public static Message lifecycleMewthodNotVoidOrHasParams(Method method)
+    {
+        return factory.createMessage(BUNDLE_PATH, 318, method.getName());
     }
 }

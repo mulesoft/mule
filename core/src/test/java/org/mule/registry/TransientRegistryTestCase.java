@@ -9,6 +9,8 @@
  */
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -16,6 +18,12 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 public class TransientRegistryTestCase extends AbstractMuleTestCase
 {
@@ -28,6 +36,17 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
 
         muleContext.dispose();
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+    }
+
+    public void testJSR250ObjectLifecycle() throws Exception
+    {
+        muleContext.start();
+
+        JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
+        muleContext.getRegistry().registerObject("test", tracker);
+
+        muleContext.dispose();
+        assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
     public void testObjectLifecycleWithTransientRegistryDirectly() throws Exception
@@ -409,5 +428,30 @@ public void testLifecycleStateOutOfSequenceStartFirst() throws Exception
 
     }
 
+    public class JSR250ObjectLifecycleTracker implements MuleContextAware
+    {
+        private final List<String> tracker = new ArrayList<String>();
+
+        public List<String> getTracker() {
+            return tracker;
+        }
+
+        public void setMuleContext(MuleContext context)
+        {
+            tracker.add("setMuleContext");
+        }
+
+        @PostConstruct
+        public void init()
+        {
+            tracker.add("initialise");
+        }
+
+        @PreDestroy
+        public void dispose()
+        {
+            tracker.add("dispose");
+        }
+    }
 
 }
