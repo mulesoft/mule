@@ -9,9 +9,9 @@
  */
 package org.mule.impl.expression.parsers;
 
+import org.mule.api.annotations.expressions.CustomEvaluator;
+import org.mule.api.annotations.expressions.Evaluator;
 import org.mule.api.expression.ExpressionParser;
-import org.mule.config.annotations.expressions.CustomEvaluator;
-import org.mule.config.annotations.expressions.Evaluator;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
