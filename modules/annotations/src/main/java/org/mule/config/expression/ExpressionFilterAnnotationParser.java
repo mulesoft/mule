@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.expression.parsers;
+package org.mule.config.expression;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;

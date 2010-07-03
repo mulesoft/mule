@@ -7,10 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.expression.parsers;
+package org.mule.config.expression;
 
+import org.mule.api.annotations.expressions.CustomEvaluator;
 import org.mule.api.annotations.expressions.Evaluator;
-import org.mule.api.annotations.expressions.Ognl;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -18,17 +18,20 @@ import org.mule.expression.transformers.ExpressionArgument;
 import java.lang.annotation.Annotation;
 
 /**
- * TODO
+ * Used to parse custom expressions annotations
+ *
+ * @see org.mule.config.annotations.expressions.CustomEvaluator
+ * @see org.mule.expression.CustomExpressionEvaluator
  */
-public class OgnlAnnotationParser implements ExpressionParser
+public class CustomEvaluatorAnnotationParser implements ExpressionParser
 {
     public ExpressionArgument parse(Annotation annotation, Class parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Ognl) annotation).value(),
-                    evaluator.value(), null), ((Ognl) annotation).required(), parameterType);
+            CustomEvaluator eval = (CustomEvaluator) annotation;
+            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(eval.value(), evaluator.value(), eval.evaluator()), ((CustomEvaluator) annotation).required(), parameterType);
             return arg;
         }
         else
@@ -40,6 +43,6 @@ public class OgnlAnnotationParser implements ExpressionParser
 
     public boolean supports(Annotation annotation)
     {
-        return annotation instanceof Ognl;
+        return annotation instanceof CustomEvaluator;
     }
 }

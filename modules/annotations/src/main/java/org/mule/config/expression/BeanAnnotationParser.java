@@ -7,39 +7,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.expression.parsers;
+package org.mule.config.expression;
 
+import org.mule.api.annotations.expressions.Bean;
 import org.mule.api.annotations.expressions.Evaluator;
-import org.mule.api.annotations.expressions.XPath;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
 import java.lang.annotation.Annotation;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 /**
- * TODO
+ * Used to parse Bean annotations
+ *
+ * @see org.mule.config.annotations.expressions.Bean
+ * @see org.mule.module.xml.expression.BeanPayloadExpressionEvaluator
  */
-public class XPathAnnotationParser implements ExpressionParser
+public class BeanAnnotationParser implements ExpressionParser
 {
     public ExpressionArgument parse(Annotation annotation, Class parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
-        String eval = "xpath";
         if (evaluator != null)
         {
-            if (parameterType.equals(Node.class) || parameterType.equals(org.dom4j.Node.class) ||
-                    parameterType.equals(Element.class) || parameterType.equals(org.dom4j.Element.class) ||
-                    parameterType.equals(Document.class) || parameterType.equals(org.dom4j.Document.class))
-            {
-                eval = "xpath-node";
-            }
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((XPath) annotation).value(),
-                    eval, null), ((XPath) annotation).required(), parameterType);
+            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Bean) annotation).value(), evaluator.value(), null), ((Bean) annotation).required(), parameterType);
             return arg;
         }
         else
@@ -51,6 +42,6 @@ public class XPathAnnotationParser implements ExpressionParser
 
     public boolean supports(Annotation annotation)
     {
-        return annotation instanceof XPath;
+        return annotation instanceof Bean;
     }
 }
