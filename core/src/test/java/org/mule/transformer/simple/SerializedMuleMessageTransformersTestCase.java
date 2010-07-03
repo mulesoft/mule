@@ -62,13 +62,13 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     @Override
     public Transformer getTransformer() throws Exception
     {
-        return new MuleMessageToByteArray();
+        return createObject(MuleMessageToByteArray.class);
     }
 
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToMuleMessage();
+        return createObject(ByteArrayToMuleMessage.class);
     }
 
     @Override

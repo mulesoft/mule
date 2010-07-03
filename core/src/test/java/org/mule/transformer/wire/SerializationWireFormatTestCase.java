@@ -17,9 +17,9 @@ import org.mule.transformer.simple.SerializableToByteArray;
 public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
 {
 
-    protected WireFormat getWireFormat()
+    protected WireFormat getWireFormat() throws Exception
     {
-        return new SerializationWireFormat();
+        return createObject(SerializationWireFormat.class);
     }
 
     public void testGetDefaultInboundTransformer()

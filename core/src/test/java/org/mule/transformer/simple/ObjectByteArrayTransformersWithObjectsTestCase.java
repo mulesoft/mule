@@ -18,13 +18,13 @@ public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedOb
     @Override
     public Transformer getTransformer() throws Exception
     {
-        return new ObjectToByteArray();
+        return createObject(ObjectToByteArray.class);
     }
 
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToObject();
+        return createObject(ByteArrayToObject.class);
     }
 
 }

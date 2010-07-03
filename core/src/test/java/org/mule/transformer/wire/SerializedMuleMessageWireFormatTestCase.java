@@ -17,18 +17,18 @@ import org.mule.transformer.simple.MuleMessageToByteArray;
 public class SerializedMuleMessageWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {
 
-    protected WireFormat getWireFormat()
+    protected WireFormat getWireFormat() throws Exception
     {
-        return new SerializedMuleMessageWireFormat();
+        return createObject(SerializedMuleMessageWireFormat.class);
     }
 
-    public void testGetDefaultInboundTransformer()
+    public void testGetDefaultInboundTransformer() throws Exception
     {
         SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
         assertEquals(ByteArrayToMuleMessage.class, wireFormat.getInboundTransformer().getClass());
     }
 
-    public void testGetDefaultOutboundTransformer()
+    public void testGetDefaultOutboundTransformer() throws Exception
     {
         SerializedMuleMessageWireFormat wireFormat = (SerializedMuleMessageWireFormat) getWireFormat();
         assertEquals(MuleMessageToByteArray.class, wireFormat.getOutboundTransformer().getClass());

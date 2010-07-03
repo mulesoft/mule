@@ -22,12 +22,12 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
     public Transformer getTransformer() throws Exception
     {
-        return new SerializableToByteArray();
+        return createObject(SerializableToByteArray.class);
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToSerializable();
+        return createObject(ByteArrayToSerializable.class);
     }
 
     public Object getTestData()
