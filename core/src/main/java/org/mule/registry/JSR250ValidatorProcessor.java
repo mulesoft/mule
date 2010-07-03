@@ -15,14 +15,23 @@ import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 /**
- * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered
- * implements {@link org.mule.api.context.MuleContextAware}.
+ * This registry processor will check for objects that have JSR-250 lifecycle annotations defined and validates that the
+ * following conditions are met (according to the JSR-250 spec)
+ * <ol>
+ * <li>The method MUST NOT have any parameters except in the case of EJB interceptors in which case it takes an InvocationContext object as defined by the EJB specification. Note that Mule is not an EJB container so the EJB case is ignored in Mule.</li>
+ * <li>The return type of the method MUST be void.</li>
+ * <li>The method MUST NOT throw a checked exception.</li>
+ * <li>The method on which PostConstruct is applied MAY be public, protected, package private or private.</li>
+ * <li>The method MUST NOT be static except for the application client.</li>
+ * <li>The method MAY be final or non-final, except in the case of EJBs where it MUST be non-final. Note that Mule is not an EJB container so the EJB case is ignored in Mule.</li>
+ * </ol>
  */
 public class JSR250ValidatorProcessor implements InjectProcessor
 {
@@ -35,7 +44,7 @@ public class JSR250ValidatorProcessor implements InjectProcessor
         }
         else if(annos.size()==1)
         {
-            validateMethod((Method)annos.get(0).getMember());
+            validateLifecycleMethod((Method)annos.get(0).getMember());
         }
 
         annos = AnnotationUtils.getMethodAnnotations(object.getClass(), PreDestroy.class);
@@ -45,22 +54,35 @@ public class JSR250ValidatorProcessor implements InjectProcessor
         }
         else if(annos.size()==1)
         {
-            validateMethod((Method)annos.get(0).getMember());
+            validateLifecycleMethod((Method)annos.get(0).getMember());
         }
 
         return object;
     }
 
-    protected void validateMethod(Method method)
+    public final void validateLifecycleMethod(Method method)
     {
         if(method.getParameterTypes().length != 0)
         {
-            throw new IllegalArgumentException(CoreMessages.lifecycleMewthodNotVoidOrHasParams(method).getMessage());
+            throw new IllegalArgumentException(CoreMessages.lifecycleMethodNotVoidOrHasParams(method).getMessage());
         }
 
         if(!method.getReturnType().equals(Void.TYPE))
         {
-            throw new IllegalArgumentException(CoreMessages.lifecycleMewthodNotVoidOrHasParams(method).getMessage());
+            throw new IllegalArgumentException(CoreMessages.lifecycleMethodNotVoidOrHasParams(method).getMessage());
+        }
+
+        if(Modifier.isStatic(method.getModifiers()))
+        {
+            throw new IllegalArgumentException(CoreMessages.lifecycleMethodCannotBeStatic(method).getMessage());
+        }
+
+        for (Class<?> aClass : method.getExceptionTypes())
+        {
+            if(!RuntimeException.class.isAssignableFrom(aClass))
+            {
+                throw new IllegalArgumentException(CoreMessages.lifecycleMethodCannotThrowChecked(method).getMessage());                
+            }
         }
     }
 }

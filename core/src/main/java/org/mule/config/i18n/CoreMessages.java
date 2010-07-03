@@ -1281,8 +1281,18 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 317, clazz.getName());        
     }
 
-    public static Message lifecycleMewthodNotVoidOrHasParams(Method method)
+    public static Message lifecycleMethodNotVoidOrHasParams(Method method)
     {
         return factory.createMessage(BUNDLE_PATH, 318, method.getName());
+    }
+
+    public static Message lifecycleMethodCannotBeStatic(Method method)
+    {
+        return factory.createMessage(BUNDLE_PATH, 319, method.getName());
+    }
+
+    public static Message lifecycleMethodCannotThrowChecked(Method method)
+    {
+        return factory.createMessage(BUNDLE_PATH, 320, method.getName());
     }
 }

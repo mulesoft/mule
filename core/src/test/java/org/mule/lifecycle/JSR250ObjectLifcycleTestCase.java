@@ -54,11 +54,11 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testBadPostConstructMethod() throws Exception
+    public void testBadReturnTypePostConstructMethod() throws Exception
     {
         try
         {
-            muleContext.getRegistry().registerObject("test", new BadPostConstructLifecycleMethodObject());
+            muleContext.getRegistry().registerObject("test", new BadReturnTypePostConstructLifecycleMethodObject());
             fail("PostContruct Lifecycle method has a non-void return type");
         }
         catch (IllegalArgumentException e)
@@ -67,12 +67,38 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testBadPreDestroyMethod() throws Exception
+    public void testBadParamPreDestroyMethod() throws Exception
     {
         try
         {
-            muleContext.getRegistry().registerObject("test", new BadPreDestroyLifecycleMethodObject());
+            muleContext.getRegistry().registerObject("test", new BadParamPreDestroyLifecycleMethodObject());
             fail("PreDestroy Lifecycle method has a parameter");
+        }
+        catch (IllegalArgumentException e)
+        {
+            //expected
+        }
+    }
+
+    public void testBadStaticPreDestroyMethod() throws Exception
+    {
+        try
+        {
+            muleContext.getRegistry().registerObject("test", new BadStaticMethodPostConstructLifecycleMethodObject());
+            fail("PostConstruct Lifecycle method is static");
+        }
+        catch (IllegalArgumentException e)
+        {
+            //expected
+        }
+    }
+
+    public void testBadCheckedExceptionPreDestroyMethod() throws Exception
+    {
+        try
+        {
+            muleContext.getRegistry().registerObject("test", new BadCheckedExceptionPreDestroyLifecycleMethodObject());
+            fail("PreDestroy Lifecycle method throws a checked exception");
         }
         catch (IllegalArgumentException e)
         {
@@ -100,7 +126,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
-    public class BadPostConstructLifecycleMethodObject
+    public class BadReturnTypePostConstructLifecycleMethodObject
     {
         @PostConstruct
         public boolean init()
@@ -109,10 +135,28 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
-    public class BadPreDestroyLifecycleMethodObject
+    public class BadParamPreDestroyLifecycleMethodObject
     {
         @PreDestroy
         public void destroy(boolean foo)
+        {
+
+        }
+    }
+
+    public static class BadStaticMethodPostConstructLifecycleMethodObject
+    {
+        @PostConstruct
+        public static void init()
+        {
+
+        }
+    }
+
+    public class BadCheckedExceptionPreDestroyLifecycleMethodObject
+    {
+        @PreDestroy
+        public void destroy() throws Exception
         {
 
         }

@@ -33,6 +33,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
+import org.mule.registry.JSR250ValidatorProcessor;
 import org.mule.routing.binding.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -56,9 +57,18 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>DefaultComponentLifecycleAdapter</code> is a default implementation of
  * {@link LifecycleAdapter} for use with {@link JavaComponent} that expects component
- * instances to implement Mule lifecycle interfaces in order to receive lifecycle.
- * Custom implementations should be used in order to adapt Mule lifecycle to other
- * custom lifecycle methods that are used by a component instance.
+ * instances to implement Mule lifecycle interfaces in order to receive lifecycle. Lifecycle interfaces supported are -
+ * <ul>
+ * <li>{@link org.mule.api.lifecycle.Initialisable}</li>
+ * <li>{@link org.mule.api.lifecycle.Startable}</li>
+ * <li>{@link org.mule.api.lifecycle.Stoppable}</li>
+ * <li>{@link org.mule.api.lifecycle.Disposable}</li>
+ * </ul>
+ *  This implementation also supports JSR-250 lifecycle annotations
+ *  {@link javax.annotation.PostConstruct} (for initialisation) and/or {@link javax.annotation.PreDestroy}
+ * (for disposal of the object). Only one of each annotation can be used per component object.
+ *
+ * @see org.mule.registry.JSR250ValidatorProcessor for details about the rules for using JSR-250 lifecycle annotations
  */
 public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 {
@@ -132,14 +142,13 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected void setLifecycleFlags()
     {
-        initMethod = findInitMethod(componentObject.get());
-        disposeMethod = findDisposeMethod(componentObject.get());
+        Object object = componentObject.get();
+        initMethod = findInitMethod(object);
+        disposeMethod = findDisposeMethod(object);
         isInitialisable = initMethod!=null;
-        //isInitialisable = Initialisable.class.isInstance(componentObject.get());
-        isStartable = Startable.class.isInstance(componentObject.get());
-        isStoppable = Stoppable.class.isInstance(componentObject.get());
-        //isDisposable = Disposable.class.isInstance(componentObject.get());
         isDisposable = disposeMethod!=null;
+        isStartable = Startable.class.isInstance(object);
+        isStoppable = Stoppable.class.isInstance(object);
     }
 
     protected Method findInitMethod(Object object)
@@ -167,7 +176,9 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         else
         {
-            return (Method) metaData.get(0).getMember();
+            Method m = (Method) metaData.get(0).getMember();
+            new JSR250ValidatorProcessor().validateLifecycleMethod(m);
+            return m;
         }
     }
 
@@ -196,7 +207,9 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         else
         {
-            return (Method) metaData.get(0).getMember();
+            Method m = (Method) metaData.get(0).getMember();
+            new JSR250ValidatorProcessor().validateLifecycleMethod(m);
+            return m;
         }
     }
 
@@ -204,12 +217,12 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     {
         // store a hard ref to the component object in the registry, so it's not GC'ed too early
         MuleRegistry r = muleContext.getRegistry();
-        final String key = createRegistryHardRefName(component);
+        componentObjectRegistryKey = createRegistryHardRefName(component);
         // register only if none registered yet
         if (r.lookupObjects(componentObject.get().getClass()).size() == 0)
         {
             // don't mess up the current component's lifecycle, just put a direct ref without any callbacks executed
-            r.registerObject(key, componentObject.get(), MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG);
+            r.registerObject(componentObjectRegistryKey, componentObject.get(), MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG);
         }
     }
 
@@ -224,7 +237,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     {
         if (isInitialisable)
         {
-            //((Initialisable)componentObject.get()).initialise();
             try
             {
                 initMethod.invoke(componentObject.get());
@@ -307,7 +319,6 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
                 Object o = componentObject.get();
                 if (o != null)
                 {
-                    //((Disposable)o).dispose();
                     try
                     {
                         disposeMethod.invoke(o);
@@ -437,23 +448,13 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     /**
      * Generate a registry key name for this component. Used to bind component's hard reference to
      * the Mule's lifecycle and prevent the garbage collector from kicking in too early.
+     *
+     * @param object the object to associate to the generated reference name
+     * @return A component ref name that is associated with the hard reference to the component object.  The name uses the form
+     * <code>"_component.hardref." + flowConstruct.getName() + "." + System.identityHashCode(object)</code>
      */
     protected String createRegistryHardRefName(Object object)
     {
         return "_component.hardref." + flowConstruct.getName() + "." + System.identityHashCode(object);
-    }
-
-    /**
-     * Holder class used only to crate reference to component instance from registry
-     * without if receiving muleContext injection or lifecycle for a second time.
-     */
-    private class ComponentObjectHolder
-    {
-        Object componentObject;
-
-        ComponentObjectHolder(Object componentObject)
-        {
-            this.componentObject = componentObject;
-        }
     }
 }
