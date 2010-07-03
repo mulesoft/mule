@@ -16,7 +16,7 @@ import org.springframework.core.io.Resource;
  */
 public class DefaultServletBasePackageResolver implements BasePackageResolver
 {
-    //the base package wich represents the root of the scanned resources/classes folder.
+    //the base package which represents the root of the scanned resources/classes folder.
     public final static String DEFAULT_BASE_SCANNING_PACKAGE = "/WEB-INF/classes/";
 
     public String getPackage(Resource resource)

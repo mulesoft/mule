@@ -46,8 +46,8 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
-import org.mule.utils.AnnotationMetaData;
-import org.mule.utils.AnnotationUtils;
+import org.mule.util.annotation.AnnotationMetaData;
+import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;

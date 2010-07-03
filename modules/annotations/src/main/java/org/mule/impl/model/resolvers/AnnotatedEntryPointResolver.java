@@ -23,7 +23,8 @@ import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.model.resolvers.AbstractEntryPointResolver;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
-import org.mule.utils.AnnotationUtils;
+import org.mule.util.annotation.AnnotationUtils;
+import org.mule.utils.AnnotationHelper;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -152,7 +153,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         ExpressionTransformer trans = (ExpressionTransformer) transformerCache.get(method);
         if (trans == null)
         {
-            trans = AnnotationUtils.getTransformerForMethodWithAnnotations(method, muleContext);
+            trans = AnnotationHelper.getTransformerForMethodWithAnnotations(method, muleContext);
             transformerCache.put(method, trans);
         }
 

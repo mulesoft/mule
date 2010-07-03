@@ -15,7 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.json.transformers.ObjectToJson;
 import org.mule.transport.ajax.i18n.AjaxMessages;
 import org.mule.transport.service.TransportFactory;
-import org.mule.utils.AnnotationUtils;
+import org.mule.util.annotation.AnnotationUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
