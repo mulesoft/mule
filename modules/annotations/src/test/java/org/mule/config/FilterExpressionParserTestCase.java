@@ -12,12 +12,11 @@ package org.mule.config;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.impl.expression.parsers.ExpressionFilterParser;
+import org.mule.config.expression.ExpressionFilterParser;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-//TODO this feature is not complete
 public class FilterExpressionParserTestCase extends AbstractMuleTestCase
 {
     public void testSimpleFilters() throws Exception
@@ -31,7 +30,7 @@ public class FilterExpressionParserTestCase extends AbstractMuleTestCase
         assertTrue(f.accept(message));
 
 
-        f = parser.parseFilterString("#[regex:[.*] bar] AND #[wildcard:foo*]");
+        f = parser.parseFilterString("#[regex:.* bar] AND #[wildcard:foo*]");
         assertNotNull(f);
         assertTrue(f instanceof AndFilter);
         assertEquals(2, ((AndFilter)f).getFilters().size());
@@ -40,12 +39,20 @@ public class FilterExpressionParserTestCase extends AbstractMuleTestCase
         assertTrue(((AndFilter)f).getFilters().get(1) instanceof ExpressionFilter);
         assertEquals("wildcard", ((ExpressionFilter)((AndFilter)f).getFilters().get(1)).getEvaluator());
 
-        //TODO
-//        message = new DefaultMuleMessage("foo bar", muleContext);
-//        assertTrue(f.accept(message));
-//
-//        message = new DefaultMuleMessage("foo car", muleContext);
-//        assertTrue(f.accept(message));
+        message = new DefaultMuleMessage("foo bar", muleContext);
+        assertTrue(f.accept(message));
+
+        message = new DefaultMuleMessage("foo car", muleContext);
+        assertFalse(f.accept(message));
+
+        f = parser.parseFilterString("#[regex:.* bar] OR #[wildcard:foo*]");
+        assertNotNull(f);
+
+        message = new DefaultMuleMessage("foo bar", muleContext);
+        assertTrue(f.accept(message));
+
+        message = new DefaultMuleMessage("foo car", muleContext);
+        assertTrue(f.accept(message));
 
     }
 }

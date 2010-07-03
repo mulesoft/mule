@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.expression.parsers;
+package org.mule.config.expression;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.routing.filter.Filter;
@@ -18,7 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO
+ * Will create a filter from one of more expression filters.  This parser will parse one or more filter expressions
+ * and understands the operators AND and OR. i.e.
+ *
+ * #[regex:.* bar] OR #[wildcard:foo*]
+ *
+ * or
+ *
+ * #[xpath:/Order/id != null] AND #[header:foo=bar]
  */
 public class ExpressionFilterParser
 {
@@ -29,6 +36,7 @@ public class ExpressionFilterParser
 
         for (String s : strings)
         {
+            s = s.trim();
             if (s.equals("AND"))
             {
                 filter = new AndFilter(filter);
