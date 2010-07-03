@@ -11,9 +11,9 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.ObjectScope;
 import org.mule.config.PoolingProfile;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.annotations.ObjectScope;
 import org.mule.object.AbstractObjectFactory;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;

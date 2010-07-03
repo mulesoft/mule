@@ -49,7 +49,7 @@ public interface AnnotationsParserFactory
 
     /**
      * Retrieves a parser for the given annotation, where the annotation is an Expression annotation; one annotated with
-     * the {@link org.mule.config.annotations.expressions.Evaluator} annotation.
+     * the {@link org.mule.api.annotations.expressions.Evaluator} annotation.
      * <p/>
      *
      * @param annotation the annotation being processed
@@ -60,7 +60,7 @@ public interface AnnotationsParserFactory
 
     /**
      * Retrieves a parser for the given annotation, where the annotation is a Router annotation; one annotated with
-     * the {@link org.mule.config.annotations.routing.Router} annotation. the parameters passed in can be used to validate the use of
+     * the {@link org.mule.api.annotations.routing.Router} annotation. the parameters passed in can be used to validate the use of
      * the annotation, i.e. you may want to restrict annotations to only be configured on concrete classes.
      * <p/>
      *

@@ -11,7 +11,7 @@ package org.mule.config;
 
 import org.mule.api.MuleContext;
 import org.mule.config.builders.AbstractConfigurationBuilder;
-import org.mule.impl.endpoint.DefaultAnnotationsParserFactory;
+import org.mule.config.endpoint.DefaultAnnotationsParserFactory;
 
 /**
  * Enables Mule annotation processing so that annotated objects registered with the Mule registry will automatically

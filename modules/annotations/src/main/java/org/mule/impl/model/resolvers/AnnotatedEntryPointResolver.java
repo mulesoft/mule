@@ -11,20 +11,21 @@ package org.mule.impl.model.resolvers;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
+import org.mule.api.annotations.Entrypoint;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.annotations.Entrypoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.model.resolvers.AbstractEntryPointResolver;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationUtils;
-import org.mule.utils.AnnotationHelper;
+import org.mule.config.utils.AnnotationHelper;
+
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -40,9 +41,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Mule {@link org.mule.api.model.EntryPointResolver} implementation that will resolve methods on a service class
- * that has the {@link org.mule.config.annotations.Entrypoint} annotation. It will transform the received message to
- * match the arguments on the annotated method and will honor any parameter annotations such as {@link org.mule.config.annotations.expressions.XPath}
- * or {@link org.mule.config.annotations.expressions.Mule} annotations.
+ * that has the {@link org.mule.api.annotations.Entrypoint} annotation. It will transform the received message to
+ * match the arguments on the annotated method and will honor any parameter annotations such as {@link org.mule.api.annotations.expressions.XPath}
+ * or {@link org.mule.api.annotations.expressions.Mule} annotations.
  */
 public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver implements MuleContextAware
 {
@@ -203,6 +204,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
     {
         Set<Class> classes = new HashSet<Class>();
         Class clazz = object.getClass();
+
         
         if(Proxy.isProxyClass(clazz))
         {

@@ -1,4 +1,4 @@
-?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,8 +11,8 @@
         A Test using spring beans only and have them discovered by Mule
     </description>
 
-    <bean class="org.mule.impl.annotations.processors.spring.ServiceAndEndpointAnnotationBeanPostProcessor"/>
-    <bean class="org.mule.impl.annotations.processors.spring.BindAnnotationBeanPostProcessor"/>
+    <bean class="org.mule.config.spring.ServiceAndEndpointAnnotationBeanPostProcessor"/>
+    <bean class="org.mule.config.spring.BindAnnotationBeanPostProcessor"/>
 
     <bean class="org.mule.ibeans.example.hello.AnnotatedHelloComponent" name="foo">
         <property name="messageLocale">

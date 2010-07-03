@@ -1,2 +1,2 @@
-org.mule.config.annotations.example.HelloComponentFunctionalTestCase
-org.mule.config.annotations.example.HelloComponentFunctionalSpringTestCase
+org.mule.api.annotations.example.HelloComponentFunctionalTestCase
+org.mule.api.annotations.example.HelloComponentFunctionalSpringTestCase

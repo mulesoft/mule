@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parser.specific;
 
-import org.mule.config.annotations.Service;
+import org.mule.api.annotations.Service;
 import org.mule.config.spring.factories.ScopedObjectFactory;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.object.AbstractObjectFactory;

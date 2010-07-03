@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
-import org.mule.impl.annotations.AnnotatedServiceBuilder;
+import org.mule.config.AnnotatedServiceBuilder;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 
