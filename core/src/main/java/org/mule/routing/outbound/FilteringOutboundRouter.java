@@ -163,9 +163,6 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             OutboundEndpoint ep = endpoints.get(index);
             String uri = ep.getEndpointURI().getUri().toString();
 
-            if(uri.contains(TemplateParser.SQUARE_TEMPLATE_STYLE))
-            
-            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Uri before parsing is: " + uri);
