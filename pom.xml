@@ -124,6 +124,7 @@
         <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.22</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
+        <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.14</log4jVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
@@ -625,6 +626,11 @@
                         <artifactId>stax-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>jsr250-api</artifactId>
+                <version>${jsr250AnnotationVerson}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
