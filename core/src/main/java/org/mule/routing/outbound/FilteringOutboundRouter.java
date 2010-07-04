@@ -46,7 +46,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
     private Filter filter;
 
-    private boolean useTemplates = false;
+    private boolean useTemplates = true;
 
     // We used Square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
