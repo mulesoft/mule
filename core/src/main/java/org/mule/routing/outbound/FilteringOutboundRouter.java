@@ -163,6 +163,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             OutboundEndpoint ep = endpoints.get(index);
             String uri = ep.getEndpointURI().getUri().toString();
 
+            if(uri.contains(TemplateParser.SQUARE_TEMPLATE_STYLE))
+            
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Uri before parsing is: " + uri);
@@ -178,28 +181,36 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                 props.put(propertyKey, message.getProperty(propertyKey));
             }
 
-            String newUriString = parser.parse(props, uri);
-            if (logger.isDebugEnabled())
+            if (!parser.isContainsTemplate(uri))
             {
-                logger.debug("Uri after parsing is: " + uri);
+                logger.debug("Uri does not contain template(s)");
+                return ep;
             }
-
-            try
+            else
             {
-                EndpointURI newUri = new MuleEndpointURI(newUriString, muleContext);
-                if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
+
+                String newUriString = parser.parse(props, uri);
+                if (logger.isDebugEnabled())
                 {
-                    throw new CouldNotRouteOutboundMessageException(CoreMessages.schemeCannotChangeForRouter(
-                        ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
+                    logger.debug("Uri after parsing is: " + uri);
                 }
+                try
+                {
+                    EndpointURI newUri = new MuleEndpointURI(newUriString, muleContext);
+                    if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
+                    {
+                        throw new CouldNotRouteOutboundMessageException(
+                            CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
+                                newUri.getScheme()), message, ep);
+                    }
 
-                return new DynamicURIOutboundEndpoint(ep, newUri);
-            }
-            catch (EndpointException e)
-            {
-                throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), 
-                    message, ep, e);
+                    return new DynamicURIOutboundEndpoint(ep, newUri);
+                }
+                catch (EndpointException e)
+                {
+                    throw new CouldNotRouteOutboundMessageException(
+                        CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), message, ep, e);
+                }
             }
         }
     }
