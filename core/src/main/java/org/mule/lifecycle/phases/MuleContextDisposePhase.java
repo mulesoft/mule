@@ -21,6 +21,7 @@ import org.mule.api.model.Model;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RouterCollection;
 import org.mule.api.source.MessageSource;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
@@ -75,7 +76,17 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         //Can call dispose from all lifecycle Phases
         registerSupportedPhase(LifecyclePhase.ALL_PHASES);
         setOrderedLifecycleObjects(orderedObjects);
-        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, RouterCollection.class, Router.class});
+        /*
+        Ignored objects -
+        -Component is ignored because the FlowConstruct will manage the components lifecycle
+        -MessageSource disposal is managed by the connector it is associated with
+        -RouterCollection is ignored because the FlowConstruct will manage the lifecycle
+        -Router is ignored since its lifecycle is managed by the associated router collection
+        -Transformer is ignored since the Dispose lifecycle is managed by the base {@link AbstractTransformer} by receiving
+        a CONTEXT_DISPOSING event and calling dispose on the transformer.  This is necessary since transformers are prototype objects
+        and not managed by DI containers such as Spring after the creation of the object
+         */
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, RouterCollection.class, Router.class, Transformer.class});
     }
 
      @Override
