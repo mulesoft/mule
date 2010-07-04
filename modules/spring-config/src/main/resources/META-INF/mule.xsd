@@ -3635,15 +3635,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="template-endpoint-router" type="filteringOutboundRouterType"
-                 substitutionGroup="abstract-outbound-router">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows endpoints to be altered at runtime based on properties set on the current message or fallback values set on the endpoint properties. Templated values are expressed using square braces around a property name.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="chaining-router" type="multipleEndpointFilteringOutboundRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
