@@ -369,8 +369,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertDispatcherStartedConntected(out2, true, true);
 
         connector.stop();
-        System.out.println("ACTIVE = "+connector.dispatchers.getNumActive());
-        System.out.println("IDEL = "+connector.dispatchers.getNumIdle());
         
         // Pool is cleared because of implementation of workaround for MULE-4553
         assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
