@@ -23,6 +23,3 @@ org.mule.transport.cxf.WSProxyTestCase
 # Broken by r12671, CI build MULE-MULE2JDK5-429
 # MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
-
-# MULE-4931 / CI build MULE-MULE3JDK5-1151
-org.mule.transport.cxf.issues.LargeProxyTestCase
