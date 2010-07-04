@@ -98,10 +98,8 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         ImmutableEndpoint ep = router.getEndpoint(2, message);
         assertEquals("test://foo?bar&synchronous=true", ep.getEndpointURI().toString());
 
-        session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
-            (OutboundEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test?synchronous=true", muleContext))), message);
-        session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
-            (OutboundEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test?synchronous=true", muleContext))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(0)), message);
+        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(1)), message);
         session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
             (OutboundEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar&synchronous=true", muleContext))), message);
         final MuleMessage result = router.route(message, (MuleSession)session.proxy());

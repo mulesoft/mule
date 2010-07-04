@@ -51,7 +51,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
 
-        assertFalse(router.isUseTemplates());
+        // Default is now true
+        assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
@@ -99,7 +100,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
 
-        assertFalse(router.isUseTemplates());
+        // Default is now true
+        assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
