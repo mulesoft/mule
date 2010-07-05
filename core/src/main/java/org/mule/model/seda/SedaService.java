@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
@@ -81,7 +82,14 @@ public class SedaService extends AbstractService
         builder.chain(new ServiceStatisticsMessageObserver(this));
         builder.chain(new ServiceSetEventRequestContextMessageObserver());
         builder.chain(new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
-            workManager, lifecycleManager.getState(), exceptionListener, stats, muleContext));
+            new WorkManagerSource()
+            {
+                public WorkManager getWorkManager() throws MuleException
+                {
+                    return workManager;
+                }
+            }, getThreadingProfile().isDoThreading(), lifecycleManager.getState(), exceptionListener, stats,
+            muleContext));
         builder.chain(new ServiceInternalMessageProcessor(this));
         builder.chain(new ServiceOutboundMessageProcessor(this));
         builder.chain(new ServiceOutboundStatisticsObserver(this));
