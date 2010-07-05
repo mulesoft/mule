@@ -304,7 +304,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
             muleActivationSpec.getEndpoint(), muleContext));
 
-        endpointBuilder.setExchangePattern(MessageExchangePattern.one_way);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
     }

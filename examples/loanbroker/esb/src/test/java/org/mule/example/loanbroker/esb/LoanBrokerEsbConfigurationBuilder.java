@@ -183,7 +183,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         //binding
         EndpointBuilder eb2 = (EndpointBuilder) CreditAgency.clone();
         eb2.addTransformer(LoanQuoteRequestToCreditProfileArgs);
-        eb2.setExchangePattern(MessageExchangePattern.request_response);
+        eb2.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         List<Transformer> responseTransformers = new ArrayList<Transformer>();
         responseTransformers.add(CreditProfileXmlToCreditProfile);
         eb2.setResponseTransformers(responseTransformers);
@@ -217,7 +217,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         OutboundRouterCollection lenderGatewayServiceInboundOutbound = new DefaultOutboundRouterCollection();
         FilteringOutboundRouter lenderGatewayServiceInboundOutboundRouter = new FilteringOutboundRouter();
         EndpointBuilder eb3 = (EndpointBuilder) LenderService.clone();
-        eb3.setExchangePattern(MessageExchangePattern.request_response);
+        eb3.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         lenderGatewayServiceInboundOutboundRouter.addEndpoint(eb3.buildOutboundEndpoint());
         EndpointBuilder eb4 = (EndpointBuilder) BankingGateway.clone();
         eb4.addTransformer(SetLendersAsRecipients);

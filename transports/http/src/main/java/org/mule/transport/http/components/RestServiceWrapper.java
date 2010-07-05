@@ -204,7 +204,7 @@ public class RestServiceWrapper extends AbstractComponent
         event.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
-        endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
         result = RequestContext.getEventContext().sendEvent(

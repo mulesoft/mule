@@ -190,7 +190,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         {
             endpointBuilder.addTransformer(new NoActionTransformer());
         }
-        endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         service.getInboundRouter().addEndpoint(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
         final Latch latch = new Latch();

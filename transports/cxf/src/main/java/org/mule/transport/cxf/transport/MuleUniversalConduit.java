@@ -294,7 +294,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
 
         EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder(uri, connector.getMuleContext());
-        builder.setExchangePattern(MessageExchangePattern.request_response);
+        builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
         if (muleEndpoint == null)
         {

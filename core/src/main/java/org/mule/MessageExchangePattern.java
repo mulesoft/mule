@@ -12,7 +12,7 @@ package org.mule;
 
 public enum MessageExchangePattern
 {    
-    one_way
+    ONE_WAY
     {
         @Override
         public boolean hasResponse()
@@ -21,7 +21,7 @@ public enum MessageExchangePattern
         }
     }, 
     
-    request_response
+    REQUEST_RESPONSE
     {
         @Override
         public boolean hasResponse()
@@ -36,11 +36,11 @@ public enum MessageExchangePattern
     {
         if (sync)
         {
-            return request_response;
+            return REQUEST_RESPONSE;
         }
         else
         {
-            return one_way;
+            return ONE_WAY;
         }
     }
 }

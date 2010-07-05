@@ -115,7 +115,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // Must not use transformers
             endpointBuilder.setTransformers(Collections.EMPTY_LIST);
             endpointBuilder.setResponseTransformers(Collections.EMPTY_LIST);
-            endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
+            endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }

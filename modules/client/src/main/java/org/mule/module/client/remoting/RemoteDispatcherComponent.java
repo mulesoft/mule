@@ -208,7 +208,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             {
                 EndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
-                endpointBuilder.setExchangePattern(MessageExchangePattern.request_response);
+                endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
                 endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)

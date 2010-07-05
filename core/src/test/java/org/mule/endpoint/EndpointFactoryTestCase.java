@@ -203,7 +203,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(endpointBuilder1.hashCode(), endpointBuilder2.hashCode());
 
         // Test creating an endpoint from endpointBuilder1
-        endpointBuilder1.setExchangePattern(MessageExchangePattern.request_response);
+        endpointBuilder1.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         endpointBuilder1.setResponseTimeout(99);
         ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(endpointBuilder1);
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
@@ -213,7 +213,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(testConnector1, ep.getConnector());
 
         // Test creating an endpoint from endpointBuilder2
-        endpointBuilder2.setExchangePattern(MessageExchangePattern.one_way);
+        endpointBuilder2.setExchangePattern(MessageExchangePattern.ONE_WAY);
         endpointBuilder2.setResponseTimeout(0);
         endpointBuilder2.setConnector(testConnector2);
         ImmutableEndpoint ep2 = endpointFactory.getInboundEndpoint(endpointBuilder2);
