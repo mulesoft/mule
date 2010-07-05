@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.work.AbstractMuleEventWork;
@@ -36,15 +37,14 @@ import javax.resource.spi.work.WorkListener;
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements WorkListener
 {
-    protected WorkManager workManager;
+    protected WorkManagerSource workManagerSource;
     protected ExceptionListener exceptionListener;
     protected boolean doThreading;
 
-    public AsyncInterceptingMessageProcessor(WorkManager workManager, ExceptionListener exceptionListener)
+    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading, ExceptionListener exceptionListener)
     {
-        this.workManager = workManager;
+        this.workManagerSource = workManagerSource;
         this.exceptionListener = exceptionListener;
-        this.doThreading = workManager.getThreadingProfile().isDoThreading();
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -72,7 +72,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             Work work = new AsyncMessageProcessorWoker(event);
             if (doThreading)
             {
-                workManager.scheduleWork(work, WorkManager.INDEFINITE, null, this);
+                workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, this);
             }
             else
             {

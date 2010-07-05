@@ -18,6 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
@@ -66,13 +67,14 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     public SedaStageInterceptingMessageProcessor(String name,
                                                  QueueProfile queueProfile,
                                                  int queueTimeout,
-                                                 WorkManager workManager,
+                                                 WorkManagerSource workManagerSource,
+                                                 boolean doThreading,
                                                  LifecycleState lifecycleState,
                                                  ExceptionListener exceptionListener,
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(workManager, exceptionListener);
+        super(workManagerSource, doThreading, exceptionListener);
         this.name = name;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;
@@ -237,7 +239,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                     Work work = new SedaStageWorker(event);
                     if (doThreading)
                     {
-                        workManager.scheduleWork(work, WorkManager.INDEFINITE, null, this);
+                        workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
+                            this);
                     }
                     else
                     {
@@ -346,7 +349,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
         try
         {
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
+            workManagerSource.getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, this);
         }
         catch (WorkException e)
         {
