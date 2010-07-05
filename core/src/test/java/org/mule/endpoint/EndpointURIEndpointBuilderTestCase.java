@@ -10,9 +10,9 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -47,20 +47,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     {
         String uri = "test://address";
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        try
-        {
-            ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-            assertFalse(ep instanceof InboundEndpoint);
-            assertTrue(ep instanceof OutboundEndpoint);
-            assertTrue(ep.getTransformers() != null);
-            assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
-            assertTrue(ep.getResponseTransformers().isEmpty());
-            testDefaultCommonEndpointAttributes(ep);
-        }
-        catch (Exception e)
-        {
-            fail("Unexpected exception: " + e.getStackTrace());
-        }
+        ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
+        assertFalse(ep instanceof InboundEndpoint);
+        assertTrue(ep instanceof OutboundEndpoint);
+        assertTrue(ep.getTransformers() != null);
+        assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
+        assertTrue(ep.getResponseTransformers().isEmpty());
+        testDefaultCommonEndpointAttributes(ep);
     }
 
     // TODO DF: Test more than defaults with tests using builder to set non-default
@@ -82,12 +75,42 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(null, ep.getFilter());
         assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
-
-    public void testHasSetEncodingMethod() throws EndpointException, SecurityException, NoSuchMethodException
+    
+    public void testHasSetEncodingMethod() throws Exception
     {
         String uri = "test://address";
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
     }
-
+    
+    public void testEndpointBuilderFromEndpoint() throws Exception
+    {
+        String uri = "test://address";
+        ImmutableEndpoint endpoint = getTestInboundEndpoint("endpoint.test.address", uri);
+        SensingEndpointURIEndpointBuilder builder = new SensingEndpointURIEndpointBuilder(endpoint);
+        assertEquals(uri, builder.getEndpointBuilder().getEndpoint().getUri().toString());
+        assertEquals(endpoint.getConnector(), builder.getConnector());
+        assertEquals(endpoint.getProperties(), builder.getProperties());
+        assertEquals(endpoint.getTransactionConfig(), builder.getTransactionConfig());
+        assertEquals(endpoint.isDeleteUnacceptedMessages(), builder.getDeleteUnacceptedMessages(builder.getConnector()));
+        assertEquals(endpoint.getInitialState(), builder.getInitialState(builder.getConnector()));
+        assertEquals(endpoint.getResponseTimeout(), builder.getResponseTimeout(builder.getConnector()));
+        assertEquals(endpoint.getFilter(), builder.getFilter(builder.getConnector()));
+        assertEquals(endpoint.getSecurityFilter(), builder.getSecurityFilter());
+        assertEquals(endpoint.getRetryPolicyTemplate(), builder.getRetryPolicyTemplate(builder.getConnector()));
+        assertEquals(MessageExchangePattern.ONE_WAY, builder.getExchangePattern());
+    }
+    
+    private static class SensingEndpointURIEndpointBuilder extends EndpointURIEndpointBuilder
+    {
+        public SensingEndpointURIEndpointBuilder(ImmutableEndpoint endpoint)
+        {
+            super(endpoint);
+        }
+        
+        public MessageExchangePattern getExchangePattern()
+        {
+            return messageExchangePattern;
+        }
+    }
 }

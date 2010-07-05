@@ -63,7 +63,5 @@
             </inbound>
             <echo-component/>
         </service>
-        
     </model>
-    
 </mule>

@@ -17,7 +17,6 @@ import org.mule.tck.FunctionalTestCase;
 
 public class CxfOverJMSTestCase extends FunctionalTestCase
 {
-
     private static final String req = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                                       + "<soap:Body>"
                                       + "<ns2:echo xmlns:ns2=\"http://simple.component.mule.org/\">"
@@ -26,6 +25,7 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
                                       + "</soap:Body>"
                                       + "</soap:Envelope>";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/transport/cxf/cxf-over-jms-config.xml";
@@ -58,5 +58,4 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         assertNotNull(result.getPayload());
         assertTrue(result.getPayloadAsString().contains("<ns2:echo>hello</ns2:echo>"));
     }
-
 }
