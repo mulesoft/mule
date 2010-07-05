@@ -165,7 +165,10 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            log.debug("Invoking " + this + " with event " + event);
+            if (log.isDebugEnabled())
+            {
+                log.debug("Invoking " + this + " with event " + event);
+            }
             return firstInChain.process(event);
         }
 

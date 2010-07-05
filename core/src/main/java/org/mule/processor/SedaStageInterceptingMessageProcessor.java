@@ -235,7 +235,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                             getStageDescription(), getQueueName()));
                     }
                     Work work = new SedaStageWorker(event);
-                    if (workManager.getThreadingProfile().isDoThreading())
+                    if (doThreading)
                     {
                         workManager.scheduleWork(work, WorkManager.INDEFINITE, null, this);
                     }

@@ -38,11 +38,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 {
     protected WorkManager workManager;
     protected ExceptionListener exceptionListener;
+    protected boolean doThreading;
 
     public AsyncInterceptingMessageProcessor(WorkManager workManager, ExceptionListener exceptionListener)
     {
         this.workManager = workManager;
         this.exceptionListener = exceptionListener;
+        this.doThreading = workManager.getThreadingProfile().isDoThreading();
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -68,7 +70,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         try
         {
             Work work = new AsyncMessageProcessorWoker(event);
-            if (workManager.getThreadingProfile().isDoThreading())
+            if (doThreading)
             {
                 workManager.scheduleWork(work, WorkManager.INDEFINITE, null, this);
             }
