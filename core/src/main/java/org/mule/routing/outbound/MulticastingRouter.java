@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -32,8 +33,10 @@ import java.util.List;
 public class MulticastingRouter extends FilteringOutboundRouter
 {
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
         if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
@@ -72,11 +75,11 @@ public class MulticastingRouter extends FilteringOutboundRouter
                         message, muleContext);
                     if (endpoint.isSynchronous())
                     {
-                        results.add(send(session, clonedMessage, endpoint));
+                        results.add(sendRequest(session, clonedMessage, endpoint, true));
                     }
                     else
                     {
-                        dispatch(session, clonedMessage, endpoint);
+                        sendRequest(session, clonedMessage, endpoint, false);
                     }
                 }
             }

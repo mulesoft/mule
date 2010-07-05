@@ -51,11 +51,14 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
 
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+
         FilteringOutboundRouter router1 = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router1.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         router1.setEndpoints(endpoints);
 
         FilteringOutboundRouter router2 = new FilteringOutboundRouter();
@@ -63,7 +66,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         filter2.setExpectedType(Exception.class);
         router2.setFilter(filter2);
         endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router2.setEndpoints(endpoints);
 
         messageRouter.addRouter(router1);
@@ -78,21 +81,21 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         MuleEvent event = getTestInboundEvent("test event", (MuleSession) session.proxy());
 
-        session.expect("dispatchEvent", C.eq(event.getMessage(), endpoint1));
+        mockendpoint1.expect("process",RouterTestUtils.getArgListCheckerMuleEvent());
         messageRouter.process(event);
-        session.verify();
+        mockendpoint1.verify();
 
         event = getTestInboundEvent(new IllegalArgumentException(), (MuleSession) session.proxy());
         
         session.expectAndReturn("getFlowConstruct", getTestService());
-        session.expect("dispatchEvent", C.eq(event.getMessage(), endpoint2));
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         messageRouter.process(event);
-        session.verify();
+        mockendpoint2.verify();
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
         router3.setFilter(new PayloadTypeFilter(Object.class));
         endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router3.setEndpoints(endpoints);
         messageRouter.addRouter(router3);
 
@@ -101,12 +104,13 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("getFlowConstruct", getTestService());
         session.expectAndReturn("getFlowConstruct", getTestService());
 
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
 
         messageRouter.setMatchAll(true);
         messageRouter.process(event);
-        session.verify();
+        mockendpoint1.verify();
+        mockendpoint2.verify();
     }
 
     public void testRouterWithCatchAll() throws Exception
@@ -120,22 +124,22 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleMessage message, MuleSession session)
+            public MuleMessage route(MuleEvent event)
                 throws RoutingException
             {
                 count1[0]++;
-                return message;
+                return event.getMessage();
             }
         };
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleMessage message, MuleSession session)
+            public MuleMessage route(MuleEvent event)
                 throws RoutingException
             {
                 count2[0]++;
-                return message;
+                return event.getMessage();
             }
         };
 
@@ -183,7 +187,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         MuleSession session = getTestSession(getTestService(), muleContext);
         MuleMessage message = new DefaultMuleMessage(new StringBuffer(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
-        filterRouter.setMessageProperties(session, message, endpoint);
+        filterRouter.setMessageProperties(session.getFlowConstruct(), message, endpoint);
         assertNotNull(message.getCorrelationId());
     }
 }

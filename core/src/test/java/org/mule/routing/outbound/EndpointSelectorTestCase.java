@@ -38,6 +38,10 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     OutboundEndpoint dest2;
     OutboundEndpoint dest3;
     EndpointSelector router;
+    Mock mockendpoint1;
+    Mock mockendpoint2;
+    Mock mockendpoint3;
+
 
     @Override
     protected void doSetUp() throws Exception
@@ -49,10 +53,14 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         dest2 = getTestOutboundEndpoint("dest2");
         dest3 = getTestOutboundEndpoint("dest3");
 
+        mockendpoint1 = RouterTestUtils.getMockEndpoint(dest1);
+        mockendpoint2 = RouterTestUtils.getMockEndpoint(dest2);
+        mockendpoint3 = RouterTestUtils.getMockEndpoint(dest3);
+
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(dest1);
-        endpoints.add(dest2);
-        endpoints.add(dest3);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
 
         router = new EndpointSelector();
         router.setEndpoints(endpoints);
@@ -69,9 +77,9 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.eq(message, dest3));
-        router.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint3.verify();
     }
 
     public void testSelectEndpointCustomProperty() throws Exception
@@ -87,9 +95,9 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.eq(message, dest2));
-        router.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint2.verify();
     }
 
     public void testSelectEndpointNoMatch() throws Exception
@@ -102,7 +110,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
             // this test used to fail at the router; it now fails earlier when the message is
             // constructed.  i don't think this is a problem.
             MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
-            router.route(message, (MuleSession) session.proxy());
+            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
             fail("Router should have thrown an exception if endpoint was not found.");
         }
         catch (Exception e)
@@ -117,9 +125,9 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         router.setDefaultEndpointName("dest3");
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.eq(message, dest3));
-        router.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint3.verify();
     }
 
     public void testSelectEndpointNoPropertySet() throws Exception
@@ -128,7 +136,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            router.route(message, (MuleSession) session.proxy());
+            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
             fail("Router should have thrown an exception if no selector property was set on the message.");
         }
         catch (RoutingException e)

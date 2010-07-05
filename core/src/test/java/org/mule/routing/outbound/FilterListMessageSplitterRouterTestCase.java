@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -42,12 +43,15 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         ListMessageSplitter router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
-        router.addEndpoint(endpoint1);
-        router.addEndpoint(endpoint2);
-        router.addEndpoint(endpoint3);
+        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
 
         List payload = new ArrayList();
         payload.add(new Apple());
@@ -57,37 +61,43 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(Orange.class), C.eq(endpoint2)));
-        session.expect("dispatchEvent", C.args(new PayloadClassConstraint(String.class), C.eq(endpoint3)));
-        router.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
+        mockendpoint3.verify();
 
         endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
         endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?synchronous=true", null, new PayloadTypeFilter(Orange.class), null);
         endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?synchronous=true");
+        mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
         router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
-        router.addEndpoint(endpoint1);
-        router.addEndpoint(endpoint2);
-        router.addEndpoint(endpoint3);
+        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
+
 
         message = new DefaultMuleMessage(payload, muleContext);
 
-        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)),
-                message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Apple.class), C.eq(endpoint1)),
-                message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(Orange.class), C.eq(endpoint2)),
-                message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadClassConstraint(String.class), C.eq(endpoint3)),
-                message);
-        MuleMessage result = router.route(message, (MuleSession) session.proxy());
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint3.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
         assertEquals(((List) result.getPayload()).size(), 4);
-        session.verify();
+        mockendpoint1.verify();
+        mockendpoint2.verify();
+        mockendpoint3.verify();
     }
 
 }

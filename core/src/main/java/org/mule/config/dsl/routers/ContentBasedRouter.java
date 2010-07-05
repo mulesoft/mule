@@ -23,8 +23,11 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
  */
 public class ContentBasedRouter extends AbstractOutboundRouter
 {
-    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
+    public MuleMessage route(MuleEvent theEvent) throws MessagingException
     {
+        MuleMessage message = theEvent.getMessage();
+        MuleSession session = theEvent.getSession();
+
         for (OutboundEndpoint endpoint : endpoints)
         {
             if (isMatch(message))

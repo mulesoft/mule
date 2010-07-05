@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -61,14 +62,17 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3");
 
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
-        endpoints.add(endpoint3);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
@@ -77,10 +81,10 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        mockSession.expect("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)));
-        MuleMessage result = router.route(message, (MuleSession)mockSession.proxy());
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
         assertNull("Async call should've returned null.", result);
-        mockSession.verify();
+        mockendpoint1.verify();
     }
 
     public void testSuccessfulExceptionRouterSynchronous() throws Exception
@@ -102,28 +106,31 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3?synchronous=true");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
-        endpoints.add(endpoint3);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
-
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
         // only one send should be called and succeed, the others should not be
         // called
-        mockSession.expectAndReturn("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)), message);
-        MuleMessage result = router.route(message, (MuleSession)mockSession.proxy());
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
         assertNotNull(result);
         assertEquals(message, result);
-        mockSession.verify();
+        mockendpoint1.verify();
     }
 
     /**
@@ -142,14 +149,16 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
         RegExFilter filter = new RegExFilter("(.*) event");
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
@@ -160,13 +169,13 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         // exception to throw
         MuleException rex = new RoutingException(message, endpoint1);
-        mockSession.expectAndThrow("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)), rex);
-        mockSession.expectAndThrow("dispatchEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint2)), rex);
+        mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
+        mockendpoint2.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         MuleSession session = (MuleSession)mockSession.proxy();
         MuleMessage result = null;
         try
         {
-            result = router.route(message, session);
+            result = router.route(new OutboundRoutingTestEvent(message, session));
             fail("Should have thrown exception as both endpoints would have failed");
         }
         catch (CouldNotRouteOutboundMessageException e)
@@ -190,14 +199,17 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=true");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=true");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addEndpoint(endpoint1);
-        router.addEndpoint(endpoint2);
+        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(expectedResultMessage, null);
 
         assertTrue(router.isMatch(message));
 
@@ -205,11 +217,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         // exception to throw
         MuleException rex = new RoutingException(message, endpoint1);
         // 1st failure
-        mockSession.expectAndThrow("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)), rex);
-        // next endpoint
-        mockSession.expectAndReturn("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint2)), expectedResultMessage);
-        MuleMessage actualResultMessage = router.route(message, session);
-        mockSession.verify();
+        mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
 
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
     }
@@ -225,27 +237,33 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=false");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=false");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addEndpoint(endpoint1);
-        router.addEndpoint(endpoint2);
+        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(expectedResultMessage, null);
+
 
         assertTrue(router.isMatch(message));
 
         final MuleSession session = (MuleSession)mockSession.proxy();
         // exception to throw
         MuleException rex = new RoutingException(message, endpoint1);
-        // 1st failure
-        mockSession.expectAndThrow("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)), rex);
-        // next endpoint
-        mockSession.expectAndReturn("dispatchEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint2)), expectedResultMessage);
-        MuleMessage actualResultMessage = router.route(message, session);
+
+        mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
         assertNull("Async call should not return any results.", actualResultMessage);
-        mockSession.verify();
+
+        mockendpoint1.verify();
+        mockendpoint2.verify();
+
     }
 
     /**
@@ -259,14 +277,17 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=true");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=true");
-
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addEndpoint(endpoint1);
-        router.addEndpoint(endpoint2);
+        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
+        MuleEvent expectedResultEvent = new OutboundRoutingTestEvent(expectedResultMessage, null);
+
 
         assertTrue(router.isMatch(message));
 
@@ -274,14 +295,17 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         // message
         MuleMessage exPayloadMessage = new DefaultMuleMessage("there was a failure", muleContext);
         exPayloadMessage.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+        MuleEvent exPayloadMessageEvent = new OutboundRoutingTestEvent(exPayloadMessage, null);
+
 
         final MuleSession session = (MuleSession)mockSession.proxy();
         // 1st failure
-        mockSession.expectAndReturn("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint1)), exPayloadMessage);
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), exPayloadMessage);
         // next endpoint
-        mockSession.expectAndReturn("sendEvent", C.args(new IsPayloadEqual(message), C.eq(endpoint2)), expectedResultMessage);
-        MuleMessage actualResultMessage = router.route(message, session);
-        mockSession.verify();
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), expectedResultEvent);
+        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
 
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
     }

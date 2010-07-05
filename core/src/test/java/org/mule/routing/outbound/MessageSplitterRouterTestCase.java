@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
@@ -41,11 +42,18 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
-        //Sync endpoints
+        //Sync endpoints  org.python.core.__builtin__
         OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
         OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
         OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+        Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
+        Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
+        Mock mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);
+
 
         // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter()
@@ -67,36 +75,41 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         router.setMuleContext(muleContext);
 
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
-        endpoints.add(endpoint3);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
         router.setEndpoints(endpoints);
 
         MuleMessage message = new DefaultMuleMessage("test,mule,message", muleContext);
 
         assertTrue(router.isMatch(message));
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint2)));
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint3)));
-        router.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
+        mockendpoint3.verify();
 
         endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint4);
-        endpoints.add(endpoint5);
-        endpoints.add(endpoint6);
+        endpoints.add((OutboundEndpoint) mockendpoint4.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint5.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint6.proxy());
         router.getEndpoints().clear();
         router.setEndpoints(endpoints);
 
         message = new DefaultMuleMessage("test,mule,message", muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint4)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint5)), message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.eq(endpoint6)), message);
-        MuleMessage result = router.route(message, (MuleSession) session.proxy());
+        mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(3, ((MuleMessageCollection) result).size());
-        session.verify();
+        mockendpoint4.verify();
+        mockendpoint5.verify();
+        mockendpoint6.verify();
     }
 }

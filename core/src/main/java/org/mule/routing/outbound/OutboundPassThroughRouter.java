@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -62,12 +63,12 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
         {
-            return message;
+            return event.getMessage();
         }
-        return super.route(message, session);
+        return super.route(event);
     }
 }

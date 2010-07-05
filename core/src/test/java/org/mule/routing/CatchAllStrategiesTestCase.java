@@ -156,20 +156,20 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleMessage message, MuleSession session)
+            public MuleMessage route(MuleEvent event)
             {
                 count1[0]++;
-                return message;
+                return event.getMessage();
             }
         };
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleMessage message, MuleSession session)
+            public MuleMessage route(MuleEvent event)
             {
                 count2[0]++;
-                return message;
+                return event.getMessage();
             }
         };
 

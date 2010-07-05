@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -380,7 +381,7 @@ public abstract class AbstractExceptionListener
         MulticastingRouter router = new MulticastingRouter()
         {
             @Override
-            protected void setMessageProperties(MuleSession session,
+            protected void setMessageProperties(FlowConstruct session,
                                                 MuleMessage message,
                                                 OutboundEndpoint endpoint)
             {

@@ -10,6 +10,7 @@
 
 package org.mule.transport.udp.functional;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -26,8 +27,10 @@ import org.mule.routing.outbound.FilteringOutboundRouter;
 public class DynamicEndpointRouter extends FilteringOutboundRouter
 {
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
         MuleMessage result = null;
 
         if (endpoints == null || endpoints.size() == 0)
@@ -58,11 +61,11 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
 
             if (ep.isSynchronous())
             {
-                result = send(session, message, ep);
+                result = sendRequest(session, message, ep, true);
             }
             else
             {
-                dispatch(session, message, ep);
+                sendRequest(session, message, ep, false);
             }
         }
         catch (MuleException e)

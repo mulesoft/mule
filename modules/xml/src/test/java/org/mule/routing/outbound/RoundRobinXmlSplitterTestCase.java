@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
@@ -38,6 +39,12 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     private OutboundEndpoint endpoint4;
     private OutboundEndpoint endpoint5;
     private OutboundEndpoint endpoint6;
+    private Mock mockendpoint1;
+    private Mock mockendpoint2;
+    private Mock mockendpoint3;
+    private Mock mockendpoint4;
+    private Mock mockendpoint5;
+    private Mock mockendpoint6;
     private XmlMessageSplitter asyncXmlSplitter;
     private XmlMessageSplitter syncXmlSplitter;
 
@@ -48,11 +55,17 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
         endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
+        mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+        mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         // setup sync endpoints
         endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
         endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
         endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+        mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
+        mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
+        mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);
 
         // setup async splitter
         asyncXmlSplitter = new XmlMessageSplitter();
@@ -67,9 +80,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         namespaces.put("e", "http://www.example.com");
         asyncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
         asyncXmlSplitter.setNamespaces(namespaces);
-        asyncXmlSplitter.addEndpoint(endpoint1);
-        asyncXmlSplitter.addEndpoint(endpoint2);
-        asyncXmlSplitter.addEndpoint(endpoint3);
+        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
+        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
+        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
 
         // setup sync splitter
         syncXmlSplitter = new XmlMessageSplitter();
@@ -79,9 +92,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
 
         syncXmlSplitter.setNamespaces(namespaces);
-        syncXmlSplitter.addEndpoint(endpoint4);
-        syncXmlSplitter.addEndpoint(endpoint5);
-        syncXmlSplitter.addEndpoint(endpoint6);
+        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint4.proxy());
+        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint5.proxy());
+        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint6.proxy());
     }
 
     public void testStringPayloadXmlMessageSplitter() throws Exception
@@ -112,25 +125,29 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
         assertTrue(asyncXmlSplitter.isMatch(message));
         final RoundRobinXmlSplitterTestCase.ItemNodeConstraint itemNodeConstraint = new RoundRobinXmlSplitterTestCase.ItemNodeConstraint();
-        session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint2)));
-        session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint3)));
-        session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        asyncXmlSplitter.route(message, (MuleSession) session.proxy());
-        session.verify();
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        asyncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
+        mockendpoint3.verify();
 
         message = new DefaultMuleMessage(payload, muleContext);
-
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
         assertTrue(syncXmlSplitter.isMatch(message));
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint5)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint6)), message);
-        session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint4)), message);
-        MuleMessage result = syncXmlSplitter.route(message, (MuleSession) session.proxy());
+        mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = syncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(4, ((MuleMessageCollection) result).size());
-        session.verify();
+        mockendpoint4.verify();
+        mockendpoint5.verify();
+        mockendpoint6.verify();
     }
 
     public void testXsdNotFoundThrowsException() throws Exception
@@ -150,7 +167,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(message, (MuleSession) session.proxy());
+            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
@@ -173,7 +190,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(message, (MuleSession) session.proxy());
+            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)

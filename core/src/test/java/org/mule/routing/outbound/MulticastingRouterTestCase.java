@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
@@ -44,22 +45,25 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test2", null, filter, null);
         assertNotNull(endpoint2);
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
 
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router.setEndpoints(endpoints);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
 
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)));
-        session.expect("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)));
-        router.route(message, (MuleSession)session.proxy());
-        session.verify();
+        mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        mockendpoint1.verify();
+        mockendpoint2.verify();
 
     }
 
@@ -73,13 +77,15 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=true");
         assertNotNull(endpoint2);
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
         RegExFilter filter = new RegExFilter("(.*) Message");
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router.setEndpoints(endpoints);
 
         assertEquals(filter, router.getFilter());
@@ -88,13 +94,16 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        session.expectAndReturn("sendEvent",  C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)), message);
-        session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy());
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
         assertTrue(result instanceof MuleMessageCollection);
         assertEquals(2, ((MuleMessageCollection)result).size());
-        session.verify();
+        mockendpoint1.verify();
+        mockendpoint2.verify();
     }
 
     public void testMulticastingRouterMixedSyncAsync() throws Exception
@@ -108,23 +117,28 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?synchronous=false");
         assertNotNull(endpoint2);
 
+        Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
+        Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
+
         MulticastingRouter router = createObject(MulticastingRouter.class);
         
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
+        endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
+        endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router.setEndpoints(endpoints);
 
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
-        session.expectAndReturn("sendEvent",  C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint1)), message);
-        session.expectAndReturn("dispatchEvent", C.args(new PayloadConstraint(TEST_MESSAGE), C.eq(endpoint2)), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy());
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
         assertEquals(message, result);
-        session.verify();
+        mockendpoint1.verify();
+        mockendpoint2.verify();
     }
 }

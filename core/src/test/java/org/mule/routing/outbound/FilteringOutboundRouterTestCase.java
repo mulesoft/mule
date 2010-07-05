@@ -10,7 +10,9 @@
 
 package org.mule.routing.outbound;
 
+import com.mockobjects.dynamic.AnyConstraintMatcher;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -44,11 +46,12 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         assertNotNull(endpoint1);
 
+        Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
         FilteringOutboundRouter router = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
+        endpoints.add((OutboundEndpoint) mockEndpoint.proxy());
         router.setEndpoints(endpoints);
 
         // Default is now true
@@ -59,9 +62,11 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (MuleSession)session.proxy());
-        session.verify();
+        //session.expect("dispatchEvent", C.eq(message, endpoint1));
+        mockEndpoint.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        mockEndpoint.verify();
+        //session.verify();
 
 
         //Test with transform
@@ -92,12 +97,12 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
         assertNotNull(endpoint1);
-
+        Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
         FilteringOutboundRouter router = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
-        endpoints.add(endpoint1);
+        endpoints.add((OutboundEndpoint) mockEndpoint.proxy());
         router.setEndpoints(endpoints);
 
         // Default is now true
@@ -105,9 +110,9 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
-
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        MuleMessage result = router.route(message, (MuleSession)session.proxy());
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        mockEndpoint.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
+        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

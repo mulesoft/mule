@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -36,8 +37,11 @@ import java.util.List;
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
+
         List recipients = null;
         try
         {
@@ -98,7 +102,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             {
                 try
                 {
-                    result = send(session, request, endpoint);
+                    result = sendRequest(session, request, endpoint, true);
                     if (result != null)
                     {
                         result.applyTransformers(endpoint.getResponseTransformers());
@@ -127,7 +131,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             {
                 try
                 {
-                    dispatch(session, request, endpoint);
+                    sendRequest(session, request, endpoint, false);
                     success = true;
                     break;
                 }

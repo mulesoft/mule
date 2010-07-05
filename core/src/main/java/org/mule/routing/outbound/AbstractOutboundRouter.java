@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -23,6 +24,8 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transport.DispatchException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.StringMessageUtils;
@@ -68,7 +71,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleMessage responseMessage = route(event.getMessage(), event.getSession());
+        MuleMessage responseMessage = route(event);
         if (responseMessage != null)
         {
             return new DefaultMuleEvent(responseMessage, event);
@@ -79,81 +82,45 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
     
-    protected abstract MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException, MessagingException;
+    protected abstract MuleMessage route(MuleEvent event) throws RoutingException, MessagingException;
 
-    protected void dispatch(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
+    protected final MuleMessage sendRequest(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint, boolean awaitResponse)
+            throws MuleException
     {
-        setMessageProperties(session, message, endpoint);
-
-        if (logger.isDebugEnabled())
-        {
-            try
-            {
-                logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n"
-                        + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
-                        + "\n outbound transformer is: " + endpoint.getTransformers());
-            }
-            catch (Exception e)
-            {
-                logger.debug("Message being sent to: " + endpoint.getEndpointURI()
-                        + " Message payload: \n(unable to retrieve payload: " + e.getMessage()
-                        + "\n outbound transformer is: " + endpoint.getTransformers());
-            }
-        }
-
-        try
-        {
-            session.dispatchEvent(message, endpoint);
-        }
-        catch (Exception e)
-        {
-            throw new RoutingException(message, null, e);
-        }
-
-
-        if (getRouterStatistics() != null)
-        {
-            if (getRouterStatistics().isEnabled())
-            {
-                getRouterStatistics().incrementRoutedMessage(endpoint);
-            }
-        }
-    }
-
-    protected MuleMessage send(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint) throws MuleException
-    {
-        if (replyTo != null)
+        if (awaitResponse && replyTo != null)
         {
             logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using asynchronous dispatch");
-            dispatch(session, message, endpoint);
+            awaitResponse = false;
             return null;
         }
 
-        this.setMessageProperties(session, message, endpoint);
+        setMessageProperties(session.getFlowConstruct(), message, endpoint);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Message being sent to: " + endpoint.getEndpointURI());
-            logger.debug(message);
+           logger.debug("Message being sent to: " + endpoint.getEndpointURI());
+           logger.debug(message);
         }
 
         if (logger.isTraceEnabled())
         {
             try
             {
-                logger.trace("Message payload: \n" + message.getPayloadAsString());
+                logger.trace("Request payload: \n"
+                    + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
+                    + "\n outbound transformer is: " + endpoint.getTransformers());
             }
             catch (Exception e)
             {
-                // ignore
+                logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage()
+                    + "\n outbound transformer is: " + endpoint.getTransformers());
             }
         }
 
-        MuleMessage result;
-
+        MuleMessage result = null;
         try
         {
-            result = session.sendEvent(message, endpoint);
+            result = sendRequestEvent(session, message, endpoint, awaitResponse);
         }
         catch (MessagingException me)
         {
@@ -163,7 +130,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             throw new RoutingException(message, null, e);
         }
-
+        
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -172,35 +139,33 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        if (logger.isDebugEnabled())
+        if (result != null)
         {
-            logger.debug("Response message from sending to: " + endpoint.getEndpointURI());
-            logger.debug(result);
-        }
-
-        if (logger.isTraceEnabled())
-        {
-            try
+            if (logger.isTraceEnabled())
             {
-                logger.trace("Message payload: \n" + result.getPayloadAsString());
-            }
-            catch (Exception e)
-            {
-                // ignore
+                try
+                {
+                    logger.trace("Response payload: \n"
+                        + StringMessageUtils.truncate(result.getPayloadAsString(), 100, false));
+                }
+                catch (Exception e)
+                {
+                    logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
+                }
             }
         }
 
         return result;
     }
 
-    protected void setMessageProperties(MuleSession session, MuleMessage message, OutboundEndpoint endpoint)
+    protected void setMessageProperties(FlowConstruct service, MuleMessage message, OutboundEndpoint endpoint)
     {
         if (replyTo != null)
         {
             // if replyTo is set we'll probably want the correlationId set as
             // well
             message.setReplyTo(replyTo);
-            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, session.getFlowConstruct().getName());
+            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
             if (logger.isDebugEnabled())
             {
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "
@@ -384,5 +349,36 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     {
         return false;
     }
-    
+
+    /** send of message event to destination */
+    private MuleMessage sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
+            throws MuleException
+    {
+        if (endpoint == null)
+        {
+            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message, endpoint);
+        }
+
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous(), null);
+
+        if (awaitResponse)
+        {
+            int timeout = message.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+            if (timeout >= 0)
+            {
+                event.setTimeout(timeout);
+            }
+        }
+
+        MuleEvent resultEvent = endpoint.process(event);
+        if (resultEvent != null)
+        {
+            return resultEvent.getMessage();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 }

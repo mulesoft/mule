@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -47,9 +48,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     private Boolean synchronous;
 
-    public MuleMessage route(MuleMessage message, MuleSession session)
+    public MuleMessage route(MuleEvent event)
         throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
 
         List recipients = this.getRecipients(message);
         List results = new ArrayList();
@@ -86,11 +89,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             {
                 if (sync)
                 {
-                    results.add(send(session, request, endpoint));
+                    results.add(sendRequest(session, request, endpoint, true));
                 }
                 else
                 {
-                    dispatch(session, request, endpoint);
+                    sendRequest(session, request, endpoint, false);
                 }
             }
             catch (MuleException e)

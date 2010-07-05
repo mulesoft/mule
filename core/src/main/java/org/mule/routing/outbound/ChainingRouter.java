@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -38,8 +39,11 @@ public class ChainingRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
+
         MuleMessage resultToReturn = null;
         if (endpoints == null || endpoints.size() == 0)
         {
@@ -73,7 +77,7 @@ public class ChainingRouter extends FilteringOutboundRouter
 
                 if (!lastEndpointInChain)
                 {
-                    MuleMessage localResult = send(session, intermediaryResult, endpoint);
+                    MuleMessage localResult = sendRequest(session, intermediaryResult, endpoint, true);
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)
@@ -108,7 +112,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                     // use the 'sync/async' method parameter
                     if (endpoint.isSynchronous())
                     {
-                        resultToReturn = send(session, intermediaryResult, endpoint);
+                        resultToReturn = sendRequest(session, intermediaryResult, endpoint, true);
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Received final Chain result '" + i + "': "
@@ -119,7 +123,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                     {
                         // reset the previous call result to avoid confusion
                         resultToReturn = null;
-                        dispatch(session, intermediaryResult, endpoint);
+                        sendRequest(session, intermediaryResult, endpoint, false);
                     }
                 }
             }

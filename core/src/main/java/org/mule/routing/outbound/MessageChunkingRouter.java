@@ -10,7 +10,9 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.routing.RoutingException;
@@ -49,11 +51,13 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException
+    public MuleMessage route(MuleEvent event) throws RoutingException
     {
+        MuleMessage message = event.getMessage();
+        MuleSession session = event.getSession();
         if (messageSize == 0 && numberOfMessages < 2)
         {
-            return super.route(message, session);
+            return super.route(event);
         }
         else if (messageSize > 0)
         {
@@ -98,7 +102,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     {
                         logger.info("sending part " + count + " of " + parts);
                     }
-                    super.route(part, session);
+                    super.route(new DefaultMuleEvent(part, event.getEndpoint(), session, event.isSynchronous()));
                     if (logger.isInfoEnabled())
                     {
                         logger.info("sent");
