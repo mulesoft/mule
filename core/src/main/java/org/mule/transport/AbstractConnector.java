@@ -20,6 +20,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
@@ -2439,7 +2440,13 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
         ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new AsyncInterceptingMessageProcessor(getDispatcherWorkManager(), this));
+        builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
+        {
+            public WorkManager getWorkManager() throws MuleException
+            {
+                return getDispatcherWorkManager();
+            }
+        }, getDispatcherThreadingProfile().isDoThreading(), this));
         builder.chain(new MessageProcessor()
         {
             private MessageProcessor notificationMessageProcessor;

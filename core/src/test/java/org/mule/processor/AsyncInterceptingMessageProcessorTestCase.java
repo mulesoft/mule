@@ -12,6 +12,8 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.context.WorkManager;
+import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
@@ -49,7 +51,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
 
     public void testProcessAsync() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(false), false);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(false));
 
         MuleEvent result = messageProcessor.process(event);
 
@@ -68,7 +70,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         throws Exception
     {
         AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-            muleContext.getWorkManager(), this);
+            new TestWorkManagerSource(), true,  this);
         mp.setListener(listener);
         return mp;
     }
@@ -88,6 +90,14 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
     public void exceptionThrown(Exception e)
     {
         exceptionThrown = e;
+    }
+
+    class TestWorkManagerSource implements WorkManagerSource
+    {
+        public WorkManager getWorkManager() throws MuleException
+        {
+            return muleContext.getWorkManager();
+        }
     }
 
 }
