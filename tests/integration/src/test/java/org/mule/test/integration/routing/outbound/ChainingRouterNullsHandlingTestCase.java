@@ -12,21 +12,22 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.service.ServiceException;
+import org.mule.api.component.Component;
+import org.mule.component.ComponentException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
-    
+
     @Override
-    protected String getConfigResources() 
+    protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/chaining-router-null-handling.xml";
     }
 
-    public void testNoComponentFails() throws Exception 
+    public void testNoComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
@@ -35,7 +36,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
     }
 
-    public void testLastComponentFails() throws Exception 
+    public void testLastComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
@@ -45,9 +46,10 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ServiceException);
-        String compName = ((ServiceException) exception).getService().getName();
-        assertEquals("Exception raised in wrong service", "component2Fail", compName);
+        assertTrue("Wrong exception", exception instanceof ComponentException);
+        Component component = ((ComponentException) exception).getComponent();
+        assertEquals("Exception raised in wrong service", muleContext.getRegistry().lookupService(
+            "component2Fail").getComponent(), component);
     }
 
     public void testFirstComponentFails() throws Exception
@@ -60,9 +62,10 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ServiceException);
-        String compName = ((ServiceException) exception).getService().getName();
-        assertEquals("Exception raised in wrong service", "component1Fail", compName);
+        assertTrue("Wrong exception", exception instanceof ComponentException);
+        Component component = ((ComponentException) exception).getComponent();
+        assertEquals("Exception raised in wrong service", muleContext.getRegistry().lookupService(
+        "component1Fail").getComponent(), component);
     }
-    
+
 }
