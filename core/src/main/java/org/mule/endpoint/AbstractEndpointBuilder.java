@@ -108,7 +108,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN);
         if (StringUtils.isNotEmpty(mepString))
         {
-            mepString = mepString.replace('-', '_');
+            mepString = mepString.toUpperCase().replace('-', '_');
             setExchangePattern(MessageExchangePattern.valueOf(mepString));
         }
         
