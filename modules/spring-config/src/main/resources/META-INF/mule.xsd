@@ -1749,7 +1749,6 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
-<!--        <xsd:attribute name="exchange-pattern" default="one-way">-->
         <xsd:attribute name="exchange-pattern">
             <xsd:annotation>
                 <xsd:documentation>
@@ -1759,9 +1758,6 @@
                 <xsd:restriction base="xsd:NMTOKEN">
                     <xsd:enumeration value="one-way"/>
                     <xsd:enumeration value="request-response"/>
-                    <xsd:enumeration value="request-optional-response"/>
-                    <xsd:enumeration value="request-ack"/> 
-                    <xsd:enumeration value="request-response-ack"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>

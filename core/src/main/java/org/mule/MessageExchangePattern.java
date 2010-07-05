@@ -28,36 +28,8 @@ public enum MessageExchangePattern
         {
             return true;
         }
-    }, 
+    }; 
     
-    request_optional_response
-    {
-        @Override
-        public boolean hasResponse()
-        {
-            return true;
-        }
-
-    },
-    
-    request_ack
-    {
-        @Override
-        public boolean hasResponse()
-        {
-            return false;
-        }
-    },
-    
-    request_reply_ack
-    {
-        @Override
-        public boolean hasResponse()
-        {
-            return true;
-        }
-    };
-
     public abstract boolean hasResponse();
 
     public static MessageExchangePattern fromSyncFlag(boolean sync)
