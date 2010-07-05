@@ -206,8 +206,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         @Override
         protected void doDispatch(MuleEvent event) throws Exception
         {
-            System.out.println("doDispatch " + Thread.currentThread().getName() + " "
-                               + System.currentTimeMillis());
             super.doDispatch(event);
             Thread.sleep(DELAY_TIME);
             counter.incrementAndGet();

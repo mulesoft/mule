@@ -45,6 +45,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         this.workManagerSource = workManagerSource;
         this.exceptionListener = exceptionListener;
+        this.doThreading = doThreading;
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
