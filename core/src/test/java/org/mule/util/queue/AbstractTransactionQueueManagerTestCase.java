@@ -61,6 +61,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         Thread t = new Thread()
         {
+            @Override
             public void run()
             {
                 try
@@ -106,6 +107,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         Thread t = new Thread()
         {
+            @Override
             public void run()
             {
                 try
@@ -157,6 +159,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         Thread t = new Thread()
         {
+            @Override
             public void run()
             {
                 try
@@ -322,6 +325,46 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         else
         {
             logger.info("Ignoring test because queue manager is not persistent");
+        }
+    }
+
+    public void testPutTake_RespectsOrderOnPersistence() throws Exception
+    {
+        if (isPersistent())
+        {
+            TransactionalQueueManager mgr1 = createQueueManager();
+            mgr1.start();
+
+            QueueSession s1 = mgr1.getQueueSession();
+            Queue q1 = s1.getQueue("queue1");
+
+            assertEquals("Queue size", 0, q1.size());
+            final int numberOfElements = 10;
+            for (int i = 1; i <= numberOfElements; i++)
+            {
+                q1.put("String" + i);
+                assertEquals("Queue size", i, q1.size());
+            }
+
+            mgr1.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+
+            TransactionalQueueManager mgr2 = createQueueManager();
+            mgr2.start();
+
+            QueueSession s2 = mgr2.getQueueSession();
+            Queue q2 = s2.getQueue("queue1");
+
+            for (int i = 1; i <= numberOfElements; i++)
+            {
+                Object o = q2.take();
+                assertNotNull(o);
+                assertEquals("Queue content", "String" + i, o);
+            }
+            assertEquals("Queue size", 0, q2.size());
+
+            purgeQueue(q2);
+
+            mgr2.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
 

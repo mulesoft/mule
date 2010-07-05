@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -67,7 +68,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
 
     public Object store(String queue, Object obj) throws IOException
     {
-        String id = UUID.getUUID();
+        String id = UUID.getAscendingOrderUUID();
         
         String filename = queue + File.separator + id + EXTENSION;
         File file = FileUtils.newFile(store, filename);
@@ -178,7 +179,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         {
             return;
         }
-
+        // sort the files so they are in the order in which
+        // their ids were generated in method store()
+        Arrays.sort(files);
         for (int i = 0; i < files.length; i++)
         {
             if (files[i].isDirectory())

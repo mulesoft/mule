@@ -10,6 +10,8 @@
 
 package org.mule.util;
 
+import org.safehaus.uuid.UUIDGenerator;
+
 /**
  * <code>UUID</code> Generates a UUID using JDK 5. THe reason for this class is that we have changed the UUID impl in the past.
  * using this class makes it easy to switch out implementations
@@ -25,6 +27,19 @@ public final class UUID
     public static String getUUID()
     {
         return java.util.UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generates incremental and unique ids.
+     * 
+     * @return an id that will be different from the previous ones.
+     */
+    public static String getAscendingOrderUUID()
+    {
+        // The timeBasedUUID will generate strictly incremental unique ids.
+        // Sorting all the ids will give us the ids in the order that were
+        // generated.
+        return UUIDGenerator.getInstance().generateTimeBasedUUID().toString();
     }
 
 }

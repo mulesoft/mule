@@ -124,6 +124,7 @@
         <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.22</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
+        <jugVersion>2.0.0</jugVersion>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.14</log4jVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
