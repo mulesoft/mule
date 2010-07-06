@@ -560,10 +560,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
         }
 
-        // Workaround for MULE-4553
-        this.clearDispatchers();
-        this.clearRequesters();
-
         if (this.isConnected())
         {
             try
@@ -577,12 +573,18 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
         }
 
+        // Now that dispatchers are borrowed/returned in worker thread we need to
+        // dispose workManager before clearing object pools
+        this.disposeWorkManagers();
+
+        // Workaround for MULE-4553
+        this.clearDispatchers();
+        this.clearRequesters();
+        
         // make sure the scheduler is gone
         scheduler = null;
-        
-        this.disposeWorkManagers();
     }
-
+    
     protected void shutdownScheduler()
     {
         if (scheduler != null)
