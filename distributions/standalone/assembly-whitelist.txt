@@ -92,6 +92,7 @@ jsr330-api-0.9
 juel-2.1.0
 juel-engine-2.1.0
 juel-impl-2.1.0
+jug-2.0.0-osgi-asl
 junit-4.8.1
 livetribe-jsr223-2.0.5
 log4j-1.2.14
