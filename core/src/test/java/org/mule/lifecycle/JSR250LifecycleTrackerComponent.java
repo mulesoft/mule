@@ -46,7 +46,7 @@ public class JSR250LifecycleTrackerComponent implements Startable, Stoppable, Mu
     }
 
     @PostConstruct
-    public void initialise() throws InitialisationException {
+    public void initialise() {
         tracker.add("jsr250 initialise");
     }
 
