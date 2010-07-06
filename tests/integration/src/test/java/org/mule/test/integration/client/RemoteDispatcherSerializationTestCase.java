@@ -41,7 +41,7 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
     
     public void testNotificationJavaSerialization() throws Exception
     {
-        doTestNotificationSerialization(new SerializationWireFormat());
+        doTestNotificationSerialization(createObject(SerializationWireFormat.class));
     }
 
     // TODO MULE-3118
