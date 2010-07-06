@@ -63,11 +63,11 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
         {
-            return event.getMessage();
+            return event;
         }
         return super.route(event);
     }

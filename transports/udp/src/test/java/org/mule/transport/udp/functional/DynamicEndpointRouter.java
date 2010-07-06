@@ -27,11 +27,11 @@ import org.mule.routing.outbound.FilteringOutboundRouter;
 public class DynamicEndpointRouter extends FilteringOutboundRouter
 {
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
-        MuleMessage result = null;
+        MuleEvent result = null;
 
         if (endpoints == null || endpoints.size() == 0)
         {

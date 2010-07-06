@@ -71,20 +71,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleMessage responseMessage = route(event);
-        if (responseMessage != null)
-        {
-            return new DefaultMuleEvent(responseMessage, event);
-        }
-        else
-        {
-            return null;
-        }
+        return route(event);
     }
     
-    protected abstract MuleMessage route(MuleEvent event) throws RoutingException, MessagingException;
+    protected abstract MuleEvent route(MuleEvent event) throws RoutingException, MessagingException;
 
-    protected final MuleMessage sendRequest(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint, boolean awaitResponse)
+    protected final MuleEvent sendRequest(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint, boolean awaitResponse)
             throws MuleException
     {
         if (awaitResponse && replyTo != null)
@@ -117,7 +109,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        MuleMessage result = null;
+        MuleEvent result = null;
         try
         {
             result = sendRequestEvent(session, message, endpoint, awaitResponse);
@@ -141,16 +133,20 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
         if (result != null)
         {
+            MuleMessage resultMessage = result.getMessage();
             if (logger.isTraceEnabled())
             {
-                try
+                if (resultMessage != null)
                 {
-                    logger.trace("Response payload: \n"
-                        + StringMessageUtils.truncate(result.getPayloadAsString(), 100, false));
-                }
-                catch (Exception e)
-                {
-                    logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
+                    try
+                    {
+                        logger.trace("Response payload: \n"
+                            + StringMessageUtils.truncate(resultMessage.getPayloadAsString(), 100, false));
+                    }
+                    catch (Exception e)
+                    {
+                        logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
+                    }
                 }
             }
         }
@@ -351,7 +347,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     }
 
     /** send of message event to destination */
-    private MuleMessage sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
+    private MuleEvent sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
             throws MuleException
     {
         if (endpoint == null)
@@ -370,15 +366,18 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        MuleEvent resultEvent = endpoint.process(event);
-        if (resultEvent != null)
-        {
-            return resultEvent.getMessage();
-        }
-        else
-        {
-            return null;
-        }
+        return endpoint.process(event);
     }
 
+    /** @eturn the message from a (possibly null) event */
+    protected final MuleMessage getMessage(MuleEvent event)
+    {
+        return event == null ? null : event.getMessage();
+    }
+
+    /** @eturn a possible null event created to hold a possible null message */
+    protected final MuleEvent createEvent(MuleMessage message, MuleEvent previous)
+    {
+        return message == null ? null : new DefaultMuleEvent(message, previous);
+    }
 }

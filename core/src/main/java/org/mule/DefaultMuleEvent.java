@@ -173,7 +173,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((DefaultMuleSession) session).setFlowConstruct(rewriteEvent.getFlowConstruct());
+        session.setFlowConstruct(rewriteEvent.getFlowConstruct());
         this.endpoint = rewriteEvent.getEndpoint();
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();

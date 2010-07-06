@@ -56,16 +56,19 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, session));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session));
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        assertEquals("There should be 4 results for 4 split messages.", 4, ((MuleMessageCollection) result).size());
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
+        assertTrue(resultMessage instanceof MuleMessageCollection);
+        assertEquals("There should be 4 results for 4 split messages.", 4, ((MuleMessageCollection) resultMessage).size());
     }
 
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", null);
+        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
@@ -118,10 +121,12 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = syncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = syncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        assertEquals(4, ((MuleMessageCollection) result).size());
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
+        assertTrue(resultMessage instanceof MuleMessageCollection);
+        assertEquals(4, ((MuleMessageCollection) resultMessage).size());
         session.verify();
     }
 }

@@ -23,7 +23,7 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
  */
 public class ContentBasedRouter extends AbstractOutboundRouter
 {
-    public MuleMessage route(MuleEvent theEvent) throws MessagingException
+    public MuleEvent route(MuleEvent theEvent) throws MessagingException
     {
         MuleMessage message = theEvent.getMessage();
         MuleSession session = theEvent.getSession();
@@ -37,16 +37,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
                     DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous());
                     if (endpoint.isSynchronous())
                     {
-                        MuleEvent resultEvent;
-                        resultEvent = endpoint.process(event);
-                        if (resultEvent != null)
-                        {
-                            return resultEvent.getMessage();
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        return endpoint.process(event);
                     }
                     else
                     {

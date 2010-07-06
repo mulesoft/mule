@@ -14,6 +14,7 @@ import com.mockobjects.dynamic.AnyConstraintMatcher;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -62,6 +63,19 @@ public class RouterTestUtils
             public boolean matches(Object[] args)
             {
                 return args.length == 1 && args[0] instanceof MuleEvent;
+            }
+        } ;
+    }
+
+    /** @return an object that verifies that the argument list was a single MuleEvent */
+    public static AnyConstraintMatcher getArgListCheckerFlowConstruct()
+    {
+        return new AnyConstraintMatcher()
+        {
+            @Override
+            public boolean matches(Object[] args)
+            {
+                return args.length == 1 && (args[0] == null || args[0] instanceof FlowConstruct);
             }
         } ;
     }

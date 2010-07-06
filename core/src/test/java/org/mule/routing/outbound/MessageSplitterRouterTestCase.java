@@ -37,6 +37,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
+        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
         //Async endpoints
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
@@ -104,10 +105,12 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        assertEquals(3, ((MuleMessageCollection) result).size());
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
+        assertTrue(resultMessage instanceof MuleMessageCollection);
+        assertEquals(3, ((MuleMessageCollection) resultMessage).size());
         mockendpoint4.verify();
         mockendpoint5.verify();
         mockendpoint6.verify();

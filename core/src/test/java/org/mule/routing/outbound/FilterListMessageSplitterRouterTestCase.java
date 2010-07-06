@@ -39,7 +39,8 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
-
+        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
+        
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
@@ -91,10 +92,12 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint3.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
         assertNotNull(result);
-        assertTrue(result.getPayload() instanceof List);
-        assertEquals(((List) result.getPayload()).size(), 4);
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
+        assertTrue(resultMessage.getPayload() instanceof List);
+        assertEquals(((List) resultMessage.getPayload()).size(), 4);
         mockendpoint1.verify();
         mockendpoint2.verify();
         mockendpoint3.verify();

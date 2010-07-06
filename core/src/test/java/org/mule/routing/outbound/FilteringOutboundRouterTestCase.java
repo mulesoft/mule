@@ -112,9 +112,9 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null);
         mockEndpoint.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
-        assertEquals(message, result);
+        assertEquals(message, result.getMessage());
         session.verify();
     }
 

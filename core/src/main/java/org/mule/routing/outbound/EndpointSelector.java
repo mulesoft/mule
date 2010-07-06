@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -55,7 +56,7 @@ public class EndpointSelector extends FilteringOutboundRouter
     private ExpressionConfig expressionConfig = new ExpressionConfig(DEFAULT_SELECTOR_EXPRESSION, DEFAULT_SELECTOR_EVALUATOR, null);
 
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
@@ -128,7 +129,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 }
                 if (ep.isSynchronous())
                 {
-                    results.add(sendRequest(session, message, ep, true));
+                    results.add(getMessage(sendRequest(session, message, ep, true)));
                 }
                 else
                 {
@@ -140,7 +141,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 throw new CouldNotRouteOutboundMessageException(message, ep, e);
             }
         }
-        return resultsHandler.aggregateResults(results, message, muleContext);
+        return createEvent(resultsHandler.aggregateResults(results, message, muleContext), event);
     }
 
     protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException

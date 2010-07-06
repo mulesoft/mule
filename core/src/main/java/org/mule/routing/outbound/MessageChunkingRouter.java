@@ -51,7 +51,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
@@ -120,6 +120,6 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                 throw e;
             }
         }
-        return message;
+        return event;
     }
 }

@@ -61,9 +61,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         expressionManager = muleContext.getExpressionManager();
     }
 
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
-        MuleMessage result = null;
+        MuleEvent result = null;
 
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();

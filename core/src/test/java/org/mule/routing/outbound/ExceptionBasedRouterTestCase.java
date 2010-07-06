@@ -82,7 +82,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
         assertNull("Async call should've returned null.", result);
         mockendpoint1.verify();
     }
@@ -127,9 +127,9 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         // only one send should be called and succeed, the others should not be
         // called
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)mockSession.proxy()));
         assertNotNull(result);
-        assertEquals(message, result);
+        assertEquals(message, result.getMessage());
         mockendpoint1.verify();
     }
 
@@ -172,7 +172,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         MuleSession session = (MuleSession)mockSession.proxy();
-        MuleMessage result = null;
+        MuleEvent result = null;
         try
         {
             result = router.route(new OutboundRoutingTestEvent(message, session));
@@ -219,11 +219,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         // 1st failure
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
+        MuleEvent actualResult = router.route(new OutboundRoutingTestEvent(message, session));
         mockendpoint1.verify();
         mockendpoint2.verify();
 
-        assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
+        assertEquals("Got an invalid return message.", expectedResultMessage, actualResult.getMessage());
     }
 
     /**
@@ -258,8 +258,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
-        assertNull("Async call should not return any results.", actualResultMessage);
+        MuleEvent actualResult = router.route(new OutboundRoutingTestEvent(message, session));
+        assertNull("Async call should not return any results.", actualResult);
 
         mockendpoint1.verify();
         mockendpoint2.verify();
@@ -303,11 +303,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), exPayloadMessage);
         // next endpoint
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), expectedResultEvent);
-        MuleMessage actualResultMessage = router.route(new OutboundRoutingTestEvent(message, session));
+        MuleEvent actualResult = router.route(new OutboundRoutingTestEvent(message, session));
         mockendpoint1.verify();
         mockendpoint2.verify();
 
-        assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
+        assertEquals("Got an invalid return message.", expectedResultMessage, actualResult.getMessage());
     }
 
     private static class IsPayloadEqual implements Constraint

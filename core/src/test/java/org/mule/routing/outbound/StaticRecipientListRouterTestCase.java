@@ -86,7 +86,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
-
+        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
+        
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
@@ -127,10 +128,12 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
          });
 
         router.getRecipients().add("test://recipient3?synchronous=true");
-        MuleMessage result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
-        assertTrue(result.getPayload() instanceof List);
-        assertEquals(3, ((List)result.getPayload()).size());
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
+        assertTrue(resultMessage.getPayload() instanceof List);
+        assertEquals(3, ((List)resultMessage.getPayload()).size());
         session.verify();
 
     }

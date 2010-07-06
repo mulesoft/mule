@@ -37,7 +37,7 @@ import java.util.List;
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
@@ -81,7 +81,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             }
         }
 
-        MuleMessage result = null;
+        MuleEvent result = null;
         OutboundEndpoint endpoint = null;
         MuleMessage request = null;
         boolean success = false;
@@ -102,12 +102,17 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             {
                 try
                 {
+                    MuleMessage resultMessage = null;
                     result = sendRequest(session, request, endpoint, true);
                     if (result != null)
                     {
-                        result.applyTransformers(endpoint.getResponseTransformers());
+                        resultMessage = result.getMessage();
                     }
-                    if (!exceptionPayloadAvailable(result))
+                    if (resultMessage != null)
+                    {
+                        resultMessage.applyTransformers(endpoint.getResponseTransformers());
+                    }
+                    if (!exceptionPayloadAvailable(resultMessage))
                     {
                         if (logger.isDebugEnabled())
                         {

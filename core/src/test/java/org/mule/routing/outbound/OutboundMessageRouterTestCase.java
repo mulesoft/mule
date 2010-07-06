@@ -124,22 +124,22 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleEvent event)
+            public MuleEvent route(MuleEvent event)
                 throws RoutingException
             {
                 count1[0]++;
-                return event.getMessage();
+                return event;
             }
         };
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter()
         {
             @Override
-            public MuleMessage route(MuleEvent event)
+            public MuleEvent route(MuleEvent event)
                 throws RoutingException
             {
                 count2[0]++;
-                return event.getMessage();
+                return event;
             }
         };
 

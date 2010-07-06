@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -39,12 +40,12 @@ public class ChainingRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public MuleMessage route(MuleEvent event) throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
 
-        MuleMessage resultToReturn = null;
+        MuleEvent resultToReturn = null;
         if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
@@ -77,7 +78,7 @@ public class ChainingRouter extends FilteringOutboundRouter
 
                 if (!lastEndpointInChain)
                 {
-                    MuleMessage localResult = sendRequest(session, intermediaryResult, endpoint, true);
+                    MuleMessage localResult = getMessage(sendRequest(session, intermediaryResult, endpoint, true));
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)
@@ -100,7 +101,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                     {
                         // if there was an error in the first link of the chain, make sure we propagate back
                         // any exception payloads alongside the NullPayload
-                        resultToReturn = intermediaryResult;
+                        resultToReturn = createEvent(intermediaryResult, event);
                         logger.warn("Chaining router cannot process any further endpoints. "
                                     + "There was no result returned from endpoint invocation: " + endpoint);
                         break;
@@ -115,8 +116,9 @@ public class ChainingRouter extends FilteringOutboundRouter
                         resultToReturn = sendRequest(session, intermediaryResult, endpoint, true);
                         if (logger.isDebugEnabled())
                         {
+                            MuleMessage resultMessage = getMessage(resultToReturn);
                             logger.debug("Received final Chain result '" + i + "': "
-                                         + (resultToReturn == null ? "null" : resultToReturn.toString()));
+                                         + (resultMessage == null ? "null" : resultMessage.toString()));
                         }
                     }
                     else

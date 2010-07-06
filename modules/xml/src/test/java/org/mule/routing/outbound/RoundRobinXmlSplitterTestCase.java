@@ -120,7 +120,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
-
+        session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncXmlSplitter.isMatch(message));
@@ -141,10 +141,12 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleMessage result = syncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = syncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleMessage resultMessage = result.getMessage();
+        assertNotNull(resultMessage);
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        assertEquals(4, ((MuleMessageCollection) result).size());
+        assertTrue(resultMessage instanceof MuleMessageCollection);
+        assertEquals(4, ((MuleMessageCollection) resultMessage).size());
         mockendpoint4.verify();
         mockendpoint5.verify();
         mockendpoint6.verify();
