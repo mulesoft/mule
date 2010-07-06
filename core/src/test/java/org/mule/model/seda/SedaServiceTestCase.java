@@ -113,7 +113,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.initialise();
         service.start();
         service.pause();
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext, false));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext));
 
         // This test will timeout and fail if dispatch() blocks
 
@@ -181,7 +181,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         muleContext.getRegistry().registerService(service);
         service.start();
 
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext, false));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 

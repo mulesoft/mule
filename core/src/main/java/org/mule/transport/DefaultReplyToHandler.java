@@ -76,7 +76,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         
         // Create the replyTo event asynchronous
-        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession(), false);
+        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession());
 
         // dispatch the event
         try

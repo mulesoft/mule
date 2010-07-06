@@ -94,7 +94,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private boolean stopFurtherProcessing = false;
 
-    private boolean synchronous = false;
+    private Boolean synchronous;
 
     private int timeout = TIMEOUT_NOT_SET_VALUE;
 
@@ -132,10 +132,9 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
-                            MuleSession session,
-                            boolean synchronous)
+                            MuleSession session)
     {
-        this(message, endpoint, session, synchronous, null);
+        this(message, endpoint, session, null);
     }
 
     /**
@@ -144,6 +143,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @param message  the event payload
      * @param endpoint the endpoint to associate with the event
      * @param session  the previous event if any
+     * @deprecated
      */
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
@@ -161,6 +161,21 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         fillProperties(null);
     }
 
+    public DefaultMuleEvent(MuleMessage message,
+                            ImmutableEndpoint endpoint,
+                            MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        super(message.getPayload());
+        this.message = message;
+        this.endpoint = endpoint;
+        this.session = session;
+        this.id = generateEventId();
+        this.outputStream = outputStream;
+        fillProperties(null);
+    }
+
+    
     /**
      * A helper constructor used to rewrite an event payload
      *
@@ -535,7 +550,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         else
         {
             // TODO This should be determined by the inbound endpoint only
-            return synchronous;
+            if (synchronous != null)
+            {
+                return synchronous.booleanValue();
+            }
+            else
+            {
+                return endpoint.isSynchronous();
+            }
         }
     }
 

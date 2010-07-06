@@ -51,8 +51,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
-        ImmutableEndpoint endpoint = getTestInboundEndpoint("Test1Provider");
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
+        ImmutableEndpoint endpoint = getTestInboundEndpoint(false);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
@@ -60,7 +60,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         messageRouter.process(event);
         session.verify();
 
-        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), true);
+        endpoint = getTestInboundEndpoint(true);
+        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         session.expectAndReturn("getService", testService);
@@ -73,7 +74,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         session.expectAndReturn("toString", "");
         message = new DefaultMuleMessage(new Exception(), muleContext);
 
-        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
+        endpoint = getTestInboundEndpoint(false);
+        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         assertTrue(!router.isMatch(event));
 
         messageRouter.process(event);

@@ -110,7 +110,7 @@ public class RemoteDispatcher implements Disposable
         MuleMessage msg = new DefaultMuleMessage(ServerHandshake.SERVER_HANDSHAKE_PROPERTY, muleContext);
         MuleMessage result = null;
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg, syncServerEndpoint,
-            new DefaultMuleSession(muleContext), true));
+            new DefaultMuleSession(muleContext)));
         if (resultEvent != null)
         {
             result = resultEvent.getMessage();
@@ -370,7 +370,7 @@ public class RemoteDispatcher implements Disposable
         message.addProperties(action.getProperties());
         MuleSession session = new DefaultMuleSession(muleContext);
 
-        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint, session, true);
+        MuleEvent event = new DefaultMuleEvent(message, serverEndpoint, session);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled())
         {
@@ -458,6 +458,6 @@ public class RemoteDispatcher implements Disposable
     protected void updateContext(MuleMessage message, ImmutableEndpoint endpoint, boolean synchronous)
         throws MuleException
     {
-        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(muleContext), synchronous));
+        RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(muleContext)));
     }
 }

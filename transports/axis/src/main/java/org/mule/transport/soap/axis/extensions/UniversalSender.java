@@ -226,7 +226,7 @@ public class UniversalSender extends BasicHandler
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);
-                MuleEvent dispatchEvent = new DefaultMuleEvent(message, syncEndpoint, session, sync);
+                MuleEvent dispatchEvent = new DefaultMuleEvent(message, syncEndpoint, session);
                 MuleMessage result = null;
                 MuleEvent resultEvent = syncEndpoint.process(dispatchEvent);
                 if (resultEvent != null)
@@ -254,7 +254,7 @@ public class UniversalSender extends BasicHandler
             }
             else
             {
-                MuleEvent dispatchEvent = new DefaultMuleEvent(message, endpoint, session, sync);
+                MuleEvent dispatchEvent = new DefaultMuleEvent(message, endpoint, session);
                 endpoint.process(dispatchEvent);
             }
         }

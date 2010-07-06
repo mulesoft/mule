@@ -27,7 +27,7 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractOutbound
         TestListener listener = new TestListener();
         mp.setListener(listener);
 
-        MuleEvent event = createTestOutboundEvent(createTestOutboundEndpoint(null, null), true);
+        MuleEvent event = createTestOutboundEvent(createTestOutboundEndpoint(null, null));
         mp.process(event);
 
         assertSame(event, listener.sensedEvent);
@@ -45,7 +45,7 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractOutbound
             TransactionCoordination.getInstance().bindTransaction(tx);
             tx.setRollbackOnly();
 
-            MuleEvent event = createTestOutboundEvent(createTestOutboundEndpoint(null, null), true);
+            MuleEvent event = createTestOutboundEvent(createTestOutboundEndpoint(null, null));
             MuleEvent result = mp.process(event);
 
             assertNull(listener.sensedEvent);

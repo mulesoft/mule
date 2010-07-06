@@ -113,12 +113,12 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         // template method
     }
 
-    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint, boolean sync) throws Exception
+    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint) throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
-            getTestSession(getTestService(), muleContext), sync);
+            getTestSession(getTestService(), muleContext));
     }
 
     protected MuleMessage createTestResponseMuleMessage()

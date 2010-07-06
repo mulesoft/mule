@@ -49,7 +49,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event =
                 new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                        (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session, true);
+                        (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session);
         session.sendEvent(event);
     }
 

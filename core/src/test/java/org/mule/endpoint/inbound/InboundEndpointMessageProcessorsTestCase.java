@@ -72,6 +72,6 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
 
     protected MuleEvent createTestRequestEvent(ImmutableEndpoint endpoint) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext), endpoint.isSynchronous());
+        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext));
     }    
 }

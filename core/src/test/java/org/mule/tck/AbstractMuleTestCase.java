@@ -705,15 +705,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, boolean synchronous) throws Exception
-    {
-        return MuleTestUtils.getTestEvent(data, endpoint, muleContext, synchronous);
-    }
-
     public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint)
             throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext, true);
+        return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);
     }
 
     public static MuleSession getTestSession(Service service, MuleContext context)

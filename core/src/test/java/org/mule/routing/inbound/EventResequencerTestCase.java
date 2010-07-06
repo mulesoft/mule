@@ -50,10 +50,10 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
-        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session, false);
-        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session, false);
-        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session, false);
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint(false);
+        MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
+        MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
+        MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);
         assertTrue(router.isMatch(event1));
         assertTrue(router.isMatch(event2));
         assertTrue(router.isMatch(event3));

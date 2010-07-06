@@ -14,7 +14,6 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
 
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInbou
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
-        MuleEvent inEvent = createTestInboundEvent(endpoint, true);
+        MuleEvent inEvent = createTestInboundEvent(endpoint);
         MuleEvent resultEvent = mp.process(inEvent);
         assertNotNull(listner.sensedEvent);
         assertSame(inEvent, listner.sensedEvent);
@@ -46,7 +45,7 @@ public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInbou
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
-        MuleEvent inEvent = createTestInboundEvent(endpoint, true);
+        MuleEvent inEvent = createTestInboundEvent(endpoint);
 
         // Need event in RequestContext :-(
         RequestContext.setEvent(inEvent);

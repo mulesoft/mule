@@ -28,7 +28,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
 
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, false, null);
         MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
-        MuleEvent event = createTestOutboundEvent(endpoint, false);
+        MuleEvent event = createTestOutboundEvent(endpoint);
         mp.process(event);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -48,7 +48,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
 
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, true, null);
         MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
-        MuleEvent event = createTestOutboundEvent(endpoint, false);
+        MuleEvent event = createTestOutboundEvent(endpoint);
         mp.process(event);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

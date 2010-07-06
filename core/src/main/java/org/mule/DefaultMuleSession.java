@@ -401,7 +401,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             }
             else
             {
-                event = new DefaultMuleEvent(message, endpoint, this, endpoint.isSynchronous(), null);
+                event = new DefaultMuleEvent(message, endpoint, this, null);
             }
             return event;
         }

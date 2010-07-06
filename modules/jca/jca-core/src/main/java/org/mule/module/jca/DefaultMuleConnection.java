@@ -174,7 +174,7 @@ public class DefaultMuleConnection implements MuleConnection
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
 
-            return new DefaultMuleEvent(message, endpoint, session, synchronous);
+            return new DefaultMuleEvent(message, endpoint, session);
         }
         catch (Exception e)
         {

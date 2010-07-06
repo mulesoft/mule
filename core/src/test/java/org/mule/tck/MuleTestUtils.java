@@ -165,6 +165,18 @@ public final class MuleTestUtils
             }
         });
     }
+
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, final boolean sync, final MuleContext context) throws Exception
+    {
+        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                builder.setSynchronous(sync);
+                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
     
     public static OutboundEndpoint getTestOutboundEndpoint(final boolean sync, final MuleContext context) throws Exception
     {
@@ -174,6 +186,18 @@ public final class MuleTestUtils
             {
                 builder.setSynchronous(sync);
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
+
+    public static InboundEndpoint getTestInboundEndpoint(String name, final boolean sync, final MuleContext context) throws Exception
+    {
+        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                builder.setSynchronous(sync);
+                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         });
     }
@@ -319,42 +343,37 @@ public final class MuleTestUtils
     /** Supply service but no endpoint */
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestOutboundEndpoint("test1", context), context, true);
+        return getTestEvent(data, service, getTestOutboundEndpoint("test1", true, context), context);
     }
 
     public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1", context), context, true);
+        return getTestEvent(data, service, getTestInboundEndpoint("test1", true, context), context);
     }
 
     /** Supply endpoint but no service */
     public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestService(context), endpoint, context, true);
+        return getTestEvent(data, getTestService(context), endpoint, context);
     }
     
-    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context,  boolean synchronous) throws Exception
-    {
-        return getTestEvent(data, getTestService(context), endpoint, context, synchronous);
-    }
-
-    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context, boolean synchronous) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
         MuleSession session = getTestSession(service, context);
         
         MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         MuleMessage message = factory.create(data, endpoint.getEncoding());
         
-        return new DefaultMuleEvent(message, endpoint, session, synchronous);
+        return new DefaultMuleEvent(message, endpoint, session);
     }
     
     public static MuleEvent getTestInboundEvent(Object data, MuleSession session, MuleContext context) throws Exception
     {
-        InboundEndpoint endpoint = getTestInboundEndpoint("test1", context);
+        InboundEndpoint endpoint = getTestInboundEndpoint("test1", true, context);
         MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         MuleMessage message = factory.create(data, endpoint.getEncoding());
         
-        return new DefaultMuleEvent(message, endpoint, session, true);
+        return new DefaultMuleEvent(message, endpoint, session);
     }
     
 

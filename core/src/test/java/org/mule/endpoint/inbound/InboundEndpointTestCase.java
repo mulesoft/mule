@@ -15,20 +15,17 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterException;
 import org.mule.api.security.EndpointSecurityFilter;
-import org.mule.api.transaction.TransactionConfig;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractEndpoint;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.security.TestSecurityFilter;
-import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.simple.InboundAppendTransformer;
 import org.mule.transformer.simple.ResponseAppendTransformer;
 
@@ -189,47 +186,6 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         assertMessageNotSent();
     }
 
-    /**
-     * Assert that event is sync even if endpoint is async when remoteSync message
-     * property is set
-     */
-    public void testRemoteSyncMessagePropertyForcesSync() throws Exception
-    {
-        endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
-        endpoint.setListener(inboundListener);
-
-        inMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
-        requestEvent = createTestRequestEvent(endpoint);
-        responseEvent = createTestResponseEvent(endpoint);
-
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
-        result = mpChain.process(requestEvent);
-
-        assertMessageSentSame(true);
-        assertEquals(responseEvent.getMessage(), result.getMessage());
-    }
-
-    /**
-     * Assert that event is sync if transaction is used even if endpoint is async
-     */
-    public void testTransactionForcesSync() throws Exception
-    {
-        TransactionConfig txConfig = new MuleTransactionConfig();
-        txConfig.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        endpoint = createTestInboundEndpoint(null, null, null, null, false, txConfig);
-        endpoint.setListener(inboundListener);
-
-        inMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
-        requestEvent = createTestRequestEvent(endpoint);
-        responseEvent = createTestResponseEvent(endpoint);
-
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
-        result = mpChain.process(requestEvent);
-
-        assertMessageSentSame(true);
-        assertEquals(responseEvent.getMessage(), result.getMessage());
-    }
-
     public void testMessagePropertyErrorMapping() throws Exception
     {
         endpoint = createTestInboundEndpoint(null, null, null, null, false, null);
@@ -319,22 +275,13 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
 
     protected MuleEvent createTestRequestEvent(ImmutableEndpoint endpoint) throws Exception
     {
-        boolean synchronous;
-        if (inMessage.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false))
-        {
-            synchronous = true;
-        }
-        else
-        {
-            synchronous = endpoint.isSynchronous();
-        }
-        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext), synchronous);
+        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext));
     }
     
     protected MuleEvent createTestResponseEvent(ImmutableEndpoint endpoint) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
-            endpoint, getTestSession(getTestService(), muleContext), true);
+            endpoint, getTestSession(getTestService(), muleContext));
     }
 
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException

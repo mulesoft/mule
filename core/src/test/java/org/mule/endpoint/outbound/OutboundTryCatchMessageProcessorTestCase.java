@@ -45,7 +45,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         TestListener listener = new TestListener();
         mp.setListener(listener);
 
-        MuleEvent event = createTestOutboundEvent(endpoint, true);
+        MuleEvent event = createTestOutboundEvent(endpoint);
 
         MuleEvent result = mp.process(event);
 
@@ -60,7 +60,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, true);
+        MuleEvent event = createTestOutboundEvent(endpoint);
 
         MuleEvent result = null;
         try
@@ -84,7 +84,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, false);
+        MuleEvent event = createTestOutboundEvent(endpoint);
 
         MuleEvent result = null;
         try
@@ -106,7 +106,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, true);
+        MuleEvent event = createTestOutboundEvent(endpoint);
 
         MuleEvent result = null;
         try
@@ -129,7 +129,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, false);
+        MuleEvent event = createTestOutboundEvent(endpoint);
 
         MuleEvent result = null;
         try

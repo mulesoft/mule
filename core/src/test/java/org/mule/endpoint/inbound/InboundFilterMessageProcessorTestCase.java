@@ -29,7 +29,7 @@ public class InboundFilterMessageProcessorTestCase extends AbstractInboundMessag
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
-        MuleEvent inEvent = createTestInboundEvent(endpoint, true);
+        MuleEvent inEvent = createTestInboundEvent(endpoint);
         MuleEvent resultEvent = mp.process(inEvent);
         assertNotNull(listner.sensedEvent);
         assertSame(inEvent, listner.sensedEvent);
@@ -45,7 +45,7 @@ public class InboundFilterMessageProcessorTestCase extends AbstractInboundMessag
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
-        MuleEvent inEvent = createTestInboundEvent(endpoint, true);
+        MuleEvent inEvent = createTestInboundEvent(endpoint);
         try
         {
             MuleEvent resultEvent = mp.process(inEvent);

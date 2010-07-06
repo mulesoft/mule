@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -29,7 +28,7 @@ public class InboundNotificationMessageProcessorTestCase extends AbstractInbound
 
         InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
         MessageProcessor mp = new InboundNotificationMessageProcessor(endpoint);
-        MuleEvent event = createTestInboundEvent(endpoint, false);
+        MuleEvent event = createTestInboundEvent(endpoint);
         mp.process(event);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));

@@ -34,7 +34,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
             {
                 try
                 {
-                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous());
+                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
                     if (endpoint.isSynchronous())
                     {
                         return endpoint.process(event);

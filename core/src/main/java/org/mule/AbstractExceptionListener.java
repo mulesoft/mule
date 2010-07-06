@@ -359,7 +359,7 @@ public abstract class AbstractExceptionListener
             MuleMessage clonedMessage = new DefaultMuleMessage(exceptionMessage.getPayload(),
                 exceptionMessage, muleContext);
             MuleEvent exceptionEvent = new DefaultMuleEvent(clonedMessage, endpoint, 
-                new DefaultMuleSession(muleContext), true);
+                new DefaultMuleSession(muleContext));
             exceptionEvent = RequestContext.setEvent(exceptionEvent);
 
             endpoint.process(exceptionEvent);

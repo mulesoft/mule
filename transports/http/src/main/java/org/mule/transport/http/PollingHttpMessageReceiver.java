@@ -119,7 +119,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }
-        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint, session, true);
+        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint, session);
 
         MuleEvent result = outboundEndpoint.process(event);
         MuleMessage message = null;

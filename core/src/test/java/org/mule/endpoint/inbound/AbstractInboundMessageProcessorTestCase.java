@@ -98,12 +98,12 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         return endpoint;
     }
 
-    protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint, boolean sync) throws Exception
+    protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
-            getTestSession(getTestService(), muleContext), sync);
+            getTestSession(getTestService(), muleContext));
     }
 
     static class TestFilter implements Filter

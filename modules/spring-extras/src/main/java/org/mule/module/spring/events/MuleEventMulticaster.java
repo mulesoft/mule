@@ -494,7 +494,7 @@ public class MuleEventMulticaster
                 else
                 {
                     MuleSession session = new DefaultMuleSession(service, muleContext);
-                    RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session, false));
+                    RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session));
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
                     {
@@ -502,7 +502,7 @@ public class MuleEventMulticaster
                             applicationEvent.getProperties(), muleContext);
                         message.applyTransformers(endpoint.getTransformers());
                     }
-                    endpoint.process(new DefaultMuleEvent(message, endpoint, session, false));
+                    endpoint.process(new DefaultMuleEvent(message, endpoint, session));
                 }
             }
             catch (Exception e1)

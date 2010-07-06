@@ -333,8 +333,8 @@ public class MuleClient implements Disposable
             logger.warn("The mule muleContext is not running synchronously, a null message payload will be returned");
         }
         MuleSession session = new DefaultMuleSession(service, muleContext);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload());
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
+        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
         if (logger.isDebugEnabled())
         {
@@ -388,8 +388,8 @@ public class MuleClient implements Disposable
                 message);
         }
         MuleSession session = new DefaultMuleSession(service, muleContext);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload());
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
+        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
         if (logger.isDebugEnabled())
         {
@@ -757,7 +757,7 @@ public class MuleClient implements Disposable
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
                     user.getUsername(), user.getPassword()));
             }
-            DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, synchronous);
+            DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
             return event;
         }
         catch (Exception e)
@@ -819,7 +819,7 @@ public class MuleClient implements Disposable
         return endpoint;
     }
 
-    protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload)
+    protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload, boolean sync)
         throws MuleException
     {
         // as we are bypassing the message transport layer we need to check that
@@ -839,6 +839,7 @@ public class MuleClient implements Disposable
                 {
                     EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
                     builder.setTransformers(new LinkedList());
+                    builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
                     return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
                 }
             }

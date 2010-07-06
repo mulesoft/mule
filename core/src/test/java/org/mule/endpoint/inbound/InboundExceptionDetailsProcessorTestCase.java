@@ -13,7 +13,6 @@ package org.mule.endpoint.inbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.message.DefaultExceptionPayload;
 
 public class InboundExceptionDetailsProcessorTestCase extends AbstractInboundMessageProcessorTestCase
@@ -24,7 +23,7 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractInboundMes
         InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
         MessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
 
-        MuleEvent event = createTestInboundEvent(endpoint, true);
+        MuleEvent event = createTestInboundEvent(endpoint);
         event.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
         MuleEvent result = mp.process(event);

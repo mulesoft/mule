@@ -49,7 +49,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint, true);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertMessageSentSame(true);
@@ -69,7 +69,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, false, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint, false);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -82,7 +82,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), null, null,
             true, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint, true);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertMessageSentSame(true);
@@ -105,7 +105,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), null, null,
             true, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint, true);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         RequestContext.setEvent(testOutboundEvent);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
@@ -130,7 +130,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint, true);
+        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -148,7 +148,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, false, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint, false);
+        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -164,7 +164,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
             new ResponseAppendTransformer(), true, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint, true);
+        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(outboundEvent);
 
         assertMessageSent(true);
@@ -180,7 +180,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
     public void testConnectorNotStarted() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint, true);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         endpoint.getConnector().stop();
         try
         {
@@ -199,7 +199,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         int testTimeout = 999;
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint, true);
+        testOutboundEvent = createTestOutboundEvent(endpoint);
         testOutboundEvent.getMessage()
             .setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
 

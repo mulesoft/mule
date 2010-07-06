@@ -62,7 +62,7 @@ public class WireTap extends SelectiveConsumer
 
             tapMessage = DefaultMuleMessage.copy(originalMessage);
             
-            tap.process(new DefaultMuleEvent(tapMessage, tap, session, false));
+            tap.process(new DefaultMuleEvent(tapMessage, tap, session));
         }
         catch (MessagingException e)
         {

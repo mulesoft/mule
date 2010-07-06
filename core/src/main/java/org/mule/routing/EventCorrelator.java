@@ -601,7 +601,7 @@ public class EventCorrelator
                                 {
                                     MuleMessage msg = callback.aggregateEvents(group);
                                     MuleEvent newEvent = new DefaultMuleEvent(msg, group.toArray()[0].getEndpoint(),
-                                                                              new DefaultMuleSession((Service) service, context), false);
+                                                                              new DefaultMuleSession((Service) service, context));
 
                                     if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
                                     {

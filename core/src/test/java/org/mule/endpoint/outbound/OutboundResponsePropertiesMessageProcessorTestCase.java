@@ -39,11 +39,11 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends
             {
                 // return event with same payload but no properties
                 return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
-                    muleContext), null, null, true);
+                    muleContext), null, null);
             }
         });
 
-        MuleEvent event = createTestOutboundEvent(endpoint, false);
+        MuleEvent event = createTestOutboundEvent(endpoint);
         event.getMessage().setStringProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
         event.getMessage().setStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
             MULE_CORRELATION_ID_VAL);
