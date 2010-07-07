@@ -14,15 +14,14 @@
     <model name="main">
         <service name="testService">
             <inbound>
-                <vm:inbound-endpoint path="entry"/>
+                <vm:inbound-endpoint path="entry" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="queue"/>
+                    <outbound-endpoint ref="queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
     </model>
-
 </mule>

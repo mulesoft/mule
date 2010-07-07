@@ -21,29 +21,35 @@
     </custom-transformer>
 
     <vm:endpoint name="in-global-name-global-transformer" path="in-global-name-global-transformer"
-                 connector-ref="default"/>
+                 connector-ref="default" exchange-pattern="one-way"/>
     <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer"
-                 connector-ref="queue"/>
+                 connector-ref="queue" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default"
                  responseTransformer-refs="response" exchange-pattern="request-response"/>
 
-    <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" connector-ref="queue"/>
+    <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" 
+        connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" 
+        connector-ref="queue" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-url-transformer" path="global-name-url-transformer?responseTransformers=response"
                  connector-ref="default" exchange-pattern="request-response"/>
 
     <vm:endpoint name="in-global-name-local-transformer" path="in-global-name-local-transformer"
-                 connector-ref="default"/>
+                 connector-ref="default" exchange-pattern="one-way"/>
     <vm:endpoint name="out-global-name-local-transformer" path="out-global-name-local-transformer"
-                 connector-ref="queue"/>
+                 connector-ref="queue" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer" connector-ref="default"
                  exchange-pattern="request-response"/>
 
-    <vm:endpoint name="in-local-name-local-transformer" path="in-local-name-local-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-local-name-local-transformer" path="out-local-name-local-transformer" connector-ref="queue"/>
+    <vm:endpoint name="in-local-name-local-transformer" path="in-local-name-local-transformer" 
+        connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="out-local-name-local-transformer" path="out-local-name-local-transformer" 
+        connector-ref="queue" exchange-pattern="one-way"/>
 
-    <vm:endpoint name="in-local-name-url-transformer" path="in-local-name-url-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-local-name-url-transformer" path="out-local-name-url-transformer" connector-ref="queue"/>
+    <vm:endpoint name="in-local-name-url-transformer" path="in-local-name-url-transformer" 
+        connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="out-local-name-url-transformer" path="out-local-name-url-transformer" 
+        connector-ref="queue" exchange-pattern="one-way"/>
 
     <model name="response transformer tests">
         <service name="gngt">
@@ -122,7 +128,8 @@
 
         <service name="lnlt-bounce">
             <inbound>
-                <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default"/>
+                <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default"
+                    exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>
@@ -143,7 +150,8 @@
 
         <service name="lnut-bounce">
             <inbound>
-                <vm:inbound-endpoint path="local-name-url-transformer" connector-ref="default"/>
+                <vm:inbound-endpoint path="local-name-url-transformer" connector-ref="default"
+                    exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>

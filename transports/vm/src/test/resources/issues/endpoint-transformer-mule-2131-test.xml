@@ -8,17 +8,16 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:endpoint name="in" address="vm://in" />
-    <endpoint name="direct" address="vm://direct" />
+    <vm:endpoint name="in" address="vm://in" exchange-pattern="one-way"/>
+    <endpoint name="direct" address="vm://direct" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer"
-                  transformer-refs="transformer"/>
+        transformer-refs="transformer" exchange-pattern="one-way"/>
     <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer"
-              />
+        exchange-pattern="one-way"/>
 
     <custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
     <model name="endpoint transformer tests">
-
         <service name="main">
             <inbound>
                 <inbound-endpoint ref="in"/>
@@ -27,16 +26,16 @@
                 <multicasting-router>
                     <outbound-endpoint ref="direct"/>
                     <outbound-endpoint ref="global-name-global-transformer"/>
-                    <vm:outbound-endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer"
-                                           transformer-refs="transformer"/>
+                    <vm:outbound-endpoint name="local-name-local-transformer" 
+                        address="vm://local-name-local-transformer"
+                        transformer-refs="transformer"
+                        exchange-pattern="one-way"/>
                     <!-- these two don't transform -->
                     <outbound-endpoint ref="global-name-local-transformer" transformer-refs="transformer"/>
-                    <vm:outbound-endpoint path="no-name-local-transformer" 
-                                          transformer-refs="transformer"/>
+                    <vm:outbound-endpoint path="no-name-local-transformer" transformer-refs="transformer"
+                        exchange-pattern="one-way"/>
                 </multicasting-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

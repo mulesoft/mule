@@ -12,9 +12,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
-        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd"
-
->
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
 
     <jbossts:transaction-manager/>
 
@@ -24,22 +22,19 @@
     <vm:endpoint name="queue" path="foo" connector-ref="vm-queue" exchange-pattern="request-response">
         <xa-transaction action="ALWAYS_JOIN"/>
     </vm:endpoint>
-    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal" exchange-pattern="request-response">
-    </vm:endpoint>
+    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="testService">
             <inbound>
-                <vm:inbound-endpoint path="entry" connector-ref="vm-normal"/>
+                <vm:inbound-endpoint path="entry" connector-ref="vm-normal" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="queue">
-                    </outbound-endpoint>
+                    <outbound-endpoint ref="queue"/>
                 </pass-through-router>
             </outbound>
         </service>
     </model>
-
 </mule>

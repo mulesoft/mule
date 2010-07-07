@@ -8,8 +8,8 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:endpoint name="dispatch" path="bridge" />
-    <vm:endpoint name="receive" path="result" />
+    <vm:endpoint name="dispatch" path="bridge" exchange-pattern="one-way"/>
+    <vm:endpoint name="receive" path="result" exchange-pattern="one-way"/>
 
     <model name="scribblingTestModel">
         <service name="bridge">
@@ -20,14 +20,14 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="responder"
-                                          exchange-pattern="request-response" />
+                                          exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="responder">
             <inbound>
-                <vm:inbound-endpoint path="responder" exchange-pattern="one-way" />
+                <vm:inbound-endpoint path="responder" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

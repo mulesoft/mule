@@ -13,7 +13,7 @@
     <model name="testSimple">
         <service name="testServiceSimple">
             <inbound>
-                <vm:inbound-endpoint path="simple">
+                <vm:inbound-endpoint path="simple" exchange-pattern="one-way">
                     <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -24,7 +24,7 @@
     <model name="testChained">
         <service name="testServiceChained">
             <inbound>
-                <vm:inbound-endpoint path="chained"/>
+                <vm:inbound-endpoint path="chained" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -34,7 +34,7 @@
         </service>
         <service name="testServiceChainedB">
             <inbound>
-                <vm:inbound-endpoint path="out">
+                <vm:inbound-endpoint path="out" exchange-pattern="one-way">
                     <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound>

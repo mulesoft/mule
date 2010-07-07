@@ -17,14 +17,13 @@
                      class="org.mule.transformer.simple.StringToObjectArray"/>
 
     <model name="test">
-
         <service name="ReceiverUMO">
             <inbound>
-                <vm:inbound-endpoint path="receiver"/>
+                <vm:inbound-endpoint path="receiver" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="echo">
+                    <vm:outbound-endpoint path="echo" exchange-pattern="one-way">
                         <transformer ref="testTransformer"/>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -33,15 +32,13 @@
 
         <service name="EchoUMO">
             <inbound>
-                <vm:inbound-endpoint path="echo"/>
+                <vm:inbound-endpoint path="echo" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

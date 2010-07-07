@@ -20,17 +20,17 @@
         <vm:queueProfile maxOutstandingMessages="10" persistent="true" />
     </vm:connector>
 
-    <vm:endpoint path="queue" name="vmEndpoint" connector-ref="vmConnector1" />
+    <vm:endpoint path="queue" name="vmEndpoint" connector-ref="vmConnector1" exchange-pattern="one-way"/>
 
-    <vm:endpoint path="foo" name="globalWithTx" connector-ref="vmConnectorDefaults">
+    <vm:endpoint path="foo" name="globalWithTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
         <vm:transaction action="ALWAYS_BEGIN" timeout="42"/>
     </vm:endpoint>
     
-    <vm:endpoint path="bar" name="customTx" connector-ref="vmConnectorDefaults">
+    <vm:endpoint path="bar" name="customTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
         <custom-transaction action="JOIN_IF_POSSIBLE" factory-ref="txFactory"/>
     </vm:endpoint>
     
-    <vm:endpoint path="baz" name="xaTx" connector-ref="vmConnectorDefaults">
+    <vm:endpoint path="baz" name="xaTx" connector-ref="vmConnectorDefaults" exchange-pattern="one-way">
         <xa-transaction action="ALWAYS_JOIN"/>
     </vm:endpoint>
 </mule>

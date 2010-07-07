@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:endpoint path="in" name="vm-in"/>
+    <vm:endpoint path="in" name="vm-in" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="test">
@@ -18,5 +18,4 @@
             <component class="org.mule.transport.vm.functional.AttachmentsComponent"/>
         </service>
     </model>
-
 </mule>

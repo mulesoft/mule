@@ -11,7 +11,7 @@
     <model name="model1">
         <service name="service1">
             <inbound>
-                <vm:inbound-endpoint path="test1-in">
+                <vm:inbound-endpoint path="test1-in" exchange-pattern="one-way">
                     <append-string-transformer message="1"/>
                     <append-string-transformer message="2"/>
                     <append-string-transformer message="3"/>
@@ -19,7 +19,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="test1-out"/>
+                    <vm:outbound-endpoint path="test1-out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -32,7 +32,7 @@
     <model name="model2">
         <service name="service2">
             <inbound>
-                <vm:inbound-endpoint path="test2-in">
+                <vm:inbound-endpoint path="test2-in" exchange-pattern="one-way">
                     <transformer ref="1"/>
                     <transformer ref="2"/>
                     <transformer ref="3"/>
@@ -40,7 +40,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="test2-out"/>
+                    <vm:outbound-endpoint path="test2-out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -49,7 +49,7 @@
     <model name="model3">
         <service name="service3">
             <inbound>
-                <vm:inbound-endpoint path="test3-in">
+                <vm:inbound-endpoint path="test3-in" exchange-pattern="one-way">
                     <append-string-transformer message="1"/>
                     <append-string-transformer message="2"/>
                     <append-string-transformer message="3"/>
@@ -57,7 +57,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="test3-out">
+                    <vm:outbound-endpoint path="test3-out" exchange-pattern="one-way">
                         <append-string-transformer message="a"/>
                         <append-string-transformer message="b"/>
                         <append-string-transformer message="c"/>
@@ -66,5 +66,4 @@
             </outbound>
         </service>
     </model>
-
 </mule>

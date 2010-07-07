@@ -19,14 +19,14 @@
     <model name="main">
         <service name="test">
             <inbound>
-                <vm:inbound-endpoint path="in">
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way">
                     <vm:transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
             </inbound>
-            <component class="org.mule.providers.vm.functional.VmXATransactionTestCase$TestComponent"/>
+            <component class="org.mule.transport.vm.functional.VmXATransactionTestCase$TestComponent"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="vm"/>
+                    <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

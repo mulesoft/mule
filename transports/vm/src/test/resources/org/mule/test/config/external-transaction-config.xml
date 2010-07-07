@@ -33,14 +33,14 @@
     <model name="main">
         <service name="testService">
             <inbound>
-                <vm:inbound-endpoint path="entry" connector-ref="vm-normal">
+                <vm:inbound-endpoint path="entry" connector-ref="vm-normal" exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
                     </vm:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="queue">
+                    <outbound-endpoint ref="queue" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -49,7 +49,7 @@
 
         <service name="testServices">
             <inbound>
-                <vm:inbound-endpoint path="queue" connector-ref="vm-queue">
+                <vm:inbound-endpoint path="queue" connector-ref="vm-queue" exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -57,7 +57,7 @@
             <!--
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="queue2">
+                    <outbound-endpoint ref="queue2" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
                     </outbound-endpoint>
                 </pass-through-router>
