@@ -36,15 +36,15 @@
         
         <service name="chain2SelectAlwaysBegin">
             <inbound>
-                <inbound-endpoint address="vm://chain.always.begin"/>
+                <inbound-endpoint address="vm://chain.always.begin" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <chaining-router>
-                    <jdbc:outbound-endpoint queryKey="selectCount">
+                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     
-                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1">
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     
@@ -55,14 +55,14 @@
         
         <service name="chain2SelectBeginOrJoin">
             <inbound>
-                <inbound-endpoint address="vm://chain.begin.or.join"/>
+                <inbound-endpoint address="vm://chain.begin.or.join" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <chaining-router>
-                    <jdbc:outbound-endpoint queryKey="selectCount">
+                    <jdbc:outbound-endpoint queryKey="selectCount" exchange-pattern="one-way">
                         <jdbc:transaction action="BEGIN_OR_JOIN"/>
                     </jdbc:outbound-endpoint>
-                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1">
+                    <jdbc:outbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
                         <jdbc:transaction action="ALWAYS_BEGIN"/>
                     </jdbc:outbound-endpoint>
                     

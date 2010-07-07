@@ -38,13 +38,14 @@
     <model name="testing">
         <service name="bridge">
             <inbound>
-                <jdbc:inbound-endpoint queryKey="read" connector-ref="jdbcConnector">
+                <jdbc:inbound-endpoint queryKey="read" connector-ref="jdbcConnector" exchange-pattern="one-way">
                     <jdbc:transaction action="ALWAYS_BEGIN"/>
                 </jdbc:inbound-endpoint>                
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector">
+                    <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector" 
+                        exchange-pattern="one-way">
                         <jdbc:transaction action="NONE"/>
                     </jdbc:outbound-endpoint>
                 </pass-through-router>

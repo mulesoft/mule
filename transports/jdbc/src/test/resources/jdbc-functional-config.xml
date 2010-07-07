@@ -13,7 +13,7 @@
     <model name="test">
         <service name="bridgeB">
             <inbound>
-                <jdbc:inbound-endpoint queryKey="getTest?type=1">
+                <jdbc:inbound-endpoint queryKey="getTest?type=1" exchange-pattern="one-way">
                     <expression-transformer>
                         <return-argument evaluator="map-payload" expression="data"/>
                     </expression-transformer>
@@ -23,7 +23,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint queryKey="writeTest?type=2" />
+                    <jdbc:outbound-endpoint queryKey="writeTest?type=2" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

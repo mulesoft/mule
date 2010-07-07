@@ -23,13 +23,13 @@
         <service name="outboundInsertExample">
             <inbound>
                 <jdbc:inbound-endpoint queryKey="selectQuery"
-                    connector-ref="jdbcConnector">
+                    connector-ref="jdbcConnector" exchange-pattern="one-way">
                     <jdbc:transaction action="ALWAYS_BEGIN" />
                 </jdbc:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint
+                    <jdbc:outbound-endpoint exchange-pattern="one-way"
                         queryKey="insertQuery" connector-ref="jdbcConnector">
                         <jdbc:transaction action="ALWAYS_JOIN" />
                     </jdbc:outbound-endpoint>

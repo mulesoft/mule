@@ -33,16 +33,19 @@
         <jdbc:sqlStatementStrategyFactory ref="sqlStatementStrategyFactory"/>
     </jdbc:connector>
 
-    <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3" queryTimeout="3">
+    <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3" 
+        queryTimeout="3" exchange-pattern="one-way">
         <jdbc:query key="getTest2" value="OVERRIDDEN VALUE" />
         <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL" />
     </jdbc:endpoint>
 
-    <jdbc:endpoint name="endpointWithTransaction" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+    <jdbc:endpoint name="endpointWithTransaction" address="jdbc://getTest?type=1" 
+        connector-ref="jdbcConnector3" exchange-pattern="one-way">
         <jdbc:transaction action="NONE"/>
     </jdbc:endpoint>
     
-    <jdbc:endpoint name="endpointWithXaTransaction" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+    <jdbc:endpoint name="endpointWithXaTransaction" address="jdbc://getTest?type=1"
+        connector-ref="jdbcConnector3" exchange-pattern="one-way">
         <xa-transaction action="ALWAYS_BEGIN"/>
     </jdbc:endpoint>
     
