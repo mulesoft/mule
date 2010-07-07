@@ -14,7 +14,8 @@
 
     <vm:connector name="vmQueueConnector"/>
 
-    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000">
+    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000"
+        exchange-pattern="one-way">
         <quartz:endpoint-polling-job>
             <quartz:job-endpoint address="vm://event.queue"/>
         </quartz:endpoint-polling-job>
@@ -27,14 +28,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://quartz.in"/>
+                    <outbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="scheduledService">
             <inbound>
-                <inbound-endpoint address="vm://quartz.in"/>
+                <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

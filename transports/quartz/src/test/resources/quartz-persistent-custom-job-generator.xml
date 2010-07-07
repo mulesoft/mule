@@ -25,22 +25,23 @@
     <model>
         <service name="VmTrampoline">
             <inbound>
-                <vm:inbound-endpoint path="customJobQueue"/>
+                <vm:inbound-endpoint path="customJobQueue" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="customJobInput"/>
+                    <vm:outbound-endpoint path="customJobInput" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="CustomJobScheduler">
             <inbound>
-                <vm:inbound-endpoint path="customJobInput"/>
+                <vm:inbound-endpoint path="customJobInput" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <quartz:outbound-endpoint jobName="myService2" repeatInterval="1000" repeatCount="1">
+                    <quartz:outbound-endpoint jobName="myService2" repeatInterval="1000" 
+                        repeatCount="1" exchange-pattern="one-way">
                         <quartz:custom-job-from-message evaluator="payload" expression=""/>
                     </quartz:outbound-endpoint>
                 </pass-through-router>

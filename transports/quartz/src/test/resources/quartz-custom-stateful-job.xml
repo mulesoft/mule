@@ -24,7 +24,8 @@
     <model>
         <service name="quartzService">
             <inbound>
-                <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="1">
+                <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="1"
+                    exchange-pattern="one-way">
                     <quartz:custom-job job-ref="job" />
                 </quartz:inbound-endpoint>
             </inbound>

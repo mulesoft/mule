@@ -10,13 +10,14 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
 
-    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000">
+    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" exchange-pattern="one-way">
        <quartz:scheduled-dispatch-job>
            <quartz:job-endpoint address="vm://quartz.in"/>
        </quartz:scheduled-dispatch-job>
     </quartz:endpoint>
 
-    <quartz:endpoint name="expressionSchedulerEndpoint" jobName="myExpressionService" repeatInterval="1000">
+    <quartz:endpoint name="expressionSchedulerEndpoint" jobName="myExpressionService" 
+        repeatInterval="1000" exchange-pattern="one-way">
        <quartz:scheduled-dispatch-job>
            <quartz:job-endpoint address="vm://#[header:ENDPOINT_NAME]"/>
        </quartz:scheduled-dispatch-job>
@@ -25,7 +26,7 @@
     <model name="quartz-dispatcher">
         <service name="quartzSchedulingService">
             <inbound>
-                <inbound-endpoint address="vm://quartz.scheduler"/>
+                <inbound-endpoint address="vm://quartz.scheduler" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -37,7 +38,7 @@
 
          <service name="quartzExpressionSchedulingService">
             <inbound>
-                <inbound-endpoint address="vm://quartz.expression.scheduler"/>
+                <inbound-endpoint address="vm://quartz.expression.scheduler" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -49,17 +50,16 @@
 
         <service name="scheduledService">
             <inbound>
-                <inbound-endpoint address="vm://quartz.in"/>
+                <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>
 
         <service name="expressionScheduledService">
             <inbound>
-                <inbound-endpoint address="vm://quartz.expression.in"/>
+                <inbound-endpoint address="vm://quartz.expression.in" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>
     </model>
-
 </mule>
