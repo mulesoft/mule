@@ -10,16 +10,16 @@
                http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd
                http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd">
 
-    <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
+    <endpoint name="restFileEndpoint" address="file://./.mule/restFile" exchange-pattern="one-way"/>
 
     <model name="samples">
-
         <service name="restTest">
             <inbound>
                 <!-- transformers are already defined in hello-http-config.xml -->
                 <inbound-endpoint transformer-refs="HttpRequestToParameter" 
                                   address="servlet://restPUTTest"
-                                  responseTransformer-refs="PlainTextResponseTransformer"/>
+                                  responseTransformer-refs="PlainTextResponseTransformer"
+                                  exchange-pattern="one-way"/>
             </inbound>
             <pooled-component>
                 <prototype-object class="org.mule.example.rest.RestTester">
@@ -32,7 +32,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>
