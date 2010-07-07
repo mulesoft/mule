@@ -15,7 +15,7 @@
                 at the browser. there is no fancy street walking algorithm so the results may vary.
             </description>
             <inbound>
-                <quartz:inbound-endpoint repeatInterval="3000" jobName="walkGenerator">
+                <quartz:inbound-endpoint repeatInterval="3000" jobName="walkGenerator" exchange-pattern="one-way">
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>
@@ -24,7 +24,7 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <ajax:servlet-outbound-endpoint path="/services/gps">
+                    <ajax:servlet-outbound-endpoint path="/services/gps" exchange-pattern="one-way">
                         <bean-to-map-transformer/>
                     </ajax:servlet-outbound-endpoint>
                 </pass-through-router>
