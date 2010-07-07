@@ -5,14 +5,14 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Stock Quote" default="setup">
+<project name="Mule Examples: Stock Quote" default="deploy">
 
     <property name="app.name" value="mule-example-stockquote"/>
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.conf" value="conf"/>
     <property name="dir.resources" value="${dir.java}/main/resources"/>
+    <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
@@ -21,8 +21,7 @@
         <delete dir="${dir.build}"/>
     </target>
 
-    <target name="init">
-
+    <target name="init" depends="setup,ifMuleBase,ifMuleHome">    
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -63,57 +62,79 @@
         </copy>
     </target>
 
-   <target name="package"
+    <target name="package"
            depends="compile"
            description="Package the application">
 
         <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
-   </target>
+    </target>
 
-   <target name="deploy"
-           depends="package"
-           description="Deploy the application to the Mule server">
+    <target name="deploy" depends="package,test" description="Deploy the applications to the Mule server">
 
-            <copy file="${dir.build}/${app.name}.jar"
-                  todir="${dir.mule.home}/apps/${app.name}/lib"
-                  overwrite="true" verbose="true"/>
+        <antcall target="deploy-instance">
+            <param name="instance.name" value="stockquote-rest" />
+            <param name="config.file.name" value="stockquote-rest" />
+        </antcall>
 
-           <copy todir="${dir.mule.home}/apps/${app.name}"
-                 overwrite="true" verbose="true">
-                <fileset dir="${dir.classes}">
-                    <include name="**/*.xml"/>
-                </fileset>
-           </copy>
-   </target>
+        <antcall target="deploy-instance">
+            <param name="instance.name" value="stockquote-wsdl" />
+            <param name="config.file.name" value="stockquote-wsdl" />
+        </antcall>
 
-   <target name="setup">
-      <fail message="MULE_HOME environment variable has not been set.">
-       <condition>
-        <or>
-         <equals arg1="${env.MULE_HOME}" arg2=""/>
-          <!-- Using a trick here. If there was no MULE_HOME environment
+        <antcall target="deploy-instance">
+            <param name="instance.name" value="stockquote-soap" />
+            <param name="config.file.name" value="stockquote-soap" />
+        </antcall>
+    </target>
+
+    <target name="deploy-instance" description="deploys an instance of the stockquote config">
+        <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
+        <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
+        <copy file="${dir.build}/${app.name}.jar" todir="${dir.mule.home}/apps/${instance.name}/lib" overwrite="true" verbose="true" />
+        <copy file="${dir.classes}/${config.file.name}-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/${config.file.name}-config.xml" />
+        <copy file="${dir.classes}/stdio-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/stdio-config.xml" />
+        <copy file="${dir.classes}/${config.file.name}-deploy.properties" tofile="${dir.mule.home}/apps/${instance.name}/mule-deploy.properties" />
+    </target>
+
+    <target name="setup">
+        <fail message="MULE_HOME environment variable has not been set.">
+            <condition>
+                <or>
+                    <equals arg1="${env.MULE_HOME}" arg2=""/>
+                    <!-- Using a trick here. If there was no MULE_HOME environment
                variable set, ant will set the value to the unprocessed
                template string -->
-          <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
-         </or>
-        </condition>
-      </fail>
+                    <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
+                </or>
+            </condition>
+        </fail>
+    </target>
 
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
-   </target>
+    <target name="ifMuleBase" if="env.MULE_BASE">
+        <property name="dir.mule.home" value="${env.MULE_BASE}"/>
+        <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    </target>
 
-   <target name="ifMuleBase" if="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_BASE}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
-   </target>
+    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
+        <property name="dir.mule.home" value="${env.MULE_HOME}"/>
+        <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    </target>
 
-   <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_HOME}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
-   </target>
-
+    <target name="test" depends="compile">
+		<!--
+        <junit haltonerror="true" haltonfailure="true">
+            <classpath>
+                <pathelement location="${dir.build}/classes"/>
+                <path refid="classpath.mule"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest fork="yes" todir="${dir.build}">
+              <fileset dir="${dir.java}/test/java">
+                <include name="**/*Test*.java"/>
+              </fileset>
+            </batchtest>
+        </junit>
+		-->
+    </target>
 </project>
