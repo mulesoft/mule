@@ -74,7 +74,7 @@
                             <tasks>
                                 <copy tofile="${MULE_HOME}/apps/loanbroker-esn-async/mule-config.xml" file="${basedir}/target/classes/loan-broker-async-config.xml"/>
                                 <copy todir="${MULE_HOME}/apps/loanbroker-esn-async" file="${basedir}/target/classes/mule-deploy.properties"/>
-                                <copy tofile="${MULE_HOME}/apps/loanbroker-esn-sync/mule-config.xml" file="${basedir}/target/classes/lloan-broker-sync-config.xml"/>
+                                <copy tofile="${MULE_HOME}/apps/loanbroker-esn-sync/mule-config.xml" file="${basedir}/target/classes/loan-broker-sync-config.xml"/>
                                 <copy todir="${MULE_HOME}/apps/loanbroker-esn-sync" file="${basedir}/target/classes/mule-deploy.properties"/>
                             </tasks>
                         </configuration>
@@ -107,7 +107,6 @@
                             </artifactItems>
                         </configuration>
                     </execution>
-                <executions>
                     <execution>
                         <id>copy-artifact2</id>
                         <phase>install</phase>
