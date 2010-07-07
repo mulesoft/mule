@@ -13,7 +13,6 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <model name="Test">
-    
         <service name="proxy">
             <inbound>
                 <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
@@ -26,11 +25,11 @@
                 </sxc:filtering-router>
             <!-- 
                  <filtering-router>
-                     <outbound-endpoint address="vm://log"/>
+                     <outbound-endpoint address="vm://log" exchange-pattern="one-way"/>
                      <mule-xml:jxpath-filter pattern="//purchaseOrder/@country" expectedValue="US"/>
                  </filtering-router>
                  <filtering-router>
-                     <outbound-endpoint address="vm://log"/>
+                     <outbound-endpoint address="vm://log" exchange-pattern="one-way"/>
                      <mule-xml:jaxen-filter pattern="//purchaseOrder/@country" expectedValue="US"/>
                  </filtering-router>
                  -->
@@ -90,8 +89,5 @@
             </inbound>
             <component class="org.mule.module.sxc.ReceiveComponent"/>
         </service>
-
     </model>
-
 </mule>
-        
