@@ -25,8 +25,5 @@ refer to the following information.)
 +---------------------+
 | Running the example |
 +---------------------+
-Depending on which scripting flavor you'd like to test, either run
-
-    $MULE_HOME/bin/mule -app scripting-groovy
-or
-    $MULE_HOME/bin/mule -app scripting-python
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in 
+this directory to run the example.
