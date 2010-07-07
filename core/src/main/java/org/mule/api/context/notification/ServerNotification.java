@@ -10,6 +10,9 @@
 
 package org.mule.api.context.notification;
 
+import java.util.EventObject;
+import java.util.Map;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -17,14 +20,11 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
-import java.util.EventObject;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <code>ServerNotification</code> is an event triggered by something happening
- * in the Server itself such as the server starting or a service being registered.
+ * <code>ServerNotification</code> is an event triggered by something happening in
+ * the Server itself such as the server starting or a service being registered.
  */
 public abstract class ServerNotification extends EventObject implements MuleContextAware
 {
@@ -52,7 +52,8 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     protected static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
     protected static final int ROUTING_EVENT_ACTION_START_RANGE = 1300;
     protected static final int COMPONENT_EVENT_ACTION_START_RANGE = 1400;
-    
+    protected static final int FLOW_CONSTRUCT_EVENT_ACTION_START_RANGE = 1500;
+
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
@@ -68,7 +69,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     @SuppressWarnings("unchecked")
     private static Map actionIdToName = new ConcurrentHashMap();
-    
+
     @SuppressWarnings("unchecked")
     private static Map actionNameToId = new ConcurrentHashMap();
 
@@ -104,12 +105,14 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     protected static String generateId(MuleContext context)
     {
-        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId() + "." + context.getConfiguration().getId();
+        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId()
+               + "." + context.getConfiguration().getId();
     }
 
     protected static MuleMessage cloneMessage(MuleMessage message)
     {
-        if(message==null) {
+        if (message == null)
+        {
             return null;
         }
         synchronized (message)
@@ -147,7 +150,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-                + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+               + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
     }
 
     protected String getPayloadToString()
@@ -164,7 +167,6 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     {
         return getActionName(action);
     }
-
 
     @SuppressWarnings("unchecked")
     protected static synchronized void registerAction(String name, int i)
