@@ -47,12 +47,16 @@ echo This example requires additional libraries which need to be downloaded by t
 goto :eof
 
 :mule
-ECHO The Loan Broker example is available in three flavors:
-ECHO   1. Loan Broker ESB
-ECHO   2. Loan Broker ESN
-ECHO   3. Loan Broker BPM
+ECHO The Loan Broker example is available in five flavors:
+ECHO   1. Loan Broker ESB - Ejb via an Endpoint
+ECHO   2. Loan Broker ESB - Managed Ejb Component
+ECHO   3. Loan Broker ESN - sync
+ECHO   4. Loan Broker ESN - async
+ECHO   5. Loan Broker BPM
 SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -production -main org.mule.example.loanbroker.esb.LoanBrokerApp -M-Dmule.home.unix="%MULE_HOME_UNIX%"
-IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -production -main org.mule.example.loanbroker.esn.LoanBrokerApp
-IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -production -main org.mule.example.loanbroker.bpm.LoanBrokerApp
+IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -app loanbroker-esb -M-Dmule.home.unix="%MULE_HOME_UNIX%"
+IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -app loanbroker-ejb -M-Dmule.home.unix="%MULE_HOME_UNIX%"
+IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -app loanbroker-esn-sync
+IF '%Choice%'=='4' call "%MULE_BASE%\bin\mule.bat" -app loanbroker-esn-async
+IF '%Choice%'=='5' call "%MULE_BASE%\bin\mule.bat" -app loanbroker-bpm

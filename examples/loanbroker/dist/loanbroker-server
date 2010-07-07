@@ -26,7 +26,7 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-echo "The Loan Broker example is available in three flavors:"
+echo "The Loan Broker example is available in five flavors:"
 echo "  1. Loan Broker ESB - Ejb via an Endpoint"
 echo "  2. Loan Broker ESB - Managed Ejb Component"
 echo "  3. Loan Broker ESN - sync"
