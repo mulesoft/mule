@@ -6,13 +6,12 @@
        http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.0/mule-tcp.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-
     <tcp:connector name="test1"/>
 
     <tcp:connector name="test2"/>
 
-    <tcp:endpoint name="epTest1" host="localhost" port="34532" connector-ref="test1"/>
-    <tcp:endpoint name="epTest2" host="localhost" port="43231" connector-ref="test2"/>
+    <tcp:endpoint name="epTest1" host="localhost" port="34532" connector-ref="test1" exchange-pattern="one-way"/>
+    <tcp:endpoint name="epTest2" host="localhost" port="43231" connector-ref="test2" exchange-pattern="one-way"/>
 
     <model>
         <service name="testService">

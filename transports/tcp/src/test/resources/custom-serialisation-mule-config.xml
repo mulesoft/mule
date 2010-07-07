@@ -19,14 +19,13 @@
     <custom-transformer name="NoAction" class="org.mule.transformer.NoActionTransformer"/>
 
     <model name="model">
-
         <service name="BridgeIn">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="9994">
+                    <tcp:outbound-endpoint host="localhost" port="9994" exchange-pattern="one-way">
                         <custom-transformer class="org.mule.transformer.NoActionTransformer"/>
                     </tcp:outbound-endpoint>
                 </pass-through-router>
@@ -35,16 +34,15 @@
 
         <service name="BridgeOut">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="9994" transformer-refs="NoAction"/>
+                <tcp:inbound-endpoint host="localhost" port="9994" transformer-refs="NoAction" 
+                    exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

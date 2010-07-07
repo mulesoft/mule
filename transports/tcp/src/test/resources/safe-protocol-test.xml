@@ -13,6 +13,7 @@
              an error - see discussion in SafeProtocolMule2227TestCase -->  
         <tcp:safe-protocol payloadOnly="true" maxMessageLength="200"/>
     </tcp:connector>
+    
     <tcp:connector name="unsafe">
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
@@ -21,8 +22,10 @@
         <service name="service">
             <inbound>
                 <!-- legacy style -->
-                <inbound-endpoint address="tcp://localhost:65432" connector-ref="safe" exchange-pattern="request-response"/>
-                <tcp:inbound-endpoint host="localhost" port="65433" connector-ref="unsafe" exchange-pattern="request-response"/>
+                <inbound-endpoint address="tcp://localhost:65432" connector-ref="safe" 
+                    exchange-pattern="request-response"/>
+                <tcp:inbound-endpoint host="localhost" port="65433" connector-ref="unsafe" 
+                    exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

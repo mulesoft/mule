@@ -18,7 +18,6 @@
     <tcp:endpoint name="asyncClientEndpoint2" host="localhost" port="60193" exchange-pattern="one-way"/>
 
     <model name="main">
-
         <service name="testComponent1">
             <inbound>
                 <tcp:inbound-endpoint ref="clientEndpoint"/>

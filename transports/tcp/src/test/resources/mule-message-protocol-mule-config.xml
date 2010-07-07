@@ -19,23 +19,23 @@
     <model name="main">
         <service name="BridgeIn">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <message-chunking-router messageSize="90">
-                    <tcp:outbound-endpoint host="localhost" port="63994"/>
+                    <tcp:outbound-endpoint host="localhost" port="63994" exchange-pattern="one-way"/>
                 </message-chunking-router>
             </outbound>
         </service>
 
         <service name="BridgeOut">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="63994"/>
+                <tcp:inbound-endpoint host="localhost" port="63994" exchange-pattern="one-way"/>
                 <message-chunking-aggregator-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -21,11 +21,11 @@
     <model name="echoModel">
         <service name="echo">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65466" />
+                <tcp:inbound-endpoint host="localhost" port="65466" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="queue" />
+                    <vm:outbound-endpoint path="out" connector-ref="queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

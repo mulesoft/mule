@@ -15,10 +15,10 @@
     <model name="main">
         <service name="echo">
             <inbound>
-                <tcp:inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"/>
+                <tcp:inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"
+                    exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>
     </model>
-
 </mule>

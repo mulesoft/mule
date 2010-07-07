@@ -13,7 +13,6 @@
     </tcp:connector>
 
     <model name="echoModel">
-
         <service name="echo">
             <inbound>
                 <tcp:inbound-endpoint host="localhost" port="65432" exchange-pattern="one-way"/>
