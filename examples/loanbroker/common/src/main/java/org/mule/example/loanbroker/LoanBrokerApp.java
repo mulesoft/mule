@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: LoanBrokerApp.java 17762 2010-06-30 23:19:36Z dzapata $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.example.loanbroker.bpm;
+package org.mule.example.loanbroker;
 
 import org.mule.example.loanbroker.AbstractLoanBrokerApp;
 //import org.mule.tck.util.MuleDerbyTestUtils;
@@ -18,13 +18,6 @@ import org.mule.example.loanbroker.AbstractLoanBrokerApp;
  */
 public class LoanBrokerApp extends AbstractLoanBrokerApp
 {
-    /*
-    public LoanBrokerApp(String config) throws Exception
-    {
-        super(config);
-    }
-    */
-
     public LoanBrokerApp() throws Exception
     {
         super();
@@ -32,18 +25,9 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
     
     public static void main(String[] args) throws Exception
     {
-        //String configFile = "loan-broker-bpm-mule-config.xml";
-    /*
-        if (args != null && args.length > 0 
-            // This is a hack for MULE-4082 which assumes that if the parameter is a 
-            // Mule config file, it will contain a "." in the name
-            && args[0].contains("."))
-        {
-            configFile = args[0];
-        }
-    */
         //LoanBrokerApp loanBrokerApp = new LoanBrokerApp(configFile);
         LoanBrokerApp loanBrokerApp = new LoanBrokerApp();
+        // FIXME DZ: need to know if we are running sync/async servers
         loanBrokerApp.run(false);
     }
 

@@ -41,7 +41,7 @@
     </target>
 
     <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
-       <ant dir="${dir.common.tests}" antfile="build.xml" />
+       <ant dir="${dir.common.tests}" antfile="build.xml" inheritall="false" inheritrefs="false"/>
 
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>

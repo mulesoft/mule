@@ -94,7 +94,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/shared/loanbroker</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-esn-sync/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -107,6 +107,27 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                <executions>
+                    <execution>
+                        <id>copy-artifact2</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-esn-async/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>                    
                 </executions>
             </plugin>
         </plugins>

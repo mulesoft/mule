@@ -51,9 +51,9 @@ then
     then
         # MULE_HOME_UNIX must be set. This is a workaround for windows but since the config relies
         # on it we need to implement it here, too
-        exec "$MULE_BASE/bin/mule" -app loanbroker-esb
+        exec "$MULE_BASE/bin/mule" -app loanbroker-esb -M-Dmule.home.unix="$MULE_HOME"
     fi
-elseif [2 = $i ]
+elif [ 2 = $i ]
 then
     if [ ! -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
        if [ ! -f "$MULE_HOME/lib/user/${ACTIVEMQ}" ]; then
@@ -69,7 +69,7 @@ then
     then
         # MULE_HOME_UNIX must be set. This is a workaround for windows but since the config relies
         # on it we need to implement it here, too
-        exec "$MULE_BASE/bin/mule" -app loanbroker-ejb
+        exec "$MULE_BASE/bin/mule" -app loanbroker-ejb -M-Dmule.home.unix="$MULE_HOME"
     fi
 elif [ 3 = $i ]
 then

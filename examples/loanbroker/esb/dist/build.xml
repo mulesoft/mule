@@ -51,7 +51,7 @@
 
     <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
 
-       <ant dir="${dir.common.tests}" antfile="build.xml" />   
+       <ant dir="${dir.common.tests}" antfile="build.xml" inheritall="false" inheritrefs="false"/>   
            
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
@@ -121,12 +121,13 @@
        <mkdir dir="${dir.esb.app}" />
        <mkdir dir="${dir.common.deploy}" />       
 
-       <copy file="${dir.build}/${app.name}.jar" todir="${dir.common.deploy}" overwrite="true" verbose="true"/>
+       <copy file="${dir.build}/${app.name}.jar" todir="${dir.esb.app}/lib" overwrite="true" verbose="true"/>
+   	   <copy file="${dir.build}/${app.name}.jar" todir="${dir.ejb.app}/lib" overwrite="true" verbose="true"/>
        
        <copy tofile="${dir.esb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config.xml" overwrite="true" verbose="true"/>
        <copy todir="${dir.esb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
-       <copy tofile="${dir.esb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml" overwrite="true" verbose="true"/>
-       <copy todir="${dir.esb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
+       <copy tofile="${dir.ejb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.ejb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
    </target>
 
    <target name="setup">

@@ -19,5 +19,5 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec java -Djava.ext.dirs=$MULE_HOME/apps/loanbroker-bpm/lib:$MULE_HOME/lib/shared/loanbroker:$MULE_HOME/lib/boot:$MULE_HOME/lib/mule:$MULE_HOME/lib/opt org.mule.example.loanbroker.bpm.LoanBrokerApp
+exec java -Djava.ext.dirs=$MULE_HOME/lib/shared/loanbroker:$MULE_HOME/lib/boot:$MULE_HOME/lib/mule:$MULE_HOME/lib/opt org.mule.example.loanbroker.LoanBrokerApp
 

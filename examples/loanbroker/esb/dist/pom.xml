@@ -133,7 +133,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/shared/loanbroker</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-esb</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -145,9 +145,29 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
-                    </execution>                                
+                    </execution>
                     <execution>
-                        <id>copy-artifact</id>
+                        <id>copy-artifact2</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-ejb</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-artifact3</id>
                         <phase>install</phase>
                         <goals>
                             <goal>copy</goal>

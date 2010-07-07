@@ -49,7 +49,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/lib/shared/loanbroker</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>

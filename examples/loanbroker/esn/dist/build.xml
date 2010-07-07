@@ -28,7 +28,7 @@
     </target>
 
     <target name="init" depends="setup,ifMuleBase,ifMuleHome">
-       <ant dir="${dir.common.tests}" antfile="build.xml" />   
+       <ant dir="${dir.common.tests}" antfile="build.xml" inheritall="false" inheritrefs="false"/>   
            
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
@@ -92,21 +92,19 @@
            depends="package" 
            description="Deploy the application to the Mule server">
 
-        <mkdir dir="${dir.common.deploy}" />       
-
-        <copy file="${dir.build}/${app.name}.jar" 
-              todir="${dir.common.deploy}" 
-              overwrite="true"
-              verbose="true"/>
-
        <mkdir dir="${dir.async.app}" />
        <mkdir dir="${dir.sync.app}" />
+       <mkdir dir="${dir.async.app}/lib" />
+   	   <mkdir dir="${dir.sync.app}/lib" />
        
-       <copy file="${dir.build}/${app.name}.jar" todir="${dir.common.deploy}" overwrite="true" verbose="true"/>
+       <copy file="${dir.build}/${app.name}.jar" todir="${dir.async.app}/lib" overwrite="true" verbose="true"/>
+   	   <copy file="${dir.build}/${app.name}.jar" todir="${dir.sync.app}/lib" overwrite="true" verbose="true"/>
        
        <copy tofile="${dir.async.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-async-config.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.async.app}" file="${basedir}/target/classes/loan-broker-cxf-endpoints-config.xml" overwrite="true" verbose="true"/>
        <copy todir="${dir.async.app}" file="${basedir}/src/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
        <copy tofile="${dir.sync.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-sync-config.xml" overwrite="true" verbose="true"/>
+       <copy todir="${dir.sync.app}" file="${basedir}/target/classes/loan-broker-cxf-endpoints-config.xml" overwrite="true" verbose="true"/>
        <copy todir="${dir.sync.app}" file="${basedir}/src/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>
        
    </target>
