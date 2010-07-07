@@ -18,14 +18,19 @@
 
     <vm:connector name="vmQueue"/>
 
-    <endpoint name="Sender" address="jnp://localhost:1099/SimpleMathsUMO?method=addTen"/>
-    <jnp:endpoint name="Sender2" host="localhost" port="1099" object="MatchingUMO" method="reverseString"/>
+    <endpoint name="Sender" address="jnp://localhost:1099/SimpleMathsUMO?method=addTen"
+        exchange-pattern="request-response"/>
+        
+    <jnp:endpoint name="Sender2" host="localhost" port="1099" object="MatchingUMO" 
+        method="reverseString" exchange-pattern="request-response"/>
 
     <endpoint name="GoodType"
-              address="jnp://localhost:1099/MatchingUMO?method=reverseString&amp;methodArgumentTypes=java.lang.String"/>
+              address="jnp://localhost:1099/MatchingUMO?method=reverseString&amp;methodArgumentTypes=java.lang.String"
+              exchange-pattern="one-way"/>
 
     <jnp:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO"
-                  method="reverseString" methodArgumentTypes="java.lang.StringBuffer"/>
+                  method="reverseString" methodArgumentTypes="java.lang.StringBuffer"
+                  exchange-pattern="one-way"/>
 
     <model name="sample">
         <service name="TestUMO">
@@ -34,11 +39,11 @@
             </inbound>
             <outbound>
                 <filtering-router>
-                    <jnp:outbound-endpoint ref="Sender" exchange-pattern="request-response"/>
+                    <jnp:outbound-endpoint ref="Sender"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender2" exchange-pattern="request-response"/>
+                    <outbound-endpoint ref="Sender2"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound>

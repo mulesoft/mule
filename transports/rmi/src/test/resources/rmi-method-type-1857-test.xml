@@ -18,12 +18,16 @@
 
     <vm:connector name="vmQueue"/>
 
-    <rmi:endpoint name="Sender" host="localhost" port="1099" object="SimpleMathsUMO" method="addTen"/>
-    <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>
+    <rmi:endpoint name="Sender" host="localhost" port="1099" object="SimpleMathsUMO" 
+        method="addTen" exchange-pattern="request-response"/>
+        
+    <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"
+        exchange-pattern="request-response"/>
 
     <!-- note that this sets proeprties both from the endpoint (method) and directly
          DO NOT update this to use a more succinct config - this is what is being tested! -->
-    <rmi:endpoint name="GoodType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
+    <rmi:endpoint name="GoodType" host="localhost" port="1099" object="MatchingUMO" 
+        method="reverseString" exchange-pattern="one-way">
         <properties>
             <spring:entry key="methodArgumentTypes" value="java.lang.String"/>
         </properties>
@@ -31,7 +35,8 @@
 
     <!-- note that this sets proeprties both from the endpoint (method) and directly
          DO NOT update this to use a more succinct config - this is what is being tested! -->
-    <rmi:endpoint name="BadType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
+    <rmi:endpoint name="BadType" host="localhost" port="1099" object="MatchingUMO" 
+        method="reverseString" exchange-pattern="one-way">
         <properties>
             <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
         </properties>
@@ -44,11 +49,11 @@
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender" exchange-pattern="request-response"/>
+                    <outbound-endpoint ref="Sender"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <rmi:outbound-endpoint ref="Sender2" exchange-pattern="request-response"/>
+                    <rmi:outbound-endpoint ref="Sender2"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound>
