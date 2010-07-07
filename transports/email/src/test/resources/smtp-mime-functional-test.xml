@@ -17,11 +17,11 @@
     <model name="test">
         <service name="relay">
             <inbound>
-                <vm:inbound-endpoint path="send"/>
+                <vm:inbound-endpoint path="send" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="smtp://localhost:65438"/>
+                    <outbound-endpoint address="smtp://localhost:65438" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

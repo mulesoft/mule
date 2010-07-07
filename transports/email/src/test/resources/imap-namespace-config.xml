@@ -22,9 +22,12 @@
         <imaps:tls-trust-store path="empty.jks" storePassword="password"/>
     </imaps:connector>
 
-    <imap:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>
-    <imap:endpoint name="global2" address="imap://bob:secret@localhost:123"/>
-    <imaps:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"/>
-    <imaps:endpoint name="global2s" address="imaps://bob:secret@localhost:123"/>
-
+    <imap:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"
+        exchange-pattern="one-way"/>
+    <imap:endpoint name="global2" address="imap://bob:secret@localhost:123"
+        exchange-pattern="one-way"/>
+    <imaps:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"
+        exchange-pattern="one-way"/>
+    <imaps:endpoint name="global2s" address="imaps://bob:secret@localhost:123"
+        exchange-pattern="one-way"/>
 </mule>

@@ -17,18 +17,16 @@
     <no-action-transformer name="noActionTransformer"/>
 
     <model name="test">
-
         <service name="relay">
             <inbound>
-                <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="65445" transformer-refs="noActionTransformer"/>
+                <pop3:inbound-endpoint user="bob" password="password" host="localhost" 
+                    port="65445" transformer-refs="noActionTransformer" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="receive"/>
+                    <vm:outbound-endpoint path="receive" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

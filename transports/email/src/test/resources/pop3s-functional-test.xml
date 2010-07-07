@@ -26,11 +26,12 @@
     <model name="test">
         <service name="relay">
             <inbound>
-                <pop3s:inbound-endpoint user="bob" password="password" host="localhost" port="65436"/>
+                <pop3s:inbound-endpoint user="bob" password="password" host="localhost" 
+                    port="65436" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="receive"/>
+                    <vm:outbound-endpoint path="receive" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

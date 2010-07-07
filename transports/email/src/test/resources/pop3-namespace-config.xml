@@ -22,9 +22,12 @@
         <pop3s:tls-trust-store path="empty.jks" storePassword="password"/>
     </pop3s:connector>
 
-    <pop3:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>
-    <pop3:endpoint name="global2" address="pop3://bob:secret@localhost:123"/>
-    <pop3s:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"/>
-    <pop3s:endpoint name="global2s" address="pop3s://bob:secret@localhost:123"/>
-
+    <pop3:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"
+        exchange-pattern="one-way"/>
+    <pop3:endpoint name="global2" address="pop3://bob:secret@localhost:123"
+        exchange-pattern="one-way"/>
+    <pop3s:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"
+        exchange-pattern="one-way"/>
+    <pop3s:endpoint name="global2s" address="pop3s://bob:secret@localhost:123"
+        exchange-pattern="one-way"/>
 </mule>

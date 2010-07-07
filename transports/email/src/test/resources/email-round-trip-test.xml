@@ -18,7 +18,8 @@
     <model name="main">
         <service name="source">
             <inbound>
-                <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002">
+                <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002"
+                    exchange-pattern="one-way">
                     <transformer ref="mime-rfc822"/>
                 </pop3:inbound-endpoint>
             </inbound>
@@ -36,7 +37,8 @@
             <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint path="rfc822"/>
-                    <smtp:outbound-endpoint user="alice" password="secret" host="localhost" port="62000">
+                    <smtp:outbound-endpoint user="alice" password="secret" host="localhost" 
+                        port="62000" exchange-pattern="one-way">
                         <transformer ref="rfc822-mime"/>
                     </smtp:outbound-endpoint>
                 </multicasting-router>
