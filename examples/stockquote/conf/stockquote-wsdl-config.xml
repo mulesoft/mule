@@ -44,13 +44,15 @@
         -->
         <service name="serviceProxy">
             <inbound>
-                <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="stockquote" exchange-pattern="request-response"
+                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
+                    <outbound-endpoint 
+                        address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
+                        exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

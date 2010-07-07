@@ -49,13 +49,14 @@
         -->
         <service name="serviceProxy">
             <inbound>
-                <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="stockquote" exchange-pattern="request-response"
+                                     responseTransformer-refs="XmlDecoder Xslt XmlToObject"/>
             </inbound>
             <outbound>
                 <pass-through-router>
                     <cxf:outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx"
+                            exchange-pattern="request-response"
                             clientClass="net.webservicex.StockQuote"
                             operation="GetQuote" 
                             wsdlPort="StockQuoteSoap" 
