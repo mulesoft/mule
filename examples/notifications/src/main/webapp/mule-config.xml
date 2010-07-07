@@ -18,7 +18,8 @@
     <json:json-to-object-transformer name="JsonToObject"/>
 
     <management:publish-notifications ignoreConnectionNotifications="true">
-        <ajax:servlet-outbound-endpoint path="/mule/notifications" transformer-refs="ObjectToJson" cacheMessages="true">
+        <ajax:servlet-outbound-endpoint path="/mule/notifications" transformer-refs="ObjectToJson" 
+            cacheMessages="true" exchange-pattern="one-way">
             <or-filter>
                 <payload-type-filter expectedType="org.mule.example.notifications.HeartbeatNotification"/>
                 <payload-type-filter expectedType="org.mule.context.notification.SecurityNotification"/>
