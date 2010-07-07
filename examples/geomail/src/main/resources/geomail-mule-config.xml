@@ -50,20 +50,20 @@
     <!-- # Endpoint Definitions -->
 
     <!-- Todo add your email server here, note that Gmail, Yahoo, etc cannot be used since they do not set the sender ip addrsss -->
-    <!--<imaps:endpoint name="Input" host="imap.mycompany.com" user="x" password="y"/>-->
+    <!--<imaps:endpoint name="Input" host="imap.mycompany.com" user="x" password="y" exchange-pattern="one-way"/>-->
 
-    <quartz:endpoint name="quartzTrigger" repeatInterval="2000" jobName="dataGenerator">
+    <quartz:endpoint name="quartzTrigger" repeatInterval="2000" jobName="dataGenerator" exchange-pattern="one-way">
         <quartz:event-generator-job/>
     </quartz:endpoint>
 
-    <vm:endpoint name="Gatekeeper" path="channels/gatekeeper"/>
-    <vm:endpoint name="Geocoder" path="channels/geocoder"/>
-    <vm:endpoint name="Fraudlabs" path="channels/fraudlabs"/>
-    <vm:endpoint name="Positions" path="channels/positions"/>
-    <vm:endpoint name="Storage" path="channels/storage"/>
-    <vm:endpoint name="Aggregator" path="channels/positions/aggregator"/>
+    <vm:endpoint name="Gatekeeper" path="channels/gatekeeper" exchange-pattern="one-way"/>
+    <vm:endpoint name="Geocoder" path="channels/geocoder" exchange-pattern="one-way"/>
+    <vm:endpoint name="Fraudlabs" path="channels/fraudlabs" exchange-pattern="one-way"/>
+    <vm:endpoint name="Positions" path="channels/positions" exchange-pattern="one-way"/>
+    <vm:endpoint name="Storage" path="channels/storage" exchange-pattern="one-way"/>
+    <vm:endpoint name="Aggregator" path="channels/positions/aggregator" exchange-pattern="one-way"/>
     
-    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson"/>
+    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson" exchange-pattern="one-way"/>
 
     <model>
 
