@@ -9,6 +9,6 @@
     <jetty:connector name="jettyConnector" configFile="jetty-config.xml"/>
 
     <!-- See MULE-3603 
-    <jetty:endpoint name="endpoint" host="localhost" port="60223" path="/"/>
+    <jetty:endpoint name="endpoint" host="localhost" port="60223" path="/" exchange-pattern="one-way"/>
     -->
 </mule>
