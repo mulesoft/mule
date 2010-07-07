@@ -29,7 +29,7 @@
         <mule:model name="test">
             <mule:service name="echoUMO">
                 <mule:inbound>
-                    <mule:inbound-endpoint address="vm://test">
+                    <mule:inbound-endpoint address="vm://test" exchange-pattern="one-way">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
                     </mule:inbound-endpoint>
                 </mule:inbound>
@@ -38,7 +38,7 @@
                 </mule:component>
                 <mule:outbound>
                     <mule:pass-through-router>
-                        <mule:outbound-endpoint address="vm://output"/>
+                        <mule:outbound-endpoint address="vm://output" exchange-pattern="one-way"/>
                     </mule:pass-through-router>
                 </mule:outbound>
             </mule:service>

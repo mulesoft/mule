@@ -20,24 +20,26 @@
     <model name="http polling test model">
         <service name="pollingUMO_authenticated">
             <inbound>
-                <inbound-endpoint address="http://marie:marie@localhost:4567" connector-ref="PollingHttpConnector"/>
+                <inbound-endpoint address="http://marie:marie@localhost:4567" 
+                    connector-ref="PollingHttpConnector" exchange-pattern="one-way"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://toclient"/>
+                    <outbound-endpoint address="vm://toclient" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="pollingUMO_not_authenticated">
             <inbound>
-                <inbound-endpoint address="http://dodgy:geezer@localhost:4567" connector-ref="PollingHttpConnector"/>
+                <inbound-endpoint address="http://dodgy:geezer@localhost:4567" 
+                    connector-ref="PollingHttpConnector" exchange-pattern="one-way"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://toclient2"/>
+                    <outbound-endpoint address="vm://toclient2" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

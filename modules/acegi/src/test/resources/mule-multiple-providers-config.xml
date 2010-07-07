@@ -42,9 +42,7 @@
               
     <!--
         Mule configuration
-    -->
-    <configuration defaultSynchronousEndpoints="false"/>
-    
+    -->    
     <acegi:security-manager>
         <acegi:delegate-security-provider name="daoAuthenticationSecurityProvider2" delegate-ref="daoAuthenticationProvider2"/>
     </acegi:security-manager>
