@@ -23,15 +23,17 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <stdio:inbound-endpoint name="in" system="IN" connector-ref="stdioConnector"/>
+                <stdio:inbound-endpoint name="in" system="IN" connector-ref="stdioConnector"
+                    exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <stdio:outbound-endpoint name="out" system="OUT" connector-ref="stdioConnector"/>
-                    <stdio:outbound-endpoint name="err" system="ERR" connector-ref="stdioConnector"/>
+                    <stdio:outbound-endpoint name="out" system="OUT" connector-ref="stdioConnector"
+                        exchange-pattern="one-way"/>
+                    <stdio:outbound-endpoint name="err" system="ERR" connector-ref="stdioConnector"
+                        exchange-pattern="one-way"/>
                 </multicasting-router>
             </outbound>
         </service>
     </model>
-
 </mule>
