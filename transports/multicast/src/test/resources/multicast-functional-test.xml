@@ -13,7 +13,7 @@
     <vm:connector name="vm-queue"/>
 
     <!-- 224.0.0.1 is all systems on this subnet -->
-    <multicast:endpoint host="224.0.0.1" port="60131" name="serverEndpoint"/>
+    <multicast:endpoint host="224.0.0.1" port="60131" name="serverEndpoint" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="Component1">
@@ -23,7 +23,7 @@
             <test:component appendString="#[mule:context.serviceName]"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://foo"/>
+                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -35,7 +35,7 @@
             <test:component appendString="#[mule:context.serviceName]"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://foo"/>
+                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -47,7 +47,7 @@
             <test:component appendString="#[mule:context.serviceName]"/>            
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://foo"/>
+                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
