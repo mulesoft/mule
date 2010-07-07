@@ -17,7 +17,7 @@
 
     <ftp:connector name="ftpConnector" validateConnections="false"/>
 
-    <endpoint address="vm://receive" name="receive"/>
+    <endpoint address="vm://receive" name="receive" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="testInput">
