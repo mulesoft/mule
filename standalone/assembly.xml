@@ -189,8 +189,10 @@
         <outputDirectory>examples/loanbroker</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
-            <include>loanbroker</include>
-            <include>loanbroker.bat</include>
+            <include>loanbroker-client</include>
+            <include>loanbroker-server</include>
+            <include>loanbroker-client.bat</include>
+            <include>loanbroker-server.bat</include>
         </includes>
     </fileSet>
     <!-- Common classes -->
