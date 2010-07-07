@@ -12,14 +12,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <ajax:endpoint name="ajax-endpoint1" address="http://0.0.0.0:58381/test1"/>
-    <ajax:endpoint name="ajax-endpoint2" address="http://0.0.0.0:58381/test2"/>
+    <ajax:endpoint name="ajax-endpoint1" address="http://0.0.0.0:58381/test1" exchange-pattern="one-way"/>
+    <ajax:endpoint name="ajax-endpoint2" address="http://0.0.0.0:58381/test2" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="clientSubscribe-test1">
             <description>This service will send a String to any clients listening on "/test1" channel</description>
             <inbound>
-                <vm:inbound-endpoint path="in1"/>
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
@@ -37,7 +37,7 @@
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="in2"/>
+                    <vm:outbound-endpoint path="in2" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
