@@ -13,9 +13,9 @@ package org.mule.construct;
 import org.mule.api.MuleException;
 import org.mule.tck.AbstractMuleTestCase;
 
-public abstract class AbstractSimpleFlowConstuctTestCase extends AbstractMuleTestCase
+public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 {
-    protected abstract AbstractSimpleFlowConstuct getFlowConstruct();
+    protected abstract AbstractFlowConstuct getFlowConstruct();
 
     public void testStart() throws MuleException
     {

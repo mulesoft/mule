@@ -19,7 +19,7 @@ import org.mule.component.AbstractComponent;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
 
-public class SimpleServiceTestCase extends AbstractSimpleFlowConstuctTestCase
+public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
     private SimpleService simpleService;
     private DirectInboundMessageSource dims;
@@ -31,13 +31,12 @@ public class SimpleServiceTestCase extends AbstractSimpleFlowConstuctTestCase
 
         dims = new DirectInboundMessageSource();
 
-        simpleService = new SimpleService(muleContext);
-        simpleService.setInboundMessageSource(dims);
-        simpleService.setComponent(new StringReverserComponent());
+        simpleService = new SimpleService(muleContext, "test-simple-service", dims,
+            new StringReverserComponent());
     }
 
     @Override
-    protected AbstractSimpleFlowConstuct getFlowConstruct()
+    protected AbstractFlowConstuct getFlowConstruct()
     {
         return simpleService;
     }

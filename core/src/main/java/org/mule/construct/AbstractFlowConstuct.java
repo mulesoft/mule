@@ -1,17 +1,7 @@
-/*
- * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
- */
 
 package org.mule.construct;
 
 import java.beans.ExceptionListener;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,11 +26,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.FlowConstructNotification;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.lifecycle.AbstractLifecycleManager;
-import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
 
-public abstract class AbstractSimpleFlowConstuct implements FlowConstruct, Lifecycle
+public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -55,8 +44,6 @@ public abstract class AbstractSimpleFlowConstuct implements FlowConstruct, Lifec
     protected MessageSource inboundMessageSource;
 
     protected MessageProcessor messageProcessorChain;
-
-    protected List<MessageProcessor> messageProcessors;
 
     // temporary private implementation that only logs and fire notifications but
     // performs no particular action
@@ -120,92 +107,62 @@ public abstract class AbstractSimpleFlowConstuct implements FlowConstruct, Lifec
         }
     }
 
-    public AbstractSimpleFlowConstuct(MuleContext muleContext)
+    public AbstractFlowConstuct(MuleContext muleContext, String name) throws MuleException
     {
         this.muleContext = muleContext;
         this.lifecycleManager = new NoActionLifecycleManager(this);
     }
 
-    protected void buildServiceMessageProcessorChain()
+    public final void initialise() throws InitialisationException
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        addMessageProcessors(builder);
-        messageProcessorChain = builder.build();
-
-        if (messageProcessorChain instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
-        }
-    }
-
-    protected MessageProcessor getServiceStartedAssertingMessageProcessor()
-    {
-        return new ProcessIfStartedMessageProcessor(this, getLifecycleState());
-    }
-
-    protected abstract void addMessageProcessors(ChainMessageProcessorBuilder builder);
-
-    public void initialise() throws InitialisationException
-    {
-        // TODO add support for statistics
-
-        if (inboundMessageSource instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) inboundMessageSource).setFlowConstruct(this);
-        }
-
-        buildServiceMessageProcessorChain();
-
-        inboundMessageSource.setListener(messageProcessorChain);
-
         try
         {
+            createMessageProcessorChain();
+
+            if (inboundMessageSource != null)
+            {
+                inboundMessageSource.setListener(messageProcessorChain);
+            }
+
+            injectFlowConstructMuleContext(inboundMessageSource);
+            injectFlowConstructMuleContext(messageProcessorChain);
+            initialiseObject(inboundMessageSource);
+            initialiseObject(messageProcessorChain);
+            doInitialise();
+            validateConstuct();
             lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
         }
-        catch (LifecycleException le)
+        catch (LifecycleException e)
         {
-            throw new InitialisationException(le, this);
+            throw new InitialisationException(e, this);
         }
     }
 
-    public void start() throws MuleException
+    public final void start() throws MuleException
     {
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
-
-        if (messageProcessorChain instanceof Startable)
-        {
-            ((Startable) messageProcessorChain).start();
-        }
-
-        if (inboundMessageSource instanceof Startable)
-        {
-            ((Startable) inboundMessageSource).start();
-        }
-
+        startObject(messageProcessorChain);
+        startObject(inboundMessageSource);
+        doStart();
         lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
     }
 
-    public void stop() throws MuleException
+    public final void stop() throws MuleException
     {
-        if (inboundMessageSource instanceof Stoppable)
-        {
-            ((Stoppable) inboundMessageSource).stop();
-        }
-
-        if (messageProcessorChain instanceof Stoppable)
-        {
-            ((Stoppable) messageProcessorChain).stop();
-        }
-
+        lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
+        stopObject(messageProcessorChain);
+        stopObject(inboundMessageSource);
+        doStop();
         lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
     }
 
-    public void dispose()
+    public final void dispose()
     {
-        inboundMessageSource.setListener(null);
-
         try
         {
+            disposeObject(messageProcessorChain);
+            disposeObject(inboundMessageSource);
+            doDispose();
             lifecycleManager.fireLifecycle(Disposable.PHASE_NAME);
         }
         catch (MuleException me)
@@ -229,9 +186,18 @@ public abstract class AbstractSimpleFlowConstuct implements FlowConstruct, Lifec
         return lifecycleManager.getState().isStopping();
     }
 
-    public LifecycleState getLifecycleState()
+    protected void createMessageProcessorChain()
     {
-        return lifecycleManager.getState();
+        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        configureMessageProcessors(builder);
+        messageProcessorChain = builder.build();
+    }
+
+    protected abstract void configureMessageProcessors(ChainMessageProcessorBuilder builder);
+
+    public String getName()
+    {
+        return name;
     }
 
     public ExceptionListener getExceptionListener()
@@ -239,35 +205,89 @@ public abstract class AbstractSimpleFlowConstuct implements FlowConstruct, Lifec
         return exceptionListener;
     }
 
+    public LifecycleState getLifecycleState()
+    {
+        return lifecycleManager.getState();
+    }
+
     public MuleContext getMuleContext()
     {
         return muleContext;
     }
 
-    public String getName()
+    protected void doInitialise() throws InitialisationException
     {
-        return name;
+        // Empty template method
     }
 
-    public void setName(String name)
+    protected void doStart() throws MuleException
     {
-        this.name = name;
+        // Empty template method
     }
 
-    public void setInboundMessageSource(MessageSource inboundMessageSource)
+    protected void doStop() throws MuleException
     {
-        this.inboundMessageSource = inboundMessageSource;
+        // Empty template method
     }
 
-    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
+    protected void doDispose()
     {
-        this.messageProcessors = messageProcessors;
+        // Empty template method
+    }
+
+    protected void validateConstuct() throws InitialisationException
+    {
+        // Empty template method
+    }
+
+    private void injectFlowConstructMuleContext(Object candidate)
+    {
+        if (candidate instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) candidate).setFlowConstruct(this);
+        }
+        if (messageProcessorChain instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
+        }
     }
 
     @Override
     public String toString()
     {
         return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+    }
+
+    private void initialiseObject(Object candidate) throws InitialisationException
+    {
+        if (candidate instanceof Initialisable)
+        {
+            ((Initialisable) candidate).initialise();
+        }
+    }
+
+    private void startObject(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Startable)
+        {
+            ((Startable) candidate).start();
+        }
+    }
+
+    private void stopObject(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Stoppable)
+        {
+            ((Stoppable) candidate).stop();
+        }
+    }
+
+    private void disposeObject(Object candidate) throws InitialisationException
+    {
+        if (candidate instanceof Disposable)
+        {
+            ((Disposable) candidate).dispose();
+        }
     }
 
 }

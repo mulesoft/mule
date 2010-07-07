@@ -24,6 +24,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.NullMessageProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -228,14 +229,6 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         }
     }
 
-    private static class NullMessageProcessor implements MessageProcessor
-    {
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            return event;
-        }
-    }
-    
     @Override
     public String toString()
     {

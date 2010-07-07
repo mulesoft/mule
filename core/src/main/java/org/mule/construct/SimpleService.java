@@ -11,36 +11,33 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.component.Component;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.api.source.MessageSource;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * In-out SOA-style simple service, with no outbound router. Always fully
  * synchronous.
  */
-public class SimpleService extends AbstractSimpleFlowConstuct
+public class SimpleService extends SimpleFlowConstuct
 {
-    private Component component;
+    private final Component component;
 
-    public SimpleService(MuleContext muleContext)
+    public SimpleService(MuleContext muleContext,
+                         String name,
+                         MessageSource inboundMessageSource,
+                         Component component) throws MuleException
     {
-        super(muleContext);
-    }
-
-    public void setComponent(Component component)
-    {
+        super(muleContext, name);
+        this.inboundMessageSource = inboundMessageSource;
         this.component = component;
+        setMessageProcessors(Collections.singletonList(component));
     }
 
     public Component getComponent()
     {
         return component;
-    }
-
-    @Override
-    protected void addMessageProcessors(ChainMessageProcessorBuilder builder)
-    {
-        component.setFlowConstruct(this);
-        builder.chain(component);
     }
 }

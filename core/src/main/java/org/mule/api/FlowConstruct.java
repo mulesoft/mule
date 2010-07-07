@@ -14,16 +14,20 @@ import java.beans.ExceptionListener;
 
 import org.mule.api.lifecycle.LifecycleState;
 
-public interface FlowConstruct extends NamedObject {
+public interface FlowConstruct
+{
     /**
      * The exception strategy to use to handle exceptions in the Mule component.
      * 
-     * @return the exception strategy to use. If none has been set a default will be used.
+     * @return the exception strategy to use. If none has been set a default will be
+     *         used.
      */
     ExceptionListener getExceptionListener();
 
     MuleContext getMuleContext();
 
     LifecycleState getLifecycleState();
+
+    String getName();
 
 }
