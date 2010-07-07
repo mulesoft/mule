@@ -12,7 +12,7 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <inbound-endpoint name="endpoint" address="test://foo">
+                <inbound-endpoint name="endpoint" address="test://foo" exchange-pattern="one-way">
                     <transformers>
                         <transformer ref="normal1"/>
                         <string-to-byte-array-transformer name="normal2"/>

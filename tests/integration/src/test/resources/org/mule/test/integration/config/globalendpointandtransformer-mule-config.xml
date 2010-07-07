@@ -8,7 +8,7 @@
 
     <string-to-byte-array-transformer name="StringtoByteArray"/>
     
-    <endpoint name="in" address="vm://in"/>
+    <endpoint name="in" address="vm://in" exchange-pattern="one-way"/>
 
     <model name="test">
         <service name="Bridge">

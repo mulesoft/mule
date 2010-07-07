@@ -18,7 +18,8 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38103/mule/services"/>
+                <inbound-endpoint address="axis:http://localhost:38103/mule/services"
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
@@ -27,7 +28,8 @@
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
+                <inbound-endpoint address="axis:http://localhost:38104/mule/services"
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent">
@@ -38,7 +40,8 @@
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
+                <inbound-endpoint address="axis:http://localhost:38104/mule/services"
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>

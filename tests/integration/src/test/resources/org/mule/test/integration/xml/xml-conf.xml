@@ -36,12 +36,12 @@
         <service name="xmlReceiver">
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/xml-parse"
-                    transformer-refs="InputStreamToDOM" exchange-pattern="request-response">
+                    exchange-pattern="request-response" transformer-refs="InputStreamToDOM">
                     <filter ref="XPathFilter" />
                 </inbound-endpoint>
-                <inbound-endpoint
-                    address="http://localhost:63081/xml-xslt-parse"
-                    transformer-refs="InputStreamToDOM TestXslTransformer" exchange-pattern="request-response">
+                <inbound-endpoint address="http://localhost:63081/xml-xslt-parse"
+                    exchange-pattern="request-response" 
+                    transformer-refs="InputStreamToDOM TestXslTransformer">
                     <filter ref="XPathFilter" />
                 </inbound-endpoint>
                 <inbound-endpoint address="http://localhost:63081/validate" exchange-pattern="request-response" >

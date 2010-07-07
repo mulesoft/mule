@@ -17,7 +17,7 @@
     <model name="test">
         <service name="Distributor">
             <inbound>
-                <vm:inbound-endpoint path="distributor.queue"/>
+                <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -27,36 +27,36 @@
 
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue"/>
+                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" 1 Received"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue"/>
+                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" 2 Received"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceThree">
             <inbound>
-                <vm:inbound-endpoint path="service3.queue"/>
+                <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" 3 Received"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

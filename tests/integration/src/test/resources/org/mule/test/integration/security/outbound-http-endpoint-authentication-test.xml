@@ -29,8 +29,10 @@
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
     
-    <http:endpoint name="outbound" host="localhost" port="50504" user="ross" password="ross"/>
-    <vm:endpoint name="out" path="out"/>
+    <http:endpoint name="outbound" host="localhost" port="50504" exchange-pattern="request-response"
+        user="ross" password="ross"/>
+        
+    <vm:endpoint name="out" path="out" exchange-pattern="one-way"/>
     
     <model name="http secured test model">
         <service name="SecureService">

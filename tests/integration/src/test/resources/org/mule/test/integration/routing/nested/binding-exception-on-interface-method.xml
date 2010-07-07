@@ -13,7 +13,7 @@
     <model>
         <service name="HelloComponent">
             <inbound>
-                <inbound-endpoint address="vm://hello.in" />
+                <inbound-endpoint address="vm://hello.in" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.routing.nested.BindingExceptionOnInterfaceMethodTestCase$ExceptionThrowingService" />
             
@@ -33,7 +33,7 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="invoker.out" />
+                    <vm:outbound-endpoint path="invoker.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

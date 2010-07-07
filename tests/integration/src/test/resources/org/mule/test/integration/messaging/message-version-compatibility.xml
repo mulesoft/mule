@@ -39,13 +39,15 @@
             <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint connector-ref="jmsLegacyConnector" queue="q1" />
+                    <jms:outbound-endpoint queue="q1" exchange-pattern="one-way" 
+                        connector-ref="jmsLegacyConnector" />
                 </pass-through-router>
             </outbound>
         </service>
         <service name="r1">
             <inbound>
-                <jms:inbound-endpoint connector-ref="jmsLegacyConnector" queue="q1" />
+                <jms:inbound-endpoint queue="q1" exchange-pattern="one-way" 
+                    connector-ref="jmsLegacyConnector" />
             </inbound>
             <script:component script-ref="GetProperty" />
             <outbound>
@@ -63,13 +65,15 @@
             <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint connector-ref="jmsLegacyConnector" queue="q2" />
+                    <jms:outbound-endpoint queue="q2" exchange-pattern="one-way" 
+                        connector-ref="jmsLegacyConnector" />
                 </pass-through-router>
             </outbound>
         </service>
         <service name="r2">
             <inbound>
-                <jms:inbound-endpoint connector-ref="jmsConnector" queue="q2" />
+                <jms:inbound-endpoint queue="q2" exchange-pattern="one-way" 
+                    connector-ref="jmsConnector"  />
             </inbound>
             <script:component script-ref="GetProperty" />
             <outbound>
@@ -87,13 +91,15 @@
             <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="q3" />
+                    <jms:outbound-endpoint queue="q3" exchange-pattern="one-way" 
+                        connector-ref="jmsConnector" />
                 </pass-through-router>
             </outbound>
         </service>
         <service name="r3">
             <inbound>
-                <jms:inbound-endpoint connector-ref="jmsLegacyConnector" queue="q3" />
+                <jms:inbound-endpoint queue="q3" exchange-pattern="one-way" 
+                    connector-ref="jmsLegacyConnector" />
             </inbound>
             <script:component script-ref="GetProperty" />
             <outbound>
@@ -111,13 +117,15 @@
             <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint connector-ref="jmsConnector" queue="q4" />
+                    <jms:outbound-endpoint queue="q4" exchange-pattern="one-way" 
+                        connector-ref="jmsConnector" />
                 </pass-through-router>
             </outbound>
         </service>
         <service name="r4">
             <inbound>
-                <jms:inbound-endpoint connector-ref="jmsConnector" queue="q4" />
+                <jms:inbound-endpoint queue="q4" exchange-pattern="one-way" 
+                    connector-ref="jmsConnector" />
             </inbound>
             <script:component script-ref="GetProperty" />
             <outbound>

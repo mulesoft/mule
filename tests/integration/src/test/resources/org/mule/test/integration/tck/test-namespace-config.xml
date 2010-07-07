@@ -13,7 +13,7 @@
      <model>
         <service name="testService1">
             <inbound>
-                <inbound-endpoint address="vm://service1"/>
+                <inbound-endpoint address="vm://service1" exchange-pattern="one-way"/>
             </inbound>
             <test:component enableNotifications="false" enableMessageHistory="false">
                 <test:return-data>Foo Bar Car Jar</test:return-data>
@@ -22,7 +22,7 @@
 
         <service name="testService2">
             <inbound>
-                <inbound-endpoint address="vm://service2"/>
+                <inbound-endpoint address="vm://service2" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data file="org/mule/test/integration/tck/test-data.txt"/>
@@ -31,21 +31,21 @@
 
         <service name="testService3">
             <inbound>
-                <inbound-endpoint address="vm://service3"/>
+                <inbound-endpoint address="vm://service3" exchange-pattern="one-way"/>
             </inbound>
             <test:component enableMessageHistory="false" appendString=" received in #[mule:context.serviceName]"/>
         </service>
 
         <service name="testService4">
             <inbound>
-                <inbound-endpoint address="vm://service4"/>
+                <inbound-endpoint address="vm://service4" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true" />
         </service>
 
          <service name="testService5">
             <inbound>
-                <inbound-endpoint address="vm://service5"/>
+                <inbound-endpoint address="vm://service5" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true" exceptionToThrow="java.io.FileNotFoundException"/>
         </service>

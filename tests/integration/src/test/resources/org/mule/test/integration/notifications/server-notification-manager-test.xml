@@ -17,10 +17,9 @@
     <model name="the-model">
         <service name="the-service">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>
     </model>
-
 </mule>

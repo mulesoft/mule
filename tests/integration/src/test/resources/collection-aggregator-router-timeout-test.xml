@@ -18,15 +18,15 @@
         -->
         <service name="splitter">
             <inbound>
-                <vm:inbound-endpoint path="splitter"/>
+                <vm:inbound-endpoint path="splitter" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <!--
                     round-robin is critical here, otherwise 'lostInTime' endpoint is never hit.
                 -->
                 <list-message-splitter-router disableRoundRobin="false">
-                    <vm:outbound-endpoint path="aggregator"/>
-                    <vm:outbound-endpoint path="lostInTime"/>
+                    <vm:outbound-endpoint path="aggregator" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
                 </list-message-splitter-router>
             </outbound>
         </service>
@@ -37,12 +37,12 @@
         -->
         <service name="vortex">
             <inbound>
-                <vm:inbound-endpoint path="lostInTime"/>
+                <vm:inbound-endpoint path="lostInTime" exchange-pattern="one-way"/>
             </inbound>
             <test:component waitTime="6000"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="aggregator"/>
+                    <vm:outbound-endpoint path="aggregator" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -52,13 +52,14 @@
         -->
         <service name="aggregator">
             <inbound>
-                <vm:inbound-endpoint path="aggregator"/>
+                <vm:inbound-endpoint path="aggregator" exchange-pattern="one-way"/>
                 <collection-aggregator-router timeout="2000" failOnTimeout="false"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"
+                        connector-ref="queue"/>
                 </pass-through-router>
             </outbound>
         </service>

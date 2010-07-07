@@ -17,10 +17,12 @@
         http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
     <endpoint name="httpService" 
-              address="http://www.webservicex.net/stockquote.asmx/GetQuote" />
+              address="http://www.webservicex.net/stockquote.asmx/GetQuote" 
+              exchange-pattern="request-response"/>
 
     <endpoint name="cxfService"
-              address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" />
+              address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote" 
+              exchange-pattern="request-response"/>
 
     <model>
         <service name="httpService1">
@@ -71,5 +73,4 @@
             </outbound>
         </service>
     </model>
-
 </mule>

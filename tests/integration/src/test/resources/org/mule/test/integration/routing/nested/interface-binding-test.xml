@@ -14,19 +14,18 @@
     <vm:connector name="vmConnector"/>
 
     <model>
-
         <service name="HelloComponent">
             <inbound>
-                <inbound-endpoint address="vm://hello.in" />
-                <inbound-endpoint address="jms://hello.in" />
-                <inbound-endpoint address="jms://topic:thello.in" />
+                <inbound-endpoint address="vm://hello.in" exchange-pattern="one-way"/>
+                <inbound-endpoint address="jms://hello.in" exchange-pattern="one-way"/>
+                <inbound-endpoint address="jms://topic:thello.in" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.routing.nested.HelloService" />
         </service>
 
         <service name="InvokerComponent">
             <inbound>
-                <inbound-endpoint address="vm://invoker.in" />
+                <inbound-endpoint address="vm://invoker.in" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
@@ -36,14 +35,14 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://invoker.out" />
+                    <outbound-endpoint address="vm://invoker.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="JmsQueueInvokerComponent">
             <inbound>
-                <inbound-endpoint address="jms://invoker.in" />
+                <inbound-endpoint address="jms://invoker.in" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
@@ -53,14 +52,14 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://invoker.out" />
+                    <outbound-endpoint address="jms://invoker.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="JmsTopicInvokerComponent">
             <inbound>
-                <inbound-endpoint address="jms://topic:tinvoker.in" />
+                <inbound-endpoint address="jms://topic:tinvoker.in" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
@@ -70,10 +69,9 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://topic:tinvoker.out" />
+                    <outbound-endpoint address="jms://topic:tinvoker.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

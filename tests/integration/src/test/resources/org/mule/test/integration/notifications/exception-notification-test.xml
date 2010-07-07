@@ -20,11 +20,9 @@
 
         <service name="the-service">
             <inbound>
-                <vm:inbound-endpoint path="in-1"/>
+                <vm:inbound-endpoint path="in-1" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true" enableMessageHistory="false"/>
         </service>
-
     </model>
-
 </mule>

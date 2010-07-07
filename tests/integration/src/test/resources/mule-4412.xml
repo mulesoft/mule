@@ -11,15 +11,14 @@
     <model name="main">
         <service name="AsyncRequest">
             <inbound>
-                <vm:inbound-endpoint path="async" exchange-pattern="one-way">
-                </vm:inbound-endpoint>
+                <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
                 <selective-consumer-router >
                     <custom-filter class="org.mule.test.filters.FilterCounter"/>                    
                 </selective-consumer-router>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="asyncResponse"/>
+                    <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -24,54 +24,59 @@
 
         <service name="echo">
             <inbound>
-               <vm:inbound-endpoint path="inEcho" connector-ref="vm"/>
+               <vm:inbound-endpoint path="inEcho" exchange-pattern="one-way" connector-ref="vm"/>
             </inbound>
             <test:component throwException="true"/>
         </service>
 
         <service name="dispatcherExceptionBridge">
             <inbound>
-               <vm:inbound-endpoint path="dispatcherExceptionBridge" connector-ref="vm"/>
+               <vm:inbound-endpoint path="dispatcherExceptionBridge" exchange-pattern="one-way"
+                    connector-ref="vm"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vmExceptionThrowingDispatcher"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way"
+                        connector-ref="vmExceptionThrowingDispatcher"/>
                 </filtering-router>
             </outbound>
         </service>
         
        <service name="receiverExceptionBridge">
             <inbound>
-               <vm:inbound-endpoint path="receiverExceptionBridge" connector-ref="vmExceptionThrowingReceiver"/>
+               <vm:inbound-endpoint path="receiverExceptionBridge" exchange-pattern="one-way"
+                    connector-ref="vmExceptionThrowingReceiver"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vm"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
                 </filtering-router>
             </outbound>
         </service>
         
         <service name="inboundFilterExceptionBridge">
             <inbound>
-               <vm:inbound-endpoint path="inboundFilterExceptionBridge" connector-ref="vm">
+               <vm:inbound-endpoint path="inboundFilterExceptionBridge" exchange-pattern="one-way"
+                    connector-ref="vm">
                    <custom-filter class="org.mule.test.integration.streaming.ExceptionThrowingFilter"/>
                </vm:inbound-endpoint>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vm"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
                 </filtering-router>
             </outbound>
         </service>
         
         <service name="inboundRouterExceptionBridge">
             <inbound>
-               <vm:inbound-endpoint path="inboundRouterExceptionBridge" connector-ref="vm"/>
+               <vm:inbound-endpoint path="inboundRouterExceptionBridge" exchange-pattern="one-way"
+                    connector-ref="vm"/>
                <custom-inbound-router class="org.mule.test.integration.streaming.ExceptionThrowingInboundRouter"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out" connector-ref="vm"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way" connector-ref="vm"/>
                 </filtering-router>
             </outbound>
         </service>

@@ -24,21 +24,21 @@
           </mule-xml:jaxen-filter>
         </filtering-router>
         <pass-through-router>
-            <outbound-endpoint address="vm://null"/>
+            <outbound-endpoint address="vm://null" exchange-pattern="one-way"/>
         </pass-through-router>
       </outbound>
     </service>
     
     <service name="echoService">
       <inbound>
-        <inbound-endpoint address="vm://echo"/>
+        <inbound-endpoint address="vm://echo" exchange-pattern="one-way"/>
       </inbound>
       <echo-component/>
     </service>
     
     <service name="nullService">
       <inbound>
-        <inbound-endpoint address="vm://null"/>
+        <inbound-endpoint address="vm://null" exchange-pattern="one-way"/>
       </inbound>
       <log-component />
     </service>

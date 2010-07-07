@@ -40,7 +40,7 @@
         <!-- This service will append " Received" to the message so we know we're getting the correct one -->
         <service name="pojo3">
             <inbound>
-                <vm:inbound-endpoint path="pojo3"/>
+                <vm:inbound-endpoint path="pojo3" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

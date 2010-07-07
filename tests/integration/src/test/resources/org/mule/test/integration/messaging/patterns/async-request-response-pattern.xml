@@ -19,7 +19,8 @@
     <model name="Async_Request-Response_Message_Pattern">
         <service name="AsyncRequestResponseService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" exchange-pattern="request-response"/>
+                <http:inbound-endpoint host="localhost" port="8080" path="/mule/services" 
+                    exchange-pattern="request-response"/>
             </inbound>
 
             <test:component/>
@@ -33,7 +34,7 @@
             </outbound>
 
             <async-reply timeout="5000">
-                <jms:inbound-endpoint queue="reply.queue"/>
+                <jms:inbound-endpoint queue="reply.queue" exchange-pattern="one-way"/>
                 <collection-async-reply-router/>
             </async-reply>
         </service>

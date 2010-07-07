@@ -14,7 +14,7 @@
         <service name="BackOfficeImplBindingImplUMO">
             <inbound>
                 <axis:inbound-endpoint address="http://localhost:8081/services" 
-                    style="DOCUMENT" use="LITERAL">
+                    exchange-pattern="request-response" style="DOCUMENT" use="LITERAL">
                     <axis:options wsdlServiceElement="BackOfficeImplService" wsdlPortType="BackOfficeImplPortType"/>
                     <axis:bean-type interface="org.mule.test.usecases.axis.Trade"/>
                     <axis:bean-type interface="org.mule.test.usecases.axis.TradeStatus"/>

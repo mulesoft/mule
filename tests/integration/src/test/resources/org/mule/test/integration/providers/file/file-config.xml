@@ -13,7 +13,8 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="file://./test" connector-ref="file">
+                <inbound-endpoint address="file://./test" exchange-pattern="one-way" 
+                    connector-ref="file">
                     <file:filename-wildcard-filter pattern="*.data"/>
                 </inbound-endpoint>
             </inbound>

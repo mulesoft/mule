@@ -23,7 +23,7 @@
     <model>
         <service name="VmXaTestService">
             <inbound>
-                <vm:inbound-endpoint path="in">
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -31,6 +31,5 @@
 
             <queue-profile persistent="true"/>
         </service>
-
     </model>
 </mule>

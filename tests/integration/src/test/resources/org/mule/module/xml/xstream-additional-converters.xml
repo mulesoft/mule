@@ -20,7 +20,8 @@
     <model>
         <service name="ObjectToXml">
             <inbound>
-                <vm:inbound-endpoint path="FromTest" transformer-refs="XmlToObject"/>
+                <vm:inbound-endpoint path="FromTest" transformer-refs="XmlToObject"
+                    exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

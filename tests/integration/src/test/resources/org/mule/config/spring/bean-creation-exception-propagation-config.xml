@@ -7,5 +7,5 @@
         http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd">
 
     <!-- This endpoint is intentionally malformed. -->
-    <stdio:endpoint name="invalidEndpoint" address="stream://System.in"/>
+    <stdio:endpoint name="invalidEndpoint" address="stream://System.in" exchange-pattern="one-way"/>
 </mule>

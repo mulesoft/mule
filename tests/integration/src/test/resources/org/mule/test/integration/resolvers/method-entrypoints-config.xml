@@ -13,7 +13,7 @@
     <model name="Model">
         <service name="Service">
            <inbound>
-                <vm:inbound-endpoint path="service"/>
+                <vm:inbound-endpoint path="service" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -25,10 +25,10 @@
 
         <service name="Service2">
            <inbound>
-                <vm:inbound-endpoint path="service2-reverseString">
+                <vm:inbound-endpoint path="service2-reverseString" exchange-pattern="one-way">
                     <property key="method" value="reverseString"/>
                 </vm:inbound-endpoint>
-               <vm:inbound-endpoint path="service2-upperCaseString">
+               <vm:inbound-endpoint path="service2-upperCaseString" exchange-pattern="one-way">
                     <property key="method" value="upperCaseString"/>
                 </vm:inbound-endpoint>
             </inbound>

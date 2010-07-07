@@ -9,7 +9,7 @@
     <model>        
         <service name="Router">
             <inbound>
-                <inbound-endpoint address="vm://router" />
+                <inbound-endpoint address="vm://router" exchange-pattern="one-way"/>
             </inbound>
             <static-component>
                 <return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup.xml" />
@@ -21,7 +21,7 @@
 
         <service name="BadRouter">
             <inbound>
-                <inbound-endpoint address="vm://routerBad" />
+                <inbound-endpoint address="vm://routerBad" exchange-pattern="one-way"/>
             </inbound>
             <static-component>
                 <return-data file="org/mule/test/usecases/routing/lookup/wsrr-lookup-bad.xml" />

@@ -9,7 +9,7 @@
     <model name="fileAppend">
         <service name="Bridge">
             <inbound>
-                <inbound-endpoint address="vm://fileappend"/>
+                <inbound-endpoint address="vm://fileappend" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>

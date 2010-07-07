@@ -10,41 +10,40 @@
 
     <vm:connector name="vm">
         <default-connector-exception-strategy>
-            <vm:outbound-endpoint path="error"/>
+            <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
         </default-connector-exception-strategy>
     </vm:connector>
 
     <custom-transformer name="fail" class="org.mule.test.transformers.FailingTransformer"/>
 
     <model name="test">
-
         <service name="with-router">
             <inbound>
-                <vm:inbound-endpoint path="with-router-in" transformer-refs="fail"/>
+                <vm:inbound-endpoint path="with-router-in" exchange-pattern="one-way" 
+                    transformer-refs="fail"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="with-router-out"/>
+                    <vm:outbound-endpoint path="with-router-out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="without-router">
             <inbound>
-                <vm:inbound-endpoint path="without-router-in" transformer-refs="fail"/>
+                <vm:inbound-endpoint path="without-router-in" exchange-pattern="one-way" 
+                    transformer-refs="fail"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="without-router-out"/>
+                    <vm:outbound-endpoint path="without-router-out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
             <!-- need this instead -->
             <default-service-exception-strategy>
-                <vm:outbound-endpoint path="error"/>
+                <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
             </default-service-exception-strategy>
         </service>
-
     </model>
-    
 </mule>

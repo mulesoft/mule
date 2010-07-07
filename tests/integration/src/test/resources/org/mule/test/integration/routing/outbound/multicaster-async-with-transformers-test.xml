@@ -13,7 +13,6 @@
     <vm:connector name="vm"/>
 
     <model name="test">
-
         <service name="Distributor">
             <inbound>
                 <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
@@ -41,42 +40,42 @@
         
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue"/>
+                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue"/>
+                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceThree">
             <inbound>
-                <vm:inbound-endpoint path="service3.queue"/>
+                <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

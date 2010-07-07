@@ -25,22 +25,20 @@
 
         <service name="service-1">
             <inbound>
-                <vm:inbound-endpoint path="in-1" connector-ref="direct"/>
+                <vm:inbound-endpoint path="in-1" exchange-pattern="one-way" connector-ref="direct"/>
             </inbound>
             <echo-component/>
         </service>
 
         <service name="service-2">
             <inbound>
-                <vm:inbound-endpoint path="in-2" connector-ref="direct"/>
+                <vm:inbound-endpoint path="in-2" exchange-pattern="one-way" connector-ref="direct"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out-2" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="out-2" exchange-pattern="one-way" connector-ref="queue"/>
                 </pass-through-router>
             </outbound>
         </service>
-        
     </model>
-
 </mule>

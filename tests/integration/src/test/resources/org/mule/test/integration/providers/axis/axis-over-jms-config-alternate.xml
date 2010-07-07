@@ -13,14 +13,14 @@
     <model name="Test-Case">
         <service name="TestComponent">
             <inbound>
-                <inbound-endpoint address="axis:jms://TestComponent">
+                <inbound-endpoint address="axis:jms://TestComponent" exchange-pattern="one-way">
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://testout"/>
+                    <outbound-endpoint address="jms://testout" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

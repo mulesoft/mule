@@ -5,11 +5,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
 
-    <endpoint name="myendpoint" address="test://foo">
+    <endpoint name="myendpoint" address="test://foo" exchange-pattern="one-way">
         <property key="foo" value="foo-value"/>
         <property key="bar" value="bar-value"/>
     </endpoint>
 
     <custom-transformer class="org.mule.tck.testmodels.fruit.FruitBowlToFruitBasket" name="bowlToBasket"/>
-
 </mule>

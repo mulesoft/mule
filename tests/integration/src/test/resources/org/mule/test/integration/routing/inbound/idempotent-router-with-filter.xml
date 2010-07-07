@@ -18,7 +18,7 @@
     <model name="IdempotentRouterTest">
         <service name="IdempotentPlaceHolder">
             <inbound>
-                <inbound-endpoint address="vm://FromTestCase" />
+                <inbound-endpoint address="vm://FromTestCase" exchange-pattern="one-way"/>
                 <!-- Only strings should be allowed in -->
                 <idempotent-receiver-router>
                     <payload-type-filter expectedType="java.lang.String" />
@@ -26,7 +26,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://ToTestCase" />
+                    <outbound-endpoint address="vm://ToTestCase" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

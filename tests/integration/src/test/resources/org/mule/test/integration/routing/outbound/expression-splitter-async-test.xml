@@ -15,18 +15,18 @@
     <model name="test">
         <service name="Distributor">
             <inbound>
-                <vm:inbound-endpoint path="distributor.queue"/>
+                <vm:inbound-endpoint path="distributor.queue" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <!-- FruitBowl.getFruit() List -->
                 <expression-splitter-router evaluator="bean" expression="fruit">
-                    <vm:outbound-endpoint path="service1.queue">
+                    <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service2.queue">
+                    <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service3.queue">
+                    <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
                         <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange"/>
                     </vm:outbound-endpoint>
                 </expression-splitter-router>
@@ -35,42 +35,42 @@
 
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue"/>
+                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue"/>
+                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ServiceThree">
             <inbound>
-                <vm:inbound-endpoint path="service3.queue"/>
+                <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="collector.queue"/>
+                    <vm:outbound-endpoint path="collector.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

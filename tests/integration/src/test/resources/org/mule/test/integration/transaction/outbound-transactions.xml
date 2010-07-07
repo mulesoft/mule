@@ -22,15 +22,15 @@
     <model>
         <service name="component1">
             <inbound>
-                <vm:inbound-endpoint path="component1"/>
+                <vm:inbound-endpoint path="component1" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>
                 <multicasting-router>
-                    <jms:outbound-endpoint queue="my.queue1">
+                    <jms:outbound-endpoint queue="my.queue1" exchange-pattern="one-way">
                         <jms:transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
-                    <jms:outbound-endpoint queue="my.queue2">
+                    <jms:outbound-endpoint queue="my.queue2" exchange-pattern="one-way">
                         <jms:transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
                     <jms:transaction action="ALWAYS_BEGIN"/>
@@ -40,17 +40,17 @@
         
         <service name="component2">
             <inbound>
-                <jms:inbound-endpoint queue="component2">
+                <jms:inbound-endpoint queue="component2" exchange-pattern="one-way">
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>
                 <multicasting-router>
-                    <jms:outbound-endpoint queue="my.queue3">
+                    <jms:outbound-endpoint queue="my.queue3" exchange-pattern="one-way">
                         <jms:transaction action="NONE"/>
                     </jms:outbound-endpoint>
-                    <jms:outbound-endpoint queue="my.queue4">
+                    <jms:outbound-endpoint queue="my.queue4" exchange-pattern="one-way">
                         <jms:transaction action="NONE"/>
                     </jms:outbound-endpoint>
                 </multicasting-router>

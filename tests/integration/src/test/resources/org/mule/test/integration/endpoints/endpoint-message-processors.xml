@@ -13,7 +13,7 @@
     <model>
         <service name="synchronousOutbound">
             <inbound>
-                <vm:inbound-endpoint path="in1">
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
                     <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
                     </custom-message-processor>
@@ -55,7 +55,7 @@
         
         <service name="asynchronousOutbound">
             <inbound>
-                <vm:inbound-endpoint path="in2">
+                <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
                     <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
                     </custom-message-processor>
@@ -98,7 +98,7 @@
         
         <service name="echoService">
             <inbound>
-                <vm:inbound-endpoint path="service2" />
+                <vm:inbound-endpoint path="service2" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=":service2" />
         </service>

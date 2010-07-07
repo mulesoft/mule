@@ -26,11 +26,13 @@
     <xm:object-to-xml-transformer name="ObjectToXml"/>
     <xm:xml-to-object-transformer name="XmlToObject"/>
 
-    <endpoint name="server1" address="tcp://localhost:45431" />
-    <endpoint name="server2" address="tcp://localhost:45432" />
-    <endpoint name="server3" address="tcp://localhost:45433" />
-    <endpoint name="testEndpoint" address="vm://another.queue" connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
-    <endpoint name="testEndpoint2" address="vm://yet.another.queue" connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
+    <endpoint name="server1" address="tcp://localhost:45431" exchange-pattern="one-way"/>
+    <endpoint name="server2" address="tcp://localhost:45432" exchange-pattern="one-way"/>
+    <endpoint name="server3" address="tcp://localhost:45433" exchange-pattern="one-way"/>
+    <endpoint name="testEndpoint" address="vm://another.queue" exchange-pattern="one-way"
+        connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
+    <endpoint name="testEndpoint2" address="vm://yet.another.queue" exchange-pattern="one-way"
+        connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
 
     <model name="main">
         
@@ -39,19 +41,21 @@
         -->
         <service name="TestComponent1">
             <inbound>
-                <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector1" />
+                <inbound-endpoint address="test://localhost/test.queue" exchange-pattern="one-way"
+                    connector-ref="testConnector1" />
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" />
+                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="TestComponent2">
             <inbound>
-                <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector2" transformer-refs="XmlToObject" />
+                <inbound-endpoint address="test://localhost/test.queue" exchange-pattern="one-way"
+                    connector-ref="testConnector2" transformer-refs="XmlToObject" />
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
@@ -64,11 +68,13 @@
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint name="tcp1" address="tcp://localhost:60201"/>
+                    <outbound-endpoint name="tcp1" address="tcp://localhost:60201" 
+                        exchange-pattern="one-way"/>
                 </filtering-router>
                 <multicasting-router>
-                    <outbound-endpoint address="udp://localhost:56731" />
-                    <outbound-endpoint address="test://test.queue2" connector-ref="testConnector1"/>
+                    <outbound-endpoint address="udp://localhost:56731" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="test://test.queue2" exchange-pattern="one-way"
+                        connector-ref="testConnector1"/>
                 </multicasting-router>
             </outbound>
         </service>
@@ -78,20 +84,22 @@
         <service name="TestComponent4">
             <inbound>
                 <!-- this didn't make sense? -->
-                <!-- inbound-endpoint address="vm://queue4" connector-ref="testConnector1" / -->
-                <inbound-endpoint address="vm://queue4"  connector-ref="vmConnector2" transformer-refs="ObjectToXml"/>
+                <!-- inbound-endpoint address="vm://queue4" exchange-pattern="one-way" connector-ref="testConnector1" / -->
+                <inbound-endpoint address="vm://queue4" exchange-pattern="one-way"
+                    connector-ref="vmConnector2" transformer-refs="ObjectToXml"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="udp://localhost:56731" />
+                    <outbound-endpoint address="udp://localhost:56731" exchange-pattern="one-way"/>
                 </filtering-router>
             </outbound>
         </service>
 
         <service name="TestComponent5">
             <inbound>
-                <inbound-endpoint address="vm://some.queue" connector-ref="vmConnector2" />
+                <inbound-endpoint address="vm://some.queue" exchange-pattern="one-way"
+                    connector-ref="vmConnector2" />
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
@@ -109,7 +117,5 @@
                 </filtering-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

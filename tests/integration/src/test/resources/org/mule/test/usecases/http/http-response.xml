@@ -9,7 +9,7 @@
     <model name="model">
         <service name="HttpAsync">
             <inbound>
-                <inbound-endpoint address="http://localhost:8990">
+                <inbound-endpoint address="http://localhost:8990" exchange-pattern="one-way">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>

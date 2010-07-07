@@ -19,11 +19,11 @@
     <model name="StreamTest">
         <service name="StreamTestService">
             <inbound>
-                <inbound-endpoint address="http://localhost:38900/services" />
+                <inbound-endpoint address="http://localhost:38900/services" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="queue" />
+                    <jms:outbound-endpoint queue="queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

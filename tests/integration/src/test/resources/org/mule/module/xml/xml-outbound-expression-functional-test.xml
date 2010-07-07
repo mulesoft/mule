@@ -18,17 +18,18 @@
     <vm:connector name="default"/>
     <vm:connector name="queue"/>
 
-    <endpoint name="split" address="vm://split" connector-ref="default"/>
-    <vm:endpoint name="service1" path="service1" connector-ref="queue"/>
-    <endpoint name="service2" address="vm://service2" connector-ref="queue"/>
+    <endpoint name="split" address="vm://split" connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="service1" path="service1" connector-ref="queue" exchange-pattern="one-way"/>
+    <endpoint name="service2" address="vm://service2" connector-ref="queue" exchange-pattern="one-way"/>
 
-    <vm:endpoint name="roundrobin-det" address="vm://roundrobin-det" connector-ref="default"/>
-    <vm:endpoint name="roundrobin-indet" path="roundrobin-indet" connector-ref="default"/>
-    <endpoint name="robin1" address="vm://robin1" connector-ref="queue"/>
-    <vm:endpoint name="robin2" path="robin2" connector-ref="queue"/>
+    <vm:endpoint name="roundrobin-det" address="vm://roundrobin-det" connector-ref="default"
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="roundrobin-indet" path="roundrobin-indet" connector-ref="default"
+        exchange-pattern="one-way"/>
+    <endpoint name="robin1" address="vm://robin1" connector-ref="queue" exchange-pattern="one-way"/>
+    <vm:endpoint name="robin2" path="robin2" connector-ref="queue" exchange-pattern="one-way"/>
 
     <model name="xml outbound tests">
-
         <!-- given this configuration, this service splits the DOM into separate
              services via message-splitter.  the service name is then used in the
              jxpath-filter to send each service to a separate endpoint -->
@@ -73,7 +74,5 @@
                 </expression-splitter-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

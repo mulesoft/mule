@@ -31,23 +31,23 @@
             <echo-component />
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://pojo3" />
+                    <outbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
             <async-reply timeout="7000">
-                <inbound-endpoint address="jms://response" />
+                <inbound-endpoint address="jms://response" exchange-pattern="one-way"/>
                 <single-async-reply-router />
             </async-reply>
         </service>
 
         <service name="pojo3">
             <inbound>
-                <inbound-endpoint address="jms://pojo3" />
+                <inbound-endpoint address="jms://pojo3" exchange-pattern="one-way"/>
             </inbound>
             <echo-component />
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://pojo4" />
+                    <outbound-endpoint address="jms://pojo4" exchange-pattern="one-way"/>
                     <reply-to address="jms://response" />
                 </pass-through-router>
             </outbound>
@@ -56,7 +56,7 @@
         <!-- This component will append " Received" to the message so we know we're getting the correct one -->
         <service name="pojo4">
             <inbound>
-                <inbound-endpoint address="jms://pojo4"/>
+                <inbound-endpoint address="jms://pojo4" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

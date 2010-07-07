@@ -35,15 +35,16 @@
     <service name="Echo">
         <inbound>
             <!-- this endpoint is used by the functional test -->
-            <vm:inbound-endpoint path="test.in" transformer-refs="xquery" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="test.in" exchange-pattern="request-response" 
+                transformer-refs="xquery"/>
         </inbound>
 
         <echo-component/>
 
         <outbound>
             <multicasting-router>
-                <vm:outbound-endpoint path="test.out"/>
-                <stdio:outbound-endpoint system="OUT"/>
+                <vm:outbound-endpoint path="test.out" exchange-pattern="one-way"/>
+                <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
             </multicasting-router>
         </outbound>
     </service>

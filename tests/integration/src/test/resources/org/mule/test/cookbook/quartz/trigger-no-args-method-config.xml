@@ -12,10 +12,9 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-
     <vm:connector name="resultQueueConnector"/>
 
-    <vm:endpoint name="resultQueue" path="results"/>
+    <vm:endpoint name="resultQueue" path="results" exchange-pattern="one-way"/>
 
     <model>
         <service name="noArgService">
@@ -24,7 +23,7 @@
                 NulePayload object will be used and the method on the component will be matched by Mule.
             </description>
             <inbound>
-                <quartz:inbound-endpoint jobName="myServiceJob" repeatInterval="1000">
+                <quartz:inbound-endpoint jobName="myServiceJob" repeatInterval="1000" exchange-pattern="one-way">
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>

@@ -11,12 +11,12 @@
 
         <service name="component1">
             <inbound>
-                <vm:inbound-endpoint path="component1"/>
+                <vm:inbound-endpoint path="component1" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="component2">
+                    <vm:outbound-endpoint path="component2" exchange-pattern="one-way">
                         <custom-transformer class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyTransformer"/>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -25,7 +25,7 @@
 
         <service name="component2">
             <inbound>
-                <vm:inbound-endpoint path="component2"/>
+                <vm:inbound-endpoint path="component2" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
         </service>

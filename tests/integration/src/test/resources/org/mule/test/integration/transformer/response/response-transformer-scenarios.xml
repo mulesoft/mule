@@ -26,16 +26,16 @@
 
         <service name="CxfSync">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:4444/services/CxfSync" exchange-pattern="request-response"
-                    responseTransformer-refs="customResponse" />
+                <inbound-endpoint address="cxf:http://localhost:4444/services/CxfSync" 
+                    exchange-pattern="request-response" responseTransformer-refs="customResponse" />
             </inbound>
             <echo-component />
         </service>
 
         <service name="AxisSync">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:4445/services/AxisSync" exchange-pattern="request-response"
-                    responseTransformer-refs="customResponse" />
+                <inbound-endpoint address="axis:http://localhost:4445/services/AxisSync" 
+                    exchange-pattern="request-response" responseTransformer-refs="customResponse" />
             </inbound>
             <echo-component />
         </service>
@@ -79,12 +79,14 @@
 
         <service name="VmSyncOutboundEndpointResponseTransformer">
             <inbound>
-                <inbound-endpoint address="vm://syncOutboundEndpointResponseTransformer" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://syncOutboundEndpointResponseTransformer" 
+                    exchange-pattern="request-response" />
             </inbound>
             <echo-component />
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
+                    <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+                        responseTransformer-refs="customResponse" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -102,40 +104,48 @@
 
         <service name="JmsSyncOutboundEndpointResponseTransformer">
             <inbound>
-                <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer" 
+                    exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
+                    <outbound-endpoint address="jms://echo" exchange-pattern="request-response"
+                        responseTransformer-refs="customResponse"  />
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="ChainedRouterOutboundEndpointResponseTransformer">
             <inbound>
-                <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer" 
+                    exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://echo" exchange-pattern="request-response" />
                     <outbound-endpoint address="jms://echo" exchange-pattern="request-response" />
-                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
+                    <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+                        responseTransformer-refs="customResponse" />
+                    <outbound-endpoint address="jms://echo" exchange-pattern="request-response" 
+                        responseTransformer-refs="customResponse"/>
                 </chaining-router>
             </outbound>
         </service>
 
         <service name="NestedRouterOutboundEndpointResponseTransformer">
             <inbound>
-                <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer" 
+                    exchange-pattern="request-response" />
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.transformer.response.BindingInterfaceComponent" />
                 <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello1">
-                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
+                    <outbound-endpoint address="vm://echo" exchange-pattern="request-response"
+                        responseTransformer-refs="customResponse" />
                 </binding>
                 <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello2">
-                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" exchange-pattern="request-response" />
+                    <outbound-endpoint address="jms://echo" exchange-pattern="request-response" 
+                        responseTransformer-refs="customResponse" />
                 </binding>
             </component>
         </service>
@@ -153,9 +163,5 @@
             </inbound>
             <echo-component />
         </service>
-
-
-
     </model>
-
 </mule>

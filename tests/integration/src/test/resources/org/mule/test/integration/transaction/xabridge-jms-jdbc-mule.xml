@@ -42,14 +42,14 @@
     <model name="model">
         <service name="JdbcToJms">
             <inbound>
-                <jdbc:inbound-endpoint address="jdbc://getTest?type=1">
+                <jdbc:inbound-endpoint address="jdbc://getTest?type=1" exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </jdbc:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://my.queue">
+                    <outbound-endpoint address="jms://my.queue" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -58,14 +58,15 @@
 
         <service name="JmsToJdbc">
             <inbound>
-                <jms:inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
+                <jms:inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false"
+                    exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jdbc://writeTest?type=2">
+                    <outbound-endpoint address="jdbc://writeTest?type=2" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
                 </pass-through-router>

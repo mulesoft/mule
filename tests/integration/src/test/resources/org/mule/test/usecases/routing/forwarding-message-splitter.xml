@@ -13,18 +13,18 @@
     <model name="test" >
         <service name="forwardingSplitter">
             <inbound>
-                <inbound-endpoint address="vm://in.queue"/>
+                <inbound-endpoint address="vm://in.queue" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <list-message-splitter-router>
-                    <outbound-endpoint address="vm://component.1">
+                    <outbound-endpoint address="vm://component.1" exchange-pattern="one-way">
                         <payload-type-filter expectedType="java.lang.String"/>
                     </outbound-endpoint>
-                    <outbound-endpoint address="vm://component.2">
+                    <outbound-endpoint address="vm://component.2" exchange-pattern="one-way">
                         <payload-type-filter expectedType="java.lang.Integer"/>
                     </outbound-endpoint>
-                    <outbound-endpoint address="vm://error.queue">
+                    <outbound-endpoint address="vm://error.queue" exchange-pattern="one-way">
                         <payload-type-filter expectedType="java.lang.Exception"/>
                     </outbound-endpoint>
                 </list-message-splitter-router>

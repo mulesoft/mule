@@ -15,7 +15,7 @@
     <model name="CollationError">
         <service name="Distributor">
             <inbound>
-                <inbound-endpoint address="vm://distributor.queue"/>
+                <inbound-endpoint address="vm://distributor.queue" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
@@ -29,14 +29,14 @@
                 </static-recipient-list-router>
             </outbound>
             <async-reply timeout="3000" failOnTimeout="false">
-                <inbound-endpoint address="vm://Aggregator.queue"/>
+                <inbound-endpoint address="vm://Aggregator.queue" exchange-pattern="one-way"/>
                 <collection-async-reply-router/>
             </async-reply>
         </service>
 
         <service name="QuoteProviderOne">
             <inbound>
-                <inbound-endpoint address="vm://quoteprovider1.queue"/>
+                <inbound-endpoint address="vm://quoteprovider1.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
@@ -44,7 +44,7 @@
         <!-- This is a quotation system -->
         <service name="QuoteProviderTwo">
             <inbound>
-                <inbound-endpoint address="vm://quoteprovider2.queue"/>
+                <inbound-endpoint address="vm://quoteprovider2.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
@@ -52,7 +52,7 @@
         <!-- this will cause a response timeout -->
         <service name="QuoteProviderThree">
             <inbound>
-                <inbound-endpoint address="vm://quoteprovider3.queue"/>
+                <inbound-endpoint address="vm://quoteprovider3.queue" exchange-pattern="one-way"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

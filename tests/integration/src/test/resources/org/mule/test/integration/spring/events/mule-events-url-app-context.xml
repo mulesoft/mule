@@ -23,6 +23,7 @@
             <ref local="mailConnector"/>
         </property>
         <property name="endpointURI" value="pop3://user@lotsofmail.org"/>
+        <property name="exchangePattern" value="one-way"/>
     </bean>
 
     <bean id="mailConnector" class="org.mule.transport.email.Pop3Connector">

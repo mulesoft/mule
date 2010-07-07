@@ -69,27 +69,27 @@
     </mxml:xslt-transformer>
         
     <!-- Check transformer elements canbe embedded in endpoint config -->    
-    <endpoint name="ep1" address="vm://1">
+    <endpoint name="ep1" address="vm://1" exchange-pattern="one-way">
         <mxml:dom-to-xml-transformer/>
     </endpoint>
 
-    <endpoint name="ep2" address="vm://2">
+    <endpoint name="ep2" address="vm://2" exchange-pattern="one-way">
         <mxml:jxpath-extractor-transformer expression="/expression" singleResult="false"/>
     </endpoint>
     
-    <endpoint name="ep3" address="vm://3">
+    <endpoint name="ep3" address="vm://3" exchange-pattern="one-way">
         <mxml:object-to-xml-transformer  acceptMuleMessage="true"/>
     </endpoint>
     
-    <endpoint name="ep4" address="vm://4">
+    <endpoint name="ep4" address="vm://4" exchange-pattern="one-way">
         <mxml:xml-to-dom-transformer/>
     </endpoint>
 
-    <endpoint name="ep5" address="vm://5">
+    <endpoint name="ep5" address="vm://5" exchange-pattern="one-way">
         <mxml:xml-to-object-transformer/>
     </endpoint>
     
-    <endpoint name="ep6" address="vm://6">
+    <endpoint name="ep6" address="vm://6" exchange-pattern="one-way">
         <mxml:xslt-transformer
             ignoreBadInput="true"
             returnClass="java.lang.Object"
@@ -114,6 +114,4 @@
             <mxml:context-property key="bar" value="#[header:foo]"/>
         </mxml:xslt-transformer>
     </endpoint>
-    
-
 </mule>

@@ -11,7 +11,6 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <model name="xml outbound namespace tests">
-
         <service name="fancy config splitter">
             <inbound>
                 <forwarding-router/>
@@ -19,13 +18,10 @@
             <outbound>
                 <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
                                            externalSchemaLocation="external" validateSchema="true" deterministic="true">
-                    <vm:outbound-endpoint path="foo.bar"/>
+                    <vm:outbound-endpoint path="foo.bar" exchange-pattern="one-way"/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
             </outbound>
         </service>
-
-
     </model>
-
 </mule>

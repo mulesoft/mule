@@ -46,7 +46,7 @@
 
         <service name="AsyncRequest">
             <inbound>
-                <vm:inbound-endpoint path="async"/>
+                <vm:inbound-endpoint path="async" exchange-pattern="one-way"/>
                 <selective-consumer-router>
                     <message-property-filter pattern="messageType=async"/>
                 </selective-consumer-router>
@@ -55,11 +55,9 @@
             <scripting:component script-ref="testComponent"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="asyncResponse"/>
+                    <vm:outbound-endpoint path="asyncResponse" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

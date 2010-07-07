@@ -13,7 +13,7 @@
     <model name="main">
         <service name="StopFlowService">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.components.ComponentReturningNullFlowTestCase$ComponentReturningNull"/>
             <outbound>
@@ -25,12 +25,11 @@
 
         <service name="ShouldNotBeReachable">
             <inbound>
-                <vm:inbound-endpoint path="next"/>
+                <vm:inbound-endpoint path="next" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>ERROR</test:return-data>
             </test:component>
         </service>
-
     </model>
 </mule>

@@ -11,12 +11,12 @@
     <model name="main">
         <service name="Receiver">
             <inbound>
-                <inbound-endpoint address="vm://inbound.channel"/>
+                <inbound-endpoint address="vm://inbound.channel" exchange-pattern="one-way"/>
                 <wire-tap-router>
-                    <outbound-endpoint address="vm://tapped.channel1"/>
+                    <outbound-endpoint address="vm://tapped.channel1" exchange-pattern="one-way"/>
                 </wire-tap-router>
                 <wire-tap-router>
-                    <outbound-endpoint address="vm://tapped.channel2"/>
+                    <outbound-endpoint address="vm://tapped.channel2" exchange-pattern="one-way"/>
                 </wire-tap-router>
             </inbound>
             <test:component/>
@@ -24,14 +24,14 @@
 
         <service name="TappedReceiver1">
             <inbound>
-                <inbound-endpoint address="vm://tapped.channel1"/>
+                <inbound-endpoint address="vm://tapped.channel1" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>
 
         <service name="TappedReceiver2">
             <inbound>
-                <inbound-endpoint address="vm://tapped.channel2"/>
+                <inbound-endpoint address="vm://tapped.channel2" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

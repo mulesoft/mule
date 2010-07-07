@@ -18,7 +18,7 @@
     
     <vm:connector name="queue"/>
 
-    <vm:endpoint name="in" path="in" connector-ref="default"/>
+    <vm:endpoint name="in" path="in" connector-ref="default" exchange-pattern="one-way"/>
 
     <model name="property extractor test">
 
@@ -30,14 +30,14 @@
             <outbound>
                 <exception-based-router>
                     <vm:outbound-endpoint path="unreliable" connector-ref="default" exchange-pattern="request-response"/>
-                    <vm:outbound-endpoint path="error" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="error" connector-ref="queue" exchange-pattern="one-way"/>
                 </exception-based-router>
             </outbound>
         </service>
 
         <service name="unreliable">
             <inbound>
-                <vm:inbound-endpoint path="unreliable" connector-ref="default"/>
+                <vm:inbound-endpoint path="unreliable" connector-ref="default" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -51,7 +51,5 @@
                 </endpoint-selector-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

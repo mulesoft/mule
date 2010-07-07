@@ -15,7 +15,7 @@
     <seda-model>
         <service name="foo">
             <inbound>
-                <vm:inbound-endpoint path="in">
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way">
                     <transformers>
                         <auto-transformer returnClass="org.mule.tck.testmodels.fruit.FruitBasket"/>
                     </transformers>

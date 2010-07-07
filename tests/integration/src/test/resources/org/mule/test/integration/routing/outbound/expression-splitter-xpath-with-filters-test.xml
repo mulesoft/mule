@@ -15,7 +15,6 @@
     <vm:connector name="vm"/>
 
     <model name="test">
-
         <service name="Distributor">
             <inbound>
                 <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response">
@@ -24,13 +23,13 @@
             </inbound>
             <outbound>
                 <expression-splitter-router evaluator="xpath" expression="/Foo/Bar/*">
-                    <vm:outbound-endpoint path="service1.queue">
+                    <vm:outbound-endpoint path="service1.queue" exchange-pattern="one-way">
                         <expression-filter evaluator="xpath" expression="/ = 'One'"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service2.queue">
+                    <vm:outbound-endpoint path="service2.queue" exchange-pattern="one-way">
                         <expression-filter evaluator="xpath" expression="/ = 'Two'"/>
                     </vm:outbound-endpoint>
-                    <vm:outbound-endpoint path="service3.queue">
+                    <vm:outbound-endpoint path="service3.queue" exchange-pattern="one-way">
                         <expression-filter evaluator="xpath" expression="/ = 'Three'"/>
                     </vm:outbound-endpoint>
                 </expression-splitter-router>
@@ -39,11 +38,11 @@
         
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue"/>
+                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="service1.out">
+                    <vm:outbound-endpoint path="service1.out" exchange-pattern="one-way">
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -52,11 +51,11 @@
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue"/>
+                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="service2.out">
+                    <vm:outbound-endpoint path="service2.out" exchange-pattern="one-way">
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -65,16 +64,15 @@
 
         <service name="ServiceThree">
             <inbound>
-                <vm:inbound-endpoint path="service3.queue"/>
+                <vm:inbound-endpoint path="service3.queue" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="service3.out">
+                    <vm:outbound-endpoint path="service3.out" exchange-pattern="one-way">
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

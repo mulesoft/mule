@@ -29,7 +29,7 @@
             -->
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="out.queue"/>
+                    <jms:outbound-endpoint queue="out.queue" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
             <!-- this exception strategy will forward the current message to a jms queue
@@ -37,7 +37,7 @@
             -->
             <default-service-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
-                <jms:outbound-endpoint queue="DLQ">
+                <jms:outbound-endpoint queue="DLQ" exchange-pattern="one-way">
                     <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:outbound-endpoint>
             </default-service-exception-strategy>

@@ -31,7 +31,8 @@
 
         <service name="JMSReplyProvider">
             <inbound>
-                <inbound-endpoint address="jms://queue_in" transformer-refs="jmsmessagetoobject inboundtransformer" exchange-pattern="request-response"/>
+                <inbound-endpoint address="jms://queue_in" exchange-pattern="request-response"
+                    transformer-refs="jmsmessagetoobject inboundtransformer" />
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

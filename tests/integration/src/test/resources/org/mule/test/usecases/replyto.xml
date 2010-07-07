@@ -15,15 +15,20 @@
     <!-- Asynchronous VM connector (uses in-memory queues) -->
     <vm:connector name="asyncVm"/>
 
-    <vm:endpoint name="ReplyTo" path="reply.to" connector-ref="asyncVm"/>
+    <vm:endpoint name="ReplyTo" path="reply.to" exchange-pattern="one-way"
+        connector-ref="asyncVm"/>
 
-    <vm:endpoint name="EchoVm" path="echo.service"/>
+    <vm:endpoint name="EchoVm" path="echo.service" exchange-pattern="one-way"/>
     
-    <endpoint name="EchoAxisSend" address="axis:http://localhost:10080/mule/EchoService?method=echo"/>
-    <endpoint name="EchoAxisReceive" address="axis:http://localhost:10080/mule"/>
+    <endpoint name="EchoAxisSend" address="axis:http://localhost:10080/mule/EchoService?method=echo"
+        exchange-pattern="request-response"/>
+    <endpoint name="EchoAxisReceive" address="axis:http://localhost:10080/mule"
+        exchange-pattern="request-response"/>
     
-    <endpoint name="EchoCxfSend" address="cxf:http://localhost:10081/mule/EchoService?method=echo"/>
-    <endpoint name="EchoCxfReceive" address="cxf:http://localhost:10081/mule/EchoService"/>
+    <endpoint name="EchoCxfSend" address="cxf:http://localhost:10081/mule/EchoService?method=echo"
+        exchange-pattern="request-response"/>
+    <endpoint name="EchoCxfReceive" address="cxf:http://localhost:10081/mule/EchoService"
+        exchange-pattern="request-response"/>
     
     <model name="ReplyToTestCase">
         <service name="EchoService">

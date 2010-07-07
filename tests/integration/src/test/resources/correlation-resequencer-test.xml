@@ -17,7 +17,7 @@
         -->
         <service name="splitter service">
             <inbound>
-                <vm:inbound-endpoint path="splitter"/>
+                <vm:inbound-endpoint path="splitter" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <list-message-splitter-router>
@@ -28,7 +28,7 @@
 
         <service name="resequencer service">
             <inbound>
-                <vm:inbound-endpoint path="resequencer"/>
+                <vm:inbound-endpoint path="resequencer" exchange-pattern="one-way"/>
                 <correlation-resequencer-router/>
             </inbound>
             <outbound>
@@ -43,7 +43,7 @@
 
         <service name="test validator">
             <inbound>
-                <vm:inbound-endpoint path="sorted"/>
+                <vm:inbound-endpoint path="sorted" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
 

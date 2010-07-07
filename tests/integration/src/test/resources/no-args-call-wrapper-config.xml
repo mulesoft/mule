@@ -18,7 +18,7 @@
     <model name="NoArgsWrapperModel">
         <service name="WrapperUMO">
             <inbound>
-                <inbound-endpoint address="vm://invoke"/>
+                <inbound-endpoint address="vm://invoke" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
@@ -28,14 +28,14 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="WrapperUMOInjected">
             <inbound>
-                <inbound-endpoint address="vm://invokeWithInjected"/>
+                <inbound-endpoint address="vm://invokeWithInjected" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
@@ -49,7 +49,7 @@
                         don't reuse the output queue, ensure we're the only sender
                         for this one by providing a unique name
                     -->
-                    <outbound-endpoint address="vm://outWithInjected"/>
+                    <outbound-endpoint address="vm://outWithInjected" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

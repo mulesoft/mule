@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <endpoint name="vmEndpoint" address="vm://test.queue"/>
+    <endpoint name="vmEndpoint" address="vm://test.queue" exchange-pattern="one-way"/>
 
     <model name="model">
         <service name="TestReceiverUMO">
@@ -18,7 +18,7 @@
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

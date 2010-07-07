@@ -28,7 +28,8 @@
     <model name="model">
         <service name="JmsToJdbc">
             <inbound>
-                <jms:inbound-endpoint queue="my.queue" connector-ref="jmsXAConnector" exchange-pattern="request-response">
+                <jms:inbound-endpoint queue="my.queue" exchange-pattern="request-response" 
+                    connector-ref="jmsXAConnector">
                     <xa-transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound>
@@ -37,7 +38,7 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="output"/>
+                    <vm:outbound-endpoint path="output" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>    

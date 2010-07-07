@@ -16,22 +16,25 @@
     <model>
         <service name="testService1">
             <inbound>
-                <vm:inbound-endpoint path="in1" />
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
             <default-service-exception-strategy>
-                <vm:outbound-endpoint path="out1" connector-ref="vmConnector"/> 
+                <vm:outbound-endpoint path="out1" exchange-pattern="one-way" 
+                    connector-ref="vmConnector"/> 
             </default-service-exception-strategy>
         </service>
 
         <service name="testService2">
             <inbound>
-                <vm:inbound-endpoint path="in2" />
+                <vm:inbound-endpoint path="in2" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
             <default-service-exception-strategy>
-                <vm:outbound-endpoint path="out2" connector-ref="vmConnector"/> 
-                <vm:outbound-endpoint path="out3" connector-ref="vmConnector"/> 
+                <vm:outbound-endpoint path="out2" exchange-pattern="one-way" 
+                    connector-ref="vmConnector"/> 
+                <vm:outbound-endpoint path="out3" exchange-pattern="one-way" 
+                    connector-ref="vmConnector"/> 
             </default-service-exception-strategy>
         </service>
     </model>

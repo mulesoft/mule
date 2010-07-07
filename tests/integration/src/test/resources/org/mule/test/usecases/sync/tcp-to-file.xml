@@ -13,13 +13,13 @@
     <model>
         <service name="TcpReceiver">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="4444"/>            
+                <tcp:inbound-endpoint host="localhost" port="4444" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <null-component/>
             <outbound>
                 <pass-through-router>
-                    <file:outbound-endpoint path="temp/tests/mule"/>
+                    <file:outbound-endpoint path="temp/tests/mule" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>    

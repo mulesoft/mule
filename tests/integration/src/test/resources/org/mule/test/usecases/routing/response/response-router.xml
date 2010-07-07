@@ -46,12 +46,12 @@
     <model name="fo">
         <service name="getLaszloW10">
             <inbound>
-                <inbound-endpoint address="http://localhost:28081"/>
+                <inbound-endpoint address="http://localhost:28081" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound matchAll="false">
                 <multicasting-router>
-                    <outbound-endpoint address="vm://getReportW10"/>
+                    <outbound-endpoint address="vm://getReportW10" exchange-pattern="one-way"/>
                     <!--                    <properties>-->
                     <!--                        <property name="replyTo" value="vm://W10Response"/>-->
                     <!--                        <property name="correlationId" value="true"/>-->
@@ -59,20 +59,20 @@
                 </multicasting-router>
             </outbound>
             <async-reply>
-                <inbound-endpoint address="vm://W10Response"/>
+                <inbound-endpoint address="vm://W10Response" exchange-pattern="one-way"/>
                 <single-async-reply-router/>
             </async-reply>
         </service>
 
         <service name="W10Report">
             <inbound>
-                <inbound-endpoint address="vm://getReportW10"/>
+                <inbound-endpoint address="vm://getReportW10" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <multicasting-router>
-                    <!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" connector="MidFileConnector"/>-->
-                    <outbound-endpoint address="vm://getFO"/>
+                    <!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" exchange-pattern="one-way" connector="MidFileConnector"/>-->
+                    <outbound-endpoint address="vm://getFO" exchange-pattern="one-way"/>
                     <!--                    <properties>-->
                     <!--                        <property name="correlationId" value="false"/>-->
                     <!--                    </properties>-->
@@ -82,15 +82,15 @@
 
         <service name="W10FO">
             <inbound>
-                <inbound-endpoint address="vm://getFO">
+                <inbound-endpoint address="vm://getFO" exchange-pattern="one-way">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>
                 <multicasting-router>
-                    <outbound-endpoint address="file://temp/test-data/out"/>
-                    <outbound-endpoint address="vm://W10Response"/>
+                    <outbound-endpoint address="file://temp/test-data/out" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="vm://W10Response" exchange-pattern="one-way"/>
                     <!--                    <properties>-->
                     <!--                        <property name="correlationId" value="false"/>-->
                     <!--                    </properties>-->

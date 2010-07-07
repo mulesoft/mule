@@ -11,7 +11,8 @@
     <model>
         <service name="test">
             <inbound>
-                <cxf:inbound-endpoint  address="http://localhost:63081/ser" frontend="simple">
+                <cxf:inbound-endpoint  address="http://localhost:63081/ser" 
+                    exchange-pattern="request-response" frontend="simple">
                     <response-transformers>
                         <message-properties-transformer>
                             <add-message-property key="foo" value="bar"/>

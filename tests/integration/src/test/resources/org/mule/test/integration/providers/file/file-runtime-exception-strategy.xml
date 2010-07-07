@@ -10,14 +10,14 @@
 
     <file:connector name="fileConnector" outputAppend="true" outputPattern="test-#[function:count].out">
         <default-connector-exception-strategy>
-            <outbound-endpoint address="file://./.mule/errors"/>
+            <outbound-endpoint address="file://./.mule/errors" exchange-pattern="one-way"/>
         </default-connector-exception-strategy>
     </file:connector>
 
     <model name="ESTest">
         <service name="FolderToVM">
             <inbound>
-                <inbound-endpoint address="file://./.mule/in">
+                <inbound-endpoint address="file://./.mule/in" exchange-pattern="one-way">
                     <custom-transformer name="failPoint" class="org.mule.test.transformers.FailingRuntimeTransformer"/>
                 </inbound-endpoint>
                 <forwarding-router/>
@@ -25,8 +25,8 @@
 
             <outbound>
                 <chaining-router>
-                    <!--<endpoint address="stdio://System.out"/>-->
-                    <outbound-endpoint address="file://./.mule/out"/>
+                    <!--<endpoint address="stdio://System.out" exchange-pattern="one-way"/>-->
+                    <outbound-endpoint address="file://./.mule/out" exchange-pattern="one-way"/>
                 </chaining-router>
             </outbound>
         </service>

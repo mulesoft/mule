@@ -15,14 +15,15 @@
 
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="tcp://localhost:25551" exchange-pattern="request-response" responseTimeout="10000"/>
+        <client:remote-endpoint address="tcp://localhost:25551" exchange-pattern="request-response" 
+            responseTimeout="10000"/>
     </client:remote-dispatcher-agent>
 
     <model name="model">
 
         <service name="testComponent1">
             <inbound>
-                <inbound-endpoint address="vm://test.queue.1">
+                <inbound-endpoint address="vm://test.queue.1" exchange-pattern="one-way">
                     <custom-transformer class="org.mule.test.transformers.FailingTransformer"/>
                 </inbound-endpoint>
             </inbound>
@@ -31,7 +32,7 @@
 
         <service name="testComponent2">
             <inbound>
-                <inbound-endpoint address="vm://test.queue.2"/>
+                <inbound-endpoint address="vm://test.queue.2" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
         </service>

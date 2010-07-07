@@ -15,7 +15,7 @@
         <service name="AxisService">
             <inbound>
                 <axis:inbound-endpoint address="http://localhost:63381/services"
-                        style="WRAPPED" use="LITERAL"/>
+                    exchange-pattern="request-response" style="WRAPPED" use="LITERAL"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
@@ -23,13 +23,17 @@
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
         <service name="test">
             <inbound>
-                <inbound-endpoint address="vm://localhost.test"/>
+                <inbound-endpoint address="vm://localhost.test" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
-                    <outbound-endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
+                    <outbound-endpoint 
+                        address="axis:http://localhost:63380/services/AxisService?method=receive"
+                        exchange-pattern="request-response"/>
+                    <outbound-endpoint 
+                        address="axis:http://localhost:63381/services/AxisService?method=receive"
+                        exchange-pattern="request-response"/>
                 </exception-based-router>
             </outbound>
         </service>
@@ -37,13 +41,14 @@
         <!-- Accessing an Axis hosted web-service using Cxf dynamic client -->
         <service name="BridgeToAxisService">
             <inbound>
-                <inbound-endpoint address="vm://axis.in"/>
+                <inbound-endpoint address="vm://axis.in" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint
-                            address="wsdl-cxf:http://localhost:63381/services/AxisService?wsdl&amp;method=receive"/>
+                            address="wsdl-cxf:http://localhost:63381/services/AxisService?wsdl&amp;method=receive"
+                            exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>

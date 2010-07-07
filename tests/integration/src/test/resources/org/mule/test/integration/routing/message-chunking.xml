@@ -19,18 +19,18 @@
     <model name="main">
         <service name="Receiver">
             <inbound>
-                <vm:inbound-endpoint path="inbound.channel"/>
+                <vm:inbound-endpoint path="inbound.channel" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <message-chunking-router messageSize="2">
-                    <vm:outbound-endpoint path="chunking.channel"/>
+                    <vm:outbound-endpoint path="chunking.channel" exchange-pattern="one-way"/>
                 </message-chunking-router>
             </outbound>
         </service>
 
         <service name="ChunkingReceiver">
             <inbound>
-                <vm:inbound-endpoint path="chunking.channel"/>
+                <vm:inbound-endpoint path="chunking.channel" exchange-pattern="one-way"/>
                 <message-chunking-aggregator-router/>
             </inbound>
             <test:component appendString=" Received"/>
@@ -41,18 +41,18 @@
 
         <service name="ObjectReceiver">
             <inbound>
-                <vm:inbound-endpoint path="inbound.object.channel"/>
+                <vm:inbound-endpoint path="inbound.object.channel" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <message-chunking-router messageSize="2">
-                    <vm:outbound-endpoint path="chunking.object.channel"/>
+                    <vm:outbound-endpoint path="chunking.object.channel" exchange-pattern="one-way"/>
                 </message-chunking-router>
             </outbound>
         </service>
 
         <service name="ChunkingObjectReceiver">
             <inbound>
-                <vm:inbound-endpoint path="chunking.object.channel"/>
+                <vm:inbound-endpoint path="chunking.object.channel" exchange-pattern="one-way"/>
                 <message-chunking-aggregator-router/>
             </inbound>
             <test:component doInboundTransform="false"/>

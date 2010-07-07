@@ -13,10 +13,10 @@
     <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
 
     <model name="main">
-
         <service name="WORMS">
             <inbound>
-                <inbound-endpoint address="vm://in" connector-ref="VmConnector"/>
+                <inbound-endpoint address="vm://in" connector-ref="VmConnector" 
+                    exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
@@ -26,14 +26,16 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out" connector-ref="VmConnector"/>
+                    <outbound-endpoint address="vm://out" connector-ref="VmConnector"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="TIRANA">
             <inbound>
-                <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"/>
+                <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"
+                    exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
@@ -43,10 +45,10 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://outWithInjected" connector-ref="VmConnector"/>
+                    <outbound-endpoint address="vm://outWithInjected" connector-ref="VmConnector"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

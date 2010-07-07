@@ -15,14 +15,14 @@
 
         <service name="HelloComponent">
             <inbound>
-                <inbound-endpoint address="jms://hello.in" />
+                <inbound-endpoint address="jms://hello.in" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.routing.nested.HelloService" />
         </service>
 
         <service name="InvokerComponent">
             <inbound>
-                <inbound-endpoint address="jms://invoker.in" />
+                <inbound-endpoint address="jms://invoker.in" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
@@ -32,10 +32,9 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://invoker.out" />
+                    <outbound-endpoint address="jms://invoker.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

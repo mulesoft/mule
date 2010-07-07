@@ -41,14 +41,14 @@
 
       <service name="Part3Service" initialState="started">
          <inbound>
-            <inbound-endpoint address="jms://out1"/>
+            <inbound-endpoint address="jms://out1" exchange-pattern="one-way"/>
          </inbound>
          <test:component appendString=" [REMOTESYNC RESPONSE]"/>
       </service>
 
       <service name="Part4Service" initialState="started">
          <inbound>
-            <inbound-endpoint address="vm://out2"/>
+            <inbound-endpoint address="vm://out2" exchange-pattern="one-way"/>
          </inbound>
          <test:component appendString=" [REMOTESYNC RESPONSE 2]"/>
       </service>

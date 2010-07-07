@@ -15,16 +15,16 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="vm://component.in"/>
+                <inbound-endpoint address="vm://component.in" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://component.out"/>
+                    <outbound-endpoint address="vm://component.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
             <default-service-exception-strategy>
-                <outbound-endpoint address="vm://error.queue"/>
+                <outbound-endpoint address="vm://error.queue" exchange-pattern="one-way"/>
             </default-service-exception-strategy>
         </service>
     </model>

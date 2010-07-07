@@ -53,12 +53,13 @@
         <service name="Echo">
             <inbound>
                 <!-- this endpoint is used by the functional test -->
-                <vm:inbound-endpoint path="test.in" transformer-refs="xslt" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="test.in" exchange-pattern="request-response"
+                    transformer-refs="xslt" />
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT"/>
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

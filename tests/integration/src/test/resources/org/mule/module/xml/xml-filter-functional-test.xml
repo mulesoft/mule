@@ -13,13 +13,12 @@
     <vm:connector name="default"/>
     <vm:connector name="queue"/>
 
-    <vm:endpoint name="in" address="vm://in" connector-ref="default"/>
-    <vm:endpoint name="notxml" path="notxml" connector-ref="queue"/>
-    <endpoint name="self" address="vm://self" connector-ref="queue"/>
-    <endpoint name="other" address="vm://other" connector-ref="queue"/>
+    <vm:endpoint name="in" address="vm://in" connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="notxml" path="notxml" connector-ref="queue" exchange-pattern="one-way"/>
+    <endpoint name="self" address="vm://self" connector-ref="queue" exchange-pattern="one-way"/>
+    <endpoint name="other" address="vm://other" connector-ref="queue" exchange-pattern="one-way"/>
 
     <model name="xml filter test">
-
         <service name="test for xml">
             <inbound>
                 <inbound-endpoint ref="in"/>
@@ -27,7 +26,7 @@
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://xml" connector-ref="default"/>
+                    <outbound-endpoint address="vm://xml" connector-ref="default" exchange-pattern="one-way"/>
                     <mxml:is-xml-filter/>
                 </filtering-router>
                 <filtering-router>
@@ -41,7 +40,7 @@
 
         <service name="filter xml for content">
             <inbound>
-                <vm:inbound-endpoint path="xml" connector-ref="default"/>
+                <vm:inbound-endpoint path="xml" connector-ref="default" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -58,7 +57,5 @@
                 </forwarding-catch-all-strategy>
             </outbound>
         </service>
-
     </model>
-
 </mule>

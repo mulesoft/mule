@@ -15,36 +15,36 @@
     <model name="InjectionProblem">
         <service name="pojo1">
             <inbound>
-                <vm:inbound-endpoint path="pojo1"/>
+                <vm:inbound-endpoint path="pojo1" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo2"/>
+                    <jms:outbound-endpoint queue="pojo2" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="pojo2">
             <inbound>
-                <jms:inbound-endpoint queue="pojo2"/>
+                <jms:inbound-endpoint queue="pojo2" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo3"/>
+                    <jms:outbound-endpoint queue="pojo3" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="pojo3">
             <inbound>
-                <jms:inbound-endpoint queue="pojo3"/>
+                <jms:inbound-endpoint queue="pojo3" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="pojo4"/>
+                    <jms:outbound-endpoint queue="pojo4" exchange-pattern="one-way"/>
                     <reply-to address="jms://response"/>
                 </pass-through-router>
             </outbound>
@@ -53,7 +53,7 @@
         <!-- This service will append " Received" to the message so we know we're getting the correct one -->
         <service name="pojo4">
             <inbound>
-                <jms:inbound-endpoint queue="pojo4"/>
+                <jms:inbound-endpoint queue="pojo4" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

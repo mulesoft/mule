@@ -14,6 +14,7 @@
                    method="POST">
         <property key="http.post.body.param" value="IncidentData"/>
     </http:endpoint>
+    
     <endpoint name="httpService"
               address="http://localhost:18080/RemoteService"
               exchange-pattern="request-response"/>
@@ -26,5 +27,4 @@
             <echo-component/>
         </service>
     </model>
-
 </mule>

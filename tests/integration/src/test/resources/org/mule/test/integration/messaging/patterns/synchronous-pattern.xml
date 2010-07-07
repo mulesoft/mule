@@ -22,7 +22,7 @@
 
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="test.out"/>
+                    <jms:outbound-endpoint queue="test.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

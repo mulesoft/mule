@@ -17,10 +17,9 @@
 
         <service name="testService1">
             <inbound>
-                <inbound-endpoint address="test://test1"/>
+                <inbound-endpoint address="test://test1" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>
-
     </model>
 </mule>

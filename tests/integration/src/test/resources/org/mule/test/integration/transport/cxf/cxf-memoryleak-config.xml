@@ -27,6 +27,7 @@
     <cxf:endpoint
             name="clientEndpoint"
             address="http://localhost:63081/services/greeter"
+            exchange-pattern="request-response"
             clientClass="org.apache.hello_world_soap_http.SOAPService"
             wsdlPort="SoapPort"
             wsdlLocation="classpath:/wsdl/hello_world.wsdl">
@@ -35,21 +36,22 @@
     <model>
         <service name="greeterService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"/>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
             </component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="PopulateBatchData">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <scripting:component>
                 <scripting:script engine="groovy">
@@ -64,6 +66,7 @@
                 <pass-through-router>
                     <cxf:outbound-endpoint
                             address="http://localhost:63081/services/greeter"
+                            exchange-pattern="request-response"
                             clientClass="org.apache.hello_world_soap_http.SOAPService"
                             wsdlPort="SoapPort"
                             wsdlLocation="classpath:/wsdl/hello_world.wsdl"

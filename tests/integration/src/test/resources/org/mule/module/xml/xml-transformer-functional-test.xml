@@ -58,24 +58,35 @@
     </mxml:xslt-transformer>
 <!--// START SNIPPET: xml-transformers2 -->
 
-    <endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
-    <vm:endpoint name="object-in" path="object-in" connector-ref="default"/>
-    <endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default"/>
-    <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" transformer-refs="xmlToDom"/>
+    <endpoint name="xml-in" address="vm://xml-in" connector-ref="default" 
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="object-in" path="object-in" connector-ref="default"  
+        exchange-pattern="one-way"/>
+    <endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default" 
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" 
+        transformer-refs="xmlToDom" exchange-pattern="one-way"/>
 
-    <endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
-    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out" connector-ref="queue"/>
-    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string" connector-ref="queue"/>
-    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"/>
-    <endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"/>
-    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"/>
-    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
-    <vm:endpoint name="object-xml-out" path="object-xml-out" connector-ref="queue"/>
-    <endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"/>
-
+    <endpoint name="xml-out" address="vm://xml-out" connector-ref="queue" 
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="object-xml-out" path="object-xml-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
+    <endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"
+        exchange-pattern="one-way"/>
 
     <model name="xml transformer tests">
-
         <service name="xml to ...">
             <inbound>
                 <inbound-endpoint ref="xml-in"/>

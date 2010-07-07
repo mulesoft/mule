@@ -40,14 +40,14 @@
     <model name="model">
         <service name="TestJdbc">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <jdbc:outbound-endpoint queryKey="insertRecord">
+                    <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </jdbc:outbound-endpoint>
-                    <jdbc:outbound-endpoint queryKey="causeException">
+                    <jdbc:outbound-endpoint queryKey="causeException" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </jdbc:outbound-endpoint>
                     <xa-transaction action="ALWAYS_BEGIN"/>
@@ -58,11 +58,11 @@
         
         <service name="TestJms">
             <inbound>
-                <vm:inbound-endpoint path="in1"/>
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <jdbc:outbound-endpoint queryKey="insertRecord">
+                    <jdbc:outbound-endpoint queryKey="insertRecord" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </jdbc:outbound-endpoint>
                     <jms:outbound-endpoint queue="queue.out" exchange-pattern="request-response">

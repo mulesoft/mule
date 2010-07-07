@@ -33,13 +33,11 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
             </component>
         </service>
     </model>
-
 </mule>
-        

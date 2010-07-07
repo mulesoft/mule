@@ -26,19 +26,19 @@
             <component class="org.mule.component.simple.EchoComponent" />
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="jms://queue_in" />
+                    <outbound-endpoint address="jms://queue_in" exchange-pattern="one-way"/>
                     <reply-to address="jms://queue_out" />
                 </pass-through-router>
             </outbound>
             <async-reply>
-                <inbound-endpoint address="jms://queue_out" />
+                <inbound-endpoint address="jms://queue_out" exchange-pattern="one-way"/>
                 <single-async-reply-router/>
             </async-reply>
         </service>
 
         <service name="JMSReplyProvider">
             <inbound>
-                <inbound-endpoint address="jms://queue_in">
+                <inbound-endpoint address="jms://queue_in" exchange-pattern="one-way">
                     <transformer ref="jmsmessage-to-object" />
                     <transformer ref="bytearray-to-object" />
                 </inbound-endpoint>

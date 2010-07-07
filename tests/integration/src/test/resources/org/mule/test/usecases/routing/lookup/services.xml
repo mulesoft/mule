@@ -9,7 +9,8 @@
     <model>
         <service name="BadResponse">
             <inbound>
-                <inbound-endpoint address="http://localhost:8888/services/BadResponse" />
+                <inbound-endpoint address="http://localhost:8888/services/BadResponse" 
+                    exchange-pattern="one-way"/>
             </inbound>
             <static-component>
                 <return-data>
@@ -25,7 +26,8 @@
 
         <service name="GoodService">
             <inbound>
-                <inbound-endpoint address="http://localhost:8890/services/GoodOne" />
+                <inbound-endpoint address="http://localhost:8890/services/GoodOne" 
+                    exchange-pattern="one-way"/>
             </inbound>
             <static-component>
                 <return-data>

@@ -28,18 +28,18 @@
 
         <service name="testBridge">
             <inbound>
-                <stdio:inbound-endpoint system="IN"/>
+                <stdio:inbound-endpoint system="IN" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="in"/>
+                    <vm:outbound-endpoint path="in" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="VmXaTestService">
             <inbound>
-                <vm:inbound-endpoint path="in">
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </vm:inbound-endpoint>
             </inbound>
@@ -47,7 +47,7 @@
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT">
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
                         <xa-transaction action="ALWAYS_JOIN"/>
                     </stdio:outbound-endpoint>
                 </pass-through-router>
