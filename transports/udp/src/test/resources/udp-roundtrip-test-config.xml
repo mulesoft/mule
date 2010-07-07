@@ -16,14 +16,13 @@
 
         <service name="PassingThrough">
             <inbound>
-                <udp:inbound-endpoint host="${hostname}" port="61000"/>
+                <udp:inbound-endpoint host="${hostname}" port="61000" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <udp:outbound-endpoint host="${hostname}" port="61001"/>
+                    <udp:outbound-endpoint host="${hostname}" port="61001" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

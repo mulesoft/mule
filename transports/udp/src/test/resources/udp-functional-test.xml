@@ -17,8 +17,8 @@
     <vm:connector name="vm-queue"/>
 
     <!-- MULE-2109 -->
-    <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131"/ -->
-    <endpoint name="serverEndpoint" address="udp://localhost:60131"/>
+    <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131" exchange-pattern="one-way"/ -->
+    <endpoint name="serverEndpoint" address="udp://localhost:60131" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="testUDP1">
@@ -28,10 +28,9 @@
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://foo"/>
+                    <outbound-endpoint address="vm://foo" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
     </model>
-
 </mule>
