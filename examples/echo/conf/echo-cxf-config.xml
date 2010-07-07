@@ -29,7 +29,8 @@
         <service name="EchoUMO">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
-                                      serviceClass="org.mule.example.echo.Echo"/>
+                                      serviceClass="org.mule.example.echo.Echo"
+                                      exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

@@ -38,8 +38,8 @@
         <service name="EchoUMO">
             <!-- any number of endpoints can be added to an inbound router -->
             <inbound>
-                <stdio:inbound-endpoint system="IN"/>
-                <vm:inbound-endpoint path="echo"/>
+                <stdio:inbound-endpoint system="IN" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="echo" exchange-pattern="one-way"/>
             </inbound>
 
             <echo-component/>
@@ -52,7 +52,7 @@
             -->
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT"/>
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
