@@ -10,6 +10,6 @@
 
     <servlet:connector name="servletConnector" servletUrl="foo"/>
 
-    <servlet:endpoint name="ep" path="foo/bar"/>
+    <servlet:endpoint name="ep" path="foo/bar" exchange-pattern="one-way"/>
 
 </mule>
