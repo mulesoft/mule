@@ -45,8 +45,6 @@
     <!--
         Mule configuration
     -->
-    <configuration defaultSynchronousEndpoints="false"/>
-    
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="daoAuthenticationSecurityProvider2" delegate-ref="authenticationManager2"/>
     </mule-ss:security-manager>

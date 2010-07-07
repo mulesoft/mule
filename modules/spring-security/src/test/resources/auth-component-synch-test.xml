@@ -15,7 +15,6 @@
     <import resource="auth-component-security.xml"/>
 
     <mule:mule>
-
         <spring-security:security-manager>
             <spring-security:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
         </spring-security:security-manager>
@@ -27,7 +26,7 @@
         <mule:model name="test">
             <mule:service name="echoUMO">
                 <mule:inbound>
-                    <mule:inbound-endpoint address="vm://test">
+                    <mule:inbound-endpoint address="vm://test" exchange-pattern="one-way">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
                     </mule:inbound-endpoint>
                 </mule:inbound>
@@ -36,7 +35,5 @@
                 </mule:component>
             </mule:service>
         </mule:model>
-
     </mule:mule>
-
 </beans>

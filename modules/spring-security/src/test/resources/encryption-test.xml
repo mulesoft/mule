@@ -36,10 +36,10 @@
     <model name="test">
         <service name="echo">
             <inbound>
-                <vm:inbound-endpoint path="my.queue">
+                <vm:inbound-endpoint path="my.queue" exchange-pattern="one-way">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </vm:inbound-endpoint>
-                <inbound-endpoint address="http://localhost:4567">
+                <inbound-endpoint address="http://localhost:4567" exchange-pattern="one-way">
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>
