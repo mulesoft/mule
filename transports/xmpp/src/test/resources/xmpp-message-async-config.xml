@@ -18,11 +18,12 @@
     <model>
         <service name="dispatchViaMessage">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <xmpp:outbound-endpoint type="MESSAGE" recipient="${conversationPartner}"/>
+                    <xmpp:outbound-endpoint type="MESSAGE" recipient="${conversationPartner}"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -32,7 +33,8 @@
         -->
         <service name="receiveFromJabber" initialState="stopped">
             <inbound>
-                <xmpp:inbound-endpoint type="MESSAGE" from="${conversationPartner}"/>
+                <xmpp:inbound-endpoint type="MESSAGE" from="${conversationPartner}" 
+                    exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
         </service>

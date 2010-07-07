@@ -32,11 +32,12 @@
     <model>
         <service name="receiveMessage">
             <inbound>
-                <xmpp:inbound-endpoint type="MESSAGE" from="mule2@localhost"/>
+                <xmpp:inbound-endpoint type="MESSAGE" from="mule2@localhost"
+                    exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="toTest"/>
+                    <vm:outbound-endpoint path="toTest" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

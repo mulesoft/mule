@@ -19,7 +19,7 @@
 
     <!-- sending endpoint -->
     <xmpp:endpoint name="sendingMessageEndpoint" type="MESSAGE" recipient="recipient@jabberhost" 
-        subject="TheSubject"/>
+        subject="TheSubject" exchange-pattern="one-way"/>
 
     <!-- receiving endpoint -->
     <xmpp:endpoint name="receivingChatEndpoint" type="CHAT" from="sender@jabberhost"/>
