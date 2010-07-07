@@ -17,77 +17,84 @@
          
         <service name="OutboundDelete">
             <inbound>
-                <vm:inbound-endpoint path="doDelete"/>
+                <vm:inbound-endpoint path="doDelete" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="DELETE"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="DELETE"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundGet">
             <inbound>
-                <vm:inbound-endpoint path="doGet"/>
+                <vm:inbound-endpoint path="doGet" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="GET"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="GET"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundHead">
             <inbound>
-                <vm:inbound-endpoint path="doHead"/>
+                <vm:inbound-endpoint path="doHead" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="HEAD"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="HEAD"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundOptions">
             <inbound>
-                <vm:inbound-endpoint path="doOptions"/>
+                <vm:inbound-endpoint path="doOptions" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="OPTIONS"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="OPTIONS"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundPost">
             <inbound>
-                <vm:inbound-endpoint path="doPost"/>
+                <vm:inbound-endpoint path="doPost" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="POST"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="POST"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundPut">
             <inbound>
-                <vm:inbound-endpoint path="doPut"/>
+                <vm:inbound-endpoint path="doPut" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="PUT"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="PUT"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutboundTrace">
             <inbound>
-                <vm:inbound-endpoint path="doTrace"/>
+                <vm:inbound-endpoint path="doTrace" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="TRACE"/>
+                    <http:outbound-endpoint address="http://localhost:60215/" method="TRACE"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -22,21 +22,22 @@
         <service name="pollingUMO">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="61206"
-                                       connector-ref="PollingHttpConnector">
+                                       connector-ref="PollingHttpConnector" exchange-pattern="one-way">
                     <append-string-transformer message=" toClient-only"/>
                 </http:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://toclient"/>
+                    <outbound-endpoint address="vm://toclient" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="polledUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:61206" exchange-pattern="request-response" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:61206" exchange-pattern="request-response" 
+                    connector-ref="HttpConnector"/>
             </inbound>
             <test:component appendString="foo"/>
         </service>

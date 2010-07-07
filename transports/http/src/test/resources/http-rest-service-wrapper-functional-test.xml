@@ -15,9 +15,9 @@
     <http:endpoint name="serverEndpoint" host="localhost" port="60226" exchange-pattern="request-response" 
         transformer-refs="ByteArrayToString"/>
 
-    <vm:endpoint name="restServiceEndpoint" path="restservice" />
-    <vm:endpoint name="restServiceEndpoint2" path="restservice2" />
-    <vm:endpoint name="restServiceEndpoint3" path="restservice3" />
+    <vm:endpoint name="restServiceEndpoint" path="restservice" exchange-pattern="one-way"/>
+    <vm:endpoint name="restServiceEndpoint2" path="restservice2" exchange-pattern="one-way"/>
+    <vm:endpoint name="restServiceEndpoint3" path="restservice3" exchange-pattern="one-way"/>
 
     <model name="Sample">
         <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->

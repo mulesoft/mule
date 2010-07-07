@@ -21,10 +21,10 @@ import java.io.InputStream;
 
 public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
 {
-    
     private static final String NAME_PAYLOAD = "test-xml-payload.xml";
     private static final String NAME_STYLESHEET = "stylesheet.xsl";
 
+    @Override
     protected String getConfigResources()
     {
         return "http-content-length-propagation-conf.xml";
@@ -40,10 +40,11 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:8085", new DefaultMuleMessage(fileContents, muleContext));
 
         XsltTransformer trans = new XsltTransformer();
+        trans.setMuleContext(muleContext);
         trans.setXslFile(NAME_STYLESHEET);
+        trans.initialise();
         final byte[] locallyTransformedBytes = (byte[]) trans.doTransform(fileContents, "UTF-8");
 
         assertEquals(new String(locallyTransformedBytes), result.getPayloadAsString());
     }
-
 }

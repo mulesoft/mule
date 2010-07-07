@@ -30,11 +30,13 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     private boolean cookieFound = false;
     private List<String> cookieHeaders  = new ArrayList<String>();
 
+    @Override
     protected String getConfigResources()
     {
         return "http-cookie-test.xml";
     }
 
+    @Override
     protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
         return new SimpleHttpServer(LISTEN_PORT, serverStartLatch, latch);
@@ -46,7 +48,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         properties.put("COOKIE_HEADER","MYCOOKIE");
 
         MuleClient client = new MuleClient(muleContext);
-        client.send("vm://vm-in", "foobar", properties);
+        client.dispatch("vm://vm-in", "foobar", properties);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);

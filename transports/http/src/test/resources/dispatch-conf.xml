@@ -13,7 +13,7 @@
     <vm:connector name="asyncVm"/>
 
     <!-- only used for the async loan broker to send the lowest quote back to the customer -->
-    <vm:endpoint name="Responses" path="queue" connector-ref="asyncVm" />
+    <vm:endpoint name="Responses" path="queue" connector-ref="asyncVm" exchange-pattern="one-way"/>
 
     <model name="BasicCxfTest">
         <service name="echoService">

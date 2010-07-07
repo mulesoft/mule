@@ -9,10 +9,9 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint address="http://localhost:60208"/>
+                <inbound-endpoint address="http://localhost:60208" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.transport.tcp.issues.InputStreamSource"/>
         </service>
     </model>
-
 </mule>

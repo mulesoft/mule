@@ -17,16 +17,17 @@
     <http:endpoint name="clientEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
     <http:endpoint name="serverEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
 
-    <http:endpoint name="clientEndpoint2" host="localhost" port="60204" contentType="application/xml">
+    <http:endpoint name="clientEndpoint2" host="localhost" port="60204" contentType="application/xml"
+        exchange-pattern="one-way">
         <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
         <property key="X-Test" value="foo"/>
     </http:endpoint>
-    <http:endpoint name="serverEndpoint2" host="localhost" port="60204"/>
+    <http:endpoint name="serverEndpoint2" host="localhost" port="60204" exchange-pattern="request-response"/>
 
     <model name="Test">
         <service name="ProductDataSourceRepository">
             <inbound>
-                <http:inbound-endpoint ref="serverEndpoint" exchange-pattern="request-response" contentType="application/x-download">
+                <http:inbound-endpoint ref="serverEndpoint" contentType="application/x-download">
                     <properties>
                         <spring:entry key="Content-Disposition" value="attachment; filename=foo.zip"/>
                         <spring:entry key="Content-Type" value="application/x-download"/>
@@ -41,7 +42,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" connector-ref="vm"/>
+                    <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -13,7 +13,7 @@
     <model>
         <service name="HttpMethodDelete">
             <inbound>
-                <vm:inbound-endpoint path="fromTest"/>
+                <vm:inbound-endpoint path="fromTest" exchange-pattern="one-way"/>
             </inbound>
             <http:rest-service-component serviceUrl="http://localhost:60205" httpMethod="DELETE"/>
         </service>

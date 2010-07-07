@@ -21,12 +21,13 @@
         <custom-service name="Test" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <http:inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                                       address="http://localhost:60206/TestServer"/>
+                                       address="http://localhost:60206/TestServer"
+                                       exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </custom-service>

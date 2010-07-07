@@ -22,12 +22,12 @@
         <service name="pollingUMO">
             <inbound>
                 <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
-                                       connector-ref="PollingHttpConnector"/>
+                                       connector-ref="PollingHttpConnector" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://toclient"/>
+                    <outbound-endpoint address="vm://toclient" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
