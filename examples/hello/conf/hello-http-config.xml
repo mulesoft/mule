@@ -97,7 +97,7 @@
 
             <!-- Route unexpected errors to separate error handler -->
             <default-service-exception-strategy>
-                <vm:outbound-endpoint path="systemErrorHandler"/>
+                <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
             </default-service-exception-strategy>
         </service>
 
@@ -127,11 +127,9 @@
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="ERR"/>
+                    <stdio:outbound-endpoint system="ERR" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

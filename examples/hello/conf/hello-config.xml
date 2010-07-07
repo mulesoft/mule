@@ -64,40 +64,43 @@
         <service name="GreeterUMO">
 
             <inbound>
-                <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"/>
+                <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"
+                    exchange-pattern="one-way"/>
             </inbound>
 
             <component class="org.mule.example.hello.Greeter"/>
 
             <outbound>
                 <filtering-router>
-                    <vm:outbound-endpoint path="chitchatter"/>
+                    <vm:outbound-endpoint path="chitchatter" exchange-pattern="one-way"/>
                     <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
                 </filtering-router>
 
                 <filtering-router>
-                    <vm:outbound-endpoint path="userErrorHandler"/>
+                    <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="one-way"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
             </outbound>
 
             <!-- Route unexpected errors to separate error handler -->
             <default-service-exception-strategy>
-                <vm:outbound-endpoint path="systemErrorHandler"/>
+                <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
             </default-service-exception-strategy>
         </service>
 
         <service name="ChitChatUMO">
 
             <inbound>
-                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"
+                    exchange-pattern="one-way"/>
             </inbound>
 
             <component class="org.mule.example.hello.ChitChatter"/>
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString" />
+                    <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
 
@@ -107,12 +110,13 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound>
-                <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"/>
+                <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"
+                    exchange-pattern="one-way"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT"/>
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -121,12 +125,12 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
             <inbound>
-                <vm:inbound-endpoint path="systemErrorHandler"/>
+                <vm:inbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="ERR"/>
+                    <stdio:outbound-endpoint system="ERR" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
