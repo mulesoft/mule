@@ -27,13 +27,13 @@
     <jms:activemq-connector name="jmsConnector" />
 
 	<!-- Customer loan requests to the Loan Broker -->
-	<jms:endpoint name="CustomerRequests" queue="customer.requests" />
+	<jms:endpoint name="CustomerRequests" queue="customer.requests" exchange-pattern="one-way"/>
 	<!-- Requests to the credit agency -->
-	<jms:endpoint name="CreditAgency" queue="credit.agency" />
+	<jms:endpoint name="CreditAgency" queue="credit.agency" exchange-pattern="one-way"/>
 	<!-- Customer credit profiles from the credit agency -->
-	<jms:endpoint name="CreditProfiles" queue="credit.profiles" />
+	<jms:endpoint name="CreditProfiles" queue="credit.profiles" exchange-pattern="one-way"/>
 	<!-- Final loan quote to the customer -->
-	<jms:endpoint name="CustomerResponses" queue="customer.responses" />
+	<jms:endpoint name="CustomerResponses" queue="customer.responses" exchange-pattern="one-way"/>
     <!-- Bigger banks handle bigger loans.  -->
     <vm:endpoint name="BigBank" path="big.bank" exchange-pattern="request-response" />
     <vm:endpoint name="MediumBank" path="medium.bank" exchange-pattern="request-response" />
@@ -55,7 +55,7 @@
             </inbound>
             <outbound>
                 <filtering-router>
-                    <bpm:outbound-endpoint process="LoanBroker" />
+                    <bpm:outbound-endpoint process="LoanBroker" exchange-pattern="one-way"/>
                 </filtering-router>
             </outbound>
         </service>
@@ -63,7 +63,7 @@
         <!-- Messages generated from the process engine -->
         <service name="FromBPMS">
             <inbound>
-                <bpm:inbound-endpoint process="LoanBroker" />
+                <bpm:inbound-endpoint process="LoanBroker" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <bpm:outbound-router>

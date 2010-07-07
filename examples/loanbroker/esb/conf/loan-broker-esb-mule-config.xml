@@ -75,30 +75,41 @@
     <!-- Example of a built-in, transport specific transformer -->
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
 
-    <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" />
-    <vm:endpoint name="CustomerRequests" path="customer.requests" />
-    <jms:endpoint name="CustomerResponses" queue="esb.loan.quotes" />
-    <jms:endpoint name="LoanQuotes" queue="esb.loan.quotes" />
-    <jms:endpoint name="CreditAgencyGateway" queue="esb.credit.agency" />
+    <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" 
+        exchange-pattern="one-way"/>
+    <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="one-way"/>
+    <jms:endpoint name="CustomerResponses" queue="esb.loan.quotes" exchange-pattern="one-way"/>
+    <jms:endpoint name="LoanQuotes" queue="esb.loan.quotes" exchange-pattern="one-way"/>
+    <jms:endpoint name="CreditAgencyGateway" queue="esb.credit.agency" exchange-pattern="one-way"/>
     <!-- Here we're telling Mule to invoke a remote Ejb directly 
     (not host a proxy service for the remote object as with the other example in loan-broker-esb-mule-config-with-ejb-container.xml) -->
-    <ejb:endpoint name="CreditAgency" host="localhost" port="1099" object="local/CreditAgency" method="getCreditProfile" />
-    <jms:endpoint name="LenderGateway" queue="esb.lender.service" />
-    <vm:endpoint name="LenderService" path="lender.service" />
-    <jms:endpoint name="BankingGateway" queue="esb.banks" />
-    <cxf:endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank1In" address="http://localhost:10080/mule/TheBank1" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank2In" address="http://localhost:20080/mule/TheBank2" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank3In" address="http://localhost:30080/mule/TheBank3" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank4In" address="http://localhost:40080/mule/TheBank4" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank5In" address="http://localhost:50080/mule/TheBank5" serviceClass="org.mule.example.loanbroker.bank.BankService" />
+    <ejb:endpoint name="CreditAgency" host="localhost" port="1099" object="local/CreditAgency" 
+        method="getCreditProfile"  exchange-pattern="request-response"/>
+    <jms:endpoint name="LenderGateway" queue="esb.lender.service" exchange-pattern="one-way"/>
+    <vm:endpoint name="LenderService" path="lender.service" exchange-pattern="one-way"/>
+    <jms:endpoint name="BankingGateway" queue="esb.banks" exchange-pattern="one-way"/>
+    <cxf:endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1" 
+        exchange-pattern="request-response" operation="getLoanQuote" />
+    <cxf:endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2" 
+        exchange-pattern="request-response" operation="getLoanQuote" />
+    <cxf:endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3"
+        exchange-pattern="request-response" operation="getLoanQuote" />
+    <cxf:endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4" 
+        exchange-pattern="request-response" operation="getLoanQuote" />
+    <cxf:endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5" 
+        exchange-pattern="request-response" operation="getLoanQuote" />
+    <cxf:endpoint name="Bank1In" address="http://localhost:10080/mule/TheBank1" 
+        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
+    <cxf:endpoint name="Bank2In" address="http://localhost:20080/mule/TheBank2" 
+        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
+    <cxf:endpoint name="Bank3In" address="http://localhost:30080/mule/TheBank3" 
+        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
+    <cxf:endpoint name="Bank4In" address="http://localhost:40080/mule/TheBank4" 
+        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
+    <cxf:endpoint name="Bank5In" address="http://localhost:50080/mule/TheBank5" 
+        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
 
     <model name="loan-broker">
-
         <service name="LoanBroker">
             <description>
                 The LoanBroker service is our 'entry' service that accepts requests from the outside world
@@ -140,8 +151,9 @@
                     <!-- We invoke the credit Agency service using synchronous which means that a response
                     will be returned from the service. there is also a responseTransformer that will
                     conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
-                    <outbound-endpoint exchange-pattern="request-response" transformer-refs="CustomerToCreditProfileArgs"
-                                   responseTransformer-refs="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
+                    <outbound-endpoint ref="CreditAgency" exchange-pattern="request-response" 
+                        transformer-refs="CustomerToCreditProfileArgs"
+                        responseTransformer-refs="CreditProfileXmlToCreditProfile" />
                 </binding>
             </component>
             <outbound>
@@ -162,7 +174,7 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint exchange-pattern="request-response" ref="LenderService" />
+                    <outbound-endpoint ref="LenderService" exchange-pattern="request-response" />
                     <outbound-endpoint ref="BankingGateway" transformer-refs="SetLendersAsRecipients ObjectToJMSMessage" />
                 </chaining-router>
             </outbound>

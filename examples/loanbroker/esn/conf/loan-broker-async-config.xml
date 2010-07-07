@@ -27,7 +27,8 @@
     <vm:connector name="asyncVm"/>
 
     <!-- only used for the async loan broker to send the lowest quote back to the customer -->
-    <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm"/>
+    <vm:endpoint name="CustomerResponses" path="customer.responses" exchange-pattern="one-way"
+        connector-ref="asyncVm"/>
 
     <!--
        The Mule model initialises and manages your Mule components
