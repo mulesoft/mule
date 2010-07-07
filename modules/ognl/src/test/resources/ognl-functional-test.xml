@@ -8,18 +8,16 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/ognl http://www.mulesoft.org/schema/mule/ognl/3.0/mule-ognl.xsd
-">
+       http://www.mulesoft.org/schema/mule/ognl http://www.mulesoft.org/schema/mule/ognl/3.0/mule-ognl.xsd">
 
     <model name="OGNL Functional TestCase">
-
         <service name="OGNLServiceWrapper1">
             <inbound>
-                <inbound-endpoint address="vm://in"/>
+                <inbound-endpoint address="vm://in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
                     <ognl:filter>
                         <ognl:expression><![CDATA[ equals("foo") || content.endsWith("bar") ]]></ognl:expression>
                     </ognl:filter>
@@ -29,11 +27,11 @@
 
         <service name="OGNLServiceWrapper2">
             <inbound>
-                <inbound-endpoint address="vm://in2"/>
+                <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="vm://out2"/>
+                    <outbound-endpoint address="vm://out2" exchange-pattern="one-way"/>
                     <expression-filter evaluator="ognl" expression="equals('foo') || content.endsWith('bar')"/>
                 </filtering-router>
             </outbound>
