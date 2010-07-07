@@ -24,7 +24,7 @@
         <service name="echoService">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
-                                      frontend="simple" />
+                                      frontend="simple" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
         </service>

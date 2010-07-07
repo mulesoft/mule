@@ -15,7 +15,8 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <cxf:inbound-endpoint address="servlet://mycomponent" frontend="jaxws"/>
+                <cxf:inbound-endpoint address="servlet://mycomponent" frontend="jaxws"
+                    exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.cxf.testmodels.Echo"/>
         </service>    

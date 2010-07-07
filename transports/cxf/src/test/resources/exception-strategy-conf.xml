@@ -14,7 +14,8 @@
     <service name="CxfWithExceptionStrategy">
       <inbound>
         <inbound-endpoint
-          address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" />
+          address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" 
+          exchange-pattern="request-response"/>
       </inbound>
       <component
         class="org.mule.transport.cxf.testmodels.TestCxfComponent" />
@@ -24,7 +25,8 @@
     <service name="CxfDefault">
       <inbound>
         <inbound-endpoint
-          address="cxf:http://localhost:63181/services/CxfDefault" />
+          address="cxf:http://localhost:63181/services/CxfDefault"
+          exchange-pattern="request-response"/>
       </inbound>
       <component
         class="org.mule.transport.cxf.testmodels.TestCxfComponent" />

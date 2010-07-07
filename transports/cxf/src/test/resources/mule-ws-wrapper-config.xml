@@ -15,28 +15,27 @@
      <cxf:connector name="cxf" defaultFrontend="simple" />
 
      <model name="Sample">
-
           <service name="WebServiceSample">
                <inbound>
-                    <vm:inbound-endpoint path="testin" />
+                    <vm:inbound-endpoint path="testin" exchange-pattern="one-way"/>
                </inbound>
                <cxf:wrapper-component address="http://localhost:65081/services/TestUMO?method=onReceive"/>
           </service>
 
           <service name="WebServiceSample2">
                <inbound>
-                    <vm:inbound-endpoint path="testin2" />
+                    <vm:inbound-endpoint path="testin2" exchange-pattern="one-way"/>
                </inbound>
                <cxf:wrapper-component addressFromMessage="true"/>
           </service>
 
           <service name="TestUMO">
                <inbound>
-                    <cxf:inbound-endpoint address="http://localhost:65081/services/TestUMO" serviceClass="org.mule.tck.functional.Receiveable"/>
+                    <cxf:inbound-endpoint address="http://localhost:65081/services/TestUMO" 
+                        serviceClass="org.mule.tck.functional.Receiveable"
+                        exchange-pattern="request-response"/>
                </inbound>
                <test:web-service-component/>
           </service>
-
      </model>
-    
 </mule>

@@ -14,7 +14,7 @@
         <service name="mycomponent">
             <inbound>
                <cxf:inbound-endpoint address="http://localhost:63081/services/mtom" 
-                                     mtomEnabled="true">
+                                     mtomEnabled="true" exchange-pattern="request-response">
         
                </cxf:inbound-endpoint>
             </inbound>

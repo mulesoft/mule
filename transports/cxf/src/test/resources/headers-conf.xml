@@ -3,7 +3,7 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
@@ -15,14 +15,15 @@
     </notifications>
 
     <cxf:connector name="cxf" defaultFrontend="simple"/>
-    
-     <model name="TestCxfHeaders">
+
+    <model name="TestCxfHeaders">
         <service name="TestComponent">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63181/services/TestComponent" serviceClass="org.mule.tck.functional.Receiveable"/>
+                <cxf:inbound-endpoint address="http://localhost:63181/services/TestComponent"
+                    serviceClass="org.mule.tck.functional.Receiveable" 
+                    exchange-pattern="request-response" />
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" />
         </service>
-     </model>
-
+    </model>
 </mule>

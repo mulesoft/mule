@@ -9,26 +9,24 @@
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
-
     <cxf:endpoint name="greetMeOutboundEndpoint"
         address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
         wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-        operation="greetMe" payloadToArguments="nullPayloadAsVoid">
+        operation="greetMe" payloadToArguments="nullPayloadAsVoid" exchange-pattern="request-response">
     </cxf:endpoint>
-
 
     <cxf:endpoint name="sayHiOutboundEndpoint"
         address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
         wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-        operation="sayHi" payloadToArguments="nullPayloadAsVoid">
+        operation="sayHi" payloadToArguments="nullPayloadAsVoid" exchange-pattern="request-response">
     </cxf:endpoint>
-
 
     <model>
         <service name="greeterService">
             <inbound>
                 <cxf:inbound-endpoint
-                    address="http://localhost:63081/services/greeter" />
+                    address="http://localhost:63081/services/greeter" 
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object
@@ -37,4 +35,3 @@
         </service>
     </model>
 </mule>
-

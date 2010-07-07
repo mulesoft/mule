@@ -22,7 +22,8 @@
                     address="http://localhost:63081/services/Echo"
                     frontend="simple"
                     responseTransformer-refs="ResponseXslt"
-                    applyTransformersToProtocol="true">
+                    applyTransformersToProtocol="true"
+                    exchange-pattern="request-response">
                     <cxf:features>
                         <cxf-core:logging/>
                     </cxf:features>

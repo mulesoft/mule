@@ -12,7 +12,8 @@
         <service name="greeterService">
             <inbound>
                 <cxf:inbound-endpoint frontend="aegis"
-                    address="http://localhost:63081/services/greeter" />
+                    address="http://localhost:63081/services/greeter"
+                    exchange-pattern="request-response" />
             </inbound>
             <component>
                 <singleton-object
@@ -30,7 +31,8 @@
                     <cxf:outbound-endpoint
                         address="http://localhost:63081/services/greeter"
                         serviceClass="org.apache.hello_world_soap_http.Greeter"
-                        operation="greetMe" frontend="aegis">
+                        operation="greetMe" frontend="aegis"
+                        exchange-pattern="request-response">
                         <!--
                             Aegis will use file
                             resources/org/apache/hello_world_soap_http/Greeter.aegis.xml

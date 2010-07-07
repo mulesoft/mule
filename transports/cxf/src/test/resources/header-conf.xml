@@ -15,7 +15,8 @@
       address="http://localhost:63081/services/greeter"
       clientClass="org.apache.hello_world_soap_http.SOAPService" 
       wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+      exchange-pattern="request-response">
       <cxf:inInterceptors>
           <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
       </cxf:inInterceptors>

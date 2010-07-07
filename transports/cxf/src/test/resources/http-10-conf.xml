@@ -61,12 +61,9 @@
       </component>
       <outbound>
           <pass-through-router>
-              <vm:outbound-endpoint path="out" />
+              <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
           </pass-through-router>
       </outbound>
     </service> 
-
   </model>
-
 </mule>
-

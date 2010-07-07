@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-  xmlns:http="http://www.mulesoft.org/schema/mule/http"
-  xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
-  <model name="BasicCxfTest">
-
-    <service name="echoService">
-      <inbound>
-        <cxf:inbound-endpoint
-          address="http://localhost:63081/services/Echo" frontend="simple">
-          <cxf:databinding>
-            <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-              <spring:property name="configuration">
-                <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions"/>
-              </spring:property>
-            </spring:bean>
-          </cxf:databinding>
-        </cxf:inbound-endpoint>
-      </inbound>
-      <component class="org.mule.component.simple.EchoComponent" />
-    </service>
-  </model>
+    <model name="BasicCxfTest">
+        <service name="echoService">
+            <inbound>
+                <cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
+                    frontend="simple" exchange-pattern="request-response">
+                    <cxf:databinding>
+                        <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+                            <spring:property name="configuration">
+                                <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                            </spring:property>
+                        </spring:bean>
+                    </cxf:databinding>
+                </cxf:inbound-endpoint>
+            </inbound>
+            <component class="org.mule.component.simple.EchoComponent" />
+        </service>
+    </model>
 </mule>
 

@@ -43,13 +43,15 @@
                 <cxf:inbound-endpoint 
                     address="http://localhost:60443/services/Echo"
                     frontend="simple"
-                    applySecurityToProtocol="true">
+                    applySecurityToProtocol="true"
+                    exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </cxf:inbound-endpoint>
                 <cxf:inbound-endpoint 
                     address="https://localhost:60444/services/Echo"
                     frontend="simple"
-                    applySecurityToProtocol="true">
+                    applySecurityToProtocol="true"
+                    exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </cxf:inbound-endpoint>
             </inbound>

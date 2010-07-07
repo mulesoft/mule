@@ -12,17 +12,15 @@
     <custom-transformer class="org.mule.tck.functional.StringAppendTestTransformer" name="StringAppendTestTransformer" />
     
     <model name="model">
-        
         <service name="CXFService">
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:4444/services/CXFService" 
                     applyTransformersToProtocol="false"
                     frontend="simple" 
-                    transformer-refs="StringAppendTestTransformer" />
+                    transformer-refs="StringAppendTestTransformer"
+                    exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
-            
     </model>
-    
 </mule>

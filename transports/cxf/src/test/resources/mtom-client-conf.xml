@@ -24,7 +24,8 @@
                      jobName="eventTimer" 
                      repeatInterval="1000" 
                      repeatCount="0" 
-                     startDelay="1000">
+                     startDelay="1000"
+                     exchange-pattern="one-way">
         <quartz:event-generator-job/>
     </quartz:endpoint>
    
@@ -45,7 +46,8 @@
                       operation="addEmployee" 
                       wsdlPort="EmployeeDirectoryPort" 
                       wsdlLocation="classpath:employeeDirectory.wsdl"
-                      mtomEnabled="true">
+                      mtomEnabled="true"
+                      exchange-pattern="request-response">
                       <cxf:outInterceptors>
                         <spring:bean class="org.mule.transport.cxf.employee.AttachmentVerifyInterceptor"/>
                       </cxf:outInterceptors>
@@ -58,7 +60,8 @@
           <inbound>
             <cxf:inbound-endpoint 
                 address="http://localhost:63081/services/employeeDirectory"
-                mtomEnabled="true">
+                mtomEnabled="true"
+                exchange-pattern="request-response">
             </cxf:inbound-endpoint>
           </inbound>
           <component>
@@ -66,5 +69,4 @@
           </component>
         </service>
     </model>
-
 </mule>

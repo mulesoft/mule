@@ -15,21 +15,20 @@
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
     <model name="WsdlTest">
-
         <service name="mycomponent">
             <inbound>
-                <cxf:inbound-endpoint address="servlet://mycomponent" serviceClass="org.mule.api.lifecycle.Callable"/>
+                <cxf:inbound-endpoint address="servlet://mycomponent" 
+                    serviceClass="org.mule.api.lifecycle.Callable" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
         </service>
         
         <service name="cxfService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63082/cxfService" serviceClass="org.mule.api.lifecycle.Callable"/>
+                <cxf:inbound-endpoint address="http://localhost:63082/cxfService" 
+                    serviceClass="org.mule.api.lifecycle.Callable" exchange-pattern="request-response"/>
             </inbound>
             <test:component/>
         </service>
-
     </model>
-    
 </mule>

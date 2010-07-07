@@ -8,14 +8,12 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
-    <configuration defaultSynchronousEndpoints="true"/>
-
     <cxf:connector name="cxf" defaultFrontend="simple"/>
-    
+
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="cxf:vm://mycomponent"/>
+                <inbound-endpoint address="cxf:vm://mycomponent" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
@@ -24,7 +22,7 @@
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="cxf:vm://mycomponent2">
+                <inbound-endpoint address="cxf:vm://mycomponent2" exchange-pattern="request-response">
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
@@ -42,7 +40,7 @@
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="cxf:vm://mycomponent3"/>
+                <inbound-endpoint address="cxf:vm://mycomponent3" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>

@@ -27,7 +27,8 @@
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/proxy-envelope"
                                       proxy="true"
-                                      payload="envelope">
+                                      payload="envelope"
+                                      exchange-pattern="request-response">
                      <cxf:inInterceptors>
                         <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                                <spring:property name="properties" ref="wss4jInConfiguration" />
@@ -37,7 +38,8 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="http://localhost:63081/echo" proxy="true" payload="envelope">
+                    <cxf:outbound-endpoint address="http://localhost:63081/echo" proxy="true" 
+                        payload="envelope" exchange-pattern="request-response">
                         <cxf:outInterceptors>
                           <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                                <spring:property name="properties" ref="wss4jOutConfiguration" />
@@ -54,7 +56,7 @@
               </description>
             <inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/proxy-body"
-                                      proxy="true">
+                                      proxy="true" exchange-pattern="request-response">
                      <cxf:inInterceptors>
                         <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                                <spring:property name="properties" ref="wss4jInConfiguration" />
@@ -64,7 +66,8 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="http://localhost:63081/echo" proxy="true">
+                    <cxf:outbound-endpoint address="http://localhost:63081/echo" 
+                        proxy="true" exchange-pattern="request-response">
                         <cxf:outInterceptors>
                           <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                                <spring:property name="properties" ref="wss4jOutConfiguration" />
@@ -77,7 +80,7 @@
 
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/echo"/>
+                <inbound-endpoint address="http://localhost:63081/echo" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>

@@ -17,7 +17,7 @@
     <mule:service name="TestComponent">
       <mule:inbound>
         <mule:inbound-endpoint
-          address="cxf:http://localhost:63381/services/TestComponent">
+          address="cxf:http://localhost:63381/services/TestComponent" exchange-pattern="request-response">
           <mule:properties>
             <entry key="frontend" value="simple" />
           </mule:properties>

@@ -9,7 +9,8 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
   
-  <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" repeatCount="1">
+  <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" 
+    repeatCount="1" exchange-pattern="request-response">
        <quartz:scheduled-dispatch-job>
            <quartz:job-endpoint address="vm://quartz.in"/>
        </quartz:scheduled-dispatch-job>
@@ -20,7 +21,8 @@
       address="http://localhost:63081/services/greeter"
       clientClass="org.apache.hello_world_soap_http.SOAPService" 
       wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+      exchange-pattern="request-response">
       <cxf:inInterceptors>
           <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
       </cxf:inInterceptors>
@@ -33,7 +35,8 @@
   
     <service name="greeterService">
       <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" />
+          <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" 
+            exchange-pattern="request-response"/>
       </inbound>
       <component>
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
@@ -42,7 +45,7 @@
     
     <service name="cxfClient">
       <inbound>
-        <inbound-endpoint address="vm://quartz.in"/>
+        <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
       </inbound>
       <component>
           <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator"/>
@@ -54,7 +57,8 @@
              clientClass="org.apache.hello_world_soap_http.SOAPService"
              wsdlPort="SoapPort"
              wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-             operation="greetMe"/>
+             operation="greetMe"
+             exchange-pattern="request-response"/>
         </pass-through-router>
       </outbound>
     </service>

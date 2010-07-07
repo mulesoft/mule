@@ -22,23 +22,21 @@
             <echo-component />
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://echo" />
+                    <outbound-endpoint address="vm://echo" exchange-pattern="one-way"/>
                     <reply-to address="vm://reply" />
                 </pass-through-router>
             </outbound>
             <async-reply>
-                <inbound-endpoint address="vm://reply"/>
+                <inbound-endpoint address="vm://reply" exchange-pattern="one-way"/>
                 <single-async-reply-router/>
             </async-reply>
         </service>
         
         <service name="EchoService">
             <inbound>
-                <inbound-endpoint address="vm://echo" />
+                <inbound-endpoint address="vm://echo" exchange-pattern="one-way"/>
             </inbound>
             <echo-component />
         </service>
-        
     </model>
-    
 </mule>
