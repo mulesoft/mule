@@ -335,60 +335,60 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
-//    public void testDispatchersLifecycle() throws Exception
-//    {
-//        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
-//
-//        // attempts to send/dispatch/request are made on a stopped/stopping connector
-//        // This should fail because the connector is not started!
-//        try
-//        {
-//            out.process(getTestEvent("data"));
-//            fail("cannot sent on a connector that is not started");
-//        }
-//        catch (LifecycleException e)
-//        {
-//            //Expected
-//            //assertTrue(e.getCause() instanceof LifecycleException);
-//        }
-//
-//        assertEquals(0, connector.dispatchers.getNumIdle());
-//
-//        // Dispatcher is not started or connected
-//        assertDispatcherStartedConntected(out, false, false);
-//
-//        connector.start();
-//        assertDispatcherStartedConntected(out, true, true);
-//
-//        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
-//        out2.process(getTestEvent("data"));
-//
-//
-//        assertEquals(1, connector.dispatchers.getNumIdle());
-//        assertDispatcherStartedConntected(out, true, true);
-//        assertDispatcherStartedConntected(out2, true, true);
-//
-//        connector.stop();
-//        
-//        // Pool is cleared because of implementation of workaround for MULE-4553
-//        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//         assertDispatcherStartedConntected(out, false, false);
-//         assertDispatcherStartedConntected(out2, false, false);
-//
-//        connector.start();
-//        //TODO 
-//        assertEquals(2, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//         assertDispatcherStartedConntected(out, true, true);
-//         assertDispatcherStartedConntected(out2, true, true);
-//
-//        out.process(getTestEvent("data"));
-//        assertEquals(2, connector.dispatchers.getNumIdle());
-//        assertDispatcherStartedConntected(out, true, true);
-//
-//        connector.dispose();
-//        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//
-//    }
+    public void testDispatchersLifecycle() throws Exception
+    {
+        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
+
+        // attempts to send/dispatch/request are made on a stopped/stopping connector
+        // This should fail because the connector is not started!
+        try
+        {
+            out.process(getTestEvent("data"));
+            fail("cannot sent on a connector that is not started");
+        }
+        catch (LifecycleException e)
+        {
+            //Expected
+            //assertTrue(e.getCause() instanceof LifecycleException);
+        }
+
+        assertEquals(0, connector.dispatchers.getNumIdle());
+
+        // Dispatcher is not started or connected
+        assertDispatcherStartedConntected(out, false, false);
+
+        connector.start();
+        assertDispatcherStartedConntected(out, true, true);
+
+        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
+        out2.process(getTestEvent("data", out2));
+
+
+        assertEquals(1, connector.dispatchers.getNumIdle());
+        assertDispatcherStartedConntected(out, true, true);
+        assertDispatcherStartedConntected(out2, true, true);
+
+        connector.stop();
+        
+        // Pool is cleared because of implementation of workaround for MULE-4553
+        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+         assertDispatcherStartedConntected(out, false, false);
+         assertDispatcherStartedConntected(out2, false, false);
+
+        connector.start();
+        //TODO 
+        assertEquals(2, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+         assertDispatcherStartedConntected(out, true, true);
+         assertDispatcherStartedConntected(out2, true, true);
+
+        out.process(getTestEvent("data", out));
+        assertEquals(2, connector.dispatchers.getNumIdle());
+        assertDispatcherStartedConntected(out, true, true);
+
+        connector.dispose();
+        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+
+    }
 
     public void testWorkManagerLifecycle() throws MuleException, WorkException
     {
