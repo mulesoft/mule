@@ -10,7 +10,6 @@
 
 package org.mule.construct;
 
-import org.mule.AbstractSimpleFlowConstuct;
 import org.mule.api.MuleContext;
 import org.mule.api.component.Component;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
