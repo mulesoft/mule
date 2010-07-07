@@ -13,11 +13,11 @@
     <model name="ContextRestartTestCase">
         <service name="SimpleBridge">
             <inbound>
-                <inbound-endpoint address="test://in"/>
+                <inbound-endpoint address="test://in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="test://out"/>
+                    <outbound-endpoint address="test://out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

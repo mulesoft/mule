@@ -19,14 +19,14 @@
     <model name="JMXStatisticsTest">
         <service name="statisticsTestService">
             <inbound>
-                <vm:inbound-endpoint path="in"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>data</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

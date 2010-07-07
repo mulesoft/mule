@@ -16,8 +16,8 @@
     <management:jmx-default-config/>
 
     <!-- the two endpoints share the same path but must have different names in JMX -->
-    <vm:endpoint name="ep1" path="vmInbound" />
-    <vm:endpoint name="ep2" path="vmInbound" />
+    <vm:endpoint name="ep1" path="vmInbound" exchange-pattern="one-way"/>
+    <vm:endpoint name="ep2" path="vmInbound" exchange-pattern="one-way"/>
 
     <model>
         <service name="EndpointsWithIdenticalName">
