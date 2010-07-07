@@ -10,7 +10,8 @@
         moveToDirectory="target/FilterOnGlobalFileEndpointTestCase/testdir-moveto" 
         streaming="false"/>
 
-    <file:endpoint name="globalEP"  path="target/FilterOnGlobalFileEndpointTestCase/testdir" connector-ref="fileConnector">
+    <file:endpoint name="globalEP"  path="target/FilterOnGlobalFileEndpointTestCase/testdir" 
+        connector-ref="fileConnector" exchange-pattern="one-way">
         <file:filename-wildcard-filter pattern="*.xml"/>
     </file:endpoint>
 </mule>

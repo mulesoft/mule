@@ -9,12 +9,13 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
     <vm:connector name="vmQueue"/>
 
-    <endpoint address="vm://receive" name="receive"/>
+    <endpoint address="vm://receive" name="receive" exchange-pattern="one-way"/>
 
     <model name="receiveModel">
         <service name="inputTest">
             <inbound>
-                <file:inbound-endpoint encoding="EUC-JP" path=".mule/mule-file-test-EUC-JP">
+                <file:inbound-endpoint encoding="EUC-JP" path=".mule/mule-file-test-EUC-JP"
+                    exchange-pattern="one-way">
                     <file:file-to-string-transformer/>
                 </file:inbound-endpoint>
             </inbound>
