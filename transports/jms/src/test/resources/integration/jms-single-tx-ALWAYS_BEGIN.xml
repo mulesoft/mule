@@ -9,26 +9,32 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
-    <endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1">
+    <endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1"
+        exchange-pattern="one-way">
         <jms:transaction action="BEGIN_OR_JOIN"/>
     </endpoint>
-    <endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2">
+    <endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2"
+        exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </endpoint>
 
-    <endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1">
+    <endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1"
+        exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </endpoint>
 
-    <endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2">
+    <endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2"
+        exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </endpoint>
 
-    <endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1">
+    <endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1"
+        exchange-pattern="one-way">
         <jms:transaction action="BEGIN_OR_JOIN"/>
     </endpoint>
 
-    <endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2">
+    <endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2"
+        exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </endpoint>
 

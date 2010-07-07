@@ -17,8 +17,8 @@
     
     <vm:connector name="vmQueue"/>
 
-    <vm:endpoint name="in" path="in" connector-ref="vmQueue"/>
-    <vm:endpoint name="out" path="out" connector-ref="vmQueue"/>
+    <vm:endpoint name="in" path="in" connector-ref="vmQueue" exchange-pattern="one-way"/>
+    <vm:endpoint name="out" path="out" connector-ref="vmQueue" exchange-pattern="one-way"/>
     
     <model name="TEST">
         <service name="Pre">
@@ -28,7 +28,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="middle">
+                    <jms:outbound-endpoint queue="middle" exchange-pattern="one-way">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
@@ -38,14 +38,14 @@
 
         <service name="Part1">
             <inbound>
-                <jms:inbound-endpoint queue="middle">
+                <jms:inbound-endpoint queue="middle" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="middle2">
+                    <jms:outbound-endpoint queue="middle2" exchange-pattern="one-way">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </pass-through-router>
@@ -54,14 +54,14 @@
 
         <service name="Part2">
             <inbound>
-                <jms:inbound-endpoint queue="middle2">
+                <jms:inbound-endpoint queue="middle2" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="middle3">
+                    <jms:outbound-endpoint queue="middle3" exchange-pattern="one-way">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </pass-through-router>
@@ -70,14 +70,14 @@
 
         <service name="Part3">
             <inbound>
-                <jms:inbound-endpoint queue="middle3">
+                <jms:inbound-endpoint queue="middle3" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q4">
+                    <jms:outbound-endpoint queue="q4" exchange-pattern="one-way">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </pass-through-router>
@@ -86,14 +86,14 @@
 
         <service name="Part4">
             <inbound>
-                <jms:inbound-endpoint queue="q4">
+                <jms:inbound-endpoint queue="q4" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <jms:outbound-endpoint queue="q5">
+                    <jms:outbound-endpoint queue="q5" exchange-pattern="one-way">
                         <xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                     <xa-transaction action="BEGIN_OR_JOIN"/>
@@ -103,7 +103,7 @@
 
         <service name="Outbound">
             <inbound>
-                <jms:inbound-endpoint queue="q5">
+                <jms:inbound-endpoint queue="q5" exchange-pattern="one-way">
                     <xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound>

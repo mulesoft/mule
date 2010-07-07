@@ -58,21 +58,25 @@
                     connectionFactory-ref="connectionFactory"
                     redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
-    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults" disableTemporaryReplyToDestinations="true">
+    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults" 
+        disableTemporaryReplyToDestinations="true" exchange-pattern="one-way">
         <jms:selector expression="foo"/>
     </jms:endpoint>
 
-    <jms:endpoint name="endpoint2" address="jms://blah" connector-ref="jmsConnectorDefaults">
+    <jms:endpoint name="endpoint2" address="jms://blah" connector-ref="jmsConnectorDefaults"
+        exchange-pattern="one-way">
         <not-filter>
             <jms:property-filter pattern="bar"/>
         </not-filter>
     </jms:endpoint>
 
-    <jms:endpoint name="endpoint3" queue="blah" connector-ref="jmsConnectorDefaults">
+    <jms:endpoint name="endpoint3" queue="blah" connector-ref="jmsConnectorDefaults"
+        exchange-pattern="one-way">
         <custom-transaction factory-ref="txFactory" action="BEGIN_OR_JOIN"/>
     </jms:endpoint>
 
-    <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults">
+    <jms:endpoint name="endpoint4" queue="blub" connector-ref="jmsConnectorDefaults" 
+        exchange-pattern="one-way">
         <xa-transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
     
@@ -103,7 +107,9 @@
     <model>
         <service name="testService">
             <inbound>
-                <jms:inbound-endpoint name="inboundEndpoint" topic="myTopic" connector-ref="jmsConnectorDefaults" durableName="testCustomDurableName"/>
+                <jms:inbound-endpoint name="inboundEndpoint" topic="myTopic" 
+                    connector-ref="jmsConnectorDefaults" durableName="testCustomDurableName"
+                    exchange-pattern="one-way"/>
             </inbound>
         </service>
     </model>

@@ -7,8 +7,8 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
     
-    <endpoint name="in" address="${inbound.destination}" />
-    <endpoint name="topic" address="${broadcast.topic.destination}"/>
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="topic" address="${broadcast.topic.destination}" exchange-pattern="one-way"/>
 
     <model name="TEST">
         <service name="InputPart">
@@ -24,7 +24,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

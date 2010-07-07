@@ -7,21 +7,19 @@
     xmlns:tx="http://www.springframework.org/schema/tx"
     xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
         http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
     <vm:connector name="VMQueue"/>
 
-    <endpoint name="in" address="${inbound.destination}">
-
-    </endpoint>
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
     
     <!-- see MULE-3342 for what this test is supposed to check -->
     <model name="model">
         <service name="vm-to-jms-queue">
             <inbound>
-                <inbound-endpoint address="vm://in"/>
+                <inbound-endpoint address="vm://in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -38,7 +36,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out"/>
+                    <outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

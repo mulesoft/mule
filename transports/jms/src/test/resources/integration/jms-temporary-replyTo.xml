@@ -12,7 +12,8 @@
 
     <vm:connector name="vmConnector"/>
 
-    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector2"/>
+    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector2"
+        exchange-pattern="one-way"/>
     
     <model name="Model">
 
@@ -23,7 +24,8 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" />
+                    <outbound-endpoint address="${outbound.destination}" 
+                        connector-ref="jmsConnector1" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -35,7 +37,8 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" />
+                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" 
+                        connector-ref="jmsConnector1" />
                 </pass-through-router>
             </outbound>
         </service>
@@ -47,7 +50,8 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1">
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"
+                        exchange-pattern="one-way">
                         <property key="disableTemporaryReplyToDestinations" value="true"/>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -61,7 +65,8 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" exchange-pattern="request-response">
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1" 
+                        exchange-pattern="request-response">
                         <property key="disableTemporaryReplyToDestinations" value="true"/>
                     </outbound-endpoint>
                 </pass-through-router>
@@ -74,7 +79,8 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                        exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -86,12 +92,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"/>
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                        exchange-pattern="one-way"/>
                     <reply-to ref="replyTo"/>
                 </pass-through-router>
             </outbound>
             <async-reply timeout="5001" failOnTimeout="true">
-                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
+                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
+                    exchange-pattern="one-way"/>
                 <single-async-reply-router/>
             </async-reply>
         </service>
@@ -102,6 +110,5 @@
             </inbound>
             <test:component appendString=" #[mule:context.serviceName]"/>
         </service>
-
     </model>
 </mule>

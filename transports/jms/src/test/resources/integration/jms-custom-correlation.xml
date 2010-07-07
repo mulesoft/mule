@@ -12,17 +12,18 @@
 
     <vm:connector name="vmConnector"/>
 
-    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector1"/>
+    <endpoint name="replyTo" address="${inbound.destination}" connector-ref="jmsConnector1"
+        exchange-pattern="one-way"/>
 
     <model name="Model">
-
         <service name="JMSService">
             <inbound>
                 <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2">
+                    <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
+                        exchange-pattern="one-way">
                         <property key="priority" value="1"/>
                     </outbound-endpoint>
                     <reply-to ref="replyTo"/>
@@ -35,7 +36,8 @@
                 </pass-through-router>
             </outbound>
             <async-reply>
-                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"/>
+                <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
+                    exchange-pattern="one-way"/>
                 <single-async-reply-router>
                     <!-- Now when we receive the messages back we need need to know what to correlate with. Maybe we should add
                     a "correlatesUsing" property that will be used to extract the create ID from the currnet message -->

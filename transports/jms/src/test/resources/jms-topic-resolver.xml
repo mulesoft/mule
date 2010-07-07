@@ -15,16 +15,14 @@
 
     <!-- DON'T use jms:endpoints here as we are testing for resolution from uri
          (all that the jms topic attribute does is make an address using "jms://topic:") -->
-    <endpoint name="ep1" address="jms://queue.NotATopic"/>
-    <endpoint name="ep2" address="jms://context.aTopic?topic=true"/>
-    <endpoint name="ep3" address="jms://topic:context.ThisIsATopic"/>
-    <endpoint name="ep4" address="jms://topic:context.ThisIsATopic?topic=false"/>
-    <endpoint name="ep5" address="jms://context.aTopic.Properties">
+    <endpoint name="ep1" address="jms://queue.NotATopic" exchange-pattern="one-way"/>
+    <endpoint name="ep2" address="jms://context.aTopic?topic=true" exchange-pattern="one-way"/>
+    <endpoint name="ep3" address="jms://topic:context.ThisIsATopic" exchange-pattern="one-way"/>
+    <endpoint name="ep4" address="jms://topic:context.ThisIsATopic?topic=false" exchange-pattern="one-way"/>
+    <endpoint name="ep5" address="jms://context.aTopic.Properties" exchange-pattern="one-way">
         <property key="topic" value="true"/>
     </endpoint>
-    <endpoint name="ep6" address="jms://topic:/context/TopicWithLeadingSlash"/>
-    <endpoint name="ep7" address="jms://topic:context/TopicWithSlashes"/>
-    <endpoint name="ep8" address="jms://queue/testQueue"/>
-
-
+    <endpoint name="ep6" address="jms://topic:/context/TopicWithLeadingSlash" exchange-pattern="one-way"/>
+    <endpoint name="ep7" address="jms://topic:context/TopicWithSlashes" exchange-pattern="one-way"/>
+    <endpoint name="ep8" address="jms://queue/testQueue" exchange-pattern="one-way"/>
 </mule>

@@ -8,13 +8,13 @@
 
     <jms:activemq-connector name="jmsConnector" disableTemporaryReplyToDestinations="true"/>    
 
-    <jms:endpoint name="in_olga" queue="in">
+    <jms:endpoint name="in_olga" queue="in" exchange-pattern="one-way">
         <jms:selector expression="JMSType = 'OLGA'"/>
     </jms:endpoint>
 
-    <jms:endpoint name="in_natali" queue="in">
+    <jms:endpoint name="in_natali" queue="in" exchange-pattern="one-way">
         <jms:selector expression="JMSType = 'NATALI'"/>
     </jms:endpoint>
 
-    <jms:endpoint name="out" queue="out" />
+    <jms:endpoint name="out" queue="out" exchange-pattern="one-way"/>
 </mule>

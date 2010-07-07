@@ -9,8 +9,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <endpoint name="in" address="${inbound.destination}" />
-    <endpoint name="in.topic" address="${broadcast.topic.destination}"/>
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="in.topic" address="${broadcast.topic.destination}" exchange-pattern="one-way"/>
 
     <model name="TEST">
         <service name="InputPart">

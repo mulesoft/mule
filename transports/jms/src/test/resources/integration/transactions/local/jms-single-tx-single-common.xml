@@ -11,23 +11,23 @@
 
 <!-- we don't use jms:endpoint since it causes problems with the wmq transport version of the tests which your an address of 'wmq://' -->
 	<endpoint name="out1" address="${outbound.destination1}"
-		connector-ref="jmsConnector1">
+		connector-ref="jmsConnector1" exchange-pattern="one-way">
 		<jms:transaction action="NONE" />
 	</endpoint>
 	<endpoint name="out2" address="${outbound.destination2}"
-		connector-ref="jmsConnector1">
+		connector-ref="jmsConnector1" exchange-pattern="one-way">
 		<jms:transaction action="ALWAYS_BEGIN" />
 	</endpoint>
 	<endpoint name="out3" address="${outbound.destination3}"
-		connector-ref="jmsConnector1">
+		connector-ref="jmsConnector1" exchange-pattern="one-way">
 		<jms:transaction action="BEGIN_OR_JOIN" />
 	</endpoint>
 	<endpoint name="out4" address="${outbound.destination4}"
-		connector-ref="jmsConnector1">
+		connector-ref="jmsConnector1" exchange-pattern="one-way">
 		<jms:transaction action="ALWAYS_JOIN" />
 	</endpoint>
 	<endpoint name="out5" address="${outbound.destination5}"
-		connector-ref="jmsConnector1">
+		connector-ref="jmsConnector1" exchange-pattern="one-way">
 		<jms:transaction action="JOIN_IF_POSSIBLE" />
 	</endpoint>
 

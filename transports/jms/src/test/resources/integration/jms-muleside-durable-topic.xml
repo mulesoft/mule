@@ -9,12 +9,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <endpoint name="broadcast" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC1"/>
-    <endpoint name="broadcast2" address="${broadcast.topic.destination}" connector-ref="jmsConnectorC2"/>
-    <endpoint name="out" address="${outbound.destination}" connector-ref="jmsConnector"/>
+    <endpoint name="broadcast" address="${broadcast.topic.destination}" 
+        connector-ref="jmsConnectorC1" exchange-pattern="one-way"/>
+    <endpoint name="broadcast2" address="${broadcast.topic.destination}" 
+        connector-ref="jmsConnectorC2" exchange-pattern="one-way"/>
+    <endpoint name="out" address="${outbound.destination}" 
+        connector-ref="jmsConnector" exchange-pattern="one-way"/>
 
     <model name="TEST">
-
         <service name="Part1">
             <inbound>
                 <inbound-endpoint ref="broadcast"/>
@@ -42,6 +44,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
 </mule>

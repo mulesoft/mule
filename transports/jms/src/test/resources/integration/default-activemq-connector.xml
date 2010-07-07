@@ -11,9 +11,9 @@
 
     <jms:activemq-connector name="jmsConnector" acknowledgementMode="CLIENT_ACKNOWLEDGE"/>
 
-    <endpoint name="in" address="${inbound.destination}"/>
-    <endpoint name="middle" address="${middle.destination}"/>
-    <endpoint name="out" address="${outbound.destination}"/>
+    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
+    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
 
     <model name="jmsTest">
 

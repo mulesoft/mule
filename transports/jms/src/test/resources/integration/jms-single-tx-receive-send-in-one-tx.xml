@@ -14,7 +14,7 @@
     <model name="TEST">
         <service name="Part2">
             <inbound>
-                <inbound-endpoint address="${inbound.destination}">
+                <inbound-endpoint address="${inbound.destination}" exchange-pattern="one-way">
                     <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
             </inbound>
@@ -23,7 +23,7 @@
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="${outbound.destination}">
+                    <outbound-endpoint address="${outbound.destination}" exchange-pattern="one-way">
                         <jms:transaction action="ALWAYS_JOIN"/>
                     </outbound-endpoint>
                 </pass-through-router>
