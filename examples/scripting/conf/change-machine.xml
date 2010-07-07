@@ -25,8 +25,6 @@
     -->
     <context:property-placeholder location="default-config.properties"/>
 
-    <configuration defaultSynchronousEndpoints="true"/>
-
     <stdio:connector name="SystemStreamConnector"
                      promptMessage="How much more change do you need? (enter an amount such as 2.37)"
                      messageDelayTime="1000"/>
@@ -41,24 +39,26 @@
     <model name="main">
         <service name="Accumulator">
             <inbound>
-                <stdio:inbound-endpoint system="IN" transformer-refs="StringToNumber DollarsToCents"/>
+                <stdio:inbound-endpoint system="IN" transformer-refs="StringToNumber DollarsToCents"
+                    exchange-pattern="request-response"/>
                 <!-- For unit testing -->
-                <vm:inbound-endpoint path="input" transformer-refs="DollarsToCents"/>
+                <vm:inbound-endpoint path="input" transformer-refs="DollarsToCents" 
+                    exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.example.scripting.AccumulatorComponent"/>
             </component>
             <outbound>
                 <chaining-router>
-                    <vm:outbound-endpoint path="script"/>
-                    <stdio:outbound-endpoint system="OUT"/>
+                    <vm:outbound-endpoint path="script" exchange-pattern="request-response"/>
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="request-response"/>
                 </chaining-router>
             </outbound>
         </service>
 
         <service name="ScriptService">
             <inbound>
-                <vm:inbound-endpoint path="script"/>
+                <vm:inbound-endpoint path="script" exchange-pattern="request-response"/>
             </inbound>
             <script:component>
                 <script:script file="${scriptfile}">
