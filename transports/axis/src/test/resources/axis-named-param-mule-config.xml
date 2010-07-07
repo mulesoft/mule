@@ -12,7 +12,7 @@
         
         <service name="mycomponent1">
             <inbound>
-                <inbound-endpoint address="vm://mycomponent1"/>
+                <inbound-endpoint address="vm://mycomponent1" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
             <outbound>

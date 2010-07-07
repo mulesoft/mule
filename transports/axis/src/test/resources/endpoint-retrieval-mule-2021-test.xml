@@ -6,7 +6,8 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <endpoint name="Endpoint" address="axis:http://localhost:18081/mule/Service?method=toString"/>
+    <endpoint name="Endpoint" address="axis:http://localhost:18081/mule/Service?method=toString"
+        exchange-pattern="request-response"/>
 
     <model name="model">
 

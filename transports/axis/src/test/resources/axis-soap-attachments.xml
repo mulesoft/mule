@@ -17,12 +17,13 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:60198/mule/services" exchange-pattern="request-response"/>
+                <inbound-endpoint address="axis:http://localhost:60198/mule/services" 
+                    exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="test://test" name="test1"/>
+                    <outbound-endpoint address="test://test" name="test1" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

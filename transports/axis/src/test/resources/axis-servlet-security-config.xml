@@ -34,7 +34,8 @@
         <service name="mycomponent">
             <inbound>
                 <axis:inbound-endpoint address="servlet://mycomponent"
-                                       responseTransformer-refs="ByteArrayToString">
+                                       responseTransformer-refs="ByteArrayToString"
+                                       exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </axis:inbound-endpoint>
             </inbound>

@@ -14,7 +14,7 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:62108/mule"/>
+                <inbound-endpoint address="axis:http://localhost:62108/mule" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent">

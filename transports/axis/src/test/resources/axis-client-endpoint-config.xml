@@ -10,7 +10,7 @@
 
     <axis:endpoint name="calculatorAddEndpoint"
                    address="http://localhost:62080/mule-tests-external-axis/axis/Calculator.jws?method=add"
-                   style="WRAPPED" use="LITERAL">
+                   style="WRAPPED" use="LITERAL" exchange-pattern="request-response">
         <axis:soap-method method="add">
             <axis:soap-parameter parameter="Number1" type="int" mode="IN"/>
             <axis:soap-parameter parameter="Number2" type="int" mode="IN"/>

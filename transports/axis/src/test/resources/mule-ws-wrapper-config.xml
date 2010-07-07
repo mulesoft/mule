@@ -30,7 +30,7 @@
         
         <service name="WebServiceSample3">
             <inbound>
-                <vm:inbound-endpoint path="queue.in"/>
+                <vm:inbound-endpoint path="queue.in" exchange-pattern="one-way"/>
             </inbound>
             <axis:wrapper-component address="http://localhost:62088/axis/Calculator?method=add" style="WRAPPED" use="LITERAL">
                 <axis:soap-method method="qname{add:http://muleumo.org/Calc}">
@@ -41,21 +41,23 @@
             </axis:wrapper-component>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="queue.out"/>
+                    <vm:outbound-endpoint path="queue.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>  
         
         <service name="TestUMO">
             <inbound>
-                <axis:inbound-endpoint address="http://localhost:65081/services" style="WRAPPED" use="LITERAL"/>
+                <axis:inbound-endpoint address="http://localhost:65081/services" 
+                    style="WRAPPED" use="LITERAL" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <service name="Calculator">
             <inbound>
-                <axis:inbound-endpoint address="http://localhost:62088/axis" style="WRAPPED" use="LITERAL">
+                <axis:inbound-endpoint address="http://localhost:62088/axis" style="WRAPPED" 
+                    use="LITERAL" exchange-pattern="request-response">
                     <axis:soap-method method="qname{add:http://muleumo.org/Calc}">
                         <axis:soap-parameter parameter="Number1" type="any" mode="IN"/>
                         <axis:soap-parameter parameter="Number2" type="any" mode="IN"/>
@@ -65,7 +67,5 @@
             </inbound>
             <component class="org.mule.transport.soap.axis.Calculator"/>
         </service>
-        
     </model>
-    
 </mule>

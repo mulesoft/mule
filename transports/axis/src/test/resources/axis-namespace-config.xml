@@ -27,6 +27,7 @@
     <axis:endpoint name="endpoint"
                    clientConfig="clientConfig"
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
+                   exchange-pattern="request-response"
                    connector-ref="axisConnector2"
                    soapAction="#[methodNamespace]#[method]"
                    SOAPAction="direct"

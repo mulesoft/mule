@@ -12,7 +12,8 @@
         <service name="ServiceEntryPoint">
             <inbound>
                 <axis:inbound-endpoint address="http://localhost:63080"
-                    style="MESSAGE" serviceNamespace="http://muleumo.org">
+                    style="MESSAGE" serviceNamespace="http://muleumo.org"
+                    exchange-pattern="request-response">
                     <axis:options wsdlServiceElement="testService"/>
                 </axis:inbound-endpoint>
             </inbound>

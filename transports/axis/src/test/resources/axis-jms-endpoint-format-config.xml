@@ -16,25 +16,28 @@
 
     <axis:endpoint name="soapActionDefined"
                    address="jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"
-                   SOAPAction="jms://soap.my.queue/echoComponent"/>
-    <axis:endpoint name="componentName" address="jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"/>
-    <endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"/>
-    <endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"/>
+                   SOAPAction="jms://soap.my.queue/echoComponent"
+                   exchange-pattern="one-way"/>
+    <axis:endpoint name="componentName" address="jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"
+        exchange-pattern="one-way"/>
+    <endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"
+        exchange-pattern="one-way"/>
+    <endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"
+        exchange-pattern="one-way"/>
 
     <model name="test">
         <service name="echoComponent">
             <inbound>
-                <inbound-endpoint address="axis:jms://soap.my.queue"/>
+                <inbound-endpoint address="axis:jms://soap.my.queue" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
         <service name="myComponent">
             <inbound>
-                <inbound-endpoint address="axis:jms://myComponent"/>
+                <inbound-endpoint address="axis:jms://myComponent" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
-
 </mule>

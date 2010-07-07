@@ -11,7 +11,7 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="axis:vm://mycomponent"/>
+                <inbound-endpoint address="axis:vm://mycomponent" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
@@ -20,7 +20,7 @@
 
         <service name="mycomponent2">
             <inbound>
-                <axis:inbound-endpoint address="vm://mycomponent2">
+                <axis:inbound-endpoint address="vm://mycomponent2" exchange-pattern="one-way">
                     <axis:soap-service interface="org.mule.api.component.simple.EchoService"/>
                     <axis:soap-service interface="org.mule.tck.testmodels.services.DateService"/>
                 </axis:inbound-endpoint>
@@ -32,7 +32,7 @@
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="axis:vm://mycomponent3"/>
+                <inbound-endpoint address="axis:vm://mycomponent3" exchange-pattern="one-way"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
