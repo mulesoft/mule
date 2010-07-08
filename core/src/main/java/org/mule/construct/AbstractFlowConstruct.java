@@ -10,6 +10,10 @@
 
 package org.mule.construct;
 
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -30,11 +34,6 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
-
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -217,6 +216,11 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         return exceptionListener;
     }
 
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
+    }
+
     public LifecycleState getLifecycleState()
     {
         return lifecycleManager.getState();
@@ -249,7 +253,9 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     /**
      * Validates configured flow construct
-     * @throws FlowConstructInvalidException if the flow construct does not pass validation 
+     * 
+     * @throws FlowConstructInvalidException if the flow construct does not pass
+     *             validation
      */
     protected void validateConstruct() throws FlowConstructInvalidException
     {
