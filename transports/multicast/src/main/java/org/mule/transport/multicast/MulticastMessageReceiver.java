@@ -10,7 +10,7 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.FlowConstruct;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.transport.AbstractConnector;

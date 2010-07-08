@@ -11,8 +11,8 @@
 package org.mule.transport.rmi;
 
 import org.mule.RequestContext;
-import org.mule.api.FlowConstruct;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;

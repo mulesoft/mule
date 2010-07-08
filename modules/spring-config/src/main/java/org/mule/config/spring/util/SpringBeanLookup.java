@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.util;
 
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;

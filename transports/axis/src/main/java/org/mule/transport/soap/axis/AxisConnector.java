@@ -11,9 +11,9 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.MessageExchangePattern;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;

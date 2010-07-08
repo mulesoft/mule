@@ -11,10 +11,10 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;

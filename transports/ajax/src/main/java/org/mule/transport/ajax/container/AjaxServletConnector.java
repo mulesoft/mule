@@ -9,9 +9,9 @@
  */
 package org.mule.transport.ajax.container;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;

@@ -12,11 +12,11 @@ package org.mule.module.jca;
 
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.LifecycleAdapter;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.component.AbstractJavaComponent;
