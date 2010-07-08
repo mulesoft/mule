@@ -7,146 +7,132 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePair;
-import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.service.Service;
 import org.mule.context.notification.FlowConstructNotification;
 import org.mule.context.notification.ServiceNotification;
-import org.mule.lifecycle.AbstractLifecycleManager;
-import org.mule.lifecycle.DefaultLifecyclePair;
+import org.mule.lifecycle.SimpleLifecycleManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * The lifecycle manager responsible for managing lifecycle transitions for a Mule
- * service. The Mule service adds some additional states, namely pause and resume.
- * The lifecycle manager manages lifecycle notifications and logging as well.
+ * The lifecycle manager responsible for managing lifecycle transitions for a Mule service.  The Mule service adds some additional
+ * states, namely pause and resume.  The lifecycle manager manages lifecycle notifications and logging as well.
  */
-public class ServiceLifecycleManager extends AbstractLifecycleManager
+public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruct>
 {
     /**
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
 
-    private final AbstractService service;
 
-    public ServiceLifecycleManager(AbstractService service, LifecycleManager lifecycleManager)
-        throws MuleException
+    public ServiceLifecycleManager(FlowConstruct service) throws MuleException
     {
-        super(service.getName());
-        this.service = service;
-        for (LifecyclePair pair : lifecycleManager.getLifecyclePairs())
-        {
-            registerLifecycle(pair);
-        }
-        registerLifecycle(new DefaultLifecyclePair(new PausePhase(), new ResumePhase()));
-    }
-
-    /**
-     * This lifecycle manager handles calling of lifecycle menthods explicitly since
-     * we need to handle custom pause and resume states This method simply checks
-     * that the phase is valid and delegates to
-     * {@link #invokePhase(org.mule.api.lifecycle.LifecyclePhase)} which in turn
-     * calls {@link #doApplyPhase(org.mule.api.lifecycle.LifecyclePhase)}
-     * 
-     * @param phase the phase to transition to
-     * @throws LifecycleException if there is an exception thrown when call a
-     *             lifecycle method
-     */
-    @Override
-    public void fireLifecycle(String phase) throws LifecycleException
-    {
-        checkPhase(phase);
-        LifecyclePhase li = getPhaseForIndex(getPhaseIndex(phase));
-        invokePhase(li);
+        super(service.getName(), service);
     }
 
     @Override
-    protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
+    protected void registerTransitions()
     {
-        try
-        {
-            if (phase.getName().equals(Initialisable.PHASE_NAME))
-            {
-                logger.debug("Initialising service: " + service.getName());
-                service.doInitialise();
-                fireServiceNotification(ServiceNotification.SERVICE_INITIALISED);
-            }
-            else if (phase.getName().equals(Startable.PHASE_NAME))
-            {
-                logger.debug("Starting service: " + service.getName());
-                service.doStart();
-                fireServiceNotification(ServiceNotification.SERVICE_STARTED);
-            }
-            else if (phase.getName().equals(Pausable.PHASE_NAME))
-            {
-                logger.debug("Pausing service: " + service.getName());
-                service.doPause();
-                fireServiceNotification(ServiceNotification.SERVICE_PAUSED);
-            }
-            else if (phase.getName().equals(Resumable.PHASE_NAME))
-            {
-                logger.debug("Resuming service: " + service.getName());
-                service.doResume();
-                fireServiceNotification(ServiceNotification.SERVICE_RESUMED);
-            }
-            else if (phase.getName().equals(Stoppable.PHASE_NAME))
-            {
-                logger.debug("Stopping service: " + service.getName());
-                service.doStop();
-                fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
-            }
-            else if (phase.getName().equals(Disposable.PHASE_NAME))
-            {
-                // We need to handle transitions to get to dispose since, dispose can
-                // be called from any lifecycle state
-                logger.debug("Disposing service: " + service.getName());
+        super.registerTransitions();
 
-                if (getState().isPhaseComplete(Pausable.PHASE_NAME))
-                {
-                    // This is a work around to bypass the phase checking so that we
-                    // can call resume even though dispose was called
-                    setExecutingPhase(null);
-                    service.resume();
-                }
+        //pause resume
+        addDirectTransition(Startable.PHASE_NAME, Pausable.PHASE_NAME);
+        //Note that 'Resume' state gets removed and the current state is set to 'start'. See {@link #notifyTransition}
+        addDirectTransition(Pausable.PHASE_NAME, Resumable.PHASE_NAME);
+        addDirectTransition(Pausable.PHASE_NAME, Stoppable.PHASE_NAME);
+    }
 
-                if (getState().isStarted())
-                {
-                    // This is a work around to bypass the phase checking so that we
-                    // can call stop even though dispose was called
-                    setExecutingPhase(null);
-                    service.stop();
-                }
-                service.doDispose();
-                fireServiceNotification(ServiceNotification.SERVICE_DISPOSED);
-            }
-            else
-            {
-                throw new LifecycleException(CoreMessages.lifecyclePhaseNotRecognised(phase.getName()),
-                    service);
-            }
-        }
-        catch (MuleException e)
+    @Override
+    protected void notifyTransition(String currentPhase)
+    {
+        if(currentPhase.equals(Resumable.PHASE_NAME))
         {
-            throw new LifecycleException(e, service);
+            //Revert back to start phase
+            completedPhases.remove(Resumable.PHASE_NAME);
+            completedPhases.remove(Pausable.PHASE_NAME);
+            setCurrentPhase(Startable.PHASE_NAME);
         }
     }
 
-    protected void fireServiceNotification(int action)
+    @Override
+    public void fireInitialisePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Initialisable.PHASE_NAME);
+        //TODO No pre notification
+        if(logger.isInfoEnabled()) logger.info("Initialising service: " + getLifecycleObject().getName());
+        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_INITIALISED);
+    }
+
+
+    @Override
+    public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Startable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Starting service: " + getLifecycleObject().getName());
+        //TODO No pre notification
+        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_STARTED);
+    }
+
+
+    public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Pausable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Pausing service: " + getLifecycleObject().getName());
+
+        //TODO No pre notification
+        invokePhase(Pausable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_PAUSED);
+    }
+
+    public void fireResumePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Resumable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Resuming service: " + getLifecycleObject().getName());
+        //TODO No pre notification
+        invokePhase(Resumable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_RESUMED);
+    }
+
+    @Override
+    public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Stoppable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Stopping service: " + getLifecycleObject().getName());
+        //TODO No pre notification
+        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_STOPPED);
+    }
+
+    @Override
+    public void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
+    {
+        checkPhase(Disposable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Disposing service: " + getLifecycleObject().getName());
+        //TODO No pre notification
+        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+        fireNotification(ServiceNotification.SERVICE_DISPOSED);
+    }
+
+    protected void fireNotification(int action)
     {
         // double broadcast for backwards compatibility
-        service.getMuleContext().fireNotification(new ServiceNotification(service, action));
-        service.getMuleContext().fireNotification(new FlowConstructNotification(service, action));
+        getLifecycleObject().getMuleContext().fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
+        if(getLifecycleObject() instanceof Service)
+        {
+            getLifecycleObject().getMuleContext().fireNotification(new ServiceNotification((Service)getLifecycleObject(), action));
+        }
     }
 }

@@ -7,10 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
-
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.registry.Registry;
+package org.mule.lifecycle.phases;
 
 /**
  * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable

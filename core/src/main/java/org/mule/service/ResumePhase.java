@@ -9,15 +9,14 @@
  */
 package org.mule.service;
 
-import org.mule.api.lifecycle.ReverseLifecyclePhase;
-import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.phases.DefaultLifecyclePhase;
 
 /**
  * Resume phase happens only alfter a pause phase.  Resume is a reverse lifecycle phase since it reverts the lifecycle state
  * to the state previous to the lifecycle pair invocation. i.e. if a services was started, then paused, then resumed, its lifecycle state
  * is reverted to 'start' not 'resume'.
  */
-public class ResumePhase extends DefaultLifecyclePhase implements ReverseLifecyclePhase
+public class ResumePhase extends DefaultLifecyclePhase
 {
     public ResumePhase()
     {

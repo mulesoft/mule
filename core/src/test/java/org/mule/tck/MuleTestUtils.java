@@ -232,7 +232,7 @@ public final class MuleTestUtils
             MuleContext.class).newInstance(context);
 
         connector.setName("testConnector");
-        context.getLifecycleManager().applyCompletedPhases(connector);
+        context.getRegistry().applyLifecycle(connector);
         
         String endpoingUri = uri == null ? "test://test" : uri;
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoingUri, context);
@@ -320,7 +320,7 @@ public final class MuleTestUtils
                         AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
-        context.getLifecycleManager().applyCompletedPhases(connector);
+        context.getRegistry().applyLifecycle(connector);
         connector.registerSupportedProtocol(protocol);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test", context);
@@ -412,7 +412,7 @@ public final class MuleTestUtils
     {
         TestConnector testConnector = new TestConnector(context);
         testConnector.setName("testConnector");
-        context.getLifecycleManager().applyCompletedPhases(testConnector);
+        context.getRegistry().applyLifecycle(testConnector);
         return testConnector;
     }
 
@@ -435,7 +435,7 @@ public final class MuleTestUtils
     {
         SedaModel model = new SedaModel();
         model.setMuleContext(context);
-        context.getLifecycleManager().applyCompletedPhases(model);
+        context.getRegistry().applyLifecycle(model);
         
         Service service = new SedaService(context);
         service.setName(name);

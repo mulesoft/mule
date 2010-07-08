@@ -12,98 +12,62 @@ package org.mule.transport;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePair;
-import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.transport.Connector;
 import org.mule.context.notification.ConnectionNotification;
-import org.mule.lifecycle.AbstractLifecycleManager;
+import org.mule.lifecycle.SimpleLifecycleManager;
 
 /**
- * TODO
+ * Manages the lifecycle of connectors in Mule. Currently only manages the 'initialsie', 'start', 'stop' and dispose
+ * phases, not the connect phase which is managed by the Retry handler
+ *
+ * @since 3.0
  */
-public class ConnectorLifecycleManager extends AbstractLifecycleManager
+public class ConnectorLifecycleManager extends SimpleLifecycleManager<Connector>
 {
-    private AbstractConnector connector;
-
-    public ConnectorLifecycleManager(AbstractConnector connector, LifecycleManager lifecycleManager) throws MuleException
+    public ConnectorLifecycleManager(AbstractConnector connector)
     {
-        super(connector.getName());
-        this.connector = connector;
-        //TODO see if we can incorporate connect and disconnect
-        for (LifecyclePair pair : lifecycleManager.getLifecyclePairs())
-        {
-            registerLifecycle(pair);
-        }
+        super(connector.getName(), connector);
     }
 
-    /**
-     * This lifecycle manager handles calling of lifecycle methods explicitly
-     * This method simply checks that the phase is valid and delegates to {@link #invokePhase(org.mule.api.lifecycle.LifecyclePhase)}
-     * which in turn calls {@link #doApplyPhase(org.mule.api.lifecycle.LifecyclePhase)}
-     * @param phase the phase to transition to
-     * @throws LifecycleException if there is an exception thrown when call a lifecycle method
-     */
-    @Override
-    public void fireLifecycle(String phase) throws LifecycleException
+    public void fireInitialisePhase(LifecycleCallback<Connector> callback) throws MuleException
     {
-        checkPhase(phase);
-        LifecyclePhase li = getPhaseForIndex(getPhaseIndex(phase));
-        invokePhase(li);
+        checkPhase(Initialisable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Initialising connector: " + getLifecycleObject().getName());
+        //No pre notification
+        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+        //No post notification
     }
 
-    @Override
-    protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
+    public void fireStartPhase(LifecycleCallback<Connector> callback) throws MuleException
     {
-        try
-        {
-            if(phase.getName().equals(Initialisable.PHASE_NAME))
-            {
-                logger.debug("Initialising connector: " + connector.getName());
-                connector.doInitialise();
-
-            }
-            else if(phase.getName().equals(Startable.PHASE_NAME))
-            {
-                logger.debug("Starting connector: " + connector.getName());
-                connector.doStart();
-            }
-
-            else if(phase.getName().equals(Stoppable.PHASE_NAME))
-            {
-                logger.debug("Stopping connector: " + connector.getName());
-                connector.doStop();
-            }
-            else if(phase.getName().equals(Disposable.PHASE_NAME))
-            {
-                //We need to handle transitions to get to dispose since, dispose can be called from any lifecycle state
-                logger.debug("Disposing connector: " + connector.getName());
-
-
-                if(getState().isStarted())
-                {
-                    //This is a work around to bypass the phase checking so that we can call stop even though dispose was called
-                    setExecutingPhase(null);
-                    connector.stop();
-                }
-                connector.doDispose();
-            }
-            else
-            {
-                throw new LifecycleException(CoreMessages.lifecyclePhaseNotRecognised(phase.getName()), connector);
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new LifecycleException(e, connector);
-        }
+        checkPhase(Startable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Starting connector: " + getLifecycleObject().getName());
+        //No pre notification
+        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+        //No post notification
     }
 
-    protected void fireConnectionNotification(int action)
+    public void fireStopPhase(LifecycleCallback<Connector> callback) throws MuleException
     {
-        connector.getMuleContext().fireNotification(new ConnectionNotification(connector, connector.getName(), action));
+        checkPhase(Stoppable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Stopping connector: " + getLifecycleObject().getName());
+        //No pre notification
+        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+        //No post notification
+    }
+
+    public void fireDisposePhase(LifecycleCallback<Connector> callback) throws MuleException
+    {
+        if(logger.isInfoEnabled()) logger.info("Disposing connector: " + getLifecycleObject().getName());                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                //No pre notification
+        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+        //No post notification
+    }
+
+    protected void fireNotification(int action)
+    {
+        getLifecycleObject().getMuleContext().fireNotification(new ConnectionNotification(getLifecycleObject(), getLifecycleObject().getName(), action));
     }
 }

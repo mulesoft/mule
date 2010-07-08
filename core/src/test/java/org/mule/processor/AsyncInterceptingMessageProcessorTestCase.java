@@ -29,7 +29,12 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
     protected MessageProcessor messageProcessor;
     protected TestListener target = new TestListener();
     protected Exception exceptionThrown;
-    protected Latch latch = new Latch();;
+    protected Latch latch = new Latch();
+
+    public AsyncInterceptingMessageProcessorTestCase()
+    {
+        setStartContext(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception

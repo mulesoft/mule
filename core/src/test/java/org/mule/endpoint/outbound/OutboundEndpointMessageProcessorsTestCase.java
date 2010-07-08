@@ -64,9 +64,6 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundM
                                                       boolean sync,
                                                       TransactionConfig txConfig) throws Exception
     {
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(filter, securityFilter, in, response, sync, txConfig);
-        Connector connector = endpoint.getConnector();
-        connector.start();
-        return endpoint;
+        return createTestOutboundEndpoint(filter, securityFilter, in, response, sync, txConfig);
     }
 }

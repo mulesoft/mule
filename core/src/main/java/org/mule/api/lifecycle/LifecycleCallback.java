@@ -9,10 +9,15 @@
  */
 package org.mule.api.lifecycle;
 
+import org.mule.api.MuleException;
+
 /**
- * A marker interface that makes a lifecycle transition revert to the state previous to the phase execution rather than
- * progressing the lifecycle to a new phase.
+ * This callback is used to execute lifecycle behaviour for an object being managed by a {@link LifecycleManager}
+ * The callback is used so that transitions can be managed consistently outside of an object
+ *
+ * @since 3.0
  */
-public interface ReverseLifecyclePhase
+public interface LifecycleCallback<O>
 {
+    void onTransition(String phaseName, O object) throws MuleException;
 }

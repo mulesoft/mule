@@ -16,8 +16,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
@@ -25,7 +23,6 @@ import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.util.UUID;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,10 +37,8 @@ public abstract class AbstractRegistry implements Registry
 
     protected MuleContext muleContext;
 
-    protected LifecycleManager lifecycleManager;
+    protected RegistryLifecycleManager lifecycleManager;
 
-
-    /** Default Constructor */
     protected AbstractRegistry(String id, MuleContext muleContext)
     {
         if (id == null)
@@ -52,7 +47,7 @@ public abstract class AbstractRegistry implements Registry
         }
         this.id = id;
         this.muleContext = muleContext;
-        lifecycleManager = createLifecycleManager(muleContext.getLifecycleManager().getLifecyclePairs());
+        lifecycleManager = createLifecycleManager();
     }
 
     public final synchronized void dispose()
@@ -78,15 +73,9 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
-    protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
+    protected RegistryLifecycleManager createLifecycleManager()
     {
-        LifecycleManager lifecycleManager = new RegistryLifecycleManager(this);
-
-        for (LifecyclePair lifecyclePair : lifecyclePairs)
-        {
-            lifecycleManager.registerLifecycle(lifecyclePair);
-        }
-        return lifecycleManager;
+        return new RegistryLifecycleManager(getRegistryId(), this, muleContext);
     }
 
     abstract protected void doInitialise() throws InitialisationException;
@@ -126,7 +115,7 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
-    public LifecycleManager getLifecycleManager()
+    public RegistryLifecycleManager getLifecycleManager()
     {
         return lifecycleManager;
     }

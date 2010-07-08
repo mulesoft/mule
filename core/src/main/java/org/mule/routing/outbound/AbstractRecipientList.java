@@ -151,7 +151,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         if (null != endpoint)
         {
-            muleContext.getLifecycleManager().applyCompletedPhases(endpoint);
+            muleContext.getRegistry().applyLifecycle(endpoint);
         }
         return endpoint;
     }

@@ -349,7 +349,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         catch (LifecycleException e)
         {
             //Expected
-            //assertTrue(e.getCause() instanceof LifecycleException);
         }
 
         assertEquals(0, connector.dispatchers.getNumIdle());

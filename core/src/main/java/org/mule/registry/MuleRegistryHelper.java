@@ -579,6 +579,11 @@ public class MuleRegistryHelper implements MuleRegistry
         return registry.getTransientRegistry().applyLifecycle(object);
     }
 
+    public Object applyLifecycle(Object object, String phase) throws MuleException
+    {
+        return registry.getTransientRegistry().applyLifecycle(object, phase);        
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Delegate to internal registry
     ////////////////////////////////////////////////////////////////////////////

@@ -83,7 +83,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         // Log but don't proceed if connector is not started
         list.add(new OutboundLoggingMessageProcessor());
-        list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleManager().getState()));
+        list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleState()));
 
         // Everything is processed within TransactionTemplate
         list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(),

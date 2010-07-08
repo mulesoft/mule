@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.api.FlowConstruct;
 import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -21,6 +22,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecycleState;
@@ -35,6 +37,7 @@ import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
@@ -107,11 +110,6 @@ public abstract class AbstractService implements Service
      */
     protected String initialState = INITIAL_STATE_STARTED;
 
-    /**
-     * Indicates whether a service has passed its initial startup state.
-     */
-    private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
-
     // Default component to use if one is not configured.
     // TODO MULE-3113 This should not really be needed as to implement bridging we
     // should
@@ -127,7 +125,7 @@ public abstract class AbstractService implements Service
         this.muleContext = muleContext;
         try
         {
-            lifecycleManager = new ServiceLifecycleManager(this, muleContext.getLifecycleManager());
+            lifecycleManager = new ServiceLifecycleManager(this);
         }
         catch (MuleException e)
         {
@@ -136,130 +134,94 @@ public abstract class AbstractService implements Service
 
     }
 
+    //----------------------------------------------------------------------------------------//
+    //-                    LIFECYCLE METHODS
+    //----------------------------------------------------------------------------------------//
+
     /**
      * Initialise the service. The service will first create a component from the
      * ServiceDescriptor and then initialise a pool based on the attributes in the
      * ServiceDescriptor .
-     * 
+     *
+     * @throws org.mule.api.lifecycle.InitialisationException
+     *          if the service fails to
+     *          initialise
      * @see org.mule.api.registry.ServiceDescriptor
-     * @throws org.mule.api.lifecycle.InitialisationException if the service fails to
-     *             initialise
      */
     public final synchronized void initialise() throws InitialisationException
     {
-        ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
-
-        if (exceptionListener == null)
-        {
-            // By default us the model Exception Listener
-            // TODO MULE-2102 This should be configured in the default template.
-            exceptionListener = getModel().getExceptionListener();
-        }
-
-        inboundMessageSource = (((DefaultInboundRouterCollection) inboundRouter).getMessageSource());
-        asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
-        if (inboundMessageSource instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) inboundMessageSource).setFlowConstruct(this);
-        }
-        if (asyncReplyMessageSource instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) asyncReplyMessageSource).setFlowConstruct(this);
-        }
-        // Ensure Component has service instance and is initialised. If the component
-        // was configured with spring and is therefore in the registry it will get
-        // started automatically, if it was set on the service directly then it won't
-        // be started automatically. So to be sure we start it here.
-        component.setFlowConstruct(this);
-
         try
         {
-            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
+            lifecycleManager.fireInitialisePhase(new LifecycleCallback<FlowConstruct>()
+            {
+                public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+                {
+                    ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
+
+                    if (exceptionListener == null)
+                    {
+                        // By default us the model Exception Listener
+                        // TODO MULE-2102 This should be configured in the default template.
+                        exceptionListener = getModel().getExceptionListener();
+                    }
+
+                    inboundMessageSource = (((DefaultInboundRouterCollection) inboundRouter).getMessageSource());
+                    asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
+                    if (inboundMessageSource instanceof FlowConstructAware)
+                    {
+                        ((FlowConstructAware) inboundMessageSource).setFlowConstruct(object);
+                    }
+                    if (asyncReplyMessageSource instanceof FlowConstructAware)
+                    {
+                        ((FlowConstructAware) asyncReplyMessageSource).setFlowConstruct(object);
+                    }
+                    // Ensure Component has service instance and is initialised. If the component
+                    // was configured with spring and is therefore in the registry it will get
+                    // started automatically, if it was set on the service directly then it won't
+                    // be started automatically. So to be sure we start it here.
+                    component.setFlowConstruct(object);
+
+                    doInitialise();
+                }
+            });
         }
-        catch (LifecycleException e)
+        catch (InitialisationException e)
+        {
+            throw e;
+        }
+        catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
-    }
 
-    protected void buildServiceMessageProcessorChain()
-    {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(getServiceStartedAssertingMessageProcessor());
-        addMessageProcessors(builder);
-
-        // Used by deprecated send() and dispatch() methods only
-        serviceOnlyMessageProcessorChain = builder.build();
-
-        builder.chainBefore(inboundRouter);
-        messageProcessorChain = builder.build();
-
-        if (messageProcessorChain instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
-        }
-    }
-
-    protected MessageProcessor getServiceStartedAssertingMessageProcessor()
-    {
-        return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
-    }
-
-    protected abstract void addMessageProcessors(ChainMessageProcessorBuilder builder);
-
-    protected ServiceStatistics createStatistics()
-    {
-        return new ServiceStatistics(name);
-    }
-
-    public void forceStop() throws MuleException
-    {
-        // Kepping this here since I don't understand why this method exists. AFAICS
-        // this just says the service is stopped
-        // without actually stopping it
-        // if (!stopped.get())
-        // {
-        // logger.debug("Stopping Service");
-        // stopping.set(true);
-        // fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
-        // doForceStop();
-        // stopped.set(true);
-        // stopping.set(false);
-        // fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
-        // }
-        doForceStop();
-        stop();
-    }
-
-    public void stop() throws MuleException
-    {
-        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
     }
 
     public void start() throws MuleException
     {
-        lifecycleManager.checkPhase(Startable.PHASE_NAME);
-
-        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
+        if (!isStopped() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
         {
+            //Transition to a stopped state without changing state of the flow construct
+            lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
+            lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
+
             logger.info("Service " + name + " has not been started (initial state = 'stopped')");
-            beyondInitialState.set(true);
             return;
         }
-
-        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
+        
+        lifecycleManager.fireStartPhase(new LifecycleCallback<FlowConstruct>()
         {
-            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
-            lifecycleManager.fireLifecycle(Pausable.PHASE_NAME);
+            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+            {
+                doStart();
+            }
+        });
+
+        //Cannot call one lifecycle phase from within another, so we pause if necessary here
+        if ( initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
+        {
+            pause();
             logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
         }
-        else
-        {
-            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
-            logger.info("Service " + name + " has been started successfully");
-        }
-
-        beyondInitialState.set(true);
 
     }
 
@@ -270,7 +232,13 @@ public abstract class AbstractService implements Service
      */
     public final void pause() throws MuleException
     {
-        lifecycleManager.fireLifecycle(Pausable.PHASE_NAME);
+        lifecycleManager.firePausePhase(new LifecycleCallback<FlowConstruct>()
+        {
+            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+            {
+                doPause();
+            }
+        });
     }
 
     /**
@@ -279,48 +247,44 @@ public abstract class AbstractService implements Service
      */
     public final void resume() throws MuleException
     {
-        lifecycleManager.fireLifecycle(Resumable.PHASE_NAME);
+        lifecycleManager.fireResumePhase(new LifecycleCallback<FlowConstruct>()
+        {
+            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+            {
+                doResume();
+            }
+        });
     }
 
-    /**
-     * Determines if the service is in a paused state
-     * 
-     * @return True if the service is in a paused state, false otherwise
-     */
-    public boolean isPaused()
-    {
-        return lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME);
-    }
 
-    /**
-     * Custom components can execute code necessary to put the service in a paused
-     * state here. If a developer overloads this method the doResume() method MUST
-     * also be overloaded to avoid inconsistent state in the service
-     * 
-     * @throws MuleException
-     */
-    protected void doPause() throws MuleException
+    public void stop() throws MuleException
     {
-        // template method
-    }
-
-    /**
-     * Custom components can execute code necessary to resume a service once it has
-     * been paused If a developer overloads this method the doPause() method MUST
-     * also be overloaded to avoid inconsistent state in the service
-     * 
-     * @throws MuleException
-     */
-    protected void doResume() throws MuleException
-    {
-        // template method
+        lifecycleManager.fireStopPhase(new LifecycleCallback<FlowConstruct>()
+        {
+            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+            {
+                doStop();
+            }
+        });
     }
 
     public final void dispose()
     {
+
         try
         {
-            lifecycleManager.fireLifecycle(Disposable.PHASE_NAME);
+            if(isStarted())
+            {
+                stop();
+            }
+            
+            lifecycleManager.fireDisposePhase(new LifecycleCallback<FlowConstruct>()
+            {
+                public void onTransition(String phaseName, FlowConstruct object) throws MuleException
+                {
+                    doDispose();
+                }
+            });
         }
         catch (MuleException e)
         {
@@ -328,43 +292,24 @@ public abstract class AbstractService implements Service
         }
     }
 
-    public ServiceStatistics getStatistics()
+    public LifecycleState getLifecycleState()
     {
-        return stats;
+        return lifecycleManager.getState();
     }
 
-    @Deprecated
-    public void dispatchEvent(MuleEvent event) throws MuleException
+    public boolean isStarted()
     {
-        serviceOnlyMessageProcessorChain.process(event);
-    }
-
-    @Deprecated
-    public MuleMessage sendEvent(MuleEvent event) throws MuleException
-    {
-        MuleEvent resultEvent = serviceOnlyMessageProcessorChain.process(event);
-        if (resultEvent != null)
-        {
-            return resultEvent.getMessage();
-        }
-        else
-        {
-            return null;
-        }
+        return lifecycleManager.getState().isStarted();
     }
 
     /**
-     * @return the Mule descriptor name which is associated with the service
+     * Determines if the service is in a paused state
+     *
+     * @return True if the service is in a paused state, false otherwise
      */
-    public String getName()
+    public boolean isPaused()
     {
-        return name;
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+        return lifecycleManager.getCurrentPhase().equals(Pausable.PHASE_NAME);
     }
 
     public boolean isStopped()
@@ -377,9 +322,28 @@ public abstract class AbstractService implements Service
         return lifecycleManager.getState().isStopping();
     }
 
-    protected void handleException(Exception e)
+    /**
+     * Custom components can execute code necessary to put the service in a paused
+     * state here. If a developer overloads this method the doResume() method MUST
+     * also be overloaded to avoid inconsistent state in the service
+     *
+     * @throws MuleException
+     */
+    protected void doPause() throws MuleException
     {
-        exceptionListener.exceptionThrown(e);
+        // template method
+    }
+
+    /**
+     * Custom components can execute code necessary to resume a service once it has
+     * been paused If a developer overloads this method the doPause() method MUST
+     * also be overloaded to avoid inconsistent state in the service
+     *
+     * @throws MuleException
+     */
+    protected void doResume() throws MuleException
+    {
+        // template method
     }
 
     protected void doForceStop() throws MuleException
@@ -397,7 +361,7 @@ public abstract class AbstractService implements Service
         {
             ((Stoppable) asyncReplyMessageSource).stop();
         }
-        
+
         // Component is not in chain
         if (component instanceof Stoppable)
         {
@@ -479,15 +443,104 @@ public abstract class AbstractService implements Service
         inboundRouter.initialise();
     }
 
-    public boolean isStarted()
+    public void forceStop() throws MuleException
     {
-        return lifecycleManager.getState().isStarted();
+        // Kepping this here since I don't understand why this method exists. AFAICS
+        // this just says the service is stopped
+        // without actually stopping it
+        // if (!stopped.get())
+        // {
+        // logger.debug("Stopping Service");
+        // stopping.set(true);
+        // fireServiceNotification(ServiceNotification.SERVICE_STOPPING);
+        // doForceStop();
+        // stopped.set(true);
+        // stopping.set(false);
+        // fireServiceNotification(ServiceNotification.SERVICE_STOPPED);
+        // }
+        doForceStop();
+        stop();
     }
-    
-    public LifecycleState getLifecycleState()
+
+
+    //----------------------------------------------------------------------------------------//
+    //-                    END LIFECYCLE METHODS
+    //----------------------------------------------------------------------------------------//
+
+    protected void handleException(Exception e)
     {
-        return lifecycleManager.getState();
+        exceptionListener.exceptionThrown(e);
     }
+
+    protected void buildServiceMessageProcessorChain()
+    {
+        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        builder.chain(getServiceStartedAssertingMessageProcessor());
+        addMessageProcessors(builder);
+
+        // Used by deprecated send() and dispatch() methods only
+        serviceOnlyMessageProcessorChain = builder.build();
+
+        builder.chainBefore(inboundRouter);
+        messageProcessorChain = builder.build();
+
+        if (messageProcessorChain instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
+        }
+    }
+
+    protected MessageProcessor getServiceStartedAssertingMessageProcessor()
+    {
+        return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
+    }
+
+    protected abstract void addMessageProcessors(ChainMessageProcessorBuilder builder);
+
+    protected ServiceStatistics createStatistics()
+    {
+        return new ServiceStatistics(name);
+    }
+
+    public ServiceStatistics getStatistics()
+    {
+        return stats;
+    }
+
+    @Deprecated
+    public void dispatchEvent(MuleEvent event) throws MuleException
+    {
+        serviceOnlyMessageProcessorChain.process(event);
+    }
+
+    @Deprecated
+    public MuleMessage sendEvent(MuleEvent event) throws MuleException
+    {
+        MuleEvent resultEvent = serviceOnlyMessageProcessorChain.process(event);
+        if (resultEvent != null)
+        {
+            return resultEvent.getMessage();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * @return the Mule descriptor name which is associated with the service
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
+    }
+
 
     // /////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters

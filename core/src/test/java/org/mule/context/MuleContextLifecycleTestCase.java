@@ -16,9 +16,7 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.security.SecurityManager;
@@ -34,7 +32,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -420,10 +417,10 @@ public class MuleContextLifecycleTestCase
         }
 
         @Override
-        protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
+        public void fireLifecycle(String phase) throws LifecycleException
         {
-            appliedLifecyclePhases.add(phase.getName());
-            super.doApplyPhase(phase);
+            appliedLifecyclePhases.add(phase);
+            super.fireLifecycle(phase);
         }
     }
     

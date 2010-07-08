@@ -12,6 +12,8 @@ package org.mule.service;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.QueueProfile;
@@ -53,6 +55,12 @@ public class ServiceTestCase extends AbstractMuleTestCase
 
     }
 
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        muleContext.getRegistry().unregisterObject(service.getName(), MuleRegistry.LIFECYCLE_BYPASS_FLAG);
+    }
+
     public void testUnregisterListenersOnServiceDisposal() throws Exception
     {
         // Start muleContext, this starts connectors and services
@@ -61,6 +69,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
         // Assert that connector has two receivers registered, one for each endpoint
         assertEquals(2, ((AbstractConnector) testConnector).getReceivers().size());
 
+        service.stop();
         service.dispose();
 
         // Assert that connector has no receivers registered after service disposal

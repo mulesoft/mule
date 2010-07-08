@@ -42,6 +42,11 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
     private CountDownLatch latch;
     private AtomicInteger counter = new AtomicInteger();
 
+    public DispatcherThreadingProfileTestCase()
+    {
+        setStartContext(true);
+    }
+
     @Override
     protected void doTearDown() throws Exception
     {
@@ -184,8 +189,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         connector.setDispatcherThreadingProfile(threadingProfile);
         muleContext.getRegistry().registerConnector(connector);
         connector.setDispatcherFactory(new DelayTestMessageDispatcherFactory());
-
-        connector.start();
     }
 
     private void dispatchTwoAsyncEvents() throws DispatchException, Exception

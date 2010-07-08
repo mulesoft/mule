@@ -10,11 +10,11 @@
 
 package org.mule.api;
 
+import org.mule.api.lifecycle.LifecycleStateEnabled;
+
 import java.beans.ExceptionListener;
 
-import org.mule.api.lifecycle.LifecycleState;
-
-public interface FlowConstruct
+public interface FlowConstruct extends LifecycleStateEnabled
 {
     /**
      * The exception strategy to use to handle exceptions in the Mule component.
@@ -26,8 +26,5 @@ public interface FlowConstruct
 
     MuleContext getMuleContext();
 
-    LifecycleState getLifecycleState();
-
     String getName();
-
 }

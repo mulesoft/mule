@@ -37,6 +37,11 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 {
     private SedaService service;
 
+    public SedaServiceTestCase()
+    {
+        setStartContext(true);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -143,7 +148,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
             }
         }));
         muleContext.getRegistry().registerService(service);
-        service.start();
 
         service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
 
@@ -179,7 +183,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
             }
         }));
         muleContext.getRegistry().registerService(service);
-        service.start();
 
         service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext));
 
@@ -213,7 +216,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
             }
         }));
         muleContext.getRegistry().registerService(service);
-        service.start();
 
         service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
 

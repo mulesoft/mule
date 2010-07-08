@@ -9,7 +9,7 @@
  */
 package org.mule.service;
 
-import org.mule.lifecycle.DefaultLifecyclePhase;
+import org.mule.lifecycle.phases.DefaultLifecyclePhase;
 
 /**
  * Defines a phase phase that will invoke the {@link org.mule.service.Pausable#pause()} method on an object.

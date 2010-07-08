@@ -24,6 +24,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
@@ -177,6 +178,12 @@ public class TransientRegistry extends AbstractRegistry
         return object;
     }
 
+    Object applyLifecycle(Object object, String phase) throws MuleException
+    {
+        getLifecycleManager().applyPhase(object, NotInLifecyclePhase.PHASE_NAME, phase);
+        return object;
+    }
+
 
 
     Object applyProcessors(Object object, Object metadata)
@@ -289,6 +296,15 @@ public class TransientRegistry extends AbstractRegistry
         return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
     }
 
+    /**
+     * Will remove an object by name from the registry. By default the registry will apply all remaining lifecycle phases
+     * to the object when it is removed.
+     *
+     * @param key the name or key of the object to remove from the registry
+     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry.LIFECYCLE_BYPASS_FLAG}
+     * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
+     * the object's lifecycle threw an exception
+     */
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         Object obj;
@@ -299,7 +315,10 @@ public class TransientRegistry extends AbstractRegistry
 
         try
         {
-            getLifecycleManager().applyPhase(obj, Disposable.PHASE_NAME);
+            if(!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG))
+            {
+                getLifecycleManager().applyPhase(obj, lifecycleManager.getCurrentPhase(), Disposable.PHASE_NAME);
+            }
         }
         catch (MuleException e)
         {

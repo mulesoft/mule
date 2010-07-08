@@ -9,138 +9,266 @@
  */
 package org.mule.lifecycle;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.RegistryLifecycleHelpers;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
+import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
+import org.mule.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.lifecycle.phases.MuleContextStartPhase;
+import org.mule.lifecycle.phases.MuleContextStopPhase;
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class RegistryLifecycleManager extends AbstractLifecycleManager
+public class RegistryLifecycleManager extends LifecycleManagerSupport<Registry> implements RegistryLifecycleHelpers
 {
-    /**
-     * logger used by this class
-     */
-    protected transient final Log logger = LogFactory.getLog(RegistryLifecycleManager.class);
+    protected Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>();
+    private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
+    private MuleContext muleContext;
 
-    private Registry registry;
-
-    public RegistryLifecycleManager(Registry registry)
+    public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
     {
-        super(registry.getRegistryId());
-        this.registry = registry;
+        super(id, object);
+        this.muleContext = muleContext;
+
+        RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new EmptyLifecycleCallback());
+        registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
+        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
+        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
+        registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
+    }
+
+    public RegistryLifecycleManager(String id, Registry object, Map<String, LifecyclePhase> phases )
+    {
+        super(id, object);
+        RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
+
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new LifecycleCallback(){
+            public void onTransition(String phaseName, Object object) throws MuleException
+            { }});
+
+        for (Map.Entry<String, LifecyclePhase> entry : phases.entrySet())
+        {
+            registerPhase(entry.getKey(), entry.getValue(), callback);
+        }
     }
 
     @Override
-    protected void doApplyPhase(LifecyclePhase phase) throws LifecycleException
+    protected void registerTransitions()
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Applying lifecycle phase: " + phase.getName() + " for registry: " + registry.getClass().getSimpleName());
-        }
+        addDirectTransition(NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
+        addDirectTransition(Initialisable.PHASE_NAME, Startable.PHASE_NAME);
 
-        if(phase instanceof ContainerManagedLifecyclePhase)
-        {
-            phase.applyLifecycle(registry);
-            return;
-        }
-
-        // overlapping interfaces can cause duplicates
-        Set<Object> duplicates = new HashSet<Object>();
-
-        for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
-        {
-            // TODO Collection -> List API refactoring
-            Collection<?> targetsObj = registry.lookupObjects(lo.getType());
-            List targets = new LinkedList(targetsObj);
-            if (targets.size() == 0)
-            {
-                continue;
-            }
-
-            lo.firePreNotification(muleContext);
-
-            for (Iterator target = targets.iterator(); target.hasNext();)
-            {
-                Object o = target.next();
-                if (duplicates.contains(o))
-                {
-                    target.remove();
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
-                    }
-                    phase.applyLifecycle(o);
-                    target.remove();
-                    duplicates.add(o);
-                }
-            }
-
-            lo.firePostNotification(muleContext);
-        }
+        //start stop
+        addDirectTransition(Startable.PHASE_NAME, Stoppable.PHASE_NAME);
+        addDirectTransition(Stoppable.PHASE_NAME, Startable.PHASE_NAME);
+        //Dispose can be called from any phase. see {@link #checkPhase}
     }
 
     @Override
     public void checkPhase(String name) throws IllegalStateException
     {
-        if (executingPhase != null)
+        //Allow dispose to be called from any other lifecycle since the registry can transition through the
+        //phases automatically
+        if (Disposable.PHASE_NAME.equals(name) && !state.isDisposed())
         {
-            if (name.equalsIgnoreCase(executingPhase))
-            {
-                throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
-            }
-            else
-            {
-                throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
-            }
+            return;
         }
 
-        if (name.equalsIgnoreCase(currentPhase))
-        {
-            throw new IllegalStateException("Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
-        }
+        super.checkPhase(name);
+    }
 
+    protected void registerPhase(String phaseName, LifecyclePhase phase, LifecycleCallback callback)
+    {
+        phaseNames.add(phaseName);
+        callbacks.put(phaseName, callback);
+        phases.put(phaseName, phase);
+    }
 
-        Integer phaseIndex = getPhaseIndex(name);
-        if (phaseIndex == null)
+    public void fireLifecycle(String destinationPhase) throws LifecycleException
+    {
+        checkPhase(destinationPhase);
+        if (isDirectTransition(destinationPhase))
         {
-            throw new IllegalStateException("Phase does not exist: " + name);
+
+            // transition to phase without going through other phases first
+            invokePhase(destinationPhase, object, callbacks.get(destinationPhase));
         }
         else
         {
-            //Allow dispose to be called from any other lifecycle
-            if(Disposable.PHASE_NAME.equals(name))
+            //Call all phases to including the destination phase
+            boolean start = false;
+            for (String phase : phaseNames)
             {
-                return;
-            }
-            //We can always transition to the next phase
-            if(index.get(phaseIndex-1).getName().equals(getCurrentPhase()))
-            {
-                return;
-            }
-            for (LifecyclePair pair : lifecyclePairs)
-            {
-                //Always allow a phase to transition from begin phase to end phase
-                if(pair.getBegin().getName().equals(name) && pair.getEnd().getName().equals(getCurrentPhase()) ||
-                   pair.getEnd().getName().equals(name) && pair.getBegin().getName().equals(getCurrentPhase()))
+                if (start)
                 {
-                    return;
+                    invokePhase(phase, object, callbacks.get(phase));
+                    if (phase.equals(destinationPhase))
+                    {
+                        break;
+                    }
+                }
+                if (phase.equals(getCurrentPhase()))
+                {
+                    start = true;
                 }
             }
-            throw new IllegalStateException("Registry " + registry.getRegistryId() + " Lifecycle phase: " + currentPhase + " does not support phase: " + name);
+        }
+    }
+
+    protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException
+    {
+        try
+        {
+            setExecutingPhase(phase);
+            callback.onTransition(phase, object);
+            setCurrentPhase(phase);
+        }
+        catch (MuleException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            setExecutingPhase(null);
+        }
+    }
+
+
+    //-------------------------------------------------------------------------------------------//
+    //-                     LIFECYCLE HELPER METHODS
+    //-------------------------------------------------------------------------------------------//
+
+
+    public void applyPhase(Object object, String fromPhase, String toPhase) throws LifecycleException
+    {
+        //TODO i18n
+        if(fromPhase == null || toPhase==null)
+        {
+            throw new IllegalArgumentException("toPhase and fromPhase must be null");
+        }
+        if(!phaseNames.contains(fromPhase))
+        {
+            throw new IllegalArgumentException("fromPhase '" + fromPhase + "' not a valid phase.");
+        }
+        if(!phaseNames.contains(toPhase))
+        {
+            throw new IllegalArgumentException("toPhase '" + fromPhase + "' not a valid phase.");
+        }
+        boolean start = false;
+        for (String phaseName : phaseNames)
+        {
+            if(start)
+            {
+                phases.get(phaseName).applyLifecycle(object);
+            }
+            if(toPhase.equals(phaseName))
+            {
+                break;
+            }
+            if(phaseName.equals(fromPhase))
+            {
+                start = true;
+            }
+
+        }
+    }
+
+    public void applyCompletedPhases(Object object) throws LifecycleException
+    {
+        String lastPhase = NotInLifecyclePhase.PHASE_NAME;
+        for (String phase : completedPhases)
+        {
+            if(isDirectTransition(lastPhase, phase))
+            {
+                LifecyclePhase lp = phases.get(phase);
+                lp.applyLifecycle(object);
+                lastPhase = phase;
+            }
+        }
+    }
+
+    class RegistryLifecycleCallback implements LifecycleCallback<Object>
+    {
+        /**
+         * logger used by this class
+         */
+        protected transient final Log logger = LogFactory.getLog(RegistryLifecycleCallback.class);
+
+        public void onTransition(String phaseName, Object object) throws MuleException
+        {
+            LifecyclePhase phase = phases.get(phaseName);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Applying lifecycle phase: " + phase + " for registry: " + object.getClass().getSimpleName());
+            }
+
+            if (phase instanceof ContainerManagedLifecyclePhase)
+            {
+                phase.applyLifecycle(object);
+                return;
+            }
+
+            // overlapping interfaces can cause duplicates
+            Set<Object> duplicates = new HashSet<Object>();
+
+            for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
+            {
+                // TODO Collection -> List API refactoring
+                Collection<?> targetsObj = getLifecycleObject().lookupObjects(lo.getType());
+                List<Object> targets = new LinkedList<Object>(targetsObj);
+                if (targets.size() == 0)
+                {
+                    continue;
+                }
+
+                lo.firePreNotification(muleContext);
+
+                for (Iterator<Object> target = targets.iterator(); target.hasNext();)
+                {
+                    Object o = target.next();
+                    if (duplicates.contains(o))
+                    {
+                        target.remove();
+                    }
+                    else
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
+                        }
+                        phase.applyLifecycle(o);
+                        target.remove();
+                        duplicates.add(o);
+                    }
+                }
+
+                lo.firePostNotification(muleContext);
+            }
         }
     }
 }

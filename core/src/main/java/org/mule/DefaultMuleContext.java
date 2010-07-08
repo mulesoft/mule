@@ -215,7 +215,7 @@ public class DefaultMuleContext implements MuleContext
 
     public synchronized void dispose()
     {
-        if (isStarted() && !isStopped())
+        if (isStarted())
         {
             try
             {

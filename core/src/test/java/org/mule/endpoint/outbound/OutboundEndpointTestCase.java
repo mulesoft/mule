@@ -289,7 +289,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
             }
 
         });
-        connector.start();
+        //connector.start();
         return endpoint;
     }
 

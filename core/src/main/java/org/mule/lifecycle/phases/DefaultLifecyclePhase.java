@@ -7,22 +7,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle;
+package org.mule.lifecycle.phases;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.registry.Registry;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.lifecycle.LifecycleObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -200,6 +199,16 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         if (!getLifecycleClass().isAssignableFrom(o.getClass()))
         {
             return;
+        }
+        if(o instanceof LifecycleStateEnabled)
+        {
+            //If an object has its own lifecycle manager "LifecycleStateEnabled" it is possible that
+            //its state can be controlled outside the registry i.e. via JMX, double check here that we are
+            //not calling the same lifecycle twice
+            if(((LifecycleStateEnabled)o).getLifecycleState().isPhaseComplete(this.getName()))
+            {
+                return;
+            }
         }
         try
         {

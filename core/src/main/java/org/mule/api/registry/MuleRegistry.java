@@ -236,8 +236,10 @@ public interface MuleRegistry extends Registry
      * @param object the object to apply the current lifecycle state to
      * @return the same object with any lifecycle methods called
      * @throws org.mule.api.MuleException if the registry fails to execute a lifecycle method.
-     */
+b     */
     Object applyLifecycle(Object object) throws MuleException;
+
+    Object applyLifecycle(Object object, String phase) throws MuleException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Creation methods

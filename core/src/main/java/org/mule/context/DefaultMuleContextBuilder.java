@@ -29,7 +29,6 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
@@ -45,12 +44,7 @@ import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.TransactionNotification;
-import org.mule.lifecycle.DefaultLifecyclePair;
 import org.mule.lifecycle.MuleContextLifecycleManager;
-import org.mule.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.lifecycle.phases.MuleContextStartPhase;
-import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.util.ClassUtils;
 import org.mule.util.SplashScreen;
 import org.mule.work.DefaultWorkListener;
@@ -148,57 +142,14 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     public void setLifecycleManager(LifecycleManager manager)
     {
-        if ((manager instanceof MuleContextLifecycleManager) == false)
+        if (!(manager instanceof MuleContextLifecycleManager))
         {
             Message msg = MessageFactory.createStaticMessage(
                 "lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
             throw new MuleRuntimeException(msg);
         }
         
-        MuleContextLifecycleManager contextManager = (MuleContextLifecycleManager) manager;
-        addRequiredLifecyclePairs(contextManager);
-        
-        lifecycleManager = contextManager;
-    }
-
-    protected void addRequiredLifecyclePairs(MuleContextLifecycleManager contextManager)
-    {
-        boolean initializeDisposePairPresent = false;
-        boolean startStopPairPresent = false;
-        for (LifecyclePair pair : contextManager.getLifecyclePairs())
-        {
-            if ((pair.getBegin() instanceof MuleContextInitialisePhase) && 
-                (pair.getEnd() instanceof MuleContextDisposePhase))
-            {
-                initializeDisposePairPresent = true;
-            }
-            
-            if ((pair.getBegin() instanceof MuleContextStartPhase) &&
-                (pair.getEnd() instanceof MuleContextStopPhase))
-            {
-                startStopPairPresent = true;
-            }
-        }
-        
-        if (initializeDisposePairPresent == false)
-        {
-            registerInitializeDisposeLifecyclePair(contextManager);
-        }
-        if (startStopPairPresent == false)
-        {
-            registerStartStopLifecyclePair(contextManager);
-        }
-    }
-
-    protected void registerInitializeDisposeLifecyclePair(MuleContextLifecycleManager manager)
-    {
-        DefaultLifecyclePair pair = new DefaultLifecyclePair(new MuleContextInitialisePhase(), new MuleContextDisposePhase());
-        manager.registerLifecycle(pair);
-    }
-
-    private void registerStartStopLifecyclePair(MuleContextLifecycleManager manager)
-    {
-        manager.registerLifecycle(new DefaultLifecyclePair(new MuleContextStartPhase(), new MuleContextStopPhase()));
+        lifecycleManager = (MuleContextLifecycleManager) manager;
     }
 
     protected WorkManager getWorkManager()
@@ -264,9 +215,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected MuleContextLifecycleManager createLifecycleManager()
     {
-        MuleContextLifecycleManager manager = new MuleContextLifecycleManager();
-        addRequiredLifecyclePairs(manager);
-        return manager;
+        return new MuleContextLifecycleManager();
     }
 
     protected MuleWorkManager createWorkManager()

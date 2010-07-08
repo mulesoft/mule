@@ -9,43 +9,19 @@
  */
 package org.mule.api.lifecycle;
 
+import org.mule.lifecycle.phases.NotInLifecyclePhase;
+
 import java.util.List;
 
 /**
  * The LifecycleManager is responsible for managing the different lifecycle phases of the server and managing the
  * transitions between lifecycle phases.
+ *
+ * @since 3.0
  */
 public interface LifecycleManager
 {
-    /**
-     * The lifecycle pairs that will be invoked by this lifecycle manager
-     * @return The lifecycle pairs that will be invoked by this lifecycle manager
-     *
-     * @since 3.0
-     */
-    List<LifecyclePair> getLifecyclePairs();
-
-    /**
-     * The lifecycle pairs that will be invoked by this lifecycle manager
-     * The order the list will be the order in which  the life cycle phases will be invoked
-     * the {@link org.mule.api.lifecycle.LifecyclePair#getBegin()} phases will be called in order, the
-     * {@link LifecyclePair#getEnd()} will be called in opposite order. i.e. call initialise first and dispose last.
-     * @param lifecyclePairs The lifecycle pairs that will be invoked by this lifecycle manager
-     *
-     * @since 3.0
-     */
-    void setLifecyclePairs(List<LifecyclePair> lifecyclePairs);
-
-    /**
-     * Register a lifecycle pair that will be invoked by this lifecycle manager
-     * The order in which the lifecycle pairs are registered will be the order in which  the life cycle phases will be invoked
-     * the {@link org.mule.api.lifecycle.LifecyclePair#getBegin()} phases will be called in order, the
-     * {@link LifecyclePair#getEnd()} will be called in opposite order. i.e. call initialise first and dispose last.
-     * @param lifecyclePair a lifecycle pair that will be invoked by this lifecycle manager
-     *
-     * @since 3.0
-     */
-    void registerLifecycle(LifecyclePair lifecyclePair);
+    static final NotInLifecyclePhase NOT_IN_LIFECYCLE_PHASE = new NotInLifecyclePhase();
 
     /**
      * Applies lifecycle phase to a collection of objects.
@@ -53,16 +29,6 @@ public interface LifecycleManager
      * @throws LifecycleException if the phase is not a valid transition of does not exist on this lifecycle manager
      */
     void fireLifecycle(String phase) throws LifecycleException;
-
-    /**
-     * Applies lifecycle phase to an object independent of the current lifecycle phase. All phases between the current
-     * phase and the 'endPhase' will be executed.
-     * @param object the object to apply lifecycle to
-     * @param phase the lifecycle phase to execute
-     * @throws LifecycleException if there is an exection while invoking lifecycle on the object
-     */
-    void applyPhase(Object object, String phase) throws LifecycleException;
-
 
     /**
      * The current phase for the lifecycle manager.  While in transition this will reflect the last completed phase not
@@ -90,15 +56,6 @@ public interface LifecycleManager
     boolean isPhaseComplete(String phaseName);
 
     /**
-     * Successively applies all completed lifecycle phase to an object.
-     *
-     * @param object the object to which the lifecycle should be applied
-     * @throws LifecycleException if there is an error while applying lifecycle to the object
-     */
-    void applyCompletedPhases(Object object) throws LifecycleException;
-
-
-    /**
      * Will check that the phase passed in is a valid next phase for this lifecycle manager.  If the phase is not a valid next
      * transition an exception will be thrown
      *
@@ -116,4 +73,6 @@ public interface LifecycleManager
      * @since 3.0
      */
     LifecycleState getState();
+
+
 }

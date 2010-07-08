@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.components;
 
-import org.mule.lifecycle.AbstractLifecycleTracker;
 import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;

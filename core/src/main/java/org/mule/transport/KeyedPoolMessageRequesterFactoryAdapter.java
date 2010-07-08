@@ -13,6 +13,8 @@ package org.mule.transport;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -46,9 +48,8 @@ public class KeyedPoolMessageRequesterFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
-        InboundEndpoint endpoint = (InboundEndpoint)key;
         //Ensure requester has the same lifecycle as the connector
-        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(obj);
+        applyLifecycle((MessageRequester)obj, false);
 
         factory.activate((InboundEndpoint) key, (MessageRequester) obj);
     }
@@ -60,7 +61,9 @@ public class KeyedPoolMessageRequesterFactoryAdapter
 
     public Object makeObject(Object key) throws Exception
     {
-        return factory.create((InboundEndpoint) key);
+        Object obj = factory.create((InboundEndpoint) key);
+        applyLifecycle((MessageRequester)obj, true);
+        return obj;
     }
 
     public void passivateObject(Object key, Object obj) throws Exception
@@ -103,4 +106,12 @@ public class KeyedPoolMessageRequesterFactoryAdapter
         return factory.validate(endpoint, requester);
     }
 
+    protected void applyLifecycle(MessageRequester requester, boolean created) throws MuleException
+    {
+//        String phase = ((AbstractConnector)requester.getConnector()).getLifecycleManager().getCurrentPhase();
+//        if(created || !phase.equals(Startable.PHASE_NAME))
+//        {
+//            requester.getConnector().getMuleContext().getRegistry().applyLifecycle(requester, phase);
+//        }
+    }
 }

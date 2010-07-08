@@ -10,7 +10,6 @@
 package org.mule.lifecycle.phases;
 
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.lifecycle.DefaultLifecyclePhase;
 
 /**
  * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before

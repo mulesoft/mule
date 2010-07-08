@@ -50,6 +50,7 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
     {
         super.doSetUp();
         responseMessage = createTestResponseMuleMessage();
+        muleContext.start();
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.mule.api.routing.Router;
 import org.mule.api.routing.RouterCollection;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transport.Connector;
-import org.mule.lifecycle.DefaultLifecyclePhase;
 import org.mule.lifecycle.LifecycleObject;
 import org.mule.lifecycle.NotificationLifecycleObject;
 

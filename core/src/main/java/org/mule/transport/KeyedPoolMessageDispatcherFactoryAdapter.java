@@ -13,6 +13,7 @@ package org.mule.transport;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -48,7 +49,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     {
         OutboundEndpoint endpoint = (OutboundEndpoint)key;
         //Ensure dispatcher has the same lifecycle as the connector
-        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(obj);
+        applyLifecycle((MessageDispatcher)obj, false);
 
         factory.activate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
@@ -62,7 +63,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     {
         OutboundEndpoint endpoint = (OutboundEndpoint) key;
         MessageDispatcher dispatcher = factory.create(endpoint);
-        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(dispatcher);
+        applyLifecycle(dispatcher, true);
         return dispatcher;
     }
 
@@ -89,7 +90,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     public void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
     {
         //Ensure dispatcher has the same lifecycle as the connector
-        ((AbstractConnector)endpoint.getConnector()).getLifecycleManager().applyCompletedPhases(dispatcher);
+        applyLifecycle(dispatcher, false);
         factory.activate(endpoint, dispatcher);
     }
 
@@ -106,6 +107,15 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     public boolean validate(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         return factory.validate(endpoint, dispatcher);
+    }
+
+    protected void applyLifecycle(MessageDispatcher dispatcher, boolean created) throws MuleException
+    {
+//        String phase = ((AbstractConnector)dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
+//        if(created || !phase.equals(Startable.PHASE_NAME))
+//        {
+//            dispatcher.getConnector().getMuleContext().getRegistry().applyLifecycle(dispatcher, phase);
+//        }
     }
 
 }

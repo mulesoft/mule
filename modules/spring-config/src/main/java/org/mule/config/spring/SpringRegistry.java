@@ -16,21 +16,22 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.lifecycle.LifecyclePair;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.lifecycle.ContainerManagedLifecyclePhase;
-import org.mule.lifecycle.DefaultLifecyclePair;
+import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.lifecycle.phases.MuleContextStartPhase;
+import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -122,25 +123,14 @@ public class SpringRegistry extends AbstractRegistry
     }
 
     @Override
-    protected LifecycleManager createLifecycleManager(List<LifecyclePair> lifecyclePairs)
+    protected RegistryLifecycleManager createLifecycleManager()
     {
-        LifecycleManager lifecycleManager = new RegistryLifecycleManager(this);
-
-        for (LifecyclePair pair : lifecyclePairs)
-        {
-            //Marker: MULE-4813
-            if (pair.getBegin().getName().equals(Initialisable.PHASE_NAME))
-            {
-                lifecycleManager.registerLifecycle(new DefaultLifecyclePair(
-                        new SpringContextInitialisePhase(), new SpringContextDisposePhase()));
-            }
-            else
-            {
-                lifecycleManager.registerLifecycle(pair);
-            }
-        }
-
-        return lifecycleManager;
+        Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>(3);
+        phases.put(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
+        phases.put(Startable.PHASE_NAME, new MuleContextStartPhase());
+        phases.put(Stoppable.PHASE_NAME, new MuleContextStopPhase());
+        phases.put(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+        return new RegistryLifecycleManager(getRegistryId(), this, phases);
     }
 
     public Object lookupObject(String key)

@@ -29,12 +29,10 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -60,6 +58,7 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
+import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
@@ -133,7 +132,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * <li>Dispose Receivers
  * </ol>
  */
-public abstract class AbstractConnector implements Connector, ExceptionListener, Connectable, WorkListener
+public abstract class AbstractConnector<O extends Connector> implements Connector, ExceptionListener, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
@@ -189,7 +188,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
 
     protected final Map<String, FlowConstruct> flowConstructByEndpoint = new HashMap<String, FlowConstruct>();
-    
+
     /**
      * Defines the dispatcher threading profile
      */
@@ -295,14 +294,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     public AbstractConnector(MuleContext context)
     {
         muleContext = context;
-        try
-        {
-            lifecycleManager = new ConnectorLifecycleManager(this, muleContext.getLifecycleManager());
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToCreate("Connector Lifecycle Manager"), e);
-        }
+        lifecycleManager = new ConnectorLifecycleManager(this);
+
         setDynamicNotification(false);
         updateCachedNotificationHandler();
 
@@ -341,132 +334,114 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         name = newName;
     }
 
+    //-----------------------------------------------------------------------------------------------//
+    //-             LIFECYCLE METHODS
+    //-----------------------------------------------------------------------------------------------//
+
+    ConnectorLifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
+    }
+
+    public LifecycleState getLifecycleState()
+    {
+        return lifecycleManager.getState();
+    }
+
     public final synchronized void initialise() throws InitialisationException
     {
-        lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
-
-        if (retryPolicyTemplate == null)
-        {
-            retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
-        }
-
-        // Initialise the structure of this connector
-        this.initFromServiceDescriptor();
-
-        configureDispatcherPool();
-        setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
-
         try
         {
-            lifecycleManager.fireLifecycle(Initialisable.PHASE_NAME);
+            lifecycleManager.fireInitialisePhase(new LifecycleCallback<Connector>()
+            {
+                public void onTransition(String phaseName, Connector object) throws MuleException
+                {
+                    if (retryPolicyTemplate == null)
+                    {
+                        retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
+                                MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+                    }
+
+                    // Initialise the structure of this connector
+                    initFromServiceDescriptor();
+
+                    configureDispatcherPool();
+                    setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
+
+                    doInitialise();
+
+                    // We do the management context injection here just in case we're using a
+                    // default ExceptionStrategy
+                    // We always create a default just in case anything goes wrong before
+                    if (exceptionListener == null)
+                    {
+                        exceptionListener = new DefaultExceptionStrategy();
+                        ((DefaultExceptionStrategy) exceptionListener).setMuleContext(muleContext);
+                        ((DefaultExceptionStrategy) exceptionListener).initialise();
+                    }
+
+                    try
+                    {
+                        initWorkManagers();
+                    }
+                    catch (MuleException e)
+                    {
+                        throw new LifecycleException(e, this);
+                    }
+                }
+            });
+        }
+        catch (InitialisationException e)
+        {
+            throw e;
         }
         catch (LifecycleException e)
         {
             throw new InitialisationException(e, this);
         }
-
-        // We do the management context injection here just in case we're using a
-        // default ExceptionStrategy
-        // We always create a default just in case anything goes wrong before
-        if (exceptionListener == null)
-        {
-            exceptionListener = new DefaultExceptionStrategy();
-            ((DefaultExceptionStrategy) exceptionListener).setMuleContext(muleContext);
-            ((DefaultExceptionStrategy) exceptionListener).initialise();
-        }
-
-        try
-        {
-            initWorkManagers();
-        }
         catch (MuleException e)
         {
-            throw new InitialisationException(e, this);
+            e.printStackTrace();
         }
-    }
-
-    /**
-     * <p>
-     * Create a {@link MuleMessageFactory} from this connector's configuration,
-     * typically through the transport descriptor.
-     * </p>
-     * <p>
-     * <b>Attention!</b> This method is not meant to be used by client code directly.
-     * It is only publicly available to service message receivers which should be
-     * used as <em>real</em> factories to create {@link MuleMessage} instances.
-     * 
-     * @see MessageReceiver#createMuleMessage(Object)
-     * @see MessageReceiver#createMuleMessage(Object, String)
-     */
-    public MuleMessageFactory createMuleMessageFactory() throws CreateException
-    {
-        try
-        {
-            return serviceDescriptor.createMuleMessageFactory();
-        }
-        catch (TransportServiceException tse)
-        {
-            throw new CreateException(CoreMessages.failedToCreate("MuleMessageFactory"), tse, this);
-        }
-    }
-
-    public ConnectorLifecycleManager getLifecycleManager()
-    {
-        return lifecycleManager;
-    }
-
-    public void setLifecycleManager(ConnectorLifecycleManager lifecycleManager)
-    {
-        this.lifecycleManager = lifecycleManager;
-    }
-
-    protected void configureDispatcherPool()
-    {
-        // Normally having a the same maximum number of dispatcher objects as threads
-        // is ok.
-        int maxDispatchersActive = getDispatcherThreadingProfile().getMaxThreadsActive();
-
-        // BUT if the WHEN_EXHAUSTED_RUN threading profile exhausted action is
-        // configured then a single
-        // additional dispatcher is required that can be used by the caller thread
-        // when it executes job's itself.
-        // Also See: MULE-4752
-        if (ThreadingProfile.WHEN_EXHAUSTED_RUN == getDispatcherThreadingProfile().getPoolExhaustedAction())
-        {
-            maxDispatchersActive++;
-        }
-        setMaxDispatchersActive(maxDispatchersActive);
     }
 
     public final synchronized void start() throws MuleException
     {
-        lifecycleManager.checkPhase(Startable.PHASE_NAME);
-
         if (isInitialStateStopped())
         {
+            lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<Connector>());
+            lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<Connector>());
             logger.info("Connector not started because 'initialStateStopped' is true");
             return;
         }
 
-        if (!this.isConnected())
+        lifecycleManager.fireStartPhase(new LifecycleCallback<Connector>()
         {
-            startOnConnect = true;
+            public void onTransition(String phaseName, Connector object) throws MuleException
+            {
 
-            // Make sure we are connected
-            try
-            {
-                connect();
+
+                if (!isConnected())
+                {
+                    startOnConnect = true;
+
+                    // Make sure we are connected
+                    try
+                    {
+                        connect();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new LifecycleException(e, this);
+                    }
+                }
+                else
+                {
+                    //Do start called in this method
+                    startAfterConnect();
+                }
             }
-            catch (Exception e)
-            {
-                throw new LifecycleException(e, this);
-            }
-        }
-        else
-        {
-            startAfterConnect();
-        }
+        });
 
     }
 
@@ -480,10 +455,19 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // the scheduler is recreated after stop()
         scheduler = createScheduler();
 
-        initWorkManagers();
+        try
+        {
+            initWorkManagers();
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
 
         if (!isStarted())
-            lifecycleManager.fireLifecycle(Startable.PHASE_NAME);
+        {
+            doStart();
+        }
 
         if (receivers != null)
         {
@@ -495,7 +479,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Starting receiver on endpoint: "
-                                     + receiver.getEndpoint().getEndpointURI());
+                                + receiver.getEndpoint().getEndpointURI());
                     }
                     if (receiver.getFlowConstruct().getLifecycleState().isStarted())
                     {
@@ -522,6 +506,84 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     }
 
+
+    public final synchronized void stop() throws MuleException
+    {
+        lifecycleManager.fireStopPhase(new LifecycleCallback<Connector>()
+        {
+            public void onTransition(String phaseName, Connector object) throws MuleException
+            {
+                 // shutdown our scheduler service
+                shutdownScheduler();
+
+                doStop();
+
+                // Stop all the receivers on this connector (this will cause them to
+                // disconnect too)
+                if (receivers != null)
+                {
+                    for (MessageReceiver receiver : receivers.values())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        }
+                        receiver.stop();
+                    }
+                }
+
+                if (isConnected())
+                {
+                    try
+                    {
+                        disconnect();
+                    }
+                    catch (Exception e)
+                    {
+                        //TODO We only log here since we need to make sure we stop with
+                        //a consistent state. Another option would be to collect exceptions
+                        //and handle them at the end of this message
+                        logger.error("Failed to disconnect: " + e.getMessage(), e);
+                    }
+                }
+
+                // Now that dispatchers are borrowed/returned in worker thread we need to
+                // dispose workManager before clearing object pools
+                disposeWorkManagers();
+
+                // Workaround for MULE-4553
+                clearDispatchers();
+                clearRequesters();
+
+                // make sure the scheduler is gone
+                scheduler = null;
+            }
+        });
+    }
+
+    public final synchronized void dispose()
+    {
+        try
+        {
+            if(lifecycleManager.getState().isStarted())
+            {
+                stop();
+            }
+            lifecycleManager.fireDisposePhase(new LifecycleCallback<Connector>()
+            {
+                public void onTransition(String phaseName, Connector object) throws MuleException
+                {
+                    doDispose();
+                    disposeReceivers();
+                }
+            });
+        }
+        catch (MuleException e)
+        {
+            logger.warn("Failed to dispose connector: " + name, e);
+        }
+    }
+
     public final boolean isStarted()
     {
         return lifecycleManager.getState().isStarted();
@@ -537,54 +599,54 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         return lifecycleManager.getState().isStopped();
     }
 
-    public final synchronized void stop() throws MuleException
+
+    //-----------------------------------------------------------------------------------------------//
+    //-             END LIFECYCLE METHODS
+    //-----------------------------------------------------------------------------------------------//
+
+   protected void configureDispatcherPool()
+   {
+       // Normally having a the same maximum number of dispatcher objects as threads
+       // is ok.
+       int maxDispatchersActive = getDispatcherThreadingProfile().getMaxThreadsActive();
+
+       // BUT if the WHEN_EXHAUSTED_RUN threading profile exhausted action is
+       // configured then a single
+       // additional dispatcher is required that can be used by the caller thread
+       // when it executes job's itself.
+       // Also See: MULE-4752
+       if (ThreadingProfile.WHEN_EXHAUSTED_RUN == getDispatcherThreadingProfile().getPoolExhaustedAction())
+       {
+           maxDispatchersActive++;
+       }
+       setMaxDispatchersActive(maxDispatchersActive);
+   }
+
+    /**
+     * <p>
+     * Create a {@link MuleMessageFactory} from this connector's configuration,
+     * typically through the transport descriptor.
+     * </p>
+     * <p/>
+     * <b>Attention!</b> This method is not meant to be used by client code directly.
+     * It is only publicly available to service message receivers which should be
+     * used as <em>real</em> factories to create {@link MuleMessage} instances.
+     *
+     * @see MessageReceiver#createMuleMessage(Object)
+     * @see MessageReceiver#createMuleMessage(Object, String)
+     */
+    public MuleMessageFactory createMuleMessageFactory() throws CreateException
     {
-        lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
-
-        // shutdown our scheduler service
-        shutdownScheduler();
-
-        lifecycleManager.fireLifecycle(Stoppable.PHASE_NAME);
-
-        // Stop all the receivers on this connector (this will cause them to
-        // disconnect too)
-        if (receivers != null)
+        try
         {
-            for (MessageReceiver receiver : receivers.values())
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                }
-                receiver.stop();
-            }
+            return serviceDescriptor.createMuleMessageFactory();
         }
-
-        if (this.isConnected())
+        catch (TransportServiceException tse)
         {
-            try
-            {
-                this.disconnect();
-            }
-            catch (Exception e)
-            {
-                // TODO MULE-863: What should we really do?
-                logger.error("Failed to disconnect: " + e.getMessage(), e);
-            }
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessageFactory"), tse, this);
         }
-
-        // Now that dispatchers are borrowed/returned in worker thread we need to
-        // dispose workManager before clearing object pools
-        this.disposeWorkManagers();
-
-        // Workaround for MULE-4553
-        this.clearDispatchers();
-        this.clearRequesters();
-        
-        // make sure the scheduler is gone
-        scheduler = null;
     }
-    
+
     protected void shutdownScheduler()
     {
         if (scheduler != null)
@@ -595,7 +657,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             {
                 // Wait a while for existing tasks to terminate
                 if (!scheduler.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(),
-                    TimeUnit.MILLISECONDS))
+                        TimeUnit.MILLISECONDS))
                 {
                     // Cancel currently executing tasks and return list of pending
                     // tasks
@@ -604,16 +666,16 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     if (!scheduler.awaitTermination(SCHEDULER_FORCED_SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
                     {
                         logger.warn(MessageFormat.format(
-                            "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
-                            outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
+                                "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
+                                outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
                     }
                     else
                     {
                         if (!outstanding.isEmpty())
                         {
                             logger.warn(MessageFormat.format(
-                                "Pool {0} terminated; {1} work items were cancelled.", name,
-                                Integer.toString(outstanding.size())));
+                                    "Pool {0} terminated; {1} work items were cancelled.", name,
+                                    Integer.toString(outstanding.size())));
                         }
                     }
 
@@ -633,26 +695,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
     }
 
-    public final synchronized void dispose()
-    {
-        try
-        {
-            lifecycleManager.fireLifecycle(Disposable.PHASE_NAME);
-        }
-        catch (LifecycleException e)
-        {
-            logger.warn("Failed to dispose connector: " + name, e);
-        }
-
-        this.disposeReceivers();
-    }
-
     protected void initWorkManagers() throws MuleException
     {
         if (receiverWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-                getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -663,9 +711,11 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         {
             ThreadingProfile dispatcherThreadingProfile = this.getDispatcherThreadingProfile();
             if (dispatcherThreadingProfile.getMuleContext() == null)
+            {
                 dispatcherThreadingProfile.setMuleContext(muleContext);
+            }
             WorkManager newWorkManager = dispatcherThreadingProfile.createWorkManager(
-                getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -675,7 +725,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (requesterWorkManager.get() == null)
         {
             WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
-                getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
+                    getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
 
             if (requesterWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -782,7 +832,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
 
         if (isConnected() && exception instanceof ConnectException
-            && !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
+                && !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
         {
             logger.info("Exception caught is a ConnectException, attempting to reconnect...");
             try
@@ -804,7 +854,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 else
                 {
                     throw new MuleRuntimeException(
-                        CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
+                            CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
                 }
 
                 // Store some info. about the receiver/dispatcher which threw the
@@ -834,7 +884,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 if (exceptionListener == null)
                 {
                     throw new MuleRuntimeException(
-                        CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), e);
+                            CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), e);
                 }
                 else
                 {
@@ -851,7 +901,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             else
             {
                 throw new MuleRuntimeException(
-                    CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
+                        CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
             }
         }
     }
@@ -942,7 +992,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // up with ClassCastExceptions on downcast to their implementation (sigh)
         this.requesterFactory = requesterFactory;
     }
-    
+
     /**
      * <p>The connector creates a {@link MuleMessageFactory} lazily and holds a reference to it for
      * others to use.</p>
@@ -966,7 +1016,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * {@link #start()}. This flag is used internally since some connectors that rely
      * on external servers may need to wait for that server to become available
      * before starting.
-     * 
+     *
      * @return true if the connector is not to be started with normal lifecycle,
      *         flase otherwise
      * @since 3.0.0
@@ -985,10 +1035,10 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * before starting. The only time this method should be used is when a
      * subclassing connector needs to delay the start lifecycle due to a dependence
      * on an external system. Most users can ignore this.
-     * 
+     *
      * @param true to stop the connector starting through normal lifecycle. It will
-     *        be the responsibility of the code that sets this property to start the
-     *        connector
+     *             be the responsibility of the code that sets this property to start the
+     *             connector
      * @since 3.0.0
      */
     public void setInitialStateStopped(boolean initialStateStopped)
@@ -999,7 +1049,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Returns the maximum number of dispatchers that can be concurrently active per
      * endpoint.
-     * 
+     *
      * @return max. number of active dispatchers
      */
     public int getMaxDispatchersActive()
@@ -1010,7 +1060,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Returns the maximum number of dispatchers that can be concurrently active for
      * all endpoints.
-     * 
+     *
      * @return max. total number of active dispatchers
      */
     public int getMaxTotalDispatchers()
@@ -1021,7 +1071,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Configures the maximum number of dispatchers that can be concurrently active
      * per endpoint
-     * 
+     *
      * @param maxActive max. number of active dispatchers
      */
     public void setMaxDispatchersActive(int maxActive)
@@ -1039,7 +1089,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (!isStarted())
         {
             throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
-                lifecycleManager.getCurrentPhase()), this);
+                    lifecycleManager.getCurrentPhase()), this);
         }
 
         if (endpoint == null)
@@ -1050,7 +1100,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                this.getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
+                    this.getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
         }
 
         MessageDispatcher dispatcher = null;
@@ -1067,7 +1117,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Borrowed a dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
-                             + dispatcher.toString());
+                        + dispatcher.toString());
             }
 
             return dispatcher;
@@ -1099,7 +1149,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
-                             + dispatcher.toString());
+                        + dispatcher.toString());
             }
 
             try
@@ -1111,7 +1161,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 // ignore - if the dispatcher is broken, it will likely get cleaned
                 // up by the factory
                 logger.error("Failed to dispose dispatcher for endpoint: " + endpoint
-                             + ". This will cause a memory leak. Please report to", e);
+                        + ". This will cause a memory leak. Please report to", e);
             }
 
         }
@@ -1120,7 +1170,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Returns the maximum number of requesters that can be concurrently active per
      * endpoint.
-     * 
+     *
      * @return max. number of active requesters
      */
     public int getMaxRequestersActive()
@@ -1131,7 +1181,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Configures the maximum number of requesters that can be concurrently active
      * per endpoint
-     * 
+     *
      * @param maxActive max. number of active requesters
      */
     public void setMaxRequestersActive(int maxActive)
@@ -1149,7 +1199,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (!isStarted())
         {
             throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
-                lifecycleManager.getCurrentPhase()), this);
+                    lifecycleManager.getCurrentPhase()), this);
         }
 
         if (endpoint == null)
@@ -1160,7 +1210,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
-                this.getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
+                    this.getProtocol(), endpoint.getEndpointURI().toString()).getMessage());
         }
 
         MessageRequester requester = null;
@@ -1177,7 +1227,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Borrowed a requester for endpoint: " + endpoint.getEndpointURI() + " = "
-                             + requester.toString());
+                        + requester.toString());
             }
 
             return requester;
@@ -1209,7 +1259,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Returning requester for endpoint: " + endpoint.getEndpointURI() + " = "
-                             + requester.toString());
+                        + requester.toString());
             }
 
             try
@@ -1221,7 +1271,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 // ignore - if the requester is broken, it will likely get cleaned
                 // up by the factory
                 logger.error("Failed to dispose requester for endpoint: " + endpoint
-                             + ". This will cause a memory leak. Please report to", e);
+                        + ". This will cause a memory leak. Please report to", e);
             }
         }
 
@@ -1248,7 +1298,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
 
         logger.info("Registering listener: " + flowConstruct.getName() + " on endpointUri: "
-                    + endpointUri.toString());
+                + endpointUri.toString());
 
         if (getReceiver(flowConstruct, endpoint) != null)
         {
@@ -1268,7 +1318,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         {
             ((InboundEndpointDecorator) endpoint).onListenerAdded(flowConstruct);
         }
-        
+
         if (isConnected())
         {
             receiver.connect();
@@ -1282,15 +1332,15 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param flowConstruct the service for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the service
+     * @param endpoint      the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
     protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(),
-            endpoint.getEndpointURI().getAddress());
+                endpoint.getEndpointURI().getAddress());
     }
 
     public final void unregisterListener(InboundEndpoint endpoint) throws Exception
@@ -1301,12 +1351,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
 
         FlowConstruct flowConstruct = (FlowConstruct) flowConstructByEndpoint.remove(endpoint.getName());
-        
+
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
         {
             throw new IllegalArgumentException(
-                "The endpointUri must not be null when you unregister a listener");
+                    "The endpointUri must not be null when you unregister a listener");
         }
 
         if (logger.isInfoEnabled())
@@ -1341,7 +1391,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'dispatcherThreadingProfile'.
-     * 
+     *
      * @return Value for property 'dispatcherThreadingProfile'.
      */
     public ThreadingProfile getDispatcherThreadingProfile()
@@ -1355,9 +1405,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Setter for property 'dispatcherThreadingProfile'.
-     * 
+     *
      * @param dispatcherThreadingProfile Value to set for property
-     *            'dispatcherThreadingProfile'.
+     *                                   'dispatcherThreadingProfile'.
      */
     public void setDispatcherThreadingProfile(ThreadingProfile dispatcherThreadingProfile)
     {
@@ -1366,7 +1416,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'requesterThreadingProfile'.
-     * 
+     *
      * @return Value for property 'requesterThreadingProfile'.
      */
     public ThreadingProfile getRequesterThreadingProfile()
@@ -1380,9 +1430,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Setter for property 'requesterThreadingProfile'.
-     * 
+     *
      * @param requesterThreadingProfile Value to set for property
-     *            'requesterThreadingProfile'.
+     *                                  'requesterThreadingProfile'.
      */
     public void setRequesterThreadingProfile(ThreadingProfile requesterThreadingProfile)
     {
@@ -1391,7 +1441,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'receiverThreadingProfile'.
-     * 
+     *
      * @return Value for property 'receiverThreadingProfile'.
      */
     public ThreadingProfile getReceiverThreadingProfile()
@@ -1405,9 +1455,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Setter for property 'receiverThreadingProfile'.
-     * 
+     *
      * @param receiverThreadingProfile Value to set for property
-     *            'receiverThreadingProfile'.
+     *                                 'receiverThreadingProfile'.
      */
     public void setReceiverThreadingProfile(ThreadingProfile receiverThreadingProfile)
     {
@@ -1428,14 +1478,14 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Template method to perform any work when starting the connectoe
-     * 
+     *
      * @throws MuleException if the method fails
      */
     protected abstract void doStart() throws MuleException;
 
     /**
      * Template method to perform any work when stopping the connectoe
-     * 
+     *
      * @throws MuleException if the method fails
      */
     protected abstract void doStop() throws MuleException;
@@ -1469,7 +1519,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'replyToHandler'.
-     * 
+     *
      * @return Value for property 'replyToHandler'.
      */
     public ReplyToHandler getReplyToHandler()
@@ -1479,7 +1529,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Fires a server notification to all registered listeners
-     * 
+     *
      * @param notification the notification to fire.
      */
     public void fireNotification(ServerNotification notification)
@@ -1519,7 +1569,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'receivers'.
-     * 
+     *
      * @return Value for property 'receivers'.
      */
     public Map<Object, MessageReceiver> getReceivers()
@@ -1562,7 +1612,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         if (lifecycleManager.getState().isDisposed())
         {
             throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
-                lifecycleManager.getCurrentPhase()), this);
+                    lifecycleManager.getCurrentPhase()), this);
         }
 
         if (isConnected())
@@ -1582,8 +1632,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 if (validateConnections && !validateConnection(context).isOk())
                 {
                     throw new ConnectException(
-                        MessageFactory.createStaticMessage("Unable to connect to resource"),
-                        context.getLastFailure(), null);
+                            MessageFactory.createStaticMessage("Unable to connect to resource"),
+                            context.getLastFailure(), null);
                 }
                 doConnect();
 
@@ -1599,8 +1649,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     if (validateConnections && !receiver.validateConnection(context).isOk())
                     {
                         throw new ConnectException(
-                            MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
-                            context.getLastFailure(), receiver);
+                                MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
+                                context.getLastFailure(), receiver);
                     }
                 }
                 else if (info.get(RetryContext.FAILED_DISPATCHER) != null)
@@ -1612,8 +1662,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                         if (validateConnections && !dispatcher.validateConnection(context).isOk())
                         {
                             throw new ConnectException(
-                                MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
-                                context.getLastFailure(), null);
+                                    MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
+                                    context.getLastFailure(), null);
                         }
                     }
                     finally
@@ -1630,8 +1680,8 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                         if (validateConnections && !requester.validateConnection(context).isOk())
                         {
                             throw new ConnectException(
-                                MessageFactory.createStaticMessage("Unable to connect requester to resource"),
-                                context.getLastFailure(), null);
+                                    MessageFactory.createStaticMessage("Unable to connect requester to resource"),
+                                    context.getLastFailure(), null);
                         }
                     }
                     finally
@@ -1662,7 +1712,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * Override this method to test whether the connector is able to connect to its
      * resource(s). This will allow a retry policy to go into effect in the case of
      * failure.
-     * 
+     *
      * @return retry context with a success flag or failure details
      * @see RetryContext#isOk()
      * @see RetryContext#getLastFailure()
@@ -1686,7 +1736,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Disconnecting receiver on endpoint: "
-                                     + receiver.getEndpoint().getEndpointURI());
+                                + receiver.getEndpoint().getEndpointURI());
                     }
                     receiver.disconnect();
                 }
@@ -1701,12 +1751,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 {
                     // TODO MULE-3969
                     if (receiver instanceof AbstractMessageReceiver
-                        && ((AbstractMessageReceiver) receiver).isStarted())
+                            && ((AbstractMessageReceiver) receiver).isStarted())
                     {
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Stopping receiver on endpoint: "
-                                         + receiver.getEndpoint().getEndpointURI());
+                                    + receiver.getEndpoint().getEndpointURI());
                         }
                         receiver.stop();
                     }
@@ -1720,7 +1770,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             logger.info("Disconnected: " + this.getConnectionDescription());
         }
         this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-             ConnectionNotification.CONNECTION_DISCONNECTED));
+                ConnectionNotification.CONNECTION_DISCONNECTED));
     }
 
     public String getConnectionDescription()
@@ -1740,7 +1790,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Template method where any connections should be made for the connector
-     * 
+     *
      * @throws Exception
      */
     protected abstract void doConnect() throws Exception;
@@ -1748,14 +1798,14 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Template method where any connected resources used by the connector should be
      * disconnected
-     * 
+     *
      * @throws Exception
      */
     protected abstract void doDisconnect() throws Exception;
 
     /**
      * The resource id used when firing ConnectEvents from this connector
-     * 
+     *
      * @return the resource id used when firing ConnectEvents from this connector
      */
     protected String getConnectEventId()
@@ -1769,7 +1819,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * {@link #getNumberOfConcurrentTransactedReceivers()}. This property is used by
      * transports that support transactions, specifically receivers that extend the
      * TransactedPollingMessageReceiver.
-     * 
+     *
      * @return true if multiple receivers will be enabled for this connection
      */
     public boolean isCreateMultipleTransactedReceivers()
@@ -1778,8 +1828,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     }
 
     /**
-     * @param createMultipleTransactedReceivers if true, multiple receivers will be
-     *            created for this connection
+     * @param createMultipleTransactedReceivers
+     *         if true, multiple receivers will be
+     *         created for this connection
      * @see #isCreateMultipleTransactedReceivers()
      */
     public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers)
@@ -1790,7 +1841,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Returns the number of concurrent receivers that will be launched when
      * {@link #isCreateMultipleTransactedReceivers()} returns <code>true</code>.
-     * 
+     *
      * @see #DEFAULT_NUM_CONCURRENT_TX_RECEIVERS
      */
     public int getNumberOfConcurrentTransactedReceivers()
@@ -1823,7 +1874,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             else
             {
                 cachedNotificationHandler = new OptimisedNotificationHandler(
-                    muleContext.getNotificationManager(), EndpointMessageNotification.class);
+                        muleContext.getNotificationManager(), EndpointMessageNotification.class);
             }
         }
     }
@@ -1840,7 +1891,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * be axis:jms. Here, 'axis' is the scheme meta info and 'jms' is the protocol.
      * If the protocol argument does not start with the connector's protocol, it will
      * be appended.
-     * 
+     *
      * @param protocol the supported protocol to register
      */
     public void registerSupportedProtocol(String protocol)
@@ -1861,7 +1912,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * endpoint type. For example an RSS endpoint uses the Http connector. By
      * registering 'rss' as a supported meta protocol, this connector can be used
      * when creating RSS endpoints.
-     * 
+     *
      * @param protocol the meta protocol that can be used with this connector
      * @since 3.0.0
      */
@@ -1880,7 +1931,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * generic 'finder' transport that will use Axis or CXF to create the WSDL
      * client. These transport protocols would be wsdl-axis and wsdl-cxf, but they
      * can all support 'wsdl' protocol too.
-     * 
+     *
      * @param protocol the supported protocol to register
      */
     protected void registerSupportedProtocolWithoutPrefix(String protocol)
@@ -1911,7 +1962,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Returns an unmodifiable list of the protocols supported by this connector
-     * 
+     *
      * @return an unmodifiable list of the protocols supported by this connector
      */
     public List getSupportedProtocols()
@@ -1921,7 +1972,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Sets A list of protocols that the connector can accept
-     * 
+     *
      * @param supportedProtocols
      */
     public void setSupportedProtocols(List supportedProtocols)
@@ -1943,7 +1994,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Returns a work manager for message dispatchers.
-     * 
+     *
      * @throws MuleException in case of error
      */
     protected WorkManager getDispatcherWorkManager() throws MuleException
@@ -1953,7 +2004,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Returns a work manager for message requesters.
-     * 
+     *
      * @throws MuleException in case of error
      */
     protected WorkManager getRequesterWorkManager() throws MuleException
@@ -1976,7 +2027,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // Use connector's classloader so that other temporary classloaders
         // aren't used when things are started lazily or from elsewhere.
         ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler", this.getClass()
-            .getClassLoader());
+                .getClassLoader());
         ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
         newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
@@ -1986,7 +2037,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Getter for property 'sessionHandler'.
-     * 
+     *
      * @return Value for property 'sessionHandler'.
      */
     public SessionHandler getSessionHandler()
@@ -1996,7 +2047,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Setter for property 'sessionHandler'.
-     * 
+     *
      * @param sessionHandler Value to set for property 'sessionHandler'.
      */
     public void setSessionHandler(SessionHandler sessionHandler)
@@ -2044,7 +2095,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         }
 
         logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                     + event.getWork().toString());
+                + event.getWork().toString());
 
         if (e instanceof Exception)
         {
@@ -2060,7 +2111,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * This method will return the dispatcher to the pool or, if the payload is an
      * inputstream, replace the payload with a new DelegatingInputStream which
      * returns the dispatcher to the pool when the stream is closed.
-     * 
+     *
      * @param endpoint
      * @param dispatcher
      * @param result
@@ -2098,7 +2149,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     public MuleMessage request(String uri, long timeout) throws Exception
     {
         return request(getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri),
-            timeout);
+                timeout);
     }
 
     public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
@@ -2122,7 +2173,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * This method will return the requester to the pool or, if the payload is an
      * inputstream, replace the payload with a new DelegatingInputStream which
      * returns the requester to the pool when the stream is closed.
-     * 
+     *
      * @param endpoint
      * @param requester
      * @param result
@@ -2165,18 +2216,18 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * determine the connector type is passed to this method so that any properties
      * set on the endpoint that can be used to initialise the connector are made
      * available.
-     * 
+     *
      * @param endpointUri the {@link EndpointURI} use to create this connector
      * @throws InitialisationException If there are any problems with the
-     *             configuration set on the Endpoint or if another exception is
-     *             thrown it is wrapped in an InitialisationException.
+     *                                 configuration set on the Endpoint or if another exception is
+     *                                 thrown it is wrapped in an InitialisationException.
      */
     public void initialiseFromUrl(EndpointURI endpointUri) throws InitialisationException
     {
         if (!supportsProtocol(endpointUri.getFullScheme()))
         {
             throw new InitialisationException(CoreMessages.schemeNotCompatibleWithConnector(
-                endpointUri.getFullScheme(), this.getClass()), this);
+                    endpointUri.getFullScheme(), this.getClass()), this);
         }
         Properties props = new Properties();
         props.putAll(endpointUri.getParams());
@@ -2210,17 +2261,17 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * Initialises this connector from its {@link TransportServiceDescriptor} This
      * will be called before the {@link #doInitialise()} method is called.
-     * 
+     *
      * @throws InitialisationException InitialisationException If there are any
-     *             problems with the configuration or if another exception is thrown
-     *             it is wrapped in an InitialisationException.
+     *                                 problems with the configuration or if another exception is thrown
+     *                                 it is wrapped in an InitialisationException.
      */
     protected synchronized void initFromServiceDescriptor() throws InitialisationException
     {
         try
         {
             serviceDescriptor = (TransportServiceDescriptor) muleContext.getRegistry()
-                .lookupServiceDescriptor(ServiceType.TRANSPORT, getProtocol().toLowerCase(), serviceOverrides);
+                    .lookupServiceDescriptor(ServiceType.TRANSPORT, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(getProtocol()));
@@ -2229,7 +2280,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Loading DispatcherFactory for connector: " + getName() + " ("
-                             + getClass().getName() + ")");
+                        + getClass().getName() + ")");
             }
 
             MessageDispatcherFactory df = serviceDescriptor.createDispatcherFactory();
@@ -2245,7 +2296,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             if (logger.isDebugEnabled())
             {
                 logger.debug("Loading RequesterFactory for connector: " + getName() + " ("
-                             + getClass().getName() + ")");
+                        + getClass().getName() + ")");
             }
 
             MessageRequesterFactory rf = serviceDescriptor.createRequesterFactory();
@@ -2271,7 +2322,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * null if the connector was created by the developer. To create a connector the
      * proper way the developer should use the {@link TransportFactory} and pass in
      * an endpoint.
-     * 
+     *
      * @return the {@link TransportServiceDescriptor} for this connector
      */
     protected TransportServiceDescriptor getServiceDescriptor()
@@ -2285,16 +2336,16 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Create a Message receiver for this connector
-     * 
+     *
      * @param flowConstruct the service that will receive events from this receiver, the
-     *            listener
-     * @param endpoint the endpoint that defies this inbound communication
+     *                      listener
+     * @param endpoint      the endpoint that defies this inbound communication
      * @return an instance of the message receiver defined in this connectors'
      *         {@link org.mule.transport.service.TransportServiceDescriptor}
      *         initialised using the service and endpoint.
      * @throws Exception if there is a problem creating the receiver. This exception
-     *             really depends on the underlying transport, thus any exception
-     *             could be thrown
+     *                   really depends on the underlying transport, thus any exception
+     *                   could be thrown
      */
     protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
@@ -2304,7 +2355,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     /**
      * A map of fully qualified class names that should override those in the
      * connectors' service descriptor This map will be null if there are no overrides
-     * 
+     *
      * @return a map of override values or null
      */
     public Map getServiceOverrides()
@@ -2314,7 +2365,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
 
     /**
      * Set the Service overrides on this connector.
-     * 
+     *
      * @param serviceOverrides the override values to use
      */
     public void setServiceOverrides(Map serviceOverrides)
@@ -2329,16 +2380,16 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * is not supported by this transport an {@link UnsupportedOperationException} is
      * thrown. Note that the stream MUST release resources on close. For help doing
      * so, see {@link org.mule.model.streaming.CallbackOutputStream}.
-     * 
+     *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
+     * @param message  the current message being processed
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */
     public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message) throws MuleException
     {
         throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol())
-            .toString());
+                .toString());
     }
 
     public MuleContext getMuleContext()
@@ -2353,7 +2404,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{name=").append(name);
         sb.append(", lifecycle=").append(
-            lifecycleManager == null ? "not in lifecycle" : lifecycleManager.getCurrentPhase());
+                lifecycleManager == null ? "not in lifecycle" : lifecycleManager.getCurrentPhase());
         sb.append(", this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
         sb.append(", createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);

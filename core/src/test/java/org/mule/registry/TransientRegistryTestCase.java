@@ -398,11 +398,11 @@ public void testLifecycleStateOutOfSequenceStartFirst() throws Exception
         muleContext.getRegistry().registerObject("test", tracker);
         //Start is bypassed because the component was added when the registry was stopped, hence no need to start the component
         //Stop isn't called either because start was not called
-        //Initialised is called because in order for a component to be stopped it needs to be initialised
-        assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
+        //Initialised is called because that pahse has completed in the registry
+        assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
 
         muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
+        assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
 
