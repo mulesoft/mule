@@ -25,7 +25,6 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.AxisStringWriter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
@@ -68,7 +67,7 @@ import org.w3c.dom.Document;
  * <code>AxisServiceComponent</code> is a Mule component implementation of the Axis
  * servlet. This component supports all the features of the Axis servlet except -
  * <ol>
- * <li>Jws class services are not supported as they don't add any value to the Mule¯
+ * <li>Jws class services are not supported as they don't add any value to the Muleï¿½
  * model</li>
  * <li>Currently there is no HttpSession support. This will be fixed when MuleSession
  * support is added to the Http Connector</li>

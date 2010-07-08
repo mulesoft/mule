@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport;
+package org.mule.transport.soap.axis;
 
 import java.io.IOException;
 import java.io.StringWriter;
