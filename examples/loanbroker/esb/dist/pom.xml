@@ -133,7 +133,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/loanbroker-esb</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-esb/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
@@ -153,7 +153,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/loanbroker-ejb</outputDirectory>
+                            <outputDirectory>${MULE_HOME}/apps/loanbroker-ejb/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
