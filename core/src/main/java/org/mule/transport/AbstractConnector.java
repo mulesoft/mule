@@ -132,7 +132,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * <li>Dispose Receivers
  * </ol>
  */
-public abstract class AbstractConnector<O extends Connector> implements Connector, ExceptionListener, WorkListener
+public abstract class AbstractConnector implements Connector, ExceptionListener, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
