@@ -14,6 +14,7 @@ import org.mule.api.FlowConstruct;
 import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -220,9 +221,9 @@ public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle, 
         {
             ((FlowConstructAware) candidate).setFlowConstruct(this);
         }
-        if (messageProcessorChain instanceof FlowConstructAware)
+        if (candidate instanceof MuleContextAware)
         {
-            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
+            ((MuleContextAware) candidate).setMuleContext(muleContext);
         }
     }
 
