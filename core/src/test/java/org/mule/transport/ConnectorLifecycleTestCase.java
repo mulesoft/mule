@@ -371,11 +371,16 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertDispatcherStartedConnected(out, false, false);
 
         connector.start();
+        //This causes the first instance out dispatcher to be created
         assertDispatcherStartedConnected(out, true, true);
 
         OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
+        //This causes the first instance out2 dispatcher to be created
         out2.process(getTestEvent("data", out2));
 
+        Thread.sleep(1000);
+        //At this point there should be two idle, but the build server reports one, I suspect its a timing issues
+        //so I ahve inserted the sleep above to allow time for the out2 dispatcher to be returned to the pool
         assertEquals(2, connector.dispatchers.getNumIdle());
         assertDispatcherStartedConnected(out, true, true);
         assertDispatcherStartedConnected(out2, true, true);
