@@ -16,9 +16,6 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import javax.xml.namespace.QName;
 
-/**
- * TODO document me
- */
 public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception
@@ -39,10 +36,10 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);
-        event.getFlowConstruct().setName("myService");
+        String name = event.getFlowConstruct().getName();
         String result = dispatcher.parseSoapAction("#[scheme]://#[host]:#[port]/#[serviceName]/#[method]",
             new QName("foo"), event);
 
-        assertEquals("http://mycompany.com:8080/myService/foo", result);
+        assertEquals("http://mycompany.com:8080/" + name + "/foo", result);
     }
 }
