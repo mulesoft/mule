@@ -36,7 +36,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
     }
 
     @Override
-    protected AbstractFlowConstuct getFlowConstruct()
+    protected AbstractFlowConstruct getFlowConstruct()
     {
         return simpleService;
     }

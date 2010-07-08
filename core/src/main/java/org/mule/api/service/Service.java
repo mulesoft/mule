@@ -10,13 +10,13 @@
 
 package org.mule.api.service;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.component.Component;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;

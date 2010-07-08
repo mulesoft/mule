@@ -11,7 +11,6 @@
 package org.mule.transport;
 
 import org.mule.DefaultExceptionStrategy;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.context.notification.ServerNotification;

@@ -10,7 +10,7 @@
 
 package org.mule.context.notification;
 
-import org.mule.api.FlowConstruct;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 

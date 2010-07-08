@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.security.SecurityContext;

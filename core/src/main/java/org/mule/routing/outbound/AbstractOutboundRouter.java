@@ -11,13 +11,13 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;

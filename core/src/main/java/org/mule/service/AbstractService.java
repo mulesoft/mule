@@ -10,14 +10,14 @@
 
 package org.mule.service;
 
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;

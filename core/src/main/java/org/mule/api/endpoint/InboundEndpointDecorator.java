@@ -9,8 +9,8 @@
  */
 package org.mule.api.endpoint;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 
 /**
  * Used on custom endpoints that provide additional processing to service or message to handle the way certain

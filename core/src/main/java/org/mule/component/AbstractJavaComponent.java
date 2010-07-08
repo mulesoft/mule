@@ -10,13 +10,13 @@
 
 package org.mule.component;
 
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;

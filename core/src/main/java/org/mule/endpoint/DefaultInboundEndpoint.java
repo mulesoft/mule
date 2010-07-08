@@ -13,7 +13,7 @@ package org.mule.endpoint;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.FlowConstruct;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;

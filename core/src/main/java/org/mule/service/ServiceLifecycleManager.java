@@ -9,8 +9,8 @@
  */
 package org.mule.service;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleCallback;

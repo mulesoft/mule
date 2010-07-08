@@ -10,9 +10,9 @@
 
 package org.mule.api.component;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.model.EntryPointResolverSet;
 
 /** <code>LifecycleAdapterFactory</code> TODO (document class) */

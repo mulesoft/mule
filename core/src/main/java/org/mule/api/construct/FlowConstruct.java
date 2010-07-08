@@ -8,8 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.api.construct;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 
 import java.beans.ExceptionListener;

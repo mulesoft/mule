@@ -10,10 +10,10 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.component.DefaultComponentLifecycleAdapter;
 

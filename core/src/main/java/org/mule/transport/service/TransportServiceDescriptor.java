@@ -10,8 +10,8 @@
 
 package org.mule.transport.service;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;

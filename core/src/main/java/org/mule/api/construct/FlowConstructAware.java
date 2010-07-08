@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api;
+package org.mule.api.construct;
 /**
 * Implemented by objects that require the {@link FlowConstruct} to be injected.
 */

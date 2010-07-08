@@ -11,12 +11,12 @@
 package org.mule.routing.outbound;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;

@@ -10,10 +10,10 @@
 
 package org.mule.lifecycle.phases;
 
-import org.mule.api.FlowConstruct;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.component.Component;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;

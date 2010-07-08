@@ -10,10 +10,11 @@
 
 package org.mule.construct;
 
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -52,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
  * lifecycle transitions.
  */
-public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle, LifecycleStateEnabled
+public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle, LifecycleStateEnabled
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -65,7 +66,7 @@ public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle, 
 
     protected final MuleContext muleContext;
 
-    public AbstractFlowConstuct(String name, MuleContext muleContext)
+    public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         this.name = name;
@@ -246,7 +247,11 @@ public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle, 
         // Empty template method
     }
 
-    protected void validateConstruct() throws InitialisationException
+    /**
+     * Validates configured flow construct
+     * @throws FlowConstructInvalidException if the flow construct does not pass validation 
+     */
+    protected void validateConstruct() throws FlowConstructInvalidException
     {
         // Empty template method
     }

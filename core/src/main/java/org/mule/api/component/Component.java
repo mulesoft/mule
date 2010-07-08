@@ -10,8 +10,8 @@
 
 package org.mule.api.component;
 
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.management.stats.ComponentStatistics;
 

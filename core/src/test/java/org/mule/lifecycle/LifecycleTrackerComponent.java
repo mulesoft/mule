@@ -10,11 +10,11 @@
 
 package org.mule.lifecycle;
 
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.management.stats.ComponentStatistics;
 
 import org.mockito.Mockito;

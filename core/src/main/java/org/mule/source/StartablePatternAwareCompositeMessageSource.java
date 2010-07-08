@@ -12,8 +12,8 @@ package org.mule.source;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;

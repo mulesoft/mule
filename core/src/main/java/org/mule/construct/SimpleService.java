@@ -13,7 +13,7 @@ package org.mule.construct;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.source.MessageSource;
 import org.mule.processor.builder.ChainMessageProcessorBuilder;
 
@@ -21,7 +21,7 @@ import org.mule.processor.builder.ChainMessageProcessorBuilder;
  * In-out SOA-style simple service, with no outbound router. Always fully
  * synchronous.
  */
-public class SimpleService extends AbstractFlowConstuct
+public class SimpleService extends AbstractFlowConstruct
 {
     private final Component component;
 
@@ -44,13 +44,11 @@ public class SimpleService extends AbstractFlowConstuct
     }
 
     @Override
-    protected void validateConstruct() throws InitialisationException
+    protected void validateConstruct() throws FlowConstructInvalidException
     {
         super.validateConstruct();
         // Ensure messageSource is a single InboundEndpoint (not composite)?
         // Ensure InboundEndpoint messageSource has supported Exchange Pattern
-
-        // Should we create a new exception type for this maybe?
     }
 
     public Component getComponent()

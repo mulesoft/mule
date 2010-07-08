@@ -19,7 +19,7 @@ import org.mule.processor.builder.ChainMessageProcessorBuilder;
 import java.util.Collection;
 
 /**
- * Simple implementation of {@link AbstractFlowConstuct} that allows a list of
+ * Simple implementation of {@link AbstractFlowConstruct} that allows a list of
  * {@link MessageProcessor}s that will be used to process messages to be configured.
  * These MessageProcessors are chained together using the
  * {@link ChainMessageProcessorBuilder}.
@@ -27,7 +27,7 @@ import java.util.Collection;
  * If not message processors are configured then the source message is simply
  * returned.
  */
-public class SimpleFlowConstuct extends AbstractFlowConstuct
+public class SimpleFlowConstruct extends AbstractFlowConstruct
 {
     protected Collection<MessageProcessor> messageProcessors;
 
@@ -36,7 +36,7 @@ public class SimpleFlowConstuct extends AbstractFlowConstuct
         this.messageProcessors = messageProcessors;
     }
 
-    public SimpleFlowConstuct(String name, MuleContext muleContext) throws MuleException
+    public SimpleFlowConstruct(String name, MuleContext muleContext) throws MuleException
     {
         super(name, muleContext);
     }

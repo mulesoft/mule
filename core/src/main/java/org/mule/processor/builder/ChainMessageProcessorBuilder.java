@@ -10,10 +10,10 @@
 
 package org.mule.processor.builder;
 
-import org.mule.api.FlowConstruct;
-import org.mule.api.FlowConstructAware;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
