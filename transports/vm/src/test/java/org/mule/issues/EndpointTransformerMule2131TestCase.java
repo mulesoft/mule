@@ -21,6 +21,11 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public static final String MESSAGE = "a message";
 
+    public EndpointTransformerMule2131TestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     protected String getConfigResources()
     {
         return "issues/endpoint-transformer-mule-2131-test.xml";
