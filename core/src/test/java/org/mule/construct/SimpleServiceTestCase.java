@@ -21,6 +21,7 @@ import org.mule.util.StringUtils;
 
 public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
+    private static final StringReverserComponent COMPONENT = new StringReverserComponent();
     private SimpleService simpleService;
     private DirectInboundMessageSource dims;
 
@@ -31,8 +32,9 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 
         dims = new DirectInboundMessageSource();
 
-        simpleService = new SimpleService(muleContext, "test-simple-service", dims,
-            new StringReverserComponent());
+        simpleService = new SimpleService(muleContext, "test-simple-service");
+        simpleService.setMessageSource(dims);
+        simpleService.setComponent(COMPONENT);
     }
 
     @Override
