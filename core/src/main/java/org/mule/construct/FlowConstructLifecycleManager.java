@@ -36,7 +36,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     protected transient final Log logger = LogFactory.getLog(FlowConstructLifecycleManager.class);
 
 
-    public FlowConstructLifecycleManager(FlowConstruct flowConstruct) throws MuleException
+    public FlowConstructLifecycleManager(FlowConstruct flowConstruct)
     {
         super(flowConstruct.getName(), flowConstruct);
     }
