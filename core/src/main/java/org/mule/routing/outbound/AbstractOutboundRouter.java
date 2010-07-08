@@ -83,7 +83,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using asynchronous dispatch");
             awaitResponse = false;
-            return null;
         }
 
         setMessageProperties(session.getFlowConstruct(), message, endpoint);
