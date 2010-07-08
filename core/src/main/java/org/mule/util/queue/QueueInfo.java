@@ -124,4 +124,16 @@ public class QueueInfo
         }
     }
 
+    public void untake(Object item) throws InterruptedException
+    {
+        if (Thread.interrupted())
+        {
+            throw new InterruptedException();
+        }
+        synchronized (list)
+        {
+            list.addFirst(item);
+        }
+    }
+
 }

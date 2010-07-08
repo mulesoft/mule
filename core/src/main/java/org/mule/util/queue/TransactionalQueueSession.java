@@ -93,6 +93,11 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             return poll(Long.MAX_VALUE);
         }
 
+        public void untake(Object item) throws InterruptedException
+        {
+            queue.untake(item);
+        }
+
         public Object poll(long timeout) throws InterruptedException
         {
             try

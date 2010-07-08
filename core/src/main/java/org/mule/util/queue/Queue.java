@@ -35,6 +35,8 @@ public interface Queue
      */
     Object take() throws InterruptedException;
 
+    void untake(Object item) throws InterruptedException;
+
     Object peek() throws InterruptedException;
 
     Object poll(long timeout) throws InterruptedException;

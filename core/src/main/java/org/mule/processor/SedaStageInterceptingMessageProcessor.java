@@ -146,7 +146,16 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             logger.trace(MessageFormat.format("{0}: Polling queue {1}, timeout = {2}", getStageName(),
                 getStageDescription(), queueTimeout));
         }
-        return (MuleEvent) queue.poll(queueTimeout);
+
+        MuleEvent event = (MuleEvent)queue.poll(queueTimeout);
+        //If the service has been paused why the poll was waiting for an event to arrive on the queue,
+        //we put the object back on the queue
+        if(event!=null && lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
+        {
+            queue.untake(event);
+            return null;
+        }
+        return event;
     }
 
     private class SedaStageWorker extends AbstractMuleEventWork
@@ -194,7 +203,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 // Wait if the service is paused
                 if (lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
                 {
-                    waitIfPaused(event);
+                    waitIfPaused();
 
                     // If service is resumed as part of stopping
                     if (lifecycleState.isStopping())
@@ -306,7 +315,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         return "SEDA Stage " + getStageName();
     }
 
-    protected void waitIfPaused(MuleEvent event) throws InterruptedException
+    protected void waitIfPaused() throws InterruptedException
     {
         if (logger.isDebugEnabled() && lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
         {
