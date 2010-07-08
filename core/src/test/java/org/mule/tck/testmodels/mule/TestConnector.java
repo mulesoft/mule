@@ -12,17 +12,21 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.MessageRequester;
 import org.mule.endpoint.AbstractEndpoint;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.AbstractMessageRequesterFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 
 /**
@@ -52,6 +56,18 @@ public class TestConnector extends AbstractConnector
                 return new TestMessageDispatcher(endpoint);
             }
         });
+
+        setRequesterFactory(new AbstractMessageRequesterFactory()
+        {
+            @Override
+            public MessageRequester create(InboundEndpoint endpoint) throws MuleException
+            {
+                return new TestMessageRequester(endpoint);
+            }
+        });
+
+        setRetryPolicyTemplate((RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
+                                MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE));
     }
 
     public String getProtocol()

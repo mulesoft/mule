@@ -30,7 +30,7 @@ import org.mule.config.i18n.CoreMessages;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundEndpoint
+public class    DefaultInboundEndpoint extends AbstractEndpoint implements InboundEndpoint
 {
     private static final long serialVersionUID = -4752772777414636142L;
     private MessageProcessor listener;

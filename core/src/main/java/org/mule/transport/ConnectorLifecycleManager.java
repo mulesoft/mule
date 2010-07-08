@@ -61,6 +61,7 @@ public class ConnectorLifecycleManager extends SimpleLifecycleManager<Connector>
 
     public void fireDisposePhase(LifecycleCallback<Connector> callback) throws MuleException
     {
+        checkPhase(Disposable.PHASE_NAME);
         if(logger.isInfoEnabled()) logger.info("Disposing connector: " + getLifecycleObject().getName());                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                //No pre notification
         invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
         //No post notification

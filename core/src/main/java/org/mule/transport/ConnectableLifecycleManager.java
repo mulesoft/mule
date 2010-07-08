@@ -1,0 +1,61 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.transport;
+
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleCallback;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.lifecycle.SimpleLifecycleManager;
+
+/**
+ * TODO
+ */
+public class ConnectableLifecycleManager<O> extends SimpleLifecycleManager<O>
+{
+    public ConnectableLifecycleManager(String id, O object)
+    {
+        super(id, object);
+    }
+
+    @Override
+    public void fireInitialisePhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Initialisable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Initialising: " + lifecycleManagerId + "' object is: " + getLifecycleObject().getClass().getSimpleName());
+        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+    }
+
+    @Override
+    public void fireStartPhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Startable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Starting: " + lifecycleManagerId + "' object is: " + getLifecycleObject().getClass().getSimpleName());
+        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+    }
+
+    @Override
+    public void fireStopPhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Stoppable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Stoppable: " + lifecycleManagerId + "' object is: " + getLifecycleObject().getClass().getSimpleName());
+        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+    }
+
+    @Override
+    public void fireDisposePhase(LifecycleCallback<O> callback) throws MuleException
+    {
+        checkPhase(Disposable.PHASE_NAME);
+        if(logger.isInfoEnabled()) logger.info("Disposing: " + lifecycleManagerId + "' object is: " + getLifecycleObject().getClass().getSimpleName());
+        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+    }
+}

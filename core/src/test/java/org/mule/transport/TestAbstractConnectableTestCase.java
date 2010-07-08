@@ -10,12 +10,6 @@
 
 package org.mule.transport;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
@@ -31,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
@@ -42,6 +35,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This test tests class {@link AbstractConnectable} but its name starts with "Test"
@@ -71,6 +70,12 @@ public class TestAbstractConnectableTestCase
             protected WorkManager getWorkManager()
             {
                 return null;
+            }
+
+            @Override
+            protected ConnectableLifecycleManager createLifecycleManager()
+            {
+                return new ConnectableLifecycleManager("test", this);
             }
         };
         connectable.initialise();
@@ -210,6 +215,12 @@ public class TestAbstractConnectableTestCase
             protected WorkManager getWorkManager()
             {
                 return null;
+            }
+
+            @Override
+            protected ConnectableLifecycleManager createLifecycleManager()
+            {
+                return new ConnectableLifecycleManager("test", this);
             }
 
             @Override

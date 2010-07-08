@@ -12,9 +12,9 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
-import org.mule.api.transport.MessageDispatcher;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -108,10 +108,22 @@ public class KeyedPoolMessageRequesterFactoryAdapter
 
     protected void applyLifecycle(MessageRequester requester, boolean created) throws MuleException
     {
-//        String phase = ((AbstractConnector)requester.getConnector()).getLifecycleManager().getCurrentPhase();
-//        if(created || !phase.equals(Startable.PHASE_NAME))
-//        {
-//            requester.getConnector().getMuleContext().getRegistry().applyLifecycle(requester, phase);
-//        }
+        String phase = ((AbstractConnector)requester.getConnector()).getLifecycleManager().getCurrentPhase();
+        if(phase.equals(Startable.PHASE_NAME) && !requester.getLifecycleState().isStarted())
+        {
+            if(!requester.getLifecycleState().isInitialised())
+            {
+                requester.initialise();
+            }
+            requester.start();
+        }
+        else if(phase.equals(Stoppable.PHASE_NAME) && requester.getLifecycleState().isStarted())
+        {
+            requester.stop();
+        }
+        else if(Disposable.PHASE_NAME.equals(phase))
+        {
+            requester.dispose();
+        }
     }
 }

@@ -35,6 +35,12 @@ public class ConnectableTestCase extends AbstractMuleTestCase
         }
 
         @Override
+        protected ConnectableLifecycleManager createLifecycleManager()
+        {
+            return new ConnectableLifecycleManager("test", this);
+        }
+
+        @Override
         protected WorkManager getWorkManager()
         {
             return null;

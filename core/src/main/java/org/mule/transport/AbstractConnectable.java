@@ -18,7 +18,10 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleState;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
@@ -35,15 +38,13 @@ import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
-public abstract class AbstractConnectable implements Connectable, ExceptionListener
+public abstract class AbstractConnectable<O> implements Connectable, ExceptionListener, LifecycleStateEnabled
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -54,20 +55,28 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
 
     protected final WaitableBoolean connected = new WaitableBoolean(false);
     protected final WaitableBoolean connecting = new WaitableBoolean(false);
-    protected final WaitableBoolean started = new WaitableBoolean(false);
-    protected final AtomicBoolean disposed = new AtomicBoolean(false);
 
     /**
-     * Indicates whether the receiver/dispatcher/requester should start upon connecting.  
-     * This is necessary to support asynchronous retry policies, otherwise the start() 
+     * Indicates whether the receiver/dispatcher/requester should start upon connecting.
+     * This is necessary to support asynchronous retry policies, otherwise the start()
      * method would block until connection is successful.
      */
     protected volatile boolean startOnConnect = false;
+
+    protected ConnectableLifecycleManager<O> lifecycleManager;
 
     public AbstractConnectable(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         this.connector = (AbstractConnector) endpoint.getConnector();
+        this.lifecycleManager = createLifecycleManager();
+    }
+
+    protected abstract ConnectableLifecycleManager<O> createLifecycleManager();
+
+    public LifecycleState getLifecycleState()
+    {
+        return lifecycleManager.getState();
     }
 
     protected void disposeAndLogException()
@@ -102,7 +111,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     public boolean validate()
     {
         // by default a dispatcher/requester can be used unless disposed
-        return !disposed.get();
+        return !getLifecycleState().isDisposed();
     }
 
     public void activate()
@@ -114,11 +123,30 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     {
         // nothing to do by default
     }
-    
+
     public void initialise() throws InitialisationException
     {
-        initializeRetryPolicy();
-        initializeMessageFactory();
+        try
+        {
+            lifecycleManager.fireInitialisePhase(new LifecycleCallback<O>()
+            {
+                public void onTransition(String phaseName, O object) throws MuleException
+                {
+                    initializeRetryPolicy();
+                    initializeMessageFactory();
+                    doInitialise();
+                }
+            });
+        }
+        catch (InitialisationException e)
+        {
+            throw e;
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+
     }
 
     protected void initializeRetryPolicy()
@@ -155,18 +183,29 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
      */
     public synchronized void dispose()
     {
-        if (!disposed.get())
+        try
         {
             try
             {
-                this.disconnect();
-                this.stop();
+                disconnect();
             }
             catch (Exception e)
             {
-                // TODO MULE-863: What should we really do?
                 logger.warn(e.getMessage(), e);
             }
+            if(isStarted()) stop();
+            
+            //Nothing to do when disposing, just transition
+            lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() {
+                public void onTransition(String phaseName, O object) throws MuleException
+                {
+                    doDispose();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            logger.warn(e.getMessage(), e);
         }
     }
 
@@ -189,62 +228,62 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             return;
         }
 
-        if (disposed.get())
+        if (getLifecycleState().isDisposed())
         {
             throw new IllegalStateException(
-                "Requester/dispatcher has been disposed; cannot connect to resource:" + this);
+                    "Requester/dispatcher has been disposed; cannot connect to resource:" + this);
         }
-        
+
         if (!connecting.compareAndSet(false, true))
         {
             return;
         }
-        
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Connecting: " + this);
         }
-            
+
         retryTemplate.execute(
-            new RetryCallback()
-            {
-                public void doWork(RetryContext context) throws Exception
+                new RetryCallback()
                 {
-                    try
+                    public void doWork(RetryContext context) throws Exception
                     {
-                        doConnect();
-                        connected.set(true);
-                        connecting.set(false);
-
-                        if (logger.isDebugEnabled())
+                        try
                         {
-                            logger.debug("Connected: " + getWorkDescription());
+                            doConnect();
+                            connected.set(true);
+                            connecting.set(false);
+
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Connected: " + getWorkDescription());
+                            }
+                            // TODO Make this work somehow inside the RetryTemplate
+                            //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                            //    ConnectionNotification.CONNECTION_CONNECTED));
+
+                            if (startOnConnect)
+                            {
+                                start();
+                            }
                         }
-                        // TODO Make this work somehow inside the RetryTemplate
-                        //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
-                        //    ConnectionNotification.CONNECTION_CONNECTED));
-
-                        if (startOnConnect)
+                        catch (Exception e)
                         {
-                            start();
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("exception in doWork", e);
+                            }
+                            throw e;
                         }
                     }
-                    catch (Exception e)
+
+                    public String getWorkDescription()
                     {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("exception in doWork", e);
-                        }
-                        throw e;
+                        return getConnectionDescription();
                     }
-                }
-    
-                public String getWorkDescription()
-                {
-                    return getConnectionDescription();
-                }
-            }, 
-            getWorkManager()
+                },
+                getWorkManager()
         );
     }
 
@@ -253,7 +292,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         retryContext.setOk();
         return retryContext;
     }
-    
+
     public final synchronized void disconnect() throws Exception
     {
         if (!connected.get())
@@ -274,7 +313,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             logger.debug("Disconnected: " + this);
         }
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
-            ConnectionNotification.CONNECTION_DISCONNECTED));
+                ConnectionNotification.CONNECTION_DISCONNECTED));
     }
 
     protected String getConnectEventId(ImmutableEndpoint endpoint)
@@ -292,7 +331,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         return connecting.get();
     }
 
-    protected boolean isDoThreading ()
+    protected boolean isDoThreading()
     {
         return connector.getDispatcherThreadingProfile().isDoThreading();
     }
@@ -308,46 +347,44 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     /**
      * This method will start the connectable, calling {@link #connect()} if it is
      * needed.
-     * <p>
+     * <p/>
      * This method is synchronous or not depending on how the {@link #retryTemplate}
      * behaves.
-     * <p>
+     * <p/>
      * This method ensures that {@link #doStart()} will be called at most one time
      * and will return without error if the component is already {@link #started}.
      */
     public final void start() throws MuleException
     {
+        //We only fire start lifecycle once we are connected, see {@link #callDoStartWhenItIsConnected}
         if (!connected.get() && !connecting.get())
         {
             connectAndThenStart();
         }
         else
         {
-            if (started.compareAndSet(false, true))
+            try
             {
-                try
+                retryTemplate.execute(new RetryCallback()
                 {
-                    retryTemplate.execute(new RetryCallback()
+                    public void doWork(RetryContext context) throws InterruptedException, MuleException
                     {
-                        public void doWork(RetryContext context) throws InterruptedException, MuleException
-                        {
-                            callDoStartWhenItIsConnected();
-                        }
+                        callDoStartWhenItIsConnected();
+                    }
 
-                        public String getWorkDescription()
-                        {
-                            return "starting " + getConnectionDescription();
-                        }
-                    }, getWorkManager());
-                }
-                catch (MuleException e)
-                {
-                    throw e;
-                }
-                catch (Exception e)
-                {
-                    throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
-                }
+                    public String getWorkDescription()
+                    {
+                        return "starting " + getConnectionDescription();
+                    }
+                }, getWorkManager());
+            }
+            catch (MuleException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, AbstractConnectable.this);
             }
         }
     }
@@ -356,7 +393,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
      * This method will call {@link #connect()} after setting {@link #startOnConnect}
      * in true. This will make the {@link #connect()} method call {@link #start()}
      * after finishing establishing connection.
-     * 
+     *
      * @throws LifecycleException
      */
     protected void connectAndThenStart() throws LifecycleException
@@ -377,11 +414,11 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     /**
      * This method will block until {@link #connected} is true and then will call
      * {@link #doStart()}.
-     * 
+     *
      * @throws InterruptedException if the thread is interrupted while waiting for
-     *             {@link #connected} to be true.
-     * @throws MuleException this is just a propagation of any {@link MuleException}
-     *             that {@link #doStart()} may throw.
+     *                              {@link #connected} to be true.
+     * @throws MuleException        this is just a propagation of any {@link MuleException}
+     *                              that {@link #doStart()} may throw.
      */
     protected void callDoStartWhenItIsConnected() throws InterruptedException, MuleException
     {
@@ -391,18 +428,20 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             {
                 public void run()
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Starting: " + this);
-                    }
                     try
                     {
-                        doStart();
+                        lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
+                        {
+                            public void onTransition(String phaseName, O object) throws MuleException
+                            {
+                                doStart();
+                            }
+                        });
                     }
                     catch (MuleException e)
                     {
                         throw new MuleRuntimeException(
-                            CoreMessages.createStaticMessage("wrapper exception for a MuleException"), e);
+                                CoreMessages.createStaticMessage("wrapper exception for a MuleException"), e);
                     }
                 }
             });
@@ -420,7 +459,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
     }
 
-    public final void stop()
+    public final void stop() throws MuleException
     {
         try
         {
@@ -431,34 +470,31 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
         catch (Exception e)
         {
-            // TODO MULE-863: What should we really do?
             logger.error(e.getMessage(), e);
         }
 
-        if (started.compareAndSet(true, false))
+        lifecycleManager.fireStopPhase(new LifecycleCallback<O>()
         {
-            try
+            public void onTransition(String phaseName, O object) throws MuleException
             {
-                if (logger.isDebugEnabled())
+                try
                 {
-                    logger.debug("Stopping: " + this);
+                    doStop();
                 }
-                doStop();
+                catch (MuleException e)
+                {
+                    logger.error(e.getMessage(), e);
+                }
             }
-            catch (MuleException e)
-            {
-                // TODO MULE-863: What should we really do?
-                logger.error(e.getMessage(), e);
-            }
+        });
 
-        }
     }
 
     protected void doInitialise() throws InitialisationException
     {
         // nothing to do by default
     }
-    
+
     protected void doDispose()
     {
         // nothing to do by default
@@ -491,12 +527,13 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", endpoint=").append(endpoint.getEndpointURI());
-        sb.append(", disposed=").append(disposed);
+        sb.append(", disposed=").append(getLifecycleState().isDisposed());
         sb.append('}');
         return sb.toString();
     }
 
     // TODO MULE-4871 Endpoint should not be mutable
+
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         if (endpoint == null)
@@ -505,31 +542,31 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         }
         this.endpoint = endpoint;
     }
-    
+
     abstract protected WorkManager getWorkManager();
 
     public boolean isStarted()
     {
-        return started.get();
+        return getLifecycleState().isStarted();
     }
-    
+
     /**
      * This method uses the connector's <code>createMuleMessageFactory</code> method to create
-     * a new {@link MuleMessageFactory}. Subclasses may need to override this method in order to 
+     * a new {@link MuleMessageFactory}. Subclasses may need to override this method in order to
      * perform additional initialization on the message factory before it's actually used.
      */
     protected MuleMessageFactory createMuleMessageFactory() throws CreateException
     {
         return connector.createMuleMessageFactory();
     }
-    
+
     /**
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
      * The payload of the new message will be taken from <code>transportMessage</code>, all
      * message properties will be copied from <code>previousMessage</code>.
      */
     public MuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage,
-        String encoding) throws MuleException
+                                         String encoding) throws MuleException
     {
         try
         {
@@ -540,10 +577,10 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
             throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e);
         }
     }
- 
+
     /**
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
-     * This is the designated way to build {@link MuleMessage}s from the transport specific message. 
+     * This is the designated way to build {@link MuleMessage}s from the transport specific message.
      */
     public MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException
     {
@@ -560,7 +597,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
     /**
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
      * Uses the default encoding.
-     * 
+     *
      * @see MuleConfiguration#getDefaultEncoding()
      */
     public MuleMessage createMuleMessage(Object transportMessage) throws MuleException
@@ -568,7 +605,7 @@ public abstract class AbstractConnectable implements Connectable, ExceptionListe
         String encoding = endpoint.getMuleContext().getConfiguration().getDefaultEncoding();
         return createMuleMessage(transportMessage, encoding);
     }
-    
+
     /**
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
      * Rather than passing in a transport message instance, {@link NullPayload} is used instead.

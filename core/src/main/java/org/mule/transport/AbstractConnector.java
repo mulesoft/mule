@@ -100,7 +100,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -1112,7 +1111,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
 
             dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
-            dispatcher.initialise();
 
             if (logger.isDebugEnabled())
             {
@@ -1222,7 +1220,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
 
             requester = (MessageRequester) requesters.borrowObject(endpoint);
-            requester.initialise();
 
             if (logger.isDebugEnabled())
             {

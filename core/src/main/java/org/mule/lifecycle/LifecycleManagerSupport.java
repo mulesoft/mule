@@ -94,7 +94,7 @@ public abstract class LifecycleManagerSupport<O> implements LifecycleManager
             }
             else
             {
-                throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+                throw new IllegalStateException("Cannot fire phase '" + name + "', currently executing lifecycle phase: " + executingPhase);
             }
         }
 

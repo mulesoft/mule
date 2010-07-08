@@ -17,7 +17,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
@@ -37,25 +36,17 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     }
 
     @Override
-    public final void initialise() throws InitialisationException
+    protected ConnectableLifecycleManager createLifecycleManager()
     {
-        super.initialise();
-        doInitialise();
+        return new ConnectableLifecycleManager<MessageDispatcher>(getDispatcherName(), this);
     }
 
-    @Override
-    public final synchronized void dispose()
+    protected String getDispatcherName()
     {
-        super.dispose();
-        try
-        {
-            doDispose();
-        }
-        finally
-        {
-            disposed.set(true);
-        }
+        return getConnector().getName() + ".dispatcher." + System.identityHashCode(this);
     }
+    
+
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {

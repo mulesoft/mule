@@ -14,13 +14,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
 
 
 /**
  * Combine {@link org.mule.api.transport.MessageRequesting} with
  * various lifecycle methods for the actual instances doing message sending.
  */
-public interface MessageRequester extends Connectable, MessageRequesting
+public interface MessageRequester extends Connectable, MessageRequesting, LifecycleStateEnabled
 {
     /**
      * This method can perform necessary state updates before any of the

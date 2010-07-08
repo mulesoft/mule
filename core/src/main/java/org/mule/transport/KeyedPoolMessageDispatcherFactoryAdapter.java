@@ -12,8 +12,9 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -49,7 +50,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     {
         OutboundEndpoint endpoint = (OutboundEndpoint)key;
         //Ensure dispatcher has the same lifecycle as the connector
-        applyLifecycle((MessageDispatcher)obj, false);
+        applyLifecycle((MessageDispatcher)obj);
 
         factory.activate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
@@ -63,7 +64,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     {
         OutboundEndpoint endpoint = (OutboundEndpoint) key;
         MessageDispatcher dispatcher = factory.create(endpoint);
-        applyLifecycle(dispatcher, true);
+        applyLifecycle(dispatcher);
         return dispatcher;
     }
 
@@ -90,7 +91,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
     public void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
     {
         //Ensure dispatcher has the same lifecycle as the connector
-        applyLifecycle(dispatcher, false);
+        applyLifecycle(dispatcher);
         factory.activate(endpoint, dispatcher);
     }
 
@@ -109,13 +110,25 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
         return factory.validate(endpoint, dispatcher);
     }
 
-    protected void applyLifecycle(MessageDispatcher dispatcher, boolean created) throws MuleException
+    protected void applyLifecycle(MessageDispatcher dispatcher) throws MuleException
     {
-//        String phase = ((AbstractConnector)dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
-//        if(created || !phase.equals(Startable.PHASE_NAME))
-//        {
-//            dispatcher.getConnector().getMuleContext().getRegistry().applyLifecycle(dispatcher, phase);
-//        }
+        String phase = ((AbstractConnector)dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
+        if(phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
+        {
+            if(!dispatcher.getLifecycleState().isInitialised())
+            {
+                dispatcher.initialise();
+            }
+            dispatcher.start();
+        }
+        else if(phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
+        {
+            dispatcher.stop();
+        }
+        else if(Disposable.PHASE_NAME.equals(phase))
+        {
+            dispatcher.dispose();
+        }
     }
 
 }

@@ -28,7 +28,7 @@ import junit.framework.Assert;
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
  * Also test lifecycle of a connector dispatchers, receivers, workManagers and scheduler.
  */
-public class ConnectorLifecycleTestCase extends AbstractMuleTestCase 
+public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 {
     private TestConnector connector;
 
@@ -42,12 +42,15 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     @Override
     public void doTearDown() throws Exception
     {
+        if(!connector.isDisposed()) connector.dispose();
         connector = null;
     }
 
     /**
      * This test ensures that the connector is only initialised once even on a
      * direct initialisation (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
     public void testDoubleInitialiseConnector() throws Exception
     {
@@ -62,11 +65,11 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertEquals(0, connector.getDisposeCount());
 
         // Initialising the connector again should not throw an exception.
-        try 
+        try
         {
             connector.initialise();
             Assert.fail("Expected IllegalStateException not thrown.");
-        } 
+        }
         catch (IllegalStateException ex)
         {
             // ignore since expected
@@ -76,6 +79,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     /**
      * This test ensures that the connector is only started once even on a
      * direct restart (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
     public void testDoubleStartConnector() throws Exception
     {
@@ -110,6 +115,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     /**
      * This test ensures that the connector is only stopped once even on a
      * direct restop (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
     public void testDoubleStopConnector() throws Exception
     {
@@ -155,15 +162,17 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     /**
      * This test ensures that the connector is only disposed once even on a
      * direct disposal (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
     public void testDoubleDisposeConnectorStartStop() throws Exception
     {
         connector.start();
         assertTrue(connector.isStarted());
-        
+
         connector.stop();
         assertFalse(connector.isStarted());
-        
+
         // Disposing the connector should leave it uninitialised.
         connector.dispose();
         assertEquals(1, connector.getInitialiseCount());
@@ -193,12 +202,14 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     /**
      * This test ensures that the connector is only disposed once even on a
      * direct disposal (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
-    public void testDoubleDisposeConnectorStartOnly() throws Exception 
+    public void testDoubleDisposeConnectorStartOnly() throws Exception
     {
         connector.start();
         assertTrue(connector.isStarted());
-        
+
         // Disposing the connector should leave it uninitialised.
         connector.dispose();
         assertEquals(1, connector.getInitialiseCount());
@@ -224,14 +235,16 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         // dispose() implicitly calls stop()
         assertEquals(1, connector.getStopCount());
         assertEquals(1, connector.getDisconnectCount());
-        assertEquals(1, connector.getDisposeCount());   
+        assertEquals(1, connector.getDisposeCount());
     }
 
     /**
      * This test ensures that the connector is only disposed once even on a
      * direct disposal (not through Mule).
+     *
+     * @throws Exception if things go pear-shaped
      */
-    public void testDoubleDisposeConnector() throws Exception 
+    public void testDoubleDisposeConnector() throws Exception
     {
         // Disposing the connector should leave it uninitialised.
         connector.dispose();
@@ -261,72 +274,73 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     public void testReceiversLifecycle() throws Exception
     {
-        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getNullMessageProcessor(), getTestService());
+        Service service=getTestService();
+        service.start();
+        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getNullMessageProcessor(), service);
 
         assertEquals(1, connector.receivers.size());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(( connector.receivers.get("in")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.start();
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertTrue(( connector.receivers.get("in")).isConnected());
+        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getNullMessageProcessor(), getTestService());
+        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getNullMessageProcessor(), service);
 
         assertEquals(2, connector.receivers.size());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertTrue(( connector.receivers.get("in")).isConnected());
+        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        // TODO MULE-4554 Receivers that are created (when new listener is registered) while connector is started are not started or connected
-        // assertTrue(((AbstractMessageReceiver)connector.receivers.get("in2")).isConnected());
-        // assertTrue(((AbstractMessageReceiver)connector.receivers.get("in2")).isStarted());
+        assertTrue((connector.receivers.get("in2")).isConnected());
+        assertTrue(((AbstractMessageReceiver)connector.receivers.get("in2")).isStarted());
 
         connector.stop();
         assertEquals(2, connector.receivers.size());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(( connector.receivers.get("in")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isConnected());
+        assertFalse(( connector.receivers.get("in2")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
         connector.start();
         assertEquals(2, connector.receivers.size());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
+        assertTrue((connector.receivers.get("in")).isConnected());
+        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
+        assertTrue((connector.receivers.get("in2")).isConnected());
+        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
         connector.dispose();
         assertEquals(0, connector.receivers.size());
 
     }
-    
+
     public void testReceiversServiceLifecycle() throws Exception
     {
         Service service = getTestService();
         InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
         service.getInboundRouter().addEndpoint(endpoint);
         connector = (TestConnector) endpoint.getConnector();
-        
+
         assertEquals(0, connector.receivers.size());
 
         connector.start();
         assertEquals(0, connector.receivers.size());
-        
+
         service.start();
         assertEquals(1, connector.receivers.size());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertTrue(( connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.stop();
         assertEquals(1, connector.receivers.size());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertFalse(( connector.receivers.get("in")).isConnected());
         assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.start();
         assertEquals(1, connector.receivers.size());
-        assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isConnected());
+        assertTrue(( connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        
+
         service.stop();
         assertEquals(0, connector.receivers.size());
 
@@ -335,59 +349,115 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
-//    public void testDispatchersLifecycle() throws Exception
-//    {
-//        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
-//
-//        // attempts to send/dispatch/request are made on a stopped/stopping connector
-//        // This should fail because the connector is not started!
-//        try
-//        {
-//            out.process(getTestEvent("data"));
-//            fail("cannot sent on a connector that is not started");
-//        }
-//        catch (LifecycleException e)
-//        {
-//            //Expected
-//        }
-//
-//        assertEquals(0, connector.dispatchers.getNumIdle());
-//
-//        // Dispatcher is not started or connected
-//        assertDispatcherStartedConntected(out, false, false);
-//
-//        connector.start();
-//        assertDispatcherStartedConntected(out, true, true);
-//
-//        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
-//        out2.process(getTestEvent("data", out2));
-//
-//
-//        assertEquals(1, connector.dispatchers.getNumIdle());
-//        assertDispatcherStartedConntected(out, true, true);
-//        assertDispatcherStartedConntected(out2, true, true);
-//
-//        connector.stop();
-//
-//        // Pool is cleared because of implementation of workaround for MULE-4553
-//        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//         assertDispatcherStartedConntected(out, false, false);
-//         assertDispatcherStartedConntected(out2, false, false);
-//
-//        connector.start();
-//        //TODO
-//        assertEquals(2, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//         assertDispatcherStartedConntected(out, true, true);
-//         assertDispatcherStartedConntected(out2, true, true);
-//
-//        out.process(getTestEvent("data", out));
-//        assertEquals(2, connector.dispatchers.getNumIdle());
-//        assertDispatcherStartedConntected(out, true, true);
-//
-//        connector.dispose();
-//        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-//
-//    }
+    public void testDispatchersLifecycle() throws Exception
+    {
+        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
+
+        // attempts to send/dispatch/request are made on a stopped/stopping connector
+        // This should fail because the connector is not started!
+        try
+        {
+            out.process(getTestEvent("data"));
+            fail("cannot sent on a connector that is not started");
+        }
+        catch (LifecycleException e)
+        {
+            //Expected
+        }
+
+        assertEquals(0, connector.dispatchers.getNumIdle());
+
+        // Dispatcher is not started or connected
+        assertDispatcherStartedConnected(out, false, false);
+
+        connector.start();
+        assertDispatcherStartedConnected(out, true, true);
+
+        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
+        out2.process(getTestEvent("data", out2));
+
+        assertEquals(2, connector.dispatchers.getNumIdle());
+        assertDispatcherStartedConnected(out, true, true);
+        assertDispatcherStartedConnected(out2, true, true);
+
+        connector.stop();
+
+        // Pool is cleared because of implementation of workaround for MULE-4553
+        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+         assertDispatcherStartedConnected(out, false, false);
+         assertDispatcherStartedConnected(out2, false, false);
+
+        connector.start();
+
+        assertEquals(2, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+         assertDispatcherStartedConnected(out, true, true);
+         assertDispatcherStartedConnected(out2, true, true);
+
+        out.process(getTestEvent("data", out));
+        assertEquals(2, connector.dispatchers.getNumIdle());
+        assertDispatcherStartedConnected(out, true, true);
+
+        connector.dispose();
+        assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+
+    }
+
+    public void testRequestersLifecycle() throws Exception
+    {
+        InboundEndpoint in = getTestInboundEndpoint("in", "test://in", null, null, null, connector);
+
+        // attempts to send/dispatch/request are made on a stopped/stopping connector
+        // This should fail because the connector is not started!
+        try
+        {
+            in.request(1000L);
+            fail("cannot sent on a connector that is not started");
+        }
+        catch (LifecycleException e)
+        {
+            //Expected
+        }
+
+
+        assertEquals(0, connector.requesters.getNumIdle());
+
+        // Dispatcher is not started or connected
+        assertRequesterStartedConnected(in, false, false);
+
+        connector.start();
+        assertRequesterStartedConnected(in, true, true);
+
+        assertEquals(1, connector.requesters.getNumIdle());
+
+        InboundEndpoint in2 = getTestInboundEndpoint("in2", "test://in2", null, null, null, connector);
+        in2.request(1000L);
+
+
+        assertEquals(2, connector.requesters.getNumIdle());
+        assertRequesterStartedConnected(in, true, true);
+        assertRequesterStartedConnected(in2, true, true);
+
+        connector.stop();
+
+        // Pool is cleared because of implementation of workaround for MULE-4553
+        assertEquals(0, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
+         assertRequesterStartedConnected(in, false, false);
+         assertRequesterStartedConnected(in2, false, false);
+
+        connector.start();
+        //Between Stop and start the requester pool maintains existing pooled objects
+        assertEquals(2, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
+         assertRequesterStartedConnected(in, true, true);
+         assertRequesterStartedConnected(in2, true, true);
+
+        in.request(1000L);
+        assertEquals(2, connector.requesters.getNumIdle());
+        assertRequesterStartedConnected(in, true, true);
+
+        connector.dispose();
+        assertEquals(0, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
+
+    }
 
     public void testWorkManagerLifecycle() throws MuleException, WorkException
     {
@@ -458,12 +528,21 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         };
     }
 
-    private void assertDispatcherStartedConntected(OutboundEndpoint out, boolean started, boolean connected)
+    private void assertDispatcherStartedConnected(OutboundEndpoint out, boolean started, boolean connected)
         throws Exception
     {
         AbstractMessageDispatcher dispatcher = (AbstractMessageDispatcher) connector.dispatchers.borrowObject(out);
         assertEquals("Dispatcher started", started, dispatcher.isStarted());
         assertEquals("Dispatcher connected", connected, dispatcher.isConnected());
         connector.dispatchers.returnObject(out, dispatcher);
+    }
+
+    private void assertRequesterStartedConnected(InboundEndpoint in, boolean started, boolean connected)
+        throws Exception
+    {
+        AbstractMessageRequester requester = (AbstractMessageRequester) connector.requesters.borrowObject(in);
+        assertEquals("Requester started", started, requester.isStarted());
+        assertEquals("requester connected", connected, requester.isConnected());
+        connector.requesters.returnObject(in, requester);
     }
 }

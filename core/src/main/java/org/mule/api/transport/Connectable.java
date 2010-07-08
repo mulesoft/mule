@@ -10,16 +10,13 @@
 
 package org.mule.api.transport;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.retry.RetryContext;
 
 /**
  * Interface for objects that should connect to a resource.
  */
-public interface Connectable extends Initialisable, Disposable, Startable, Stoppable
+public interface Connectable extends Lifecycle
 {
 
     /**

@@ -10,6 +10,8 @@
 
 package org.mule.transport;
 
+import org.mule.api.MuleException;
+
 import javax.resource.spi.work.Work;
 
 public class PollingReceiverWorker implements Work
@@ -37,7 +39,7 @@ public class PollingReceiverWorker implements Work
     // by the scheduler
     public void run()
     {
-        if (receiver.started.get())
+        if (receiver.isStarted())
         {
             running = true;
             try
@@ -49,7 +51,14 @@ public class PollingReceiverWorker implements Work
             catch (InterruptedException e)
             {
                // stop polling
-               receiver.stop();
+                try
+                {
+                    receiver.stop();
+                }
+                catch (MuleException e1)
+                {
+                    receiver.handleException(e1);
+                }
             }
             catch (Exception e)
             {

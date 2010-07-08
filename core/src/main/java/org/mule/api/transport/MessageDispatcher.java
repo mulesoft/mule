@@ -14,13 +14,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessor;
 
 /**
  * Combine {@link MessageDispatching} with
  * various lifecycle methods for the actual instances doing message sending.
  */
-public interface MessageDispatcher extends Connectable, MessageProcessor
+public interface MessageDispatcher extends Connectable, MessageProcessor, LifecycleStateEnabled
 {
     long RECEIVE_WAIT_INDEFINITELY = 0;
     long RECEIVE_NO_WAIT = -1;

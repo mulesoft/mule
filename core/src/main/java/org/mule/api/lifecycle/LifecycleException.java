@@ -52,7 +52,7 @@ public class LifecycleException extends MuleException
      */
     public LifecycleException(Throwable cause, Object component)
     {
-        super(CoreMessages.initialisationFailure(cause.getMessage()), cause);
+        super(CoreMessages.createStaticMessage(cause.getMessage()), cause);
         this.component = component;
         addInfo("Object", ObjectUtils.toString(component, "null"));
     }

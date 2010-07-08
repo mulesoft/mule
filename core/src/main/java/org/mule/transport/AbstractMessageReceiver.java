@@ -98,6 +98,12 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         this.flowConstruct = flowConstruct;
     }
 
+    @Override
+    protected ConnectableLifecycleManager createLifecycleManager()
+    {
+        return new ConnectableLifecycleManager<MessageReceiver>(getReceiverKey(), this);
+    }
+
     /**
      * Method used to perform any initialisation work. If a fatal error occurs during
      * initialisation an <code>InitialisationException</code> should be thrown,
@@ -114,25 +120,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     @Override
     public final void initialise() throws InitialisationException
     {
-        super.initialise();
-
         endpointUri = endpoint.getEndpointURI();
-
-        doInitialise();
-    }
-
-    @Override
-    public final synchronized void dispose()
-    {
-        super.dispose();
-        try
-        {
-            doDispose();
-        }
-        finally
-        {
-            disposed.set(true);
-        }
+        super.initialise();
     }
 
     public FlowConstruct getFlowConstruct()
