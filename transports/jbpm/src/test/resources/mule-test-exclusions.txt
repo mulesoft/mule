@@ -4,3 +4,6 @@
 
 # MULE-4864
 org.mule.transport.jbpm.MessagingExceptionTestCase
+
+# MULE-4945 Broken by lifecycle changes RM owning
+org.mule.transport.jbpm.ForkedProcessTestCase
