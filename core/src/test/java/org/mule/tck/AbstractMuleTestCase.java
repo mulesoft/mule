@@ -637,7 +637,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
     {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null);
+        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null, null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri) throws Exception
@@ -647,7 +647,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public static InboundEndpoint getTestInboundEndpoint(String name, List<Transformer> transformers) throws Exception
     {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null);
+        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null, null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, List<Transformer> transformers) throws Exception
@@ -655,9 +655,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties, Connector connector) throws Exception
     {
-        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties);
+        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception

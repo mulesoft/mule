@@ -102,7 +102,7 @@ public final class MuleTestUtils
             {
                 return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
-        });
+        }, null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
@@ -113,7 +113,7 @@ public final class MuleTestUtils
             {
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
-        });
+        }, null);
     }
     
     public static InboundEndpoint getTestInboundEndpoint(String name,
@@ -121,7 +121,8 @@ public final class MuleTestUtils
                                                             String uri,
                                                             List<Transformer> transformers,
                                                             Filter filter,
-                                                            Map properties) throws Exception
+                                                            Map properties,
+                                                            Connector connector) throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
         {
@@ -129,7 +130,7 @@ public final class MuleTestUtils
             {
                 return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
-        });
+        }, connector);
     }
     
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
@@ -145,7 +146,7 @@ public final class MuleTestUtils
             {
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
-        });
+        }, null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
@@ -163,7 +164,7 @@ public final class MuleTestUtils
                 builder.setConnector(connector);
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
-        });
+        }, null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, final boolean sync, final MuleContext context) throws Exception
@@ -175,7 +176,7 @@ public final class MuleTestUtils
                 builder.setSynchronous(sync);
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
-        });
+        }, null);
     }
     
     public static OutboundEndpoint getTestOutboundEndpoint(final boolean sync, final MuleContext context) throws Exception
@@ -187,10 +188,10 @@ public final class MuleTestUtils
                 builder.setSynchronous(sync);
                 return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
-        });
+        }, null);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name, final boolean sync, final MuleContext context) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, final boolean sync, final MuleContext context, final Connector connector) throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
         {
@@ -199,7 +200,7 @@ public final class MuleTestUtils
                 builder.setSynchronous(sync);
                 return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
-        });
+        }, connector);
     }
 
     public static InboundEndpoint getTestInboundEndpoint(final boolean sync, final MuleContext context) throws Exception
@@ -211,7 +212,7 @@ public final class MuleTestUtils
                 builder.setSynchronous(sync);
                 return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
-        });
+        }, null);
     }
 
     private static ImmutableEndpoint getTestEndpoint(String name,
@@ -220,16 +221,20 @@ public final class MuleTestUtils
                                                      Filter filter,
                                                      Map properties,
                                                      MuleContext context,
-                                                     EndpointSource source) throws Exception
+                                                     EndpointSource source,
+                                                     Connector connector) throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("name", name);
         props.put("endpointURI", new MuleEndpointURI("test://test", context));
         props.put("connector", "testConnector");
-        // need to build endpoint this way to avoid depenency to any endpoint jars
-        AbstractConnector connector = (AbstractConnector) ClassUtils.loadClass(
+        if(connector==null)
+        {
+            // need to build endpoint this way to avoid depenency to any endpoint jars
+         connector = (Connector)ClassUtils.loadClass(
             "org.mule.tck.testmodels.mule.TestConnector", AbstractMuleTestCase.class).getConstructor(
             MuleContext.class).newInstance(context);
+        }
 
         connector.setName("testConnector");
         context.getRegistry().applyLifecycle(connector);
@@ -348,7 +353,7 @@ public final class MuleTestUtils
 
     public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1", true, context), context);
+        return getTestEvent(data, service, getTestInboundEndpoint("test1", true, context, null), context);
     }
 
     /** Supply endpoint but no service */
@@ -369,7 +374,7 @@ public final class MuleTestUtils
     
     public static MuleEvent getTestInboundEvent(Object data, MuleSession session, MuleContext context) throws Exception
     {
-        InboundEndpoint endpoint = getTestInboundEndpoint("test1", true, context);
+        InboundEndpoint endpoint = getTestInboundEndpoint("test1", true, context, null);
         MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         MuleMessage message = factory.create(data, endpoint.getEncoding());
         

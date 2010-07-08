@@ -74,7 +74,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         // Endpoint wants String-typed properties
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         
-        InboundEndpoint endpoint = getTestInboundEndpoint("mock", null, null, null, props);
+        InboundEndpoint endpoint = getTestInboundEndpoint("mock", null, null, null, props, null);
 
         Service service = getTestService("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
