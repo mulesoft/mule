@@ -113,8 +113,8 @@ public abstract class AbstractFlowConstuct implements FlowConstruct, Lifecycle, 
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
-                stopObject(messageProcessorChain);
                 stopObject(inboundMessageSource);
+                stopObject(messageProcessorChain);
                 doStop();
             }
         });
