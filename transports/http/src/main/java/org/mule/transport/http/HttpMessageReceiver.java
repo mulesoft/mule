@@ -517,10 +517,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Message request '" + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
-                    + "' is being rejected since it does not match the filter on this endpoint: " + endpoint);
+            logger.debug("Message request '"
+                         + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND)
+                         + "' is being rejected since it does not match the filter on this endpoint: "
+                         + endpoint);
         }
-        message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
+        message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
+                            String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE),
+                            PropertyScope.OUTBOUND);
         return message;
     }
 }
