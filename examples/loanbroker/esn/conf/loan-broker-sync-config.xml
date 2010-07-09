@@ -33,7 +33,7 @@
              -->
              <service name="TheLoanBroker">
                  <inbound>
-                     <inbound-endpoint ref="CustomerRequests"/>
+                     <inbound-endpoint ref="CustomerRequests" exchange-pattern="request-response"/>
                  </inbound>
 
                  <component class="org.mule.example.loanbroker.esn.SynchronousLoanBroker">

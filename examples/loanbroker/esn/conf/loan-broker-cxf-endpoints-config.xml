@@ -35,7 +35,7 @@
 
     <custom-transformer name="SetLendersAsRecipients" class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients"/>
 
-    <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="request-response"
+    <vm:endpoint name="CustomerRequests" path="customer.requests"
         connector-ref="syncVm"/>
     <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" exchange-pattern="request-response"
         connector-ref="syncVm"/>

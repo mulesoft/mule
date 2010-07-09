@@ -45,7 +45,7 @@
             -->
             <inbound>
                 <!-- New requests from customers -->
-                <inbound-endpoint ref="CustomerRequests"/>
+                <inbound-endpoint ref="CustomerRequests" exchange-pattern="one-way"/>
                 <!-- Loan quotes from banks -->
                 <inbound-endpoint ref="LoanBrokerQuotes"/>
                 <custom-inbound-router class="org.mule.example.loanbroker.routers.BankQuotesInboundAggregator">
