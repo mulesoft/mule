@@ -159,11 +159,10 @@ public class EventCorrelator
         {
             try
             {
-                logger.trace(String.format("Received async reply message for correlationID: %s%n%s",
+                logger.trace(String.format("Received async reply message for correlationID: %s%n%s%n%s",
                                            groupId,
-                                           StringMessageUtils.truncate(
-                                                   StringMessageUtils.toString(event.getMessage().getPayload()), 200, false)));
-                logger.trace(String.format("Received async reply message details: %n%s", StringMessageUtils.headersToString(event.getMessage())));
+                                           StringMessageUtils.truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false),
+                                           StringMessageUtils.headersToString(event.getMessage())));
             }
             catch (Exception e)
             {
@@ -355,9 +354,9 @@ public class EventCorrelator
         {
             try
             {
-                logger.trace(String.format("Waiting for response(s) for message: %n%s",
-                                           StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false)));
-                logger.trace(String.format("Response Message detail: %n%s", StringMessageUtils.headersToString(message)));
+                logger.trace(String.format("Waiting for response(s) for message: %n%s%n%s",
+                                           StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false),
+                                           StringMessageUtils.headersToString(message)));
             }
             catch (Exception e)
             {
@@ -377,7 +376,7 @@ public class EventCorrelator
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Got response but no one is waiting for it yet. Creating latch for "
+                logger.debug("Got response but no one is waiting for it yet. Creating latch for message id "
                         + responseId + " in " + this);
             }
 
