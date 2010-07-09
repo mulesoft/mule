@@ -126,7 +126,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     {
         Object src = msg.getPayload();
 
-        String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.OUTBOUND, null);
         if (endpointString == null)
         {
             throw new TransformerException(
@@ -134,7 +134,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                             MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 
-        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INVOCATION, null);
+        if (method == null)
+        {
+            method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.OUTBOUND, "POST");
+        }
         try
         {
             //Allow Expressions to be embedded
@@ -146,11 +150,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-                String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND,
                                                                            HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
 
-                String paramValue = null;
-                boolean encode =  msg.getBooleanProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
+                String paramValue;
+                Boolean encode =  msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.INVOCATION, null);
+                if (encode == null)
+                {
+                    encode = msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.OUTBOUND, true);
+                }
+                
                 if (encode)
                 {
                     paramValue = URLEncoder.encode(src.toString(), outputEncoding);

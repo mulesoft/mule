@@ -4,9 +4,11 @@
     xmlns:spring="http://www.springframework.org/schema/beans" 
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
@@ -18,10 +20,19 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="63081" path="services/Echo" 
-                    exchange-pattern="request-response" keep-alive="true"/>
+                <http:inbound-endpoint host="localhost"
+                                       port="63081"
+                                       path="services/Echo"
+                                       exchange-pattern="request-response"
+                                       keep-alive="true">
+                    <transformers>
+                        <message-properties-transformer>
+                            <add-message-property key="MULE_REPLYTO" value="#[groovy:message.getProperty('MULE_REPLYTO', org.mule.api.transport.PropertyScope.INBOUND)]"/>
+                        </message-properties-transformer>
+                    </transformers>
+                </http:inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent" />
+            <echo-component/>
         </service>
     </model>
 </mule>

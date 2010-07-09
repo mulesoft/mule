@@ -12,6 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -19,7 +20,6 @@ import org.mule.transport.http.HttpConstants;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -85,7 +85,7 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
         {
             MuleMessage message = context.getMessage();
                         
-            Object httpMethod = message.getProperty("http.method");
+            Object httpMethod = message.getProperty("http.method", PropertyScope.INBOUND);
             if (HttpConstants.METHOD_GET.equals(httpMethod))
             {
                 assertEquals("/services/Echo?foo=bar", message.getPayloadAsString());
@@ -99,8 +99,8 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
                 fail("invalid HTTP method : " + httpMethod);
             }
             
-            assertEquals("true", message.getProperty(HttpConstants.HEADER_CONNECTION));
-            assertEquals("true", message.getProperty(HttpConstants.HEADER_KEEP_ALIVE));
+            assertEquals("true", message.getProperty(HttpConstants.HEADER_CONNECTION, PropertyScope.INBOUND));
+            assertEquals("true", message.getProperty(HttpConstants.HEADER_KEEP_ALIVE, PropertyScope.INBOUND));
             
             messageDidArrive.countDown();            
         }

@@ -36,6 +36,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
@@ -755,7 +756,7 @@ public class MuleClient implements Disposable
             if (user != null)
             {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
-                    user.getUsername(), user.getPassword()));
+                    user.getUsername(), user.getPassword()), PropertyScope.OUTBOUND);
             }
             DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
             return event;

@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
@@ -30,35 +31,14 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         MuleMessage result = client.send("clientEndpoint", null, null);
         
         String contentTypeProperty = 
-            result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND, null);
         assertNotNull(contentTypeProperty); 
         assertEquals("application/x-download", contentTypeProperty); 
         
         String contentDispositionProperty = 
-            result.getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
+            result.getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, PropertyScope.OUTBOUND, null);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
     }
 
-    public void testClientHeaders() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        client.dispatch("clientEndpoint2", null, null); 
-
-        MuleMessage result = client.request("vm://out", 5000);
-        
-        String contentTypeProperty = 
-            result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
-        assertNotNull(contentTypeProperty);
-        assertEquals("application/xml", contentTypeProperty);
-        
-        String contentDispositionProperty =
-            result.getStringProperty(HttpConstants.HEADER_CONTENT_DISPOSITION, null);
-        assertNotNull(contentDispositionProperty);
-        assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
-
-        assertNotNull(result.getProperty("X-Test"));
-        assertEquals("foo", result.getProperty("X-Test"));
-    }
-    
 }

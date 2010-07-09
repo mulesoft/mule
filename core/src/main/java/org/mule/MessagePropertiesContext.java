@@ -140,35 +140,22 @@ public class MessagePropertiesContext implements Serializable
         }
     }
 
+    /**
+     *
+     * @deprecated use the overloaded version with an explicit lookup scope. This method will
+     * now use only the outbound scope.
+     */
+    @Deprecated
     public Object getProperty(String key)
     {
-        Object value = null;
-        for (PropertyScope scope : SCOPE_ORDER)
-        {
-            if (PropertyScope.SESSION.equals(scope))
-            {
-                if (RequestContext.getEvent() != null)
-                {
-                    value = RequestContext.getEvent().getSession().getProperty(key);
-                }
-            }
-            else
-            {
-                value = scopedMap.get(scope).get(key);
-            }
-            if (value != null)
-            {
-                break;
-            }
-        }
-        return value;
+        return getProperty(key, PropertyScope.OUTBOUND);
     }
 
     public Object getProperty(String key, PropertyScope scope)
     {
         if (scope == null)
         {
-            return getProperty(key);
+            return getProperty(key, PropertyScope.OUTBOUND);
         }
 
         Object value = null;
@@ -424,9 +411,15 @@ public class MessagePropertiesContext implements Serializable
         return ObjectUtils.getBoolean(getProperty(name), defaultValue);
     }
 
+    @Deprecated
     public String getStringProperty(String name, String defaultValue)
     {
-        return ObjectUtils.getString(getProperty(name), defaultValue);
+        return getStringProperty(name, PropertyScope.OUTBOUND, defaultValue);
+    }
+
+    public String getStringProperty(String name, PropertyScope scope, String defaultValue)
+    {
+        return ObjectUtils.getString(getProperty(name, scope), defaultValue);
     }
 
     protected MessagePropertiesContext copy()

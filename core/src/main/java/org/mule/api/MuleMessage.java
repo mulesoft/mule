@@ -50,19 +50,22 @@ public interface MuleMessage extends Serializable
     void clearProperties();
 
     /**
-     * Gets a property of the message implementation
-     * 
-     * @param key the key on which to lookup the property value
-     * @return the property value or null if the property does not exist
+     /**
+     *
+     * @deprecated use the overloaded version with an explicit lookup scope. This method will
+     * now use only the outbound scope.
      */
+    @Deprecated
     Object getProperty(String key);
 
     /**
      * Set a property on the message
-     * 
+     * @deprecated
+     *  
      * @param key the key on which to associate the value
      * @param value the property value
      */
+    @Deprecated
     void setProperty(String key, Object value);
 
     /**
@@ -125,7 +128,9 @@ public interface MuleMessage extends Serializable
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
      * @return the property value or the defaultValue if the property does not exist
+     * @deprecated
      */
+    @Deprecated
     Object getProperty(String name, Object defaultValue);
 
     /**
@@ -136,7 +141,9 @@ public interface MuleMessage extends Serializable
      * @return the property value or the defaultValue if the property does not exist in the specified scope
      */
     Object getProperty(String name, PropertyScope scope);
-    
+
+    <T> T getProperty(String name, PropertyScope scope, T defaultValue);
+
     /**
      * Gets an integer property from the message
      * 
@@ -211,8 +218,14 @@ public interface MuleMessage extends Serializable
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
      * @return the property value or the defaultValue if the property does not exist
+     * @deprecated
      */
+    @Deprecated
     String getStringProperty(String name, String defaultValue);
+
+    String getStringProperty(String name, PropertyScope scope, String defaultValue);
+
+
 
     /**
      * Sets a String property on the message

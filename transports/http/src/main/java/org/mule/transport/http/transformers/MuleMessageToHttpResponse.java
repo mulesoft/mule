@@ -168,7 +168,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     {
         HttpResponse response = new HttpResponse();
 
-        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
         int status = HttpConstants.SC_OK;
 
         if (tmp != null)
@@ -225,12 +225,16 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
         response.setFallbackCharset(encoding);
 
-        Collection headerNames = HttpConstants.RESPONSE_HEADER_NAMES.values();
-        String headerName, value;
-        for (Iterator iterator = headerNames.iterator(); iterator.hasNext();)
+        @SuppressWarnings("unchecked")
+        Collection<String> headerNames = HttpConstants.RESPONSE_HEADER_NAMES.values();
+
+        for (String headerName : headerNames)
         {
-            headerName = (String) iterator.next();
-            value = msg.getStringProperty(headerName, null);
+            String value = msg.getStringProperty(headerName, PropertyScope.INVOCATION, null);
+            if (value == null)
+            {
+                value = msg.getStringProperty(headerName, PropertyScope.OUTBOUND, null);
+            }
             if (value != null)
             {
                 response.setHeader(new Header(headerName, value));
@@ -253,13 +257,10 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             }
         }
 
-        //attach the outbound prorperties to the message
-        Object v;
-        for (Iterator iterator = msg.getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
+        //attach the outbound properties to the message
+        for (String headerName : msg.getPropertyNames(PropertyScope.OUTBOUND))
         {
-            headerName = (String) iterator.next();
-
-            v = msg.getProperty(headerName, PropertyScope.OUTBOUND);
+            Object v = msg.getProperty(headerName, PropertyScope.OUTBOUND);
             if (v != null)
             {
                 response.setHeader(new Header(headerName, v.toString()));
@@ -267,7 +268,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
 
         // Mule properties
-        String user = msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, null);
+        String user = msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, PropertyScope.OUTBOUND, null);
         if (user != null)
         {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));

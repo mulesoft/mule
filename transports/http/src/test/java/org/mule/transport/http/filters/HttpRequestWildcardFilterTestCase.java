@@ -62,7 +62,8 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     public void testHttpGetFiltered() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConstants.METHOD_GET, "true");
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
+        //props.put(HttpConstants.METHOD_GET, "true");
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(HTTP_ENDPOINT + "/" + TEST_BAD_MESSAGE, "mule", props);

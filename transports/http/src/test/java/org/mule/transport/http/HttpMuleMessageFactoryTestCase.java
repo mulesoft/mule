@@ -63,7 +63,8 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         assertEquals("/services/Echo", message.getPayload());
-        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        // note that on this level it's only message factory, and it adds messages from http request to the inbound scope
+        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND));
         assertEquals("foo-value", message.getProperty("foo-header", PropertyScope.INBOUND));
     }
     

@@ -12,6 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.module.client.MuleClient;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.concurrent.Latch;
 
 import java.io.BufferedReader;
 import java.util.StringTokenizer;
@@ -22,8 +23,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
     private static final int LISTEN_PORT = 60215;
-    private CountDownLatch testLatch = new CountDownLatch(1);
-    private String httpMethod = null;
+    private Latch testLatch = new Latch();
+    private String httpMethod;
     
     protected MockHttpServer getHttpServer(CountDownLatch latch)
     {
@@ -45,7 +46,7 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         sendHttpRequest("vm://doGet", HttpConstants.METHOD_GET);
     }
 
-    public void testOutboutHead() throws Exception
+    public void testOutboundHead() throws Exception
     {
         sendHttpRequest("vm://doHead", HttpConstants.METHOD_HEAD);
     }

@@ -258,7 +258,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             o = event.getEndpoint().getProperty(prop);
             if (o != null)
             {
-                msg.setProperty(prop, o);
+                msg.setProperty(prop, o, PropertyScope.OUTBOUND);
             }
         }
     }

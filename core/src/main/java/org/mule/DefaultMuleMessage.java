@@ -50,7 +50,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -187,7 +186,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 for (String name : muleMessage.getPropertyNames(scope))
                 {
-                    Object value = muleMessage.getProperty(name);
+                    Object value = muleMessage.getProperty(name, scope);
                     setProperty(name, value, scope);
                 }
             }
@@ -414,10 +413,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Object getProperty(String key)
     {
         assertAccess(READ);
-        return properties.getProperty(key);
+        return properties.getProperty(key, PropertyScope.OUTBOUND);
     }
 
     /**
@@ -439,6 +439,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /** {@inheritDoc} */
+    @Deprecated
     public void setProperty(String key, Object value)
     {
         assertAccess(WRITE);
@@ -540,7 +541,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setDoubleProperty(String name, double value)
     {
         assertAccess(WRITE);
-        setProperty(name, Double.valueOf(value));
+        setProperty(name, Double.valueOf(value), PropertyScope.OUTBOUND);
     }
 
     /**
@@ -576,6 +577,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.getProperty(name, scope);
     }
 
+    public <T> T getProperty(String name, PropertyScope scope, T defaultValue)
+    {
+        assertAccess(READ);
+        @SuppressWarnings("unchecked")
+        final T result = (T) properties.getProperty(name, scope);
+        if (result == null)
+        {
+            return defaultValue;
+        }
+        return result;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -609,7 +622,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setBooleanProperty(String name, boolean value)
     {
         assertAccess(WRITE);
-        setProperty(name, Boolean.valueOf(value));
+        setProperty(name, Boolean.valueOf(value), PropertyScope.OUTBOUND);
     }
 
     /**
@@ -618,7 +631,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setIntProperty(String name, int value)
     {
         assertAccess(WRITE);
-        setProperty(name, Integer.valueOf(value));
+        setProperty(name, Integer.valueOf(value), PropertyScope.OUTBOUND);
     }
 
     /**
@@ -627,7 +640,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setLongProperty(String name, long value)
     {
         assertAccess(WRITE);
-        setProperty(name, Long.valueOf(value));
+        setProperty(name, Long.valueOf(value), PropertyScope.OUTBOUND);
     }
 
     /**
@@ -638,7 +651,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         if (StringUtils.isNotBlank(id))
         {
-            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id);
+            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, PropertyScope.OUTBOUND);
         }
         else
         {
@@ -663,7 +676,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         if (replyTo != null)
         {
-            setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+            setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo, PropertyScope.OUTBOUND);
         }
         else
         {
@@ -677,7 +690,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public Object getReplyTo()
     {
         assertAccess(READ);
-        return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
     }
 
     /**
@@ -826,13 +839,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.getStringProperty(name, defaultValue);
     }
 
+    public String getStringProperty(String name, PropertyScope scope, String defaultValue)
+    {
+        assertAccess(READ);
+        return properties.getStringProperty(name, scope, defaultValue);
+    }
+
     /**
      * {@inheritDoc}
      */
     public void setStringProperty(String name, String value)
     {
         assertAccess(WRITE);
-        setProperty(name, value);
+        setProperty(name, value, PropertyScope.OUTBOUND);
     }
 
     /**

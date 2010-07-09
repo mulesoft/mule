@@ -62,13 +62,13 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         mpc.setProperty("Prop", "invocation", PropertyScope.INVOCATION);
         mpc.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
 
-        assertEquals("outbound", mpc.getProperty("Prop"));
+        assertEquals("outbound", mpc.getProperty("Prop", PropertyScope.OUTBOUND));
         mpc.removeProperty("Prop", PropertyScope.OUTBOUND);
 
-        assertEquals("invocation", mpc.getProperty("Prop"));
+        assertEquals("invocation", mpc.getProperty("Prop", PropertyScope.INVOCATION));
         mpc.removeProperty("Prop", PropertyScope.INVOCATION);
 
-        assertEquals("session", mpc.getProperty("Prop"));
+        assertEquals("session", mpc.getProperty("Prop", PropertyScope.SESSION));
         assertNull(mpc.getProperty("Prop", PropertyScope.INBOUND));
         assertNull(mpc.getProperty("Prop", PropertyScope.INVOCATION));
         assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
@@ -106,9 +106,9 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
     protected void doTest(MessagePropertiesContext mpc)
     {
         //Look in all scopes
-        assertEquals("BAR", mpc.getProperty("foo"));
-        assertEquals("DAR", mpc.getProperty("doo"));
-        assertEquals("abc", mpc.getProperty("abc"));
+        assertEquals("BAR", mpc.getProperty("foo", PropertyScope.OUTBOUND));
+        assertEquals("DAR", mpc.getProperty("doo", PropertyScope.INVOCATION));
+        assertEquals("abc", mpc.getProperty("abc", PropertyScope.OUTBOUND));
 
         //Look in specific scope
         assertEquals("BAR", mpc.getProperty("foO", PropertyScope.OUTBOUND)); //default scope

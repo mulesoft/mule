@@ -19,7 +19,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.tcp.TcpConnector;
@@ -177,9 +176,6 @@ public class HttpConnector extends TcpConnector
         }
     }
 
-    /**
-     * @see Connector#registerListener(Service, InboundEndpoint)
-     */
     @Override
     public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception
     {
