@@ -32,7 +32,7 @@
 
                     <!-- A better approach here would be to add a property to the router called "correlationId", that is used to set the
                      correlationId on outgoing messages -->
-                    <expression-message-info-mapping  messageIdExpression="#[header:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
+                    <expression-message-info-mapping  messageIdExpression="#[header:INBOUND:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
                 </pass-through-router>
             </outbound>
             <async-reply>
@@ -42,7 +42,7 @@
                     <!-- Now when we receive the messages back we need need to know what to correlate with. Maybe we should add
                     a "correlatesUsing" property that will be used to extract the create ID from the currnet message -->
                     
-                    <expression-message-info-mapping messageIdExpression="#[header:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
+                    <expression-message-info-mapping messageIdExpression="#[header:INBOUND:customCorrelation]" correlationIdExpression="#[mule:message.correlationId]"/>
                 </single-async-reply-router>
             </async-reply>
         </service>
