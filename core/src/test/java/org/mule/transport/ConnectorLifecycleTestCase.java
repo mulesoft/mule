@@ -353,7 +353,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     public void testDispatchersLifecycle() throws Exception
     {
         //using sync endpoint so that any calls to 'process()' will be blocking and avoid timing issues
-        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out?synchronous=true", null, null, null, connector);
+        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out?exchange-pattern=request-response", null, null, null, connector);
 
         // attempts to send/dispatch/request are made on a stopped/stopping connector
         // This should fail because the connector is not started!
@@ -376,7 +376,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         //This causes the first instance out dispatcher to be created
         assertDispatcherStartedConnected(out, true, true);
 
-        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2?synchronous=true", null, null, null, connector);
+        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2?exchange-pattern=request-response", null, null, null, connector);
         //This causes the first instance out2 dispatcher to be created
         out2.process(getTestEvent("data", out2));
 
