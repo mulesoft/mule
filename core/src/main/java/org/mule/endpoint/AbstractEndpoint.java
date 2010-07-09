@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -24,7 +23,6 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
@@ -196,12 +194,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 logger.debug("Endpoint has a transaction configuration. Defaulting to synchronous. Endpoint is: " + toString());
             }
             this.synchronous = true;
-            
-            if (messageExchangePattern.hasResponse() == false)
-            {
-                throw new InvalidEndpointTypeException(
-                    CoreMessages.endpointMepDoesNotSupportTransactions(endpointUri, messageExchangePattern));
-            }
         }
         else
         {
