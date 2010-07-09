@@ -19,7 +19,7 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MethodEntrypointsTestCase extends FunctionalTestCase
+public class MethodEntryPointsTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
