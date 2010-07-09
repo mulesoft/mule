@@ -54,19 +54,20 @@
 
     <no-action-transformer name="Default"/>
 
-    <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
+    <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
          <message-property-filter pattern="foo=bar"/>
     </endpoint>
-    <endpoint name="waterMelonEndpoint" address="test://test.queue" encoding="UTF-8-TEST"/>
-    <endpoint name="appleInEndpoint" address="test://AppleQueue"/>
-    <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
-    <endpoint name="orangeEndpoint" address="test://orangeQ">
+    <endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way" 
+        encoding="UTF-8-TEST"/>
+    <endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
+    <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue" exchange-pattern="one-way"/>
+    <endpoint name="orangeEndpoint" address="test://orangeQ" exchange-pattern="one-way">
         <property key="beanProperty2" value="12"/>
         <property key="containerProperty" value="myString"/>
     </endpoint>
-    <endpoint name="testEPWithCS" address="test://test.queue2"/>
+    <endpoint name="testEPWithCS" address="test://test.queue2" exchange-pattern="one-way"/>
     
-    <endpoint name="endpointWithProps" address="test://endpointWithProps">
+    <endpoint name="endpointWithProps" address="test://endpointWithProps" exchange-pattern="one-way">
         <properties>
             <spring:entry key="brand" value="Juicy Baby!"/>
             <spring:entry key="segments" value="9"/>
@@ -136,7 +137,7 @@
     
     <model name="main">
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <outbound-endpoint address=" test://component.exceptions "/>
+            <outbound-endpoint address=" test://component.exceptions " exchange-pattern="one-way"/>
             <spring:property name="testProperty" value="testValue" />
         </custom-exception-strategy>
 
@@ -146,14 +147,16 @@
 
         <service name="orangeComponent">
             <inbound>
-                <inbound-endpoint name="Orange" address="test://orange/" transformer-refs="TestCompressionTransformer"
-                                  responseTransformer-refs="TestCompressionTransformer"/>
-                <inbound-endpoint ref="orangeEndpoint" transformer-refs="TestCompressionTransformer">
+                <inbound-endpoint name="Orange" address="test://orange/" exchange-pattern="one-way"
+                    transformer-refs="TestCompressionTransformer" 
+                    responseTransformer-refs="TestCompressionTransformer"/>
+                <inbound-endpoint ref="orangeEndpoint" exchange-pattern="one-way"
+                    transformer-refs="TestCompressionTransformer">
                     <payload-type-filter expectedType="java.lang.String"/>
                     <property key="testLocal" value="value1"/>
                 </inbound-endpoint>
                 <forwarding-catch-all-strategy>
-                    <outbound-endpoint address="test://catch.all"/>
+                    <outbound-endpoint address="test://catch.all" exchange-pattern="one-way"/>
                 </forwarding-catch-all-strategy>
             </inbound>
 
@@ -163,21 +166,22 @@
                 <timer-interceptor/>
                 <spring-object bean="orange"/>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                    <outbound-endpoint address="test://do.wash"/>
+                    <outbound-endpoint address="test://do.wash" exchange-pattern="one-way"/>
                 </binding>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                    <outbound-endpoint address="test://do.polish"/>
+                    <outbound-endpoint address="test://do.polish" exchange-pattern="one-way"/>
                 </binding>
             </component>            
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="appleInEndpoint" transformer-refs="TestCompressionTransformer"/>
+                    <outbound-endpoint ref="appleInEndpoint" exchange-pattern="one-way"
+                        transformer-refs="TestCompressionTransformer"/>
                 </pass-through-router>
             </outbound>
 
             <async-reply timeout="10001">
-                <inbound-endpoint address="test://response1"/>
+                <inbound-endpoint address="test://response1" exchange-pattern="one-way"/>
                 <inbound-endpoint ref="appleResponseEndpoint"/>
                 <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator">
                     <spring:property name="testProperty" value="testValue" />
@@ -185,7 +189,7 @@
             </async-reply>
 
             <default-service-exception-strategy>
-                <outbound-endpoint address="test://orange.exceptions"/>
+                <outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
             </default-service-exception-strategy>
             
         </service>
@@ -215,7 +219,8 @@
 
             <outbound>
                 <filtering-router transformer-refs="TestCompressionTransformer">
-                    <outbound-endpoint address="test://appleQ2" name="TestApple-Out"/>
+                    <outbound-endpoint name="TestApple-Out" address="test://appleQ2" 
+                        exchange-pattern="one-way"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
 
@@ -235,7 +240,7 @@
         
         <service name="anotherComponent">
             <inbound>
-                <inbound-endpoint address="test://KiwiIn" />
+                <inbound-endpoint address="test://KiwiIn" exchange-pattern="one-way"/>
                 <custom-correlation-aggregator-router class="org.mule.tck.testmodels.mule.TestCorrelationAggregator">
                     <spring:property name="testProperty" value="testValue" />
                 </custom-correlation-aggregator-router>

@@ -14,8 +14,10 @@
     <model name="main" inherit="true">        
         <service name="appleComponent2">
             <inbound>
-                <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                <inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2">
+                <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"
+                    exchange-pattern="one-way"/>
+                <inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2"
+                    exchange-pattern="request-response">
                     <custom-transaction action="ALWAYS_BEGIN" factory-class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
                     <property key="testEndpointProperty" value="Prop1"/>
                 </inbound-endpoint>
@@ -26,7 +28,8 @@
             </pooled-component>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
+                    <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"
+                        exchange-pattern="one-way"/>
                 </filtering-router>
             </outbound>
             <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>

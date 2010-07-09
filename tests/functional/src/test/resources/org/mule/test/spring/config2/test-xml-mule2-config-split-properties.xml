@@ -14,7 +14,9 @@
 
             <mule:service name="testPropertiesComponent">
                 <mule:inbound>
-                    <mule:inbound-endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
+                    <mule:inbound-endpoint 
+                        address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
+                        exchange-pattern="one-way"/>
                 </mule:inbound>
                 <mule:component>
                     <mule:spring-object bean="prop-test-ref"/>

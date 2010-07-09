@@ -9,7 +9,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <mule:mule>
-
         <mule:global-property name="doCompression" value="true"/>
         <mule:global-property name="beanProperty1" value="this was set from the manager properties!"/>
         <mule:global-property name="OS_Version" value="${os.version}"/>
@@ -37,9 +36,9 @@
             <!-- no way to specify connection strategy on a connector? -->
         </mule:custom-connector>
 
-        <mule:endpoint name="AppleQueue" address="test://apple.queue"/>
-        <mule:endpoint name="Banana_Queue" address="test://banana.queue"/>
-        <mule:endpoint name="TestQueue" address="test://test.queue"/>
+        <mule:endpoint name="AppleQueue" address="test://apple.queue" exchange-pattern="one-way"/>
+        <mule:endpoint name="Banana_Queue" address="test://banana.queue" exchange-pattern="one-way"/>
+        <mule:endpoint name="TestQueue" address="test://test.queue" exchange-pattern="one-way"/>
 
         <mule:custom-transformer name="TestCompressionTransformer"
                                  class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
@@ -50,22 +49,24 @@
         </mule:custom-transformer>
         <mule:no-action-transformer name="TestTransformer" returnClass="[B"/>
 
-        <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
+        <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
             <mule:message-property-filter pattern="foo=bar"/>
         </mule:endpoint>
         <!-- cannot have aliases -->
         <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
-        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue" encoding="UTF-8-TEST"/>
-        <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>
-        <mule:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
-        <mule:endpoint name="orangeEndpoint" address="test://orangeQ">
+        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way"
+            encoding="UTF-8-TEST"/>
+        <mule:endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
+        <mule:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue" 
+            exchange-pattern="one-way"/>
+        <mule:endpoint name="orangeEndpoint" address="test://orangeQ" exchange-pattern="one-way">
             <mule:properties>
                 <entry key="testGlobal" value="value1"/>
             </mule:properties>
         </mule:endpoint>
-        <mule:endpoint name="testEPWithCS" address="test://test.queue2"/>
+        <mule:endpoint name="testEPWithCS" address="test://test.queue2" exchange-pattern="one-way"/>
 
-    <mule:endpoint name="endpointWithProps" address="test://endpointWithProps">
+    <mule:endpoint name="endpointWithProps" address="test://endpointWithProps" exchange-pattern="one-way">
         <mule:properties>
             <entry key="brand" value="Juicy Baby!"/>
             <entry key="segments" value="9"/>
@@ -132,8 +133,7 @@
         <mule:model name="main">
 
             <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-                <mule:outbound-endpoint
-                        address="test://component.exceptions"/>
+                <mule:outbound-endpoint address="test://component.exceptions" exchange-pattern="one-way"/>
             </mule:custom-exception-strategy>
 
             <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/ -->
@@ -142,7 +142,9 @@
                 
                 <mule:inbound>
                     <mule:inbound-endpoint name="Orange"
-                                           address="test://orange/" transformer-refs="TestCompressionTransformer"
+                                           address="test://orange/" 
+                                           exchange-pattern="one-way"
+                                           transformer-refs="TestCompressionTransformer"
                                            responseTransformer-refs="TestCompressionTransformer"/>
                     <mule:inbound-endpoint ref="orangeEndpoint"
                                            transformer-refs="TestCompressionTransformer">
@@ -152,7 +154,7 @@
                         </mule:properties>
                     </mule:inbound-endpoint>
                     <mule:forwarding-catch-all-strategy>
-                        <mule:outbound-endpoint address="test://catch.all"/>
+                        <mule:outbound-endpoint address="test://catch.all" exchange-pattern="one-way"/>
                     </mule:forwarding-catch-all-strategy>
                 </mule:inbound>
 
@@ -162,10 +164,10 @@
                     <mule:timer-interceptor />
                     <mule:spring-object bean="orange"/>
                     <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                        <mule:outbound-endpoint address="test://do.wash"/>
+                        <mule:outbound-endpoint address="test://do.wash" exchange-pattern="one-way"/>
                     </mule:binding>
                     <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                        <mule:outbound-endpoint address="test://do.polish"/>
+                        <mule:outbound-endpoint address="test://do.polish" exchange-pattern="one-way"/>
                     </mule:binding>
                 </mule:component>
                 
@@ -177,13 +179,13 @@
                 </mule:outbound>
 
                 <mule:async-reply timeout="10001">
-                    <mule:inbound-endpoint address="test://response1"/>
+                    <mule:inbound-endpoint address="test://response1" exchange-pattern="one-way"/>
                     <mule:inbound-endpoint ref="appleResponseEndpoint"/>
                     <mule:custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
                 </mule:async-reply>
 
                 <mule:default-connector-exception-strategy>
-                    <mule:outbound-endpoint address="test://orange.exceptions"/>
+                    <mule:outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
                 </mule:default-connector-exception-strategy>
             </mule:service>
 
@@ -210,7 +212,7 @@
 
                 <mule:outbound>
                     <mule:filtering-router>
-                        <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2"/>
+                        <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2" exchange-pattern="one-way"/>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                         <mule:transformer ref="TestCompressionTransformer"/>
                     </mule:filtering-router>
@@ -234,7 +236,8 @@
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:outbound>
                     <mule:filtering-router>
-                        <mule:outbound-endpoint address="test://msgInfoMappingTestComponent" name="msgInfoMappingTestComponent-Out"/>
+                        <mule:outbound-endpoint address="test://msgInfoMappingTestComponent" 
+                            exchange-pattern="one-way" name="msgInfoMappingTestComponent-Out"/>
                         <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
                                                               correlationIdExpression="#[header:correlation]"/>
                     </mule:filtering-router>
@@ -245,7 +248,7 @@
                 <mule:inbound/>
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:async-reply>
-                     <mule:inbound-endpoint address="test://async-reply"/>
+                     <mule:inbound-endpoint address="test://async-reply" exchange-pattern="one-way"/>
                     <mule:single-async-reply-router>
                         <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
                                                               correlationIdExpression="#[header:correlation]"/>
