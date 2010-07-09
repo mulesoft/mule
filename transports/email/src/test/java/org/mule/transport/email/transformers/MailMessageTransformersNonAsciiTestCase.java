@@ -16,16 +16,16 @@ import java.util.Locale;
 
 public class MailMessageTransformersNonAsciiTestCase extends MailMessageTransformersTestCase
 {
-	@Override
+    @Override
     protected String getContentType() 
-	{
-    	return "text/plain; charset=iso-2022-jp";
+    {
+        return "text/plain; charset=iso-2022-jp";
     }
     
-	@Override
+    @Override
     public Object getResultData()
     {
-    	return LocaleMessageHandler.getString("test-data", Locale.JAPAN, 
-    	    "MailMessageTransformersNonAsciiTestCase.getResultData", new Object[] {});
+        return LocaleMessageHandler.getString("test-data", Locale.JAPAN,
+            "MailMessageTransformersNonAsciiTestCase.getResultData", new Object[] {});
     }
 }

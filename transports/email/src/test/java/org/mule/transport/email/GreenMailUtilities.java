@@ -55,7 +55,7 @@ public class GreenMailUtilities
         } 
         else 
         {
-        	message.setContent(text, "text/plain");
+            message.setContent(text, "text/plain");
         }
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         return message;

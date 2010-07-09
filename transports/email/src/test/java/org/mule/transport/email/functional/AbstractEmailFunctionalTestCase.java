@@ -122,13 +122,13 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         }
 
         MuleClient client = new MuleClient(muleContext);
-    	Map<String, Object> props = null;
+        Map<String, Object> props = null;
         if (charset != null)
         {
-        	props = new HashMap<String, Object>();
-        	props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
+            props = new HashMap<String, Object>();
+            props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
         } 
-        client.send("vm://send", msg, props);        	
+        client.send("vm://send", msg, props);
 
         server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
 
@@ -199,6 +199,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     }
 
     private static String getMessage(Locale locale) {
-    	return LocaleMessageHandler.getString("test-data", locale, "AbstractEmailFunctionalTestCase.getMessage", new Object[] {});    	
+        return LocaleMessageHandler.getString("test-data", locale, "AbstractEmailFunctionalTestCase.getMessage", new Object[] {});
     }
 }

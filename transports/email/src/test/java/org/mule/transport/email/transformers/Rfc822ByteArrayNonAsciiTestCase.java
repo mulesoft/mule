@@ -20,7 +20,7 @@ import javax.mail.internet.MimeMessage;
 
 public class Rfc822ByteArrayNonAsciiTestCase extends Rfc822ByteArrayTestCase 
 {
-	@Override
+    @Override
     protected MimeMessage newMimeMessage() throws MessagingException
     {
         MimeMessage message = new MimeMessage(newSession());

@@ -78,7 +78,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     
     protected String getContentType() 
     {
-    	return "text/plain";
+        return "text/plain";
     }
     
     @Override
