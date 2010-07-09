@@ -104,7 +104,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     public void poll() throws Exception
     {
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(),
+        TransactionTemplate<Object> tt = new TransactionTemplate<Object>(endpoint.getTransactionConfig(),
                 connector.getExceptionListener(), connector.getMuleContext());
 
         if (this.isReceiveMessagesInTransaction())
@@ -112,14 +112,15 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
             // may have been started
-            TransactionCallback<Void> cb = new TransactionCallback<Void>()
+            TransactionCallback<Object> cb = new TransactionCallback<Object>()
             {
-                public Void doInTransaction() throws Exception
+                public Object doInTransaction() throws Exception
                 {
-                    List<MuleMessage> messages = getMessages();
+                    // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
+                    List messages = getMessages();
                     if (messages != null && messages.size() > 0)
                     {
-                        for (MuleMessage message : messages)
+                        for (Object message : messages)
                         {
                             TransactedPollingMessageReceiver.this.processMessage(message);
                         }
@@ -132,16 +133,16 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         else
         {
             // Receive messages and launch a worker for each message
-            List<MuleMessage> messages = getMessages();
+            List messages = getMessages();
             if (messages != null && messages.size() > 0)
             {
                 final CountDownLatch countdown = new CountDownLatch(messages.size());
-                for (MuleMessage message : messages)
+                for (Object message : messages)
                 {
                     try
                     {
                         this.getWorkManager().scheduleWork(
-                                new MessageProcessorWorker<Void, MuleMessage>(tt, countdown, message));
+                                new MessageProcessorWorker(tt, countdown, message));
                     }
                     catch (Exception e)
                     {
@@ -154,18 +155,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
     }
 
-    /**
-     *
-     * @param <T> transaction callback return type
-     * @param <M> message type
-     */
-    protected class MessageProcessorWorker<T, M> implements Work, TransactionCallback<T>
+    protected class MessageProcessorWorker implements Work, TransactionCallback
     {
-        private final TransactionTemplate<T> tt;
-        private final M message;
+        private final TransactionTemplate tt;
+        private final Object message;
         private final CountDownLatch latch;
 
-        public MessageProcessorWorker(TransactionTemplate<T> tt, CountDownLatch latch, M message)
+        public MessageProcessorWorker(TransactionTemplate tt, CountDownLatch latch, Object message)
         {
             this.tt = tt;
             this.message = message;
@@ -193,7 +189,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
         }
 
-        public T doInTransaction() throws Exception
+        public Object doInTransaction() throws Exception
         {
             TransactedPollingMessageReceiver.this.processMessage(message);
             return null;
@@ -203,6 +199,6 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     protected abstract List<MuleMessage> getMessages() throws Exception;
 
-    protected abstract <M> void processMessage(M message) throws Exception;
+    protected abstract void processMessage(Object message) throws Exception;
 
 }
