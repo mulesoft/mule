@@ -42,7 +42,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     private List deleteProperties = null;
     private Map addProperties = null;
     /** the properties map containing rename mappings for message properties */
-    private Map renameProperties;
+    private Map<String, String> renameProperties;
     private String getProperty;
     private boolean overwrite = true;
     private PropertyScope scope;
@@ -72,7 +72,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
 
         if (renameProperties != null)
         {
-            clone.setRenameProperties(new HashMap(renameProperties));
+            clone.setRenameProperties(new HashMap<String, String>(renameProperties));
         }
         return clone;
     }
@@ -110,7 +110,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                     Object value = entry.getValue();
 
                     //Enable expression support for property values
-                    if(muleContext.getExpressionManager().isValidExpression(value.toString()))
+                    if (muleContext.getExpressionManager().isValidExpression(value.toString()))
                     {
                         value = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
@@ -140,18 +140,16 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         /* perform renaming transformation */
         if (this.renameProperties != null && this.renameProperties.size() > 0)
         {
-            for (Iterator iterator = this.renameProperties.entrySet().iterator(); iterator.hasNext();)
+            for (Map.Entry<String, String> entry : this.renameProperties.entrySet())
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
-
                 if (entry.getKey() == null)
                 {
                     logger.error("Setting Null property keys is not supported, this entry is being ignored");
                 }
                 else
                 {
-                    final String key = entry.getKey().toString();
-                    String value = (String)entry.getValue();
+                    final String key = entry.getKey();
+                    String value = entry.getValue();
 
                     if (value == null)
                     {
@@ -162,8 +160,11 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                         //Enable expression support for property values
                         if(muleContext.getExpressionManager().isValidExpression(value))
                         {
-                            Object temp = muleContext.getExpressionManager().evaluate(value.toString(), message);
-                            if(temp!=null) value = temp.toString();
+                            Object temp = muleContext.getExpressionManager().evaluate(value, message);
+                            if (temp!=null)
+                            {
+                                value = temp.toString();
+                            }
                         }
 
                         /* log transformation */
@@ -231,7 +232,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     /**
      * @param renameProperties the renameProperties to set
      */
-    public void setRenameProperties(Map renameProperties)
+    public void setRenameProperties(Map<String, String> renameProperties)
     {
         this.renameProperties = renameProperties;
     }
