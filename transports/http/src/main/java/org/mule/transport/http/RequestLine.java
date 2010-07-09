@@ -36,7 +36,7 @@ public class RequestLine
         String protocol;
         try
         {
-            if(l==null)
+            if (l==null)
             {
                 throw new ProtocolException(HttpMessages.requestLineIsMalformed(l).getMessage());
             }
