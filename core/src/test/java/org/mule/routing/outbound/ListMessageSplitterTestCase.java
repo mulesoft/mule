@@ -46,7 +46,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         router.addEndpoint(endpoint);
         router.setMuleContext(muleContext);
 
-        List payload = new ArrayList();
+        List<String> payload = new ArrayList<String>();
         payload.add("one");
         payload.add("two");
         payload.add("three");
@@ -97,11 +97,11 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         syncSplitter.addEndpoint((OutboundEndpoint) mockendpoint4.proxy());
         syncSplitter.addEndpoint((OutboundEndpoint) mockendpoint5.proxy());
         syncSplitter.addEndpoint((OutboundEndpoint) mockendpoint6.proxy());
-        List payload = new ArrayList();
+        List<Object> payload = new ArrayList<Object>();
         payload.add(new Apple());
         payload.add(new Apple());
         payload.add(new Orange());
-        payload.add(new String());
+        payload.add("");
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
         assertTrue(asyncSplitter.isMatch(message));
