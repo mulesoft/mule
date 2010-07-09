@@ -89,7 +89,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
-    public void testInboundScopeIsImmutable() throws Exception
+    /*public void testInboundScopeIsImmutable() throws Exception
     {        
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         try
@@ -101,7 +101,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         {
             // this exception was expectd
         }
-    }
+    }*/
         
     protected void doTest(MessagePropertiesContext mpc)
     {
