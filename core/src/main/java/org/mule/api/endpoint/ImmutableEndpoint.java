@@ -182,8 +182,9 @@ public interface ImmutableEndpoint extends Serializable
     MessageExchangePattern getMessageExchangePattern();
     
     /**
-     * The timeout value for waiting for a response from a remote invocation or back channel.  Mule will only wait
-     * for a response is the {@link #isSynchronous()} flag is set to true.
+     * The timeout value for waiting for a response from a remote invocation or back channel. Mule 
+     * will only wait for a response if the endpoint's message exchange pattern requires a 
+     * response.
      *
      * @return the timeout in milliseconds
      */
