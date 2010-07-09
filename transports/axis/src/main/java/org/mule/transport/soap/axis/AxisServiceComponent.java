@@ -743,7 +743,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         msgContext.setProperty(HTTPConstants.MC_HTTP_SERVLETPATHINFO, serviceName);
         msgContext.setProperty("serviceName", serviceName);
 
-        msgContext.setProperty("Authorization", msg.getStringProperty("Authorization", null));
+        msgContext.setProperty("Authorization", msg.getStringProperty("Authorization", PropertyScope.INBOUND, null));
         msgContext.setProperty("remoteaddr", endpointUri.getHost());
         ServletEndpointContextImpl sec = new ServletEndpointContextImpl();
         msgContext.setProperty("servletEndpointContext", sec);
@@ -751,7 +751,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private String getSoapAction(MuleEventContext context) throws AxisFault
     {
-        String soapAction = context.getMessage().getStringProperty(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, null);
+        String soapAction = context.getMessage().getStringProperty(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, PropertyScope.INBOUND, null);
         if (logger.isDebugEnabled())
         {
             logger.debug("Header Soap Action:" + soapAction);

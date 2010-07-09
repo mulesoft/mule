@@ -138,7 +138,7 @@ public class UniversalSender extends BasicHandler
             }
             
             Map props = new HashMap();
-            Object payload = null;
+            Object payload;
             int contentLength = 0;
             String contentType = null;
             if (msgContext.getRequestMessage().countAttachments() > 0)

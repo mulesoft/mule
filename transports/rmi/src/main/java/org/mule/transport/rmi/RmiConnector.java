@@ -22,6 +22,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractJndiConnector;
 import org.mule.transport.rmi.i18n.RmiMessages;
@@ -210,7 +211,7 @@ public class RmiConnector extends AbstractJndiConnector
 
         if (null == methodName)
         {
-            methodName = (String)event.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            methodName = (String)event.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY, PropertyScope.INVOCATION);
 
             if (null == methodName)
             {
@@ -220,7 +221,7 @@ public class RmiConnector extends AbstractJndiConnector
             }
         }
 
-        Class[] argTypes = getArgTypes(event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), event);
+        Class[] argTypes = getArgTypes(event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, PropertyScope.INVOCATION), event);
 
         try
         {

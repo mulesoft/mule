@@ -172,7 +172,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             {
                 String name = (String) i.next();
                 Object m = methods.get(name);
-                SoapMethod method = null;
+                SoapMethod method;
                 if (m instanceof List)
                 {
                     method = new SoapMethod(name, (List) m);
