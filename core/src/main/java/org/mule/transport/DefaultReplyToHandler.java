@@ -22,6 +22,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.service.AbstractService;
@@ -74,9 +75,20 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property
         // anyway as it should never be true from a replyTo dispatch
         returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-        
+
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession());
+
+        // carry over properties
+        List<String> responseProperties = endpoint.getResponseProperties();
+        for (String propertyName : responseProperties)
+        {
+            Object propertyValue = event.getMessage().getProperty(propertyName, PropertyScope.INBOUND);
+            if (propertyValue != null)
+            {
+                replyToEvent.getMessage().setProperty(propertyName, propertyValue, PropertyScope.OUTBOUND);
+            }
+        }
 
         // dispatch the event
         try

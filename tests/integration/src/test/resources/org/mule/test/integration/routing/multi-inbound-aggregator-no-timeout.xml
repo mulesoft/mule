@@ -34,7 +34,7 @@
             <inbound>
                 <inbound-endpoint address="vm://quoteprovider1.queue" exchange-pattern="one-way"/>
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
 
         <!-- This is a quotation system -->
@@ -42,7 +42,7 @@
             <inbound>
                 <inbound-endpoint address="vm://quoteprovider2.queue" exchange-pattern="one-way"/>
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" logMessageDetails="true"/>
 
         </service>
 
@@ -50,11 +50,11 @@
             <inbound>
                 <inbound-endpoint address="vm://quoteprovider3.queue" exchange-pattern="one-way"/>
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
 
 
-        <service name="ResultsServcie">
+        <service name="ResultsService">
             <inbound>
                 <inbound-endpoint address="vm://Aggregator.queue" exchange-pattern="one-way"/>
                 <collection-aggregator-router/>

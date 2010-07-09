@@ -61,7 +61,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
             ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
                 (InboundEndpoint) event.getEndpoint());
             // Do not propagate REPLY_TO beyond the inbound endpoint
-            event.getMessage().setReplyTo(null);
+            //event.getMessage().setReplyTo(null);
 
             resultEvent = service.getComponent().process(event);
             resultEvent = processNext(resultEvent);

@@ -664,12 +664,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getCorrelationId()
     {
         assertAccess(READ);
-        // TODO sounds like an invocation scope would hit a middle sweet-spot here, but not sure, fallback to outbound,
-        // which might have been set by the router
-        String correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.INBOUND, null);
+        String correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND, null);
         if (correlationId == null)
         {
-            correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND, null);
+            correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.INBOUND, null);
         }
 
         return correlationId;
@@ -713,7 +711,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationSequence()
     {
         assertAccess(READ);
-        return getIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, -1);
+        Integer seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null);
+        if (seq == null)
+        {
+            seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, -1);
+        }
+
+        return seq;
+
     }
 
     /**
@@ -731,7 +736,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationGroupSize()
     {
         assertAccess(READ);
-        return getIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, -1);
+        Integer groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null);
+        if (groupSize == null)
+        {
+            groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, -1);
+        }
+
+        return groupSize;
     }
 
     //** {@inheritDoc} */

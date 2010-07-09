@@ -25,6 +25,7 @@ import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.MuleMessageInfoMapping;
@@ -35,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -160,7 +160,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             // if replyTo is set we'll probably want the correlationId set as
             // well
             message.setReplyTo(replyTo);
-            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+            message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName(), PropertyScope.OUTBOUND);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "

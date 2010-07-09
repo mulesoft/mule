@@ -47,7 +47,7 @@ public class InboundAggregationNoTimeoutTestCase extends FunctionalTestCase
     {
         public Object process(List responseMessages)
         {
-            assertTrue(responseMessages.size() == 3);
+            assertEquals(3, responseMessages.size());
             return responseMessages;
         }
     }
