@@ -57,7 +57,11 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
         Object[] payload = getPayloadFromMessage(context);
 
-        Object methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INBOUND);
+        Object methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INVOCATION);
+        if (methodProp == null)
+        {
+            methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INBOUND);
+        }
         if (methodProp == null)
         {
             InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
