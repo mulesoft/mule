@@ -133,47 +133,42 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
 
     public final MuleMessage routeMessage(MuleMessage message) throws MuleException
     {
-        return routeMessage(message, (endpoint.isSynchronous() || TransactionCoordination.getInstance()
-            .getTransaction() != null));
-    }
-
-    public final MuleMessage routeMessage(MuleMessage message, boolean synchronous) throws MuleException
-    {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        return routeMessage(message, tx, tx != null || synchronous, null);
+        return routeMessage(message, tx, null);
     }
 
-    public final MuleMessage routeMessage(MuleMessage message, Transaction trans, boolean synchronous)
+    public final MuleMessage routeMessage(MuleMessage message, Transaction trans)
         throws MuleException
     {
-        return routeMessage(message, trans, synchronous, null);
+        return routeMessage(message, trans, null);
     }
 
     public final MuleMessage routeMessage(MuleMessage message,
                                           Transaction trans,
-                                          boolean synchronous,
                                           OutputStream outputStream) throws MuleException
     {
-        return routeMessage(message, new DefaultMuleSession(connector.getMuleContext()), trans, synchronous,
+        return routeMessage(message, new DefaultMuleSession(connector.getMuleContext()), trans,
             outputStream);
     }
 
     public final MuleMessage routeMessage(MuleMessage message,
                                           MuleSession session,
                                           Transaction trans,
-                                          boolean synchronous,
                                           OutputStream outputStream) throws MuleException
     {
 
-        // Enforce a sync endpoint if remote sync is set
         // TODO MULE-4622
         final Object o = message.getProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
-        if (ObjectUtils.getBoolean(o, false))
+        if (ObjectUtils.getBoolean(o, false) && !endpoint.isSynchronous())
         {
-            synchronous = true;
+            logger.warn("MuleClient.send() was used but inbound endpoint "
+                        + endpoint.getEndpointURI().getUri().toString()
+                        + " is not 'request-response'.  No response will be returned.");
         }
+        
+        message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
 
-        MuleEvent muleEvent = createMuleEvent(message, synchronous, outputStream);
+        MuleEvent muleEvent = createMuleEvent(message, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 
         MuleEvent resultEvent = null;
@@ -201,7 +196,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         return message;
     }
 
-    protected MuleEvent createMuleEvent(MuleMessage message, boolean synchronous, OutputStream outputStream)
+    protected MuleEvent createMuleEvent(MuleMessage message, OutputStream outputStream)
         throws MuleException
     {
         ResponseOutputStream ros = null;
@@ -234,7 +229,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
         }
-        return new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
+        return new DefaultMuleEvent(message, endpoint, session, ros);
     }
 
     public EndpointURI getEndpointURI()

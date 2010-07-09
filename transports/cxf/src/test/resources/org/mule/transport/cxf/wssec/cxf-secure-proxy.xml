@@ -80,7 +80,7 @@
 
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/echo" exchange-pattern="one-way"/>
+                <inbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

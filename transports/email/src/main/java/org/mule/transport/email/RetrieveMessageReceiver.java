@@ -146,7 +146,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         {
                             messages[i].setFlag(Flags.Flag.SEEN, true);
                         }
-                        routeMessage(message, endpoint.isSynchronous());
+                        routeMessage(message);
                     }
                 }
                 catch (MuleException e)

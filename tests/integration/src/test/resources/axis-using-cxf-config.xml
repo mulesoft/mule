@@ -23,7 +23,7 @@
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
         <service name="test">
             <inbound>
-                <inbound-endpoint address="vm://localhost.test" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://localhost.test" exchange-pattern="request-response"/>
                 <forwarding-router/>
             </inbound>
             <outbound>

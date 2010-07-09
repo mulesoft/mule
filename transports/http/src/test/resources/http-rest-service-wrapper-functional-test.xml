@@ -25,7 +25,7 @@
 
         <service name="HTTPPostSample">
             <inbound>
-                <inbound-endpoint ref="restServiceEndpoint"/>
+                <inbound-endpoint ref="restServiceEndpoint" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:error-filter>
@@ -37,7 +37,7 @@
 
         <service name="HTTPPostSample2">
             <inbound>
-                <inbound-endpoint ref="restServiceEndpoint2"/>
+                <inbound-endpoint ref="restServiceEndpoint2" exchange-pattern="request-response"/>
             </inbound>
             <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:error-filter>
@@ -49,7 +49,7 @@
 
         <service name="HTTPPostSample3">
             <inbound>
-                <inbound-endpoint ref="restServiceEndpoint3" />
+                <inbound-endpoint ref="restServiceEndpoint3" exchange-pattern="request-response"/>
             </inbound>
             <!-- Test using expressions and literal values -->
             <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">

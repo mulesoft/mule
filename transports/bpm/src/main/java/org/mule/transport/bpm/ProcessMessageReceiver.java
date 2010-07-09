@@ -119,7 +119,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         else
         {
             message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
-            response = routeMessage(message, synchronous);
+            response = routeMessage(message);
         }
         
         // TODO MULE-4864 Exceptions are not always caught here

@@ -15,7 +15,7 @@
     <model name="main">
         <service name="StopFlowService">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="one-way"
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"
                     transformer-refs="stopFlowTransformer"/>
             </inbound>
             <outbound>
@@ -27,7 +27,7 @@
 
         <service name="ShouldNotBeReachable">
             <inbound>
-                <vm:inbound-endpoint path="next" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="next" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>ERROR</test:return-data>

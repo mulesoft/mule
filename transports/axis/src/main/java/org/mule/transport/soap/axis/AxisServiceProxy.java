@@ -81,7 +81,7 @@ public class AxisServiceProxy
             // and also filter out any http related header
             messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
                                    
-            MuleMessage message = receiver.routeMessage(messageToRoute, synchronous);
+            MuleMessage message = receiver.routeMessage(messageToRoute);
             
             if (message != null)
             {

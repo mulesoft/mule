@@ -141,7 +141,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
                 }
 
                 MuleMessage message = createMuleMessage(packet, endpoint.getEncoding());
-                MuleMessage returnMessage = routeMessage(message, endpoint.isSynchronous());
+                MuleMessage returnMessage = routeMessage(message);
 
                 if (returnMessage != null && packet instanceof Message)
                 {

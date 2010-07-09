@@ -14,7 +14,7 @@
         <array-entry-point-resolver/>
         <service name="Array">
             <inbound>
-                <vm:inbound-endpoint path="array" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="array" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -26,7 +26,7 @@
         <callable-entry-point-resolver/>
         <service name="Array2">
             <inbound>
-                <vm:inbound-endpoint path="array2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="array2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <array-entry-point-resolver/>
@@ -39,7 +39,7 @@
         <callable-entry-point-resolver/>
         <service name="Callable">
             <inbound>
-                <vm:inbound-endpoint path="callable" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="callable" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -54,7 +54,7 @@
         </method-entry-point-resolver>
         <service name="Callable2">
             <inbound>
-                <vm:inbound-endpoint path="callable2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="callable2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <callable-entry-point-resolver/>
@@ -67,7 +67,7 @@
         <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
         <service name="Custom">
             <inbound>
-                <vm:inbound-endpoint path="custom" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="custom" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -82,7 +82,7 @@
         </method-entry-point-resolver>
         <service name="Custom2">
             <inbound>
-                <vm:inbound-endpoint path="custom2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="custom2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
@@ -98,7 +98,7 @@
         </method-entry-point-resolver>
         <service name="Method">
             <inbound>
-                <vm:inbound-endpoint path="method" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="method" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -110,7 +110,7 @@
         <no-arguments-entry-point-resolver/>
         <service name="Method2">
             <inbound>
-                <vm:inbound-endpoint path="method2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="method2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <method-entry-point-resolver>
@@ -126,7 +126,7 @@
         <no-arguments-entry-point-resolver/>
         <service name="NoArgs">
             <inbound>
-                <vm:inbound-endpoint path="no-arguments" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="no-arguments" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -138,7 +138,7 @@
         <property-entry-point-resolver property="propertyName"/>
         <service name="NoArgs2">
             <inbound>
-                <vm:inbound-endpoint path="no-arguments2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="no-arguments2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver/>
@@ -151,7 +151,7 @@
         <property-entry-point-resolver property="propertyName"/>
         <service name="Property">
             <inbound>
-                <vm:inbound-endpoint path="property" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="property" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -166,7 +166,7 @@
         </method-entry-point-resolver>
         <service name="Property2">
             <inbound>
-                <vm:inbound-endpoint path="property2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="property2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <property-entry-point-resolver property="propertyName"/>
@@ -179,7 +179,7 @@
         <reflection-entry-point-resolver/>
         <service name="Reflection">
             <inbound>
-                <vm:inbound-endpoint path="reflection" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="reflection" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -191,7 +191,7 @@
         <legacy-entry-point-resolver-set/>
         <service name="Reflection2">
             <inbound>
-                <vm:inbound-endpoint path="reflection2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="reflection2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <reflection-entry-point-resolver/>
@@ -204,7 +204,7 @@
         <legacy-entry-point-resolver-set/>
         <service name="Legacy">
             <inbound>
-                <vm:inbound-endpoint path="legacy" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="legacy" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>
@@ -216,7 +216,7 @@
         <no-arguments-entry-point-resolver/>        
         <service name="Legacy2">
             <inbound>
-                <vm:inbound-endpoint path="legacy2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="legacy2" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <legacy-entry-point-resolver-set/>

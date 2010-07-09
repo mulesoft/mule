@@ -125,11 +125,11 @@ public abstract class AbstractReceiverWorker implements Work
                         MuleMessage result;
                         if (session != null)
                         {
-                            result = receiver.routeMessage(muleMessage, session, tx,  tx != null || endpoint.isSynchronous(), out);
+                            result = receiver.routeMessage(muleMessage, session, tx, out);
                         }
                         else
                         {
-                            result = receiver.routeMessage(muleMessage, tx,  tx != null || endpoint.isSynchronous(), out);
+                            result = receiver.routeMessage(muleMessage, tx, out);
                         }
                         if (result != null)
                         {

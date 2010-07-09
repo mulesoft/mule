@@ -269,7 +269,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // If we are streaming no need to move/delete now, that will be done when
             // stream is closed
             message.setProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-            this.routeMessage(message, endpoint.isSynchronous());
+            this.routeMessage(message);
         }
     }
 
@@ -305,7 +305,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             // finally deliver the file message
-            this.routeMessage(message, endpoint.isSynchronous());
+            this.routeMessage(message);
 
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.

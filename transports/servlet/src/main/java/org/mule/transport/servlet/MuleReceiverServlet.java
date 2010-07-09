@@ -227,7 +227,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
             throws MuleException
     {
-        return receiver.routeMessage(requestMessage, true);
+        return receiver.routeMessage(requestMessage);
     }
 
     protected MessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)

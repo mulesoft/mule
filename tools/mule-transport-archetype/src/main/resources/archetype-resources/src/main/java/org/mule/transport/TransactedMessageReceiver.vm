@@ -12,6 +12,7 @@
 package org.mule.transport.${ModuleNameLower};
 
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
@@ -32,10 +33,10 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
        ${TransportDocumentationUrl} */
 
     public ${ModuleName}TransactedMessageReceiver(Connector connector,
-                                          Service service,
+                                          FlowConstruct flowConstruct,
                                           final InboundEndpoint endpoint) throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class ${ModuleName}TransactedMessageReceiver extends TransactedPollingMes
         // Here is how to pass the message to Mule.  Most MessageReceivers
         // will need to do nothing more than this
         MuleMessage muleMessage = createMuleMessage(message);
-        routeMessage(muleMessage, endpoint.isSynchronous());
+        routeMessage(muleMessage);
     }
 
     @Override

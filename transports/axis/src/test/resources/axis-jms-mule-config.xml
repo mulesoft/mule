@@ -22,14 +22,14 @@
 
         <service name="mycomponent">
             <inbound>
-                <axis:inbound-endpoint address="jms://mycomponent" exchange-pattern="one-way"/>
+                <axis:inbound-endpoint address="jms://mycomponent" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
             <inbound>
-                <axis:inbound-endpoint address="jms://mycomponent2" exchange-pattern="one-way"/>
+                <axis:inbound-endpoint address="jms://mycomponent2" exchange-pattern="request-response"/>
             </inbound>
             <pooled-component>
                 <prototype-object class="org.mule.tck.testmodels.services.TestServiceComponent">
@@ -47,7 +47,7 @@
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="axis:jms://mycomponent3" exchange-pattern="one-way"/>
+                <inbound-endpoint address="axis:jms://mycomponent3" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
@@ -56,7 +56,7 @@
 
         <service name="mycomponent4">
             <inbound>
-                <inbound-endpoint address="axis:jms://mycomponent4" exchange-pattern="one-way"/>
+                <inbound-endpoint address="axis:jms://mycomponent4" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>

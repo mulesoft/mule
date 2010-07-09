@@ -353,7 +353,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message, endpoint);
         }
 
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session, endpoint.isSynchronous(), null);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
         if (awaitResponse)
         {

@@ -17,6 +17,7 @@ import org.mule.transport.AbstractPollingMessageReceiver;
 #else
 import org.mule.transport.AbstractMessageReceiver;
 #end
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.service.Service;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -31,11 +32,11 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
     /* For general guidelines on writing transports see
        ${TransportDocumentationUrl} */
 
-    public ${ModuleName}MessageReceiver(Connector connector, Service service,
+    public ${ModuleName}MessageReceiver(Connector connector, FlowConstruct flowConstruct,
                               InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            calling routeMessage i.e.
 
 			MuleMessage message = createMuleMessage(object);
-            routeMessage(message, endpoint.isSynchronous());
+            routeMessage(message));
         */
 
         // TODO request a message from the underlying technology e.g. Read a file

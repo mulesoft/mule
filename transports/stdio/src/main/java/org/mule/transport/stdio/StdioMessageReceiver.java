@@ -110,7 +110,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 //Roll back our read
                 in.unread(i);
                 MuleMessage message = createMuleMessage(in, encoding);
-                routeMessage(message, endpoint.isSynchronous());
+                routeMessage(message);
             }
             else
             {
@@ -138,7 +138,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 for (int i = 0; i < lines.length; ++i)
                 {                
                     MuleMessage message = createMuleMessage(lines[i], encoding);
-                    routeMessage(message, endpoint.isSynchronous());
+                    routeMessage(message);
                 }
             }
 

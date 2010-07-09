@@ -16,9 +16,9 @@
     <model>
         <service name="HelloComponent">
             <inbound>
-                <inbound-endpoint address="vm://hello.in" exchange-pattern="one-way"/>
-                <inbound-endpoint address="jms://hello.in" exchange-pattern="one-way"/>
-                <inbound-endpoint address="jms://topic:thello.in" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://hello.in" exchange-pattern="request-response"/>
+                <inbound-endpoint address="jms://hello.in" exchange-pattern="request-response"/>
+                <inbound-endpoint address="jms://topic:thello.in" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.test.integration.routing.nested.HelloService" />
         </service>

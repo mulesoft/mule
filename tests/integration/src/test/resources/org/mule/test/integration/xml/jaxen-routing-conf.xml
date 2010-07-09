@@ -31,7 +31,7 @@
     
     <service name="echoService">
       <inbound>
-        <inbound-endpoint address="vm://echo" exchange-pattern="one-way"/>
+        <inbound-endpoint address="vm://echo" exchange-pattern="request-response"/>
       </inbound>
       <echo-component/>
     </service>

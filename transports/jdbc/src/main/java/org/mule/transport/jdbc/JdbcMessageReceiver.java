@@ -155,7 +155,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                     }
                 }
             }
-            routeMessage(muleMessage, tx, tx != null || endpoint.isSynchronous());
+            routeMessage(muleMessage);
 
         }
         catch (Exception ex)

@@ -14,7 +14,7 @@
         -->
         <service name="bridge1">
             <inbound>
-                <inbound-endpoint address="vm://incomingPass" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://incomingPass" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>
@@ -30,7 +30,7 @@
         -->
         <service name="bridge2">
             <inbound>
-                <inbound-endpoint address="vm://incomingLastFail" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://incomingLastFail" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>
@@ -46,7 +46,7 @@
         -->
         <service name="bridge3">
             <inbound>
-                <inbound-endpoint address="vm://incomingFirstFail" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://incomingFirstFail" exchange-pattern="request-response"/>
             </inbound>
 
             <outbound>
@@ -59,28 +59,28 @@
 
         <service name="component1">
             <inbound>
-                <inbound-endpoint address="vm://component1" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://component1" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received #[mule:context.serviceName]"/>
         </service>
 
         <service name="component1Fail">
             <inbound>
-                <inbound-endpoint address="vm://component1Fail" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true"/>
         </service>
 
         <service name="component2Pass">
             <inbound>
-                <inbound-endpoint address="vm://component2Pass" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://component2Pass" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received #[mule:context.serviceName]"/>
         </service>
 
         <service name="component2Fail">
             <inbound>
-                <inbound-endpoint address="vm://component2Fail" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true"/>
         </service>

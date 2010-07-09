@@ -77,7 +77,7 @@
 
     <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" 
         exchange-pattern="one-way"/>
-    <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="one-way"/>
+    <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="request-response"/>
     <jms:endpoint name="CustomerResponses" queue="esb.loan.quotes" exchange-pattern="one-way"/>
     <jms:endpoint name="LoanQuotes" queue="esb.loan.quotes" exchange-pattern="one-way"/>
     <jms:endpoint name="CreditAgencyGateway" queue="esb.credit.agency" exchange-pattern="one-way"/>
@@ -86,7 +86,7 @@
     <ejb:endpoint name="CreditAgency" host="localhost" port="1099" object="local/CreditAgency" 
         method="getCreditProfile"  exchange-pattern="request-response"/>
     <jms:endpoint name="LenderGateway" queue="esb.lender.service" exchange-pattern="one-way"/>
-    <vm:endpoint name="LenderService" path="lender.service" exchange-pattern="one-way"/>
+    <vm:endpoint name="LenderService" path="lender.service" exchange-pattern="request-response"/>
     <jms:endpoint name="BankingGateway" queue="esb.banks" exchange-pattern="one-way"/>
     <cxf:endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1" 
         exchange-pattern="request-response" operation="getLoanQuote" />

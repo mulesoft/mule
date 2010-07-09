@@ -17,14 +17,14 @@
      <model name="Sample">
           <service name="WebServiceSample">
                <inbound>
-                    <vm:inbound-endpoint path="testin" exchange-pattern="one-way"/>
+                    <vm:inbound-endpoint path="testin" exchange-pattern="request-response"/>
                </inbound>
                <cxf:wrapper-component address="http://localhost:65081/services/TestUMO?method=onReceive"/>
           </service>
 
           <service name="WebServiceSample2">
                <inbound>
-                    <vm:inbound-endpoint path="testin2" exchange-pattern="one-way"/>
+                    <vm:inbound-endpoint path="testin2" exchange-pattern="request-response"/>
                </inbound>
                <cxf:wrapper-component addressFromMessage="true"/>
           </service>

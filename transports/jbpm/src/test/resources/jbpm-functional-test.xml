@@ -25,7 +25,7 @@
     <model name="processModel">
         <service name="fromMessageProcess">
             <inbound>
-                <bpm:inbound-endpoint process="message" exchange-pattern="one-way"/>
+                <bpm:inbound-endpoint process="message" exchange-pattern="request-response"/>
             </inbound>
             <log-component />
             <outbound>
@@ -105,21 +105,21 @@
         
         <service name="echoService">
             <inbound>
-                <vm:inbound-endpoint path="echo" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="echo" exchange-pattern="request-response"/>
             </inbound>
             <echo-component />
         </service>
         
         <service name="exceptionService">
             <inbound>
-                <vm:inbound-endpoint path="exceptionService" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="exceptionService" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true" />
         </service>
         
         <service name="exceptionTransformer">
             <inbound>
-                <vm:inbound-endpoint path="exceptionTransformer" exchange-pattern="one-way">
+                <vm:inbound-endpoint path="exceptionTransformer" exchange-pattern="request-response">
                     <!-- Throw an exception -->
                     <custom-transformer class="org.mule.tck.transformer.ValidateResponse" />
                 </vm:inbound-endpoint>

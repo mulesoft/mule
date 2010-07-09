@@ -24,7 +24,7 @@
 
         <service name="echo">
             <inbound>
-               <vm:inbound-endpoint path="inEcho" exchange-pattern="one-way" connector-ref="vm"/>
+               <vm:inbound-endpoint path="inEcho" exchange-pattern="request-response" connector-ref="vm"/>
             </inbound>
             <test:component throwException="true"/>
         </service>

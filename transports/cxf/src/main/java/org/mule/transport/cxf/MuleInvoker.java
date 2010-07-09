@@ -108,7 +108,7 @@ public class MuleInvoker implements Invoker
                 muleReq.setCorrelationSequence(Integer.valueOf(corSeq));
             }
             
-            message = receiver.routeMessage(muleReq, synchronous);
+            message = receiver.routeMessage(muleReq);
         }
         catch (MuleException e)
         {

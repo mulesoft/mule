@@ -21,7 +21,7 @@
     <model>
         <service name="StaticEndpointsByName">
             <inbound>
-                <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <exception-based-router>
@@ -34,7 +34,7 @@
 
         <service name="StaticEndpointsByURI">
             <inbound>
-                <vm:inbound-endpoint path="in2" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <exception-based-router>
@@ -59,8 +59,8 @@
 
         <service name="BadService">
             <inbound>
-                <inbound-endpoint address="vm://service1" exchange-pattern="one-way" />
-                <inbound-endpoint address="vm://service4" exchange-pattern="one-way" />
+                <inbound-endpoint address="vm://service1" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://service4" exchange-pattern="request-response" />
             </inbound>
             <test:component>
                 <test:return-data>error</test:return-data>
@@ -69,8 +69,8 @@
 
         <service name="GoodService">
             <inbound>
-                <inbound-endpoint address="vm://service2" exchange-pattern="one-way" />
-                <inbound-endpoint address="vm://service5" exchange-pattern="one-way" />
+                <inbound-endpoint address="vm://service2" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://service5" exchange-pattern="request-response" />
             </inbound>
             <test:component>
                 <test:return-data>success</test:return-data>
@@ -79,8 +79,8 @@
 
         <service name="AnotherBadService">
             <inbound>
-                <inbound-endpoint address="vm://service3" exchange-pattern="one-way" />
-                <inbound-endpoint address="vm://service6" exchange-pattern="one-way" />
+                <inbound-endpoint address="vm://service3" exchange-pattern="request-response" />
+                <inbound-endpoint address="vm://service6" exchange-pattern="request-response" />
             </inbound>
             <test:component>
                 <test:return-data>error</test:return-data>

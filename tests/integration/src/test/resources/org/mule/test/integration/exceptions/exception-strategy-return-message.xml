@@ -22,7 +22,7 @@
 
         <service name="ExceptionService">
             <inbound>
-                <vm:inbound-endpoint path="badService" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="badService" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true" />
             <custom-exception-strategy class="org.mule.test.integration.exceptions.TestExceptionStrategy" /> 

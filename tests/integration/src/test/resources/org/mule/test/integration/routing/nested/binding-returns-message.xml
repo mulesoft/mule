@@ -13,14 +13,14 @@
     <model>
         <service name="HelloComponent">
             <inbound>
-                <inbound-endpoint address="vm://hello.in" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://hello.in" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.test.integration.routing.nested.HelloService" />
         </service>
 
         <service name="InvokerComponent">
             <inbound>
-                <vm:inbound-endpoint path="invoker.in" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="invoker.in" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.BindingReturnTypeTestCase$Component" />

@@ -51,7 +51,7 @@
 
         <service name="GroovyUMO_Callable">
             <inbound>
-                <inbound-endpoint address="vm://groovy_refresh_callable"/>
+                <inbound-endpoint address="vm://groovy_refresh_callable" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="groovyRefreshableCallable"/>
@@ -60,7 +60,7 @@
 
         <service name="GroovyUMO_Bean">
             <inbound>
-                <inbound-endpoint address="vm://groovy_refresh_bean"/>
+                <inbound-endpoint address="vm://groovy_refresh_bean"  exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="groovyRefreshableBean"/>
@@ -69,7 +69,7 @@
 
         <service name="GroovyUMO_ChangeIntefaces">
             <inbound>
-                <inbound-endpoint address="vm://groovy_refresh_changeInterfaces"/>
+                <inbound-endpoint address="vm://groovy_refresh_changeInterfaces"  exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="groovyRefreshableBeanChangeInterfaces"/>

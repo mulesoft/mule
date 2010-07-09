@@ -23,7 +23,7 @@
 
         <service name="testComponent1">
             <inbound>
-                <inbound-endpoint address="vm://test.queue.1" exchange-pattern="one-way">
+                <inbound-endpoint address="vm://test.queue.1" exchange-pattern="request-response">
                     <custom-transformer class="org.mule.test.transformers.FailingTransformer"/>
                 </inbound-endpoint>
             </inbound>
@@ -32,7 +32,7 @@
 
         <service name="testComponent2">
             <inbound>
-                <inbound-endpoint address="vm://test.queue.2" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://test.queue.2" exchange-pattern="request-response"/>
             </inbound>
             <test:component throwException="true"/>
         </service>

@@ -36,7 +36,7 @@
         
         <service name="ServiceOne">
             <inbound>
-                <vm:inbound-endpoint path="service1.queue" exchange-pattern="one-way">
+                <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response">
                     <response-transformers>
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>                        
                     </response-transformers>
@@ -47,7 +47,7 @@
 
         <service name="ServiceTwo">
             <inbound>
-                <vm:inbound-endpoint path="service2.queue" exchange-pattern="one-way">
+                <vm:inbound-endpoint path="service2.queue" exchange-pattern="request-response">
                     <response-transformers>
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
                     </response-transformers>

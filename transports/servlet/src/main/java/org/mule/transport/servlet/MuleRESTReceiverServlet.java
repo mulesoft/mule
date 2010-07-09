@@ -80,7 +80,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
                 
                 MuleMessage message = receiver.createMuleMessage(httpServletRequest);
-                MuleMessage returnMessage = receiver.routeMessage(message, true);
+                MuleMessage returnMessage = receiver.routeMessage(message);
                 writeResponse(httpServletResponse, returnMessage);
             }
         }
@@ -103,7 +103,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             MuleMessage message = receiver.createMuleMessage(httpServletRequest, 
                 receiver.getEndpoint().getEncoding());
             
-            MuleMessage returnMessage = receiver.routeMessage(message, true);
+            MuleMessage returnMessage = receiver.routeMessage(message);
             writeResponse(httpServletResponse, returnMessage);
         }
         catch (Exception e)
@@ -124,7 +124,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
 
             MuleMessage message = receiver.createMuleMessage(httpServletRequest, 
                 receiver.getEndpoint().getEncoding());
-            receiver.routeMessage(message, muleContext.getConfiguration().isDefaultSynchronousEndpoints());
+            receiver.routeMessage(message);
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback)

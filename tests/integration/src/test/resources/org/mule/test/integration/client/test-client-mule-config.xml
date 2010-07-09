@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <endpoint name="vmEndpoint" address="vm://test.queue" exchange-pattern="one-way"/>
+    <endpoint name="vmEndpoint" address="vm://test.queue" exchange-pattern="request-response"/>
 
     <model name="model">
         <service name="TestReceiverUMO">

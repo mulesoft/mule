@@ -22,7 +22,7 @@
 
         <service name="SpringBeanService">
             <inbound>
-                <vm:inbound-endpoint path="SpringBeanService.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="SpringBeanService.In" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="SpringBeanLifecycleTrackerComponent" />
@@ -31,7 +31,7 @@
 
         <service name="SpringBeanService2">
             <inbound>
-                <vm:inbound-endpoint path="SpringBeanService2.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="SpringBeanService2.In" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="SpringBeanLifecycleTrackerComponent2" />
@@ -40,7 +40,7 @@
 
         <service name="MulePrototypeService">
             <inbound>
-                <vm:inbound-endpoint path="MulePrototypeService.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="MulePrototypeService.In" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <prototype-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
@@ -51,7 +51,7 @@
 
         <service name="MulePooledPrototypeService">
             <inbound>
-                <vm:inbound-endpoint path="MulePooledPrototypeService.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="MulePooledPrototypeService.In" exchange-pattern="request-response"/>
             </inbound>
             <pooled-component>
                 <prototype-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
@@ -63,7 +63,7 @@
 
         <service name="MulePooledSingletonService">
             <inbound>
-                <vm:inbound-endpoint path="MulePooledSingletonService.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="MulePooledSingletonService.In" exchange-pattern="request-response"/>
             </inbound>
             <pooled-component>
                 <singleton-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">
@@ -75,7 +75,7 @@
 
         <service name="MuleSingletonService">
             <inbound>
-                <vm:inbound-endpoint path="MuleSingletonService.In" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="MuleSingletonService.In" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.lifecycle.LifecycleTrackerComponentObject">

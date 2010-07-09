@@ -72,6 +72,6 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
     protected void processMessage(Message xmppMessage) throws MuleException
     {
         MuleMessage muleMessage = createMuleMessage(xmppMessage);        
-        routeMessage(muleMessage, endpoint.isSynchronous());
+        routeMessage(muleMessage);
     }
 }    

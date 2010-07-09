@@ -143,7 +143,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
         if ((status != HttpConstants.SC_NOT_MODIFIED || !checkEtag))
         {
-            routeMessage(message, endpoint.isSynchronous());
+            routeMessage(message);
         }
     }
 }

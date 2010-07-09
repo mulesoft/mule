@@ -36,7 +36,7 @@
         
         <service name="chain2SelectAlwaysBegin">
             <inbound>
-                <inbound-endpoint address="vm://chain.always.begin" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://chain.always.begin" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <chaining-router>
@@ -55,7 +55,7 @@
         
         <service name="chain2SelectBeginOrJoin">
             <inbound>
-                <inbound-endpoint address="vm://chain.begin.or.join" exchange-pattern="one-way"/>
+                <inbound-endpoint address="vm://chain.begin.or.join" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <chaining-router>

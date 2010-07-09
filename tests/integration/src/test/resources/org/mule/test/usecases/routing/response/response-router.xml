@@ -46,7 +46,7 @@
     <model name="fo">
         <service name="getLaszloW10">
             <inbound>
-                <inbound-endpoint address="http://localhost:28081" exchange-pattern="one-way"/>
+                <inbound-endpoint address="http://localhost:28081" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
             <outbound matchAll="false">

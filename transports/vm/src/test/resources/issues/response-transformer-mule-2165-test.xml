@@ -128,8 +128,8 @@
 
         <service name="lnlt-bounce">
             <inbound>
-                <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default"
-                    exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default" 
+                                     exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>
@@ -151,7 +151,7 @@
         <service name="lnut-bounce">
             <inbound>
                 <vm:inbound-endpoint path="local-name-url-transformer" connector-ref="default"
-                    exchange-pattern="one-way"/>
+                                     exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

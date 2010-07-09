@@ -66,6 +66,6 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
             throws MuleException
     {
         //Force asynchronous processing since we are using continuations
-        return receiver.routeMessage(requestMessage, false);
+        return receiver.routeMessage(requestMessage);
     }
 }

@@ -14,7 +14,7 @@
 
         <service name="NotIgnored">
            <inbound>
-                <vm:inbound-endpoint path="not-ignored" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="not-ignored" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
@@ -28,7 +28,7 @@
 
         <service name="Selected">
            <inbound>
-                <vm:inbound-endpoint path="selected" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="selected" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver>

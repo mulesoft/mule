@@ -23,7 +23,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
@@ -94,8 +93,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private boolean stopFurtherProcessing = false;
 
-    private Boolean synchronous;
-
     private int timeout = TIMEOUT_NOT_SET_VALUE;
 
     private transient ResponseOutputStream outputStream = null;
@@ -124,7 +121,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.session = previousEvent.getSession();
         ((DefaultMuleSession) session).setFlowConstruct(service);
         this.endpoint = endpoint;
-        this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         fillProperties(previousEvent);
@@ -135,30 +131,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             MuleSession session)
     {
         this(message, endpoint, session, null);
-    }
-
-    /**
-     * Contructor.
-     *
-     * @param message  the event payload
-     * @param endpoint the endpoint to associate with the event
-     * @param session  the previous event if any
-     * @deprecated
-     */
-    public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
-                            MuleSession session,
-                            boolean synchronous,
-                            ResponseOutputStream outputStream)
-    {
-        super(message.getPayload());
-        this.message = message;
-        this.endpoint = endpoint;
-        this.session = session;
-        this.id = generateEventId();
-        this.synchronous = synchronous;
-        this.outputStream = outputStream;
-        fillProperties(null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -190,7 +162,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.session = rewriteEvent.getSession();
         session.setFlowConstruct(rewriteEvent.getFlowConstruct());
         this.endpoint = rewriteEvent.getEndpoint();
-        this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         if (rewriteEvent instanceof DefaultMuleEvent)
@@ -547,24 +518,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public boolean isSynchronous()
     {
-        if (endpoint instanceof OutboundEndpoint)
-        {
-            // If this is an outbound endpoint then synchronicity is determined by
-            // endpoint
-            return endpoint.isSynchronous();
-        }
-        else
-        {
-            // TODO This should be determined by the inbound endpoint only
-            if (synchronous != null)
-            {
-                return synchronous.booleanValue();
-            }
-            else
-            {
-                return endpoint.isSynchronous();
-            }
-        }
+        return endpoint.isSynchronous();
     }
 
     public int getTimeout()

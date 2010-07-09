@@ -110,8 +110,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
         movePropertiesToInbound(newMessage);
 
-
-        return routeMessage(newMessage, synchronous);
+        return routeMessage(newMessage);
     }
 
     protected void movePropertiesToInbound(MuleMessage newMessage)

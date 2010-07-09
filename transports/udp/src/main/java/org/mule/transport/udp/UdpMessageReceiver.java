@@ -269,7 +269,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 {
                     message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
                 }
-                returnMessage = routeMessage(message, endpoint.isSynchronous());
+                returnMessage = routeMessage(message);
 
                 if (returnMessage != null)
                 {

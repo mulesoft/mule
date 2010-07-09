@@ -244,7 +244,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()), PropertyScope.INBOUND);
 
                 preRouteMessage(message);
-                MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous());
+                MuleMessage returnMessage = receiver.routeMessage(message);
 
                 Object tempResponse;
                 if (returnMessage != null)
