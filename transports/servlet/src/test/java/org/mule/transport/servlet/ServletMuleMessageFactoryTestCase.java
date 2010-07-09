@@ -176,7 +176,8 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     private void assertRequestParameterProperty(String expected, MuleMessage message, String key)
     {
         String propertyKey = ServletConnector.PARAMETER_PROPERTY_PREFIX + key;
-        Object value = message.getProperty(propertyKey);
+        // message factory puts props in the inbound scope
+        Object value = message.getProperty(propertyKey, PropertyScope.INBOUND);
         assertEquals(expected, value);
     }
 
