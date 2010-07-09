@@ -13,7 +13,6 @@ package org.mule.service.processor;
 import org.mule.AbstractExceptionListener;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -70,11 +69,13 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 
             // Allow components to stop processing of the ReplyTo property (e.g.
             // CXF)
-            final String replyToStop = (String) resultEvent.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, PropertyScope.INVOCATION);
-            if (!event.isSynchronous()
-                || (resultEvent != null && !BooleanUtils.toBoolean(replyToStop)))
+            if (resultEvent != null)
             {
-                processReplyTo(event, resultEvent, replyToHandler, replyTo);
+                String replyToStop = (String) resultEvent.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, PropertyScope.INVOCATION);
+                if (!event.isSynchronous() || !BooleanUtils.toBoolean(replyToStop))
+                {
+                    processReplyTo(event, resultEvent, replyToHandler, replyTo);
+                }
             }
         }
         catch (Exception e)
@@ -103,7 +104,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
                     else
                     {
                         resultEvent = new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(),
-                            RequestContext.getEvent().getMessage(), event.getMuleContext()), event);
+                            event.getMessage(), event.getMuleContext()), event);
                     }
                 }
                 ExceptionPayload exceptionPayload = event.getMessage().getExceptionPayload();

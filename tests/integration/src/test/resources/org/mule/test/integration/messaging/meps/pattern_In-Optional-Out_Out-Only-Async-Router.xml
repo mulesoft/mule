@@ -20,7 +20,7 @@
         Receives a message from another party and processes the message. Then the message is sent to another service (or
         application) for processing. A Reply-To endpoint is attached to the message and this is used by the second
         service to return a result. Note that if the external service is not a Mule instance the protocol being used
-        will ahve to ahve the notion of a back channel or reply-to destination, i.e. JMS, WS-Addressing, Socket-bsed
+        will have to have the notion of a back channel or reply-to destination, i.e. JMS, WS-Addressing, Socket-bsed
         protocols.
         Since the response is optional, the &lt;async-reply&gt; router timeout should be reduced since, it will block
         for the whole time if no reply is given.
@@ -46,7 +46,7 @@
             </inbound>
             <script:component>
                 <script:script engine="groovy">
-                    if (message.getProperty("foo") != null)
+                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
                         return message
                     else
                     {
