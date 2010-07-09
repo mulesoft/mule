@@ -132,7 +132,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
             {
                 // Special handling of replyTo since it needs to go into the
                 // invocation scope
-                muleMessage.setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.INVOCATION);
+                muleMessage.setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.OUTBOUND);
             }
 
             muleMessage.setReplyTo(replyTo);
