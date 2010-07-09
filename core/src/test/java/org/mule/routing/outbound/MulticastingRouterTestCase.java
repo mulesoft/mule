@@ -148,7 +148,9 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     {
         Object payload = message.getPayload();
         if (payload instanceof List)
-            payload = ((List)payload).get(0);
+        {
+            payload = ((List) payload).get(0);
+        }
         return payload.toString();
     }
 }
