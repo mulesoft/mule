@@ -30,7 +30,7 @@
             </inbound>
             <script:component>
                 <script:script engine="groovy">
-                    if (message.getProperty("foo"))
+                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND))
                         return "foo header received"
                     else
                         return null

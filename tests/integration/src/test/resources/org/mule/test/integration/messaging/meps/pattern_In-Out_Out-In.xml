@@ -58,7 +58,7 @@
             <script:component>
                 <script:script engine="groovy">
                     message.setProperty("externalApp", "Received")
-                    if (message.getProperty("bar") != null)
+                    if (message.getProperty("bar", org.mule.api.transport.PropertyScope.INBOUND) != null)
                         return "bar header received"
                 </script:script>
             </script:component>

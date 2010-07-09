@@ -31,16 +31,17 @@
     <model>
         <service name="In-Out_Out-Only-Async-Service">
             <inbound>
-                <inbound-endpoint ref="inboundEndpoint">
-                    <message-properties-transformer>
-                        <add-message-property key="foo" value="bar"/>
-                    </message-properties-transformer>
-                </inbound-endpoint>
+                <inbound-endpoint ref="inboundEndpoint"/>
             </inbound>
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="externalEndpoint"/>
+                    <outbound-endpoint ref="externalEndpoint">
+                        <message-properties-transformer>
+                            <add-message-property key="foo" value="bar"/>
+                        </message-properties-transformer>
+                        <jms:object-to-jmsmessage-transformer/>
+                    </outbound-endpoint>
                     <reply-to ref="replyEndpoint"/>
                 </pass-through-router>
             </outbound>
@@ -54,9 +55,14 @@
 
         <service name="ExternalApp">
             <inbound>
-                <inbound-endpoint ref="externalEndpoint"/>
+                <inbound-endpoint ref="externalEndpoint">
+                    <message-properties-transformer>
+                        <!-- propagate the property explicitly -->
+                        <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
+                    </message-properties-transformer>
+                </inbound-endpoint>
             </inbound>
-            <test:component>
+            <test:component logMessageDetails="true">
                 <test:return-data>got it!</test:return-data>
             </test:component>
         </service>

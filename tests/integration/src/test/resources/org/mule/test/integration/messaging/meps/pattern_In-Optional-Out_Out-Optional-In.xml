@@ -38,7 +38,7 @@
             </inbound>
             <script:component>
                 <script:script engine="groovy">
-                    if (message.getProperty("foo") != null)
+                    if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND) != null)
                     {
                         message.setProperty("bar", "baz")
                         return message
@@ -50,7 +50,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="ExternalEndpoint"/>
-                    <!-- Mule will automatically listen on this destination when synchronous is true. If this is not set, a temprary destination is set up -->
+                    <!-- Mule will automatically listen on this destination when synchronous is true. If this is not set, a temporary destination is set up -->
                     <!--<reply-to address="jms://reply"/>-->
                 </pass-through-router>
             </outbound>
@@ -63,7 +63,7 @@
             <script:component>
                 <script:script engine="groovy">
                     message.setProperty("externalApp", "Received")
-                    if (message.getProperty("bar") != null)
+                    if (message.getProperty("bar", org.mule.api.transport.PropertyScope.INBOUND) != null)
                         return "bar header received"
                     else
                         return null
