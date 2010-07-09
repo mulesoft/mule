@@ -229,20 +229,32 @@ public class Scriptable implements Initialisable, MuleContextAware
     public Object runScript(Bindings bindings) throws ScriptException
     {
         Object result;
-        if (compiledScript != null)
+        try
         {
-            result = compiledScript.eval(bindings);
+            if (compiledScript != null)
+            {
+                result = compiledScript.eval(bindings);
+            }
+            else
+            {
+                result = scriptEngine.eval(scriptText, bindings);
+            }
+
+            // The result of the script can be returned directly or it can
+            // be set as the variable "result".
+            if (result == null)
+            {
+                result = bindings.get("result");
+            }
         }
-        else
+        catch (ScriptException e)
         {
-            result = scriptEngine.eval(scriptText, bindings);
+            // re-throw
+            throw e;
         }
-        
-        // The result of the script can be returned directly or it can
-        // be set as the variable "result".
-        if (result == null)
+        catch (Exception ex)
         {
-            result = bindings.get("result");
+            throw new ScriptException(ex);
         }
         return result;
     }
