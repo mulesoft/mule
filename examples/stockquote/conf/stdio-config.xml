@@ -26,7 +26,7 @@
                     input for the next endpoint. In this case it writes it out to System.out
                 -->
                 <chaining-router>
-                    <vm:outbound-endpoint path="stockquote" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="stockquote" exchange-pattern="request-response"/>
                     <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way"/>
                 </chaining-router>
             </outbound>
