@@ -97,7 +97,9 @@ public interface MuleMessage extends Serializable
 
     /**
      * @return all property keys on this message
+     * @deprecated
      */
+    @Deprecated
     Set<String> getPropertyNames();
 
     /**
