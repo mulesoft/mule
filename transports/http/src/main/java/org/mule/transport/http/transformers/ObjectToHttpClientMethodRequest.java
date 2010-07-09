@@ -154,8 +154,14 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-                String paramName = URLEncoder.encode(msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND,
-                                                                           HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
+                String getBodyParam = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.INVOCATION,
+                                                                  HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
+                if (getBodyParam == null)
+                {
+                    msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND,
+                                          HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
+                }
+                String paramName = URLEncoder.encode(getBodyParam, outputEncoding);
 
                 String paramValue;
                 Boolean encode =  msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.INVOCATION, null);
@@ -192,6 +198,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND, null);
+                if (paramName == null)
+                {
+                    paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.INVOCATION, null);
+                }
 
                 if (src instanceof Map)
                 {
