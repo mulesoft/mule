@@ -10,6 +10,7 @@
 
 package org.mule.module.management.mbean;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -26,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class EndpointService implements EndpointServiceMBean
 {
-
     /**
      * logger used by this class
      */
@@ -119,11 +119,11 @@ public class EndpointService implements EndpointServiceMBean
         return endpoint instanceof OutboundEndpoint;
     }
 
-    public boolean isSynchronous()
+    public MessageExchangePattern getMessageExchangePattern()
     {
-        return endpoint.isSynchronous();
+        return endpoint.getMessageExchangePattern();
     }
-
+    
     public String getComponentName()
     {
         return componentName;
@@ -133,5 +133,4 @@ public class EndpointService implements EndpointServiceMBean
     {
         this.componentName = componentName;
     }
-
 }

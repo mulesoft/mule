@@ -55,10 +55,12 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final List<Transformer> inputTransformers = new ArrayList<Transformer>();
         final List<Transformer> outputTransformers = new ArrayList<Transformer>();
         final String name = "testEndpoint";
+        
         final Map<String, String> properties = new HashMap<String, String>();
         final String property1 = "property1";
         final String value1 = "value1";
         properties.put(property1, value1);
+        
         final TransactionConfig mockTransactionConfig = mock(TransactionConfig.class);
         final Filter mockFilter = mock(Filter.class);
         final boolean deleteUnacceptedMessages = true;
@@ -91,7 +93,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(mockFilter, endpoint.getFilter());
                 assertEquals(deleteUnacceptedMessages, endpoint.isDeleteUnacceptedMessages());
                 assertEquals(mockEndpointSecurityFilter, endpoint.getSecurityFilter());
-                assertEquals(synchronous, endpoint.isSynchronous());
+                assertEquals(messageExchangePattern, endpoint.getMessageExchangePattern());
                 assertEquals(responseTimeout, endpoint.getResponseTimeout());
                 assertEquals(initialState, endpoint.getInitialState());
                 assertEquals(endpointEncoding, endpoint.getEncoding());

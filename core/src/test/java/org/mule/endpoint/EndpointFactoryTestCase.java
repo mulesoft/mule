@@ -207,7 +207,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         endpointBuilder1.setResponseTimeout(99);
         ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(endpointBuilder1);
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertTrue(ep.isSynchronous());
+        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getMessageExchangePattern());
         assertEquals(99, ep.getResponseTimeout());
         assertNotNull(ep.getConnector());
         assertEquals(testConnector1, ep.getConnector());
@@ -218,7 +218,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         endpointBuilder2.setConnector(testConnector2);
         ImmutableEndpoint ep2 = endpointFactory.getInboundEndpoint(endpointBuilder2);
         assertEquals(ep2.getEndpointURI().getUri().toString(), "test://address");
-        assertFalse(ep2.isSynchronous());
+        assertEquals(MessageExchangePattern.ONE_WAY, ep2.getMessageExchangePattern());
         assertEquals(0, ep2.getResponseTimeout());
         assertNotNull(ep.getConnector());
         assertEquals(testConnector2, ep2.getConnector());
@@ -227,7 +227,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         ImmutableEndpoint ep3 = endpointFactory.getInboundEndpoint(endpointBuilder1);
         assertEquals(ep3.getEndpointURI().getUri().toString(), "test://address");
         assertTrue(ep3.getResponseTimeout() != 0);
-        assertTrue(ep3.isSynchronous());
+        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep3.getMessageExchangePattern());
         assertNotNull(ep.getConnector());
         assertEquals(testConnector1, ep3.getConnector());
     }

@@ -35,7 +35,9 @@ public class OutboundTryCatchMessageProcessor extends AbstractInterceptingMessag
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        boolean singleThread = endpoint.isSynchronous() || endpoint.getTransactionConfig().isTransacted();
+        boolean hasResponse = endpoint.getMessageExchangePattern().hasResponse();
+        boolean isTransacted = endpoint.getTransactionConfig().isTransacted();
+        boolean singleThread = hasResponse || isTransacted;
 
         try
         {

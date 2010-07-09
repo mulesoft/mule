@@ -23,6 +23,7 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
  */
 public class ContentBasedRouter extends AbstractOutboundRouter
 {
+    @Override
     public MuleEvent route(MuleEvent theEvent) throws MessagingException
     {
         MuleMessage message = theEvent.getMessage();
@@ -35,7 +36,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
                 try
                 {
                     DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
-                    if (endpoint.isSynchronous())
+                    if (endpoint.getMessageExchangePattern().hasResponse())
                     {
                         return endpoint.process(event);
                     }

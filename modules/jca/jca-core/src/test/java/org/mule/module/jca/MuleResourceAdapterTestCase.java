@@ -11,6 +11,7 @@
 
 package org.mule.module.jca;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -39,6 +40,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
 {
     private MuleResourceAdapter resourceAdapter;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         resourceAdapter = new MuleResourceAdapter();
@@ -46,6 +48,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         resourceAdapter.bootstrapContext = new MockBoostrapContext();
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         resourceAdapter = null;
@@ -127,7 +130,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         MuleActivationSpec activationSpec = new MuleActivationSpec();
         activationSpec.setEndpoint("test://testEndpoint");
         ImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
-        testEndpoint(endpoint);
+        assertEndpointAttributes(endpoint);
     }
 
     public void testCreateJcaComponent() throws Exception
@@ -153,7 +156,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         testEndpoint(service);
 
         // Check endpoint
-        ImmutableEndpoint endpoint2 = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint2 = service.getInboundRouter().getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
         // Check service implementation
@@ -174,7 +177,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(1, resourceAdapter.endpoints.size());
 
         MuleEndpointKey key = new MuleEndpointKey(endpointFactory, activationSpec);
-        Service service = (Service) resourceAdapter.endpoints.get(key);
+        Service service = resourceAdapter.endpoints.get(key);
 
         assertEquals("JcaService#" + endpointFactory.hashCode(), service.getName());
         testJcaService(service);
@@ -229,16 +232,16 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
     protected void testEndpoint(Service service)
     {
         InboundRouterCollection inboundRouterCollection = service.getInboundRouter();
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) inboundRouterCollection.getEndpoints().get(0);
-        testEndpoint(endpoint);
+        ImmutableEndpoint endpoint = inboundRouterCollection.getEndpoints().get(0);
+        assertEndpointAttributes(endpoint);
     }
 
-    protected void testEndpoint(ImmutableEndpoint endpoint)
+    protected void assertEndpointAttributes(ImmutableEndpoint endpoint)
     {
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertEquals("testEndpoint", endpoint.getEndpointURI().getAddress());
-        assertEquals(false, endpoint.isSynchronous());
+        assertEquals(MessageExchangePattern.ONE_WAY, endpoint.getMessageExchangePattern());
     }
 
     protected void testJcaService(Service service)
@@ -261,13 +264,11 @@ class MockEndpointFactory implements MessageEndpointFactory
 
     public MessageEndpoint createEndpoint(XAResource arg0) throws UnavailableException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public boolean isDeliveryTransacted(Method arg0) throws NoSuchMethodException
     {
-        // TODO Auto-generated method stub
         return false;
     }
 }
@@ -277,20 +278,17 @@ class MockActivationSpec implements ActivationSpec
 
     public void validate() throws InvalidPropertyException
     {
-        // TODO Auto-generated method stub
-
+        // do nothing
     }
 
     public ResourceAdapter getResourceAdapter()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setResourceAdapter(ResourceAdapter arg0) throws ResourceException
     {
-        // TODO Auto-generated method stub
-
+        // do nothing
     }
 }
 
@@ -299,7 +297,6 @@ class MockBoostrapContext implements BootstrapContext
 
     public Timer createTimer() throws UnavailableException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -310,7 +307,6 @@ class MockBoostrapContext implements BootstrapContext
 
     public XATerminator getXATerminator()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 }

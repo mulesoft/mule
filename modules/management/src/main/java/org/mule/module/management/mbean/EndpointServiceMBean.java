@@ -10,13 +10,14 @@
 
 package org.mule.module.management.mbean;
 
+import org.mule.MessageExchangePattern;
+
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
  * conect/disconnect endpoints manually.
  */
 public interface EndpointServiceMBean
 {
-
     String getAddress();
 
     String getName();
@@ -31,7 +32,7 @@ public interface EndpointServiceMBean
 
     boolean isOutbound();
 
-    boolean isSynchronous();
+    MessageExchangePattern getMessageExchangePattern();
 
     String getComponentName();
 }
