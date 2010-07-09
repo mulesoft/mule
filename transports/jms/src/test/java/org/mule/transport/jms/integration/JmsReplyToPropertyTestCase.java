@@ -37,6 +37,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase
 
         // Check that the property is still on the outbound message
         MuleMessage output = client.request("out", 2000);
+        assertNotNull(output);
         assertTrue(output.getProperty("JMSReplyTo").toString().contains("middle"));
         
         // Check that the reply message was generated
