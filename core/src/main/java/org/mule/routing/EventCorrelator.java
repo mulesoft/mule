@@ -350,11 +350,13 @@ public class EventCorrelator
      */
     public MuleMessage getResponse(MuleMessage message, int timeout) throws RoutingException
     {
+        final String messageId = messageInfoMapping.getMessageId(message);
         if (logger.isTraceEnabled())
         {
             try
             {
-                logger.trace(String.format("Waiting for response(s) for message: %n%s%n%s",
+                logger.trace(String.format("Waiting for response(s) for message with id: %s%n%s%n%s",
+                                           messageId,
                                            StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false),
                                            StringMessageUtils.headersToString(message)));
             }
@@ -364,24 +366,22 @@ public class EventCorrelator
             }
         }
 
-        Object responseId = messageInfoMapping.getMessageId(message);
-
         if (logger.isDebugEnabled())
         {
-            logger.debug("Waiting for response for message id: " + responseId + " in " + this);
+            logger.debug("Waiting for response for message id: " + messageId + " in " + this);
         }
 
-        Latch l = (Latch) locks.get(responseId);
+        Latch l = (Latch) locks.get(messageId);
         if (l == null)
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Got response but no one is waiting for it yet. Creating latch for message id "
-                        + responseId + " in " + this);
+                        + messageId + " in " + this);
             }
 
             l = new Latch();
-            Latch previous = (Latch) locks.putIfAbsent(responseId, l);
+            Latch previous = (Latch) locks.putIfAbsent(messageId, l);
             if (previous != null)
             {
                 l = previous;
@@ -390,7 +390,7 @@ public class EventCorrelator
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Got latch for message: " + responseId);
+            logger.debug("Got latch for message: " + messageId);
         }
 
         // the final result message
@@ -408,7 +408,7 @@ public class EventCorrelator
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Waiting for response to message: " + responseId);
+                logger.debug("Waiting for response to message: " + messageId);
             }
 
             // how long should we wait for the lock?
@@ -428,8 +428,8 @@ public class EventCorrelator
         }
         finally
         {
-            locks.remove(responseId);
-            result = (MuleMessage) responseMessages.remove(responseId);
+            locks.remove(messageId);
+            result = (MuleMessage) responseMessages.remove(messageId);
 
             if (interruptedWhileWaiting)
             {
@@ -450,11 +450,11 @@ public class EventCorrelator
 
                 throw new ResponseTimeoutException(
                         CoreMessages.responseTimedOutWaitingForId(
-                                this.getTimeout(), responseId), message, null);
+                                this.getTimeout(), messageId), message, null);
             }
             else
             {
-                EventGroup group = this.getEventGroup(responseId);
+                EventGroup group = this.getEventGroup(messageId);
                 if (group == null)
                 {
                     //Unlikely this will ever happen
