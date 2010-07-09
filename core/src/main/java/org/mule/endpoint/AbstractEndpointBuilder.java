@@ -52,6 +52,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of
  * endpoints out of the endpoint instance itself. <br/> The use of a builder allows
@@ -91,6 +94,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String registryId = null;
     protected MuleContext muleContext;
 
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
         return doBuildInboundEndpoint();
@@ -103,7 +108,20 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected void setPropertiesFromProperties(Map<Object, Object> properties)
     {
-        synchronous = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
+
+        final Boolean tempSync = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
+        if (tempSync != null)
+        {
+            if (uriBuilder != null)
+            {
+                logger.warn(String.format("Deprecated 'synchronous' flag found on endpoint '%s', please replace with " +
+                                          "e.g. 'exchange-pattern=request-response", uriBuilder.getEndpoint()));
+            }
+            else
+            {
+                logger.warn("Deprecated 'synchronous' flag found on endpoint)");
+            }
+        }
 
         String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN);
         if (StringUtils.isNotEmpty(mepString))
@@ -111,7 +129,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             mepString = mepString.toUpperCase().replace('-', '_');
             setExchangePattern(MessageExchangePattern.valueOf(mepString));
         }
-        
+
+        //synchronous = messageExchangePattern == MessageExchangePattern.REQUEST_RESPONSE;
+
         responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
         responsePropertiesList = (String) properties.get(PROPERTY_RESPONSE_PROPERTIES);
     }
