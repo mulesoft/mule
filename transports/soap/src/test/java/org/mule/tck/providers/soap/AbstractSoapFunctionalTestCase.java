@@ -48,11 +48,6 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     protected abstract String getWsdlEndpoint();
 
-    protected Map getMessageProperties(Map props)
-    {
-        return props;
-    }
-
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
@@ -62,7 +57,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         for (int i = 0; i < number; i++)
         {
             props.put("X-Message-Number", String.valueOf(i));
-            MuleMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, getMessageProperties(props));
+            MuleMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, props);
             assertNotNull(msg);
             results.add(msg.getPayload());
         }
@@ -102,8 +97,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testSendAndReceiveComplex() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"),
-            getMessageProperties(new HashMap()));
+        MuleMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"), null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
         result = client.request(getSendReceiveComplexEndpoint2(), 0);
@@ -127,7 +121,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), getMessageProperties(new HashMap()));
+        client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), null);
         Thread.sleep(4500);
 
         // lets get our newly added person
@@ -144,7 +138,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         try
         {
-            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), getMessageProperties(new HashMap()));
+            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
             fail("A nested Fault should have been raised");
         }
         catch (MuleException e)
