@@ -64,7 +64,7 @@ public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluato
                 {
                     required = true;
                 }
-                Object val = message.getProperty(s);
+                Object val = ExpressionUtils.getPropertyWithScope(s, message);
                 if (val != null)
                 {
                     result.add(val);
