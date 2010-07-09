@@ -15,8 +15,8 @@
     <vm:connector name="vmQueueConnector"/>
 
     <quartz:endpoint name="schedulerEndpoint1" jobName="myService1" repeatInterval="1000"
-        exchange-pattern="one-way">
-        <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>
+                     exchange-pattern="one-way">
+        <quartz:custom-job-from-message evaluator="header" expression="INBOUND:jobConfig"/>
     </quartz:endpoint>
 
     <quartz:endpoint name="schedulerEndpoint2" jobName="myService2" repeatInterval="1000"
