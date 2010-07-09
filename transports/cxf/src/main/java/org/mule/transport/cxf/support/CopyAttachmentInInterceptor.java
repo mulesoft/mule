@@ -10,8 +10,6 @@
 
 package org.mule.transport.cxf.support;
 
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -25,6 +23,8 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
 {
@@ -52,7 +52,7 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
             muleMsg.setProperty(CxfConstants.ATTACHMENTS, atts, 
                 PropertyScope.OUTBOUND);
             muleMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE, 
-                muleMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE), 
+                muleMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND), 
                 PropertyScope.OUTBOUND);
         }
     }

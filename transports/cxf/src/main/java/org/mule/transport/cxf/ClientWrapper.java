@@ -16,6 +16,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.cxf.i18n.CxfMessages;
 import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
@@ -529,11 +530,11 @@ public class ClientWrapper
         // People can specify a CXF operation, which may in fact be different
         // than the method name. If that's not found, we'll default back to the 
         // mule method property. 
-        String method = (String) event.getMessage().getProperty(CxfConstants.OPERATION);
+        String method = (String) event.getMessage().getProperty(CxfConstants.OPERATION, PropertyScope.INVOCATION);
 
         if (method == null)
         {
-            method = (String) event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            method = (String) event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY, PropertyScope.INVOCATION);
         }
 
         if (method == null)
