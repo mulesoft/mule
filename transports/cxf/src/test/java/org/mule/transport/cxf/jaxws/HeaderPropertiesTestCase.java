@@ -12,11 +12,11 @@ package org.mule.transport.cxf.jaxws;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,7 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
 
     public void testClientWithMuleClient() throws Exception
     {
-        final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testService");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(testSedaService);
+        FunctionalTestComponent testComponent = getFunctionalTestComponent("testService");
         assertNotNull(testComponent);
 
         EventCallback callback = new EventCallback()
@@ -44,8 +43,8 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
-                assertEquals("BAR", msg.getProperty("FOO"));
-                assertNull(msg.getProperty("clientClass"));
+                assertEquals("BAR", msg.getProperty("FOO", PropertyScope.INBOUND));
+                assertNull(msg.getProperty("clientClass", PropertyScope.INVOCATION));
             }
         };
         testComponent.setEventCallback(callback);
