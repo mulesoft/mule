@@ -16,7 +16,7 @@ import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinit
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.module.atom.endpoint.AtomInboundEndpointFactoryBean;
 import org.mule.module.atom.routing.URIRouteFilter;
-import org.mule.module.atom.transformers.AtomEntryBuilder;
+import org.mule.module.atom.transformers.AtomEntryBuilderTransformer;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -28,7 +28,7 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
 
         registerBeanDefinitionParser("route-filter", new ChildDefinitionParser("filter", URIRouteFilter.class));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(AbderaServiceComponent.class));
-        registerBeanDefinitionParser("entry-builder-transformer", new TransformerDefinitionParser(AtomEntryBuilder.class));
+        registerBeanDefinitionParser("entry-builder-transformer", new TransformerDefinitionParser(AtomEntryBuilderTransformer.class));
         registerBeanDefinitionParser("entry-property", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
     }

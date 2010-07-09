@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.Iterator;
 
 import javax.activation.DataHandler;
 
@@ -36,12 +35,9 @@ import org.apache.abdera.model.Link;
 import org.apache.abdera.model.Person;
 import org.apache.abdera.parser.stax.FOMWriterOptions;
 
-/**
- * TODO
- */
-public class AtomEntryBuilder extends AbstractExpressionTransformer
+public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
 {
-    public AtomEntryBuilder()
+    public AtomEntryBuilderTransformer()
     {
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
@@ -51,10 +47,8 @@ public class AtomEntryBuilder extends AbstractExpressionTransformer
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();
 
-        for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext();)
+        for (ExpressionArgument arg: arguments)
         {
-            ExpressionArgument arg = iterator.next();
-
             if (arg.getName().equals("title"))
             {
                 entry.setTitle(StringUtils.trimToEmpty((String) arg.evaluate(message)));
