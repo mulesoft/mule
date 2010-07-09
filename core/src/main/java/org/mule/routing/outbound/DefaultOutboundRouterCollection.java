@@ -79,19 +79,20 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 final OutboundRouter router = outboundRouter;
 
                 
-                TransactionTemplate tt = new TransactionTemplate(outboundRouter.getTransactionConfig(),
-                    event.getFlowConstruct().getExceptionListener(), muleContext);
+                TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(
+                        outboundRouter.getTransactionConfig(),
+                        event.getFlowConstruct().getExceptionListener(), muleContext);
                 
-                TransactionCallback cb = new TransactionCallback()
+                TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
                 {
-                    public Object doInTransaction() throws Exception
+                    public MuleEvent doInTransaction() throws Exception
                     {
                         return router.process(event);
                     }
                 };
                 try
                 {
-                    result = (MuleEvent) tt.execute(cb);
+                    result = tt.execute(cb);
                 }
                 catch (Exception e)
                 {

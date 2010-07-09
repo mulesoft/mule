@@ -215,17 +215,19 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         {
             try
             {
-                TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                        connector.getExceptionListener(), connector.getMuleContext());
+                TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
+                                                        endpoint.getTransactionConfig(),
+                                                        connector.getExceptionListener(),
+                                                        connector.getMuleContext());
 
                 final String encoding = endpoint.getEncoding();
 
                 if (receiveMessagesInTransaction)
                 {
-                    TransactionCallback cb = new MessageTransactionCallback(message)
+                    TransactionCallback<Void> cb = new MessageTransactionCallback<Void>(message)
                     {
 
-                        public Object doInTransaction() throws Exception
+                        public Void doInTransaction() throws Exception
                         {
                             // Get Transaction & Bind MuleSession
                             Transaction tx = TransactionCoordination.getInstance().getTransaction();

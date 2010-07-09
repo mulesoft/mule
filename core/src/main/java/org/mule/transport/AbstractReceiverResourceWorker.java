@@ -38,7 +38,7 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
     {
         try
         {
-            Object message = null;
+            Object message;
             do 
             {
                 message = getNextMessage(resource);

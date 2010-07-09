@@ -84,13 +84,13 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         tm = context.getTransactionManager();
     }
 
-    protected TransactionTemplate createTransactionTemplate(byte action, boolean considerExternal)
+    protected <T> TransactionTemplate<T> createTransactionTemplate(byte action, boolean considerExternal)
     {
         TransactionConfig tc = new MuleTransactionConfig();
         tc.setAction(action);
         tc.setFactory(new XaTransactionFactory());
         tc.setInteractWithExternal(considerExternal);
-        TransactionTemplate tt = new TransactionTemplate(tc, null, context);
+        TransactionTemplate<T> tt = new TransactionTemplate<T>(tc, null, context);
         return tt;
     }
 

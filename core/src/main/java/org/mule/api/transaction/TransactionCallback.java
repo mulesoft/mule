@@ -10,7 +10,7 @@
 
 package org.mule.api.transaction;
 
-public interface TransactionCallback
+public interface TransactionCallback<T>
 {
-    Object doInTransaction() throws Exception;
+    T doInTransaction() throws Exception;
 }

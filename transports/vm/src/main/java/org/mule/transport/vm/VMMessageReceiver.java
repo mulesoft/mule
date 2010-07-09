@@ -101,7 +101,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    public Object onCall(MuleMessage message, boolean synchronous) throws MuleException
+    public MuleMessage onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());

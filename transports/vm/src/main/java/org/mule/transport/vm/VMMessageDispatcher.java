@@ -81,17 +81,19 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         MuleMessage message = event.getMessage();
         connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
-        TransactionTemplate tt = new TransactionTemplate(receiver.getEndpoint().getTransactionConfig(),
-                                                         connector.getExceptionListener(), event.getMuleContext());
+        TransactionTemplate<MuleMessage> tt = new TransactionTemplate<MuleMessage>(
+                                                            receiver.getEndpoint().getTransactionConfig(),
+                                                            connector.getExceptionListener(),
+                                                            event.getMuleContext());
 
-        TransactionCallback cb = new TransactionCallback()
+        TransactionCallback<MuleMessage> cb = new TransactionCallback<MuleMessage>()
         {
-            public Object doInTransaction() throws Exception
+            public MuleMessage doInTransaction() throws Exception
             {
                 return receiver.onCall(event.getMessage(), true);
             }
         };
-        retMessage = (MuleMessage) tt.execute(cb);
+        retMessage = tt.execute(cb);
         
         if (logger.isDebugEnabled())
         {

@@ -164,11 +164,13 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     {
         logger.debug("Polling...");
         
-        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), 
-            connector.getExceptionListener(), connector.getMuleContext());
-        TransactionCallback cb = new TransactionCallback()
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
+                                                endpoint.getTransactionConfig(),
+                                                connector.getExceptionListener(),
+                                                connector.getMuleContext());
+        TransactionCallback<Void> cb = new TransactionCallback<Void>()
         {
-            public Object doInTransaction() throws Exception
+            public Void doInTransaction() throws Exception
             {
                 try
                 {

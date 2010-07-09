@@ -104,7 +104,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     public void poll() throws Exception
     {
-        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(),
                 connector.getExceptionListener(), connector.getMuleContext());
 
         if (this.isReceiveMessagesInTransaction())
@@ -112,14 +112,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
             // may have been started
-            TransactionCallback cb = new TransactionCallback()
+            TransactionCallback<Void> cb = new TransactionCallback<Void>()
             {
-                public Object doInTransaction() throws Exception
+                public Void doInTransaction() throws Exception
                 {
-                    List messages = getMessages();
+                    List<MuleMessage> messages = getMessages();
                     if (messages != null && messages.size() > 0)
                     {
-                        for (Object message : messages)
+                        for (MuleMessage message : messages)
                         {
                             TransactedPollingMessageReceiver.this.processMessage(message);
                         }
@@ -132,16 +132,16 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         else
         {
             // Receive messages and launch a worker for each message
-            List messages = getMessages();
+            List<MuleMessage> messages = getMessages();
             if (messages != null && messages.size() > 0)
             {
                 final CountDownLatch countdown = new CountDownLatch(messages.size());
-                for (Object message : messages)
+                for (MuleMessage message : messages)
                 {
                     try
                     {
                         this.getWorkManager().scheduleWork(
-                                new MessageProcessorWorker(tt, countdown, message));
+                                new MessageProcessorWorker<Void, MuleMessage>(tt, countdown, message));
                     }
                     catch (Exception e)
                     {
@@ -154,13 +154,18 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
     }
 
-    protected class MessageProcessorWorker implements Work, TransactionCallback
+    /**
+     *
+     * @param <T> transaction callback return type
+     * @param <M> message type
+     */
+    protected class MessageProcessorWorker<T, M> implements Work, TransactionCallback<T>
     {
-        private final TransactionTemplate tt;
-        private final Object message;
+        private final TransactionTemplate<T> tt;
+        private final M message;
         private final CountDownLatch latch;
 
-        public MessageProcessorWorker(TransactionTemplate tt, CountDownLatch latch, Object message)
+        public MessageProcessorWorker(TransactionTemplate<T> tt, CountDownLatch latch, M message)
         {
             this.tt = tt;
             this.message = message;
@@ -188,7 +193,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
         }
 
-        public Object doInTransaction() throws Exception
+        public T doInTransaction() throws Exception
         {
             TransactedPollingMessageReceiver.this.processMessage(message);
             return null;
@@ -198,6 +203,6 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     protected abstract List<MuleMessage> getMessages() throws Exception;
 
-    protected abstract void processMessage(Object message) throws Exception;
+    protected abstract <M> void processMessage(M message) throws Exception;
 
 }

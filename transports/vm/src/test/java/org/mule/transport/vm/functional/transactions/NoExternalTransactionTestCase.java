@@ -37,7 +37,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testBeginOrJoinTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, false);
 
         logger.debug("TM is a " + tm.getClass().toString());
         tm.begin();
@@ -52,9 +52,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // This will throw, becasue nested transactions are not supported
         try
         {
-            result = (String) tt.execute(new TransactionCallback()
+            result = tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     return "OK";
                 }
@@ -69,9 +69,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         tm.rollback();
 
         // now try with no active transaction
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 muleTx.enlistResource(resource1);
@@ -87,7 +87,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testBeginTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -101,9 +101,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // This will throw, because nested transactions are not supported
         try
         {
-            result = (String) tt.execute(new TransactionCallback()
+            result = tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     return "OK";
                 }
@@ -118,9 +118,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         tm.rollback();
 
         // now try with no active transaction
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 muleTx.enlistResource(resource1);
@@ -136,7 +136,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testNoTransactionProcessing() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_NONE, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_NONE, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -145,9 +145,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertNotNull(tx);
         tx.enlistResource(resource1);
         resource1.setValue(14);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNotNull(muleTx);
@@ -164,9 +164,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // Now it's committed
         assertEquals(14, resource1.getPersistentValue());
 
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNull(muleTx);
@@ -178,7 +178,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testAlwaysJoinTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -191,9 +191,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         try
         {
             // Thjis will throw, because Mule sees no transaction to join
-            result = (String) tt.execute(new TransactionCallback()
+            result = tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     Transaction muleTx = tm.getTransaction();
                     assertSame(tx, muleTx);
@@ -215,9 +215,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         // try with no active transaction.. Should still throw
         try
         {
-            result = (String) tt.execute(new TransactionCallback()
+            result = tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     return "OK";
                 }
@@ -234,16 +234,16 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testJoinTransactionIfPossible() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
         tx.enlistResource(resource1);
         assertNotNull(tx);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertSame(tx, muleTx);
@@ -262,9 +262,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertEquals(14, resource1.getPersistentValue());
 
         // try with no active transaction.. Should run with none
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNull(muleTx);
@@ -277,7 +277,7 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
     public void testNoTransactionAllowed() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_NEVER, false);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_NEVER, false);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -286,9 +286,9 @@ public class NoExternalTransactionTestCase extends AbstractExternalTransactionTe
         assertNotNull(tx);
 
         // This will not throw since Mule sees no transaction
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 resource1.setValue(14);
                 return "OK";

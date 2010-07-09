@@ -38,16 +38,16 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testBeginOrJoinTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_BEGIN_OR_JOIN, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
         tx.enlistResource(resource1);
         assertNotNull(tx);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertSame(tx, muleTx);
@@ -66,9 +66,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals(14, resource1.getPersistentValue());
 
         // now try with no active transaction
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 muleTx.enlistResource(resource1);
@@ -84,16 +84,16 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testBeginTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_BEGIN, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
 
         assertNotNull(tx);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNotSame(tx, muleTx);
@@ -112,9 +112,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         // Now it's committed
         assertEquals(14, resource1.getPersistentValue());
 
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNotSame(tx, muleTx);
@@ -132,7 +132,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testNoTransactionProcessing() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_NONE, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_NONE, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -141,9 +141,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNotNull(tx);
         tx.enlistResource(resource1);
         resource1.setValue(14);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNull(muleTx);
@@ -160,9 +160,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         // Now it's committed
         assertEquals(14, resource1.getPersistentValue());
 
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNull(muleTx);
@@ -174,16 +174,16 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testAlwaysJoinTransaction() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_ALWAYS_JOIN, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
         tx.enlistResource(resource1);
         assertNotNull(tx);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertSame(tx, muleTx);
@@ -205,9 +205,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         Exception ex = null;
         try
         {
-            result = (String) tt.execute(new TransactionCallback()
+            result = tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     return "OK";
                 }
@@ -224,16 +224,16 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testJoinTransactionIfPossible() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_JOIN_IF_POSSIBLE, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
         final TestResource resource1 = new TestResource(tm);
         tx.enlistResource(resource1);
         assertNotNull(tx);
-        String result = (String) tt.execute(new TransactionCallback()
+        String result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertSame(tx, muleTx);
@@ -252,9 +252,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertEquals(14, resource1.getPersistentValue());
 
         // try with no active transaction.. Should run with none
-        result = (String) tt.execute(new TransactionCallback()
+        result = tt.execute(new TransactionCallback<String>()
         {
-            public Object doInTransaction() throws Exception
+            public String doInTransaction() throws Exception
             {
                 Transaction muleTx = tm.getTransaction();
                 assertNull(muleTx);
@@ -267,7 +267,7 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
     public void testNoTransactionAllowed() throws Exception
     {
         init();
-        TransactionTemplate tt = createTransactionTemplate(TransactionConfig.ACTION_NEVER, true);
+        TransactionTemplate<String> tt = createTransactionTemplate(TransactionConfig.ACTION_NEVER, true);
 
         tm.begin();
         final Transaction tx = tm.getTransaction();
@@ -279,9 +279,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         Exception ex = null;
         try
         {
-            String result = (String) tt.execute(new TransactionCallback()
+            tt.execute(new TransactionCallback<String>()
             {
-                public Object doInTransaction() throws Exception
+                public String doInTransaction() throws Exception
                 {
                     return "OK";
                 }

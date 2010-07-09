@@ -189,7 +189,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     }
 
     @Override
-    public List getMessages() throws Exception
+    public List<MuleMessage> getMessages() throws Exception
     {
         Connection con = null;
         try

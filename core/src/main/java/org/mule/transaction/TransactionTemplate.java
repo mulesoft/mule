@@ -23,7 +23,7 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.beans.ExceptionListener;
 
-public class TransactionTemplate
+public class TransactionTemplate<T>
 {
     private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
 
@@ -38,7 +38,7 @@ public class TransactionTemplate
         this.context = context;
     }
 
-    public Object execute(TransactionCallback callback) throws Exception
+    public T execute(TransactionCallback<T> callback) throws Exception
     {
         //if we want to skip TT
         if (config == null)
@@ -110,7 +110,7 @@ public class TransactionTemplate
 
         try
         {
-            Object result = callback.doInTransaction();
+            T result = callback.doInTransaction();
             if (tx != null)
             {
                 //verify that transaction is still active

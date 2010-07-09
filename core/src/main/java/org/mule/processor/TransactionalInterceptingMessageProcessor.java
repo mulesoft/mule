@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
- * the {@link TransactionConfig} is null then no tranaction is used and the next
+ * the {@link TransactionConfig} is null then no transaction is used and the next
  * {@link MessageProcessor} is invoked directly.
  */
 public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
@@ -51,10 +51,11 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            TransactionTemplate tt = new TransactionTemplate(transactionConfig, exceptionListener, event.getMuleContext());
-            TransactionCallback cb = new TransactionCallback()
+            TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(
+                    transactionConfig, exceptionListener, event.getMuleContext());
+            TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
             {
-                public Object doInTransaction() throws Exception
+                public MuleEvent doInTransaction() throws Exception
                 {
                     return next.process(event);
                 }
@@ -62,7 +63,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
             try
             {
-                return (MuleEvent) tt.execute(cb);
+                return tt.execute(cb);
             }
             catch (MessagingException e)
             {

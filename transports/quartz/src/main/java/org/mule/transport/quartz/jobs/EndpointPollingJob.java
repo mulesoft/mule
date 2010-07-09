@@ -102,28 +102,28 @@ public class EndpointPollingJob implements Job
             final boolean pollGlobalEndpoint = epBuilder != null;
 
             InboundEndpoint endpoint = null;
-            TransactionTemplate tt;
+            TransactionTemplate<Void> tt;
             if (pollGlobalEndpoint)
             {
                 // referencing a global endpoint, fetch configuration from it
                 endpoint = epBuilder.buildInboundEndpoint();
-                tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                                             endpoint.getConnector().getExceptionListener(),
-                                             muleContext);
+                tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(),
+                                                   endpoint.getConnector().getExceptionListener(),
+                                                   muleContext);
             }
             else
             {
                 // a simple inline endpoint
-                tt = new TransactionTemplate(new MuleTransactionConfig(),
-                                             connector.getExceptionListener(),
-                                             muleContext);
+                tt = new TransactionTemplate<Void>(new MuleTransactionConfig(),
+                                                   connector.getExceptionListener(),
+                                                   muleContext);
             }
 
 
             final InboundEndpoint finalEndpoint = endpoint;
-            TransactionCallback cb = new TransactionCallback()
+            TransactionCallback<Void> cb = new TransactionCallback<Void>()
             {
-                public Object doInTransaction() throws Exception
+                public Void doInTransaction() throws Exception
                 {
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
                     if (tx != null)

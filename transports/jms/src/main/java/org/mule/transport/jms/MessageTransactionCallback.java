@@ -14,7 +14,7 @@ import org.mule.api.transaction.TransactionCallback;
 
 import javax.jms.Message;
 
-public abstract class MessageTransactionCallback implements TransactionCallback
+public abstract class MessageTransactionCallback<T> implements TransactionCallback<T>
 {
     protected final Message message;
 

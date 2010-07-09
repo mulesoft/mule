@@ -82,7 +82,7 @@ public abstract class AbstractReceiverWorker implements Work
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
         // may have been started
-        TransactionCallback cb = new TransactionCallback()
+        TransactionCallback<?> cb = new TransactionCallback()
         {
             public Object doInTransaction() throws Exception
             {

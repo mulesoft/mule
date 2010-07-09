@@ -34,7 +34,7 @@ public class ExceptionThrowingVMMessageReceiver extends VMMessageReceiver
     }
 
     @Override
-    public Object onCall(MuleMessage message, boolean synchronous) throws MuleException
+    public MuleMessage onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
         throw new RuntimeException();
     }
