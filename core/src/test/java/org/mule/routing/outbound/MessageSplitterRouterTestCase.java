@@ -19,7 +19,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -48,9 +47,9 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         //Sync endpoints  org.python.core.__builtin__
-        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
-        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
-        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
+        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
+        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
         Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         Mock mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

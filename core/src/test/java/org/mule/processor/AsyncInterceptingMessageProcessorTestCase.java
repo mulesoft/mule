@@ -47,7 +47,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
     public void testProcessSync() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestOutboundEndpoint("",
-            "test://test?synchronous=true"));
+            "test://test?exchange-pattern=request-response"));
 
         MuleEvent result = messageProcessor.process(event);
 

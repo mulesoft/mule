@@ -25,7 +25,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 
 import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
@@ -68,9 +67,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         // setup async endpoints
-        endpoint4 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1?synchronous=true");
-        endpoint5 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?synchronous=true");
-        endpoint6 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?synchronous=true");
+        endpoint4 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1?exchange-pattern=request-response");
+        endpoint5 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?exchange-pattern=request-response");
+        endpoint6 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?exchange-pattern=request-response");
         mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

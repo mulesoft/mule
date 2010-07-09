@@ -25,7 +25,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
 import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -97,15 +96,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy1?synchronous=true");
+            .getOutboundEndpoint("test://Dummy1?exchange-pattern=request-response");
 
         OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy2?synchronous=true");
+            .getOutboundEndpoint("test://Dummy2?exchange-pattern=request-response");
 
         OutboundEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy3?synchronous=true");
+            .getOutboundEndpoint("test://Dummy3?exchange-pattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
@@ -197,8 +196,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=true");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
@@ -235,8 +234,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=false");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=false");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
@@ -275,8 +274,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?synchronous=true");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         ExceptionBasedRouter router = new ExceptionBasedRouter();

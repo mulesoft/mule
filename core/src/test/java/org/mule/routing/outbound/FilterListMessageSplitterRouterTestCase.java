@@ -20,9 +20,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.util.mock.PayloadClassConstraint;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -71,9 +69,9 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         mockendpoint2.verify();
         mockendpoint3.verify();
 
-        endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
-        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?synchronous=true", null, new PayloadTypeFilter(Orange.class), null);
-        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?synchronous=true");
+        endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?exchange-pattern=request-response", null, new PayloadTypeFilter(Apple.class), null);
+        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?exchange-pattern=request-response", null, new PayloadTypeFilter(Orange.class), null);
+        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?exchange-pattern=request-response");
         mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);

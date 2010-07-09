@@ -16,15 +16,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.endpoint.DynamicURIOutboundEndpoint;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -56,10 +53,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?exchange-pattern=request-response");
         assertNotNull(endpoint1);
 
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?synchronous=true");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?exchange-pattern=request-response");
         assertNotNull(endpoint2);
 
         mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -106,7 +103,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
 
         ImmutableEndpoint ep = router.getEndpoint(2, message);
-        assertEquals("test://foo?bar&synchronous=true", ep.getEndpointURI().toString());
+        assertEquals("test://foo?bar&exchange-pattern=request-response", ep.getEndpointURI().toString());
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);

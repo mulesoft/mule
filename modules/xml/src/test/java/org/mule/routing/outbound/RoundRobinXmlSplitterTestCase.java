@@ -22,7 +22,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 
 import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
@@ -60,9 +59,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         // setup sync endpoints
-        endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?synchronous=true");
-        endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true");
-        endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+        endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
+        endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
+        endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
         mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

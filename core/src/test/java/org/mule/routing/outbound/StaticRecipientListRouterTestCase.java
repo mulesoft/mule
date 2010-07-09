@@ -15,12 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -92,8 +90,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint1);
 
         List<String> recipients = new ArrayList<String>();
-        recipients.add("test://recipient1?synchronous=true");
-        recipients.add("test://recipient2?synchronous=true");
+        recipients.add("test://recipient1?exchange-pattern=request-response");
+        recipients.add("test://recipient2?exchange-pattern=request-response");
         MockingStaticRecipientList router = createObject(MockingStaticRecipientList.class);
 
         router.setRecipients(recipients);
@@ -127,7 +125,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
              }
          });
 
-        router.getRecipients().add("test://recipient3?synchronous=true");
+        router.getRecipients().add("test://recipient3?exchange-pattern=request-response");
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();

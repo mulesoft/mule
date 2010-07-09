@@ -54,7 +54,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             return event;
         }
-        else if (event.getEndpoint().isSynchronous()
+        else if (event.getEndpoint().getMessageExchangePattern().hasResponse()
                  || event.getEndpoint().getTransactionConfig().isTransacted())
         {
             return processNext(event);

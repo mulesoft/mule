@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import com.mockobjects.dynamic.AnyConstraintMatcher;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -23,7 +22,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.CollectionUtils;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -43,7 +41,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
         
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
         assertNotNull(endpoint1);
 
         Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -95,7 +93,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=true");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
         assertNotNull(endpoint1);
         Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
         FilteringOutboundRouter router = new FilteringOutboundRouter();
