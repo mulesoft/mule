@@ -43,7 +43,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
     }
 
     @Test
-    public void testResponseWithoutReplyToEndointProperties() throws Exception
+    public void testResponseWithoutReplyToEndpointProperties() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         
