@@ -12,6 +12,7 @@ package org.mule.transport.jdbc.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
@@ -31,13 +32,13 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
         
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         // provide a valid type header so the JDBC query actually returns something
-        message.setProperty("type", Integer.valueOf(1));
-        message.setProperty(PROPERTY_KEY, PROPERTY_VALUE);
+        message.setProperty("type", 1, PropertyScope.OUTBOUND);
+        message.setProperty(PROPERTY_KEY, PROPERTY_VALUE, PropertyScope.OUTBOUND);
         
         MuleMessage result = client.send("vm://in", message);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals(PROPERTY_VALUE, result.getProperty(PROPERTY_KEY));
+        assertEquals(PROPERTY_VALUE, result.getProperty(PROPERTY_KEY, PropertyScope.INBOUND));
     }
 }
