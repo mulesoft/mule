@@ -665,7 +665,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getCorrelationId()
     {
         assertAccess(READ);
-        return (String) getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        // TODO sounds like an invocation scope would hit a middle sweet-spot here, but not sure, fallback to outbound,
+        // which might have been set by the router
+        String correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.INBOUND, null);
+        if (correlationId == null)
+        {
+            correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND, null);
+        }
+
+        return correlationId;
     }
 
     /**
@@ -832,7 +840,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     public String getStringProperty(String name, String defaultValue)
     {
         assertAccess(READ);

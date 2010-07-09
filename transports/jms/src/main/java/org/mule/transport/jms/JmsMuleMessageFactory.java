@@ -130,8 +130,6 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
             Destination replyTo = jmsMessage.getJMSReplyTo();
             if (replyTo != null)
             {
-                // Special handling of replyTo since it needs to go into the
-                // invocation scope
                 muleMessage.setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.OUTBOUND);
             }
 

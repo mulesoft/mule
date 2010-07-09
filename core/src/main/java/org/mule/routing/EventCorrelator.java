@@ -438,7 +438,7 @@ public class EventCorrelator
             {
                 if (logger.isTraceEnabled())
                 {
-                    logger.trace("Current responses are: \n" + MapUtils.toString(responseMessages, true));
+                    logger.trace(String.format("Current responses are: %n%s", MapUtils.toString(responseMessages, true)));
                 }
                 context.fireNotification(new RoutingNotification(message, null,
                         RoutingNotification.ASYNC_REPLY_TIMEOUT));
@@ -455,7 +455,8 @@ public class EventCorrelator
                     //Unlikely this will ever happen
                     if (logger.isTraceEnabled())
                     {
-                        logger.trace("There is no current event Group. Current responses are: \n" + MapUtils.toString(responseMessages, true));
+                        logger.trace(String.format("There is no current event Group. Current responses are: %n%s",
+                                                   MapUtils.toString(responseMessages, true)));
                     }
                     return null;
                 }

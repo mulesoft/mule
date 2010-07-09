@@ -90,6 +90,7 @@
             <inbound>
                 <vm:inbound-endpoint path="in4" exchange-pattern="request-response"/>
             </inbound>
+            <test:component logMessageDetails="true"/>
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector2"
@@ -108,7 +109,7 @@
             <inbound>
                 <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
             </inbound>
-            <test:component appendString=" #[mule:context.serviceName]"/>
+            <test:component appendString=" #[mule:context.serviceName]" logMessageDetails="true"/>
         </service>
     </model>
 </mule>

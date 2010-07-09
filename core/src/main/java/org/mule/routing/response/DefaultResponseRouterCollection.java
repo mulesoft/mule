@@ -78,11 +78,9 @@ public class DefaultResponseRouterCollection extends DefaultInboundRouterCollect
         }
         else
         {
-            ResponseRouter router;
-            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+            for (Router router : routers)
             {
-                router = (ResponseRouter) iterator.next();
-                result = router.getResponse(message);
+                result = ((ResponseRouter) router).getResponse(message);
             }
 
             if (result == null)
