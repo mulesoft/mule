@@ -19,19 +19,23 @@
     <model name="model">
         <service name="bridge">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="4444" path="in" synchronous="true">
+                <http:inbound-endpoint host="localhost" port="4444" path="in" exchange-pattern="request-response">
                     <transformers>
                         <transformer ref="toString"/>
-                        <message-properties-transformer>
-                            <add-message-property key="X-Custom-Header" value="#[groovy:message.getProperty('X-Custom-Header', org.mule.api.transport.PropertyScope.INBOUND)]"/>
-                        </message-properties-transformer>
                     </transformers>
                 </http:inbound-endpoint>
             </inbound>
             <test:component logMessageDetails="true"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out"/>
+                    <vm:outbound-endpoint path="out">
+                        <transformers>
+                            <message-properties-transformer>
+                                <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
+                                <add-message-property key="X-Custom-Header" value="#[header:INBOUND:X-Custom-Header]"/>
+                            </message-properties-transformer>
+                        </transformers>
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
