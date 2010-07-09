@@ -17,7 +17,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.cxf.testmodels.AsyncService;
-import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 
@@ -182,10 +181,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
-        Map<String, Object> httpHeaders = new HashMap<String, Object>();
-        
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
         props.put("SOAPAction", "http://acme.com/transform");
 
         MuleClient client = new MuleClient(muleContext);
@@ -236,10 +232,7 @@ public class ProxyTestCase extends FunctionalTestCase
 
     protected Map prepareOneWayTestProperties()
     {
-        Map<String, Object> httpHeaders = new HashMap<String, Object>();
-
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, httpHeaders);
         props.put("SOAPAction", "http://acme.com/oneway");
         return props;
     }

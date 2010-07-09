@@ -224,25 +224,26 @@
             <outbound>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                        proxy="true"
-                        exchange-pattern="request-response"/>
-                    <message-property-filter pattern="SOAPAction=http://acme.com/no-transform"/>
+                                           proxy="true"
+                                           exchange-pattern="request-response"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/no-transform" scope="inbound"/>
                 </filtering-router>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
-                        proxy="true"
-                        exchange-pattern="request-response">
+                                           proxy="true"
+                                           exchange-pattern="request-response">
                          <response-transformers>
                              <transformer ref="TestXslt"/>
                          </response-transformers>
                     </cxf:outbound-endpoint>
-                    <message-property-filter pattern="SOAPAction=http://acme.com/transform"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/transform" scope="inbound"/>
                 </filtering-router>
                 <filtering-router>
                     <cxf:outbound-endpoint address="http://localhost:63081/services/oneway" 
-                        proxy="true"
-                        exchange-pattern="request-response" responseTimeout="2000"/>
-                    <message-property-filter pattern="SOAPAction=http://acme.com/oneway"/>
+                                           proxy="true"
+                                           exchange-pattern="request-response"
+                                           responseTimeout="2000"/>
+                    <message-property-filter pattern="SOAPAction=http://acme.com/oneway" scope="inbound"/>
                 </filtering-router>
             </outbound>
         </service>
