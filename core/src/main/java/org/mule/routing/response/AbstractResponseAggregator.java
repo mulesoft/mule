@@ -11,6 +11,7 @@
 package org.mule.routing.response;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -75,7 +76,8 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     public MuleEvent getResponse(MuleEvent event) throws RoutingException
     {
         MuleMessage response = eventCorrelator.getResponse(event.getMessage());
-        return response != null ? new DefaultMuleEvent(response, event) : null;
+        MuleMessage safe = RequestContext.safeMessageCopy(response);
+        return response != null ? new DefaultMuleEvent(safe, event) : null;
     }
 
     public boolean isFailOnTimeout()
