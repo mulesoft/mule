@@ -140,7 +140,9 @@ public interface MuleEvent
      * 
      * @param name the property name
      * @return the property value or null if the property does not exist
+     * @deprecated
      */
+    @Deprecated
     Object getProperty(String name);
 
     /**
@@ -149,7 +151,9 @@ public interface MuleEvent
      * @param name the property name
      * @param defaultValue a default value if the property doesn't exist in the event
      * @return the property value or the defaultValue if the property does not exist
+     * @deprecated
      */
+    @Deprecated
     Object getProperty(String name, Object defaultValue);
 
     /**

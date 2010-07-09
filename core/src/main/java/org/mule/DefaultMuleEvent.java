@@ -428,12 +428,18 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     /**
      * @see org.mule.api.MuleEvent#getProperty(java.lang.String)
+     * @deprecated
      */
+    @Deprecated
     public Object getProperty(String name)
     {
         return getProperty(name, /* defaultValue */null);
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public Object getProperty(String name, Object defaultValue)
     {
         Object property = message.getProperty(name);

@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -72,7 +73,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
     protected Object processAction(MuleEvent event) throws Exception
     {
         // An object representing the new state of the process
-        Object process = null;
+        Object process;
 
         // Create a map of process variables based on the message properties.
         Map processVariables = new HashMap();
@@ -85,8 +86,8 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
                 // The session property can become rather large and causes problems with DB persistence.
                 if (!propertyName.equals(MuleProperties.MULE_SESSION_PROPERTY))
                 {
-                	processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
-	            }
+                    processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
+                }
             }
 
             Object payload = event.transformMessage();
@@ -108,7 +109,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
 
         // Retrieve the parameters
-        Object processType = event.getProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
+        Object processType = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_TYPE, PropertyScope.INVOCATION);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_TYPE);
 
         // TODO MULE-1220 The processId for BPM is sort of like a session and so we could probably use
@@ -119,19 +120,19 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         //TODO this is redundent but I'm not sure what the correct behaviour is
         if (StringUtils.isNotEmpty(processIdField))
         {
-            processId = event.getProperty(processIdField);
+            processId = event.getMessage().getProperty(processIdField);
         }
         // If processId is explicitly set for the message, this overrides the
         // processIdField.
-        processId = event.getProperty(ProcessConnector.PROPERTY_PROCESS_ID);
+        processId = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.INVOCATION);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_ID);
 
         // Default action is "advance"
-        String action = event.getMessage().getStringProperty(ProcessConnector.PROPERTY_ACTION,
+        String action = event.getMessage().getStringProperty(ProcessConnector.PROPERTY_ACTION, PropertyScope.INVOCATION,
             ProcessConnector.ACTION_ADVANCE);
         processVariables.remove(ProcessConnector.PROPERTY_ACTION);
 
-        Object transition = event.getMessage().getProperty(ProcessConnector.PROPERTY_TRANSITION);
+        Object transition = event.getMessage().getProperty(ProcessConnector.PROPERTY_TRANSITION, PropertyScope.INVOCATION);
         processVariables.remove(ProcessConnector.PROPERTY_TRANSITION);
 
         // Decode the URI, for example:
