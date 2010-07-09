@@ -141,7 +141,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
         if (result != null && replyToHandler != null)
         {
             // TODO event.getProperty() is confusing, rework it - takes PropertyScope as a default value, not scope 
-            String requestor = (String) result.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, PropertyScope.INBOUND);
+            String requestor = (String) result.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, PropertyScope.OUTBOUND);
             if ((requestor != null && !requestor.equals(service.getName())) || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
