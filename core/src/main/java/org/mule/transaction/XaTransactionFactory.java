@@ -47,7 +47,9 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
         {
             TransactionManager txManager = muleContext.getTransactionManager();
             if (txManager.getTransaction() == null)
+            {
                 return null;
+            }
             XaTransaction xat = new ExternalXaTransaction(muleContext);
             xat.begin();
             return xat;

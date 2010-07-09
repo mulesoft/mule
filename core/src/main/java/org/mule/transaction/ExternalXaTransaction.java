@@ -14,10 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 
+import java.text.MessageFormat;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
-import javax.transaction.TransactionManager;
-import java.text.MessageFormat;
 
 /**
  * <code>ExternalXaTransaction</code> represents an external XA transaction in Mule.
@@ -86,7 +86,7 @@ public class ExternalXaTransaction extends XaTransaction
             catch (TransactionException ex)
             {
                 logger.warn(MessageFormat.format(
-                    "Exception while {0} an external transaction", commit ? "committing" : "rolling back"), ex);
+                    "Exception while {0} an external transaction {1}", commit ? "committing" : "rolling back", this), ex);
             }
         }
 
