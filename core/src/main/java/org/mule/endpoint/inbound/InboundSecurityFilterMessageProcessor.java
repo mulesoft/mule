@@ -40,7 +40,7 @@ public class InboundSecurityFilterMessageProcessor extends AbstractInterceptingM
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        MessageReceiver receiver = ((AbstractConnector) connector).getReceiver(event.getFlowConstruct(), endpoint);
+        MessageReceiver receiver = connector.getReceiver(event.getFlowConstruct(), endpoint);
         MuleEvent resultEvent = null;
 
         // Apply Security filter if one is set
