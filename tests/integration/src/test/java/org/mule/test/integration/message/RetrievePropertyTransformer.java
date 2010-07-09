@@ -12,6 +12,7 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class RetrievePropertyTransformer extends AbstractMessageAwareTransformer
@@ -21,7 +22,7 @@ public class RetrievePropertyTransformer extends AbstractMessageAwareTransformer
     @Override
     public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
-        Object storedProperty = message.getProperty(property);
+        Object storedProperty = message.getProperty(property, PropertyScope.INBOUND);
         return storedProperty != null ? storedProperty.getClass().getName() : null;
     }
 

@@ -30,7 +30,18 @@
 
             <outbound>
                 <pass-through-router>
-                     <vm:outbound-endpoint path="middle" exchange-pattern="request-response"/>
+                     <vm:outbound-endpoint path="middle" exchange-pattern="request-response">
+                         <transformers>
+                             <message-properties-transformer>
+                                 <!--
+                                    2 issues here:
+                                        * Use MPT's copy/propagate simplified syntax
+                                        * Session props should probably be propagated automatically?
+                                 -->
+                                 <add-message-property key="testProperty" value="#[header:SESSION:testProperty]"/>
+                             </message-properties-transformer>
+                         </transformers>
+                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
