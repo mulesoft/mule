@@ -40,7 +40,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -459,7 +458,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 if (tempReplyTo != null)
                 {
                     int i = tempReplyTo.toString().indexOf("://");
-                    if(i > -1)
+                    if (i > -1)
                     {
                         tempReplyTo = tempReplyTo.toString().substring(i+3);
                     }
