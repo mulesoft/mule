@@ -189,7 +189,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     {
         EndpointURI epUri = eventContext.getEndpointURI();
         String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
-        String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
         return epUri.getScheme() + "://" + host + ctx;
     }
     
@@ -199,15 +199,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
         {
             final MessageImpl m = new MessageImpl();
             final MuleMessage muleReqMsg = ctx.getMessage();
-            String method = (String) muleReqMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            String method = (String) muleReqMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND);
             
-            String ct = (String) muleReqMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            String ct = (String) muleReqMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
             if (ct != null) 
             {
                 m.put(Message.CONTENT_TYPE, ct);
             }
             
-            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
+            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND);
             if (path == null) 
             {
                 path = "";
@@ -217,7 +217,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             {
                 m.put(Message.HTTP_REQUEST_METHOD, method);
                 m.put(Message.PATH_INFO, path);
-                Object basePath = muleReqMsg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+                Object basePath = muleReqMsg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND);
                 m.put(Message.BASE_PATH, basePath);
                 
                 method = method.toUpperCase();

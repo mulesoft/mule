@@ -195,7 +195,7 @@ public class MessagePropertiesContext implements Serializable
             return;
         }
 
-        checkScopeForWriteAccess(scope);
+        //checkScopeForWriteAccess(scope);
         if (PropertyScope.SESSION.equals(scope))
         {
             if (RequestContext.getEvent() != null)
@@ -302,7 +302,7 @@ public class MessagePropertiesContext implements Serializable
             return;
         }
 
-        checkScopeForWriteAccess(scope);
+        //checkScopeForWriteAccess(scope);
         if (PropertyScope.SESSION.equals(scope))
         {
             if (RequestContext.getEvent() != null)

@@ -225,7 +225,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 path = path.substring(0, i);
             }
 
-            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.OUTBOUND);
+            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
             
             if (logger.isDebugEnabled())
             {
@@ -241,7 +241,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             if (receiver != null)
             {
                 message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                        HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()), PropertyScope.OUTBOUND);
+                        HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()), PropertyScope.INBOUND);
 
                 preRouteMessage(message);
                 MuleMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous());
@@ -367,7 +367,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             EndpointURI uri = endpoint.getEndpointURI();
             String failedPath = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort()
-                    + message.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.OUTBOUND);
+                    + message.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND);
 
             if (logger.isDebugEnabled())
             {

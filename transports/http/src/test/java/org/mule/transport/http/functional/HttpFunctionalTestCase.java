@@ -35,7 +35,7 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
 
     public void testSend() throws Exception
     {        
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("testComponent");
+        FunctionalTestComponent testComponent = getFunctionalTestComponent("testComponent");
         assertNotNull(testComponent);
 
         if (checkPathProperties) 
@@ -46,8 +46,8 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
                 {
                     MuleMessage msg = context.getMessage();
                     assertEquals("/", msg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND));
-                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.OUTBOUND));
-                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.OUTBOUND));
+                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND));
+                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND));
                 }
             };
         

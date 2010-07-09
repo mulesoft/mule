@@ -47,8 +47,8 @@ public class HttpStemTestCase extends FunctionalTestCase
             {
                 MuleMessage msg = context.getMessage();
                 assertEquals(requestPath, msg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND));
-                assertEquals(requestPath, msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.OUTBOUND));
-                assertEquals(contextPath, msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.OUTBOUND));
+                assertEquals(requestPath, msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND));
+                assertEquals(contextPath, msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND));
             }
         };
      
