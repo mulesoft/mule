@@ -10,7 +10,10 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,12 +28,6 @@ import org.mule.api.routing.RoutingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractRecipientList</code> is used to dispatch a single event to
@@ -56,7 +53,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         MuleSession session = event.getSession();
 
         List recipients = this.getRecipients(message);
-        List results = new ArrayList();
+        List<MuleEvent> results = new ArrayList<MuleEvent>();
         
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
         {
@@ -90,7 +87,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             {
                 if (sync)
                 {
-                    results.add(getMessage(sendRequest(session, request, endpoint, true)));
+                    results.add(sendRequest(session, request, endpoint, true));
                 }
                 else
                 {
@@ -103,7 +100,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        return createEvent(resultsHandler.aggregateResults(results, message, muleContext), event);
+        return resultsHandler.aggregateResults(results, muleContext, event);
     }
 
     protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException

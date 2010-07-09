@@ -10,12 +10,10 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;

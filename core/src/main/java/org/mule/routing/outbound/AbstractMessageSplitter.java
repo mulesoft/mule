@@ -10,8 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -41,7 +39,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
         String correlationId = messageInfoMapping.getCorrelationId(message);
 
-        List results = new ArrayList();
+        List<MuleEvent> results = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
         SplitMessage splitMessage = getMessageParts(message, getEndpoints());
 
@@ -89,7 +87,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
                 if (synchronous)
                 {
-                    results.add(getMessage(sendRequest(session, sendMessage, part.getEndpoint(), true)));
+                    results.add(sendRequest(session, sendMessage, part.getEndpoint(), true));
                 }
                 else
                 {
@@ -102,8 +100,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             }
         }
 
-        MuleMessage resultMessage =  resultsHandler.aggregateResults(results, message, muleContext);
-        return createEvent(resultMessage, event);
+        return resultsHandler.aggregateResults(results, muleContext, event);
     }
 
 

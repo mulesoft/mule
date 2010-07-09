@@ -10,7 +10,9 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMessageCollection;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.routing.RouterResultsHandler;
@@ -35,28 +37,32 @@ import java.util.List;
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
-    public MuleMessage aggregateResults(List<MuleMessage> results, MuleMessage orginalMessage, MuleContext muleContext)
+    public MuleEvent aggregateResults(List<MuleEvent> results, MuleContext muleContext, MuleEvent previous)
     {
+        MuleMessage aggregate;
+
         if (results == null || results.size() == 0)
         {
-            return null;
+            aggregate = null;
         }
         else if (results.size() == 1)
         {
-            return results.get(0);
+            aggregate = AbstractOutboundRouter.getMessage(results.get(0));
         }
         else
         {
             MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
-            for (Iterator<MuleMessage> iterator = results.iterator(); iterator.hasNext();)
+            for (MuleEvent event : results)
             {
-                MuleMessage muleMessage = iterator.next();
+                MuleMessage muleMessage = AbstractOutboundRouter.getMessage(event);
                 if(muleMessage!=null)
                 {
                     coll.addMessage(muleMessage);
                 }
             }
-            return coll;
+            aggregate = coll;
         }
+
+        return AbstractOutboundRouter.createEvent(aggregate, previous);
     }
 }

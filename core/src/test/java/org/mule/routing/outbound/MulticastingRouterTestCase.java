@@ -139,8 +139,16 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
-        assertEquals(message, result.getMessage());
+        assertEquals(getPayload(message), getPayload(result.getMessage()));
         mockendpoint1.verify();
         mockendpoint2.verify();
+    }
+
+    private String getPayload(MuleMessage message) throws Exception
+    {
+        Object payload = message.getPayload();
+        if (payload instanceof List)
+            payload = ((List)payload).get(0);
+        return payload.toString();
     }
 }

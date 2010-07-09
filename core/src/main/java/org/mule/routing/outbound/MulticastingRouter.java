@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -56,7 +55,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
             }
         }
 
-        List results = new ArrayList(endpoints.size());
+        List<MuleEvent> results = new ArrayList<MuleEvent>(endpoints.size());
         try
         {
             OutboundEndpoint endpoint;
@@ -76,7 +75,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
                         message, muleContext);
                     if (endpoint.isSynchronous())
                     {
-                        results.add(getMessage(sendRequest(session, clonedMessage, endpoint, true)));
+                        results.add(sendRequest(session, clonedMessage, endpoint, true));
                     }
                     else
                     {
@@ -89,6 +88,6 @@ public class MulticastingRouter extends FilteringOutboundRouter
         {
             throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
         }
-        return createEvent(resultsHandler.aggregateResults(results, message, muleContext), event);
+        return resultsHandler.aggregateResults(results, muleContext, event);
     }
 }

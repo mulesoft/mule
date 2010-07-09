@@ -10,6 +10,9 @@
 
 package org.mule.routing.outbound;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -369,13 +372,13 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     }
 
     /** @eturn the message from a (possibly null) event */
-    protected final MuleMessage getMessage(MuleEvent event)
+    protected static MuleMessage getMessage(MuleEvent event)
     {
         return event == null ? null : event.getMessage();
     }
 
     /** @eturn a possible null event created to hold a possible null message */
-    protected final MuleEvent createEvent(MuleMessage message, MuleEvent previous)
+    protected static MuleEvent createEvent(MuleMessage message, MuleEvent previous)
     {
         return message == null ? null : new DefaultMuleEvent(message, previous);
     }
