@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +22,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 
 import java.util.List;
@@ -121,7 +123,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getResponseTimeout();
     }
 
-    public List getResponseTransformers()
+    public List<Transformer> getResponseTransformers()
     {
         return endpoint.getResponseTransformers();
     }
@@ -151,7 +153,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getTransactionConfig();
     }
 
-    public List getTransformers()
+    public List<Transformer> getTransformers()
     {
         return endpoint.getTransformers();
     }
@@ -170,6 +172,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return endpoint.isSynchronous();
     }
+    
+    public MessageExchangePattern getMessageExchangePattern()
+    {
+        return endpoint.getMessageExchangePattern();
+    }
 
     public List<String> getResponseProperties()
     {
@@ -181,6 +188,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getEndpointBuilderName();
     }
 
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -190,6 +198,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return result;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)

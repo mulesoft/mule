@@ -11,6 +11,7 @@
 package org.mule.config.i18n;
 
 import org.mule.AbstractExceptionListener;
+import org.mule.MessageExchangePattern;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -1271,12 +1272,12 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 315, name);
     }
 
-    public static Message objectHasMoreThanOnePostConstructAnnotation(Class clazz)
+    public static Message objectHasMoreThanOnePostConstructAnnotation(Class<?> clazz)
     {
         return factory.createMessage(BUNDLE_PATH, 316, clazz.getName());
     }
 
-    public static Message objectHasMoreThanOnePreDestroyAnnotation(Class clazz)
+    public static Message objectHasMoreThanOnePreDestroyAnnotation(Class<?> clazz)
     {
         return factory.createMessage(BUNDLE_PATH, 317, clazz.getName());        
     }
@@ -1294,5 +1295,10 @@ public class CoreMessages extends MessageFactory
     public static Message lifecycleMethodCannotThrowChecked(Method method)
     {
         return factory.createMessage(BUNDLE_PATH, 320, method.getName());
+    }
+
+    public static Message endpointMepDoesNotSupportTransactions(EndpointURI uri, MessageExchangePattern mep)
+    {
+        return factory.createMessage(BUNDLE_PATH, 321, uri.getUri(), mep.name());
     }
 }

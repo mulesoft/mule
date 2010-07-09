@@ -45,11 +45,12 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
 
     public AtomInboundEndpoint(boolean splitFeed, Date lastUpdate, List<String> acceptedMimeTypes, InboundEndpoint ie)
     {
-        super(ie.getConnector(), ie.getEndpointURI(), ie.getTransformers(), ie.getResponseTransformers(), ie.getName(),
-                ie.getProperties(), ie.getTransactionConfig(), ie.getFilter(), ie.isDeleteUnacceptedMessages(),
-                ie.getSecurityFilter(), ie.isSynchronous(), ie.getResponseTimeout(), ie.getInitialState(),
-                ie.getEncoding(), ie.getEndpointBuilderName(), ie.getMuleContext(), ie.getRetryPolicyTemplate(), 
-                ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors());
+        super(ie.getConnector(), ie.getEndpointURI(), ie.getTransformers(), ie.getResponseTransformers(), 
+            ie.getName(), ie.getProperties(), ie.getTransactionConfig(), ie.getFilter(), 
+            ie.isDeleteUnacceptedMessages(), ie.getSecurityFilter(), ie.isSynchronous(), 
+            ie.getMessageExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
+            ie.getEncoding(), ie.getEndpointBuilderName(), ie.getMuleContext(), ie.getRetryPolicyTemplate(), 
+            ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors());
         this.splitFeed = splitFeed;
         this.lastUpdate = lastUpdate;
         this.acceptedMimeTypes = acceptedMimeTypes;
@@ -80,6 +81,7 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
         return supportedProtocols.remove(protocol);
     }
 
+    @Override
     public boolean isProtocolSupported(String protocol)
     {
         return supportedProtocols.contains(protocol);

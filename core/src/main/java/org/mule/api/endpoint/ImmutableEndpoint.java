@@ -10,6 +10,7 @@
 
 package org.mule.api.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -178,6 +179,8 @@ public interface ImmutableEndpoint extends Serializable
      */
     boolean isSynchronous();
 
+    MessageExchangePattern getMessageExchangePattern();
+    
     /**
      * The timeout value for waiting for a response from a remote invocation or back channel.  Mule will only wait
      * for a response is the {@link #isSynchronous()} flag is set to true.

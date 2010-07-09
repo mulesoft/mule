@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,6 +24,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 
@@ -130,7 +132,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getResponseTimeout();
     }
 
-    public List getResponseTransformers()
+    public List<Transformer> getResponseTransformers()
     {
         return endpoint.getResponseTransformers();
     }
@@ -160,7 +162,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getTransactionConfig();
     }
 
-    public List getTransformers()
+    public List<Transformer> getTransformers()
     {
         return endpoint.getTransformers();
     }
@@ -179,7 +181,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         return endpoint.isSynchronous();
     }
-
+    
+    public MessageExchangePattern getMessageExchangePattern()
+    {
+        return endpoint.getMessageExchangePattern();
+    }
 
     public MuleMessage request(long timeout) throws Exception
     {
@@ -196,6 +202,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return getConnector().supportsProtocol(protocol);
     }
 
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -205,6 +212,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return result;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)

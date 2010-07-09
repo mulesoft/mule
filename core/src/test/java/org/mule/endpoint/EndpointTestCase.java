@@ -10,10 +10,7 @@
 
 package org.mule.endpoint;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -35,6 +32,10 @@ import java.util.Map;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 public class EndpointTestCase extends AbstractMuleTestCase
 {
@@ -63,6 +64,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final boolean deleteUnacceptedMessages = true;
         final EndpointSecurityFilter mockEndpointSecurityFilter = mock(EndpointSecurityFilter.class);
         final boolean synchronous = true;
+        final MessageExchangePattern messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
         final int responseTimeout = 5;
         final String initialState = "state1";
         final String endpointEncoding = "enconding1";
@@ -108,8 +110,9 @@ public class EndpointTestCase extends AbstractMuleTestCase
         // configuration
         new AbstractEndpoint(mockConnector, uri, inputTransformers, outputTransformers, name, properties,
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
-            synchronous, responseTimeout, initialState, endpointEncoding, endpointBuilderName, muleContext,
-            retryPolicyTemplate, messageProcessorsFactory, messageProcessors, responseMessageProcessors)
+            synchronous, messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
+            endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
+            messageProcessors, responseMessageProcessors)
         {
             @Override
             protected MessageProcessor createMessageProcessorChain() throws MuleException

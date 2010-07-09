@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,6 +24,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
@@ -30,7 +32,7 @@ import org.mule.config.i18n.CoreMessages;
 import java.util.List;
 import java.util.Map;
 
-public class    DefaultInboundEndpoint extends AbstractEndpoint implements InboundEndpoint
+public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundEndpoint
 {
     private static final long serialVersionUID = -4752772777414636142L;
     private MessageProcessor listener;
@@ -38,8 +40,8 @@ public class    DefaultInboundEndpoint extends AbstractEndpoint implements Inbou
 
     public DefaultInboundEndpoint(Connector connector,
                                   EndpointURI endpointUri,
-                                  List transformers,
-                                  List responseTransformers,
+                                  List<Transformer> transformers,
+                                  List<Transformer> responseTransformers,
                                   String name,
                                   Map properties,
                                   TransactionConfig transactionConfig,
@@ -47,6 +49,7 @@ public class    DefaultInboundEndpoint extends AbstractEndpoint implements Inbou
                                   boolean deleteUnacceptedMessage,
                                   EndpointSecurityFilter securityFilter,
                                   boolean synchronous,
+                                  MessageExchangePattern messageExchangePattern,
                                   int responseTimeout,
                                   String initialState,
                                   String endpointEncoding,
@@ -57,10 +60,11 @@ public class    DefaultInboundEndpoint extends AbstractEndpoint implements Inbou
                                   List <MessageProcessor> messageProcessors,
                                   List <MessageProcessor> responseMessageProcessors)
     {
-        super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
-            deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-            endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
-            messageProcessorsFactory, messageProcessors, responseMessageProcessors);
+        super(connector, endpointUri, transformers, responseTransformers, name, properties, 
+            transactionConfig, filter, deleteUnacceptedMessage, securityFilter, synchronous, 
+            messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
+            endpointBuilderName, muleContext, retryPolicyTemplate,  messageProcessorsFactory, 
+            messageProcessors, responseMessageProcessors);
     }
 
     public MuleMessage request(long timeout) throws Exception
@@ -107,6 +111,7 @@ public class    DefaultInboundEndpoint extends AbstractEndpoint implements Inbou
         }
     }
 
+    @Override
     public MessageProcessor createMessageProcessorChain() throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();

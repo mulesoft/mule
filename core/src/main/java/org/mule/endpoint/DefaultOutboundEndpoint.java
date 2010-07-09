@@ -10,6 +10,7 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,6 +23,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
@@ -39,8 +41,8 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     public DefaultOutboundEndpoint(Connector connector,
                                    EndpointURI endpointUri,
-                                   List transformers,
-                                   List responseTransformers,
+                                   List<Transformer> transformers,
+                                   List<Transformer> responseTransformers,
                                    String name,
                                    Map properties,
                                    TransactionConfig transactionConfig,
@@ -48,6 +50,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    boolean deleteUnacceptedMessage,
                                    EndpointSecurityFilter securityFilter,
                                    boolean synchronous,
+                                   MessageExchangePattern messageExchangePattern,
                                    int responseTimeout,
                                    String initialState,
                                    String endpointEncoding,
@@ -59,10 +62,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    List <MessageProcessor> messageProcessors,
                                    List <MessageProcessor> responseMessageProcessors)
     {
-        super(connector, endpointUri, transformers, responseTransformers, name, properties, transactionConfig, filter,
-                deleteUnacceptedMessage, securityFilter, synchronous, responseTimeout, initialState,
-                endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
-                messageProcessorsFactory, messageProcessors, responseMessageProcessors);
+        super(connector, endpointUri, transformers, responseTransformers, name, properties, 
+            transactionConfig, filter, deleteUnacceptedMessage, securityFilter, synchronous, 
+            messageExchangePattern, responseTimeout, initialState, endpointEncoding, endpointBuilderName, 
+            muleContext, retryPolicyTemplate,  messageProcessorsFactory, messageProcessors, 
+            responseMessageProcessors);
 
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
@@ -87,6 +91,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         return getMessageProcessorChain().process(event);
     }
 
+    @Override
     protected MessageProcessor createMessageProcessorChain() throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();

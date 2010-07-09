@@ -10,11 +10,13 @@
 
 package org.mule.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -22,6 +24,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
@@ -64,12 +67,12 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    private final List transformers;
+    private final List<Transformer> transformers;
 
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    private final List responseTransformers;
+    private final List<Transformer> responseTransformers;
 
     private final EndpointMessageProcessorChainFactory messageProcessorsFactory;
 
@@ -118,6 +121,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     private final boolean synchronous;
 
+    private final MessageExchangePattern messageExchangePattern;
+    
     /**
      * How long to block when performing a remote synchronisation to a remote host.
      * This property is optional and will be set to the default Synchonous MuleEvent
@@ -140,8 +145,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
-                            List transformers,
-                            List responseTransformers,
+                            List<Transformer> transformers,
+                            List<Transformer> responseTransformers,
                             String name,
                             Map properties,
                             TransactionConfig transactionConfig,
@@ -149,6 +154,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             boolean deleteUnacceptedMessages,
                             EndpointSecurityFilter securityFilter,
                             boolean synchronous,
+                            MessageExchangePattern messageExchangePattern,
                             int responseTimeout,
                             String initialState,
                             String endpointEncoding,
@@ -190,11 +196,18 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 logger.debug("Endpoint has a transaction configuration. Defaulting to synchronous. Endpoint is: " + toString());
             }
             this.synchronous = true;
+            
+            if (messageExchangePattern.hasResponse() == false)
+            {
+                throw new InvalidEndpointTypeException(
+                    CoreMessages.endpointMepDoesNotSupportTransactions(endpointUri, messageExchangePattern));
+            }
         }
         else
         {
             this.synchronous = synchronous;
         }
+        this.messageExchangePattern = messageExchangePattern;
 
         this.messageProcessorsFactory = messageProcessorsFactory;
         if (messageProcessors == null)
@@ -269,7 +282,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return responseMessageProcessors;
     }
 
-    public List getTransformers()
+    public List<Transformer> getTransformers()
     {
         return transformers;
     }
@@ -284,6 +297,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return true;
     }
 
+    @Override
     public String toString()
     {
         // Use the interface to retrieve the string and set
@@ -344,6 +358,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return ClassUtils.equal(a, b);
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -372,6 +387,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
+    @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{this.getClass(), retryPolicyTemplate, connector,
@@ -433,6 +449,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return synchronous;
     }
 
+    public MessageExchangePattern getMessageExchangePattern()
+    {
+        return messageExchangePattern;
+    }
 
     /**
      * The timeout value for remoteSync invocations
@@ -455,7 +475,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return initialState;
     }
 
-    public List getResponseTransformers()
+    public List<Transformer> getResponseTransformers()
     {
         return responseTransformers;
     }

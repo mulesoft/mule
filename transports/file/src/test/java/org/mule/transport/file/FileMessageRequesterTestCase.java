@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
@@ -78,8 +79,9 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
             properties.put(key, value);
         }
         
-        return new DefaultInboundEndpoint(connector, null, null, null, null, 
-            properties, null, null, false, null, false, 42, null, null, null, muleContext, null, null, null, null);
+        return new DefaultInboundEndpoint(connector, null, null, null, null, properties, null, 
+            null, false, null, false, MessageExchangePattern.ONE_WAY, 42, null, null, null, 
+            muleContext, null, null, null, null);
     }
 
 }

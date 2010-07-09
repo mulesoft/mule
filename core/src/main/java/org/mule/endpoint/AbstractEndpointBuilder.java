@@ -170,8 +170,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
-                getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector), 
+                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
+                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
                 getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors);
     }
 
@@ -207,9 +207,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
-                getResponseTimeout(connector), getInitialState(connector), getEndpointEncoding(connector),
-                name, muleContext, getRetryPolicyTemplate(connector), responsePropertiesList, 
-                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors);
+                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
+                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
+                responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors, 
+                responseMessageProcessors);
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
