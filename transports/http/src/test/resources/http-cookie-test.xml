@@ -26,7 +26,7 @@
                             <spring:entry key="cookies">
                                 <spring:map>
                                     <spring:entry key="customCookie" value="yes"/>
-                                    <spring:entry key="expressionCookie" value="#[header:COOKIE_HEADER]"/>
+                                    <spring:entry key="expressionCookie" value="#[header:INBOUND:COOKIE_HEADER]"/>
                                 </spring:map>
                             </spring:entry>
                         </properties>
