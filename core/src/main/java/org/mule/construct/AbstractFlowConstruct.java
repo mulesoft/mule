@@ -32,7 +32,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.source.MessageSource;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
 
 /**
@@ -180,16 +180,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * configured {@link MessageSource}.
      * <p>
      * The default implementation of this methods uses a
-     * {@link ChainMessageProcessorBuilder} and allows a chain of
+     * {@link InterceptingChainMessageProcessorBuilder} and allows a chain of
      * {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(ChainMessageProcessorBuilder)} method but
+     * {@link #configureMessageProcessors(InterceptingChainMessageProcessorBuilder)} method but
      * if you wish to use another {@link MessageProcessorBuilder} or just a single
      * {@link MessageProcessor} then this method can be overridden and return a
      * single {@link MessageProcessor} instead.
      */
     protected void createMessageProcessor()
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         configureMessageProcessors(builder);
         messageProcessorChain = builder.build();
     }
@@ -202,9 +202,9 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * {@link MessageProcessor} manually override {@link #createMessageProcessor()}
      * instead.
      * 
-     * @param builder instance of {@link ChainMessageProcessorBuilder}
+     * @param builder instance of {@link InterceptingChainMessageProcessorBuilder}
      */
-    protected abstract void configureMessageProcessors(ChainMessageProcessorBuilder builder);
+    protected abstract void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder);
 
     public String getName()
     {

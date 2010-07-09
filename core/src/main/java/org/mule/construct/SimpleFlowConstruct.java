@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.NullMessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
 import java.util.Collection;
 
@@ -22,7 +22,7 @@ import java.util.Collection;
  * Simple implementation of {@link AbstractFlowConstruct} that allows a list of
  * {@link MessageProcessor}s that will be used to process messages to be configured.
  * These MessageProcessors are chained together using the
- * {@link ChainMessageProcessorBuilder}.
+ * {@link InterceptingChainMessageProcessorBuilder}.
  * <p/>
  * If not message processors are configured then the source message is simply
  * returned.
@@ -42,7 +42,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(ChainMessageProcessorBuilder builder)
+    protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
         if (messageProcessors != null)
         {

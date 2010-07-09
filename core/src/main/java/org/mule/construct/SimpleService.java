@@ -16,7 +16,7 @@ import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
 /**
  * In-out SOA-style simple service, with no outbound router. Always fully
@@ -37,7 +37,7 @@ public class SimpleService extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(ChainMessageProcessorBuilder builder)
+    protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         // TODO add builder.chain(statisticsInterceptingMessageProcess)

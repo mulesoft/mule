@@ -36,7 +36,7 @@ import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
 import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
@@ -124,8 +124,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, MessageProcessor target) throws MuleException
     {
         // -- REQUEST CHAIN --
-        ChainMessageProcessorBuilder requestChainBuilder = new ChainMessageProcessorBuilder();
-        requestChainBuilder.setName("Inbound endpoint request pipeline");
+        InterceptingChainMessageProcessorBuilder requestChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        requestChainBuilder.setName("InboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
         // Default MPs
         requestChainBuilder.chain(createInboundMessageProcessors(endpoint));
         // Configured MPs (if any)
@@ -139,8 +139,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         requestChainBuilder.chain(target);
 
         // -- RESPONSE CHAIN --
-        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
-        responseChainBuilder.setName("Inbound endpoint response pipeline");
+        InterceptingChainMessageProcessorBuilder responseChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        responseChainBuilder.setName("InboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
         // Default MPs
         responseChainBuilder.chain(createInboundResponseMessageProcessors(endpoint));
         // Configured MPs (if any)
@@ -148,8 +148,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         // Compose request and response chains. We do this so that if the request
         // chain returns early the response chain is still invoked.
-        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
-        compositeChainBuilder.setName("Inbound endpoint request/response composite pipeline");
+        InterceptingChainMessageProcessorBuilder compositeChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        compositeChainBuilder.setName("InboundEndpoint '"+ endpoint.getEndpointURI().getUri() +"' composite request/response chain");
         compositeChainBuilder.chain(requestChainBuilder.build(), responseChainBuilder.build());
         return compositeChainBuilder.build();
     }
@@ -157,8 +157,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException
     {
         // -- REQUEST CHAIN --
-        ChainMessageProcessorBuilder outboundChainBuilder = new ChainMessageProcessorBuilder();
-        outboundChainBuilder.setName("Outbound endpoint request chain");
+        InterceptingChainMessageProcessorBuilder outboundChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        outboundChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' request chain");
         // Default MPs
         outboundChainBuilder.chain(createOutboundMessageProcessors(endpoint));
         // Configured MPs (if any)
@@ -172,8 +172,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         outboundChainBuilder.chain(target);
         
         // -- RESPONSE CHAIN --
-        ChainMessageProcessorBuilder responseChainBuilder = new ChainMessageProcessorBuilder();
-        responseChainBuilder.setName("Outbound endpoint response chain");
+        InterceptingChainMessageProcessorBuilder responseChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        responseChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' response chain");
         // Default MPs
         responseChainBuilder.chain(createOutboundResponseMessageProcessors(endpoint));
         // Configured MPs (if any)
@@ -181,8 +181,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         // Compose request and response chains. We do this so that if the request
         // chain returns early the response chain is still invoked.
-        ChainMessageProcessorBuilder compositeChainBuilder = new ChainMessageProcessorBuilder();
-        compositeChainBuilder.setName("Outbound endpoint request/response composite chain");
+        InterceptingChainMessageProcessorBuilder compositeChainBuilder = new InterceptingChainMessageProcessorBuilder();
+        compositeChainBuilder.setName("OutboundEndpoint '" + endpoint.getEndpointURI().getUri() + "' composite request/response chain");
         compositeChainBuilder.chain(outboundChainBuilder.build(), responseChainBuilder.build());
         return compositeChainBuilder.build();
     }

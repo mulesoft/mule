@@ -23,7 +23,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
@@ -40,7 +39,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
@@ -48,8 +47,6 @@ import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -474,7 +471,8 @@ public abstract class AbstractService implements Service
 
     protected void buildServiceMessageProcessorChain()
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.setName("Service '"+name+"' Processor Chain");
         builder.chain(getServiceStartedAssertingMessageProcessor());
         addMessageProcessors(builder);
 
@@ -495,7 +493,7 @@ public abstract class AbstractService implements Service
         return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
     }
 
-    protected abstract void addMessageProcessors(ChainMessageProcessorBuilder builder);
+    protected abstract void addMessageProcessors(InterceptingChainMessageProcessorBuilder builder);
 
     protected ServiceStatistics createStatistics()
     {

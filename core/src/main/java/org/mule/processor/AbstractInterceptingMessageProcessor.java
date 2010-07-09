@@ -10,12 +10,13 @@
 
 package org.mule.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link InterceptingMessageProcessor} that simply
@@ -41,6 +42,10 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
         }
         else
         {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
+            }
             return next.process(event);
         }
     }

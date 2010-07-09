@@ -20,10 +20,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 
 import java.util.ArrayList;
@@ -48,30 +46,19 @@ import org.apache.commons.logging.LogFactory;
  * chains as required.
  * </p>
  */
-public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
+public class IteratingListMessageProcessorBuilder implements MessageProcessorBuilder
 {
 
-    protected List<MessageProcessor> chain = new ArrayList<MessageProcessor>();
+    protected List<MessageProcessor> list = new ArrayList<MessageProcessor>();
     protected String name;
 
     public MessageProcessor build()
     {
-        if (chain.isEmpty())
+        if (list.isEmpty())
         {
             return new NullMessageProcessor();
         }
-
-        InterceptingMessageProcessor first = createInterceptingMessageProcessor(chain.get(0));
-        MessageProcessor composite = new ChainedCompositeMessageProcessor(first, chain, name);
-        InterceptingMessageProcessor current = first;
-
-        for (int i = 1; i < chain.size(); i++)
-        {
-            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(chain.get(i));
-            current.setListener(mp);
-            current = mp;
-        }
-        return composite;
+        return new IteratingListCompositeMessageProcessor(list, name);
     }
 
     public void setName(String name)
@@ -79,65 +66,40 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
         this.name = name;
     }
 
-    private InterceptingMessageProcessor createInterceptingMessageProcessor(MessageProcessor processor)
-    {
-        if (processor instanceof InterceptingMessageProcessor)
-        {
-            return (InterceptingMessageProcessor) processor;
-        }
-        else
-        {
-            return new InterceptingMessageProcessorAdapter(processor);
-        }
-    }
-
-    public ChainMessageProcessorBuilder chain(MessageProcessor... processors)
+    public IteratingListMessageProcessorBuilder add(MessageProcessor... processors)
     {
         for (MessageProcessor messageProcessor : processors)
         {
-            chain.add(messageProcessor);
+            list.add(messageProcessor);
         }
         return this;
     }
 
-    public ChainMessageProcessorBuilder chain(Collection <MessageProcessor> processors)
+    public IteratingListMessageProcessorBuilder InterceptingChainMessageProcessorBuilder(Collection<MessageProcessor> processors)
     {
         if (processors != null)
         {
-            chain.addAll(processors);
+            list.addAll(processors);
         }
         return this;
     }
 
-    public ChainMessageProcessorBuilder chainBefore(MessageProcessor processor)
+    public IteratingListMessageProcessorBuilder addBefore(MessageProcessor processor)
     {
-        chain.add(0, processor);
+        list.add(0, processor);
         return this;
     }
-    
-    static class InterceptingMessageProcessorAdapter extends AbstractInterceptingMessageProcessor
+
+    @Override
+    public String toString()
     {
-        private MessageProcessor delegate;
-
-        public InterceptingMessageProcessorAdapter(MessageProcessor mp)
+        if (name != null)
         {
-            this.delegate = mp;
+            return "IteratingListMessageProcessorBuilder '" + name + "'";
         }
-
-        public MuleEvent process(MuleEvent event) throws MuleException
+        else
         {
-            return processNext(delegate.process(event));
-        }
-
-        public void setNext(MessageProcessor next)
-        {
-            this.next = next;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "InterceptingMessageProcessorAdapter[" + delegate.getClass().getName() + "]";
+            return super.toString();
         }
     }
 
@@ -147,21 +109,18 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
      * MessageProcessor in the parent chain is not injected into the first in the
      * nested chain.
      */
-    static class ChainedCompositeMessageProcessor implements MessageProcessor, Lifecycle, FlowConstructAware
+    static class IteratingListCompositeMessageProcessor
+        implements MessageProcessor, Lifecycle, FlowConstructAware
     {
         private Log log;
         private String name;
-        private MessageProcessor firstInChain;
-        private List<MessageProcessor> allProcessors;
+        private List<MessageProcessor> list;
 
-        public ChainedCompositeMessageProcessor(InterceptingMessageProcessor firstInChain,
-                                                List<MessageProcessor> allProcessors,
-                                                String name)
+        public IteratingListCompositeMessageProcessor(List<MessageProcessor> list, String name)
         {
             this.name = name;
-            this.firstInChain = firstInChain;
-            this.allProcessors = allProcessors;
-            log = LogFactory.getLog(ChainedCompositeMessageProcessor.class);
+            this.list = list;
+            log = LogFactory.getLog(IteratingListCompositeMessageProcessor.class);
         }
 
         public MuleEvent process(MuleEvent event) throws MuleException
@@ -170,12 +129,17 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
             {
                 log.debug("Invoking " + this + " with event " + event);
             }
-            return firstInChain.process(event);
+            MuleEvent result = event;
+            for (MessageProcessor processor : list)
+            {
+                result = processor.process(result);
+            }
+            return result;
         }
 
         public void initialise() throws InitialisationException
         {
-            for (MessageProcessor processor : allProcessors)
+            for (MessageProcessor processor : list)
             {
                 if (processor instanceof Initialisable)
                 {
@@ -186,7 +150,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
         public void start() throws MuleException
         {
-            for (MessageProcessor processor : allProcessors)
+            for (MessageProcessor processor : list)
             {
                 if (processor instanceof Startable)
                 {
@@ -197,7 +161,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
         public void stop() throws MuleException
         {
-            for (MessageProcessor processor : allProcessors)
+            for (MessageProcessor processor : list)
             {
                 if (processor instanceof Stoppable)
                 {
@@ -208,7 +172,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
         public void dispose()
         {
-            for (MessageProcessor processor : allProcessors)
+            for (MessageProcessor processor : list)
             {
                 if (processor instanceof Disposable)
                 {
@@ -219,7 +183,7 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
 
         public void setFlowConstruct(FlowConstruct flowConstruct)
         {
-            for (MessageProcessor processor : allProcessors)
+            for (MessageProcessor processor : list)
             {
                 if (processor instanceof FlowConstructAware)
                 {
@@ -227,41 +191,33 @@ public class ChainMessageProcessorBuilder implements MessageProcessorBuilder
                 }
             }
         }
-    }
 
-    @Override
-    public String toString()
-    {
-        StringBuffer string = new StringBuffer();
-        string.append("ChainedCompositeMessageProcessor [");
-        if (name != null)
+        @Override
+        public String toString()
         {
-            string.append("name=\"");
-            string.append(name);
-            string.append("\", ");
-        }
-        string.append("processors=");
-        Iterator<MessageProcessor> mpIterator = chain.iterator();
-        while (mpIterator.hasNext())
-        {
-            MessageProcessor mp = mpIterator.next();
-            if (mp instanceof ChainedCompositeMessageProcessor)
+            StringBuffer string = new StringBuffer();
+            string.append("IteratingListCompositeMessageProcessor ");
+            if (name != null)
             {
-                string.append("ChainedCompositeMessageProcessor [name=\"");
-                string.append(((ChainedCompositeMessageProcessor) mp).name);
-                string.append("\"]");
+                string.append(" '" + name + "' ");
             }
             else
             {
-                string.append(mp.getClass().getName());
+                string.append("[ processors= ");
+                Iterator<MessageProcessor> mpIterator = list.iterator();
+                while (mpIterator.hasNext())
+                {
+                    MessageProcessor mp = mpIterator.next();
+                    string.append(mp.getClass().getName());
+                    if (mpIterator.hasNext())
+                    {
+                        string.append(", ");
+                    }
+                }
+                string.append(" ]");
             }
-            if (mpIterator.hasNext())
-            {
-                string.append(",");
-            }
+            return string.toString();
         }
-        string.append("]");
-        return string.toString();
     }
 
 }

@@ -18,7 +18,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -60,7 +60,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
 
     public void initialise() throws InitialisationException
     {
-        ChainMessageProcessorBuilder chainBuilder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder chainBuilder = new InterceptingChainMessageProcessorBuilder();
         for (Interceptor interceptor : interceptors)
         {
             if (interceptor instanceof Initialisable)

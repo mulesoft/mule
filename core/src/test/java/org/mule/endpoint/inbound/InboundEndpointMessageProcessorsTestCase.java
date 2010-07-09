@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
 
     public void testProcessors() throws Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
         MessageProcessor mpChain = builder.build();
         
@@ -56,7 +56,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
 
     public void testNoProcessors() throws Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         MessageProcessor mpChain = builder.build();
         
         result = mpChain.process(requestEvent);

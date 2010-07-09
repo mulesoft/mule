@@ -18,18 +18,18 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.builder.ChainMessageProcessorBuilder;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
+public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
 {
 
     @Test
     public void testMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"));
         assertEquals("0123", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
@@ -37,7 +37,7 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testInterceptingMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2"),
             new AppendingInterceptingMP("3"));
         assertEquals("0before1before2before3after3after2after1", builder.build()
@@ -48,7 +48,7 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testMixedMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new AppendingInterceptingMP("1"), new AppendingMP("2"), new AppendingMP("3"),
             new AppendingInterceptingMP("4"), new AppendingMP("5"));
         assertEquals("0before123before45after4after1", builder.build()
@@ -59,8 +59,8 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testNestedMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new AppendingMP("1"), new ChainMessageProcessorBuilder().chain(new AppendingMP("a"),
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new AppendingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(new AppendingMP("a"),
             new AppendingMP("b")).build(), new AppendingMP("2"));
         assertEquals("01ab2", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
@@ -68,8 +68,8 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testNestedInterceptingMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new AppendingInterceptingMP("1"), new ChainMessageProcessorBuilder().chain(
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new AppendingInterceptingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(
             new AppendingInterceptingMP("a"), new AppendingInterceptingMP("b")).build(),
             new AppendingInterceptingMP("2"));
         assertEquals("0before1beforeabeforebafterbafterabefore2after2after1", builder.build().process(
@@ -79,8 +79,8 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testNestedMixedMPChain() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new AppendingMP("1"), new ChainMessageProcessorBuilder().chain(
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new AppendingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(
             new AppendingInterceptingMP("a"), new AppendingMP("b")).build(), new AppendingInterceptingMP("2"));
         assertEquals("01beforeabafterabefore2after2", builder.build()
             .process(getTestEvent("0"))
@@ -90,7 +90,7 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testInterceptingMPChainStopFlow() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2", true),
             new AppendingInterceptingMP("3"));
         assertEquals("0before1after1", builder.build().process(getTestEvent("0")).getMessageAsString());
@@ -103,8 +103,8 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testNestedInterceptingMPChainStopFlow() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        builder.chain(new AppendingInterceptingMP("1"), new ChainMessageProcessorBuilder().chain(
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new AppendingInterceptingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(
             new AppendingInterceptingMP("a", true), new AppendingInterceptingMP("b")).build(),
             new AppendingInterceptingMP("3"));
         assertEquals("0before1before3after3after1", builder.build()
@@ -115,7 +115,7 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testMPChainLifecycle() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         AppendingMP mp1 = new AppendingInterceptingMP("1");
         AppendingMP mp2 = new AppendingInterceptingMP("2");
         MessageProcessor chain = builder.chain(mp1, mp2).build();
@@ -130,8 +130,8 @@ public class ChainMessageProcessorBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void testNestedMPChainLifecycle() throws MuleException, Exception
     {
-        ChainMessageProcessorBuilder builder = new ChainMessageProcessorBuilder();
-        ChainMessageProcessorBuilder nestedBuilder = new ChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder nestedBuilder = new InterceptingChainMessageProcessorBuilder();
         AppendingMP mp1 = new AppendingInterceptingMP("1");
         AppendingMP mp2 = new AppendingInterceptingMP("2");
         AppendingMP mpa = new AppendingInterceptingMP("a");
