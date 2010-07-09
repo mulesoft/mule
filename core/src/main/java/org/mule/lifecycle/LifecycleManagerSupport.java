@@ -153,7 +153,7 @@ public abstract class LifecycleManagerSupport<O> implements LifecycleManager
 
     }
 
-    protected boolean isDirectTransition(String destinationPhase)
+    public boolean isDirectTransition(String destinationPhase)
     {
         return isDirectTransition(getCurrentPhase(), destinationPhase);
     }
@@ -226,4 +226,6 @@ public abstract class LifecycleManagerSupport<O> implements LifecycleManager
     {
         return state;
     }
+
+    
 }

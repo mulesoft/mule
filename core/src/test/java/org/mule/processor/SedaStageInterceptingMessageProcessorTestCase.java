@@ -225,6 +225,13 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             stopped.set(true);
             disposed.set(true);
         }
+
+        public boolean isValidTransition(String phase)
+        {
+            return false;
+        }
     }
+
+
 
 }

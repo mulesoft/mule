@@ -16,6 +16,8 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
+import org.mule.api.transport.MessageDispatcher;
+import org.mule.api.transport.MessageRequester;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -346,12 +348,12 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.stop();
         assertEquals(0, connector.receivers.size());
-
     }
 
     public void testDispatchersLifecycle() throws Exception
     {
-        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
+        //using sync endpoint so that any calls to 'process()' will be blocking and avoid timing issues
+        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out?synchronous=true", null, null, null, connector);
 
         // attempts to send/dispatch/request are made on a stopped/stopping connector
         // This should fail because the connector is not started!
@@ -374,13 +376,11 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         //This causes the first instance out dispatcher to be created
         assertDispatcherStartedConnected(out, true, true);
 
-        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2", null, null, null, connector);
+        OutboundEndpoint out2 = getTestOutboundEndpoint("out2", "test://out2?synchronous=true", null, null, null, connector);
         //This causes the first instance out2 dispatcher to be created
         out2.process(getTestEvent("data", out2));
 
-        Thread.sleep(1000);
         //At this point there should be two idle, but the build server reports one, I suspect its a timing issues
-        //so I ahve inserted the sleep above to allow time for the out2 dispatcher to be returned to the pool
         assertEquals(2, connector.dispatchers.getNumIdle());
         assertDispatcherStartedConnected(out, true, true);
         assertDispatcherStartedConnected(out2, true, true);
@@ -404,6 +404,31 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.dispose();
         assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
+
+    }
+
+    public void testDispatcherFullLifecycle() throws Exception
+    {
+        OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
+
+        MessageDispatcher dispatcher = connector.getDispatcherFactory().create(out);
+        dispatcher.initialise();
+        
+        assertTrue(dispatcher.getLifecycleState().isInitialised());
+        dispatcher.connect();
+        assertTrue(dispatcher.isConnected());
+
+        dispatcher.start();
+        assertTrue(dispatcher.getLifecycleState().isStarted());
+
+        dispatcher.stop();
+        assertTrue(dispatcher.getLifecycleState().isStopped());
+
+        dispatcher.disconnect();
+        assertFalse(dispatcher.isConnected());
+
+        dispatcher.dispose();
+        assertTrue(dispatcher.getLifecycleState().isDisposed());
 
     }
 
@@ -461,6 +486,32 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.dispose();
         assertEquals(0, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
+
+    }
+
+    public void testRequesterFullLifecycle() throws Exception
+    {
+        InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
+
+        MessageRequester requester = connector.getRequesterFactory().create(in);
+
+        requester.initialise();
+        assertTrue(requester.getLifecycleState().isInitialised());
+
+        requester.connect();
+        assertTrue(requester.isConnected());
+
+        requester.start();
+        assertTrue(requester.getLifecycleState().isStarted());
+
+        requester.stop();
+        assertTrue(requester.getLifecycleState().isStopped());
+
+        requester.disconnect();
+        assertFalse(requester.isConnected());
+
+        requester.dispose();
+        assertTrue(requester.getLifecycleState().isDisposed());
 
     }
 

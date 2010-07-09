@@ -82,4 +82,9 @@ public class DefaultLifecycleState implements LifecycleState
         }
         return false;
     }
+
+    public boolean isValidTransition(String phase)
+    {
+        return lifecycleManager.isDirectTransition(phase);
+    }
 }

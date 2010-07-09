@@ -11,8 +11,6 @@ package org.mule.api.lifecycle;
 
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 
-import java.util.List;
-
 /**
  * The LifecycleManager is responsible for managing the different lifecycle phases of the server and managing the
  * transitions between lifecycle phases.
@@ -74,5 +72,6 @@ public interface LifecycleManager
      */
     LifecycleState getState();
 
+    boolean isDirectTransition(String phase);
 
 }

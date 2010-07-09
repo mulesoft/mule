@@ -14,13 +14,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.component.DefaultComponentLifecycleAdapterFactory;
-import org.mule.context.notification.ModelNotification;
+import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.service.DefaultServiceExceptionStrategy;
@@ -30,7 +30,6 @@ import java.beans.ExceptionListener;
 import java.util.Collection;
 import java.util.Iterator;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,12 +46,12 @@ public abstract class AbstractModel implements Model
     private String name = DEFAULT_MODEL_NAME;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private AtomicBoolean initialised = new AtomicBoolean(false);
-    private AtomicBoolean started = new AtomicBoolean(false);
     private ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
+
+    protected ModelLifecycleManager lifecycleManager = new ModelLifecycleManager(this);
 
     public String getName()
     {
@@ -62,6 +61,11 @@ public abstract class AbstractModel implements Model
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public LifecycleState getLifecycleState()
+    {
+        return lifecycleManager.getState();
     }
 
     public EntryPointResolverSet getEntryPointResolverSet()
@@ -108,7 +112,15 @@ public abstract class AbstractModel implements Model
     /** Destroys any current components */
     public void dispose()
     {
-        fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
+        try
+        {
+            lifecycleManager.fireDisposePhase(new EmptyLifecycleCallback<AbstractModel>());
+        }
+        catch (MuleException e)
+        {
+            logger.error("Failed to dispose model: " + getName(), e);
+        }
+
     }
 
     /**
@@ -118,8 +130,7 @@ public abstract class AbstractModel implements Model
      */
     public void stop() throws MuleException
     {
-        started.set(false);
-        fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
+        lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<AbstractModel>());
     }
 
     /**
@@ -129,32 +140,22 @@ public abstract class AbstractModel implements Model
      */
     public void start() throws MuleException
     {
-        if (!initialised.get())
-        {
-            throw new IllegalStateException("Not Initialised");
-        }
-
-        if (!started.get())
-        {
-            started.set(true);
-            fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTED));
-        }
-        else
-        {
-            logger.debug("Model already started");
-        }
+        lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<AbstractModel>());
     }
 
     public void initialise() throws InitialisationException
     {
-        if (!initialised.get())
+        try
         {
-            initialised.set(true);
-            fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISED));
+            lifecycleManager.fireInitialisePhase(new EmptyLifecycleCallback<AbstractModel>());
         }
-        else
+        catch (InitialisationException e)
         {
-            logger.debug("Model already initialised");
+            throw e;
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -168,17 +169,7 @@ public abstract class AbstractModel implements Model
         this.exceptionListener = exceptionListener;
     }
 
-    void fireNotification(ServerNotification notification)
-    {
-        if (muleContext != null)
-        {
-            muleContext.fireNotification(notification);
-        }
-        else if (logger.isWarnEnabled())
-        {
-            logger.debug("MuleContext is not yet available for firing notifications, ignoring event: " + notification);
-        }
-    }
+
 
     public void setMuleContext(MuleContext context)
     {
@@ -189,6 +180,11 @@ public abstract class AbstractModel implements Model
         {
             ((MuleContextAware)exceptionListener).setMuleContext(muleContext);
         }
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
     }
 
     @Override

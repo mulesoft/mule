@@ -365,18 +365,25 @@ public abstract class AbstractConnectable<O> implements Connectable, ExceptionLi
         {
             try
             {
-                retryTemplate.execute(new RetryCallback()
+                lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
                 {
-                    public void doWork(RetryContext context) throws InterruptedException, MuleException
+                    public void onTransition(String phaseName, O object) throws MuleException
                     {
-                        callDoStartWhenItIsConnected();
+                        doStart();
                     }
-
-                    public String getWorkDescription()
-                    {
-                        return "starting " + getConnectionDescription();
-                    }
-                }, getWorkManager());
+                });
+//                retryTemplate.execute(new RetryCallback()
+//                {
+//                    public void doWork(RetryContext context) throws InterruptedException, MuleException
+//                    {
+//                        callDoStartWhenItIsConnected();
+//                    }
+//
+//                    public String getWorkDescription()
+//                    {
+//                        return "starting " + getConnectionDescription();
+//                    }
+//                }, getWorkManager());
             }
             catch (MuleException e)
             {

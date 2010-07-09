@@ -209,6 +209,10 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
             {
                 return;
             }
+            else if(!((LifecycleStateEnabled)o).getLifecycleState().isValidTransition(this.getName()))
+            {
+                return;   
+            }
         }
         try
         {

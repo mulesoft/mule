@@ -36,4 +36,6 @@ public interface LifecycleState
     
     boolean isPhaseExecuting(String phase);
 
+    boolean isValidTransition(String phase);
+
 }

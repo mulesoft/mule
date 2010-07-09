@@ -14,6 +14,7 @@ import org.mule.api.NamedObject;
 import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
 
 import java.beans.ExceptionListener;
 
@@ -22,7 +23,7 @@ import java.beans.ExceptionListener;
  * Mule Server instance. It is responsible for maintaining the Service instances and
  * their configuration.
  */
-public interface Model extends Lifecycle, MuleContextAware, NamedObject
+public interface Model extends Lifecycle, MuleContextAware, NamedObject, LifecycleStateEnabled
 {
     /**
      * Returns the model type name. This is a friendly identifier that is used to

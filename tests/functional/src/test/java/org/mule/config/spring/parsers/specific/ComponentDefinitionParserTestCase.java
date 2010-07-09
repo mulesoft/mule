@@ -11,22 +11,16 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
-import org.mule.api.component.LifecycleAdapter;
-import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.component.simple.StaticComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
@@ -43,6 +37,7 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 
@@ -247,10 +242,11 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertNotNull(service.getComponent());
         assertFalse(service.getComponent() instanceof PassThroughComponent);
         assertTrue(service.getComponent() instanceof JavaComponent);
-        assertEquals(StaticComponent.class, ((JavaComponent) service.getComponent()).getObjectType());
+        assertEquals(DummyComponentWithBinding.class, ((JavaComponent) service.getComponent()).getObjectType());
         assertNotNull(((JavaComponent) service.getComponent()).getBindingCollection());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
         assertTrue(((JavaComponent) service.getComponent()).getBindingCollection().getRouters().get(0) instanceof DefaultInterfaceBinding);
-        assertTrue(((JavaComponent) service.getComponent()).getLifecycleAdapterFactory() instanceof TestLifecycleAdapterFactory);
+        assertTrue(((JavaComponent) service.getComponent()).getLifecycleAdapterFactory() instanceof TestComponentLifecycleAdapterFactory);
 
     }
 
@@ -258,16 +254,4 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
     {
         return null;
     }
-
-}
-
-class TestLifecycleAdapterFactory implements LifecycleAdapterFactory
-{
-
-    public LifecycleAdapter create(Object pojoService, JavaComponent component, FlowConstruct flowConstruct, EntryPointResolverSet resolver, MuleContext muleContext)
-        throws MuleException
-    {
-        return null;
-    }
-
 }

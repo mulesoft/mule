@@ -351,9 +351,9 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
     public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
-        //fire stop directly
-        reg.fireLifecycle(Disposable.PHASE_NAME);
 
+        reg.fireLifecycle(Disposable.PHASE_NAME);
+        
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
         try
         {

@@ -85,20 +85,11 @@ public class RegistryLifecycleManager extends LifecycleManagerSupport<Registry> 
         //start stop
         addDirectTransition(Startable.PHASE_NAME, Stoppable.PHASE_NAME);
         addDirectTransition(Stoppable.PHASE_NAME, Startable.PHASE_NAME);
-        //Dispose can be called from any phase. see {@link #checkPhase}
-    }
+        //Dispose can be called from init or stopped
+        addDirectTransition(NotInLifecyclePhase.PHASE_NAME, Disposable.PHASE_NAME);
+        addDirectTransition(Initialisable.PHASE_NAME, Disposable.PHASE_NAME);
+        addDirectTransition(Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
 
-    @Override
-    public void checkPhase(String name) throws IllegalStateException
-    {
-        //Allow dispose to be called from any other lifecycle since the registry can transition through the
-        //phases automatically
-        if (Disposable.PHASE_NAME.equals(name) && !state.isDisposed())
-        {
-            return;
-        }
-
-        super.checkPhase(name);
     }
 
     protected void registerPhase(String phaseName, LifecyclePhase phase, LifecycleCallback callback)

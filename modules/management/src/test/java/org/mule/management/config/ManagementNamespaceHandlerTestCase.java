@@ -48,7 +48,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testSimpleJmxAgentConfig() throws Exception
     {
-        Agent agent = (Agent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+        Agent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;

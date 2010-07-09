@@ -16,6 +16,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
@@ -52,6 +53,17 @@ public abstract class AbstractRegistry implements Registry
 
     public final synchronized void dispose()
     {
+        if(lifecycleManager.getState().isStarted())
+        {
+            try
+            {
+                getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
+            }
+            catch (LifecycleException e)
+            {
+                logger.error("Failed to shut down registry cleanly: " + getRegistryId(), e);
+            }
+        }
         //Fire dispose lifecycle before calling doDispose() that that registries can clear any object caches once all objects
         //are disposed
         try
@@ -122,6 +134,11 @@ public abstract class AbstractRegistry implements Registry
 
     public void fireLifecycle(String phase) throws LifecycleException
     {
+        //Implicitly call stop if necessary when disposing
+        if(Disposable.PHASE_NAME.equals(phase) && lifecycleManager.getState().isStarted())
+        {
+            getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
+        }
         getLifecycleManager().fireLifecycle(phase);
     }
 

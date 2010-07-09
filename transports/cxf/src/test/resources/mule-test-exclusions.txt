@@ -24,5 +24,3 @@ org.mule.transport.cxf.WSProxyTestCase
 # MULE-3694
 org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
 
-#MULE-4945. Broken by lifecycle changes RM owning
-org.mule.transport.cxf.CxfMessageDispatcherTestCase
