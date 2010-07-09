@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.service.Service;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.soap.SoapConstants;
@@ -71,7 +72,7 @@ public class AxisServiceProxy
         {
             MuleMessage messageToRoute = receiver.createMuleMessage(args, 
                 receiver.getEndpoint().getEncoding());
-            messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
+            messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method, PropertyScope.OUTBOUND);
             
             // add all custom headers, filter out all mule headers (such as
             // MULE_SESSION) except

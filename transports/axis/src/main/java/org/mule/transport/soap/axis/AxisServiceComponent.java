@@ -21,6 +21,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -118,7 +119,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         AxisStringWriter response = new AxisStringWriter();
         String method = context.getMessage().getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY,
-            HttpConstants.METHOD_POST);
+            PropertyScope.INBOUND, HttpConstants.METHOD_POST);
         if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
         {
             doGet(context, response);
@@ -159,7 +160,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
                                 + "://" + context.getEndpointURI().getHost() + ":"
                                 + context.getEndpointURI().getPort();
-                uri += context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "");
+                uri += context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND, "");
                 endpointUri = new MuleEndpointURI(uri, context.getMuleContext());
                 endpointUri.initialise();
             }
@@ -264,8 +265,9 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
 
             Message requestMsg = new Message(request, false, context.getMessage().getStringProperty(
-                HTTPConstants.HEADER_CONTENT_TYPE, null), context.getMessage().getStringProperty(
-                HTTPConstants.HEADER_CONTENT_LOCATION, null));
+                                                        HTTPConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND, null),
+                                             context.getMessage().getStringProperty(
+                                                        HTTPConstants.HEADER_CONTENT_LOCATION, PropertyScope.INBOUND, null));
 
             if (logger.isDebugEnabled())
             {
@@ -692,12 +694,12 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             logger.debug("MessageContext:" + msgContext);
             logger.debug("HEADER_CONTENT_TYPE:"
-                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
+                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND, null));
             logger.debug("HEADER_CONTENT_LOCATION:"
-                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
+                            + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, PropertyScope.INBOUND, null));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
-            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
+            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", PropertyScope.INBOUND, null));
             logger.debug("Constants.MC_REMOTE_ADDR:" + endpointUri.getHost());
         }
 

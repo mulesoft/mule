@@ -13,6 +13,7 @@ package org.mule.transport.soap.axis.extras;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
@@ -37,7 +38,14 @@ public class AxisCleanAndAddProperties
         Map props = new HashMap();
         MuleMessage currentMessage = muleEventContext.getMessage();
 
-        for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
+        populateProps(props, currentMessage, PropertyScope.INVOCATION);
+        populateProps(props, currentMessage, PropertyScope.OUTBOUND);
+        return props;
+    }
+
+    protected static void populateProps(Map props, MuleMessage currentMessage, PropertyScope scope)
+    {
+        for (Iterator iterator = currentMessage.getPropertyNames(scope).iterator(); iterator.hasNext();)
         {
             String name = (String)iterator.next();
             if (!StringUtils.equals(name, AxisConnector.SOAP_METHODS)
@@ -48,9 +56,8 @@ public class AxisCleanAndAddProperties
                 && !HttpConstants.ALL_HEADER_NAMES.containsValue(name)
                 && !StringUtils.equals(name, HttpConnector.HTTP_STATUS_PROPERTY))
             {
-                props.put(name, currentMessage.getProperty(name));
+                props.put(name, currentMessage.getProperty(name, scope));
             }
         }
-        return props;
     }
 }
