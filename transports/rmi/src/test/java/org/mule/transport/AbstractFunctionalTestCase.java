@@ -37,7 +37,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         // send Echo String
-        MuleMessage message = client.send("vm://testin", new Integer(12), null);
+        MuleMessage message = client.send("vm://testin", 12, null);
         assertNotNull(message);
         Integer payload = (Integer)message.getPayload();
         assertEquals(payload, new Integer(22));
@@ -53,7 +53,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         assertEquals((String)message.getPayload(), "emit dnoces tnenopmoc gnihchtam tset");
 
         // send Integer
-        message = client.send("vm://testin", new Integer(15), null);
+        message = client.send("vm://testin", 15, null);
         assertNotNull(message);
         payload = (Integer)message.getPayload();
         assertEquals(payload, new Integer(25));
