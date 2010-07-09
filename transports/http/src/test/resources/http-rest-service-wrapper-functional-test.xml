@@ -49,13 +49,13 @@
 
         <service name="HTTPPostSample3">
             <inbound>
-                <inbound-endpoint ref="restServiceEndpoint3"/>
+                <inbound-endpoint ref="restServiceEndpoint3" />
             </inbound>
-            <!-- Testusing expressions and literal values -->
+            <!-- Test using expressions and literal values -->
             <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
                 <http:requiredParameter key="foo" value="boo"/>
-                <http:requiredParameter key="faz" value="#[header:baz-header]"/>
-                <http:optionalParameter key="far" value="#[header:bar-optional-header]"/>
+                <http:requiredParameter key="faz" value="#[header:INBOUND:baz-header]"/>
+                <http:optionalParameter key="far" value="#[header:INBOUND:bar-optional-header]"/>
             </http:rest-service-component>
         </service>
 

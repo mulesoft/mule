@@ -55,7 +55,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
 
     public void testAsyncPost() throws Exception
     {
-        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncService");
+        FunctionalTestComponent component = getFunctionalTestComponent("AsyncService");
         component.setEventCallback(new EventCallback()
         {
             public void eventReceived(MuleEventContext context, Object comp) throws Exception
@@ -78,7 +78,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
 
     public void testAsyncPostWithPersistentSedaQueue() throws Exception
     {
-        FunctionalTestComponent component = (FunctionalTestComponent) getComponent("AsyncPersistentQueueService");
+        FunctionalTestComponent component = getFunctionalTestComponent("AsyncPersistentQueueService");
         component.setEventCallback(new EventCallback()
         {
             public void eventReceived(MuleEventContext context, Object comp) throws Exception
