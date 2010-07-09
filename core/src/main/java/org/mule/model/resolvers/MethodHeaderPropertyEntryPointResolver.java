@@ -13,6 +13,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.InvocationResult;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
@@ -41,10 +42,9 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
 
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
-        //TODO: RM* This is a hack that can be fixed by introducing property scoping on the message
         // Transports such as SOAP need to ignore the method property
-        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean) context.getMessage().removeProperty(
-                MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
+        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean) context.getMessage().getProperty(
+                MuleProperties.MULE_IGNORE_METHOD_PROPERTY, PropertyScope.INBOUND));
 
         if (ignoreMethod)
         {
@@ -57,8 +57,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
         Object[] payload = getPayloadFromMessage(context);
 
-        //TODO: with scoped properties we wouldn't need to remove the property here
-        Object methodProp = context.getMessage().removeProperty(getMethodProperty());
+        Object methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INBOUND);
         if (methodProp == null)
         {
             InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
