@@ -76,10 +76,10 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         if (securityProviders != null)
         {
             SecurityManager localManager = new MuleSecurityManager();
-            String[] sp = StringUtils.splitAndTrim(securityProviders, ",");
-            for (int i = 0; i < sp.length; i++)
+            String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
+            for (String sp : securityProviders)
             {
-                SecurityProvider provider = securityManager.getProvider(sp[i]);
+                SecurityProvider provider = securityManager.getProvider(sp);
                 if (provider != null)
                 {
                     localManager.addProvider(provider);
@@ -88,7 +88,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
                 {
                     throw new InitialisationException(
                             CoreMessages.objectNotRegistered(
-                                    "Security Provider", sp[i]), this);
+                                    "Security Provider", sp), this);
                 }
             }
             securityManager = localManager;
