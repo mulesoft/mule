@@ -12,6 +12,7 @@ package org.mule.transport.email.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
@@ -57,18 +58,13 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector) endpoint.getConnector();
-        String to = message.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
-        String cc = message.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY,
-            connector.getCcAddresses());
-        String bcc = message.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY,
-            connector.getBccAddresses());
-        String from = message.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY,
-            connector.getFromAddress());
-        String replyTo = message.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
-            connector.getReplyToAddresses());
-        String subject = message.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
-        String contentType = message.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY,
-            connector.getContentType());
+        String to = lookupProperty(message, MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
+        String cc = lookupProperty(message, MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
+        String bcc = lookupProperty(message, MailProperties.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
+        String from = lookupProperty(message, MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
+        String replyTo = lookupProperty(message, MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
+        String subject = lookupProperty(message, MailProperties.SUBJECT_PROPERTY, connector.getSubject());
+        String contentType = lookupProperty(message, MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
 
         Properties headers = new Properties();
         Properties customHeaders = connector.getCustomHeaders();
@@ -159,6 +155,19 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
         {
             throw new TransformerException(this, e);
         }
+    }
+
+    /**
+     * Searches in outbound, then invocation scope. If not found, returns a passed in default value.
+     */
+    protected String lookupProperty(MuleMessage message, String propName, String defaultValue)
+    {
+        String to = message.getStringProperty(propName, PropertyScope.OUTBOUND, null);
+        if (to == null)
+        {
+            to = message.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, PropertyScope.INVOCATION, defaultValue);
+        }
+        return to;
     }
 
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)
