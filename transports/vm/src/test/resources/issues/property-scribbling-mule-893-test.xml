@@ -26,7 +26,7 @@
 
         <service name="responder">
             <inbound>
-                <vm:inbound-endpoint path="responder" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="responder" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
