@@ -196,7 +196,8 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         switch (scope)
         {
             case REQUEST:
-                request.setProperty(name, value);
+                // note it's not a usual Mule property scope, abdera puts and checks for things here
+                request.setProperty(name, value, PropertyScope.INBOUND);
                 break;
             case SESSION:
                 event.getSession().setProperty(name, value);
@@ -210,7 +211,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         switch (scope)
         {
             case REQUEST:
-                return request.getProperty(name);
+                return request.getProperty(name, PropertyScope.INBOUND);
             case SESSION:
                 if (event.getSession() != null)
                 {
@@ -247,7 +248,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 
     public List<String> getParameters(String name)
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public Date getDateHeader(String name)
@@ -259,7 +260,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 
     public String getHeader(String name)
     {
-        Object prop = request.getProperty(name);
+        Object prop = request.getProperty(name, PropertyScope.INBOUND);
         if (prop == null)
         {
             return null;
