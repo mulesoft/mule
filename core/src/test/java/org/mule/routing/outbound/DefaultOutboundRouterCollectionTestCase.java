@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -50,7 +51,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        testEvent = getTestEvent("TEST_MESSAGE", getTestInboundEndpoint(true));
+        testEvent = getTestEvent("TEST_MESSAGE", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         testService = createService();
         outboundRouter = new TestOutboundRouterCollection();
         testService.setOutboundRouter(outboundRouter);

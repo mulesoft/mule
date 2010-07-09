@@ -12,6 +12,7 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -50,7 +51,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint(false);
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);

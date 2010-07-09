@@ -24,7 +24,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleTestC
     {
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
         return new DefaultMuleEvent(message,
-                MuleTestUtils.getTestInboundEndpoint("test", false, muleContext, null),
+                MuleTestUtils.getTestInboundEndpoint("test", MessageExchangePattern.ONE_WAY, muleContext, null),
                 new DefaultMuleSession(new SedaService(muleContext), muleContext));
     }
 

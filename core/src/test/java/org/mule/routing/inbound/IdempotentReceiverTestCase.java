@@ -12,6 +12,7 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -75,7 +76,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
-        ImmutableEndpoint endpoint = getTestInboundEndpoint(false);
+        ImmutableEndpoint endpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store
@@ -92,7 +93,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.process(event);
 
         session.verify();
-        endpoint = getTestInboundEndpoint(true);
+        endpoint = getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE);
         message = new DefaultMuleMessage("test event", muleContext);
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
 
@@ -109,7 +110,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         session.expect("toString");
         // called by idempotent receiver
         session.expectAndReturn("getService", testService);
-        endpoint = getTestInboundEndpoint(false);
+        endpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         // we've already received this message
         assertTrue(!router.isMatch(event));

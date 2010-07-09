@@ -10,9 +10,7 @@
 
 package org.mule.model.seda;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
@@ -32,6 +30,9 @@ import org.mule.util.queue.QueueManager;
 import junit.framework.AssertionFailedError;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
@@ -118,7 +119,8 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.initialise();
         service.start();
         service.pause();
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         // This test will timeout and fail if dispatch() blocks
 
@@ -184,7 +186,8 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         }));
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", getTestInboundEndpoint(false), muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 

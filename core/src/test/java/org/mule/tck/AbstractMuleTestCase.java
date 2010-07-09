@@ -10,6 +10,7 @@
 
 package org.mule.tck;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -625,14 +626,14 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(boolean sync) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(MessageExchangePattern mep) throws Exception
     {
-        return MuleTestUtils.getTestOutboundEndpoint(sync, muleContext);
+        return MuleTestUtils.getTestOutboundEndpoint(mep, muleContext);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(boolean sync) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(MessageExchangePattern mep) throws Exception
     {
-        return MuleTestUtils.getTestInboundEndpoint(sync, muleContext);
+        return MuleTestUtils.getTestInboundEndpoint(mep, muleContext);
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception

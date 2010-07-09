@@ -73,8 +73,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
 
     void setSecurityFilter(EndpointSecurityFilter securityFilter);
-
-    void setSynchronous(boolean synchronous);
     
     void setExchangePattern(MessageExchangePattern mep);
 

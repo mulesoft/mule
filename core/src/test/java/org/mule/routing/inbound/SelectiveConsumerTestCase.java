@@ -12,6 +12,7 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -51,7 +52,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
 
-        ImmutableEndpoint endpoint = getTestInboundEndpoint(false);
+        ImmutableEndpoint endpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         assertTrue(router.isMatch(event));
 
@@ -60,7 +61,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         messageRouter.process(event);
         session.verify();
 
-        endpoint = getTestInboundEndpoint(true);
+        endpoint = getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE);
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
@@ -74,7 +75,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         session.expectAndReturn("toString", "");
         message = new DefaultMuleMessage(new Exception(), muleContext);
 
-        endpoint = getTestInboundEndpoint(false);
+        endpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy());
         assertTrue(!router.isMatch(event));
 

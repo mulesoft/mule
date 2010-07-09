@@ -10,6 +10,7 @@
 
 package org.mule.construct;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -62,12 +63,12 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 
     private InboundEndpoint getAsynchronousTestInboundEndpoint() throws Exception
     {
-        return getTestInboundEndpoint(false);
+        return getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
     }
 
     private InboundEndpoint getSynchronousTestInboundEndpoint() throws Exception
     {
-        return getTestInboundEndpoint(true);
+        return getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE);
     }
 
     private static class DirectInboundMessageSource implements MessageSource

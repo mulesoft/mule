@@ -700,11 +700,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         this.securityFilter = securityFilter;
     }
-
-    public void setSynchronous(boolean synchronous)
-    {
-        this.synchronous = Boolean.valueOf(synchronous);
-    }
     
     public void setExchangePattern(MessageExchangePattern mep)
     {

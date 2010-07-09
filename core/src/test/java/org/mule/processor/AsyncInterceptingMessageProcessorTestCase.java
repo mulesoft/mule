@@ -10,6 +10,7 @@
 
 package org.mule.processor;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
@@ -56,7 +57,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
 
     public void testProcessAsync() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(false));
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
 
         MuleEvent result = messageProcessor.process(event);
 
