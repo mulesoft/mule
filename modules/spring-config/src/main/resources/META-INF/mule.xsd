@@ -2143,7 +2143,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="message-property-filter" type="caseSensitivePatternFilterType"
+    <xsd:element name="message-property-filter" type="scopedPropertyFilterType"
                  substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -2151,6 +2151,28 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:complexType name="scopedPropertyFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="caseSensitivePatternFilterType">
+                <xsd:attribute name="scope" default="outbound">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Property scope to lookup the value from (default: outbound)
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="inbound"/>
+                            <xsd:enumeration value="invocation"/>
+                            <xsd:enumeration value="outbound"/>
+                            <xsd:enumeration value="session"/>
+                            <xsd:enumeration value="application"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
     <xsd:complexType name="caseSensitivePatternFilterType">
         <xsd:complexContent>
             <xsd:extension base="patternFilterType">
@@ -2471,6 +2493,7 @@
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="inbound"/>
                             <xsd:enumeration value="invocation"/>
                             <xsd:enumeration value="outbound"/>
                             <xsd:enumeration value="session"/>

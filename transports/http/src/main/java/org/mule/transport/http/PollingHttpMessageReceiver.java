@@ -24,7 +24,9 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -99,11 +101,10 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         MuleMessage request = new DefaultMuleMessage("", muleContext);
         if (etag != null && checkEtag)
         {
-            Map<String, String> customHeaders = 
-                Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+            Map<String, String> customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
             request.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
-        request.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        request.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET", PropertyScope.OUTBOUND);
 
         MuleSession session = new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext());
 
@@ -113,9 +114,10 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // send() as thats the only way we can customize headers and use eTags
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
             // Must not use transformers
-            endpointBuilder.setTransformers(Collections.EMPTY_LIST);
-            endpointBuilder.setResponseTransformers(Collections.EMPTY_LIST);
+            endpointBuilder.setTransformers(Collections.<Transformer>emptyList());
+            endpointBuilder.setResponseTransformers(Collections.<Transformer>emptyList());
             endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }

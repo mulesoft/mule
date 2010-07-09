@@ -12,11 +12,14 @@ package org.mule.routing.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
+import org.mule.api.transport.PropertyScope;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties on
@@ -34,6 +37,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MessagePropertyFilter implements Filter
 {
+    public static final String DEFAULT_PROPERTY_SCOPE = "outbound";
+
     /**
      * logger used by this class
      */
@@ -43,6 +48,7 @@ public class MessagePropertyFilter implements Filter
 
     private String propertyName;
     private String propertyValue;
+    private String scope = DEFAULT_PROPERTY_SCOPE;
 
     private WildcardFilter wildcardFilter;
 
@@ -62,8 +68,8 @@ public class MessagePropertyFilter implements Filter
         {
             return false;
         }
-
-        Object value = message.getProperty(propertyName);
+        PropertyScope ps = PropertyScope.get(this.scope);
+        Object value = message.getProperty(propertyName, ps);
         boolean match;
         if (value == null)
         {
@@ -73,9 +79,9 @@ public class MessagePropertyFilter implements Filter
         {
             match = compare(value.toString(), propertyValue);
         }
-        if(!match && logger.isDebugEnabled())
+        if (!match && logger.isDebugEnabled())
         {
-            logger.debug("Property: " + propertyName + " not found on message with Id: " + message.getUniqueId());
+            logger.debug(String.format("Property: '%s' not found on message with Id: %s", propertyName, message.getUniqueId()));
         }
         return match;
     }
@@ -139,7 +145,31 @@ public class MessagePropertyFilter implements Filter
     public void setCaseSensitive(boolean caseSensitive)
     {
         this.caseSensitive = caseSensitive;
-        if(wildcardFilter!=null) wildcardFilter.setCaseSensitive(caseSensitive);
+        if (wildcardFilter != null)
+        {
+            wildcardFilter.setCaseSensitive(caseSensitive);
+        }
+    }
+
+    public String getScope()
+    {
+        return scope;
+    }
+
+    public void setScope(String scope)
+    {
+        if (StringUtils.isBlank(scope))
+        {
+            // ignore and use defaults
+            return;
+        }
+
+        PropertyScope ps = PropertyScope.get(scope.toLowerCase());
+        if (ps == null)
+        {
+            throw new IllegalArgumentException(String.format("'%s' is not a valid property scope.", scope));
+        }
+        this.scope = scope;
     }
 
     public boolean equals(Object obj)
@@ -150,11 +180,12 @@ public class MessagePropertyFilter implements Filter
         final MessagePropertyFilter other = (MessagePropertyFilter) obj;
         return equal(propertyName, other.propertyName)
             && equal(propertyValue, other.propertyValue)
+            && equal(scope, other.scope)
             && caseSensitive == other.caseSensitive;
     }
 
     public int hashCode()
     {
-        return hash(new Object[]{this.getClass(), propertyName, propertyValue, caseSensitive});
+        return hash(new Object[]{this.getClass(), propertyName, propertyValue, scope, caseSensitive});
     }
 }
