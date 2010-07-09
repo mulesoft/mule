@@ -70,8 +70,9 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 
             // Allow components to stop processing of the ReplyTo property (e.g.
             // CXF)
+            final String replyToStop = (String) resultEvent.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, PropertyScope.INVOCATION);
             if (!event.isSynchronous()
-                || (resultEvent != null && !BooleanUtils.toBoolean((String) resultEvent.getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY))))
+                || (resultEvent != null && !BooleanUtils.toBoolean(replyToStop)))
             {
                 processReplyTo(event, resultEvent, replyToHandler, replyTo);
             }

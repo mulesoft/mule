@@ -302,8 +302,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 protocolReplyTo = true;
                 // Disable CXF replyTo
                 // TODO why set in invocation scope?
-                muleReqMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true",
-                    PropertyScope.INVOCATION);
+                muleReqMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true", PropertyScope.INVOCATION);
             }
             
             ExchangeImpl exchange = new ExchangeImpl();
