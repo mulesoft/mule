@@ -12,8 +12,8 @@ package org.mule.test.integration.resolvers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.model.resolvers.EntryPointNotFoundException;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service?method=reverseString", "hello", null);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "olleh");
+        assertEquals("olleh", message.getPayloadAsString());
     }
 
     public void testValidCallToUpperCase() throws Exception
@@ -57,7 +57,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service?method=upperCaseString", "hello", null);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "HELLO");
+        assertEquals("HELLO", message.getPayloadAsString());
     }
 
 
@@ -66,7 +66,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://service2-reverseString", "hello", null);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "olleh");
+        assertEquals("olleh", message.getPayloadAsString());
     }
 
     public void testValidCallToUpperCaseMethodSetOnEndpoint() throws Exception
@@ -84,7 +84,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "reverseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "olleh");
+        assertEquals("olleh", message.getPayloadAsString());
     }
 
     public void testValidCallToUpperCaseMethodSetAsHeader() throws Exception
@@ -94,7 +94,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "upperCaseString");
         MuleMessage message = client.send("vm://service", "hello", props);
         assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "HELLO");
+        assertEquals("HELLO", message.getPayloadAsString());
     }
 
 }
