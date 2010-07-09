@@ -10,13 +10,6 @@
 
 package org.mule.transport.cxf;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -26,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.http.HttpConnector;
@@ -46,6 +40,13 @@ import org.apache.cxf.transport.local.LocalConduit;
 import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CxfServiceComponentTestCase extends AbstractMuleTestCase
 {
@@ -108,10 +109,10 @@ public class CxfServiceComponentTestCase extends AbstractMuleTestCase
         final String basePath = "someBasePath";
         
         final MuleMessage muleReqMsg = new DefaultMuleMessage("some object", muleContext);
-        muleReqMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-        muleReqMsg.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
-        muleReqMsg.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, basePath);
-        muleReqMsg.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, "\"" + someActionProperty + "\"");
+        muleReqMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method, PropertyScope.INBOUND);
+        muleReqMsg.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
+        muleReqMsg.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, basePath, PropertyScope.INBOUND);
+        muleReqMsg.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, "\"" + someActionProperty + "\"", PropertyScope.INBOUND);
 
         // configure expectations.
         when(ctx.getMessage()).thenReturn(muleReqMsg);
@@ -127,8 +128,7 @@ public class CxfServiceComponentTestCase extends AbstractMuleTestCase
                 MessageImpl messageImpl = (MessageImpl) invocation.getArguments()[0];
                 assertNotNull(messageImpl);
                 assertSame(muleReqMsg, messageImpl.get(CxfConstants.MULE_MESSAGE));
-                assertEquals(someActionProperty,
-                    messageImpl.get(org.mule.transport.soap.SoapConstants.SOAP_ACTION_PROPERTY_CAPS));
+                assertEquals(someActionProperty, messageImpl.get(SoapConstants.SOAP_ACTION_PROPERTY_CAPS));
                 assertEquals(Boolean.TRUE, messageImpl.get(LocalConduit.DIRECT_DISPATCH));
                 assertSame(RequestContext.getEvent(), messageImpl.get(MuleProperties.MULE_EVENT_PROPERTY));
                 assertSame(destination, messageImpl.getDestination());

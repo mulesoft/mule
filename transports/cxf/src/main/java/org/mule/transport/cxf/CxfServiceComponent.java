@@ -414,7 +414,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
     protected String getSoapAction(MuleMessage message)
     {
-        String action = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        String action = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY, PropertyScope.INBOUND);
 
         if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2)
         {
