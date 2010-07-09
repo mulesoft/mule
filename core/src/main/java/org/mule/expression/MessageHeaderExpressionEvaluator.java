@@ -14,6 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -42,7 +43,25 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator, Ex
         {
             required = true;
         }
-        result = message.getProperty(expression);
+
+        // see if scope has been specified explicitly
+        final String[] tokens = expression.split(":", 2); // note we split only once, not on every separator
+        // default
+        PropertyScope scope = PropertyScope.OUTBOUND;
+        if (tokens.length == 2)
+        {
+            final String candidate = tokens[0];
+            scope = PropertyScope.get(candidate.toLowerCase());
+            if (scope == null)
+            {
+                throw new IllegalArgumentException(String.format("'%s' is not a valid property scope.", candidate));
+            }
+
+            // cut-off leading scope and separator
+            expression = expression.substring(candidate.length() + 1);
+        }
+
+        result = message.getProperty(expression, scope);
         //Should this fallback be in its own expression evaluator i.e. #[endpoint-param:foo] ??
         //I'm not sure because this way there is a fallback where the message doesn't have a value the
         //endpoint can define a default

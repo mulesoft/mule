@@ -17,18 +17,19 @@ import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.UUID;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
-    private Map props;
+    private Map<String, Object> props;
 
     @Override
     public void doSetUp()
     {
-        props = new HashMap(3);
+        props = new HashMap<String, Object>(3);
         props.put("foo", "moo");
         props.put("bar", "mar");
         props.put("baz", "maz");
@@ -56,13 +57,20 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = eval.evaluate("fool", message);
+            eval.evaluate("fool", message);
             fail("required value");
         }
         catch (Exception e)
         {
             //Expected
         }
+
+        ((DefaultMuleMessage) message).addInboundProperties(Collections.singletonMap("testProp", (Object) "value"));
+        result = eval.evaluate("testProp?", message);
+        assertNull(result);
+
+        result = eval.evaluate("INBOUND:testProp", message);
+        assertEquals("value", result);
     }
 
     public void testMapHeaders() throws Exception
@@ -98,7 +106,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = eval.evaluate("fool", message);
+            eval.evaluate("fool", message);
             fail("required value");
         }
         catch (Exception e)
@@ -153,7 +161,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = eval.evaluate("fool", message);
+            eval.evaluate("fool", message);
             fail("required value");
         }
         catch (Exception e)
@@ -193,7 +201,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[header:fool]", message);
+            muleContext.getExpressionManager().evaluate("#[header:fool]", message);
             fail("Required value");
         }
         catch (ExpressionRuntimeException e)
@@ -235,7 +243,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
+            muleContext.getExpressionManager().evaluate("#[headers:fool]", message);
             fail("Required value");
         }
         catch (ExpressionRuntimeException e)
@@ -277,7 +285,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + not found (throws exception)
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
+            muleContext.getExpressionManager().evaluate("#[headers-list:fool]", message);
             fail("Required value");
         }
         catch (ExpressionRuntimeException e)
