@@ -255,7 +255,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertEquals(0, connector.getDisconnectCount());
         assertEquals(1, connector.getDisposeCount());
 
-      try
+        try
         {
             connector.dispose();
             fail("cannot dispose the connector twice");
@@ -389,14 +389,14 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         // Pool is cleared because of implementation of workaround for MULE-4553
         assertEquals(0, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-         assertDispatcherStartedConnected(out, false, false);
-         assertDispatcherStartedConnected(out2, false, false);
+        assertDispatcherStartedConnected(out, false, false);
+        assertDispatcherStartedConnected(out2, false, false);
 
         connector.start();
 
         assertEquals(2, connector.dispatchers.getNumActive() + connector.dispatchers.getNumIdle());
-         assertDispatcherStartedConnected(out, true, true);
-         assertDispatcherStartedConnected(out2, true, true);
+        assertDispatcherStartedConnected(out, true, true);
+        assertDispatcherStartedConnected(out2, true, true);
 
         out.process(getTestEvent("data", out));
         assertEquals(2, connector.dispatchers.getNumIdle());
@@ -446,14 +446,14 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         // Pool is cleared because of implementation of workaround for MULE-4553
         assertEquals(0, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
-         assertRequesterStartedConnected(in, false, false);
-         assertRequesterStartedConnected(in2, false, false);
+        assertRequesterStartedConnected(in, false, false);
+        assertRequesterStartedConnected(in2, false, false);
 
         connector.start();
         //Between Stop and start the requester pool maintains existing pooled objects
         assertEquals(2, connector.requesters.getNumActive() + connector.requesters.getNumIdle());
-         assertRequesterStartedConnected(in, true, true);
-         assertRequesterStartedConnected(in2, true, true);
+        assertRequesterStartedConnected(in, true, true);
+        assertRequesterStartedConnected(in2, true, true);
 
         in.request(1000L);
         assertEquals(2, connector.requesters.getNumIdle());
@@ -534,7 +534,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     }
 
     private void assertDispatcherStartedConnected(OutboundEndpoint out, boolean started, boolean connected)
-        throws Exception
+            throws Exception
     {
         AbstractMessageDispatcher dispatcher = (AbstractMessageDispatcher) connector.dispatchers.borrowObject(out);
         assertEquals("Dispatcher started", started, dispatcher.isStarted());
@@ -543,7 +543,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     }
 
     private void assertRequesterStartedConnected(InboundEndpoint in, boolean started, boolean connected)
-        throws Exception
+            throws Exception
     {
         AbstractMessageRequester requester = (AbstractMessageRequester) connector.requesters.borrowObject(in);
         assertEquals("Requester started", started, requester.isStarted());
