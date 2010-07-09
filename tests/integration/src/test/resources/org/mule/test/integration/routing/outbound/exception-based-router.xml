@@ -53,7 +53,7 @@
                 <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
-                <recipient-list-exception-based-router evaluator="header" expression="recipients" />
+                <recipient-list-exception-based-router evaluator="header" expression="INBOUND:recipients" />
             </outbound>
         </service>
 
