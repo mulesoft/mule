@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.filters.FilterCounter;
@@ -53,16 +54,16 @@ public class Mule4412TestCase extends FunctionalTestCase
     public void testFilterOnce() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        msg.setProperty("pass", "true");
+        msg.setProperty("pass", "true", PropertyScope.INBOUND);
         MuleClient client = new MuleClient(muleContext);
         client.send("vm://async", msg);
-        MuleMessage reply = client.request("vm://asyncResponse",RECEIVE_TIMEOUT_MS);
+        MuleMessage reply = client.request("vm://asyncResponse", RECEIVE_TIMEOUT_MS);
         int times = FilterCounter.counter.get();
         assertTrue("did not filter one time as expected, times filtered " + times, times == 1);
         assertNotNull(reply);
         assertEquals("wrong message received : " + reply.getPayloadAsString(), TEST_MESSAGE,
             reply.getPayloadAsString());
-        assertEquals("'pass' property value not correct", "true", reply.getProperty("pass"));
+        assertEquals("'pass' property value not correct", "true", reply.getProperty("pass", PropertyScope.INBOUND));
 
         // make sure there are no more messages
         assertNull(client.request("vm://asyncResponse", RECEIVE_TIMEOUT_MS));

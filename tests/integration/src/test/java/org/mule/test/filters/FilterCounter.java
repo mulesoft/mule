@@ -12,6 +12,7 @@ package org.mule.test.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.PropertyScope;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,9 +25,9 @@ public class FilterCounter implements Filter
      */
     public boolean accept(MuleMessage message)
     {
-        if(message.getProperty("pass") != null && message.getProperty("pass").equals("true"))
+        if(message.getProperty("pass", PropertyScope.INBOUND) != null && message.getProperty("pass", PropertyScope.INBOUND).equals("true"))
         {
-            counter.set(counter.get()+1);
+            counter.incrementAndGet();
             return true;
         }
         return false;
