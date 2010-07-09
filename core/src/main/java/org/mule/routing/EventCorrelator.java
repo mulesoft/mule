@@ -41,7 +41,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -160,9 +159,11 @@ public class EventCorrelator
         {
             try
             {
-                logger.trace("Received Async Reply Message for group: " + groupId + "\n"
-                        + StringMessageUtils.truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false));
-                logger.trace("Receive Async Reply Message detail: \n" + StringMessageUtils.headersToString(event.getMessage()));
+                logger.trace(String.format("Received async reply message for correlationID: %s%n%s",
+                                           groupId,
+                                           StringMessageUtils.truncate(
+                                                   StringMessageUtils.toString(event.getMessage().getPayload()), 200, false)));
+                logger.trace(String.format("Received async reply message details: %n%s", StringMessageUtils.headersToString(event.getMessage())));
             }
             catch (Exception e)
             {
@@ -354,9 +355,9 @@ public class EventCorrelator
         {
             try
             {
-                logger.trace("Waiting for response(s) for Message: \n"
-                        + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
-                logger.trace("Response Message detail: \n" + StringMessageUtils.headersToString(message));
+                logger.trace(String.format("Waiting for response(s) for message: %n%s",
+                                           StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false)));
+                logger.trace(String.format("Response Message detail: %n%s", StringMessageUtils.headersToString(message)));
             }
             catch (Exception e)
             {
