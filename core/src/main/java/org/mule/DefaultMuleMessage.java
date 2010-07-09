@@ -93,7 +93,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient byte[] cache;
     protected transient MuleContext muleContext;
 
-    // these are transient because serisalisation generates a new instance
+    // these are transient because serialisation generates a new instance
     // so we allow mutation again (and we can't serialize threads anyway)
     private transient AtomicReference ownerThread = null;
     private transient AtomicBoolean mutable = null;
@@ -175,8 +175,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void copyMessageProperties(MuleMessage muleMessage)
     {
         // explicitly copy INBOUND message properties over. This cannot be done in the loop below
-        // because the INBOUND property scope is immutable
-        Map<String, Object> inboundProperties = 
+        Map<String, Object> inboundProperties =
             ((DefaultMuleMessage)muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
         addInboundProperties(inboundProperties);
         
