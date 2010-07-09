@@ -37,14 +37,23 @@
             <inbound>
                 <inbound-endpoint ref="hop1Endpoint" responseTransformer-refs="hop1ResponseEnricher"/>
             </inbound>
-            <test:component/>
+            <test:component logMessageDetails="true"/>
         </service>
 
         <service name="hop2Service">
             <inbound>
-                <inbound-endpoint ref="hop2Endpoint" transformer-refs="hop2enricher"/>
+                <inbound-endpoint ref="hop2Endpoint" transformer-refs="hop2enricher">
+                    <message-properties-transformer>
+                        <!--
+                            Note that we propagate TICKET prop to the outbound here, but strictly
+                            speaking, it's available in the inbound scope for client anyway (incoming
+                            from the previous hop).
+                        -->
+                        <add-message-property key="TICKET" value="#[header:INBOUND:TICKET]"/>
+                    </message-properties-transformer>
+                </inbound-endpoint>
             </inbound>
-            <test:component/>
+            <test:component logMessageDetails="true"/>
         </service>
     </model>
 </mule>

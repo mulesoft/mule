@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;

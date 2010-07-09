@@ -13,6 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -30,8 +31,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
 
     public void testPropertiesPropagation() throws Exception
     {
-        FunctionalTestComponent hop1 = (FunctionalTestComponent) getComponent(muleContext.getRegistry().lookupService("hop1Service"));
-        FunctionalTestComponent hop2 = (FunctionalTestComponent) getComponent(muleContext.getRegistry().lookupService("hop2Service"));
+        FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1Service");
+        FunctionalTestComponent hop2 = getFunctionalTestComponent("hop2Service");
         assertNotNull(hop1);
 
         final AtomicBoolean hop1made = new AtomicBoolean(false);
@@ -52,7 +53,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
             {
                 MuleMessage msg = context.getMessage();
                 assertTrue(hop2made.compareAndSet(false, true));
-                assertEquals("Property not propagated from the first hop.", "hop1", msg.getProperty("TICKET"));
+                // this is a service callback, props are on the inbound
+                assertEquals("Property not propagated from the first hop.", "hop1", msg.getProperty("TICKET", PropertyScope.INBOUND));
                 FunctionalTestComponent ftc = (FunctionalTestComponent) component;
                 ftc.setReturnData(msg.getPayload() + " Hop2 ACK");
             }
@@ -69,8 +71,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         assertTrue("First callback never fired", hop1made.get());
         assertTrue("Second callback never fired", hop2made.get());
         assertEquals("Hop1 ACK Hop2 ACK", reply.getPayload());
-        assertEquals("hop1", reply.getProperty("TICKET"));
-        assertEquals("10000", reply.getProperty("TTL"));
+        assertEquals("hop1", reply.getProperty("TICKET", PropertyScope.OUTBOUND));
+        assertEquals("10000", reply.getProperty("TTL", PropertyScope.OUTBOUND));
     }
 
 }
