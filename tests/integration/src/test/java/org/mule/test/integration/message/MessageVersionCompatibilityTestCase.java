@@ -31,7 +31,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://in1", "test", null);
 
-        MuleMessage reply = client.request("vm://out1", TIMEOUT);
+        MuleMessage reply = client.request("vm://out1", TIMEOUT * 10);
         assertNotNull(reply);
         assertEquals("test", reply.getPayload());
     }

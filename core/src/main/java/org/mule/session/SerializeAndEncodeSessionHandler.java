@@ -10,16 +10,18 @@
 
 package org.mule.session;
 
-import java.io.IOException;
-
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
+
+import java.io.IOException;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * A session handler used to store and retrieve session information on an
@@ -34,14 +36,14 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
-        String serializedEncodedSession = (String) message.getProperty(MuleProperties.MULE_SESSION_PROPERTY);
-        message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
+        String serializedEncodedSession = (String) message.getProperty(MuleProperties.MULE_SESSION_PROPERTY, PropertyScope.INBOUND);
         
         if (serializedEncodedSession != null)
         {
             byte[] serializedSession = Base64.decode(serializedEncodedSession);            
             if (serializedSession != null)
             {
+                // TODO may need to use a classloader-aware org.mule.util.SerializationUtils.deserialize()
                 session = (MuleSession) SerializationUtils.deserialize(serializedSession);
             }
         }
@@ -66,6 +68,6 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
         {
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession);
+        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession, PropertyScope.OUTBOUND);
     }
 }

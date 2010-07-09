@@ -11,12 +11,12 @@
 package org.mule.session;
 
 import org.mule.DefaultMuleSession;
-import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.codec.Base64Decoder;
@@ -50,10 +50,8 @@ public class LegacySessionHandler implements SessionHandler
     {
          MuleSession session = new DefaultMuleSession(message.getMuleContext());
 
-         String sessionId = (String) message.getProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
-         message.removeProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
-         Object sessionHeader = message.getProperty(MuleProperties.MULE_SESSION_PROPERTY);
-         message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
+         String sessionId = (String) message.getProperty(MuleProperties.MULE_SESSION_ID_PROPERTY, PropertyScope.INBOUND);
+         Object sessionHeader = message.getProperty(MuleProperties.MULE_SESSION_PROPERTY, PropertyScope.INBOUND);
 
          if (sessionId != null)
          {
@@ -63,7 +61,7 @@ public class LegacySessionHandler implements SessionHandler
          }
          if (sessionHeader != null)
          {
-             String sessionString = null;
+             String sessionString;
              try
              {
                  sessionString = new String((byte[]) decoder.transform(sessionHeader), message.getEncoding());
@@ -128,7 +126,7 @@ public class LegacySessionHandler implements SessionHandler
             logger.debug("Adding session header to message: " + sessionString);
         }
         sessionString = (String) encoder.transform(sessionString);
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString);
+        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString, PropertyScope.OUTBOUND);
     }
     
     /**

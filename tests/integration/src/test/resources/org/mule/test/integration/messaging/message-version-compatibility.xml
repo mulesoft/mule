@@ -20,13 +20,13 @@
     </jms:activemq-connector>
 
     <script:script name="SetProperty" engine="groovy">
-         eventContext.getSession().setProperty("foo", "bar")
+         eventContext.session.setProperty("foo", "bar")
          return eventContext.transformMessage()
     </script:script>
 
     <script:script name="GetProperty" engine="groovy">
-        if (!("bar".equals(eventContext.getSession().getProperty("foo"))))
-            throw new IllegalStateException()
+        if (!("bar" == eventContext.session.getProperty("foo")))
+            throw new IllegalStateException("Property 'foo' not propagated in session")
          return eventContext.transformMessage()
     </script:script>
 
