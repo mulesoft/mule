@@ -102,7 +102,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         // if http request
         String requestPath = parseHttpRequestProperty(
             eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
-                StringUtils.EMPTY));
+                PropertyScope.INBOUND, StringUtils.EMPTY));
         
 
         if (requestPath.indexOf('?') > -1)
@@ -139,7 +139,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         throws EndpointNotFoundException, IOException
     {
         // TODO: Is there a way to make this not so ugly?       
-        String ctxUri = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String ctxUri = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND);
         String wsdlUri = getWsdlUri(eventContext, req);
         String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
         
@@ -188,7 +188,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     private String getWsdlUri(MuleEventContext eventContext, String reqPath) 
     {
         EndpointURI epUri = eventContext.getEndpointURI();
-        String host = (String) eventContext.getMessage().getProperty("Host", epUri.getHost());
+        String host = (String) eventContext.getMessage().getProperty("Host", PropertyScope.INBOUND, epUri.getHost());
         String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
         return epUri.getScheme() + "://" + host + ctx;
     }
@@ -301,6 +301,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             {
                 protocolReplyTo = true;
                 // Disable CXF replyTo
+                // TODO why set in invocation scope?
                 muleReqMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true",
                     PropertyScope.INVOCATION);
             }

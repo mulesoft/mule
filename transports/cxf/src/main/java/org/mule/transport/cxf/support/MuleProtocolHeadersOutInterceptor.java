@@ -48,7 +48,10 @@ public class MuleProtocolHeadersOutInterceptor
         extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HttpConnector.HTTP_STATUS_PROPERTY);
 
         String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
-        if (method == null) method = HttpConstants.METHOD_POST;
+        if (method == null)
+        {
+            method = HttpConstants.METHOD_POST;
+        }
         
         muleMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method, PropertyScope.OUTBOUND);
         

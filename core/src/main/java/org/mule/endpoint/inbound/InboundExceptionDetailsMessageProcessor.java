@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 
 import org.apache.commons.logging.Log;
@@ -34,7 +35,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
 
     private static final Log logger = LogFactory.getLog(InboundExceptionDetailsMessageProcessor.class);
 
-    protected Connector connector;;
+    protected Connector connector;
 
     public InboundExceptionDetailsMessageProcessor(Connector connector)
     {
@@ -59,7 +60,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
     }
 
     /**
-     * This method is used to set any additional aand possibly transport specific
+     * This method is used to set any additional and possibly transport specific
      * information on the return message where it has an exception payload.
      * 
      * @param message
@@ -78,7 +79,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
                 logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
                              + code);
             }
-            message.setProperty(propName, code);
+            message.setProperty(propName, code, PropertyScope.OUTBOUND);
         }
     }
 
