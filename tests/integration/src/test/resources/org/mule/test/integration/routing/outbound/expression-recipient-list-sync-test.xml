@@ -19,7 +19,7 @@
             </inbound>
             <echo-component/>
             <outbound>
-                <expression-recipient-list-router evaluator="headers-list" expression="recipient1,recipient2,recipient3" synchronous="true"/>
+                <expression-recipient-list-router evaluator="headers-list" expression="INBOUND:recipient1,INBOUND:recipient2,INBOUND:recipient3" synchronous="true"/>
             </outbound>
         </service>
 
