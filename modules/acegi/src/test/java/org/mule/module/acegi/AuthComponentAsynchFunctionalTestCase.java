@@ -51,7 +51,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         client.dispatch("vm://test", "Marie", props);
         MuleMessage m = client.request("vm://output", 3000);
         assertNotNull(m);
-        assertEquals((String)m.getPayload(), "Marie");
+        assertEquals(m.getPayloadAsString(), "Marie");
     }
 
     public void testCaseGoodAuthenticationBadAuthorisation() throws Exception
