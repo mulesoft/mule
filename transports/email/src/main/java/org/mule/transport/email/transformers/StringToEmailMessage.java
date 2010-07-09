@@ -162,12 +162,12 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
      */
     protected String lookupProperty(MuleMessage message, String propName, String defaultValue)
     {
-        String to = message.getStringProperty(propName, PropertyScope.OUTBOUND, null);
-        if (to == null)
+        String value = message.getStringProperty(propName, PropertyScope.OUTBOUND, null);
+        if (value == null)
         {
-            to = message.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, PropertyScope.INVOCATION, defaultValue);
+            value = message.getStringProperty(propName, PropertyScope.INVOCATION, defaultValue);
         }
-        return to;
+        return value;
     }
 
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)
