@@ -380,7 +380,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Http response is: " + message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+            logger.debug("Http response is: " + message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND));
         }
 
         message.setExceptionPayload(ep);
