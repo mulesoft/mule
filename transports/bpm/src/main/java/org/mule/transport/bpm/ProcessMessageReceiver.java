@@ -22,7 +22,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.MessageFactory;
@@ -99,8 +98,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
             OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
 
-            DefaultMuleEvent event = new DefaultMuleEvent(message, ep, 
-                new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext()));
+            DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
             if (synchronous)
             {
                 MuleEvent resultEvent = ep.process(event);

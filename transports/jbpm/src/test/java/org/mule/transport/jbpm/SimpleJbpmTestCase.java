@@ -11,6 +11,7 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.ProcessConnector;
@@ -71,9 +72,9 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
             process = response.getPayload();
 
             String processId =
-                    response.getStringProperty(ProcessConnector.PROPERTY_PROCESS_ID, null);
+                    response.getStringProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.INVOCATION, null);
             // The process should be started and in a wait state.
-            assertFalse(processId == null);
+            assertNotNull(processId);
             assertEquals("dummyState", bpms.getState(process));
 
             // Advance the process one step.

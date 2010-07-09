@@ -25,6 +25,7 @@ import org.mule.util.StringUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Initiates or advances a workflow process from an outgoing Mule event.
@@ -51,7 +52,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         if (process != null)
         {
             MuleMessage msg = new DefaultMuleMessage(process, connector.getMuleContext());
-            msg.setProperty(ProcessConnector.PROPERTY_PROCESS_ID, connector.getBpms().getId(process));
+            msg.setProperty(ProcessConnector.PROPERTY_PROCESS_ID, connector.getBpms().getId(process), PropertyScope.INVOCATION);
             return msg;
         }
         else
@@ -79,16 +80,8 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         Map processVariables = new HashMap();
         if (event != null)
         {
-            String propertyName;
-            for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
-            {
-                propertyName = (String)iterator.next();
-                // The session property can become rather large and causes problems with DB persistence.
-                if (!propertyName.equals(MuleProperties.MULE_SESSION_PROPERTY))
-                {
-                    processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
-                }
-            }
+            populateProcessVariables(event, processVariables, PropertyScope.INVOCATION);
+            populateProcessVariables(event, processVariables, PropertyScope.OUTBOUND);
 
             Object payload = event.transformMessage();
             if (payload != null && !(payload instanceof NullPayload))
@@ -120,11 +113,15 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         //TODO this is redundent but I'm not sure what the correct behaviour is
         if (StringUtils.isNotEmpty(processIdField))
         {
-            processId = event.getMessage().getProperty(processIdField);
+            processId = event.getMessage().getProperty(processIdField, PropertyScope.INVOCATION);
         }
         // If processId is explicitly set for the message, this overrides the
         // processIdField.
-        processId = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.INVOCATION);
+        processId = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.INVOCATION, null);
+        if (processId == null)
+        {
+            processId = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.OUTBOUND, null); 
+        }
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_ID);
 
         // Default action is "advance"
@@ -229,5 +226,19 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
 
         return process;
+    }
+
+    protected void populateProcessVariables(MuleEvent event, Map processVariables, PropertyScope propertyScope)
+    {
+        final Set<String> propNames = event.getMessage().getPropertyNames(propertyScope);
+        for (Iterator iterator = propNames.iterator(); iterator.hasNext();)
+        {
+            String propertyName = (String) iterator.next();
+            // The session property can become rather large and causes problems with DB persistence.
+            if (!propertyName.equals(MuleProperties.MULE_SESSION_PROPERTY))
+            {
+                processVariables.put(propertyName, event.getMessage().getProperty(propertyName, propertyScope));
+            }
+        }
     }
 }
