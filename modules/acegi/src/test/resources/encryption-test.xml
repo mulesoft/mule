@@ -4,12 +4,14 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:acegi="http://www.mulesoft.org/schema/mule/acegi"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
        http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
@@ -43,7 +45,7 @@
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component/>
         </service>
     </model>
 

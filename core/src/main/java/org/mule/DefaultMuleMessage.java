@@ -688,6 +688,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else
         {
             removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.INBOUND);
         }
     }
 
@@ -697,7 +698,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public Object getReplyTo()
     {
         assertAccess(READ);
-        return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
+        Object replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
+        if (replyTo == null)
+        {
+            // fallback to inbound, use the requestor's setting if the invocation didn't set any
+            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.INBOUND);
+        }
+        return replyTo;
     }
 
     /**

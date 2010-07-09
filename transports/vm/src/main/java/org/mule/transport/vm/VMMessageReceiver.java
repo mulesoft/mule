@@ -18,14 +18,17 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 
@@ -105,7 +108,23 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
+        movePropertiesToInbound(newMessage);
+
+
         return routeMessage(newMessage, synchronous);
+    }
+
+    protected void movePropertiesToInbound(MuleMessage newMessage)
+    {
+        // TODO hackish way, needs to be reworked into an api - move outbound props (from dispatcher) to inbound (for receiver)
+
+        // clone to avoid CMEs
+        final Set<String> props = new HashSet<String>(newMessage.getPropertyNames(PropertyScope.OUTBOUND));
+        for (String name : props)
+        {
+            final Object value = newMessage.removeProperty(name, PropertyScope.OUTBOUND);
+            newMessage.setProperty(name, value, PropertyScope.INBOUND);
+        }
     }
 
     /**
@@ -188,6 +207,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
+        movePropertiesToInbound(newMessage);
         routeMessage(newMessage);
     }
 

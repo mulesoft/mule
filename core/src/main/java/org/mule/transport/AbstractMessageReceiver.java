@@ -30,9 +30,11 @@ import org.mule.api.routing.filter.FilterException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
+import org.mule.util.ObjectUtils;
 
 import java.io.OutputStream;
 
@@ -165,7 +167,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
 
         // Enforce a sync endpoint if remote sync is set
         // TODO MULE-4622
-        if (message.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false))
+        final Object o = message.getProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
+        if (ObjectUtils.getBoolean(o, false))
         {
             synchronous = true;
         }

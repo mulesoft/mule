@@ -15,7 +15,6 @@
         <service name="bridge">
             <inbound>
                 <inbound-endpoint ref="dispatch"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -29,7 +28,7 @@
             <inbound>
                 <vm:inbound-endpoint path="responder" exchange-pattern="one-way"/>
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
     </model>
 </mule>
