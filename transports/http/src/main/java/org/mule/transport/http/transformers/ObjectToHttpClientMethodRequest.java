@@ -129,6 +129,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.OUTBOUND, null);
         if (endpointString == null)
         {
+            endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.INVOCATION, null); 
+        }
+        if (endpointString == null)
+        {
             throw new TransformerException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
                             MuleProperties.MULE_ENDPOINT_PROPERTY), this);
@@ -187,9 +191,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
-                String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
+                String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND, null);
 
-                if(src instanceof Map)
+                if (src instanceof Map)
                 {
                     for (Iterator iterator = ((Map)src).entrySet().iterator(); iterator.hasNext();)
                     {
@@ -249,7 +253,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else
             {
                 // TODO we should probably set other properties here
-                String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
+                String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.OUTBOUND,
                                                            HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
                 {

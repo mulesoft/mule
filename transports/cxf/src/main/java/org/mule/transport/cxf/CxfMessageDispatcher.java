@@ -18,6 +18,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -44,6 +45,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -185,7 +187,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
-            props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
+            props.put(SoapBindingConstants.SOAP_ACTION, soapAction);
         }
         
         BindingProvider bp = wrapper.getClientProxy();
@@ -226,12 +228,13 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         props.put("holder", holder); 
         
         // Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        final MuleMessage message = event.getMessage();
+        String soapAction = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, bop.getName(), event);
-            props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
-            event.getMessage().setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
+            props.put(SoapBindingConstants.SOAP_ACTION, soapAction);
+            message.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction, PropertyScope.OUTBOUND);
         }
         
         Map<String, Object> ctx = new HashMap<String, Object>();
@@ -239,22 +242,26 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         ctx.put(Client.RESPONSE_CONTEXT, props); 
         
         // Set Custom Headers on the client
-        Object[] arr = event.getMessage().getPropertyNames().toArray();
-        String head;
+        // populate only from invocation and outbound scopes
+        addToHeaders(props, message, PropertyScope.INVOCATION);
+        addToHeaders(props, message, PropertyScope.OUTBOUND);
 
-        for (int i = 0; i < arr.length; i++)
-        {
-            head = (String) arr[i];
-            if ((head != null) && (!head.startsWith("MULE")))
-            {
-                props.put((String) arr[i], event.getMessage().getProperty((String) arr[i]));
-            }
-        }
-        
         Object[] response = wrapper.getClient().invoke(bop, getArgs(event), ctx);
 
         MuleMessage muleRes = holder.value;
         return buildResponseMessage(muleRes, response);
+    }
+
+    protected void addToHeaders(Map<String, Object> props, MuleMessage message, PropertyScope scope)
+    {
+        for (String name : message.getPropertyNames(scope))
+        {
+            String header = message.getStringProperty(name, scope, null);
+            if ((header != null) && (!header.startsWith("MULE")))
+            {
+                props.put(name, header);
+            }
+        }
     }
 
     private Map<String, Object> getInovcationProperties(MuleEvent event)
@@ -292,7 +299,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
             result = new DefaultMuleMessage(response, transportResponse, connector.getMuleContext());
         }
         
-        String statusCode = (String) transportResponse.getProperty(HttpConnector.HTTP_STATUS_PROPERTY);
+        String statusCode = (String) transportResponse.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
         if (statusCode != null && Integer.parseInt(statusCode) != HttpConstants.SC_OK)
         {
             String payload;
@@ -321,6 +328,18 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map<String, String> properties = new HashMap<String, String>();
         MuleMessage msg = event.getMessage();
+        // propagate only invocation- and outbound-scoped properties
+        for (String name : event.getMessage().getPropertyNames(PropertyScope.INVOCATION))
+        {
+            final String value = msg.getStringProperty(name, PropertyScope.INVOCATION, "");
+            properties.put(name, value);
+        }
+        for (String name : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))
+        {
+            final String value = msg.getStringProperty(name, PropertyScope.OUTBOUND, "");
+            properties.put(name, value);
+        }
+
         for (Iterator<?> iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String propertyKey = (String)iterator.next();
