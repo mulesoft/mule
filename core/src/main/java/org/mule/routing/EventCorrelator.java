@@ -388,11 +388,6 @@ public class EventCorrelator
             }
         }
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Got latch for message: " + messageId);
-        }
-
         // the final result message
         MuleMessage result;
 
