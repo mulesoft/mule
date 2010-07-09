@@ -27,7 +27,6 @@
         <service name="quartzSchedulingService">
             <inbound>
                 <inbound-endpoint address="vm://quartz.scheduler" exchange-pattern="one-way"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>
