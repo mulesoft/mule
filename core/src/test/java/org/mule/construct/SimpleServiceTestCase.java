@@ -31,10 +31,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
         super.doSetUp();
 
         dims = new DirectInboundMessageSource();
-
-        simpleService = new SimpleService(muleContext, "test-simple-service");
-        simpleService.setMessageSource(dims);
-        simpleService.setComponent(COMPONENT);
+        simpleService = new SimpleService(muleContext, "test-simple-service", dims, COMPONENT);
     }
 
     @Override

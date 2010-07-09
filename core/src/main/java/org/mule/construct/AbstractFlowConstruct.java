@@ -211,11 +211,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         return name;
     }
 
-    public void setMessageSource(MessageSource messageSource)
-    {
-        this.messageSource = messageSource;
-    }
-
     public ExceptionListener getExceptionListener()
     {
         return exceptionListener;

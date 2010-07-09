@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
@@ -24,15 +25,28 @@ import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
  */
 public class SimpleService extends AbstractFlowConstruct
 {
-    private Component component;
+    private final Component component;
 
-    public SimpleService(MuleContext muleContext, String name) throws MuleException
+    public SimpleService(MuleContext muleContext,
+                         String name,
+                         MessageSource messageSource,
+                         Component component) throws MuleException
     {
         super(name, muleContext);
-    }
 
-    public void setComponent(Component component)
-    {
+        if (messageSource == null)
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("messageSource can't be null on: " + this.toString()));
+        }
+
+        if (component == null)
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("component can't be null on: " + this.toString()));
+        }
+
+        this.messageSource = messageSource;
         this.component = component;
     }
 
@@ -51,18 +65,6 @@ public class SimpleService extends AbstractFlowConstruct
 
         // TODO Ensure messageSource is a single InboundEndpoint (not composite)?
         // TODO Ensure InboundEndpoint messageSource has supported Exchange Pattern
-
-        if (messageSource == null)
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("messageSource can't be null on: " + this.toString()));
-        }
-
-        if (component == null)
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("component can't be null on: " + this.toString()));
-        }
     }
 
     public Component getComponent()
