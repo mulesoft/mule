@@ -90,7 +90,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
-        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]&synchronous=true");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]&exchange-pattern=request-response");
         assertNotNull(endpoint3);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
         router.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
