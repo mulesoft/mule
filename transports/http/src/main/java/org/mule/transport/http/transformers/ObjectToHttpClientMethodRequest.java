@@ -375,11 +375,25 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
 
     protected void setHeaders(HttpMethod httpMethod, MuleMessage msg)
     {
-        // Standard requestHeaders
-        String headerValue;
-        String headerName;
+        // only invocation and outbound scope to be put on the wire
+        setHeadersScoped(httpMethod, msg, PropertyScope.INVOCATION);
+        setHeadersScoped(httpMethod, msg, PropertyScope.OUTBOUND);
 
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        Set attNams = msg.getAttachmentNames();
+        if (msg.getPayload() instanceof InputStream
+                && attNams != null && attNams.size() > 0)
+        {
+            // must set this for receiver to properly parse attachments
+            httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
+        }
+
+    }
+
+    protected void setHeadersScoped(HttpMethod httpMethod, MuleMessage msg, PropertyScope scope)
+    {
+        String headerName;
+        String headerValue;
+        for (Iterator iterator = msg.getPropertyNames(scope).iterator(); iterator.hasNext();)
         {
             headerName = (String) iterator.next();
 
@@ -390,10 +404,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                     logger.warn("Deprecation warning:  There is not need to set custom headers using: " + HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY
                         + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
                 }
-                
-                Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+
+                Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, scope);
                 if (customHeaders != null)
-                {   
+                {
                     for (Iterator headerItr = customHeaders.entrySet().iterator(); headerItr.hasNext();)
                     {
                         Map.Entry entry = (Map.Entry) headerItr.next();
@@ -407,7 +421,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null
                         && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
             {
-                headerValue = msg.getStringProperty(headerName, null);
+                headerValue = msg.getStringProperty(headerName, scope, null);
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
                 {
                     headerName = new StringBuffer(30).append("X-").append(headerName).toString();
@@ -416,15 +430,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 httpMethod.addRequestHeader(headerName, headerValue);
             }
         }
-
-        Set attNams = msg.getAttachmentNames();
-        if (msg.getPayload() instanceof InputStream
-                && attNams != null && attNams.size() > 0)
-        {
-            // must set this for receiver to properly parse attachments
-            httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
-        }
-
     }
 
     protected String paramToString(Object param)

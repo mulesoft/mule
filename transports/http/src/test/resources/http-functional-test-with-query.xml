@@ -23,8 +23,8 @@
 
     <http:endpoint name="serverEndpoint1" host="localhost" port="60231" path="test1" exchange-pattern="request-response">
         <expression-transformer>
-            <return-argument evaluator="header" expression="foo"/>
-            <return-argument evaluator="header" expression="far"/>
+            <return-argument evaluator="header" expression="INBOUND:foo"/>
+            <return-argument evaluator="header" expression="INBOUND:far"/>
         </expression-transformer>
     </http:endpoint>
 

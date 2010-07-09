@@ -28,8 +28,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        MuleMessage result = client.send("clientEndpoint1", null, props);
+        MuleMessage result = client.send("clientEndpoint1", null, null);
         assertEquals("boobar", result.getPayloadAsString());
     }
 
