@@ -56,7 +56,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         }
         catch (MuleException e)
         {
-            //exprected
+            //expected
         }
     }
 }
