@@ -102,6 +102,7 @@
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="abstract-filter"/>
+            <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
             <xsd:element ref="abstract-message-processor"/>
@@ -596,6 +597,7 @@
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
             <xsd:group ref="entryPointResolvers"/>
             <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-flow-construct" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="nonBlankString">
             <xsd:annotation>
@@ -912,7 +914,6 @@
         </xsd:attribute>
     </xsd:complexType>
 
-
     <!--==============================================================-->
     <!--  Services                                                    -->
     <!--==============================================================-->
@@ -1158,6 +1159,133 @@
     </xsd:element>
     <xsd:complexType name="abstractServiceThreadingProfileType"/>
 
+    <!--==============================================================-->
+    <!--   Flow Constructs                                            -->
+    <!--==============================================================-->
+    
+    <xsd:element name="abstract-flow-construct" abstract="true" type="abstractFlowConstructType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for a flow construct element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractFlowConstructType">
+        <xsd:attribute name="name" type="nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify this flow construct.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="abstract" type="xsd:boolean" use="optional" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines if the flow construct is abstract (ie a parent that will be inherited in concrete constructs).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="parent" type="xsd:NMTOKEN" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines if the flow construct inherits part of its configuration from a parent construct.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="baseFlowConstructType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Base support for a flow construct.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractFlowConstructType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple in-out service, with no outbound router.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="simpleServiceType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple in-out service, with no outbound router.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="baseFlowConstructType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-component" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The component that is invoked when incoming messages are received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="address" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The address on which this simple service is listening.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="endpoint-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The component that is invoked when incoming messages are received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list of the transformers that will be applied (in order) to the message before it is delivered to the component.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list of the transformers that will be applied (in order) to the synchronous response before it is returned via the transport.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="component-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The component that is invoked when incoming messages are received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="component-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specifies a component class. This is a shortcut that is equivalent to providing a 'prototype-object' element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
     <!--==============================================================-->
     <!-- Components                                              -->
     <!--==============================================================-->
@@ -4780,6 +4908,5 @@
     </xsd:attribute>
     
     -->
-
 
 </xsd:schema>
