@@ -15,11 +15,11 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
     <bpm:jbpm-connector name="bpmConnector">
-    	<bpm:process name="simple" resource="simple-process.jpdl.xml" />
-    	<bpm:process name="message" resource="message-process.jpdl.xml" />
-    	<bpm:process name="fork" resource="fork-process.jpdl.xml" />
-    	<bpm:process name="variables" resource="variables-process.jpdl.xml" />
-    	<bpm:process name="exception" resource="message-exception-process.jpdl.xml" />
+        <bpm:process name="simple" resource="simple-process.jpdl.xml" />
+        <bpm:process name="message" resource="message-process.jpdl.xml" />
+        <bpm:process name="fork" resource="fork-process.jpdl.xml" />
+        <bpm:process name="variables" resource="variables-process.jpdl.xml" />
+        <bpm:process name="exception" resource="message-exception-process.jpdl.xml" />
     </bpm:jbpm-connector>
     
     <model name="processModel">
@@ -80,7 +80,7 @@
                 <vm:inbound-endpoint path="queueA" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
-            	<test:return-data>Response A</test:return-data>
+                <test:return-data>Response A</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
@@ -94,7 +94,7 @@
                 <vm:inbound-endpoint path="queueB" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
-            	<test:return-data>Response B</test:return-data>
+                <test:return-data>Response B</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
@@ -120,8 +120,8 @@
         <service name="exceptionTransformer">
             <inbound>
                 <vm:inbound-endpoint path="exceptionTransformer" exchange-pattern="one-way">
-                	<!-- Throw an exception -->
-                	<custom-transformer class="org.mule.tck.transformer.ValidateResponse" />
+                    <!-- Throw an exception -->
+                    <custom-transformer class="org.mule.tck.transformer.ValidateResponse" />
                 </vm:inbound-endpoint>
             </inbound>
             <echo-component />

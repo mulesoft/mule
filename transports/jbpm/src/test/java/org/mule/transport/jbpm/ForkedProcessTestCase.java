@@ -55,7 +55,7 @@ public class ForkedProcessTestCase extends AbstractJbpmTestCase
             // The process should have ended.
             process = (ProcessInstance) bpms.lookupProcess(process.getId());
             assertTrue("Process should have ended, but is in state " + bpms.getState(process), 
-            		bpms.hasEnded(process));
+                    bpms.hasEnded(process));
         }
         finally
         {

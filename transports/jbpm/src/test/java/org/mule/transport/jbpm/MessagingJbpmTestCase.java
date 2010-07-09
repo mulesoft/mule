@@ -20,10 +20,10 @@ import org.mule.transport.bpm.BPMS;
  */
 public class MessagingJbpmTestCase extends AbstractJbpmTestCase
 {
-	static {
-	   	System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
-	}
-	
+    static {
+           System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
+    }
+
     protected String getConfigResources()
     {
         return "jbpm-functional-test.xml";
@@ -38,7 +38,7 @@ public class MessagingJbpmTestCase extends AbstractJbpmTestCase
         try
         {
             // Create a new process.
-        	response = client.send("bpm://message", "data", null);                  	
+            response = client.send("bpm://message", "data", null);
             process = response.getPayload();
             assertTrue(bpms.isProcess(process)); 
 

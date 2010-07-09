@@ -1,5 +1,5 @@
 <bindings>
-	<activity binding="org.mule.transport.jbpm.MuleSendBinding" />
-	<activity binding="org.mule.transport.jbpm.MuleReceiveBinding" />
-	<eventlistener binding="org.mule.transport.jbpm.MuleSendBinding" />
+    <activity binding="org.mule.transport.jbpm.MuleSendBinding" />
+    <activity binding="org.mule.transport.jbpm.MuleReceiveBinding" />
+    <eventlistener binding="org.mule.transport.jbpm.MuleSendBinding" />
 </bindings>

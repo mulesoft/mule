@@ -19,11 +19,11 @@ import java.util.Map;
 
 public class VariablesTestCase extends AbstractJbpmTestCase
 {
-	static 
-	{
-	   	System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
-	}
-	
+    static
+    {
+           System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
+    }
+
     @Override
     protected String getConfigResources()
     {
@@ -41,8 +41,8 @@ public class VariablesTestCase extends AbstractJbpmTestCase
             String processId = (String) bpms.getId(response.getPayload());
             assertNotNull(processId);
 
-        	response = client.request("vm://queueA", 3000);
-        	assertNotNull(response);
+            response = client.request("vm://queueA", 3000);
+            assertNotNull(response);
             assertEquals("bar", response.getProperty("foo"));
             assertEquals(0.75, response.getProperty("fraction"));
 

@@ -16,10 +16,10 @@ import org.mule.tck.exceptions.FunctionalTestException;
 
 public class MessagingExceptionTestCase extends AbstractJbpmTestCase
 {
-	static {
-	   	System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
-	}
-	
+    static {
+           System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
+    }
+
     protected String getConfigResources()
     {
         return "jbpm-functional-test.xml";
