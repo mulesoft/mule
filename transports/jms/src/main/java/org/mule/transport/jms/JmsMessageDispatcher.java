@@ -19,6 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -206,8 +207,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             // If we are honouring the current QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())
             {
-                Object priorityProp = eventMsg.getProperty(JmsConstants.JMS_PRIORITY);
-                Object deliveryModeProp = eventMsg.getProperty(JmsConstants.JMS_DELIVERY_MODE);
+                Object priorityProp = eventMsg.getProperty(JmsConstants.JMS_PRIORITY, PropertyScope.INBOUND);
+                Object deliveryModeProp = eventMsg.getProperty(JmsConstants.JMS_DELIVERY_MODE, PropertyScope.INBOUND);
 
                 if (priorityProp != null)
                 {
@@ -399,7 +400,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     {
         String selector = null;
         //Only used by topics
-        String durableName = null;
+        String durableName;
         //If we're not using
         if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
