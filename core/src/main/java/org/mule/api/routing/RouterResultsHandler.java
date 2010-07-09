@@ -11,7 +11,6 @@ package org.mule.api.routing;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 
 import java.util.List;
 
@@ -21,5 +20,5 @@ import java.util.List;
  */
 public interface RouterResultsHandler
 {
-    MuleEvent aggregateResults(List<MuleEvent> results, MuleContext muleContext, MuleEvent previous);
+    MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous, MuleContext muleContext);
 }

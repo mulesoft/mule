@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler
 {
-    public MuleEvent aggregateResults(List<MuleEvent> results, MuleContext muleContext, MuleEvent previous)
+    public MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous, MuleContext muleContext)
     {
         MuleMessage aggregate;
 

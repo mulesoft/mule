@@ -101,7 +101,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        return resultsHandler.aggregateResults(results, muleContext, event);
+        return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
     protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException

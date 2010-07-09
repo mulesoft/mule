@@ -100,7 +100,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             }
         }
 
-        return resultsHandler.aggregateResults(results, muleContext, event);
+        return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
 

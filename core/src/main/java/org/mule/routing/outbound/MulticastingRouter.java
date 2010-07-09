@@ -88,6 +88,6 @@ public class MulticastingRouter extends FilteringOutboundRouter
         {
             throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
         }
-        return resultsHandler.aggregateResults(results, muleContext, event);
+        return resultsHandler.aggregateResults(results, event, muleContext);
     }
 }
