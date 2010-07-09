@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -77,7 +78,8 @@ public class ChainingRouter extends FilteringOutboundRouter
 
                 if (!lastEndpointInChain)
                 {
-                    MuleMessage localResult = getMessage(sendRequest(session, intermediaryResult, endpoint, true));
+                    MuleEvent event1 = sendRequest(session, intermediaryResult, endpoint, true);
+                    MuleMessage localResult = event1 == null ? null : event1.getMessage();
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)
@@ -100,7 +102,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                     {
                         // if there was an error in the first link of the chain, make sure we propagate back
                         // any exception payloads alongside the NullPayload
-                        resultToReturn = createEvent(intermediaryResult, event);
+                        resultToReturn = intermediaryResult == null ? null : new DefaultMuleEvent(intermediaryResult, event);
                         logger.warn("Chaining router cannot process any further endpoints. "
                                     + "There was no result returned from endpoint invocation: " + endpoint);
                         break;
@@ -115,7 +117,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                         resultToReturn = sendRequest(session, intermediaryResult, endpoint, true);
                         if (logger.isDebugEnabled())
                         {
-                            MuleMessage resultMessage = getMessage(resultToReturn);
+                            MuleMessage resultMessage = resultToReturn == null ? null : resultToReturn.getMessage();
                             logger.debug("Received final Chain result '" + i + "': "
                                          + (resultMessage == null ? "null" : resultMessage.toString()));
                         }

@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -44,7 +45,7 @@ public class TransformerRouter extends AbstractOutboundRouter
                     endpoints.get(0), e);
             }
         }
-        return createEvent(message, event);
+        return message == null ? null : new DefaultMuleEvent(message, event);
     }
 
     public boolean isMatch(MuleMessage message) throws MessagingException

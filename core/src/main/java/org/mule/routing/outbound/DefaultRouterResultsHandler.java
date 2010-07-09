@@ -17,7 +17,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.routing.RouterResultsHandler;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,14 +46,15 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         }
         else if (results.size() == 1)
         {
-            aggregate = AbstractOutboundRouter.getMessage(results.get(0));
+            MuleEvent event = results.get(0);
+            aggregate = event == null ? null : event.getMessage();
         }
         else
         {
             MuleMessageCollection coll = new DefaultMessageCollection(muleContext);
             for (MuleEvent event : results)
             {
-                MuleMessage muleMessage = AbstractOutboundRouter.getMessage(event);
+                MuleMessage muleMessage = event == null ? null : event.getMessage();
                 if(muleMessage!=null)
                 {
                     coll.addMessage(muleMessage);
@@ -63,6 +63,6 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             aggregate = coll;
         }
 
-        return AbstractOutboundRouter.createEvent(aggregate, previous);
+        return aggregate == null ? null : new DefaultMuleEvent(aggregate, previous);
     }
 }

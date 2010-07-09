@@ -10,9 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -35,7 +32,6 @@ import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
-import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -77,7 +73,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         return route(event);
     }
     
-    protected abstract MuleEvent route(MuleEvent event) throws RoutingException, MessagingException;
+    protected abstract MuleEvent route(MuleEvent event) throws MessagingException;
 
     protected final MuleEvent sendRequest(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint, boolean awaitResponse)
             throws MuleException
@@ -111,7 +107,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        MuleEvent result = null;
+        MuleEvent result;
         try
         {
             result = sendRequestEvent(session, message, endpoint, awaitResponse);
@@ -321,13 +317,11 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      */
     public OutboundEndpoint getEndpoint(String name)
     {
-        OutboundEndpoint endpointDescriptor;
-        for (Iterator<OutboundEndpoint> iterator = endpoints.iterator(); iterator.hasNext();)
+        for (OutboundEndpoint endpoint : endpoints)
         {
-            endpointDescriptor = iterator.next();
-            if (endpointDescriptor.getName().equals(name))
+            if (endpoint.getName().equals(name))
             {
-                return endpointDescriptor;
+                return endpoint;
             }
         }
         return null;
@@ -348,8 +342,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         return false;
     }
 
-    /** send of message event to destination */
-    private MuleEvent sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
+    /**
+     *  Send message event to destination.
+     */
+    protected MuleEvent sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
             throws MuleException
     {
         if (endpoint == null)
@@ -371,15 +367,4 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         return endpoint.process(event);
     }
 
-    /** @eturn the message from a (possibly null) event */
-    protected static MuleMessage getMessage(MuleEvent event)
-    {
-        return event == null ? null : event.getMessage();
-    }
-
-    /** @eturn a possible null event created to hold a possible null message */
-    protected static MuleEvent createEvent(MuleMessage message, MuleEvent previous)
-    {
-        return message == null ? null : new DefaultMuleEvent(message, previous);
-    }
 }
