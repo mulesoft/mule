@@ -27,11 +27,16 @@
     <model>
         <service name="httpService1">
             <inbound>
-                <vm:inbound-endpoint path="httpService1" exchange-pattern="request-response" />
+                <vm:inbound-endpoint path="httpService1" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="httpService" exchange-pattern="request-response" />
+                    <outbound-endpoint ref="httpService" exchange-pattern="request-response">
+                        <message-properties-transformer>
+                            <!-- take the content-type from the client's request -->
+                            <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                        </message-properties-transformer>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -55,7 +60,13 @@
                 <pass-through-router>
                     <outbound-endpoint ref="httpService" exchange-pattern="request-response">
                         <property key="responseProperties" value="some,other" />
-                       </outbound-endpoint>
+                        <message-properties-transformer>
+                            <!-- take the content-type from the client's request -->
+                            <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                            <add-message-property key="some" value="#[header:INBOUND:some]"/>
+                            <add-message-property key="other" value="#[header:INBOUND:other]"/>
+                        </message-properties-transformer>
+                   </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -68,6 +79,11 @@
                 <pass-through-router>
                     <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
                         <property key="responseProperties" value="some,other" />
+                        <message-properties-transformer>
+                            <!-- Note that we don't specify content-type here, cxf does-->
+                            <add-message-property key="some" value="#[header:INBOUND:some]"/>
+                            <add-message-property key="other" value="#[header:INBOUND:other]"/>
+                        </message-properties-transformer>
                        </outbound-endpoint>
                 </pass-through-router>
             </outbound>

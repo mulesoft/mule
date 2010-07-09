@@ -12,6 +12,7 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
@@ -39,7 +40,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
-        return (WebServiceOnlineCheck.isWebServiceOnline() == false);
+        return !WebServiceOnlineCheck.isWebServiceOnline();
     }
 
     @Override
@@ -64,9 +65,9 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
-        assertEquals("TestID", response.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
-        assertEquals("TestGroupSize", response.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
-        assertEquals("TestSequence", response.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
+        assertEquals("TestID", response.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND));
+        assertEquals("TestGroupSize", response.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND));
+        assertEquals("TestSequence", response.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND));
     }
 
     /**
@@ -84,9 +85,9 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
-        assertEquals("TestID", response.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
-        assertEquals("TestGroupSize", response.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
-        assertEquals("TestSequence", response.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
+        assertEquals("TestID", response.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND));
+        assertEquals("TestGroupSize", response.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND));
+        assertEquals("TestSequence", response.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND));
     }
 
     /**
@@ -105,9 +106,9 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
-        assertNull(response.getProperty("some"));
-        assertNull(response.getProperty("other"));
-        assertEquals("text/plain; charset=utf-8", response.getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertNull(response.getProperty("some", PropertyScope.OUTBOUND));
+        assertNull(response.getProperty("other", PropertyScope.OUTBOUND));
+        assertEquals("text/plain; charset=utf-8", response.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND));
         assertEquals("utf-8", response.getEncoding());
     }
 
@@ -126,9 +127,9 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
-        assertNull(response.getProperty("some"));
-        assertNull(response.getProperty("other"));
-        assertEquals("text/xml; charset=utf-8", response.getProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertNull(response.getProperty("some", PropertyScope.OUTBOUND));
+        assertNull(response.getProperty("other", PropertyScope.OUTBOUND));
+        assertEquals("text/xml; charset=utf-8", response.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND));
         assertEquals("utf-8", response.getEncoding());
     }
 
@@ -147,8 +148,8 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://httpService2", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
-        assertEquals("thing", response.getProperty("some"));
-        assertEquals("stuff", response.getProperty("other"));
+        assertEquals("thing", response.getProperty("some", PropertyScope.OUTBOUND));
+        assertEquals("stuff", response.getProperty("other", PropertyScope.OUTBOUND));
     }
 
     /**
@@ -165,7 +166,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://cxfService2", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
-        assertEquals("thing", response.getProperty("some"));
-        assertEquals("stuff", response.getProperty("other"));
+        assertEquals("thing", response.getProperty("some", PropertyScope.OUTBOUND));
+        assertEquals("stuff", response.getProperty("other", PropertyScope.OUTBOUND));
     }
 }
