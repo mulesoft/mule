@@ -10,9 +10,6 @@
 
 package org.mule.module.sxc;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
@@ -20,6 +17,9 @@ import com.envoisolutions.sxc.xpath.XPathBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 public class SxcFilter implements Filter
 {
@@ -50,7 +50,7 @@ public class SxcFilter implements Filter
              throw new UndefinedMatchException();
          }
          
-         return ((Boolean) accept).booleanValue();
+         return (Boolean) accept;
     }
 
     /** @return XPath expression */

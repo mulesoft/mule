@@ -15,8 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.io.ByteArrayOutputStream;
-
 import org.apache.commons.io.IOUtils;
 
 public class SxcFilterTestCase extends FunctionalTestCase
@@ -27,10 +25,9 @@ public class SxcFilterTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient(muleContext);
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
+        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
 
-        MuleMessage res = client.send("vm://in", out.toByteArray(), null);
+        MuleMessage res = client.send("vm://in", testData, null);
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
@@ -38,10 +35,9 @@ public class SxcFilterTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient(muleContext);
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
+        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
 
-        MuleMessage res = client.send("vm://and-filter", out.toByteArray(), null);
+        MuleMessage res = client.send("vm://and-filter", testData, null);
 
         assertEquals(Boolean.TRUE, res.getPayload());
     }
@@ -50,10 +46,9 @@ public class SxcFilterTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient(muleContext);
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
+        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
 
-        MuleMessage res = client.send("vm://or-filter", out.toByteArray(), null);
+        MuleMessage res = client.send("vm://or-filter", testData, null);
 
         assertEquals(Boolean.TRUE, res.getPayload());
     }
@@ -62,10 +57,9 @@ public class SxcFilterTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient(muleContext);
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
+        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
 
-        MuleMessage res = client.send("vm://not-filter", out.toByteArray(), null);
+        MuleMessage res = client.send("vm://not-filter", testData, null);
 
         assertEquals(Boolean.TRUE, res.getPayload());
     }
@@ -74,20 +68,19 @@ public class SxcFilterTestCase extends FunctionalTestCase
     {
         final MuleClient client = new MuleClient(muleContext);
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
+        final String testData = IOUtils.toString(getClass().getResourceAsStream("/purchase-order.xml"));
 
         System.out.println("Warmup");
-        fire(client, out, 1500);
+        fire(client, testData, 1500);
 
         System.out.println("Running....");
 
-        fire(client, out, 1000);
+        fire(client, testData, 1000);
 
         Thread.sleep(1000);
     }
 
-    private void fire(final MuleClient client, final ByteArrayOutputStream out, final int count)
+    private void fire(final MuleClient client, final String testData, final int count)
         throws InterruptedException
     {
         long time = System.currentTimeMillis();
@@ -102,7 +95,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
                     {
                         try
                         {
-                            client.send("vm://in", out.toByteArray(), null);
+                            client.send("vm://in", testData, null);
                         }
                         catch (MuleException e)
                         {
