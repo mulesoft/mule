@@ -22,9 +22,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.util.mock.PayloadClassConstraint;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -42,7 +40,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         Service testService = getTestService("test", Apple.class);
         MuleSession session = getTestSession(testService, muleContext);
 
-        OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint", "test://endpoint?synchronous=true");
+        OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint", "test://endpoint?exchange-pattern=request-response");
         ListMessageSplitter router = new ListMessageSplitter();
         router.setFilter(null);
         router.addEndpoint(endpoint);
@@ -77,9 +75,9 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
-        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4endpoint", "test://endpointUri.4?synchronous=true", null, new PayloadTypeFilter(Apple.class), null);
-        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?synchronous=true", null, new PayloadTypeFilter(Orange.class), null);
-        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?synchronous=true");
+        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4endpoint", "test://endpointUri.4?exchange-pattern=request-response", null, new PayloadTypeFilter(Apple.class), null);
+        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response", null, new PayloadTypeFilter(Orange.class), null);
+        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
         Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         Mock mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);
