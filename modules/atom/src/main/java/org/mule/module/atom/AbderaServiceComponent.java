@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.module.atom.server.MuleRequestContext;
 import org.mule.object.SingletonObjectFactory;
@@ -37,6 +38,8 @@ import org.apache.abdera.protocol.server.FilterChain;
 import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext.Scope;
 import org.apache.abdera.protocol.server.ResponseContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This component receives requests from Mule and passes them off to Abdera.
@@ -45,6 +48,8 @@ public class AbderaServiceComponent extends DefaultJavaComponent
 {
 
     public static final String EVENT_CONTEXT = "_muleEventContext";
+
+    protected static transient final Log logger = LogFactory.getLog(AbderaServiceComponent.class);
 
     private Provider provider;
 
@@ -69,17 +74,20 @@ public class AbderaServiceComponent extends DefaultJavaComponent
 
         public Object onCall(MuleEventContext event) throws MuleException
         {
-            System.out.println(event.getMessageAsString());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(event.getMessageAsString());
+            }
             MuleMessage msg = event.getMessage();
             IRI baseIri = initBaseUri(event.getEndpointURI());
-            String contextPath = msg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "");
+            String contextPath = msg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND, "");
 
             Provider provider = abderaServiceComponent.getProvider();
             MuleRequestContext reqcontext = new MuleRequestContext(provider,
-                    event,
-                    msg,
-                    contextPath,
-                    baseIri);
+                                                                   event,
+                                                                   msg,
+                                                                   contextPath,
+                                                                   baseIri);
             reqcontext.setAttribute(Scope.REQUEST, EVENT_CONTEXT, event);
 
             FilterChain chain = new FilterChain(provider, reqcontext);
@@ -123,23 +131,22 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             };
             DefaultMuleMessage response = new DefaultMuleMessage(payload, muleContext);
 
-            response.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY,
-                    context.getStatus());
+            response.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, context.getStatus());
             long cl = context.getContentLength();
             String cc = context.getCacheControl();
             if (cl > -1)
             {
-                response.setProperty("Content-Length", Long.toString(cl));
+                response.setProperty("Content-Length", Long.toString(cl), PropertyScope.OUTBOUND);
             }
             if (cc != null && cc.length() > 0)
             {
-                response.setProperty("Cache-Control", cc);
+                response.setProperty("Cache-Control", cc, PropertyScope.OUTBOUND);
             }
 
             MimeType ct = context.getContentType();
             if (ct != null)
             {
-                response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct.toString());
+                response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct.toString(), PropertyScope.OUTBOUND);
             }
 
             String[] names = context.getHeaderNames();
@@ -155,7 +162,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
 //                        response.setDateHeader(name, ((Date)value).getTime());
                     else
                     {
-                        response.setProperty(name, value.toString());
+                        response.setProperty(name, value.toString(), PropertyScope.OUTBOUND);
                     }
                 }
             }

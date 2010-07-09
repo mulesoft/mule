@@ -11,6 +11,7 @@ package org.mule.module.atom.server;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -67,7 +68,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 
     private static String getMethod(MuleMessage request)
     {
-        return request.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "");
+        return request.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND, "");
     }
 
     public Locale getPreferredLocale()
@@ -102,7 +103,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
             case LOCALES:
                 return null;
             case PROTOCOL:
-                return request.getProperty(HttpConnector.HTTP_VERSION_PROPERTY);
+                return request.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.INBOUND);
             case REMOTEADDRESS:
                 return null;
             case REMOTEHOST:
@@ -116,9 +117,9 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
             case AUTHTYPE:
                 return null; // TODO
             case CONTENTLENGTH:
-                return request.getProperty(HttpConstants.HEADER_CONTENT_LENGTH);
+                return request.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, PropertyScope.OUTBOUND);
             case CONTENTTYPE:
-                return request.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+                return request.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
             case CONTEXTPATH:
                 return ""; // TODO
             case LOCALADDR:

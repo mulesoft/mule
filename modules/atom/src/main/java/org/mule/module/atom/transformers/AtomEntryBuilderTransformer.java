@@ -42,7 +42,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
-    public Object transform(MuleMessage message, String s) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();

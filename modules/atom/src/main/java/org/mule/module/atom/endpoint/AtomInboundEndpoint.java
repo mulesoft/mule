@@ -17,6 +17,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
@@ -140,11 +141,13 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
 
     private String getMime(MuleMessage m)
     {
-        String mimeType = m.getStringProperty("Content-Type", null);
-        if (m == null)
+        String mimeType = m.getStringProperty("Content-Type", PropertyScope.INBOUND, null);
+
+        if (mimeType == null)
         {
             return null;
         }
+
         int i = mimeType.indexOf(";");
         if (i > -1)
         {

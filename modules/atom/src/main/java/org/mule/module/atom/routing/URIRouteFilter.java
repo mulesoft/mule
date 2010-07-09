@@ -11,6 +11,7 @@ package org.mule.module.atom.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 
 import java.util.HashSet;
@@ -56,13 +57,13 @@ public class URIRouteFilter implements Filter
 
     public boolean accept(MuleMessage message)
     {
-        String method = message.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "");
+        String method = message.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND, "");
         if (verbs != null && !verbs.contains(method))
         {
             return false;
         }
 
-        String path = message.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "");
+        String path = message.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND, "");
 
         return route.match(path);
     }
