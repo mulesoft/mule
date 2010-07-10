@@ -20,7 +20,7 @@
                 This example demonstrates how to configure a Groovy Script component with an in-line script.
             </description>
             <inbound>
-                <inbound-endpoint address="vm://in1"/>
+                <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
             </inbound>
             <script:component>
                 <script:script engine="groovy">
@@ -29,7 +29,7 @@
             </script:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out1"/>
+                    <outbound-endpoint address="vm://out1" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -38,33 +38,33 @@
 
         <service name="fileBasedScript">
             <inbound>
-                <inbound-endpoint address="vm://in2"/>
+                <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
             </inbound>
             <script:component>
                 <script:script file="simple-script.groovy"/>
             </script:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out2"/>
+                    <outbound-endpoint address="vm://out2" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="referencedScript">
             <inbound>
-                <inbound-endpoint address="vm://in3"/>
+                <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
             </inbound>
             <script:component script-ref="myScript"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out3"/>
+                    <outbound-endpoint address="vm://out3" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="scriptVariables">
             <inbound>
-                <inbound-endpoint address="vm://in4"/>
+                <inbound-endpoint address="vm://in4" exchange-pattern="one-way"/>
             </inbound>
             <script:component>
                 <script:script engine="groovy">
@@ -77,7 +77,7 @@
             </script:component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out4"/>
+                    <outbound-endpoint address="vm://out4" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

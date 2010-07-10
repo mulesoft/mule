@@ -31,12 +31,12 @@
     <model>
         <service name="inlineScript">
             <inbound>
-                <inbound-endpoint address="vm://in1"/>
+                <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out1">
+                    <outbound-endpoint address="vm://out1" exchange-pattern="one-way">
                         <script:transformer>
                             <script:script engine="groovy">
                                 return src.toString().replaceAll("l", "x")
@@ -49,12 +49,12 @@
 
         <service name="fileBasedScript">
             <inbound>
-                <inbound-endpoint address="vm://in2"/>
+                <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out2">
+                    <outbound-endpoint address="vm://out2" exchange-pattern="one-way">
                         <script:transformer>
                             <script:script file="simple-transformer.groovy"/>
                         </script:transformer>
@@ -65,12 +65,12 @@
 
         <service name="referencedTransformer">
             <inbound>
-                <inbound-endpoint address="vm://in3"/>
+                <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out3" transformer-refs="stringReplace"/>
+                    <outbound-endpoint address="vm://out3" exchange-pattern="one-way" transformer-refs="stringReplace"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -82,7 +82,7 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out4" transformer-refs="stringReplaceWithParams"/>
+                    <outbound-endpoint address="vm://out4" exchange-pattern="one-way" transformer-refs="stringReplaceWithParams"/>
                 </pass-through-router>
             </outbound>
         </service>
