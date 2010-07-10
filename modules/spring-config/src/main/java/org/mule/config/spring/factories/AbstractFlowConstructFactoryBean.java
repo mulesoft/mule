@@ -11,21 +11,32 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.AbstractFlowConstruct;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public abstract class AbstractFlowConstructFactoryBean
-    implements FactoryBean, MuleContextAware, InitializingBean
+    implements FactoryBean, ApplicationContextAware, MuleContextAware, Initialisable
 {
+    protected ApplicationContext applicationContext;
     protected MuleContext muleContext;
     protected String name;
-    private AbstractFlowConstruct flowConstruct;
+    protected AbstractFlowConstruct flowConstruct;
 
     public boolean isSingleton()
     {
         return true;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.applicationContext = applicationContext;
     }
 
     public void setMuleContext(MuleContext muleContext)
@@ -38,9 +49,17 @@ public abstract class AbstractFlowConstructFactoryBean
         this.name = name;
     }
 
-    public void afterPropertiesSet() throws Exception
+    public void initialise() throws InitialisationException
     {
-        flowConstruct = createFlowConstruct();
+        try
+        {
+            flowConstruct = createFlowConstruct();
+        }
+        catch (MuleException me)
+        {
+            throw new InitialisationException(me, this);
+        }
+
         flowConstruct.initialise();
     }
 
@@ -49,5 +68,5 @@ public abstract class AbstractFlowConstructFactoryBean
         return flowConstruct;
     }
 
-    protected abstract AbstractFlowConstruct createFlowConstruct() throws Exception;
+    protected abstract AbstractFlowConstruct createFlowConstruct() throws MuleException;
 }

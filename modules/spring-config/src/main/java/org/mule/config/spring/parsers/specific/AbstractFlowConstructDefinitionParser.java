@@ -22,6 +22,9 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
     private static final String ABSTRACT_ATTRIBUTE = "abstract";
     private static final String PARENT_ATTRIBUTE = "parent";
 
+    // TODO support default service exception strategy
+    // TODO support injection of exception strategy
+
     @SuppressWarnings("unchecked")
     @Override
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)

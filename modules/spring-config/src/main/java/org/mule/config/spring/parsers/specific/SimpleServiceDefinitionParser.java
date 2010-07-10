@@ -10,10 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.factories.SimpleServiceFactoryBean;
-import org.mule.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.object.PrototypeObjectFactory;
 import org.mule.util.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -21,6 +18,7 @@ import org.w3c.dom.Element;
 
 public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefinitionParser
 {
+    private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
     private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
 
     @Override
@@ -29,24 +27,27 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
         return SimpleServiceFactoryBean.class;
     }
 
-    // TODO support @s: endpoint-ref transformer-refs responseTransformer-refs component-ref
     // TODO support child: component
-    // TODO support parent inheritance
+    // TODO support @s: transformer-refs responseTransformer-refs
 
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        // FIXME replace this with the dynamic addition of a component child
+        String componentRefAttribute = element.getAttribute(COMPONENT_REF_ATTRIBUTE);
+        if (StringUtils.isNotBlank(componentRefAttribute))
+        {
+            builder.addPropertyValue("componentBeanName", componentRefAttribute);
+        }
+        element.removeAttribute(COMPONENT_REF_ATTRIBUTE);
+
         String componentClassAttribute = element.getAttribute(COMPONENT_CLASS_ATTRIBUTE);
         if (StringUtils.isNotBlank(componentClassAttribute))
         {
-            DefaultJavaComponent component = new DefaultJavaComponent(
-                new PrototypeObjectFactory(componentClassAttribute));
-            component.setEntryPointResolverSet(new LegacyEntryPointResolverSet());
-            builder.addPropertyValue("component", component);
+            builder.addPropertyValue("componentClass", componentClassAttribute);
         }
         element.removeAttribute(COMPONENT_CLASS_ATTRIBUTE);
 
         super.doParse(element, parserContext, builder);
     }
+
 }
