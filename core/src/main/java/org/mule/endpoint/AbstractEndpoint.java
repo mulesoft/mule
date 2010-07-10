@@ -34,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -327,12 +326,12 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
         }
 
-        return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
-                + connector + ", transformer=" + transformers + ", name='" + name + "'" + ", properties=" + properties
-                + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
-                + deleteUnacceptedMessages + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous
-                + ", initialState=" + initialState + ", responseTimeout="
-                + responseTimeout + ", endpointEncoding=" + endpointEncoding + "}";
+        return getClass().getSimpleName() + "{endpointUri=" + sanitizedEndPointUri + ", name='" + name +
+                "', mep=" + messageExchangePattern  + ", properties=" + properties +
+                ", transactionConfig=" + (transactionConfig.getFactory()==null ? "none" : transactionConfig) +
+                ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages +
+                ", securityFilter=" + securityFilter + ", initialState=" + initialState + ", responseTimeout=" + responseTimeout + 
+                ", endpointEncoding=" + endpointEncoding + ", connector=" + connector + ", transformer=" + transformers + "}";
     }
 
     public String getProtocol()
