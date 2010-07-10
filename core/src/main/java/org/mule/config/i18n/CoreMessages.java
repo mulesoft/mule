@@ -1295,4 +1295,9 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 320, method.getName());
     }
+
+    public static Message cannotRenameInboundScopeProperty(String fromKey, String toKey)
+    {
+        return factory.createMessage(BUNDLE_PATH, 321, fromKey, toKey);
+    }
 }

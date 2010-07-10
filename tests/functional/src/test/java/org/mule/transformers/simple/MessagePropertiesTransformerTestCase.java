@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -28,16 +30,17 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         return "message-properties-transformer-config.xml";
     }
 
+    @Test
     public void testOverwriteFlagEnabledByDefault() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map add = new HashMap();
+        Map<String, Object> add = new HashMap<String, Object>();
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
         t.setMuleContext(muleContext);
 
-        MuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-        msg.setProperty("addedProperty", "originalValue");
+        MuleMessage msg = new DefaultMuleMessage("message", muleContext);
+        msg.setProperty("addedProperty", "originalValue", PropertyScope.OUTBOUND);
         MuleEventContext ctx = getTestEventContext(msg);
         // context clones message
         msg = ctx.getMessage();
@@ -46,77 +49,81 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
         // property values will be different
-        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames());
 
-        assertEquals("overwrittenValue", transformed.getProperty("addedProperty"));
+        assertEquals("overwrittenValue", transformed.getProperty("addedProperty", PropertyScope.OUTBOUND));
     }
 
+    @Test
     public void testOverwriteFalsePreservesOriginal() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map add = new HashMap();
+        Map<String, Object> add = new HashMap<String, Object>();
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
         t.setOverwrite(false);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-        msg.setProperty("addedProperty", "originalValue");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
+        msg.setProperty("addedProperty", "originalValue", PropertyScope.INVOCATION);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("originalValue", transformed.getProperty("addedProperty"));
+        assertEquals("originalValue", transformed.getProperty("addedProperty", PropertyScope.INVOCATION));
     }
 
+    @Test
     public void testExpressionsInAddProperties() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map add = new HashMap();
+        Map<String, Object> add = new HashMap<String, Object>();
         add.put("Foo", "#[header:public-house]");
         t.setAddProperties(add);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-        msg.setProperty("public-house", "Bar");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
+        msg.setProperty("public-house", "Bar", PropertyScope.OUTBOUND);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("Bar", transformed.getProperty("Foo"));
+        assertEquals("Bar", transformed.getProperty("Foo", PropertyScope.OUTBOUND));
     }
 
+    @Test
     public void testRenameProperties() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        Map add = new HashMap();
+        Map<String, String> add = new HashMap<String, String>();
         add.put("Foo", "Baz");
         t.setRenameProperties(add);
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-        msg.setProperty("Foo", "Bar");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
+        msg.setProperty("Foo", "Bar", PropertyScope.INVOCATION);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("Bar", transformed.getProperty("Baz"));
+        assertEquals("Bar", transformed.getProperty("Baz", PropertyScope.INVOCATION));
     }
 
+    @Test
     public void testDelete() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
         t.setDeleteProperties(Collections.singletonList("badProperty"));
         t.setMuleContext(muleContext);
 
-        DefaultMuleMessage msg = new DefaultMuleMessage("message", (Map) null, muleContext);
-        msg.setProperty("badProperty", "badValue");
+        DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
+        msg.setProperty("badProperty", "badValue", PropertyScope.OUTBOUND);
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
@@ -125,6 +132,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertFalse(transformed.getPropertyNames().contains("badValue"));
     }
 
+    @Test
     public void testTransformerConfig() throws Exception
     {
         MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) muleContext.getRegistry().lookupTransformer("testTransformer");

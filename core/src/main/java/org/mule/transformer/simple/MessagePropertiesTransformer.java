@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -189,9 +190,29 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                          * store current value of the property. then remove key and
                          * store value under new key
                          */
-                        Object propValue = message.getProperty(key, scope);
-                        message.removeProperty(key, scope);
-                        message.setProperty(value, propValue, scope);
+                        if(scope==null)
+                        {
+                            //If scope is not specified, rename the property in the same scope
+                            //Cannot rename in Inbound Scope
+                            //TODO Do Session and Application Scope still exist
+
+                            if(message.getPropertyNames(PropertyScope.INVOCATION).contains(key))
+                            {
+                                renameInScope(key, value, PropertyScope.INVOCATION, message);
+                            }
+                            else if(message.getPropertyNames(PropertyScope.OUTBOUND).contains(key))
+                            {
+                                renameInScope(key, value, PropertyScope.OUTBOUND, message);
+                            }
+                            else if(message.getPropertyNames(PropertyScope.INBOUND).contains(key))
+                            {
+                                throw new TransformerException(CoreMessages.cannotRenameInboundScopeProperty(key, value));
+                            }
+                        }
+                        else
+                        {
+                            renameInScope(key, value, scope, message);
+                        }
                     }
                 }
             }
@@ -211,6 +232,13 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         }
 
         return message;
+    }
+
+    protected void renameInScope(String oldKey, String newKey, PropertyScope scope, MuleMessage message)
+    {
+        Object propValue = message.getProperty(oldKey, scope);
+        message.removeProperty(oldKey, scope);
+        message.setProperty(newKey, propValue, scope);
     }
 
     public List getDeleteProperties()
