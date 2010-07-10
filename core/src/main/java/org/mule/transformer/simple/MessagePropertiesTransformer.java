@@ -39,8 +39,8 @@ import java.util.Map;
  */
 public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer implements MuleContextAware
 {
-    private List deleteProperties = null;
-    private Map addProperties = null;
+    private List<String> deleteProperties = null;
+    private Map<String, Object> addProperties = null;
     /** the properties map containing rename mappings for message properties */
     private Map<String, String> renameProperties;
     private String getProperty;
@@ -62,12 +62,12 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
 
         if (deleteProperties != null)
         {
-            clone.setDeleteProperties(new ArrayList(deleteProperties));
+            clone.setDeleteProperties(new ArrayList<String>(deleteProperties));
         }
 
         if (addProperties != null)
         {
-            clone.setAddProperties(new HashMap(addProperties));
+            clone.setAddProperties(new HashMap<String, Object>(addProperties));
         }
 
         if (renameProperties != null)
@@ -107,32 +107,44 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                 {
                     final String key = entry.getKey().toString();
 
-                    Object value = entry.getValue();
+                    Object value= entry.getValue();
+                    Object realValue = value;
 
                     //Enable expression support for property values
                     if (muleContext.getExpressionManager().isValidExpression(value.toString()))
                     {
-                        value = muleContext.getExpressionManager().evaluate(value.toString(), message);
+                        realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
 
-                    if (message.getProperty(key, scope) != null)
+                    if(realValue!=null)
                     {
-                        if (overwrite)
+                        if (message.getProperty(key, scope) != null)
                         {
-                            logger.debug("Overwriting message property " + key);
-                            message.setProperty(key, value, scope);
+                            if (overwrite)
+                            {
+                                logger.debug("Overwriting message property " + key);
+                                message.setProperty(key, realValue, scope);
+                            }
+                            else if(logger.isDebugEnabled())
+                            {
+                                logger.debug(MessageFormat.format(
+                                    "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
+                                    key, realValue, scope));
+                            }
                         }
+                        //If value is null an exception will not be thrown if the key was marked as optional (with a '?'). If not
+                        //optional the expression evaluator will throw an exception
                         else
                         {
-                            logger.debug(MessageFormat.format(
-                                "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
-                                key, value, scope));
+                            message.setProperty(key, realValue, scope);
                         }
                     }
-                    else
-                    {
-                        message.setProperty(key, value, scope);
-                    }
+                    else if(logger.isInfoEnabled())
+                        {
+                            logger.info(MessageFormat.format(
+                                    "Property with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this property",
+                                    key, value));
+                        }
                 }
             }
         }
@@ -206,7 +218,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         return deleteProperties;
     }
 
-    public void setDeleteProperties(List deleteProperties)
+    public void setDeleteProperties(List<String> deleteProperties)
     {
         this.deleteProperties = deleteProperties;
     }
@@ -216,7 +228,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         return addProperties;
     }
 
-    public void setAddProperties(Map addProperties)
+    public void setAddProperties(Map<String, Object> addProperties)
     {
         this.addProperties = addProperties;
     }
@@ -267,13 +279,20 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         this.scope = scope;
     }
     
-    /** For XML-based config */
+    /**
+     * For XML-based config
+     *
+     * @return The string value name for a {@link org.mule.api.transport.PropertyScope}
+     */
     public String getScopeName()
     {
         return scope != null ? scope.getScopeName() : null;
     }
 
-    /** For XML-based config */
+    /**
+     * For XML-based config
+     * @param scopeName The string value name for a {@link org.mule.api.transport.PropertyScope}
+     */
     public void setScopeName(String scopeName)
     {
         this.scope = PropertyScope.get(scopeName);
