@@ -10,11 +10,15 @@
 
 package org.mule.config.spring.factories;
 
+import java.util.List;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.object.ObjectFactory;
+import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AbstractFlowConstruct;
@@ -25,9 +29,9 @@ import org.mule.object.PrototypeObjectFactory;
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
     private EndpointBuilder endpointBuilder;
-
     private String address;
-
+    private List<Transformer> transformers;
+    private List<Transformer> responseTransformers;
     private String componentClass;
     private String componentBeanName;
 
@@ -52,6 +56,16 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         this.address = address;
     }
 
+    public void setTransformers(List<Transformer> transformers)
+    {
+        this.transformers = transformers;
+    }
+
+    public void setResponseTransformers(List<Transformer> responseTransformers)
+    {
+        this.responseTransformers = responseTransformers;
+    }
+
     public void setComponentClass(String componentClass)
     {
         this.componentClass = componentClass;
@@ -70,25 +84,29 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         }
 
         endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+        endpointBuilder.setTransformers(transformers);
+        endpointBuilder.setResponseTransformers(responseTransformers);
         return endpointBuilder.buildInboundEndpoint();
     }
 
     private Component buildComponent()
+    {
+        ObjectFactory objectFactory = getComponentObjectFactory();
+        DefaultJavaComponent component = new DefaultJavaComponent(objectFactory);
+        component.setEntryPointResolverSet(new LegacyEntryPointResolverSet());
+        return component;
+    }
+
+    private ObjectFactory getComponentObjectFactory()
     {
         if (componentBeanName != null)
         {
             SpringBeanLookup sbl = new SpringBeanLookup();
             sbl.setApplicationContext(applicationContext);
             sbl.setBean(componentBeanName);
-            DefaultJavaComponent component = new DefaultJavaComponent(sbl);
-            // TODO fetch default one from registry?
-            component.setEntryPointResolverSet(new LegacyEntryPointResolverSet());
-            return component;
+            return sbl;
         }
 
-        DefaultJavaComponent component = new DefaultJavaComponent(new PrototypeObjectFactory(componentClass));
-        // TODO fetch default one from registry?
-        component.setEntryPointResolverSet(new LegacyEntryPointResolverSet());
-        return component;
+        return new PrototypeObjectFactory(componentClass);
     }
 }
