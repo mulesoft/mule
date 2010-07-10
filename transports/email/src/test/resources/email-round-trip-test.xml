@@ -25,18 +25,19 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint exchange-pattern="request-response" path="sink"/>
+                    <vm:outbound-endpoint exchange-pattern="one-way" path="sink"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="sink">
             <inbound>
-                <vm:inbound-endpoint exchange-pattern="request-response" path="sink"/>
+                <vm:inbound-endpoint exchange-pattern="one-way" path="sink"/>
             </inbound>
+            <log-component/>            
             <outbound>
                 <multicasting-router>
-                    <vm:outbound-endpoint path="rfc822"/>
+                    <vm:outbound-endpoint path="rfc822" exchange-pattern="one-way"/>
                     <smtp:outbound-endpoint user="alice" password="secret" host="localhost" 
                         port="62000" exchange-pattern="one-way">
                         <transformer ref="rfc822-mime"/>

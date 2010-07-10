@@ -17,6 +17,8 @@ import org.mule.tck.FunctionalTestCase;
 
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Test;
+
 /**
  * This demonstrates "round trip" processing of email - an email is pulled from a POP
  * server and then sent to an SMTP server.  While within Mule the message is serialized
@@ -28,30 +30,12 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailRoundTripTestCase extends FunctionalTestCase
 {
-
-    public static final long WAIT_MS = 3000L;
-
     // this places the SMTP server at 62000 and POP at 62002
     private AbstractGreenMailSupport greenMailSupport = new FixedPortGreenMailSupport(62000);
 
     protected String getConfigResources()
     {
         return "email-round-trip-test.xml";
-    }
-
-    public void testRoundTrip() throws MuleException, InterruptedException
-    {
-        // first, check that the conversion happened - we should have a copy of
-        // the message as rfc822 encoded bytes on vm://rfc822
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.request("vm://rfc822", WAIT_MS);
-        assertTrue(message.getPayload() instanceof byte[]);
-
-        // next, check that the email is received in the server
-        greenMailSupport.getServers().waitForIncomingEmail(WAIT_MS, 1);
-        MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
-        assertNotNull("did not receive any messages", messages);
-        assertEquals("did not receive 1 mail", 1, messages.length);
     }
 
     /**
@@ -75,4 +59,19 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
         greenMailSupport.stopServers();
     }
 
+    @Test
+    public void testRoundTrip() throws MuleException, InterruptedException
+    {
+        // first, check that the conversion happened - we should have a copy of
+        // the message as rfc822 encoded bytes on vm://rfc822
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage message = client.request("vm://rfc822", RECEIVE_TIMEOUT);
+        assertTrue(message.getPayload() instanceof byte[]);
+
+        // next, check that the email is received in the server
+        greenMailSupport.getServers().waitForIncomingEmail(RECEIVE_TIMEOUT, 1);
+        MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
+        assertNotNull("did not receive any messages", messages);
+        assertEquals("did not receive 1 mail", 1, messages.length);
+    }
 }

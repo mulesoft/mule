@@ -36,7 +36,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
 
     protected static final String CONFIG_BASE = "-functional-test.xml";
-    protected static final long DELIVERY_DELAY_MS = 1000L;
     protected static final boolean MIME_MESSAGE = true;
     protected static final boolean STRING_MESSAGE = false;
 
@@ -128,9 +127,9 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
             props = new HashMap<String, Object>();
             props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
         } 
-        client.send("vm://send", msg, props);
+        client.dispatch("vm://send", msg, props);
 
-        server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
+        server.waitForIncomingEmail(RECEIVE_TIMEOUT, 1);
 
         MimeMessage[] messages = server.getReceivedMessages();
         assertNotNull("did not receive any messages", messages);
@@ -162,7 +161,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         assertEquals(1, server.getReceivedMessages().length);
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.request("vm://receive", 5000);
+        MuleMessage reply = client.request("vm://receive", RECEIVE_TIMEOUT);
         
         assertNotNull(reply);
         Object payload = reply.getPayload();
