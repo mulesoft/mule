@@ -28,6 +28,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -711,10 +712,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationSequence()
     {
         assertAccess(READ);
-        Integer seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null);
+        Integer seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null),-1);
         if (seq == null)
         {
-            seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, -1);
+            seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, null), -1);
         }
 
         return seq;
@@ -736,10 +737,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationGroupSize()
     {
         assertAccess(READ);
-        Integer groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null);
+        Integer groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null), -1);
         if (groupSize == null)
         {
-            groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, -1);
+            groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, null), -1);
         }
 
         return groupSize;
