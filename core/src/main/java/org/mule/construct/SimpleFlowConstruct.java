@@ -11,7 +11,6 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
@@ -36,7 +35,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
         this.messageProcessors = messageProcessors;
     }
 
-    public SimpleFlowConstruct(String name, MuleContext muleContext) throws MuleException
+    public SimpleFlowConstruct(String name, MuleContext muleContext)
     {
         super(name, muleContext);
     }
