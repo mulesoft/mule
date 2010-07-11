@@ -72,7 +72,7 @@ public class AxisServiceProxy
         {
             MuleMessage messageToRoute = receiver.createMuleMessage(args, 
                 receiver.getEndpoint().getEncoding());
-            messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method, PropertyScope.OUTBOUND);
+            messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method, PropertyScope.INVOCATION);
             
             // add all custom headers, filter out all mule headers (such as
             // MULE_SESSION) except
