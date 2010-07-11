@@ -20,6 +20,11 @@ import java.util.Map;
 
 public class Http10TestCase extends FunctionalTestCase
 {
+    public Http10TestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     public void testHttp10TransformerNotOnProtocol() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
