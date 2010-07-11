@@ -12,11 +12,12 @@
     <!-- We're rendering html markup -->
     <xsl:output method="html"/>
 
-    <xsl:template match="/">
-        <xsl:apply-templates/>
-    </xsl:template>
+    <xsl:param name="version">
+        <xsl:value-of select="/index/@version"/>
+    </xsl:param>
+
     <xsl:template match="/index">
-        <h2>Transport Feature Matrix (Mule 3.0)</h2>
+        <h2>Transport Feature Matrix (Mule <xsl:value-of select="$version"/>)</h2>
         <table class="confluenceTable">
             <tbody>
                 <tr>
@@ -26,6 +27,7 @@
                     <th class="confluenceTh">Request Events</th>
                     <th class="confluenceTh">Transactions</th>
                     <th class="confluenceTh">Streaming</th>
+                    <th class="confluenceTh">Retries</th>
                     <th class="confluenceTh">MEPs</th>
                     <th class="confluenceTh">Default MEP</th>
                 </tr>
@@ -34,7 +36,6 @@
         </table>
     </xsl:template>
     <xsl:template match="transport">
-        <xsl:variable name="version"><xsl:value-of select="/index/@version"/></xsl:variable>
         <xsl:choose>
             <xsl:when test="@dist = 'ee'">
                 <xsl:apply-templates select="document(concat('http://www.mulesource.org/schema/mule/ee/',. ,'$version', '/mule-', ., '-ee.xsd'))"/>
@@ -54,7 +55,10 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 </xsl:variable>
+
                 <xsl:apply-templates select="document($schemaLocation)"/>
+                <!-- TODO use deployed schemas -->
+                <!--<xsl:apply-templates select="document(concat('http://www.mulesoft.org/schema/mule/', .,'/', '$version', '/mule-', ., '.xsd'))"/>-->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -71,7 +75,6 @@
         <xsl:variable name="no">
             <img class="emoticon" src="/documentation/images/icons/emoticons/error.gif" alt="" align="absmiddle" border="0" height="16" width="16"/>
         </xsl:variable>
-
 
         <xsl:variable name="receive">
             <xsl:choose>
@@ -123,6 +126,16 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="retry">
+            <xsl:choose>
+                <xsl:when test="@reties = 'true'">
+                    <xsl:copy-of select="$yes"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$no"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <xsl:variable name="meps">
             <xsl:value-of select="schemadoc:MEPs/@supported"/>
         </xsl:variable>
@@ -151,6 +164,9 @@
             </td>
             <td class="confluenceTd">
                 <xsl:copy-of select="$stream"/>
+            </td>
+            <td class="confluenceTd">
+                <xsl:copy-of select="$retry"/>
             </td>
             <td class="confluenceTd">
                 <xsl:value-of select="$meps"/>

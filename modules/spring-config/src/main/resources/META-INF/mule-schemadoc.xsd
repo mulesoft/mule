@@ -187,6 +187,12 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="retries" type="xsd:boolean" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>Whether the transport support retry policies. Note most transports can be configured with retry policies, but this flag marks the transports that MuleSoft explicitly test and support.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
     <xsd:complexType name="MEPsType">
         <xsd:attribute name="supported" type="xsd:string" use="required"/>

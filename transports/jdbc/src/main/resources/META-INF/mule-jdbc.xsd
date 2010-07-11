@@ -19,7 +19,8 @@
                 <schemadoc:short-name>JDBC</schemadoc:short-name>
                 <schemadoc:page-title>JDBC Transport</schemadoc:page-title>
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
-                        requestEvents="true" transactions="true" streaming="false" transactionTypes="local, XA">
+                        requestEvents="true" transactions="true" streaming="false" transactionTypes="local, XA"
+                        retries="true">
                     <schemadoc:MEPs supported="one-way, request-response" default="one-way"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>

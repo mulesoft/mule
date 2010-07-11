@@ -24,7 +24,7 @@
             <schemadoc:short-name>FTP</schemadoc:short-name>
             <schemadoc:page-title>FTP Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
-                                          requestEvents="true"
+                                          requestEvents="true" retries="true"
                                           transactions="false" streaming="false">
                 <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
