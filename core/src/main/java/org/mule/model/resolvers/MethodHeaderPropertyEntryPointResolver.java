@@ -57,7 +57,10 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         // MULE-4874: this is needed in order to execute the transformers before determining the methodProp
         Object[] payload = getPayloadFromMessage(context);
 
-        Object methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INVOCATION);
+        //TODO MULE-4953 I don't think the VM transport if managing invocation properties correctly, or maybe it is and this
+        //is valid
+        //Here I have to remove the 'method' property rather than just read it
+        Object methodProp = context.getMessage().removeProperty(getMethodProperty(), PropertyScope.INVOCATION);
         if (methodProp == null)
         {
             methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INBOUND);
