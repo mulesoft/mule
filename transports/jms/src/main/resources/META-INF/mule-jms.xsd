@@ -20,7 +20,8 @@
             <schemadoc:page-title>JMS Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
-                                          transactions="true" streaming="true">
+                                          transactions="true" transactionTypes="client ack, local, XA"
+                                          streaming="false">
                 <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
