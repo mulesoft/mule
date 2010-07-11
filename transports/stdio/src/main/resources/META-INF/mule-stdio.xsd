@@ -20,11 +20,11 @@
         <xsd:appinfo>
             <schemadoc:short-name>STDIO</schemadoc:short-name>
             <schemadoc:page-title>STDIO Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true"/>
-                <schemadoc:outboundMEPs out-only="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
+
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

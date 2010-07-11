@@ -19,11 +19,9 @@
             <xsd:appinfo>
                 <schemadoc:short-name>Axis</schemadoc:short-name>
                 <schemadoc:page-title>Axis Transport</schemadoc:page-title>
-                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
-    requestEvents="true"
-    transactions="false" streaming="false">
-                    <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
-                    <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
+                            requestEvents="true" transactions="false" streaming="false">
+                    <schemadoc:MEPs supported="one-way,request-response" default="request-response"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
     </xsd:annotation>

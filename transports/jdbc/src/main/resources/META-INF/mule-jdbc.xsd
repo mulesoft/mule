@@ -18,11 +18,9 @@
             <xsd:appinfo>
                 <schemadoc:short-name>JDBC</schemadoc:short-name>
                 <schemadoc:page-title>JDBC Transport</schemadoc:page-title>
-                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
-    requestEvents="true"
-    transactions="true" streaming="false">
-                    <schemadoc:inboundMEPs in-only="true" in-optional-out="true" in-out="true"/>
-                    <schemadoc:outboundMEPs out-only="true" out-optional-in="true" out-in="true"/>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
+                        requestEvents="true" transactions="true" streaming="false">
+                    <schemadoc:MEPs supported="one-way,request-response" default="one-way"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
     </xsd:annotation>

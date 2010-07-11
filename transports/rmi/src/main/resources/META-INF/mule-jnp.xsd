@@ -10,23 +10,34 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/rmi"
                 schemaLocation="http://www.mulesoft.org/schema/mule/rmi/3.0/mule-rmi.xsd"/>
-    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.0/mule-schemadoc.xsd"/>
 
     <xsd:element name="connector" type="rmi:rmiConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                The JNP connector is an extension of the RMI connector that uses the Java Naming protocol to bind to remote objects. 
+                The JNP connector is an extension of the RMI connector that uses the Java Naming protocol to bind to
+                remote objects.
             </xsd:documentation>
+            <xsd:appinfo>
+                <schemadoc:short-name>JNP</schemadoc:short-name>
+                <schemadoc:page-title>JNP Transport</schemadoc:page-title>
+                <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
+                                              requestEvents="true" transactions="false" streaming="false">
+                    <schemadoc:MEPs supported="one-way,request-response" default="request-response"/>
+                </schemadoc:transport-features>
+            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="inbound-endpoint" type="rmi:inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:element name="inbound-endpoint" type="rmi:inboundEndpointType"
+                 substitutionGroup="mule:abstract-inbound-endpoint"/>
 
-    <xsd:element name="outbound-endpoint" type="rmi:outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="rmi:outboundEndpointType"
+                 substitutionGroup="mule:abstract-outbound-endpoint"/>
 
     <xsd:element name="endpoint" type="rmi:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
 

@@ -32,10 +32,9 @@
 
                 Jobs are used to perform an action when a time trigger occurs from the Quartz transport. Mule provides a number of jobs for generating and scheduling events. These are detailed below. Users can also write their own jobs and hook them in using the custom-job type included with Mule.
             </schemadoc:additional-documentation>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false" requestEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" requestEvents="false"
                                           transactions="false" streaming="false">
-                <schemadoc:inboundMEPs in-only="true"/>
-                <schemadoc:outboundMEPs out-only="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

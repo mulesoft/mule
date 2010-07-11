@@ -23,11 +23,10 @@
         <xsd:appinfo>
             <schemadoc:short-name>FTP</schemadoc:short-name>
             <schemadoc:page-title>FTP Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="false">
-                <schemadoc:inboundMEPs in-only="true"/>
-                <schemadoc:outboundMEPs out-only="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

@@ -23,11 +23,10 @@
         <xsd:appinfo>
             <schemadoc:short-name>Servlet</schemadoc:short-name>
             <schemadoc:page-title>Servlet Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
-                <schemadoc:outboundMEPs none="true"/>
+                <schemadoc:MEPs supported="request-response" default="request-response"/>                
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

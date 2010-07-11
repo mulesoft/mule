@@ -143,14 +143,9 @@
 
     <xsd:complexType name="transportFeaturesType">
         <xsd:sequence>
-            <xsd:element name="inboundMEPs" type="inboundMEPsType" minOccurs="1">
+            <xsd:element name="MEPs" type="MEPsType" minOccurs="1" maxOccurs="1">
                 <xsd:annotation>
-                    <xsd:documentation>The Inbound MEPs that are supported by this Transport.</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="outboundMEPs" type="outboundMEPsType" minOccurs="1">
-                <xsd:annotation>
-                    <xsd:documentation>The Outbound MEPs that are supported by this Transport.</xsd:documentation>
+                    <xsd:documentation>The MEPs that are supported by this Transport. and the dafault MEP</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
@@ -174,13 +169,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="responseEvents" type="xsd:boolean" use="required">
-            <xsd:annotation>
-                <xsd:documentation>Whether the transport can be used in request/response style messaging. This means
-                    that the transport provides a back-channel to the callee.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="transactions" type="xsd:boolean" use="required">
             <xsd:annotation>
                 <xsd:documentation>Whether transactions are supported by the transports. Transports that support (/)A
@@ -200,17 +188,8 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-    <xsd:complexType name="inboundMEPsType">
-        <xsd:attribute name="none" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="in-only" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="in-out" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="in-optional-out" type="xsd:boolean"></xsd:attribute>
-    </xsd:complexType>
-
-    <xsd:complexType name="outboundMEPsType">
-        <xsd:attribute name="none" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="out-only" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="out-in" type="xsd:boolean"></xsd:attribute>
-        <xsd:attribute name="out-optional-in" type="xsd:boolean"></xsd:attribute>
+    <xsd:complexType name="MEPsType">
+        <xsd:attribute name="supported" type="xsd:string" use="required"/>
+        <xsd:attribute name="default" type="xsd:string" use="required"/>
     </xsd:complexType>
 </xsd:schema>

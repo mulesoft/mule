@@ -24,11 +24,10 @@
         <xsd:appinfo>
             <schemadoc:short-name>IMAPS</schemadoc:short-name>
             <schemadoc:page-title>IMAPS Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
                                           requestEvents="false"
                                           transactions="false" streaming="false">
-                <schemadoc:inboundMEPs in-only="true"/>
-                <schemadoc:outboundMEPs none="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

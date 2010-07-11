@@ -21,10 +21,10 @@
         <xsd:appinfo>
             <schemadoc:short-name>IMAP</schemadoc:short-name>
             <schemadoc:page-title>IMAP Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
                                           requestEvents="false"
                                           transactions="false" streaming="false">
-                <schemadoc:inboundMEPs in-only="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>

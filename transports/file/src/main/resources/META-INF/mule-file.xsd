@@ -25,11 +25,10 @@
 
                 The filenameParser is set on the connector used when writing files to a directory. The parser will convert the outputPattern attribute to a string using the parser and the current message.
             </schemadoc:additional-documentation>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true"/>
-                <schemadoc:outboundMEPs out-only="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
