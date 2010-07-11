@@ -44,7 +44,7 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://queue.in", new Object[]{new Long(3), new Long(3)},null);
-        MuleMessage result = client.request("vm://queue.out", 500000);
+        MuleMessage result = client.request("vm://queue.out", RECEIVE_TIMEOUT);
         assertNotNull(result.getPayload());
         assertTrue(result.getPayload() instanceof Long);
         assertEquals("Payload", 6, ((Long)result.getPayload()).intValue());

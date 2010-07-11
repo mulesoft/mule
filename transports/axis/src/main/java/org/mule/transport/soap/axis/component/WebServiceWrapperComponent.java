@@ -10,7 +10,7 @@
 
 package org.mule.transport.soap.axis.component;
 
-import org.mule.api.MuleContext;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -33,8 +33,6 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
     @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
-        MuleContext muleContext = event.getMuleContext();
-
         String tempUrl;
         if (addressFromMessage)
         {
@@ -66,12 +64,12 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
             endpointBuilder.setProperty(AxisConnector.STYLE, style);
 
         }
+        //TODO MULE-4952 what is the strategy here for proxy components?
+        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointBuilder);
+        OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
 
-        MuleMessage result = event.getSession().sendEvent(message, endpoint);
-        return result;
+        return event.getSession().sendEvent(message, endpoint);
     }
 
     public String getUse()

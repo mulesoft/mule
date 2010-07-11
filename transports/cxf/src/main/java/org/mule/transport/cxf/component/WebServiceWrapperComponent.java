@@ -10,6 +10,7 @@
 
 package org.mule.transport.cxf.component;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -55,11 +56,12 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
 
         }
 
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointBuilder);
+        //TODO MULE-4952 what is the strategy here for proxy components?
+        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
-        MuleMessage result = event.getSession().sendEvent(event.getMessage(), endpoint);
-        return result;
+        OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
+
+        return event.getSession().sendEvent(event.getMessage(), endpoint);
     }
 
     public String getWsdlPort()
