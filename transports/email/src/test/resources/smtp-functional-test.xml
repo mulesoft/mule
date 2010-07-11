@@ -17,7 +17,7 @@
             <inbound>
                 <vm:inbound-endpoint path="send" exchange-pattern="one-way">
                     <message-properties-transformer scope="outbound">
-                        <add-message-property key="contentType" value="#[header:INBOUND:contentType]"/>
+                        <add-message-property key="contentType" value="#[header:INBOUND:contentType?]"/>
                     </message-properties-transformer>
                 </vm:inbound-endpoint>
             </inbound>
