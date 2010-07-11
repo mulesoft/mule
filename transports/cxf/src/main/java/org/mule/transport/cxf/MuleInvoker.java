@@ -75,7 +75,7 @@ public class MuleInvoker implements Invoker
                     m = matchMethod(m, targetClass);
                 }
             
-                muleReq.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m);
+                muleReq.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
             }
 
             if (bop != null)
