@@ -21,9 +21,9 @@
             <schemadoc:short-name>VM</schemadoc:short-name>
             <schemadoc:page-title>VM Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
-                                          requestEvents="true"
+                                          requestEvents="true" transactionTypes="XA"
                                           transactions="true" streaming="true">
-                <schemadoc:MEPs supported="one-way,request-response" default="one-way"/>
+                <schemadoc:MEPs supported="one-way, request-response" default="one-way"/>
             </schemadoc:transport-features>
 
         </xsd:appinfo>

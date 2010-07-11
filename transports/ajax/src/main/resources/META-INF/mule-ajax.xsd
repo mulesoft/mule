@@ -22,7 +22,7 @@
         <xsd:appinfo>
             <schemadoc:short-name>AJAX</schemadoc:short-name>
             <schemadoc:page-title>Ajax Transport</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="false" transactions="false" streaming="true">
                 <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
