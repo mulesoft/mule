@@ -17,13 +17,13 @@
     </xsl:param>
 
     <xsl:template match="/index">
-        <h2>Transport Feature Matrix (Mule <xsl:value-of select="$version"/>)</h2>
+        <h2>Transport Feature Matrix (Mule {$version})</h2>
         <table class="confluenceTable">
             <tbody>
                 <tr>
                     <th class="confluenceTh">Transport</th>
-                    <th class="confluenceTh">Receive Events</th>
-                    <th class="confluenceTh">Dispatch Events</th>
+                    <th class="confluenceTh">Inbound Events</th>
+                    <th class="confluenceTh">Outbound Events</th>
                     <th class="confluenceTh">Request Events</th>
                     <th class="confluenceTh">Transactions</th>
                     <th class="confluenceTh">Streaming</th>
@@ -144,10 +144,10 @@
             <xsl:value-of select="schemadoc:MEPs/@default"/>
         </xsl:variable>
         <xsl:variable name="page">
-            <xsl:value-of select="/xsd:schema/xsd:annotation/xsd:appinfo/schemadoc:page-title"/>
+            <xsl:value-of select="concat('http://mule.mulesoft.org/display/MULE2USER/', translate(/xsd:schema/xsd:annotation/xsd:appinfo/schemadoc:page-title, ' ', '+'))"/>
         </xsl:variable>
         <tr>
-            <td class="confluenceTd"><a href="concat('http://mule.mulesoft.org/display/MULE2USER/', translate($page, ' ', '+'))"><xsl:value-of
+            <td class="confluenceTd"><a href="{$page}"><xsl:value-of
                     select="/xsd:schema/xsd:annotation/xsd:appinfo/schemadoc:short-name"/></a>
             </td>
             <td class="confluenceTd">
