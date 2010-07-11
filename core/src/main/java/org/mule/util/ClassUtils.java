@@ -85,6 +85,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
+     *
+     * @return A URL pointing to the resource to load or null if the resource is not found
      */
     public static URL getResource(final String resourceName, final Class<?> callingClass)
     {
@@ -193,6 +195,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *
      * @param className    The name of the class to load
      * @param callingClass The Class object of the calling object
+     * @return The Class instance
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
     public static Class loadClass(final String className, final Class<?> callingClass)
@@ -279,6 +282,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     /**
      * Load a class with a given name from the given classloader.
+     *
+     * @param className the name of the class to load
+     * @param classLoader the loader to load it from
+     * @return the instance of the class
+     * @throws ClassNotFoundException if the class is not available in the class loader
      */
     public static Class loadClass(final String className, final ClassLoader classLoader)
             throws ClassNotFoundException
@@ -286,28 +294,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return classLoader.loadClass(className);
     }
 
-    /**
-     * Prints the current classloader hierarchy - useful for debugging.
-     */
-    public static void printClassLoader()
-    {
-        System.out.println("ClassLoaderUtils.printClassLoader");
-        printClassLoader(Thread.currentThread().getContextClassLoader());
-    }
-
-    /**
-     * Prints the classloader hierarchy from a given classloader - useful for
-     * debugging.
-     */
-    public static void printClassLoader(ClassLoader cl)
-    {
-        System.out.println("ClassLoaderUtils.printClassLoader(cl = " + cl + ")");
-
-        if (cl != null)
-        {
-            printClassLoader(cl.getParent());
-        }
-    }
 
     /**
      * Ensure that the given class is properly initialized when the argument is passed in
@@ -471,9 +457,13 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
     
     /**
-    *  Returns available constructor in the target class that as the parameters specified.
-    * @param exactMatch should exact types be used (i.e. equals rather than isAssignableFrom.)
-    */
+     *  Returns available constructor in the target class that as the parameters specified.
+     *
+     * @param clazz the class to search
+     * @param paramTypes the param types to match against
+     * @param exactMatch should exact types be used (i.e. equals rather than isAssignableFrom.)
+     * @return The matching constructor or null if no matching constructor is found
+     */
     public static Constructor getConstructor(Class clazz, Class[] paramTypes, boolean exactMatch)
     {
         Constructor[] ctors = clazz.getConstructors();
@@ -551,17 +541,18 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      *                           when they are of Object.class type
      * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is
      *                           not a desired match. This argument can be null.
+     * @param filter             Wildcard expression filter that allows methods to be matched using wildcards i.e. 'get*'
      * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
-    public static List getSatisfiableMethods(Class implementation,
+    public static List<Method> getSatisfiableMethods(Class implementation,
                                              Class[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
                                              Collection ignoredMethodNames,
                                              WildcardFilter filter)
     {
-        List result = new ArrayList();
+        List<Method> result = new ArrayList<Method>();
 
         if (ignoredMethodNames == null)
         {
@@ -595,16 +586,24 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return result;
     }
 
-    public static List getSatisfiableMethodsWithReturnType(Class implementation,
+    /**
+     * Match all method son a class with a defined return type
+     * @param implementation the class to search
+     * @param returnType the return type to match
+     * @param matchOnObject whether {@link Object} methods should be matched
+     * @param ignoredMethodNames a set of method names to ignore
+     * @return the list of methods that matched the return type and criteria. If none are found an empty result is returned
+     */
+    public static List<Method> getSatisfiableMethodsWithReturnType(Class implementation,
                                                            Class returnType,
                                                            boolean matchOnObject,
-                                                           Set ignoredMethodNames)
+                                                           Set<String> ignoredMethodNames)
     {
-        List result = new ArrayList();
+        List<Method> result = new ArrayList<Method>();
 
         if (ignoredMethodNames == null)
         {
-            ignoredMethodNames = Collections.EMPTY_SET;
+            ignoredMethodNames = Collections.emptySet();
         }
 
         Method[] methods = implementation.getMethods();
@@ -827,7 +826,12 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
-     * Is there a better place for this?  Simple helper for writing object equalities.
+     * Simple helper for writing object equalities.
+     *
+     * TODO Is there a better place for this?
+     * @param a object to compare
+     * @param b object to be compared to
+     * @return true if the objects are equal (value or reference), false otherwise
      */
     public static boolean equal(Object a, Object b)
     {
@@ -889,7 +893,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         for (Iterator it = urls.iterator(); it.hasNext();)
         {
             URL url = (URL) it.next();
-            methodAddUrl.invoke(sysCl, new Object[]{url});
+            methodAddUrl.invoke(sysCl, url);
         }
     }
 
