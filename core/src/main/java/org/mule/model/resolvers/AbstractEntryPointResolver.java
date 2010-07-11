@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -156,7 +155,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
             logger.debug("Result of call " + methodCall + " is " + (result == null ? "null" : "not null"));
         }
 
-        return new InvocationResult(result, method);
+        return new InvocationResult(this, result, method);
     }
 
     public boolean isSynchronizeCall()

@@ -17,12 +17,11 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
 /**
- * An entrypoint resolver that only allows Service objects that implmement the
+ * An entry-point resolver that only allows Service objects that implement the
  * Callable interface
  *
  * @see org.mule.api.lifecycle.Callable
@@ -50,13 +49,12 @@ public class CallableEntryPointResolver implements EntryPointResolver
         if (component instanceof Callable)
         {
             Object result = ((Callable) component).onCall(context);
-            return new InvocationResult(result, callableMethod);
+            return new InvocationResult(this, result, callableMethod);
         }
         else
         {
-            InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
-            result.setErrorMessage(ClassUtils.getClassName(getClass()) + ":" +
-                    CoreMessages.objectDoesNotImplementInterface(component, Callable.class).toString());
+            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            result.setErrorMessage(CoreMessages.objectDoesNotImplementInterface(component, Callable.class).toString());
             return result;
         }
     }
@@ -64,9 +62,6 @@ public class CallableEntryPointResolver implements EntryPointResolver
 
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("CallableEntryPointResolver");
-        sb.append("{}");
-        return sb.toString();
+        return "CallableEntryPointResolver{}";
     }
 }

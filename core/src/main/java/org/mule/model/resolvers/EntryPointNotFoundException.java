@@ -10,7 +10,7 @@
 package org.mule.model.resolvers;
 
 import org.mule.api.MuleException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.config.i18n.CoreMessages;
 
 /**
  * Tis exception gets thrown by the {@link org.mule.model.resolvers.DefaultEntryPointResolverSet} if after trying
@@ -21,6 +21,6 @@ public class EntryPointNotFoundException extends MuleException
     /** @param message the exception message */
     public EntryPointNotFoundException(String message)
     {
-        super(MessageFactory.createStaticMessage(message));
+        super(CoreMessages.failedToFindEntrypointForComponent(message));
     }
 }

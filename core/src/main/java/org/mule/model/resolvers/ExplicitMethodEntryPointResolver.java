@@ -16,13 +16,12 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * An Entrypoint resolver that allows the user to set one or more acceptiple methd names to look for.
+ * An Entry-point resolver that allows the user to set one or more acceptable method names to look for.
  * For each method reflection will be used to see if the method accepts the current payload types 
  * (the results are cached to improve performance). There has to be at least one method name set 
  * on this resolver
@@ -30,11 +29,11 @@ import java.util.Set;
 public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 {
 
-    private Set methods = new LinkedHashSet(2);
+    private Set<String> methods = new LinkedHashSet<String>(2);
 
-    public void setMethods(Collection methods)
+    public void setMethods(Set<String> methods)
     {
-        this.methods = new LinkedHashSet(methods);
+        this.methods.addAll(methods);
     }
 
     public void addMethod(String name)
@@ -87,8 +86,8 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 
         if (method == null)
         {
-            InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
-            result.setErrorNoMatchingMethods(component, classTypes, this);
+            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            result.setErrorNoMatchingMethods(component, classTypes);
             return result;
         }
         return invokeMethod(component, method, payload);

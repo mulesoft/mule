@@ -24,11 +24,11 @@ import java.util.Set;
 /**
  * A base class that allows implementing resolvers to define what parameters it is expecting.  Currently
  * there are two implementations of this {@link org.mule.model.resolvers.NoArgumentsEntryPointResolver}, that
- * allows meothds with no arguments to be invoked and {@link org.mule.model.resolvers.ArrayEntryPointResolver} that
+ * allows methods with no arguments to be invoked and {@link org.mule.model.resolvers.ArrayEntryPointResolver} that
  * allows for methods that accept an array type to be invoked.
  * <p/>
  * Users can set explicit method names on this resolver to control which methods are allowed to be called. Also a set of
- * 'ingorred' methods are available (and the use can add others) to tell the resolver to not resolve to these methods.
+ * 'ignored' methods are available (and the use can add others) to tell the resolver to not resolve to these methods.
  * The default ones are:
  * <ul>
  * <li>{@link #toString()}
@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntryPointResolver
 {
-    private Set methods = new HashSet(2);
+    private Set<String> methods = new HashSet<String>(2);
 
     private boolean enableDiscovery = true;
 
@@ -54,8 +54,8 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         setAcceptVoidMethods(true);
         // we don't want to match these methods when looking for a service method
         //If you add to this list please change the javaDoc above too.
-        setIgnoredMethods(new HashSet(Arrays.asList(new String[]{"toString",
-                "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"})));
+        setIgnoredMethods(new HashSet<String>(Arrays.asList("toString",
+                "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*")));
     }
 
     public Set getMethods()
@@ -63,7 +63,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         return methods;
     }
 
-    public void setMethods(Set methods)
+    public void setMethods(Set<String> methods)
     {
         this.methods = methods;
     }
@@ -96,7 +96,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
 
         if (payload == null)
         {
-            return new InvocationResult(InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            return new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
         }
 
         for (Iterator iterator = methods.iterator(); iterator.hasNext();)
@@ -120,34 +120,34 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
             if (isEnableDiscovery())
             {
                 Class<?>[] argTypes = getMethodArgumentTypes(payload);
-                List methods = ClassUtils.getSatisfiableMethods(component.getClass(), argTypes,
+                List<Method> methods = ClassUtils.getSatisfiableMethods(component.getClass(), argTypes,
                         isAcceptVoidMethods(), false, getIgnoredMethods(), filter);
 
                 if (methods.size() > 1)
                 {
-                    InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+                    InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
                     // too many methods match the payload argument
-                    result.setErrorTooManyMatchingMethods(component, argTypes, this);
+                    result.setErrorTooManyMatchingMethods(component, argTypes, StringMessageUtils.toString(methods));
                     return result;
                 }
                 else if (methods.size() == 1)
                 {
                     // found exact match for payload argument
-                    method = this.addMethodByArguments(component, (Method) methods.get(0), getPayloadFromMessage(context));
+                    method = this.addMethodByArguments(component, methods.get(0), getPayloadFromMessage(context));
                 }
                 else
                 {
-                    InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+                    InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
                     // no method for payload argument either - bail out
-                    result.setErrorNoMatchingMethods(component, ClassUtils.NO_ARGS_TYPE, this);
+                    result.setErrorNoMatchingMethods(component, ClassUtils.NO_ARGS_TYPE);
                     return result;
                 }
             }
             else
             {
-                InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
                 // no method for the explicit methods either
-                result.setErrorNoMatchingMethodsCalled(component, StringMessageUtils.toString(methods), this);
+                result.setErrorNoMatchingMethodsCalled(component, StringMessageUtils.toString(methods));
                 return result;
             }
         }

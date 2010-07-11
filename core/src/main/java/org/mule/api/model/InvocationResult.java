@@ -34,6 +34,8 @@ public class InvocationResult
 
     private int state;
 
+    private EntryPointResolver resolver;
+
     /**
      * Will construct an InvocationResult with a given state. The state must be either
      * {@link #STATE_INVOKE_NOT_SUPPORTED} if the resover performing the invocation knows that it cannot
@@ -43,13 +45,14 @@ public class InvocationResult
      *
      * @param state the state of the result
      */
-    public InvocationResult(int state)
+    public InvocationResult(EntryPointResolver resolver, int state)
     {
         if (state < 0 || state > 2)
         {
             throw new IllegalArgumentException("state");
         }
         this.state = state;
+        this.resolver = resolver;
     }
 
     /**
@@ -58,12 +61,13 @@ public class InvocationResult
      *
      * @param result the result of a successful invocation
      */
-    public InvocationResult(Object result, Method method)
+    public InvocationResult(EntryPointResolver resolver, Object result, Method method)
     {
 
         this.result = result;
         this.state = STATE_INVOKED_SUCESSFUL;
         this.methodCalled = method.getName();
+        this.resolver = resolver;
     }
 
     /**
@@ -131,31 +135,31 @@ public class InvocationResult
      */
     public String getErrorMessage()
     {
-        return errorMessage;
+        return resolver.getClass().getSimpleName() + ": " + errorMessage;
     }
 
-    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, String methods, EntryPointResolver resolver)
+    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, String methods)
     {
         setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
-                component.getClass().getName(), argTypes, resolver).toString());
+                component.getClass().getName(), argTypes, methods).toString());
     }
 
-    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, EntryPointResolver resolver)
-    {
-        setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
-                component.getClass().getName(), argTypes, resolver).toString());
-    }
+//    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes)
+//    {
+//        setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
+//                component.getClass().getName(), argTypes).toString());
+//    }
 
-    public void setErrorNoMatchingMethods(Object component, Class<?>[] args, EntryPointResolver resolver)
+    public void setErrorNoMatchingMethods(Object component, Class<?>[] args)
     {
         setErrorMessage(CoreMessages.noEntryPointFoundWithArgsUsingResolver(
-                component.getClass().getName(), args, resolver).toString());
+                component.getClass().getName(), args).toString());
     }
 
-    public void setErrorNoMatchingMethodsCalled(Object component, String methods, EntryPointResolver resolver)
+    public void setErrorNoMatchingMethodsCalled(Object component, String methods)
     {
         setErrorMessage(CoreMessages.noMatchingMethodsOnObjectCalledUsingResolver(
-                component.getClass().getName(), methods, resolver).toString());
+                component.getClass().getName(), methods).toString());
     }
 
 }

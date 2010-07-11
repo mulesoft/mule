@@ -55,9 +55,9 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 {
 
     // we don't want to match these methods when looking for a service method
-    private Set ignoredMethods = new HashSet(Arrays.asList(new String[]{"equals",
+    private Set<String> ignoredMethods = new HashSet<String>(Arrays.asList("equals",
             "getInvocationHandler", "set*", "toString",
-            "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"}));
+            "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"));
 
     protected WildcardFilter filter;
 
@@ -72,7 +72,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     }
 
     /**
-     * Returns an unmodifable Set of ignoredMethods on this resolver
+     * Returns an unmodifiable Set of ignoredMethods on this resolver
      * To add method to the resolver use {@link #addIgnoredMethod(String)}
      *
      * @return unmodifiable set of method names set on this resolver
@@ -82,9 +82,9 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         return Collections.unmodifiableSet(ignoredMethods);
     }
 
-    public void setIgnoredMethods(Collection methods)
+    public void setIgnoredMethods(Set<String> methods)
     {
-        this.ignoredMethods = new HashSet(methods);
+        this.ignoredMethods = new HashSet<String>(methods);
         updateFilter();
     }
 
@@ -132,9 +132,9 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         int numMethods = methods.size();
         if (numMethods > 1)
         {
-            result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+            result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
             // too many methods match the context argument
-            result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods), this);
+            result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
             return result;
 
         }
@@ -152,9 +152,9 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 
             if (numMethods > 1)
             {
-                result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+                result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
                 // too many methods match the context argument
-                result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods), this);
+                result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
                 return result;
             }
             else if (numMethods == 1)
@@ -164,9 +164,9 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
             }
             else
             {
-                result = new InvocationResult(InvocationResult.STATE_INVOKED_FAILED);
+                result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
                 // no method for payload argument either - bail out
-                result.setErrorNoMatchingMethods(component, ClassUtils.getClassTypes(payload), this);
+                result.setErrorNoMatchingMethods(component, ClassUtils.getClassTypes(payload));
                 return result;
             }
         }

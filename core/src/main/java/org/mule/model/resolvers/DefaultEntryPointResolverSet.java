@@ -17,11 +17,9 @@ import org.mule.util.CollectionUtils;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,8 +35,8 @@ public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private final Set entryPointResolvers = new LinkedHashSet(4);
-    private List exceptions = new CopyOnWriteArrayList();
+    private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
+    private Set<String> exceptions = new CopyOnWriteArraySet/*<String>*/();
 
     public Object invoke(Object component, MuleEventContext context) throws Exception
     {
@@ -74,7 +72,7 @@ public class DefaultEntryPointResolverSet implements EntryPointResolverSet
         return entryPointResolvers;
     }
 
-    public void setEntryPointResolvers(Set entryPointResolvers)
+    public void setEntryPointResolvers(Set<EntryPointResolver> entryPointResolvers)
     {
         this.entryPointResolvers.clear();
         this.entryPointResolvers.addAll(entryPointResolvers);

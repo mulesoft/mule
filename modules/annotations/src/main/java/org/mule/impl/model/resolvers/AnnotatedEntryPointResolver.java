@@ -19,13 +19,12 @@ import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.utils.AnnotationHelper;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.model.resolvers.AbstractEntryPointResolver;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationUtils;
-import org.mule.config.utils.AnnotationHelper;
-
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -72,7 +71,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
             }
             catch (Exception e)
             {
-                InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
                 result.setErrorMessage(e.toString());
                 return result;
             }
@@ -107,7 +106,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
 
             if (method == null)
             {
-                InvocationResult result = new InvocationResult(InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
                 result.setErrorMessage("@Entrypoint annotation not set on any methods of the service component: " + component);
                 return result;
             }

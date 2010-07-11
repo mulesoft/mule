@@ -15,7 +15,6 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.model.EntryPointResolver;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -968,42 +967,38 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component,
-                                                                        final String methodName,
-                                                                        EntryPointResolver resolver)
+                                                                        final String methodName)
     {
-        return factory.createMessage(BUNDLE_PATH, 239, methodName, component, resolver);
+        return factory.createMessage(BUNDLE_PATH, 239, methodName, component);
     }
 
     public static Message noEntryPointFoundWithArgsUsingResolver(Object object,
-                                                                 Object args,
-                                                                 EntryPointResolver resolver)
+                                                                 Object args)
     {
         return factory.createMessage(BUNDLE_PATH, 240, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(args), resolver);
+            StringMessageUtils.toString(args));
     }
 
     public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object,
-                                                                          Class<?> returnType,
-                                                                          EntryPointResolver resolver)
+                                                                          Class<?> returnType)
     {
         return factory.createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object),
-            returnType.getClass().getName(), resolver);
+            returnType.getClass().getName());
     }
 
     public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object,
                                                                                 Object types,
-                                                                                EntryPointResolver resolver)
+                                                                                String methods)
     {
         return factory.createMessage(BUNDLE_PATH, 242, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(types), resolver);
+            StringMessageUtils.toString(types), methods);
     }
 
     public static Message tooManyMatchingMethodsOnObjectUsingResolverWhichReturn(Object object,
-                                                                                 Object returnType,
-                                                                                 EntryPointResolver resolver)
+                                                                                 Object returnType)
     {
         return factory.createMessage(BUNDLE_PATH, 243, StringMessageUtils.toString(returnType),
-            StringMessageUtils.toString(object), resolver);
+            StringMessageUtils.toString(object));
     }
 
     public static Message objectDoesNotImplementInterface(Object object, Class<?> interfaceClass)
@@ -1017,11 +1012,9 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message noMatchingMethodsOnObjectCalledUsingResolver(Object object,
-                                                                       String methodName,
-                                                                       EntryPointResolver resolver)
+                                                                       String methodName)
     {
-        return factory.createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object), methodName,
-            resolver);
+        return factory.createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object), methodName);
     }
 
     public static Message noJtaTransactionAvailable(final Thread callingThread)
@@ -1299,5 +1292,10 @@ public class CoreMessages extends MessageFactory
     public static Message cannotRenameInboundScopeProperty(String fromKey, String toKey)
     {
         return factory.createMessage(BUNDLE_PATH, 321, fromKey, toKey);
+    }
+
+    public static Message failedToFindEntrypointForComponent(String message)
+    {
+        return factory.createMessage(BUNDLE_PATH, 322, message);
     }
 }
