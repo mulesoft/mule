@@ -1,4 +1,4 @@
 #
 # Test cases listed in this file are not run.
 #
-
+org.mule.module.spring.events.AsyncSpringEventsTestCase
