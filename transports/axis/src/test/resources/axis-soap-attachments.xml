@@ -14,6 +14,8 @@
 
     <custom-connector name="testConnector" class="org.mule.tck.testmodels.mule.TestConnector"/>
 
+    <endpoint name="client" exchange-pattern="request-response" address="axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments"/>
+
     <model name="main">
         <service name="testComponent">
             <inbound>

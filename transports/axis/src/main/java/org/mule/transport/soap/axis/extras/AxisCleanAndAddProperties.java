@@ -33,9 +33,9 @@ public class AxisCleanAndAddProperties
     // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
     // and also filter out any http related header
     
-    public static Map cleanAndAdd(MuleEventContext muleEventContext){
+    public static Map<String, Object> cleanAndAdd(MuleEventContext muleEventContext){
         
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage currentMessage = muleEventContext.getMessage();
 
         populateProps(props, currentMessage, PropertyScope.INVOCATION);
@@ -43,7 +43,7 @@ public class AxisCleanAndAddProperties
         return props;
     }
 
-    protected static void populateProps(Map props, MuleMessage currentMessage, PropertyScope scope)
+    protected static void populateProps(Map<String, Object> props, MuleMessage currentMessage, PropertyScope scope)
     {
         for (Iterator iterator = currentMessage.getPropertyNames(scope).iterator(); iterator.hasNext();)
         {

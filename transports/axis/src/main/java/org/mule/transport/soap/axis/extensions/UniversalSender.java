@@ -74,16 +74,25 @@ public class UniversalSender extends BasicHandler
     {
         boolean sync = true;
         Call call = (Call)msgContext.getProperty("call_object");
-        muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
-        if(muleContext==null)
-        {
-            throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
-        }
+
         if (call == null)
         {
             throw new IllegalStateException(
                 "The call_object property must be set on the message context to the client Call object");
         }
+
+        muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
+        if(muleContext==null)
+        {
+            throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
+        }
+
+        MuleEvent event = (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        if(event==null)
+        {
+            throw new IllegalArgumentException("Property " + MuleProperties.MULE_EVENT_PROPERTY + " not set on Axis MessageContext");
+        }
+
         if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
         {
             sync = false;
@@ -137,7 +146,7 @@ public class UniversalSender extends BasicHandler
                     .getAxis().getTypeMappingRegistry());
             }
             
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             Object payload;
             int contentLength = 0;
             String contentType = null;
@@ -211,7 +220,7 @@ public class UniversalSender extends BasicHandler
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
             }
             MuleMessage message = new DefaultMuleMessage(payload, props, muleContext);
-            MuleSession session = RequestContext.getEventContext().getSession();
+            MuleSession session = event.getSession();
 
             logger.info("Making Axis soap request on: " + uri);
             if (logger.isDebugEnabled())
