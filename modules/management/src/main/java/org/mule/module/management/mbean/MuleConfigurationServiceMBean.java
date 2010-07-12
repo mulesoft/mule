@@ -38,7 +38,10 @@ public interface MuleConfigurationServiceMBean
 
     void setFullStackTraces(boolean sanitize);
 
-    String[] getStackTraceFilter();
+    String getStackTraceFilter();
 
-    void setStackTraceFilter(String[] filter);
+    /**
+     * Comma-separated list of packages and/or classes to remove.
+     */
+    void setStackTraceFilter(String filterAsString);
 }

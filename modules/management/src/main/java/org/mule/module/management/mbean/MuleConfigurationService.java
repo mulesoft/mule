@@ -12,6 +12,7 @@ package org.mule.module.management.mbean;
 
 import org.mule.api.config.MuleConfiguration;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.util.StringUtils;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
@@ -86,13 +87,13 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         DefaultMuleConfiguration.fullStackTraces = flag;
     }
 
-    public String[] getStackTraceFilter()
+    public String getStackTraceFilter()
     {
-        return DefaultMuleConfiguration.stackTraceFilter;
+        return StringUtils.join(DefaultMuleConfiguration.stackTraceFilter, ',');
     }
 
-    public void setStackTraceFilter(String[] filter)
+    public void setStackTraceFilter(String filterAsString)
     {
-        DefaultMuleConfiguration.stackTraceFilter = filter;
+        DefaultMuleConfiguration.stackTraceFilter = filterAsString.split(",");
     }
 }
