@@ -4823,6 +4823,8 @@
         <xsd:attribute name="messageFactory" type="xsd:string"/>
         <xsd:attribute name="serviceFinder" type="xsd:string"/>
         <xsd:attribute name="sessionHandler" type="xsd:string"/>
+        <xsd:attribute name="inboundExchangePatterns" type="xsd:string"/>
+        <xsd:attribute name="outboundExchangePatterns" type="xsd:string"/>
     </xsd:complexType>
 
     <!--==============================================================-->

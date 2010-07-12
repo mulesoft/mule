@@ -101,6 +101,8 @@ public class MuleProperties
     public static final String CONNECTOR_SERVICE_ERROR = "service.error";
     public static final String CONNECTOR_SESSION_HANDLER = "session.handler";
     public static final String CONNECTOR_META_ENDPOINT_BUILDER = "meta.endpoint.builder";
+    public static final String CONNECTOR_INBOUND_EXCHANGE_PATTERNS = "inbound.exchange.patterns";
+    public static final String CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS = "outbound.exchange.patterns";
     // End Connector Service descriptor properties
 
     public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";

@@ -10,6 +10,7 @@
 
 package org.mule.transport.service;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -33,7 +34,9 @@ import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -64,6 +67,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
     private Properties exceptionMappings = new Properties();
     private MuleContext muleContext;
+    private List<MessageExchangePattern> inboundExchangePatterns;
+    private List<MessageExchangePattern> outboundExchangePatterns;
 
     private ClassLoader classLoader;
 
@@ -90,6 +95,12 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_META_ENDPOINT_BUILDER, props);
         endpointUriBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
+        
+        String mepsString = removeProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, props);
+        initInboundExchangePatterns(mepsString);
+        
+        mepsString = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, props);
+        initOutboundExchangePatterns(mepsString);
     }
 
     public void setOverrides(Properties props)
@@ -136,6 +147,12 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             endpointUriBuilder = temp;
         }
+        
+        temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, null);
+        initInboundExchangePatterns(temp);
+        
+        temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, null);
+        initOutboundExchangePatterns(temp);
     }
 
     public void setMuleContext(MuleContext context)
@@ -509,5 +526,53 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     public Properties getExceptionMappings()
     {
         return this.exceptionMappings;
+    }
+
+    protected void initInboundExchangePatterns(String mepsString)
+    {
+        inboundExchangePatterns = parseExchangePatterns(mepsString);
+    }
+
+    protected void initOutboundExchangePatterns(String mepsString)
+    {
+        outboundExchangePatterns = parseExchangePatterns(mepsString);
+    }
+
+    protected List<MessageExchangePattern> parseExchangePatterns(String mepsString)
+    {
+        if (StringUtils.isEmpty(mepsString))
+        {
+            return null;
+        }
+        
+        List<MessageExchangePattern> mepList = new ArrayList<MessageExchangePattern>();
+        
+        String[] meps = StringUtils.splitAndTrim(mepsString, ",");
+        for (String exchangePattern : meps)
+        {
+            mepList.add(MessageExchangePattern.fromString(exchangePattern));
+        }
+        
+        return mepList;
+    }
+    
+    public List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException
+    {
+        if (inboundExchangePatterns == null)
+        {
+            throw new TransportServiceException(CoreMessages.objectNotSetInService(
+                "Inbound exchange patterns", getService()));
+        }
+        return inboundExchangePatterns;
+    }
+
+    public List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException
+    {
+        if (outboundExchangePatterns == null)
+        {
+            throw new TransportServiceException(CoreMessages.objectNotSetInService(
+                "Outbound exchange patterns", getService()));
+        }
+        return outboundExchangePatterns;
     }
 }

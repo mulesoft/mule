@@ -43,7 +43,8 @@
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         <service-overrides 
             xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"
-            messageFactory="org.mule.test.spring.SpringNamespaceConfigBuilderTestCase$MockMuleMessageFactory"/>
+            messageFactory="org.mule.test.spring.SpringNamespaceConfigBuilderTestCase$MockMuleMessageFactory"
+            inboundExchangePatterns="request-response" outboundExchangePatterns="request-response"/>
     </custom-connector>
 
     <custom-transformer name="TestCompressionTransformer"

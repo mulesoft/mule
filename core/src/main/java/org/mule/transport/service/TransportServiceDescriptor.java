@@ -10,6 +10,7 @@
 
 package org.mule.transport.service;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
@@ -41,38 +42,42 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
 {
     public static final String OSGI_HEADER_TRANSPORT = "Mule-Transport";
 
-    public MuleMessageFactory createMuleMessageFactory() throws TransportServiceException;
+    MuleMessageFactory createMuleMessageFactory() throws TransportServiceException;
     
-    public SessionHandler createSessionHandler() throws TransportServiceException;
+    SessionHandler createSessionHandler() throws TransportServiceException;
 
-    public MessageReceiver createMessageReceiver(Connector connector,
+    MessageReceiver createMessageReceiver(Connector connector,
                                                  FlowConstruct flowConstruct,
                                                  InboundEndpoint endpoint) throws MuleException;
 
-    public MessageReceiver createMessageReceiver(Connector connector,
+    MessageReceiver createMessageReceiver(Connector connector,
                                                  FlowConstruct flowConstruct,
                                                  InboundEndpoint endpoint,
                                                  Object[] args) throws MuleException;
 
-    public MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;
+    MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;
 
-    public MessageRequesterFactory createRequesterFactory() throws TransportServiceException;
+    MessageRequesterFactory createRequesterFactory() throws TransportServiceException;
 
-    public TransactionFactory createTransactionFactory() throws TransportServiceException;
+    TransactionFactory createTransactionFactory() throws TransportServiceException;
 
-    public Connector createConnector() throws TransportServiceException;
+    Connector createConnector() throws TransportServiceException;
 
-    public List<Transformer> createInboundTransformers() throws TransportFactoryException;
+    List<Transformer> createInboundTransformers() throws TransportFactoryException;
 
-    public List<Transformer> createOutboundTransformers() throws TransportFactoryException;
+    List<Transformer> createOutboundTransformers() throws TransportFactoryException;
 
-    public List<Transformer> createResponseTransformers() throws TransportFactoryException;
+    List<Transformer> createResponseTransformers() throws TransportFactoryException;
 
-    public EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
+    EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 
-    public EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
+    EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
 
-    public void setExceptionMappings(Properties props);
+    void setExceptionMappings(Properties props);
 
-    public Properties getExceptionMappings();
+    Properties getExceptionMappings();
+
+    List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException;
+
+    List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException;
 }

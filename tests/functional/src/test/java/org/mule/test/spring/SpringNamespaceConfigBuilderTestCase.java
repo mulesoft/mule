@@ -9,6 +9,7 @@
  */
 package org.mule.test.spring;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
@@ -20,6 +21,9 @@ import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.DefaultMuleMessageFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -35,10 +39,9 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
                 "org/mule/test/spring/config1/test-xml-mule2-config-split.xml";
     }
 
-    public void testServiceOverrides() throws Exception
+    public void testOverrideMessageReceiver() throws Exception
     {
-        TestConnector connector = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
-        assertNotNull(connector);
+        TestConnector connector = lookupDummyConnector();
         
         // create an xa-transacted endpoint (this triggers the cration of an 
         // xaTransactedMessageReceiver in the service descriptor impl
@@ -51,11 +54,46 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
         // see if we get the overridden message receiver
         MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector, 
             getTestService(), endpoint);
-        assertEquals(TestMessageReceiver.class, receiver.getClass());
-        
+        assertEquals(TestMessageReceiver.class, receiver.getClass());        
+    }
+    
+    public void testOverrideMuleMessageFactory() throws Exception
+    {
+        TestConnector connector = lookupDummyConnector();
+        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+
         // test if the service override for the message factory works
         MuleMessageFactory messageFactory = serviceDescriptor.createMuleMessageFactory();
         assertEquals(MockMuleMessageFactory.class, messageFactory.getClass());
+    }
+
+    public void testOverrideInbounExchangePatterns() throws Exception
+    {
+        TestConnector connector = lookupDummyConnector();
+        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+        
+        List<MessageExchangePattern> meps = serviceDescriptor.getInboundExchangePatterns();
+        
+        List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
+        assertEquals(expected, meps);
+    }
+    
+    public void testOverrideOutboundExchangePatterns() throws Exception
+    {
+        TestConnector connector = lookupDummyConnector();
+        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+        
+        List<MessageExchangePattern> meps = serviceDescriptor.getOutboundExchangePatterns();
+        
+        List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
+        assertEquals(expected, meps);
+    }
+    
+    private TestConnector lookupDummyConnector()
+    {
+        TestConnector connector = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
+        assertNotNull(connector);
+        return connector;
     }
     
     public static class MockMuleMessageFactory extends DefaultMuleMessageFactory
