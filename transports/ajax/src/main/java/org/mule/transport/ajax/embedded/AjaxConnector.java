@@ -105,7 +105,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     public void onNotification(MuleContextNotification notification)
     {
 
-        if(notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
         {
             //We delay starting until the context has been started since we need the MuleAjaxServlet to initialise first
             setInitialStateStopped(false);

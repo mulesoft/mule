@@ -18,6 +18,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJsonBindingsTestCase
 {
+
     private Server httpServer;
 
     @Override
@@ -28,7 +29,7 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
         c.addEventListener(new AjaxServletContextListener(muleContext, null));
-        
+
         httpServer.start();
 
         super.doSetUp();
@@ -38,7 +39,10 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
-        if(httpServer!=null) httpServer.stop();
+        if (httpServer != null)
+        {
+            httpServer.stop();
+        }
 
     }
 
