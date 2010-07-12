@@ -24,7 +24,7 @@
 
         <service name="test">
             <inbound>
-                <inbound-endpoint ref="in"/>
+                <inbound-endpoint ref="in" exchange-pattern="one-way"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -46,8 +46,8 @@
                  -->
                 <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
                     <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
-                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" connector-ref="queue"/>
+                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" connector-ref="queue" exchange-pattern="one-way"/>
                 </endpoint-selector-router>
             </outbound>
         </service>
