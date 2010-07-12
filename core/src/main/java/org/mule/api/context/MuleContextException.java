@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>MuleContextException</code> is thrown when an exception occurs with Manager
+ * <code>MuleContextException</code> is thrown when an exception occurs with Mule Context
  * objects
  */
 public class MuleContextException extends MuleException
