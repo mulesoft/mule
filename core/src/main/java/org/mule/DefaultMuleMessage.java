@@ -776,19 +776,30 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         StringBuffer buf = new StringBuffer(120);
+        final String nl = System.getProperty("line.separator");
+
+        // format message for multi-line output, single-line is not readable
+        buf.append(nl);
         buf.append(getClass().getName());
-        buf.append("{id=").append(getUniqueId());
-        buf.append(", payload=").append(getPayload().getClass().getName());
-        buf.append(", properties=").append(properties);
-        buf.append(", correlationId=").append(getCorrelationId());
-        buf.append(", correlationGroup=").append(getCorrelationGroupSize());
-        buf.append(", correlationSeq=").append(getCorrelationSequence());
-        buf.append(", encoding=").append(getEncoding());
-        buf.append(", exceptionPayload=").append(exceptionPayload);
-        if (logger.isDebugEnabled())
-        {
-            buf.append(", properties=").append(properties);
-        }
+        buf.append(nl);
+        buf.append("{");
+        buf.append(nl);
+        buf.append("  id=").append(getUniqueId());
+        buf.append(nl);
+        buf.append("  payload=").append(getPayload().getClass().getName());
+        buf.append(nl);
+        buf.append("  correlationId=").append(getCorrelationId());
+        buf.append(nl);
+        buf.append("  correlationGroup=").append(getCorrelationGroupSize());
+        buf.append(nl);
+        buf.append("  correlationSeq=").append(getCorrelationSequence());
+        buf.append(nl);
+        buf.append("  encoding=").append(getEncoding());
+        buf.append(nl);
+        buf.append("  exceptionPayload=").append(exceptionPayload);
+        buf.append(nl);
+        buf.append("  properties=").append(properties);
+        buf.append(nl);
         buf.append('}');
         return buf.toString();
     }
