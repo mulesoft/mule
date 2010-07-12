@@ -58,7 +58,6 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
-import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
@@ -408,8 +407,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     {
         if (isInitialStateStopped())
         {
-            lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<Connector>());
-            lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<Connector>());
             logger.info("Connector not started because 'initialStateStopped' is true");
             return;
         }
