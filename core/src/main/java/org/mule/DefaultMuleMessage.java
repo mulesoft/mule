@@ -29,6 +29,7 @@ import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -798,8 +799,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         buf.append(nl);
         buf.append("  exceptionPayload=").append(exceptionPayload);
         buf.append(nl);
-        buf.append("  properties=").append(properties);
-        buf.append(nl);
+        buf.append(StringMessageUtils.headersToString(this));
+        // no new line here, as headersToString() adds one
         buf.append('}');
         return buf.toString();
     }
