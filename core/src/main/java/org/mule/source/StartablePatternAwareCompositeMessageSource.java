@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +48,7 @@ public class StartablePatternAwareCompositeMessageSource
     protected MessageProcessor listener;
     protected AtomicBoolean started = new AtomicBoolean(false);
     private MessageProcessor internalListener = new InternalMessageProcessor();
-    private List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
+    private final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
     private AtomicBoolean starting = new AtomicBoolean(false);
     private FlowConstruct flowConstruct;
 
@@ -137,8 +136,8 @@ public class StartablePatternAwareCompositeMessageSource
     @Override
     public String toString()
     {
-        return "StartableMessageSourceAgregator [listener=" + listener + ", sources=" + sources
-               + ", started=" + started + "]";
+        // TODO for DF why is the name different from the class?
+        return String.format("StartableMessageSourceAggregator [listener=%s, sources=%s, started=%s]", listener, sources, started);
     }
 
     private class InternalMessageProcessor implements MessageProcessor
@@ -156,9 +155,9 @@ public class StartablePatternAwareCompositeMessageSource
             }
             else
             {
-                log.warn("Message " + event
-                         + " was recieved from MessageSource, but message source " + this
-                         + " is stopped.  Message will be discarded.");
+                log.warn(String.format("A message was receieved from MessageSource, but message source is stopped. Message will be discarded.%n" +
+                                       "  Message: %s%n" +
+                                       "  MessageSource:%s", event, this));
                 return null;
             }
 
