@@ -29,8 +29,7 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 
     public MuleEvent doCatchMessage(MuleEvent event) throws RoutingException
     {
-        logger.warn("Message: " + event.getMessage() + " was not dispatched."
-                    + ". No routing path was defined for it.");
+        logger.warn(String.format("Message was not dispatched. No routing path was defined for it. Message: %s", event.getMessage()));
         return event;
     }
 }
