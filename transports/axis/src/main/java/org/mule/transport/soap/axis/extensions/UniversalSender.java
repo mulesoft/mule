@@ -12,6 +12,7 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -87,20 +88,14 @@ public class UniversalSender extends BasicHandler
             throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
         }
 
+        // Get the event stored in call if a request call is made there will be no event
         MuleEvent event = (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
-        if(event==null)
-        {
-            throw new IllegalArgumentException("Property " + MuleProperties.MULE_EVENT_PROPERTY + " not set on Axis MessageContext");
-        }
 
         if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
         {
             sync = false;
         }
-        // Get the event stored in call
-        // If a receive call is made there will be no event
-        // MuleEvent event =
-        // (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+
         // Get the dispatch endpoint
         String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
         ImmutableEndpoint requestEndpoint = (ImmutableEndpoint)call
@@ -220,7 +215,16 @@ public class UniversalSender extends BasicHandler
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
             }
             MuleMessage message = new DefaultMuleMessage(payload, props, muleContext);
-            MuleSession session = event.getSession();
+            MuleSession session;
+
+            if(event != null)
+            {
+                session = event.getSession();
+            }
+            else
+            {
+                session = new DefaultMuleSession(muleContext);
+            }
 
             logger.info("Making Axis soap request on: " + uri);
             if (logger.isDebugEnabled())
