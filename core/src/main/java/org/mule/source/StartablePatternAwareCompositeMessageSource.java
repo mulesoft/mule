@@ -136,8 +136,7 @@ public class StartablePatternAwareCompositeMessageSource
     @Override
     public String toString()
     {
-        // TODO for DF why is the name different from the class?
-        return String.format("StartableMessageSourceAggregator [listener=%s, sources=%s, started=%s]", listener, sources, started);
+        return String.format("%s [listener=%s, sources=%s, started=%s]", getClass().getSimpleName(), listener, sources, started);
     }
 
     private class InternalMessageProcessor implements MessageProcessor
