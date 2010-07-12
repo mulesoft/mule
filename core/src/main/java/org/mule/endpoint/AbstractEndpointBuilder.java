@@ -108,7 +108,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected void setPropertiesFromProperties(Map<Object, Object> properties)
     {
-
         final Boolean tempSync = getBooleanProperty(properties, MuleProperties.SYNCHRONOUS_PROPERTY, synchronous);
         if (tempSync != null)
         {
@@ -126,8 +125,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN);
         if (StringUtils.isNotEmpty(mepString))
         {
-            mepString = mepString.toUpperCase().replace('-', '_');
-            setExchangePattern(MessageExchangePattern.valueOf(mepString));
+            setExchangePattern(MessageExchangePattern.fromString(mepString));
         }
 
         //synchronous = messageExchangePattern == MessageExchangePattern.REQUEST_RESPONSE;

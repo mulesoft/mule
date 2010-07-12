@@ -19,7 +19,6 @@ public class MessageExchangePatternPropertyEditor extends PropertyEditorSupport
     @Override
     public void setAsText(String text) throws IllegalArgumentException
     {
-        String epString = text.toUpperCase().replace('-', '_');
-        setValue(MessageExchangePattern.valueOf(epString));
+        setValue(MessageExchangePattern.fromString(text));
     }
 }

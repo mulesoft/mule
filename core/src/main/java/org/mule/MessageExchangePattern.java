@@ -43,4 +43,10 @@ public enum MessageExchangePattern
             return ONE_WAY;
         }
     }
+
+    public static MessageExchangePattern fromString(String string)
+    {
+        String mepString = string.toUpperCase().replace('-', '_');
+        return MessageExchangePattern.valueOf(mepString);
+    }
 }
