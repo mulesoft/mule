@@ -11,6 +11,7 @@
 package org.mule.module.management.mbean;
 
 import org.mule.api.config.MuleConfiguration;
+import org.mule.config.DefaultMuleConfiguration;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
@@ -65,5 +66,33 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
     public boolean isContainerMode()
     {
         return muleConfiguration.isContainerMode();
+    }
+
+    public boolean isFullStackTraces()
+    {
+        /*
+            Sacrifice the code quality for the sake of keeping things simple -
+            the alternative would be to pass MuleContext into every exception constructor.
+         */
+        return DefaultMuleConfiguration.fullStackTraces;
+    }
+
+    public void setFullStackTraces(boolean flag)
+    {
+        /*
+           Sacrifice the code quality for the sake of keeping things simple -
+           the alternative would be to pass MuleContext into every exception constructor.
+        */
+        DefaultMuleConfiguration.fullStackTraces = flag;
+    }
+
+    public String[] getStackTraceFilter()
+    {
+        return DefaultMuleConfiguration.stackTraceFilter;
+    }
+
+    public void setStackTraceFilter(String[] filter)
+    {
+        DefaultMuleConfiguration.stackTraceFilter = filter;
     }
 }

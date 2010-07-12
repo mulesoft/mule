@@ -338,7 +338,47 @@ public final class ExceptionHelper
                 break;
             }
         }
-        return root;
+
+        return DefaultMuleConfiguration.fullStackTraces ? root : sanitize(root);
+    }
+
+    /**
+     * Removes some internal Mule entries from the stacktrace. Modifies the
+     * passed-in throwable stacktrace.
+     */
+    public static Throwable sanitize(Throwable t)
+    {
+        StackTraceElement[] trace = t.getStackTrace();
+        List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>();
+        for (StackTraceElement stackTraceElement : trace)
+        {
+            if (isMuleInternalClass(stackTraceElement.getClassName()))
+            {
+                newTrace.add(stackTraceElement);
+            }
+        }
+
+
+        StackTraceElement[] clean = new StackTraceElement[newTrace.size()];
+        newTrace.toArray(clean);
+        t.setStackTrace(clean);
+        return t;
+    }
+
+    private static boolean isMuleInternalClass(String className)
+    {
+        /*
+           Sacrifice the code quality for the sake of keeping things simple -
+           the alternative would be to pass MuleContext into every exception constructor.
+        */
+        for (String mulePackage : DefaultMuleConfiguration.stackTraceFilter)
+        {
+            if (className.startsWith(mulePackage))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static Throwable getRootParentException(Throwable t)

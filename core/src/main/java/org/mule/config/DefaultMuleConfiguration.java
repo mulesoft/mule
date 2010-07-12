@@ -39,6 +39,25 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware
 {
+
+    public static final String[] DEFAULT_STACKTRACE_FILTER = (
+            "org.mule.processor.AbstractInterceptingMessageProcessor," +
+            "org.mule.processor.builder.InterceptingChainMessageProcessorBuilder")
+            .split(",");
+
+    /**
+     * When false (default), some internal Mule entries are removed from exception stacktraces for readability.
+     * @see #stackTraceFilter
+     */
+    public static boolean fullStackTraces = false;
+
+    /**
+     * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces.
+     * Matching is done via string.startsWith().
+     * @see #fullStackTraces
+     */
+    public static String[] stackTraceFilter = DEFAULT_STACKTRACE_FILTER;
+
     private boolean synchronous = false;
 
     /**
@@ -237,6 +256,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
+        }
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.full");
+        if (p != null)
+        {
+            fullStackTraces = false;
+        }
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "stacktrace.filter");
+        if (p != null)
+        {
+            stackTraceFilter = p.split(",");
         }
     }
 

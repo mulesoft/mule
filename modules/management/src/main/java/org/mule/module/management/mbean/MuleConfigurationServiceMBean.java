@@ -34,4 +34,11 @@ public interface MuleConfigurationServiceMBean
 
     boolean isContainerMode();
 
+    boolean isFullStackTraces();
+
+    void setFullStackTraces(boolean sanitize);
+
+    String[] getStackTraceFilter();
+
+    void setStackTraceFilter(String[] filter);
 }
