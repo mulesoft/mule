@@ -32,16 +32,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>MuleEndpointURI</code> is used to determine how a message is sent of
- * received. The url defines the protocol, the endpointUri destination of the message
- * and optionally the endpoint to use when dispatching the event. Mule urls take the
- * form of - protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e. vm:///my.object or The protocol can be
- * any of any connector registered with Mule. The endpoint name if specified must be
- * the name of a register global endpoint The endpointUri can be any endpointUri
+ * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url 
+ * defines the protocol, the endpointUri destination of the message and optionally the endpoint to 
+ * use when dispatching the event. Mule urls take the form of - 
+ * protocol://[host]:[port]/[provider]/endpointUri or
+ * protocol://[host]:[port]/endpointUri i.e. vm:///my.object 
+ * <br/>
+ * The protocol can be any of any connector registered with Mule. The endpoint name if specified 
+ * must be the name of a registered global endpoint. The endpointUri can be any endpointUri
  * recognised by the endpoint type.
  */
-
 public class MuleEndpointURI implements EndpointURI
 {
     /**
@@ -280,7 +280,6 @@ public class MuleEndpointURI implements EndpointURI
     public String getFullScheme()
     {
         return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo + ':' + uri.getScheme());
-
     }
 
     public boolean isAbsolute()
