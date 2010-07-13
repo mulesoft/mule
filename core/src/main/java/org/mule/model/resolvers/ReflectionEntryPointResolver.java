@@ -18,7 +18,6 @@ import org.mule.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +76,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
      *
      * @return unmodifiable set of method names set on this resolver
      */
-    public Collection getIgnoredMethods()
+    public Set<String> getIgnoredMethods()
     {
         return Collections.unmodifiableSet(ignoredMethods);
     }
