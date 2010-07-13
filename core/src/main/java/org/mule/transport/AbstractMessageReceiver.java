@@ -166,7 +166,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                         + " is not 'request-response'.  No response will be returned.");
         }
         
-        message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+        message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
 
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
