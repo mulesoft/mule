@@ -14,18 +14,19 @@ import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.routing.filter.FilterException;
+import org.mule.processor.FilterMessageProcessor;
 import org.mule.routing.filters.EqualsFilter;
 
 import org.junit.Test;
 
-public class InboundFilterMessageProcessorTestCase extends AbstractInboundMessageProcessorTestCase
+public class FilterMessageProcessorTestCase extends AbstractInboundMessageProcessorTestCase
 {
 
     @Test
     public void testFilterPass() throws Exception
     {
         InboundEndpoint endpoint = createTestInboundEndpoint(new EqualsFilter(TEST_MESSAGE), null, true, null);
-        InterceptingMessageProcessor mp = new InboundFilterMessageProcessor();
+        InterceptingMessageProcessor mp = new FilterMessageProcessor();
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
@@ -41,7 +42,7 @@ public class InboundFilterMessageProcessorTestCase extends AbstractInboundMessag
     public void testFilterFail() throws Exception
     {
         InboundEndpoint endpoint = createTestInboundEndpoint(new EqualsFilter(null), null, true, null);
-        InterceptingMessageProcessor mp = new InboundFilterMessageProcessor();
+        InterceptingMessageProcessor mp = new FilterMessageProcessor();
         TestListener listner = new TestListener();
         mp.setListener(listner);
 

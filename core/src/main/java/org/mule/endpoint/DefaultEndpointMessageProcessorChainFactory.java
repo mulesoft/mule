@@ -20,7 +20,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
-import org.mule.endpoint.inbound.InboundFilterMessageProcessor;
+import org.mule.processor.FilterMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
@@ -54,7 +54,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
-            new InboundFilterMessageProcessor(), 
+            new FilterMessageProcessor(),
             new InboundSecurityFilterMessageProcessor(endpoint),
             new TransformerMessageProcessor(endpoint.getTransformers()) 
         });

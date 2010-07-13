@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.endpoint.inbound;
+package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
@@ -20,7 +20,7 @@ import org.mule.api.routing.filter.FilterException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
-public class InboundFilterMessageProcessor extends AbstractInterceptingMessageProcessor
+public class FilterMessageProcessor extends AbstractInterceptingMessageProcessor
 {
     public MuleEvent process(MuleEvent event) throws MuleException
     {
