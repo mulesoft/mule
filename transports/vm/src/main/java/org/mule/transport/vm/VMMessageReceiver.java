@@ -63,11 +63,13 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (!endpoint.isSynchronous())
@@ -83,6 +85,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
@@ -107,10 +110,20 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public MuleMessage onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
         // Rewrite the message to treat it as a new message
+        MuleMessage newMessage = createMessageCopy(message);
+        return routeMessage(newMessage);
+    }
+    
+    protected MuleMessage createMessageCopy(MuleMessage message)
+    {
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
         movePropertiesToInbound(newMessage);
-
-        return routeMessage(newMessage);
+        
+        newMessage.setCorrelationId(message.getCorrelationId());
+        newMessage.setCorrelationGroupSize(message.getCorrelationGroupSize());
+        newMessage.setCorrelationSequence(message.getCorrelationSequence());
+        
+        return newMessage;
     }
 
     protected void movePropertiesToInbound(MuleMessage newMessage)
@@ -129,6 +142,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     /**
      * It's impossible to process all messages in the receive transaction
      */
+    @Override
     protected List<MuleMessage> getMessages() throws Exception
     {
         if (isReceiveMessagesInTransaction())
@@ -200,13 +214,13 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         return (MuleEvent) queue.poll(connector.getQueueTimeout());
     }
 
+    @Override
     protected void processMessage(Object msg) throws Exception
     {
         MuleMessage message = (MuleMessage) msg;
 
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
-        movePropertiesToInbound(newMessage);
+        MuleMessage newMessage = createMessageCopy(message);
         routeMessage(newMessage);
     }
 
@@ -232,6 +246,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             super(pollingMessageReceiver);
         }
 
+        @Override
         public void run()
         {
             /*

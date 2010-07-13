@@ -22,11 +22,12 @@ import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.lang.SerializationUtils;
 
 public class MessageChunkingTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/message-chunking.xml";
@@ -119,6 +120,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
                 // Not strictly necessary to test for this as when we register the
                 // listener we supply the ComponentName as the subscription filter
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
+                
                 // Test that we have received all chunks in the correct order
                 Object reply = ((FunctionalTestNotification) notification).getReplyMessage();
                 assertEquals(data + " Received", reply);
@@ -147,5 +149,4 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // Ensure we processed expected number of message parts
         assertEquals(partsCount, messagePartsCount.get());
     }
-
 }
