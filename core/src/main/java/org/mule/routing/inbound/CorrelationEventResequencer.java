@@ -29,7 +29,7 @@ import java.util.Comparator;
  */
 public class CorrelationEventResequencer extends AbstractEventAggregator
 {
-    protected Comparator eventComparator;
+    protected Comparator<MuleEvent> eventComparator;
 
     public CorrelationEventResequencer()
     {
@@ -48,16 +48,17 @@ public class CorrelationEventResequencer extends AbstractEventAggregator
 
     }
 
-    public Comparator getEventComparator()
+    public Comparator<MuleEvent> getEventComparator()
     {
         return eventComparator;
     }
 
-    public void setEventComparator(Comparator eventComparator)
+    public void setEventComparator(Comparator<MuleEvent> eventComparator)
     {
         this.eventComparator = eventComparator;
     }
 
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback()
     {
         return new ResequenceCorrelatorCallback(getEventComparator(), muleContext);

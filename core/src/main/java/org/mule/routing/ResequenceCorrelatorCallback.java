@@ -18,9 +18,6 @@ import org.mule.routing.inbound.EventGroup;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A Correlator that correlates messages based on Mule correlation settings
  * Note that the {@link #aggregateEvents(org.mule.routing.inbound.EventGroup)} method only resequences the events and
@@ -29,15 +26,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
 {
-    /**
-     * logger used by this class
-     */
-    protected transient final Log logger = LogFactory.getLog(ResequenceCorrelatorCallback.class);
+    protected Comparator<MuleEvent> eventComparator;
 
-    protected Comparator eventComparator;
-    protected MuleContext muleContext;
-
-    public ResequenceCorrelatorCallback(Comparator eventComparator, MuleContext muleContext)
+    public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator, MuleContext muleContext)
     {
         super(muleContext);
         this.eventComparator = eventComparator;
@@ -56,6 +47,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
      *          whole event group is removed and passed to the exception handler
      *          for this componenet
      */
+    @Override
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
         MuleEvent results[];

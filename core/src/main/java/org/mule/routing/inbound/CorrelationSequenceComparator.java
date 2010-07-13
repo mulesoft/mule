@@ -18,18 +18,12 @@ import java.util.Comparator;
  * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for
  * {@link MuleEvent}s using their respective correlation sequences.
  */
-public final class CorrelationSequenceComparator implements Comparator
+public final class CorrelationSequenceComparator implements Comparator<MuleEvent>
 {
-
-    public CorrelationSequenceComparator()
+    public int compare(MuleEvent event1, MuleEvent event2)
     {
-        super();
-    }
-
-    public int compare(Object o1, Object o2)
-    {
-        int val1 = ((MuleEvent)o1).getMessage().getCorrelationSequence();
-        int val2 = ((MuleEvent)o2).getMessage().getCorrelationSequence();
+        int val1 = event1.getMessage().getCorrelationSequence();
+        int val2 = event2.getMessage().getCorrelationSequence();
 
         if (val1 == val2)
         {
@@ -44,5 +38,4 @@ public final class CorrelationSequenceComparator implements Comparator
             return -1;
         }
     }
-
 }

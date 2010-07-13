@@ -29,7 +29,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(CollectionCorrelatorCallback.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     protected MuleContext muleContext;
 
@@ -90,5 +90,4 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
         return size == events.size();
     }
-
 }
