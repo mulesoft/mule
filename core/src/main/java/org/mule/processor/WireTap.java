@@ -13,9 +13,6 @@ package org.mule.processor;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 
@@ -33,7 +30,7 @@ import org.mule.api.routing.filter.Filter;
  * <p>
  * <b>EIP Pattern Reference:</b> {@link http://www.eaipatterns.com/WireTap.html}
  */
-public class WireTap extends AbstractMessageObserver implements Initialisable
+public class WireTap extends AbstractMessageObserver
 
 {
     protected volatile MessageProcessor tap;
@@ -58,16 +55,6 @@ public class WireTap extends AbstractMessageObserver implements Initialisable
         catch (MuleException e)
         {
             logger.error("Exception sending to wiretap output " + tap, e);
-        }
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        if (filter != null)
-        {
-            InterceptingMessageProcessor filteringProcessor = new SilentFilter(filter);
-            filteringProcessor.setListener(tap);
-            tap = filteringProcessor;
         }
     }
 
