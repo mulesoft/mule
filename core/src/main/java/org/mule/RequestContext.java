@@ -14,7 +14,6 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -134,11 +133,7 @@ public final class RequestContext
 
     public static MuleEvent cloneAndUpdateEventEndpoint(MuleEvent event, MessageProcessor target)
     {
-        MuleSession session = new DefaultMuleSession(event.getMuleContext());
-        MuleMessage newMessage = DefaultMuleMessage.copy(event.getMessage());
-        ImmutableEndpoint newEndpoint =
-            target instanceof OutboundEndpoint ? (ImmutableEndpoint) target : event.getEndpoint();
-        return new DefaultMuleEvent(newMessage, newEndpoint, session);
+        return updateEventEndpoint(newEvent(event, SAFE), target);
     }
     
     public static MuleEvent updateEventEndpoint(MuleEvent event, MessageProcessor target)
