@@ -87,7 +87,7 @@
                  <outbound>
                      <static-recipient-list-router>
                          <reply-to address="LoanBrokerQuotes"/>
-                         <message-property-filter pattern="recipients!=null"/>
+                         <message-property-filter pattern="recipients!=null" scope="invocation"/>
                      </static-recipient-list-router>
                      <logging-catch-all-strategy/>                     
                  </outbound>

@@ -12,6 +12,7 @@ package org.mule.example.loanbroker.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.routing.outbound.StaticRecipientList;
@@ -44,7 +45,7 @@ public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
         }
 
         logger.debug("Setting recipients to '" + recipients + "'");
-        message.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
+        message.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients, PropertyScope.INVOCATION);
         return message;
     }
 
