@@ -13,12 +13,11 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.filter.Filter;
 
-public class SilentFilter extends AbstractFilteringMessageProcessor
+public class SimpleFilter extends AbstractFilteringMessageProcessor
 {
-
     protected Filter filter;
 
-    public SilentFilter(Filter filter)
+    public SimpleFilter(Filter filter)
     {
         this.filter = filter;
     }
@@ -26,6 +25,11 @@ public class SilentFilter extends AbstractFilteringMessageProcessor
     @Override
     protected boolean accept(MuleEvent event)
     {
+        if (filter == null)
+        {
+            return true;
+        }
+
         if (event != null)
         {
             return filter.accept(event.getMessage());

@@ -11,12 +11,12 @@
 package org.mule.processor;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterException;
 import org.mule.config.i18n.CoreMessages;
 
-public class FailingFilter extends SilentFilter
+public class FailingFilter extends SimpleFilter
 {
 
     public FailingFilter(Filter filter)
@@ -24,7 +24,7 @@ public class FailingFilter extends SilentFilter
         super(filter);
     }
 
-    protected MuleMessage handleUnacceptedFilter(MuleEvent event) throws FilterException
+    protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {
         throw new FilterException(CoreMessages.messageRejectedByFilter(), filter);
     }
