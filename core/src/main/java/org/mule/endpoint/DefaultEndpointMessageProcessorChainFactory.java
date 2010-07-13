@@ -37,9 +37,9 @@ import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
 import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.AbstractMessageObserver;
-import org.mule.processor.FailingFilter;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.routing.ExceptionThrowingMessageFilter;
 import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
@@ -58,7 +58,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
             new SetEventRequestContextMessageProcessor(),
-            new FailingFilter(endpoint.getFilter()),
+            new ExceptionThrowingMessageFilter(endpoint.getFilter()),
             new InboundSecurityFilterMessageProcessor(endpoint),
             new TransformerMessageProcessor(endpoint.getTransformers()) 
         });

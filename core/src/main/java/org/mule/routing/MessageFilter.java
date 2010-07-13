@@ -8,16 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.filter.Filter;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 
-public class SimpleFilter extends AbstractFilteringMessageProcessor
+public class MessageFilter extends AbstractFilteringMessageProcessor
 {
     protected Filter filter;
 
-    public SimpleFilter(Filter filter)
+    public MessageFilter(Filter filter)
     {
         this.filter = filter;
     }

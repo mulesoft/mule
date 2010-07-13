@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -16,10 +16,10 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterException;
 import org.mule.config.i18n.CoreMessages;
 
-public class FailingFilter extends SimpleFilter
+public class ExceptionThrowingMessageFilter extends MessageFilter
 {
 
-    public FailingFilter(Filter filter)
+    public ExceptionThrowingMessageFilter(Filter filter)
     {
         super(filter);
     }
