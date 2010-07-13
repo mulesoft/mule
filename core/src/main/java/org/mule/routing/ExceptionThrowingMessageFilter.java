@@ -13,7 +13,7 @@ package org.mule.routing;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.routing.filter.FilterException;
+import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.config.i18n.CoreMessages;
 
 public class ExceptionThrowingMessageFilter extends MessageFilter
@@ -26,7 +26,7 @@ public class ExceptionThrowingMessageFilter extends MessageFilter
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {
-        throw new FilterException(CoreMessages.messageRejectedByFilter(), filter);
+        throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
     }
 
 }

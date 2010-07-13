@@ -26,7 +26,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.filter.FilterException;
+import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -176,7 +176,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             resultEvent = listener.process(muleEvent);
         }
-        catch (FilterException e)
+        catch (FilterUnacceptedException e)
         {
             return handleUnacceptedFilter(muleEvent.getMessage());
         }

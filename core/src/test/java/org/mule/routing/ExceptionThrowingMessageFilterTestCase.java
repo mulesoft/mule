@@ -13,7 +13,7 @@ package org.mule.routing;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.routing.filter.FilterException;
+import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.tck.SensingNullMessageProcessor;
 
@@ -41,7 +41,7 @@ public class ExceptionThrowingMessageFilterTestCase extends MessageFilterTestCas
             MuleEvent resultEvent = mp.process(inEvent);
             fail("Filter should have thrown a FilterException");
         }
-        catch (FilterException e)
+        catch (FilterUnacceptedException e)
         {
             // expected
         }

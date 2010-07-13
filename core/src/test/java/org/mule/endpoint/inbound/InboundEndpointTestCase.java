@@ -19,7 +19,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.routing.filter.FilterException;
+import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
@@ -110,7 +110,7 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
             result = mpChain.process(requestEvent);
             fail("Filter should have thrown a FilterException");
         }
-        catch (FilterException e)
+        catch (FilterUnacceptedException e)
         {
             // expected
         }
@@ -177,7 +177,7 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
             result = mpChain.process(requestEvent);
             fail("Filter should have thrown a FilterException");
         }
-        catch (FilterException e)
+        catch (FilterUnacceptedException e)
         {
             // expected
         }

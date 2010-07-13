@@ -14,7 +14,7 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.config.i18n.Message;
 
 
-public class FilterException extends EndpointException
+public class FilterUnacceptedException extends EndpointException
 {
     private static final long serialVersionUID = -1828111078295716525L;
     
@@ -23,7 +23,7 @@ public class FilterException extends EndpointException
     /**
      * @param message the exception message
      */
-    public FilterException(Message message, Filter filter)
+    public FilterUnacceptedException(Message message, Filter filter)
     {
         super(message);
         this.filter = filter;
@@ -34,14 +34,14 @@ public class FilterException extends EndpointException
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public FilterException(Message message, Filter filter, Throwable cause)
+    public FilterUnacceptedException(Message message, Filter filter, Throwable cause)
     {
         super(message, cause);
         this.filter = filter;
         addInfo("Filter", filter.toString());
     }
 
-    public FilterException(Filter filter, Throwable cause)
+    public FilterUnacceptedException(Filter filter, Throwable cause)
     {
         super(cause);
         this.filter = filter;
@@ -52,7 +52,7 @@ public class FilterException extends EndpointException
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public FilterException(Message message, Throwable cause)
+    public FilterUnacceptedException(Message message, Throwable cause)
     {
         super(message, cause);
     }
@@ -60,7 +60,7 @@ public class FilterException extends EndpointException
     /**
      * @param message the exception message
      */
-    public FilterException(Message message)
+    public FilterUnacceptedException(Message message)
     {
         super(message);
     }
