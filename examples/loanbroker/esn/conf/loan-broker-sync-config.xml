@@ -74,7 +74,7 @@
                  <component class="org.mule.example.loanbroker.lender.DefaultLender"/>
                  <outbound>
                      <pass-through-router>
-                         <outbound-endpoint ref="BankGateway" transformer-refs="SetLendersAsRecipients"/>
+                         <outbound-endpoint ref="BankGateway"/>
                      </pass-through-router>
                  </outbound>
              </service>
@@ -85,10 +85,10 @@
                      <forwarding-router/>
                  </inbound>
                  <outbound>
-                     <static-recipient-list-router>
+                     <expression-recipient-list-router evaluator="groovy" expression="payload.lenders.endpoint">
                          <reply-to address="LoanBrokerQuotes"/>
-                         <message-property-filter pattern="recipients!=null" scope="invocation"/>
-                     </static-recipient-list-router>
+                         <expression-filter expression="payload.lenders.endpoint!=null" evaluator="groovy"/>
+                     </expression-recipient-list-router>
                      <logging-catch-all-strategy/>                     
                  </outbound>
              </service>

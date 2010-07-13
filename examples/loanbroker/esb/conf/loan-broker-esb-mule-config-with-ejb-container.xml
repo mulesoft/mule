@@ -66,13 +66,6 @@
         <return-argument evaluator="bean" expression="ssn"/>
     </expression-transformer>
 
-    <!-- The Message properties transformer can be used to add, modify or delete properties on the current message.
-    In this instance we use a groovy expression to get a List of endpoints from each of the lenders and set them as a property
-    on the message called 'recipients'-->
-    <message-properties-transformer name="SetLendersAsRecipients">
-        <add-message-property key="recipients" value="#[groovy:payload.lenders.endpoint]"/>
-    </message-properties-transformer>
-
     <!-- Example of a built-in, transport specific transformer -->
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
 
@@ -194,7 +187,7 @@
             <outbound>
                 <chaining-router>
                     <outbound-endpoint ref="LenderService" exchange-pattern="request-response" />
-                    <outbound-endpoint ref="BankingGateway" transformer-refs="SetLendersAsRecipients ObjectToJMSMessage" />
+                    <outbound-endpoint ref="BankingGateway" transformer-refs="ObjectToJMSMessage" />
                 </chaining-router>
             </outbound>
         </service>
@@ -217,10 +210,10 @@
                 <inbound-endpoint ref="BankingGateway" />
             </inbound>
             <outbound>
-                <static-recipient-list-router>
-                    <reply-to address="LoanQuotes" />
-                    <message-property-filter pattern="recipients!=null" scope="invocation" />
-                </static-recipient-list-router>
+                <expression-recipient-list-router evaluator="groovy" expression="payload.lenders.endpoint">
+                    <reply-to address="LoanQuotes"/>
+                        <expression-filter expression="payload.lenders.endpoint!=null" evaluator="groovy"/>
+                 </expression-recipient-list-router>
             </outbound>
         </service>
 

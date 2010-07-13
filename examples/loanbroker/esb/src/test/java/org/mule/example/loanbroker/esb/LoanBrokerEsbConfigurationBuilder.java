@@ -34,7 +34,6 @@ import org.mule.example.loanbroker.routers.BankQuotesResponseAggregator;
 import org.mule.example.loanbroker.transformers.CreditProfileXmlToCreditProfile;
 import org.mule.example.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs;
 import org.mule.example.loanbroker.transformers.RestRequestToCustomerRequest;
-import org.mule.example.loanbroker.transformers.SetLendersAsRecipients;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
@@ -43,9 +42,9 @@ import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
+import org.mule.routing.outbound.ExpressionRecipientList;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
-import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.response.DefaultResponseRouterCollection;
 import org.mule.transport.ejb.EjbConnector;
 import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
@@ -91,8 +90,6 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         registry.registerTransformer(LoanQuoteRequestToCreditProfileArgs);
         Transformer CreditProfileXmlToCreditProfile = new CreditProfileXmlToCreditProfile();
         registry.registerTransformer(CreditProfileXmlToCreditProfile);
-        Transformer SetLendersAsRecipients = new SetLendersAsRecipients();
-        registry.registerTransformer(SetLendersAsRecipients);
         Transformer ObjectToJMSMessage = new ObjectToJMSMessage();
         registry.registerTransformer(ObjectToJMSMessage);
 
@@ -220,7 +217,6 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         eb3.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         lenderGatewayServiceInboundOutboundRouter.addEndpoint(eb3.buildOutboundEndpoint());
         EndpointBuilder eb4 = (EndpointBuilder) BankingGateway.clone();
-        eb4.addTransformer(SetLendersAsRecipients);
         eb4.addTransformer(ObjectToJMSMessage);
         lenderGatewayServiceInboundOutboundRouter.addEndpoint(eb4.buildOutboundEndpoint());
         lenderGatewayServiceInboundOutbound.addRouter(lenderGatewayServiceInboundOutboundRouter);
@@ -250,9 +246,9 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         bankingGatewayService.setInboundRouter(bankingGatewayServiceInbound);
         // out
         OutboundRouterCollection bankingGatewayServiceOutbound = new DefaultOutboundRouterCollection();
-        StaticRecipientList staticRecipientList = new StaticRecipientList();
-        staticRecipientList.setReplyTo("LoanQuotes");
-        staticRecipientList.setFilter(new MessagePropertyFilter("recipients!=null"));
+        ExpressionRecipientList recipientList = new ExpressionRecipientList();
+        recipientList.setReplyTo("LoanQuotes");
+        recipientList.setFilter(new MessagePropertyFilter("recipients!=null"));
 
         registry.registerService(lenderGatewayService);
 

@@ -17,8 +17,6 @@
         <spring:property name="propertyName" value="customerRequest.customer"/>
     </custom-transformer>
 
-    <custom-transformer name="SetLendersAsRecipients" class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients"/>
-
     <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="one-way"
         connector-ref="syncVm"/>
     <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" exchange-pattern="one-way"
