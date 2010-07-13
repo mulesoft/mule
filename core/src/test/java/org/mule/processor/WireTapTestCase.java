@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.SensingNullMessageProcessor;
 
 public class WireTapTestCase extends AbstractMuleTestCase
 {
@@ -27,7 +28,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
         super.doSetUp();
 
         wireTap = new WireTap();
-        tapListener = getNullMessageProcessor();
+        tapListener = getSensingNullMessageProcessor();
         wireTap.setTap(tapListener);
     }
 

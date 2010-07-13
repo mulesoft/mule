@@ -14,7 +14,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
@@ -927,32 +926,17 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     }
     
-    public SensingNullMessageProcessor getNullMessageProcessor()
+    public SensingNullMessageProcessor getSensingNullMessageProcessor()
     {
         return new SensingNullMessageProcessor();
     }
     
-    public class SensingNullMessageProcessor implements MessageProcessor
-    {
-        public MuleEvent event;
+    public TriggerableMessageSource getTriggerableMessageSource(MessageProcessor listener){
+        return new TriggerableMessageSource(listener);
+    }
 
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            this.event = event;
-            if (event.getEndpoint().isSynchronous())
-            {
-                return event;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        
-        public void clear()
-        {
-            event = null;
-        }
+    public TriggerableMessageSource getTriggerableMessageSource(){
+        return new TriggerableMessageSource();
     }
 
 }

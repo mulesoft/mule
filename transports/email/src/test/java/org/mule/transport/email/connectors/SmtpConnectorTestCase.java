@@ -81,7 +81,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
             builder);
         try
         {
-            connector.registerListener(endpoint, getNullMessageProcessor(), service);
+            connector.registerListener(endpoint, getSensingNullMessageProcessor(), service);
             fail("SMTP connector does not accept listeners");
         }
         catch (Exception e)

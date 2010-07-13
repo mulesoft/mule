@@ -278,7 +278,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     {
         Service service=getTestService();
         service.start();
-        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getNullMessageProcessor(), service);
+        connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), service);
 
         assertEquals(1, connector.receivers.size());
         assertFalse(( connector.receivers.get("in")).isConnected());
@@ -288,7 +288,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertTrue(( connector.receivers.get("in")).isConnected());
         assertTrue(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
-        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getNullMessageProcessor(), service);
+        connector.registerListener(getTestInboundEndpoint("in2", "test://in2"), getSensingNullMessageProcessor(), service);
 
         assertEquals(2, connector.receivers.size());
         assertTrue(( connector.receivers.get("in")).isConnected());

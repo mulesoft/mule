@@ -46,7 +46,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
-        getConnector().registerListener(endpoint, getNullMessageProcessor(), service);
+        getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
     }
 
     public void testProperties() throws Exception

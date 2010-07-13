@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.SensingNullMessageProcessor;
 
 public class StartablePatternAwareCompositeMessageSourceTestCase extends AbstractMuleTestCase
 {
@@ -30,8 +31,8 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        listener = getNullMessageProcessor();
-        listener2 = getNullMessageProcessor();
+        listener = getSensingNullMessageProcessor();
+        listener2 = getSensingNullMessageProcessor();
         sourceAgregator = new StartablePatternAwareCompositeMessageSource();
         testEvent = getTestEvent(TEST_MESSAGE);
         source = new NullMessageSource(testEvent);

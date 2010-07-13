@@ -168,7 +168,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            connector.registerListener(null, getNullMessageProcessor(), service);
+            connector.registerListener(null, getSensingNullMessageProcessor(), service);
             fail("cannot register null");
         }
         catch (Exception e)
@@ -176,7 +176,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             // expected
         }
 
-        connector.registerListener(endpoint, getNullMessageProcessor(), service);
+        connector.registerListener(endpoint, getSensingNullMessageProcessor(), service);
 
         // this should work
         connector.unregisterListener(endpoint);
