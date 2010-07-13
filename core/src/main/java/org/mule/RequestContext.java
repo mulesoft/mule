@@ -132,13 +132,25 @@ public final class RequestContext
         return newMessage(message, SAFE);
     }
 
-    public static MuleEvent clomeEvent(MuleEvent event, MessageProcessor target)
+    public static MuleEvent cloneAndUpdateEventEndpoint(MuleEvent event, MessageProcessor target)
     {
         MuleSession session = new DefaultMuleSession(event.getMuleContext());
         MuleMessage newMessage = DefaultMuleMessage.copy(event.getMessage());
         ImmutableEndpoint newEndpoint =
             target instanceof OutboundEndpoint ? (ImmutableEndpoint) target : event.getEndpoint();
         return new DefaultMuleEvent(newMessage, newEndpoint, session);
+    }
+    
+    public static MuleEvent updateEventEndpoint(MuleEvent event, MessageProcessor target)
+    {
+        if (target instanceof OutboundEndpoint)
+        {
+            return new DefaultMuleEvent(event.getMessage(), (ImmutableEndpoint) target, event.getSession());
+        }
+        else
+        {
+            return event;
+        }
     }
 
     protected static MuleEvent newEvent(MuleEvent event, boolean safe)

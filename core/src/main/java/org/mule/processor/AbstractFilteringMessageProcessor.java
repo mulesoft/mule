@@ -20,12 +20,12 @@ import org.mule.api.processor.MessageProcessor;
  * used for filtering message flow through a {@link MessageProcessor} chain. The
  * default behaviour when the filter is not accepted is to return the request event.
  */
-public abstract class FilteringtInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
+public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor
 {
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (accept())
+        if (accept(event))
         {
             return processNext(event);
         }
@@ -35,7 +35,7 @@ public abstract class FilteringtInterceptingMessageProcessor extends AbstractInt
         }
     }
 
-    protected abstract boolean accept();
+    protected abstract boolean accept(MuleEvent event);
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {

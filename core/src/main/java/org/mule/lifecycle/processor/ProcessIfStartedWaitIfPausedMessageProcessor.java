@@ -54,7 +54,7 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
     }
 
     @Override
-    protected boolean accept()
+    protected boolean accept(MuleEvent event)
     {
         return lifecycleState.isStarted() || isPaused();
     }

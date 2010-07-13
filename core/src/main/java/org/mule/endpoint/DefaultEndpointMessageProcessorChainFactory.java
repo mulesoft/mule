@@ -20,7 +20,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
-import org.mule.processor.FilterMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
@@ -35,6 +34,7 @@ import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
 import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
+import org.mule.processor.FailingFilter;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.transformer.TransformerMessageProcessor;
@@ -54,7 +54,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
-            new FilterMessageProcessor(),
+            new FailingFilter(endpoint.getFilter()),
             new InboundSecurityFilterMessageProcessor(endpoint),
             new TransformerMessageProcessor(endpoint.getTransformers()) 
         });

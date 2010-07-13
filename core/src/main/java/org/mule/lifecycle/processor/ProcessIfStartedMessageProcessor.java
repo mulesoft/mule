@@ -16,9 +16,9 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.processor.FilteringtInterceptingMessageProcessor;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 
-public class ProcessIfStartedMessageProcessor extends FilteringtInterceptingMessageProcessor
+public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessageProcessor
 {
 
     protected Startable startable;
@@ -31,7 +31,7 @@ public class ProcessIfStartedMessageProcessor extends FilteringtInterceptingMess
     }
 
     @Override
-    protected boolean accept()
+    protected boolean accept(MuleEvent event)
     {
         return lifecycleState.isStarted();
     }
