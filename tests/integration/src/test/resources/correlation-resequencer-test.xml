@@ -11,7 +11,6 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
     <model>
-
         <!--
             Split the message and set correlation group ids and sizes
         -->
@@ -35,7 +34,6 @@
                 <pass-through-router>
                     <vm:outbound-endpoint path="sorted" exchange-pattern="request-response"/>
                 </pass-through-router>
-
             </outbound>
 
             <threading-profile maxThreadsActive="1" doThreading="false"/>
@@ -46,7 +44,6 @@
                 <vm:inbound-endpoint path="sorted" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
-
         </service>
     </model>
 </mule>
