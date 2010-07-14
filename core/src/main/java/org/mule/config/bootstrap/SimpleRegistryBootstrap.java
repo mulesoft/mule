@@ -22,7 +22,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.PropertiesUtils;
@@ -221,7 +220,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
                 if (returnClass != null)
                 {
-                    trans.setReturnDataType(new DataTypeFactory().create(returnClass, mime));
+                    trans.setReturnDataType(DataTypeFactory.create(returnClass, mime));
                 }
                 if (name != null)
                 {
