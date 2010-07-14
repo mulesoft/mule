@@ -1192,13 +1192,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <!--
-        <repository>
-            <id>com.springsource.repository.bundles.external</id>
-            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-            <url>http://repository.springsource.com/maven/bundles/external</url>
-        </repository>
-        -->
         <!-- for activemq -->
         <repository>
             <id>ops4j</id>
@@ -1466,33 +1459,8 @@
                 </configuration>
             </plugin>
 
-            <!-- The maven-bundle-plugin generates the MANIFEST.MF for all modules
-                where <packaging>bundle</packaging> is used. -->
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.3</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <obrRepository>NONE</obrRepository>
-                    <instructions>
-                        <!-- Each module can override these defaults in their osgi.properties file -->
-                        <_include>-osgi.properties</_include>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-DocURL>${pom.url}</Bundle-DocURL>
-                        <!-- Non-OSGi manifest entries -->
-                        <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
-                        <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
-                        <!-- include repository revision from buildnumber plugin -->
-                        <Build-Revision>${buildNumber}</Build-Revision>
-                        <Build-Date>${timestamp}</Build-Date>
-                    </instructions>
-                </configuration>
-            </plugin>
-
             <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
-                where <packaging>jar</packaging> is used (i.e., those which are
-                not OSGi bundles). -->
+                where <packaging>jar</packaging> is used. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
