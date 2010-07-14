@@ -25,29 +25,6 @@ public interface LocalMuleClient extends MuleClient
 {
 
     /**
-     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
-     * determines where to dispatch the event to.
-     * 
-     * @param endpoint
-     * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. In
-     *            the case of JMS you could set the JMSReplyTo property in these
-     *            properties.
-     * @throws org.mule.api.MuleException
-     */
-    void dispatch(OutboundEndpoint endpoint, Object payload, Map messageProperties) throws MuleException;
-
-    /**
-     * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL
-     * determines where to dispatch the event to.
-     * 
-     * @param endpoint
-     * @param message the message to send
-     * @throws org.mule.api.MuleException
-     */
-    void dispatch(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
-
-    /**
      * Sends an event synchronously to a endpointUri via a Mule server and a
      * resulting message is returned.
      * 
@@ -60,7 +37,8 @@ public interface LocalMuleClient extends MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    MuleMessage send(OutboundEndpoint endpoint, Object payload, Map messageProperties) throws MuleException;
+    MuleMessage process(OutboundEndpoint endpoint, Object payload, Map<String, Object> messageProperties)
+        throws MuleException;
 
     /**
      * Sends an event synchronously to a endpointUri via a Mule server and a
@@ -72,39 +50,7 @@ public interface LocalMuleClient extends MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    MuleMessage send(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
-
-    /**
-     * Sends an event synchronously to a endpointUri via a mule server and a
-     * resulting message is returned.
-     * 
-     * @param endpoint
-     * @param payload the object that is the payload of the event
-     * @param messageProperties any properties to be associated with the payload. In
-     *            the case of Jms you could set the JMSReplyTo property in these
-     *            properties.
-     * @param timeout The time in milliseconds the the call should block waiting for
-     *            a response
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
-     */
-    MuleMessage send(OutboundEndpoint endpoint, Object payload, Map messageProperties, int timeout)
-        throws MuleException;
-
-    /**
-     * Sends an event synchronously to a endpointUri via a mule server and a
-     * resulting message is returned.
-     * 
-     * @param endpoint
-     * @param message The message to send
-     * @param timeout The time in milliseconds the the call should block waiting for
-     *            a response
-     * @return A return message, this could be <code>null</code> if the the
-     *         components invoked explicitly sets a return as <code>null</code>.
-     * @throws org.mule.api.MuleException
-     */
-    MuleMessage send(OutboundEndpoint endpoint, MuleMessage message, int timeout) throws MuleException;
+    MuleMessage process(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
 
     /**
      * Will receive an event from an endpointUri determined by the URL.
@@ -118,5 +64,17 @@ public interface LocalMuleClient extends MuleClient
      * @throws org.mule.api.MuleException
      */
     MuleMessage request(InboundEndpoint endpoint, long timeout) throws MuleException;
+
+    /**
+     * Will register the specified process as a listener for the inbound endpoint.
+     * This may be implemented by subscription or polling depending on the transport
+     * implementation
+     * 
+     * @param endpoint
+     * @param processor
+     * @throws MuleException
+     */
+    // void receive(InboundEndpoint endpoint, MessageProcessor processor) throws
+    // MuleException;
 
 }
