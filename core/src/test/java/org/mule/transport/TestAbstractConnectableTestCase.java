@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
@@ -36,7 +37,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -85,9 +85,9 @@ public class TestAbstractConnectableTestCase
             connectable.start();
             fail("Should have thrown a " + MuleException.class.getSimpleName());
         }
-        catch (MuleException e)
+        catch (MuleException caughtException)
         {
-            assertSame(someMuleException, e);
+            assertExceptionIsInCaughtException(someMuleException, caughtException);
         }
     }
 
@@ -330,6 +330,27 @@ public class TestAbstractConnectableTestCase
         {
             return "Thread " + this.thread + " passing through " + this.methodName + "() at the "
                    + this.methodPart;
+        }
+    }
+
+    private void assertExceptionIsInCaughtException(MuleException someMuleException, MuleException caughtException)
+    {
+        boolean found = false;
+        Throwable candidate = caughtException;
+        while (candidate != null)
+        {
+            if (someMuleException.equals(candidate))
+            {
+                found = true;
+                break;
+            }
+            
+            candidate = candidate.getCause();
+        }
+        
+        if (found == false)
+        {
+            fail();
         }
     }
 
