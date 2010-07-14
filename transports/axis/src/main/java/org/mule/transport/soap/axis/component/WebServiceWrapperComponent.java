@@ -70,12 +70,12 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
 
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
 
-        MuleEvent responeEvent = endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint,
+        MuleEvent responseEvent = endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint,
             event.getSession()));
 
-        if (responeEvent != null)
+        if (responseEvent != null)
         {
-            return responeEvent.getMessage();
+            return responseEvent.getMessage();
         }
         else
         {
