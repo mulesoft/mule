@@ -17,7 +17,7 @@
     </xsl:param>
 
     <xsl:template match="/index">
-        <h2>Transport Feature Matrix (Mule {$version})</h2>
+        <h2>Transport Feature Matrix (Mule <xsl:value-of select="$version"/>)</h2>
         <table class="confluenceTable">
             <tbody>
                 <tr>
