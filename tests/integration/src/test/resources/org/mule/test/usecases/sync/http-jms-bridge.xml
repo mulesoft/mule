@@ -28,7 +28,7 @@
             <test:component logMessageDetails="true"/>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out">
+                    <vm:outbound-endpoint path="out" exchange-pattern="one-way">
                         <transformers>
                             <message-properties-transformer>
                                 <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
