@@ -10,6 +10,7 @@
 package org.mule.config.i18n;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  * Internationalized messages specific to the annotations module
@@ -43,6 +44,11 @@ public class AnnotationsMessages extends MessageFactory
     public static Message failedToInvokeReplyMethod(String method)
     {
         return factory.createMessage(BUNDLE_PATH, 5, method);
+    }
+
+    public static Message transformerMethodNotValid(Method method)
+    {
+        return factory.createMessage(BUNDLE_PATH, 6, method);
     }
 }
 
