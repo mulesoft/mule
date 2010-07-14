@@ -135,6 +135,7 @@ public interface MuleEventContext
      * @return the result of the send if any
      * @throws MuleException if there is no outbound endpoint configured on the
      *             service or the events fails during dispatch
+     * @deprecated
      */
     MuleMessage sendEvent(Object message) throws MuleException;
 
@@ -147,6 +148,7 @@ public interface MuleEventContext
      * @return the return Message from the call or null if there was no result
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
+     * @deprecated
      */
     MuleMessage sendEvent(MuleMessage message) throws MuleException;
 
@@ -160,6 +162,7 @@ public interface MuleEventContext
      * @return the return Message from the call or null if there was no result
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
+     * @deprecated
      */
     MuleMessage sendEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
 
@@ -276,6 +279,7 @@ public interface MuleEventContext
      * @param message the message to send
      * @throws MuleException if there is no outbound endpoint configured on the
      *             service or the events fails during dispatch
+     * @deprecated
      */
     void dispatchEvent(MuleMessage message) throws MuleException;
 
@@ -286,6 +290,7 @@ public interface MuleEventContext
      * @param payload the message payloadto send
      * @throws MuleException if there is no outbound endpoint configured on the
      *             service or the events fails during dispatch
+     * @deprecated
      */
     void dispatchEvent(Object payload) throws MuleException;
 
@@ -299,6 +304,7 @@ public interface MuleEventContext
      *            configuration and then on the mule manager configuration
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
+     * @deprecated
      */
     void dispatchEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
 
@@ -357,6 +363,7 @@ public interface MuleEventContext
      * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
+     * @deprecated
      */
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 

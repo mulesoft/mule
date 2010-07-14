@@ -64,7 +64,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
         MuleSession session = new DefaultMuleSession(message,
             ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), muleContext);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
-        MuleMessage reply = session.sendEvent(event);
+        MuleMessage reply = endpoint.process(event).getMessage();
 
         assertNotNull(reply);
 

@@ -13,14 +13,16 @@ package org.mule.module.jca;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.i18n.CoreMessages;
@@ -66,10 +68,11 @@ public class DefaultMuleConnection implements MuleConnection
     public void dispatch(String url, Object payload, Map messageProperties) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        MuleEvent event = getEvent(message, url, false);
+        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(url);
+        MuleEvent event = getEvent(message,endpoint);
         try
         {
-            event.getSession().dispatchEvent(event);
+            endpoint.process(event);
         }
         catch (MuleException e)
         {
@@ -99,12 +102,20 @@ public class DefaultMuleConnection implements MuleConnection
     public MuleMessage send(String url, Object payload, Map messageProperties) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        MuleEvent event = getEvent(message, url, true);
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, true);
+        MuleEvent event = getEvent(message, endpoint);
 
-        MuleMessage response;
         try
         {
-            response = event.getSession().sendEvent(event);
+            MuleEvent resultEvent = endpoint.process(event);
+            if (resultEvent != null)
+            {
+                return resultEvent.getMessage();
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (MuleException e)
         {
@@ -116,7 +127,6 @@ public class DefaultMuleConnection implements MuleConnection
                 ClientMessages.failedToDispatchClientEvent(), 
                 event.getMessage(), event.getEndpoint(), e);
         }
-        return response;
     }
 
     /**
@@ -143,6 +153,15 @@ public class DefaultMuleConnection implements MuleConnection
             throw new ReceiveException(endpoint, timeout, e);
         }
     }
+    
+    protected OutboundEndpoint getOutboundEndpoint(String uri, boolean synchronous) throws MuleException
+    {
+        EndpointBuilder endpointBuilder = muleContext.getRegistry()
+            .lookupEndpointFactory()
+            .getEndpointBuilder(uri);
+        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
+        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+    }
 
     /**
      * Packages a mule event for the current request
@@ -153,17 +172,9 @@ public class DefaultMuleConnection implements MuleConnection
      * @return the MuleEvent
      * @throws MuleException in case of Mule error
      */
-    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous)
+    protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint)
         throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
-        //Connector connector = endpoint.getConnector();
-
-//        if (!connector.isStarted() && manager.isStarted())
-//        {
-//            connector.start();
-//        }
-
         try
         {
             MuleSession session = new DefaultMuleSession(message,

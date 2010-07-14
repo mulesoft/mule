@@ -12,6 +12,7 @@ package org.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
@@ -31,6 +32,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
@@ -100,6 +102,8 @@ public class DefaultMuleContext implements MuleContext
     private ExpressionManager expressionManager;
 
     private ClassLoader executionClassLoader;
+    
+    protected LocalMuleClient localMuleClient;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -119,6 +123,7 @@ public class DefaultMuleContext implements MuleContext
 
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
+        localMuleClient = new DefaultLocalMuleClient(this);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -615,5 +620,10 @@ public class DefaultMuleContext implements MuleContext
                                          : new ServerShutdownSplashScreen();
         shutdownScreen.setHeader(this);
         return shutdownScreen;
+    }
+
+    public LocalMuleClient getClientInterface()
+    {
+        return localMuleClient;
     }
 }

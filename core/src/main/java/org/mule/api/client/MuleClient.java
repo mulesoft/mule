@@ -93,7 +93,7 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, int timeout)
+    MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
         throws MuleException;
 
     /**
@@ -109,7 +109,7 @@ public interface MuleClient
      *         components invoked explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    MuleMessage send(String url, MuleMessage message, int timeout) throws MuleException;
+    MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException;
 
     /**
      * Will receive an event from an endpointUri determined by the URL.

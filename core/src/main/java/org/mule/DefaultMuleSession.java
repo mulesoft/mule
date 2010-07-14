@@ -11,20 +11,11 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointNotFoundException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.security.SecurityContext;
-import org.mule.api.service.Service;
-import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.ReceiveException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.CaseInsensitiveHashMap;
@@ -176,176 +167,9 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         }
     }
 
-    public void dispatchEvent(MuleMessage message) throws MuleException
-    {
-        if (flowConstruct == null)
-        {
-            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
-        }
-        else if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException(
-                "MuleSession.dispatchEvent is only supported when flow constuct is a Service");
-        }
-        else
-        {
-            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
-            if (router == null)
-            {
-                throw new EndpointNotFoundException(CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
-            }
-            router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
-
-        }
-    }
-
-    public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
-    {
-        dispatchEvent(message, muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
-    }
-
-    public void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
-    {
-        if (endpoint == null)
-        {
-            logger.warn("Endpoint argument is null, using outbound router to determine endpoint.");
-            dispatchEvent(message);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("MuleSession has received asynchronous event on: " + endpoint);
-        }
-
-        MuleEvent event = createOutboundEvent(message, endpoint, null);
-
-        dispatchEvent(event);
-    }
-
-    public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
-    {
-        return sendEvent(message, muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
-    }
-
-    public MuleMessage sendEvent(MuleMessage message) throws MuleException
-    {
-        if (flowConstruct == null)
-        {
-            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
-        }
-        else if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException(
-                "MuleSession.sendEvent is only supported when flow constuct is a Service");
-        }
-        else
-        {
-            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
-            if (router == null)
-            {
-                throw new EndpointNotFoundException(
-                        CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
-            }
-            MuleEvent result = router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
-            if (result != null)
-            {
-                return result.getMessage();
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
-
-    public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
-    {
-        if (endpoint == null)
-        {
-            logger.warn("Endpoint argument is null, using outbound router to determine endpoint.");
-            return sendEvent(message);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("MuleSession has received synchronous event on endpoint: " + endpoint);
-        }
-
-        MuleEvent event = createOutboundEvent(message, endpoint, null);
-        return sendEvent(event);
-    }
-
-    public void dispatchEvent(MuleEvent event) throws MuleException
-    {
-        if (event.getEndpoint() instanceof OutboundEndpoint)
-        {
-            ((OutboundEndpoint) event.getEndpoint()).process(event);
-        }
-        else if (flowConstruct == null)
-        {
-            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                event.getEndpoint());
-
-        }
-        else if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException(
-                "MuleSession.dispatchEvent is only supported when flow constuct is a Service");
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("dispatching event to service: " + flowConstruct.getName() + ", event is: " + event);
-            }
-            ((Service) flowConstruct).dispatchEvent(event);
-        }
-    }
-
     public String getId()
     {
         return id;
-    }
-
-    public MuleMessage sendEvent(MuleEvent event) throws MuleException
-    {
-        int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
-        if (timeout >= 0)
-        {
-            event.setTimeout(timeout);
-        }
-
-        if (event.getEndpoint() instanceof OutboundEndpoint)
-        {
-            MuleEvent resultEvent = ((OutboundEndpoint) event.getEndpoint()).process(event);
-            if (resultEvent != null)
-            {
-                return resultEvent.getMessage();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        else if (flowConstruct == null)
-        {
-            throw new DispatchException(CoreMessages.noComponentForEndpoint(), event.getMessage(),
-                event.getEndpoint());
-        }
-        else if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException(
-                "MuleSession.sendEvent is only supported when flow constuct is a Service");
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("sending event to service: " + flowConstruct.getName() + " event is: " + event);
-            }
-            return ((Service) flowConstruct).sendEvent(event);
-
-        }
     }
 
     public boolean isValid()
@@ -356,60 +180,6 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public void setValid(boolean value)
     {
         valid = value;
-    }
-
-    public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
-    {
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
-        return requestEvent(endpoint, timeout);
-    }
-
-    public MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException
-    {
-        try
-        {
-            return endpoint.request(timeout);
-        }
-        catch (Exception e)
-        {
-            throw new ReceiveException(endpoint, timeout, e);
-        }
-    }
-
-    public MuleEvent createOutboundEvent(MuleMessage message,
-                                         OutboundEndpoint endpoint,
-                                         MuleEvent previousEvent) throws MuleException
-    {
-        if (endpoint == null)
-        {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message,
-                    endpoint);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Creating event with data: " + message.getPayload().getClass().getName()
-                    + ", for endpoint: " + endpoint);
-        }
-
-        try
-        {
-            MuleEvent event;
-            if (previousEvent != null)
-            {
-                event = new DefaultMuleEvent(message, endpoint, flowConstruct, previousEvent);
-            }
-            else
-            {
-                event = new DefaultMuleEvent(message, endpoint, this, null);
-            }
-            return event;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(
-                    CoreMessages.failedToCreate("MuleEvent"), message, endpoint, e);
-        }
     }
 
     /**

@@ -50,7 +50,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         MuleEvent event =
                 new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
                         (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session);
-        session.sendEvent(event);
+        service.sendEvent(event);
     }
 
     public static class DummyComponent implements Callable

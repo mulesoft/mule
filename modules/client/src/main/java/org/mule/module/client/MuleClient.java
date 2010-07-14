@@ -267,10 +267,11 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        MuleEvent event = getEvent(message, url, false);
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, false, null);
+        MuleEvent event = getEvent(message, endpoint);
         try
         {
-            event.getSession().dispatchEvent(event);
+            endpoint.process(event);
         }
         catch (MuleException e)
         {
@@ -635,17 +636,22 @@ public class MuleClient implements Disposable
      */
     public MuleMessage send(String url, MuleMessage message, int timeout) throws MuleException
     {
-        MuleEvent event = getEvent(message, url, true, Integer.valueOf(timeout));
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, true, timeout);
+        
+        MuleEvent event = getEvent(message, endpoint);
         event.setTimeout(timeout);
 
         try
         {
-            MuleMessage msg = event.getSession().sendEvent(event);
-            if (msg == null)
+            MuleEvent response = endpoint.process(event);
+            if (response != null)
             {
-                msg = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+                return response.getMessage();
             }
-            return msg;
+            else
+            {
+                return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            }
         }
         catch (MuleException e)
         {
@@ -727,24 +733,8 @@ public class MuleClient implements Disposable
         return message;
     }
 
-    /**
-     * Packages a mule event for the current request
-     * 
-     * @param message the event payload
-     * @param uri the destination endpointUri
-     * @param synchronous whether the event will be synchronously processed
-     * @return the MuleEvent
-     * @throws MuleException
-     */
-    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous) throws MuleException
+    protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
-        return getEvent(message, uri, synchronous, null);
-    }
-
-    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous, Integer responseTimeout)
-        throws MuleException
-    {
-        ImmutableEndpoint endpoint = getOutboundEndpoint(uri, synchronous, responseTimeout);
         if (!endpoint.getConnector().isStarted() && muleContext.isStarted())
         {
             endpoint.getConnector().start();
@@ -878,10 +868,12 @@ public class MuleClient implements Disposable
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        MuleEvent event = getEvent(message, url, true);
+        
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, true, null);
+        MuleEvent event = getEvent(message, endpoint);
         try
         {
-            event.getSession().sendEvent(event);
+            endpoint.process(event);
         }
         catch (MuleException e)
         {

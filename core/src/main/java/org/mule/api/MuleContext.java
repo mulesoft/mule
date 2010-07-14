@@ -9,6 +9,7 @@
  */
 package org.mule.api;
 
+import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
@@ -218,4 +219,6 @@ public interface MuleContext extends Lifecycle
     boolean isStopping();
 
     boolean isStarting();
+    
+    LocalMuleClient getClientInterface();
 }

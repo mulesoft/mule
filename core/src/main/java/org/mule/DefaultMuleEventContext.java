@@ -11,20 +11,29 @@
 package org.mule;
 
 import org.mule.api.FutureMessageResult;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
@@ -35,9 +44,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>DefaultMuleEventContext</code> is the context object for the current request.
- * Using the context, developers can send/dispatch/receive events programmatically as
- * well as manage transactions.
+ * <code>DefaultMuleEventContext</code> is the context object for the current
+ * request. Using the context, developers can send/dispatch/receive events
+ * programmatically as well as manage transactions.
  */
 public class DefaultMuleEventContext implements MuleEventContext
 {
@@ -48,11 +57,15 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     private final MuleEvent event;
     private final MuleSession session;
+    private final MuleContext muleContext;
+    private final LocalMuleClient clientInterface;
 
     public DefaultMuleEventContext(MuleEvent event)
     {
         this.event = event;
         this.session = event.getSession();
+        this.muleContext = event.getMuleContext();
+        this.clientInterface = muleContext.getClientInterface();
     }
 
     /**
@@ -203,8 +216,8 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
+     * synchronously to the next available Mule component in the pool or via the
+     * endpoint configured for the event
      * 
      * @param message the event message payload to send
      * @param endpoint The endpoint to disptch the event through.
@@ -214,14 +227,13 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
-        // If synchronous receive has not been explicitly set, default it to true
-        return session.sendEvent(message, endpoint);
+        return clientInterface.process(endpoint, message);
     }
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
+     * synchronously to the next available Mule component in the pool or via the
+     * endpoint configured for the event
      * 
      * @param message the message payload to send
      * @return the return Message from the call or null if there was no result
@@ -230,9 +242,21 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message) throws MuleException
     {
-        // If synchronous receive has not been explicitly set, default it to
-        // true
-        return session.sendEvent(message);
+        if (event.getEndpoint() instanceof OutboundEndpoint)
+        {
+            return clientInterface.process((OutboundEndpoint) event.getEndpoint(), message);
+        }
+        else if (session.getFlowConstruct() instanceof Service)
+        {
+            return ((Service) session.getFlowConstruct()).sendEvent(new DefaultMuleEvent(message,
+                event.getEndpoint(), session));
+        }
+        else
+        {
+            throw new MessagingException(
+                CoreMessages.createStaticMessage("Current event has 'inbound' endpoint and FlowConstuct is not a 'Service', MuleEventContext cannot  this message"),
+                message);
+        }
     }
 
     /**
@@ -248,12 +272,23 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        OutboundEndpoint endpoint =
-                getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
+        EndpointBuilder builder = null;
+        if (endpointUri.getEndpointName() != null)
+        {
+            builder = muleContext.getRegistry().lookupEndpointBuilder(endpointUri.getEndpointName());
+        }
+        if (builder == null)
+        {
+            builder = new EndpointURIEndpointBuilder(new URIBuilder(endpointUri));
+        }
 
-        // If synchronous receive has not been explicitly set, default it to
-        // true
-        return session.sendEvent(message, endpoint);
+        builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+
+        OutboundEndpoint endpoint = getMuleContext().getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(builder);
+
+        return clientInterface.process(endpoint, message);
     }
 
     /**
@@ -278,7 +313,8 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext());
+                MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(),
+                    event.getMuleContext());
                 muleMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(muleMessage);
             }
@@ -396,8 +432,8 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
+     * synchronously to the next available Mule component in the pool or via the
+     * endpoint configured for the event
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
@@ -409,8 +445,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        OutboundEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
-        return session.sendEvent(message, endpoint);
+        return clientInterface.send(endpointName, message);
     }
 
     /**
@@ -423,7 +458,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(Object message) throws MuleException
     {
-        session.dispatchEvent(new DefaultMuleMessage(message, event.getMessage(), event.getMuleContext()));
+        dispatchEvent(new DefaultMuleMessage(message, muleContext));
     }
 
     /**
@@ -436,7 +471,26 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message) throws MuleException
     {
-        session.dispatchEvent(message);
+        FlowConstruct flowConstruct = session.getFlowConstruct();
+        if (flowConstruct == null)
+        {
+            throw new IllegalStateException(CoreMessages.objectIsNull("flowConstruct").getMessage());
+        }
+        else if (!(flowConstruct instanceof Service))
+        {
+            throw new UnsupportedOperationException(
+                "EventContext.dispatchEvent is only supported when flow constuct is a Service");
+        }
+        else
+        {
+            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
+            if (router == null)
+            {
+                throw new EndpointNotFoundException(
+                    CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
+            }
+            router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+        }
     }
 
     /**
@@ -452,15 +506,28 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        OutboundEndpoint endpoint =
-                getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
-        session.dispatchEvent(message, endpoint);
-    }
+        EndpointBuilder builder = null;
+        if (endpointUri.getEndpointName() != null)
+        {
+            builder = muleContext.getRegistry().lookupEndpointBuilder(endpointUri.getEndpointName());
+        }
+        if (builder == null)
+        {
+            builder = new EndpointURIEndpointBuilder(new URIBuilder(endpointUri));
+        }
+
+        builder.setExchangePattern(MessageExchangePattern.ONE_WAY);
+
+        OutboundEndpoint endpoint = getMuleContext().getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(builder);
+
+        clientInterface.process(endpoint, message);    }
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
+     * asynchronously to the next available Mule component in the pool or via the
+     * endpoint configured for the event
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
@@ -471,13 +538,26 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        session.dispatchEvent(message, endpointName);
+        EndpointBuilder builder = muleContext.getRegistry().lookupEndpointBuilder(endpointName);
+
+        if (builder == null)
+        {
+            builder = new EndpointURIEndpointBuilder(new URIBuilder(endpointName, muleContext));
+        }
+
+        builder.setExchangePattern(MessageExchangePattern.ONE_WAY);
+
+        OutboundEndpoint endpoint = getMuleContext().getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(builder);
+
+        clientInterface.process(endpoint, message);
     }
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule component in the pool or via the endpoint
-     * configured for the event
+     * asynchronously to the next available Mule component in the pool or via the
+     * endpoint configured for the event
      * 
      * @param message the event message payload to send
      * @param endpoint The endpoint name to disptch the event through.
@@ -486,7 +566,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
-        session.dispatchEvent(message, endpoint);
+        clientInterface.process(endpoint, message);
     }
 
     /**
@@ -500,7 +580,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException
     {
-        return session.requestEvent(endpoint, timeout);
+        return clientInterface.request(endpoint, timeout);
     }
 
     /**
@@ -514,7 +594,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
-        return session.requestEvent(endpointName, timeout);
+        return clientInterface.request(endpointName, timeout);
     }
 
     /**
@@ -527,9 +607,9 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage requestEvent(EndpointURI endpointUri, long timeout) throws MuleException
     {
-        InboundEndpoint endpoint =
-                getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointUri);
-        return session.requestEvent(endpoint, timeout);
+        InboundEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            endpointUri);
+        return requestEvent(endpoint, timeout);
     }
 
     /**
@@ -580,8 +660,8 @@ public class DefaultMuleEventContext implements MuleEventContext
      * An outputstream the can optionally be used write response data to an incoming
      * message.
      * 
-     * @return an output stream if one has been made available by the message receiver
-     *         that received the message
+     * @return an output stream if one has been made available by the message
+     *         receiver that received the message
      */
     public OutputStream getOutputStream()
     {
