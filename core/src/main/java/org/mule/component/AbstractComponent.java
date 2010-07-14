@@ -14,7 +14,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidResult;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,13 +24,11 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.ServiceException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -80,7 +77,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         return interceptors;
     }
 
-    public void setInterceptors(List interceptors)
+    public void setInterceptors(List<Interceptor> interceptors)
     {
         this.interceptors = interceptors;
     }
@@ -90,8 +87,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         statistics = new ComponentStatistics();
     }
 
-    private MuleEvent invokeInternal(MuleEvent event)
-        throws DisposeException, DefaultMuleException, MuleException, ServiceException
+    private MuleEvent invokeInternal(MuleEvent event) throws MuleException
     {
         // Ensure we have event in ThreadLocal
         OptimizedRequestContext.unsafeSetEvent(event);
