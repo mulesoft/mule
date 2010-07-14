@@ -12,6 +12,7 @@ package org.mule.endpoint.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -144,6 +145,10 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         responseEvent = createTestResponseEvent(endpoint);
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        
+        // Required for UnauthorisedException creation
+        RequestContext.setEvent(requestEvent);
+        
         result = mpChain.process(requestEvent);
 
         assertMessageNotSent();
@@ -212,6 +217,10 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        
+        // Required for UnauthorisedException creation
+        RequestContext.setEvent(requestEvent);
+        
         result = mpChain.process(requestEvent);
 
         assertMessageNotSent();
