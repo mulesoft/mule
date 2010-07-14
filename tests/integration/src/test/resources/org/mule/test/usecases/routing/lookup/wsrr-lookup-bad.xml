@@ -12,7 +12,7 @@
   <ServiceRegistry>
     <ITService>
       <Endpoint>
-        <Address>http://localhost:8887/services/Offline?synchronous=true&amp;responseTransformers=validateResponse</Address>
+        <Address>http://localhost:8887/services/Offline?exchange-pattern=request-response&amp;responseTransformers=validateResponse</Address>
         <PortType>
           <name>Offline</name>
           <namespace>http://www.ibm.com</namespace>
@@ -26,7 +26,7 @@
     </ITService>
     <ITService>
       <Endpoint>
-        <Address>http://localhost:8890/services/WrongServiceName?synchronous=true&amp;responseTransformers=validateResponse</Address>
+        <Address>http://localhost:8890/services/WrongServiceName?exchange-pattern=request-response&amp;responseTransformers=validateResponse</Address>
         <PortType>
           <name>WrongServiceName</name>
       <namespace>http://www.ibm.com</namespace>
@@ -44,7 +44,7 @@
     </ITService>
     <ITService>
       <Endpoint>
-        <Address>http://localhost:8888/services/BadResponse?synchronous=true&amp;responseTransformers=validateResponse</Address>
+        <Address>http://localhost:8888/services/BadResponse?exchange-pattern=request-response&amp;responseTransformers=validateResponse</Address>
         <PortType>
           <name>BadResponse</name>
           <namespace>http://www.ibm.com</namespace>
