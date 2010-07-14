@@ -26,7 +26,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
@@ -49,6 +48,7 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.logging.Log;
@@ -354,7 +354,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                            connector.getMuleContext()), endpoint, new DefaultMuleSession((Service) flowConstruct,
+                            connector.getMuleContext()), endpoint, new DefaultMuleSession(flowConstruct,
                             connector.getMuleContext()));
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected));
@@ -378,7 +378,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
             RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
-                    new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext())));
+                    new DefaultMuleSession(flowConstruct, connector.getMuleContext())));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
         }
@@ -412,7 +412,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             requestUri.append(ep.getEndpointURI().getHost());
             requestUri.append(':').append(ep.getEndpointURI().getPort());
             
-            if (!"/".equals(path)) {
+            if (!"/".equals(path)) 
+            {
                 requestUri.append(path);
             }
         }
