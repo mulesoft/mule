@@ -66,7 +66,7 @@ public interface LocalMuleClient extends MuleClient
     MuleMessage request(InboundEndpoint endpoint, long timeout) throws MuleException;
 
     /**
-     * Will register the specified process as a listener for the inbound endpoint.
+     * Will register the specified processor as a listener for the inbound endpoint.
      * This may be implemented by subscription or polling depending on the transport
      * implementation
      * 
