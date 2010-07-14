@@ -24,21 +24,26 @@
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="vm://unreliable" connector-ref="default" exchange-pattern="request-response"/>
-                    <vm:outbound-endpoint path="error" connector-ref="queue" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="vm://unreliable" exchange-pattern="request-response"
+                        connector-ref="default"/>
+                    <vm:outbound-endpoint path="error" exchange-pattern="one-way"
+                        connector-ref="queue"/>
                 </exception-based-router>
             </outbound>
         </service>
 
         <service name="unreliable">
             <inbound>
-                <vm:inbound-endpoint address="vm://unreliable" connector-ref="default" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint address="vm://unreliable" exchange-pattern="one-way" 
+                    connector-ref="default"/>
                 <forwarding-router/>
             </inbound>
             <outbound>
                 <endpoint-selector-router evaluator="xpath" expression="/endpoint">
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue"/>
-                    <outbound-endpoint name="matchingEndpoint2" address="vm://match2" connector-ref="queue"/>
+                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" 
+                        exchange-pattern="one-way" connector-ref="queue"/>
+                    <outbound-endpoint name="matchingEndpoint2" address="vm://match2" 
+                        exchange-pattern="one-way" connector-ref="queue"/>
                 </endpoint-selector-router>
             </outbound>
         </service>
