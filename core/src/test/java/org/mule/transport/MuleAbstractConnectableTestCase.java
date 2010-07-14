@@ -17,7 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.TestAbstractConnectableTestCase.MethodInvocation.MethodPart;
+import org.mule.transport.MuleAbstractConnectableTestCase.MethodInvocation.MethodPart;
 
 import java.util.List;
 import java.util.Vector;
@@ -43,16 +43,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This test tests class {@link AbstractConnectable} but its name starts with "Test"
+ * This test tests class {@link AbstractConnectable} but its name starts with "Mule"
  * because there is an exclusion rule in parent pom for test classes that have their
  * names starting with "Abstract".
  */
-public class TestAbstractConnectableTestCase
+public class MuleAbstractConnectableTestCase
 {
     /**
      * The logger used for this class
      */
-    private static Log log = LogFactory.getLog(TestAbstractConnectableTestCase.class);
+    static Log log = LogFactory.getLog(MuleAbstractConnectableTestCase.class);
 
     @Test
     public void testStartRethrowsMuleExceptionCorrectly() throws Exception
@@ -103,6 +103,7 @@ public class TestAbstractConnectableTestCase
      * 
      * @throws Throwable
      */
+    @Ignore
     @Test
     public void testStartIsThreadSafe() throws Throwable
     {
@@ -111,7 +112,7 @@ public class TestAbstractConnectableTestCase
 
     /**
      * This inner class will do the work of
-     * {@link TestAbstractConnectableTestCase#testStartIsThreadSafe()
+     * {@link MuleAbstractConnectableTestCase#testStartIsThreadSafe()
      * testStartIsThreadSafe()}.
      */
     @Ignore
@@ -353,13 +354,13 @@ public class TestAbstractConnectableTestCase
             fail();
         }
     }
-
+    
     /**
      * @return an dummy implementation of {@link ImmutableEndpoint} suitable for this
      *         test.
      * @throws Exception
      */
-    private ImmutableEndpoint createDummyEndpoint() throws Exception
+    ImmutableEndpoint createDummyEndpoint() throws Exception
     {
         ImmutableEndpoint endpoint = mock(ImmutableEndpoint.class);
         MuleContext muleContext = mock(MuleContext.class);
