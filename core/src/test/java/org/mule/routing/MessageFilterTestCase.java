@@ -50,7 +50,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
         MuleEvent resultEvent = mp.process(inEvent);
 
         assertNull(listener.event);
-        assertEquals(inEvent, resultEvent);
+        assertNull(resultEvent);
     }
 
     protected MessageFilter getMessageFilter(Filter filter)

@@ -39,7 +39,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {
-        return event;
+        return null;
     }
 
 }
