@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jdbc</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
 

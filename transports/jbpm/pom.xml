@@ -8,7 +8,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jbpm</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>BPM Transport: JBoss jBPM</name>
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
 

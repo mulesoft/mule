@@ -7,7 +7,7 @@
     <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-hello</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Hello Example</name>
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
 

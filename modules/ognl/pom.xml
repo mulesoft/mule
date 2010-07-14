@@ -4,10 +4,10 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
- <version>3.0.0-RC1-SNAPSHOT</version>
+        <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-ognl</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>OGNL Filter</name>
     <description>Support for filtering events using OGNL notation.</description>
 

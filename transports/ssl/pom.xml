@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-ssl</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>SSL Transport</name>
     <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.</description>
 

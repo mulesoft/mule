@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-xml</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>XML Extensions</name>
     <description>Functionality for working with XML</description>
 

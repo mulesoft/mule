@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-module-builders</artifactId>
     <name>Mule Configuration Builders</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>Standard configuration builders for Mule</description>
 
     <dependencies>

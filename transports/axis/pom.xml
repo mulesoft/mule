@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-axis</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>SOAP Transport: Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 

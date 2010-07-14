@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-echo</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Echo Example</name>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 

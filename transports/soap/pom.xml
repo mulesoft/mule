@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-soap</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>SOAP Transport</name>
     <description>A Mule transport for SOAP connectivity. The transport will use Axis or CXF
         depending on which is on the classpath.</description>

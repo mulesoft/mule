@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-tomcat</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Mule Tomcat Integration</name>
     <description>Integrates Mule as a global Tomcat service, to be used with deployable configuration builder</description>
 

@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-http</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>HTTP Transport</name>
     <description>
         A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.

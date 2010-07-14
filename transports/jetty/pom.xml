@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-transport-jetty</artifactId>
     <name>Jetty Transport</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>
         A Mule transport for Jetty Http Connectivity or binding to other Servlet containers. This transport can be used
         to embed a Jetty server used to service inbound http endpoints.

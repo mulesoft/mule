@@ -9,7 +9,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jms</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>JMS Transport</name>
     <description>A Mule transport for Jms Connectivity.</description>
 

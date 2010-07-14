@@ -8,7 +8,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-xmpp</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>XMPP Transport</name>
     <description>A Mule transport that enables event sending and receiving over XMPP (Jabber).</description>
 
@@ -21,15 +21,11 @@
         <dependency>
             <groupId>jivesoftware</groupId>
             <artifactId>smack</artifactId>
-            <!--  TODO xmpp: osgify -->
-<!--            <version>${smackVersion}-osgi</version>-->
             <version>${smackVersion}</version>
         </dependency>
         <dependency>
             <groupId>jivesoftware</groupId>
             <artifactId>smackx</artifactId>
-            <!--  TODO xmpp: osgify -->
-<!--            <version>${smackVersion}-osgi</version>-->
             <version>${smackVersion}</version>
         </dependency>
 

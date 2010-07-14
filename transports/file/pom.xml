@@ -7,7 +7,7 @@
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-file</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>File Transport</name>
     <description>
         A Mule transport for File Connectivity. This transport allows files to be read and written to
