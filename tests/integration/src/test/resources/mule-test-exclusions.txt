@@ -94,3 +94,6 @@ org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
 
 #TODO
 org.mule.context.notification.ServerNotificationManagerTestCase
+
+# MULE-4958
+org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
