@@ -26,7 +26,6 @@ import org.mule.api.model.Model;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
 import org.mule.api.registry.ResolverException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
@@ -55,6 +54,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -199,6 +199,7 @@ public class MuleRegistryHelper implements MuleRegistry
      * method should only be used internally to discover transformers, typically a user does not need ot do this
      * directly
      */
+    @Deprecated
     public Transformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
         return lookupTransformer(new SimpleDataType(inputType), new SimpleDataType(outputType));
@@ -211,6 +212,7 @@ public class MuleRegistryHelper implements MuleRegistry
      * method should only be used internally to discover transformers, typically a user does not need ot do this
      * directly
      */
+    @Deprecated
     public List<Transformer> lookupTransformers(Class input, Class output)
     {
         return lookupTransformers(new SimpleDataType(input), new SimpleDataType(output));
@@ -425,9 +427,6 @@ public class MuleRegistryHelper implements MuleRegistry
         return sd;
     }
 
-    /**
-     * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
-     */
     protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
     {
         //Stripe off and use the meta-scheme if present
