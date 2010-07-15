@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.annotations.expressions;
+package org.mule.api.annotations.meta;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

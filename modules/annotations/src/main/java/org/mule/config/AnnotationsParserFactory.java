@@ -49,7 +49,7 @@ public interface AnnotationsParserFactory
 
     /**
      * Retrieves a parser for the given annotation, where the annotation is an Expression annotation; one annotated with
-     * the {@link org.mule.api.annotations.expressions.Evaluator} annotation.
+     * the {@link org.mule.api.annotations.meta.Evaluator} annotation.
      * <p/>
      *
      * @param annotation the annotation being processed

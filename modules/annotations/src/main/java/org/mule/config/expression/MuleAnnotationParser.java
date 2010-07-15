@@ -9,7 +9,7 @@
  */
 package org.mule.config.expression;
 
-import org.mule.api.annotations.expressions.Evaluator;
+import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.expressions.Mule;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;

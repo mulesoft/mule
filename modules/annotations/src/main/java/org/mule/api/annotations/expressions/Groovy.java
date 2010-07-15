@@ -9,6 +9,8 @@
  */
 package org.mule.api.annotations.expressions;
 
+import org.mule.api.annotations.meta.Evaluator;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
