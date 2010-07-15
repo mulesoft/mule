@@ -10,17 +10,10 @@
 
 package org.mule.api.routing;
 
-import org.mule.api.processor.MessageProcessor;
-
 /**
- * <code>OutboundRouterCollection</code> is responsible for holding all outbound routers for a service service.
+ * This marks a class whose instances can be used as the target of a Router
  */
 
-public interface OutboundRouterCollection extends RouterCollection, MessageProcessor
+public interface RoutingTarget
 {
-
-    /**
-     * Determines if any targets have been set on this router.
-     */
-    boolean hasEndpoints();
 }

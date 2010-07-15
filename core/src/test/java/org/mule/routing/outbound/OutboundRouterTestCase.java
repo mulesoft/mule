@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -24,9 +23,9 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
     {
         AbstractOutboundRouter router=new TransformerRouter();
         OutboundEndpoint endpoint=getTestOutboundEndpoint("test");
-        router.addEndpoint(endpoint);
-        assertNotNull(router.getEndpoints());
-        assertTrue(router.getEndpoints().contains(endpoint));
+        router.addTarget(endpoint);
+        assertNotNull(router.getTargets());
+        assertTrue(router.getTargets().contains(endpoint));
     }
 
 //    public void testAddBadEndpoint2()
@@ -47,13 +46,13 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         list.add(getTestOutboundEndpoint("test"));
         list.add(getTestOutboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
-        assertNotNull(router.getEndpoints());
-        assertEquals(0, router.getEndpoints().size());
-        router.addEndpoint(getTestOutboundEndpoint("test"));
-        assertEquals(1, router.getEndpoints().size());
-        router.setEndpoints(list);
-        assertNotNull(router.getEndpoints());
-        assertEquals(2, router.getEndpoints().size());
+        assertNotNull(router.getTargets());
+        assertEquals(0, router.getTargets().size());
+        router.addTarget(getTestOutboundEndpoint("test"));
+        assertEquals(1, router.getTargets().size());
+        router.setTargets(list);
+        assertNotNull(router.getTargets());
+        assertEquals(2, router.getTargets().size());
     }
 
     public void testSetBadEndpoints() throws Exception
@@ -63,7 +62,7 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         list.add(getTestOutboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
         try{
-            router.setEndpoints(list);
+            router.setTargets(list);
             fail("Invalid endpoint: Expecting an exception");
         }
         catch(Exception e){
@@ -78,7 +77,7 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         list.add(getTestInboundEndpoint("test"));
         AbstractOutboundRouter router=new TransformerRouter();
         try{
-            router.setEndpoints(list);
+            router.setTargets(list);
             fail("Invalid endpoint: Expecting an exception");
         }
         catch(Exception e){

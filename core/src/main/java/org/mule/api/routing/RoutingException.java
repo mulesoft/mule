@@ -29,43 +29,43 @@ public class RoutingException extends MessagingException
      */
     private static final long serialVersionUID = 2478458847072048645L;
 
-    protected final transient ImmutableEndpoint endpoint;
+    protected final transient RoutingTarget target;
 
-    public RoutingException(MuleMessage message, ImmutableEndpoint endpoint)
+    public RoutingException(MuleMessage message, RoutingTarget target)
     {
-        super(generateMessage(null, endpoint), message);
-        this.endpoint = endpoint;
+        super(generateMessage(null, target), message);
+        this.target = target;
     }
 
-    public RoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
+    public RoutingException(MuleMessage message, RoutingTarget target, Throwable cause)
     {
-        super(generateMessage(null, endpoint), message, cause);
-        this.endpoint = endpoint;
+        super(generateMessage(null, target), message, cause);
+        this.target = target;
     }
 
-    public RoutingException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
+    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
-        super(generateMessage(message, endpoint), muleMessage);
-        this.endpoint = endpoint;
+        super(generateMessage(message, target), muleMessage);
+        this.target = target;
     }
 
     public RoutingException(Message message,
                             MuleMessage muleMessage,
-                            ImmutableEndpoint endpoint,
+                            RoutingTarget target,
                             Throwable cause)
     {
-        super(generateMessage(message, endpoint), muleMessage, cause);
-        this.endpoint = endpoint;
+        super(generateMessage(message, target), muleMessage, cause);
+        this.target = target;
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public RoutingTarget getTarget()
     {
-        return endpoint;
+        return target;
     }
 
-    private static Message generateMessage(Message message, ImmutableEndpoint endpoint)
+    private static Message generateMessage(Message message, RoutingTarget target)
     {
-        Message m = CoreMessages.failedToRouterViaEndpoint(endpoint);
+        Message m = CoreMessages.failedToRouterViaEndpoint(target);
         if (message != null)
         {
             message.setNextMessage(m);

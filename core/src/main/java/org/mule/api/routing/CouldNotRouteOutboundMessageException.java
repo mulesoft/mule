@@ -26,26 +26,26 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
      */
     private static final long serialVersionUID = 4609966704030524482L;
 
-    public CouldNotRouteOutboundMessageException(MuleMessage message, ImmutableEndpoint endpoint)
+    public CouldNotRouteOutboundMessageException(MuleMessage message, RoutingTarget target)
     {
-        super(message, endpoint);
+        super(message, target);
     }
 
-    public CouldNotRouteOutboundMessageException(MuleMessage muleMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public CouldNotRouteOutboundMessageException(MuleMessage muleMessage, RoutingTarget target, Throwable cause)
     {
-        super(muleMessage, endpoint, cause);
+        super(muleMessage, target, cause);
     }
 
-    public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
+    public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
-        super(message, muleMessage, endpoint);
+        super(message, muleMessage, target);
     }
 
     public CouldNotRouteOutboundMessageException(Message message,
                                                  MuleMessage muleMessage,
-                                                 ImmutableEndpoint endpoint,
+                                                 RoutingTarget target,
                                                  Throwable cause)
     {
-        super(message, muleMessage, endpoint, cause);
+        super(message, muleMessage, target, cause);
     }
 }

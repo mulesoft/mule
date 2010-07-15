@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 /**
  * <code>ResponseRouter</code> is a router that handles response flow. Response
  * Aggregators are used to collect responses that are usually sent to replyTo
- * endpoints set on outbound routers. When an event is sent out via an outbound
+ * targets set on outbound routers. When an event is sent out via an outbound
  * router, the response router will block the response flow on an Service until
  * the Response Router resolves a reply or times out.
  */

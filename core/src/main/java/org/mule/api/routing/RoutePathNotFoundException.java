@@ -26,26 +26,26 @@ public class RoutePathNotFoundException extends RoutingException
      */
     private static final long serialVersionUID = -8481434966594513065L;
 
-    public RoutePathNotFoundException(MuleMessage message, ImmutableEndpoint endpoint)
+    public RoutePathNotFoundException(MuleMessage message, RoutingTarget target)
     {
-        super(message, endpoint);
+        super(message, target);
     }
 
-    public RoutePathNotFoundException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
+    public RoutePathNotFoundException(MuleMessage message, RoutingTarget target, Throwable cause)
     {
-        super(message, endpoint, cause);
+        super(message, target, cause);
     }
 
-    public RoutePathNotFoundException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
+    public RoutePathNotFoundException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
-        super(message, muleMessage, endpoint);
+        super(message, muleMessage, target);
     }
 
     public RoutePathNotFoundException(Message message,
                                       MuleMessage muleMessage,
-                                      ImmutableEndpoint endpoint,
+                                      RoutingTarget target,
                                       Throwable cause)
     {
-        super(message, muleMessage, endpoint, cause);
+        super(message, muleMessage, target, cause);
     }
 }

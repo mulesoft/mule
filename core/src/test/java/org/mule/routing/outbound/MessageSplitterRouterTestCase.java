@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -38,7 +39,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getFlowConstruct", getTestService());
         session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
-        //Async endpoints
+        //Async targets
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
@@ -46,7 +47,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
-        //Sync endpoints  org.python.core.__builtin__
+        //Sync targets  org.python.core.__builtin__
         OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
         OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
         OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
@@ -59,7 +60,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         AbstractMessageSplitter router = new AbstractMessageSplitter()
         {
             @Override
-            protected SplitMessage getMessageParts(MuleMessage message, List endpoints)
+            protected SplitMessage getMessageParts(MuleMessage message, List<MessageProcessor> endpoints)
             {
                 int i = 0;
                 SplitMessage splitMessage = new SplitMessage();
@@ -74,11 +75,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 
         router.setMuleContext(muleContext);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
 
         MuleMessage message = new DefaultMuleMessage("test,mule,message", muleContext);
 
@@ -91,12 +92,12 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         mockendpoint2.verify();
         mockendpoint3.verify();
 
-        endpoints = new ArrayList<OutboundEndpoint>();
+        endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint4.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint5.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint6.proxy());
-        router.getEndpoints().clear();
-        router.setEndpoints(endpoints);
+        router.getTargets().clear();
+        router.setTargets(endpoints);
 
         message = new DefaultMuleMessage("test,mule,message", muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null);

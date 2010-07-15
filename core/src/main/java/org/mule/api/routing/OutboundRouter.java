@@ -14,7 +14,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionConfig;
 
@@ -32,45 +31,45 @@ import java.util.List;
 public interface OutboundRouter extends Router, MessageProcessor
 {
     /**
-     * Sets a list of Endpoint instances associated with this router
+     * Sets a list of MessageProcessor instances associated with this router
      * 
-     * @param endpoints a list of Endpoint instances
+     * @param targets a list of MessageProcessor instances
      */
-    void setEndpoints(List<OutboundEndpoint> endpoints);
+    void setTargets(List<MessageProcessor> targets);
 
     /**
-     * Gets a list of Endpoint instances associated with this router
+     * Gets a list of MessageProcessor instances associated with this router
      * 
-     * @return a list of Endpoint instances
+     * @return a list of MessageProcessor instances
      */
-    List<OutboundEndpoint> getEndpoints();
+    List<MessageProcessor> getTargets();
 
     /**
-     * Adds an endpoint to this router
+     * Adds a target to this router
      * 
-     * @param endpoint the endpoint to add to the router
+     * @param target the target to add to the router
      */
-    void addEndpoint(OutboundEndpoint endpoint);
+    void addTarget(MessageProcessor target);
 
     /**
-     * Removes a specific endpoint from the router
+     * Removes a specific target from the router
      * 
-     * @param endpoint the endpoint to remove
-     * @return true if the endpoint was removed
+     * @param target the target to remove
+     * @return true if the target was removed
      */
-    boolean removeEndpoint(OutboundEndpoint endpoint);
+    boolean removeTarget(MessageProcessor target);
 
     /**
      * This method is responsible for routing the Message. The logic for this method
      * will change for each type of router depending on expected behaviour. For
      * example, a MulticastingRouter might just iterate through the list of
-     * assoaciated endpoints sending the message. Another type of router such as the
+     * assoaciated targets sending the message. Another type of router such as the
      * ExceptionBasedRouter will hit the first endpoint, if it fails try the second,
      * and so on. Most router implementations will extends the
      * FilteringOutboundRouter which implements all the common logic need for a
      * router.
      * 
-     * @param event the event to send via one or more endpoints on this router
+     * @param event the event to send via one or more targets on this router
      * @throws MessagingException if any errors occur during the sending of messages
      * @see org.mule.routing.outbound.FilteringOutboundRouter
      * @see org.mule.routing.outbound.ExceptionBasedRouter
@@ -117,17 +116,17 @@ public interface OutboundRouter extends Router, MessageProcessor
     void setReplyTo(String replyTo);
 
     /**
-     * Determines whether this router supports dynamic endpoint. i.e. endpoints that
+     * Determines whether this router supports dynamic endpoint. i.e. targets that
      * are not configured at design time. Endpoints might be pulled from the message
      * or payload.
      */
-    boolean isDynamicEndpoints();
+    boolean isDynamicTargets();
 
     /**
-     * @param name the Endpoint identifier
-     * @return the Endpoint or null if the endpointUri is not registered
+     * @param name the target identifier
+     * @return the target or null if the target is not registered
      */
-    OutboundEndpoint getEndpoint(String name);
+    MessageProcessor getTarget(String name);
     
     /**
      * Determines is this router requires a new message copy.

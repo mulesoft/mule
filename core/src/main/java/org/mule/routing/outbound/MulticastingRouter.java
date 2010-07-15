@@ -17,6 +17,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -36,8 +37,8 @@ public class MulticastingRouter extends FilteringOutboundRouter
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
-        if (endpoints == null || endpoints.size() == 0)
+
+        if (targets == null || targets.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
@@ -51,18 +52,18 @@ public class MulticastingRouter extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(endpoints.size());
+                message.setCorrelationGroupSize(targets.size());
             }
         }
 
-        List<MuleEvent> results = new ArrayList<MuleEvent>(endpoints.size());
+        List<MuleEvent> results = new ArrayList<MuleEvent>(targets.size());
         try
         {
-            OutboundEndpoint endpoint;
-            for (int i = 0; i < endpoints.size(); i++)
+            for (int i = 0; i < targets.size(); i++)
             {
-                endpoint = endpoints.get(i);
-                if(endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
+                MessageProcessor mp = targets.get(i);
+                OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
+                if(endpoint == null || endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
                 {
                     if (((DefaultMuleMessage) message).isConsumable())
                     {
@@ -73,20 +74,17 @@ public class MulticastingRouter extends FilteringOutboundRouter
                     
                     MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), 
                         message, muleContext);
-                    if (endpoint.isSynchronous())
+                    MuleEvent result = sendRequest(event, clonedMessage, mp, true);
+                    if (result != null)
                     {
-                        results.add(sendRequest(session, clonedMessage, endpoint, true));
-                    }
-                    else
-                    {
-                        sendRequest(session, clonedMessage, endpoint, false);
+                        results.add(result);
                     }
                 }
             }
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, targets.get(0), e);
         }
         return resultsHandler.aggregateResults(results, event, muleContext);
     }

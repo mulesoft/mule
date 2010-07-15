@@ -15,10 +15,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
@@ -53,7 +54,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
-    protected List<OutboundEndpoint> endpoints = new CopyOnWriteArrayList();
+    protected List<MessageProcessor> targets = new CopyOnWriteArrayList();
 
     protected String replyTo = null;
 
@@ -75,7 +76,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     
     protected abstract MuleEvent route(MuleEvent event) throws MessagingException;
 
-    protected final MuleEvent sendRequest(final MuleSession session, final MuleMessage message, final OutboundEndpoint endpoint, boolean awaitResponse)
+    protected final MuleEvent sendRequest(final MuleEvent routedEvent, final MuleMessage message, final MessageProcessor target,
+                                          boolean awaitResponse)
             throws MuleException
     {
         if (awaitResponse && replyTo != null)
@@ -84,12 +86,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             awaitResponse = false;
         }
 
-        setMessageProperties(session.getFlowConstruct(), message, endpoint);
+        setMessageProperties(routedEvent.getSession().getFlowConstruct(), message, target);
 
         if (logger.isDebugEnabled())
         {
-           logger.debug("Message being sent to: " + endpoint.getEndpointURI());
-           logger.debug(message);
+            if (target instanceof OutboundEndpoint)
+            {
+                logger.debug("Message being sent to: " + ((OutboundEndpoint)target).getEndpointURI());
+            }
+            logger.debug(message);
         }
 
         if (logger.isTraceEnabled())
@@ -97,20 +102,26 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             try
             {
                 logger.trace("Request payload: \n"
-                    + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
-                    + "\n outbound transformer is: " + endpoint.getTransformers());
+                    + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false));
+                if (target instanceof OutboundEndpoint)
+                {
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint)target).getTransformers());
+                }
             }
             catch (Exception e)
             {
-                logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage()
-                    + "\n outbound transformer is: " + endpoint.getTransformers());
+                logger.trace("Request payload: \n(unable to retrieve payload: " + e.getMessage());
+                if (target instanceof OutboundEndpoint)
+                {
+                    logger.trace("outbound transformer is: " + ((OutboundEndpoint)target).getTransformers());
+                }
             }
         }
 
         MuleEvent result;
         try
         {
-            result = sendRequestEvent(session, message, endpoint, awaitResponse);
+            result = sendRequestEvent(routedEvent, message, target, awaitResponse);
         }
         catch (MessagingException me)
         {
@@ -125,7 +136,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             if (getRouterStatistics().isEnabled())
             {
-                getRouterStatistics().incrementRoutedMessage(endpoint);
+                getRouterStatistics().incrementRoutedMessage(target);
             }
         }
 
@@ -152,7 +163,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         return result;
     }
 
-    protected void setMessageProperties(FlowConstruct service, MuleMessage message, OutboundEndpoint endpoint)
+    protected void setMessageProperties(FlowConstruct service, MuleMessage message, MessageProcessor endpoint)
     {
         if (replyTo != null)
         {
@@ -160,10 +171,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             // well
             message.setReplyTo(replyTo);
             message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName(), PropertyScope.OUTBOUND);
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled() && endpoint instanceof OutboundEndpoint)
             {
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: "
-                        + endpoint.getEndpointURI());
+                        + ((OutboundEndpoint)endpoint).getEndpointURI());
             }
         }
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
@@ -204,8 +215,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             if (logger.isDebugEnabled())
             {
                 StringBuffer buf = new StringBuffer();
-                buf.append("Setting Correlation info on Outbound router for endpoint: ").append(
-                        endpoint.getEndpointURI());
+                buf.append("Setting Correlation info on Outbound router");
+                if (endpoint instanceof OutboundEndpoint)
+                {
+                    buf.append(" for endpoint: ").append(
+                        ((OutboundEndpoint)endpoint).getEndpointURI());
+                }
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
@@ -217,28 +232,36 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public List<OutboundEndpoint> getEndpoints()
+    public List<MessageProcessor> getTargets()
     {
-        return endpoints;
+        return targets;
     }
 
-    public void setEndpoints(List<OutboundEndpoint> endpoints)
+    /*
+     * For spring access
+     */
+    public void setEndpoints(List<MessageProcessor> endpoints)
     {
-        this.endpoints.clear();
-        for (OutboundEndpoint endpoint : endpoints)
+        setTargets(endpoints);
+    }
+
+    public void setTargets(List<MessageProcessor> endpoints)
+    {
+        this.targets.clear();
+        for (MessageProcessor target : endpoints)
         {
-            addEndpoint(endpoint);
+            addTarget(target);
         }
     }
 
-    public void addEndpoint(OutboundEndpoint endpoint)
+    public void addTarget(MessageProcessor endpoint)
     {
-        endpoints.add(endpoint);
+        targets.add(endpoint);
     }
 
-    public boolean removeEndpoint(OutboundEndpoint endpoint)
+    public boolean removeTarget(MessageProcessor endpoint)
     {
-        return endpoints.remove(endpoint);
+        return targets.remove(endpoint);
     }
 
     public String getReplyTo()
@@ -305,7 +328,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         this.transactionConfig = transactionConfig;
     }
 
-    public boolean isDynamicEndpoints()
+    public boolean isDynamicTargets()
     {
         return false;
     }
@@ -315,13 +338,17 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.api.routing.InboundRouterCollection
      */
-    public OutboundEndpoint getEndpoint(String name)
+    public MessageProcessor getTarget(String name)
     {
-        for (OutboundEndpoint endpoint : endpoints)
+        for (MessageProcessor target  : targets)
         {
-            if (endpoint.getName().equals(name))
+            if (target instanceof OutboundEndpoint)
             {
-                return endpoint;
+                OutboundEndpoint endpoint = (OutboundEndpoint) target;
+                if (endpoint.getName().equals(name))
+                {
+                    return endpoint;
+                }
             }
         }
         return null;
@@ -345,15 +372,17 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     /**
      *  Send message event to destination.
      */
-    protected MuleEvent sendRequestEvent(MuleSession session, MuleMessage message, OutboundEndpoint endpoint, boolean awaitResponse)
+    protected MuleEvent sendRequestEvent(
+        MuleEvent routedEvent, MuleMessage message, MessageProcessor target, boolean awaitResponse)
             throws MuleException
     {
-        if (endpoint == null)
+        if (target == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message, endpoint);
+            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message, null);
         }
 
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
+        ImmutableEndpoint endpoint = (target instanceof ImmutableEndpoint) ? (ImmutableEndpoint)target : routedEvent.getEndpoint();
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession());
 
         if (awaitResponse)
         {
@@ -364,7 +393,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
 
-        return endpoint.process(event);
+        return target.process(event);
     }
 
 }

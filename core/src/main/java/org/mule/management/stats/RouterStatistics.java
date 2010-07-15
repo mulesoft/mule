@@ -95,7 +95,7 @@ public class RouterStatistics implements Statistics
     }
 
     /**
-     * Increment routed message for multiple endpoints
+     * Increment routed message for multiple targets
      *
      * @param endpoints The endpoint collection
      */
@@ -110,7 +110,7 @@ public class RouterStatistics implements Statistics
         {
             for (int i = 0; i < list.size(); i++)
             {
-                incrementRoutedMessage((ImmutableEndpoint) list.get(i));
+                incrementRoutedMessage(list.get(i));
             }
         }
     }
@@ -120,14 +120,22 @@ public class RouterStatistics implements Statistics
      *
      * @param endpoint The endpoint
      */
-    public synchronized void incrementRoutedMessage(ImmutableEndpoint endpoint)
+    public synchronized void incrementRoutedMessage(Object endpoint)
     {
         if (endpoint == null)
         {
             return;
         }
 
-        String name = endpoint.getName();
+        String name;
+        if (endpoint instanceof ImmutableEndpoint)
+        {
+            name = ((ImmutableEndpoint)endpoint).getName();
+        }
+        else
+        {
+            name = endpoint.toString();
+        }
 
         Long cpt = (Long) routed.get(name);
         long count = 0;

@@ -48,9 +48,9 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         ListMessageSplitter router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
-        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
-        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
-        router.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint1.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint3.proxy());
 
         List payload = new ArrayList();
         payload.add(new Apple());
@@ -77,9 +77,9 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
         router = createObject(ListMessageSplitter.class);
         router.setFilter(new PayloadTypeFilter(List.class));
-        router.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
-        router.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
-        router.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint1.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        router.addTarget((OutboundEndpoint) mockendpoint3.proxy());
 
 
         message = new DefaultMuleMessage(payload, muleContext);

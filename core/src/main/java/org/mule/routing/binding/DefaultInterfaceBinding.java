@@ -19,6 +19,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.config.i18n.CoreMessages;
@@ -105,7 +106,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         if (e instanceof OutboundEndpoint)
         {
             outboundRouter = new OutboundPassThroughRouter();
-            outboundRouter.addEndpoint((OutboundEndpoint) e);
+            outboundRouter.addTarget((OutboundEndpoint) e);
             outboundRouter.setTransactionConfig(e.getTransactionConfig());
         }
         else
@@ -134,7 +135,8 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
     {
         if (outboundRouter != null)
         {
-            return outboundRouter.getEndpoints().get(0);
+            MessageProcessor target = outboundRouter.getTargets().get(0);
+            return target instanceof ImmutableEndpoint ? (ImmutableEndpoint) target : null;
         }
         else
         {

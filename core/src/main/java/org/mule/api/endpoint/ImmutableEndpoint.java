@@ -14,6 +14,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -29,7 +30,7 @@ import java.util.Map;
  * sent or received. An Enpoint is an Resource address (EndpointUri), with associated
  * transformation, transaction and filtering rules.
  */
-public interface ImmutableEndpoint extends Serializable
+public interface ImmutableEndpoint extends Serializable, RoutingTarget
 {
 
     String INITIAL_STATE_STARTED = "started";

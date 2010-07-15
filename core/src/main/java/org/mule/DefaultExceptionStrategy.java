@@ -12,6 +12,7 @@ package org.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
 import org.mule.util.ObjectUtils;
@@ -30,10 +31,10 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
         routeException(messageFromContextIfAvailable(message), null, t);
     }
 
-    public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable t)
+    public void handleRoutingException(MuleMessage message, RoutingTarget target, Throwable t)
     {
         defaultHandler(t);
-        routeException(messageFromContextIfAvailable(message), endpoint, t);
+        routeException(messageFromContextIfAvailable(message), target, t);
     }
 
     public void handleLifecycleException(Object component, Throwable t)

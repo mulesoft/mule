@@ -15,7 +15,6 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -30,9 +29,9 @@ import java.util.List;
 
 /**
  * <code>ExceptionBasedRouter</code> Will send the current event to the first
- * endpoint that doesn't throw an exception. If all attempted endpoints fail then an
+ * endpoint that doesn't throw an exception. If all attempted targets fail then an
  * exception is thrown. <p/> The router will override the sync/async mode of the
- * endpoint and force the sync mode for all endpoints except the last one.
+ * endpoint and force the sync mode for all targets except the last one.
  */
 public class ExceptionBasedRouter extends ExpressionRecipientList
 {
@@ -40,7 +39,6 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
         List recipients = null;
         try
@@ -54,11 +52,11 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
 
         if (recipients == null)
         {
-            int endpointsCount = endpoints.size();
+            int endpointsCount = targets.size();
             recipients = new ArrayList(endpointsCount);
             for (int i = 0; i < endpointsCount; i++)
             {
-                recipients.add(getEndpoint(i, message));
+                recipients.add(getTarget(i, message));
             }
         }        
         
@@ -95,7 +93,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             if (!lastEndpoint)
             {
                 logger.info("Sync mode will be forced for " + endpoint.getEndpointURI()
-                            + ", as there are more endpoints available.");
+                            + ", as there are more targets available.");
             }
 
             if (!lastEndpoint || endpoint.isSynchronous())
@@ -103,7 +101,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
                 try
                 {
                     MuleMessage resultMessage = null;
-                    result = sendRequest(session, request, endpoint, true);
+                    result = sendRequest(event, request, endpoint, true);
                     if (result != null)
                     {
                         resultMessage = result.getMessage();
@@ -136,7 +134,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             {
                 try
                 {
-                    sendRequest(session, request, endpoint, false);
+                    sendRequest(event, request, endpoint, false);
                     success = true;
                     break;
                 }

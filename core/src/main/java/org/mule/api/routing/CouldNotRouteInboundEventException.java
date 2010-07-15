@@ -26,26 +26,26 @@ public class CouldNotRouteInboundEventException extends RoutingException
      */
     private static final long serialVersionUID = 2736231899561051615L;
 
-    public CouldNotRouteInboundEventException(MuleMessage message, ImmutableEndpoint endpoint)
+    public CouldNotRouteInboundEventException(MuleMessage message, RoutingTarget target)
     {
-        super(message, endpoint);
+        super(message, target);
     }
 
-    public CouldNotRouteInboundEventException(MuleMessage muleMessage, ImmutableEndpoint endpoint, Throwable cause)
+    public CouldNotRouteInboundEventException(MuleMessage muleMessage, RoutingTarget target, Throwable cause)
     {
-        super(muleMessage, endpoint, cause);
+        super(muleMessage, target, cause);
     }
 
-    public CouldNotRouteInboundEventException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
+    public CouldNotRouteInboundEventException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
-        super(message, muleMessage, endpoint);
+        super(message, muleMessage, target);
     }
 
     public CouldNotRouteInboundEventException(Message message,
                                               MuleMessage muleMessage,
-                                              ImmutableEndpoint endpoint,
+                                              RoutingTarget target,
                                               Throwable cause)
     {
-        super(message, muleMessage, endpoint, cause);
+        super(message, muleMessage, target, cause);
     }
 }

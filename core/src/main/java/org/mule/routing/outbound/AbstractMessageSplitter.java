@@ -13,7 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
@@ -27,21 +28,20 @@ import java.util.Map;
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to split
  * the contents of a received message into sub parts that can be processed by other
  * components. Each Part is fired as a separate event to each endpoint on the router. The
- * endpoints can have filters on them to receive only certain message parts.
+ * targets can have filters on them to receive only certain message parts.
  */
-public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
+public abstract class AbstractMessageSplitter extends FilteringOutboundRouter implements RoutingMessageProcessor
 {
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
         String correlationId = messageInfoMapping.getCorrelationId(message);
 
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
-        SplitMessage splitMessage = getMessageParts(message, getEndpoints());
+        SplitMessage splitMessage = getMessageParts(message, getTargets());
 
         // Cache the properties here because for some message types getting the
         // properties can be expensive
@@ -49,7 +49,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String propertyKey = (String) iterator.next();
-            props.put(propertyKey, message.getProperty(propertyKey));
+            Object value = message.getProperty(propertyKey);
+            if (value != null)
+                props.put(propertyKey, value);
         }
 
         for (int i = 0; i < splitMessage.size(); i++)
@@ -87,11 +89,11 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
                 if (synchronous)
                 {
-                    results.add(sendRequest(session, sendMessage, part.getEndpoint(), true));
+                    results.add(sendRequest(event, sendMessage, part.getEndpoint(), true));
                 }
                 else
                 {
-                    sendRequest(session, sendMessage, part.getEndpoint(), false);
+                    sendRequest(event, sendMessage, part.getEndpoint(), false);
                 }
             }
             catch (MuleException e)
@@ -110,7 +112,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
      * Note that No state should be stored on the router itself. The {@link SplitMessage} provides the parts and
      * endpoint mapping info in order for the correct dispatching to occur.
      * <p/>
-     * If users do not want to associate a message part with an endpoint, but just dispatch parts over the endpoints in
+     * If users do not want to associate a message part with an endpoint, but just dispatch parts over the targets in
      * a round-robin way, they should use the {@link org.mule.routing.outbound.AbstractRoundRobinMessageSplitter} instead.
      *
      * @param message   the current message being processed
@@ -120,5 +122,21 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
      * @see org.mule.routing.outbound.SplitMessage
      * @see org.mule.routing.outbound.AbstractRoundRobinMessageSplitter
      */
-    protected abstract SplitMessage getMessageParts(MuleMessage message, List /* <OutboundEndpoint> */ endpoints);
+    protected abstract SplitMessage getMessageParts(MuleMessage message, List <MessageProcessor> endpoints);
+
+    /**
+     * Add a new destination router
+     */
+    public void addRoute(MessageProcessor processor)
+    {
+        addTarget(processor);
+    }
+
+    /**
+     * Remove a new destination router
+     */
+    public void removeRoute(MessageProcessor processor)
+    {
+        removeTarget(processor);
+    }
 }

@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -326,9 +327,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public List<OutboundEndpoint> getEndpoints()
+        public List<MessageProcessor> getTargets()
         {
-            List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
+            List<MessageProcessor> list = new ArrayList<MessageProcessor>();
             try
             {
                 list.add(getTestOutboundEndpoint("out", "test://out"));
@@ -367,9 +368,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public List<OutboundEndpoint> getEndpoints()
+        public List<MessageProcessor> getTargets()
         {
-            List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
+            List<MessageProcessor> list = new ArrayList<MessageProcessor>();
             try
             {
                 list.add(getTestOutboundEndpoint("out", "test://out"));

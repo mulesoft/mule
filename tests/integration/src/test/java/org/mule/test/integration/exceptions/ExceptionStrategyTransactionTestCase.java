@@ -12,6 +12,7 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.api.transaction.TransactionException;
 import org.mule.module.client.MuleClient;
 import org.mule.service.DefaultServiceExceptionStrategy;
@@ -66,7 +67,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
         private int visits = 0;
 
         @Override
-        protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
+        protected void routeException(MuleMessage message, RoutingTarget target, Throwable t)
         {
             if (visits++ > 1)
             {
@@ -86,7 +87,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
                 failure = e.getMessage();
                 fail(e.getMessage());
             }
-            super.routeException(message, failedEndpoint, t);
+            super.routeException(message, target, t);
 
         }
     }

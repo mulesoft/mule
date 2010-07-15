@@ -11,7 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 
@@ -30,27 +30,27 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public void addEndpoint(OutboundEndpoint endpoint)
+    public void addTarget(MessageProcessor target)
     {
-        if (endpoint == null)
+        if (target == null)
         {
             return;
         }
-        if (endpoints.size() == 1)
+        if (targets.size() == 1)
         {
-            throw new IllegalArgumentException("Only one endpoint can be set on the PassThrough router");
+            throw new IllegalArgumentException("Only one target can be set on the PassThrough router");
         }
-        super.addEndpoint(endpoint);
+        super.addTarget(target);
     }
 
     @Override
-    public void setEndpoints(List<OutboundEndpoint> endpoints)
+    public void setTargets(List<MessageProcessor> endpoints)
     {
         if (endpoints.size() > 1)
         {
             throw new IllegalArgumentException("Only one endpoint can be set on the PassThrough router");
         }
-        super.setEndpoints(endpoints);
+        super.setTargets(endpoints);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
-        if (endpoints == null || endpoints.size() == 0)
+        if (targets == null || targets.size() == 0)
         {
             return event;
         }

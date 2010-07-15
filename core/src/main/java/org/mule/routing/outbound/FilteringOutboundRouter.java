@@ -13,12 +13,13 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -66,26 +67,18 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         MuleEvent result = null;
 
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
-        if (endpoints == null || endpoints.size() == 0)
+        if (targets == null || targets.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), 
                 message, null);
         }
 
-        OutboundEndpoint ep = getEndpoint(0, message);
+        MessageProcessor ep = getTarget(0, message);
 
         try
         {
-            if (ep.isSynchronous())
-            {
-                result = sendRequest(session, message, ep, true);
-            }
-            else
-            {
-                sendRequest(session, message, ep, false);
-            }
+                result = sendRequest(event, message, ep, true);
         }
         catch (MuleException e)
         {
@@ -118,7 +111,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         catch (TransformerException e)
         {
             throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
-                endpoints.get(0), e);
+                targets.get(0), e);
         }
         
         return getFilter().accept(message);
@@ -135,17 +128,24 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     }
 
     @Override
-    public void addEndpoint(OutboundEndpoint endpoint)
+    public void addTarget(MessageProcessor target)
     {
-        if (!useTemplates && parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
+        if (!useTemplates)
         {
-            useTemplates = true;
+            if (target instanceof ImmutableEndpoint)
+            {
+                ImmutableEndpoint endpoint = (ImmutableEndpoint) target;
+                if (parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
+                {
+                    useTemplates = true;
+                }
+            }
         }
-        super.addEndpoint(endpoint);
+        super.addTarget(target);
     }
 
     /**
-     * Will Return the endpont at the given index and will resolve any template tags
+     * Will Return the target at the given index and will resolve any template tags
      * on the Endpoint URI if necessary
      * 
      * @param index the index of the endpoint to get
@@ -155,16 +155,21 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
      * @throws CouldNotRouteOutboundMessageException if the template causs the
      *             endpoint to become illegal or malformed
      */
-    public OutboundEndpoint getEndpoint(int index, MuleMessage message)
+    public MessageProcessor getTarget(int index, MuleMessage message)
         throws CouldNotRouteOutboundMessageException
     {
         if (!useTemplates)
         {
-            return endpoints.get(index);
+            return targets.get(index);
         }
         else
         {
-            OutboundEndpoint ep = endpoints.get(index);
+            MessageProcessor mp = targets.get(index);
+            if (!(mp instanceof ImmutableEndpoint))
+            {
+                return targets.get(index);
+            }
+            OutboundEndpoint ep = (OutboundEndpoint) mp;
             String uri = ep.getEndpointURI().getUri().toString();
 
             if (logger.isDebugEnabled())

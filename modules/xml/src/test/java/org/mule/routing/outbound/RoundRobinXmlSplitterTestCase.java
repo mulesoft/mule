@@ -50,7 +50,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        // setup async endpoints
+        // setup async targets
         endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
         endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
         endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
@@ -58,7 +58,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
-        // setup sync endpoints
+        // setup sync targets
         endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
         endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
         endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
@@ -79,9 +79,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         namespaces.put("e", "http://www.example.com");
         asyncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
         asyncXmlSplitter.setNamespaces(namespaces);
-        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint1.proxy());
-        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint2.proxy());
-        asyncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint3.proxy());
+        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint1.proxy());
+        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint3.proxy());
 
         // setup sync splitter
         syncXmlSplitter = new XmlMessageSplitter();
@@ -91,9 +91,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
 
         syncXmlSplitter.setNamespaces(namespaces);
-        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint4.proxy());
-        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint5.proxy());
-        syncXmlSplitter.addEndpoint((OutboundEndpoint) mockendpoint6.proxy());
+        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint4.proxy());
+        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint5.proxy());
+        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint6.proxy());
     }
 
     public void testStringPayloadXmlMessageSplitter() throws Exception

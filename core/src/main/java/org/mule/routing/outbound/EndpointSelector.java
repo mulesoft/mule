@@ -15,9 +15,11 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointNotFoundException;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
@@ -32,7 +34,7 @@ import java.util.List;
  * <code>EndpointSelector</code> selects the outgoing endpoint based on a
  * an expression evaluator  ("header:endpoint" by default).  It will first try to match the
  * endpoint by name and then by address.
- * The endpoints to use can be set on the router itself or be global endpoint definitions.
+ * The targets to use can be set on the router itself or be global endpoint definitions.
  * <pre>
  * <p/>
  * &lt;outbound&gt;
@@ -58,7 +60,6 @@ public class EndpointSelector extends FilteringOutboundRouter
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
         List<Object> endpoints;
         String endpointName;
@@ -117,22 +118,19 @@ public class EndpointSelector extends FilteringOutboundRouter
                 throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression(expressionManager)), message, null);
             }
-            OutboundEndpoint ep = null;
+            MessageProcessor ep = null;
             try
             {
                 ep = lookupEndpoint(endpointName);
                 if (ep == null)
                 {
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.objectNotFound("Endpoint",
-                            endpointName), message, ep);
+                            endpointName), message, null);
                 }
-                if (ep.isSynchronous())
+                MuleEvent result = sendRequest(event, message, ep, true);
+                if (result != null)
                 {
-                    results.add(sendRequest(session, message, ep, true));
-                }
-                else
-                {
-                    sendRequest(session, message, ep, false);
+                    results.add(result);
                 }
             }
             catch (MuleException e)
@@ -143,26 +141,27 @@ public class EndpointSelector extends FilteringOutboundRouter
         return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
-    protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException
+    protected MessageProcessor lookupEndpoint(String endpointName) throws MuleException
     {
-        Iterator<OutboundEndpoint> iterator = endpoints.iterator();
-        while (iterator.hasNext())
+        for (MessageProcessor target : targets)
         {
-            OutboundEndpoint ep = iterator.next();
-            
-            // Endpoint identifier (deprecated)
-            if (endpointName.equals(ep.getName()))
+            if (target instanceof ImmutableEndpoint)
             {
-                return ep;
-            }
-            // Global endpoint
-            else if (endpointName.equals(ep.getName()))
-            {
-                return ep;
-            }
-            else if (endpointName.equals(ep.getEndpointURI().getUri().toString()))
-            {
-                return ep;
+                ImmutableEndpoint ep = (ImmutableEndpoint) target;
+                // Endpoint identifier (deprecated)
+                if (endpointName.equals(ep.getName()))
+                {
+                    return target;
+                }
+                // Global endpoint
+                else if (endpointName.equals(ep.getName()))
+                {
+                    return target;
+                }
+                else if (endpointName.equals(ep.getEndpointURI().getUri().toString()))
+                    {
+                        return target;
+                    }
             }
         }
         try

@@ -13,6 +13,7 @@ package org.mule.api.transport;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.config.i18n.Message;
 
 /**
@@ -27,26 +28,26 @@ public class DispatchException extends RoutingException
      */
     private static final long serialVersionUID = -8204621943732496605L;
 
-    public DispatchException(MuleMessage message, ImmutableEndpoint endpoint)
+    public DispatchException(MuleMessage message, RoutingTarget target)
     {
-        super(message, endpoint);
+        super(message, target);
     }
 
-    public DispatchException(MuleMessage message, ImmutableEndpoint endpoint, Throwable cause)
+    public DispatchException(MuleMessage message, RoutingTarget target, Throwable cause)
     {
-        super(message, endpoint, cause);
+        super(message, target, cause);
     }
 
-    public DispatchException(Message message, MuleMessage muleMessage, ImmutableEndpoint endpoint)
+    public DispatchException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
-        super(message, muleMessage, endpoint);
+        super(message, muleMessage, target);
     }
 
     public DispatchException(Message message,
                              MuleMessage muleMessage,
-                             ImmutableEndpoint endpoint,
+                             RoutingTarget target,
                              Throwable cause)
     {
-        super(message, muleMessage, endpoint, cause);
+        super(message, muleMessage, target, cause);
     }
 }

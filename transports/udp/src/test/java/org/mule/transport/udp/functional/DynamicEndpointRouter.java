@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -30,47 +31,41 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
         MuleEvent result = null;
 
-        if (endpoints == null || endpoints.size() == 0)
+        if (targets == null || targets.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
         try
         {
-            OutboundEndpoint ep = endpoints.get(0);
+            MessageProcessor ep = targets.get(0);
             EndpointURI newUri;
 
-            for (String propertyKey : message.getPropertyNames())
+            if (ep instanceof OutboundEndpoint)
             {
-                Object propertyValue = message.getProperty(propertyKey);
-                if (propertyKey.equalsIgnoreCase("packet.port"))
+                for (String propertyKey : message.getPropertyNames())
                 {
-                    int port = ((Integer) propertyValue).intValue();
-                    newUri = new MuleEndpointURI("udp://localhost:" + port, muleContext);
-                    if (logger.isDebugEnabled())
+                    Object propertyValue = message.getProperty(propertyKey);
+                    if (propertyKey.equalsIgnoreCase("packet.port"))
                     {
-                        logger.info("Uri after parsing is: " + newUri.getAddress());
+                        int port = ((Integer) propertyValue).intValue();
+                        newUri = new MuleEndpointURI("udp://localhost:" + port, muleContext);
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.info("Uri after parsing is: " + newUri.getAddress());
+                        }
+                        ep = new DynamicURIOutboundEndpoint((OutboundEndpoint)ep, newUri);
+                        break;
                     }
-                    ep = new DynamicURIOutboundEndpoint(ep, newUri);
-                    break;
                 }
             }
-
-            if (ep.isSynchronous())
-            {
-                result = sendRequest(session, message, ep, true);
-            }
-            else
-            {
-                sendRequest(session, message, ep, false);
-            }
+            result = sendRequest(event, message, ep, true);
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, targets.get(0), e);
         }
 
         return result;

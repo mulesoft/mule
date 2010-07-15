@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
@@ -27,8 +26,10 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -46,6 +47,7 @@ import org.mule.util.CollectionUtils;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
  * Exception Listeners can override. It provides template methods for handling the
- * for base types of exceptions plus allows multimple endpoints to be associated with
+ * for base types of exceptions plus allows multimple targets to be associated with
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
@@ -104,7 +106,7 @@ public abstract class AbstractExceptionListener
         }
         else
         {
-            throw new IllegalArgumentException("List of endpoints = null");
+            throw new IllegalArgumentException("List of targets = null");
         }
     }
 
@@ -135,7 +137,7 @@ public abstract class AbstractExceptionListener
         if (t != null)
         {
             RoutingException re = (RoutingException) t;
-            handleRoutingException(re.getMuleMessage(), re.getEndpoint(), e);
+            handleRoutingException(re.getMuleMessage(), re.getTarget(), e);
             return;
         }
 
@@ -261,14 +263,14 @@ public abstract class AbstractExceptionListener
      * MuleMessage and any context information.
      * 
      * @param message the MuleMessage being processed when the exception occurred
-     * @param failedEndpoint optional; the endpoint being dispatched or received on
+     * @param target optional; the endpoint being dispatched or received on
      *            when the error occurred. This is NOT the endpoint that the message
      *            will be disptched on and is only supplied to this method for
      *            logging purposes
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
-    protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
+    protected void routeException(MuleMessage message, RoutingTarget target, Throwable t)
     {
         List endpoints = getEndpoints(t);
         if (CollectionUtils.isNotEmpty(endpoints))
@@ -287,9 +289,9 @@ public abstract class AbstractExceptionListener
                     }
                     endpointUri = ctx.getEndpointURI();
                 }
-                else if (failedEndpoint != null)
+                else if (target instanceof ImmutableEndpoint)
                 {
-                    endpointUri = failedEndpoint.getEndpointURI();
+                    endpointUri = ((ImmutableEndpoint)target).getEndpointURI();
                 }
                 
                 // The payload needs to be serializable so that we can send it over the wire 
@@ -376,20 +378,20 @@ public abstract class AbstractExceptionListener
         // Use an instance of OutboundPassThroughRouter but override creation of
         // createTransactionTemplate to use a custom ExceptionListener so that
         // exception handling will not loop forever.
-        // We cannot use PassthroughRouter because multiple endpoints are supported
+        // We cannot use PassthroughRouter because multiple targets are supported
         // on exception strategies.
         MulticastingRouter router = new MulticastingRouter()
         {
             @Override
             protected void setMessageProperties(FlowConstruct session,
                                                 MuleMessage message,
-                                                OutboundEndpoint endpoint)
+                                                MessageProcessor target)
             {
-                // No reply-to or correlation for exception endpoints, at least for
+                // No reply-to or correlation for exception targets, at least for
                 // now anyway.
             }
         };
-        router.setEndpoints(getEndpoints());
+        router.setTargets(new ArrayList<MessageProcessor>(getEndpoints()));
         router.setMuleContext(muleContext);
         return router;
     }
@@ -410,13 +412,13 @@ public abstract class AbstractExceptionListener
 
     /**
      * Returns an endpoint for the given exception. ExceptionListeners can have
-     * multiple endpoints registered on them. This methods allows custom
+     * multiple targets registered on them. This methods allows custom
      * implementations to control which endpoint is used based on the exception
      * thrown. This implementation simply returns the first endpoint in the list.
      * 
      * @param t the exception thrown
      * @return The endpoint used to dispatch an exception message on or null if there
-     *         are no endpoints registered
+     *         are no targets registered
      */
     protected List<OutboundEndpoint> getEndpoints(Throwable t)
     {
@@ -542,13 +544,13 @@ public abstract class AbstractExceptionListener
      * are passed into this method
      * 
      * @param message the current message being processed
-     * @param endpoint the endpoint being dispatched to or received from when the
+     * @param target the endpoint being dispatched to or received from when the
      *            error occurred
      * @param e the top level exception thrown. This may be a Messaging exception or
      *            some wrapper exception
      * @see RoutingException
      */
-    public abstract void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable e);
+    public abstract void handleRoutingException(MuleMessage message, RoutingTarget target, Throwable e);
 
     /**
      * DefaultLifecyclePhase exceptions are thrown when an error occurs during an

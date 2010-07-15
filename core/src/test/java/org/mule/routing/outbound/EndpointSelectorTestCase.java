@@ -14,11 +14,11 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
-import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -57,13 +57,13 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         mockendpoint2 = RouterTestUtils.getMockEndpoint(dest2);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(dest3);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
 
         router = new EndpointSelector();
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
         router.setMuleContext(muleContext);
         router.initialise();
     }

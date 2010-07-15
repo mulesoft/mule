@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -48,10 +49,10 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
@@ -82,10 +83,10 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         MulticastingRouter router = createObject(MulticastingRouter.class);
         RegExFilter filter = new RegExFilter("(.*) Message");
         router.setFilter(filter);
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
 
         assertEquals(filter, router.getFilter());
 
@@ -124,10 +125,10 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         MulticastingRouter router = createObject(MulticastingRouter.class);
         
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
 
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);

@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
@@ -56,17 +57,17 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter router1 = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router1.setFilter(filter);
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
-        router1.setEndpoints(endpoints);
+        router1.setTargets(endpoints);
 
         FilteringOutboundRouter router2 = new FilteringOutboundRouter();
         PayloadTypeFilter filter2 = new PayloadTypeFilter();
         filter2.setExpectedType(Exception.class);
         router2.setFilter(filter2);
-        endpoints = new ArrayList<OutboundEndpoint>();
+        endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router2.setEndpoints(endpoints);
+        router2.setTargets(endpoints);
 
         messageRouter.addRouter(router1);
         assertEquals(1, messageRouter.getRouters().size());
@@ -93,12 +94,12 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
         router3.setFilter(new PayloadTypeFilter(Object.class));
-        endpoints = new ArrayList<OutboundEndpoint>();
+        endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router3.setEndpoints(endpoints);
+        router3.setTargets(endpoints);
         messageRouter.addRouter(router3);
 
-        // now the message should be routed twice to different endpoints
+        // now the message should be routed twice to different targets
         event = getTestInboundEvent("testing multiple routing", (MuleSession) session.proxy());
         session.expectAndReturn("getFlowConstruct", getTestService());
         session.expectAndReturn("getFlowConstruct", getTestService());

@@ -16,6 +16,7 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.BindingCollection;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.InterfaceBinding;
@@ -89,7 +90,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testEndpointConfig() throws MuleException
     {
-        // test that endpoints have been resolved on endpoints
+        // test that targets have been resolved on targets
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "waterMelonEndpoint");
         assertNotNull(endpoint);
@@ -152,7 +153,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     /*
      * Since MULE-1933, Service no longer has properties and most properties are set on endpoint.
-     * So lets continue to test properties, but on endpoints instead.
+     * So lets continue to test properties, but on targets instead.
      */
     public void testEndpointPropertiesConfig() throws Exception
     {
@@ -198,7 +199,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check first Router
         OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof OutboundPassThroughRouter);
-        assertEquals(1, route1.getEndpoints().size());
+        assertEquals(1, route1.getTargets().size());
     }
 
     public void testBindingConfig()
@@ -228,8 +229,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertEquals(1, service.getOutboundRouter().getRouters().size());
         OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
-        assertEquals(1, router.getEndpoints().size());
-        ImmutableEndpoint endpoint = router.getEndpoints().get(0);
+        assertEquals(1, router.getTargets().size());
+        MessageProcessor mp = router.getTargets().get(0);
+        assertNotNull(mp);
+        assertTrue(mp instanceof ImmutableEndpoint);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) mp;
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformers());

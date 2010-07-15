@@ -76,10 +76,11 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("C", ((TestMessageProcessor) processors.get(0)).getLabel());
         assertEquals("D", ((TestMessageProcessor) processors.get(1)).getLabel());
 
-        endpoint = 
+        MessageProcessor mp =
             ((OutboundPassThroughRouter) muleContext.getRegistry().lookupService("localEndpoints").
-                getOutboundRouter().getRouters().get(0)).getEndpoint("ep4");
+                getOutboundRouter().getRouters().get(0)).getTarget("ep4");
 
+        endpoint = (ImmutableEndpoint) mp;
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
         assertEquals(2, processors.size());

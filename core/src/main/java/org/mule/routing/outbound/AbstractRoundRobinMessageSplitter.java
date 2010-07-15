@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
@@ -82,12 +83,12 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
      * proper synchronization for shared state (payload, properties, etc.)
      *
      * @param message   the current message being processed
-     * @param endpoints A list of endpoints that will be used to dispatch each of the parts
+     * @param endpoints A list of targets that will be used to dispatch each of the parts
      * @return a {@link java.util.List} of message parts.  Each part will become the payload of the outgoing
      *         message.  Note that the parts will be dispatched to
      */
     @Override
-    protected SplitMessage getMessageParts(MuleMessage message, List endpoints)
+    protected SplitMessage getMessageParts(MuleMessage message, List<MessageProcessor> endpoints)
     {
         SplitMessage splitMessage = new SplitMessage();
 
@@ -98,7 +99,9 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String propertyKey = (String) iterator.next();
-            props.put(propertyKey, message.getProperty(propertyKey));
+            Object value = message.getProperty(propertyKey);
+            if (value != null)
+                props.put(propertyKey, value);
         }
 
         Counter counter = new Counter();
@@ -108,16 +111,16 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
             Object payload = iterator.next();
             MuleMessage part = new DefaultMuleMessage(payload, props, muleContext);
             boolean matchFound = false;
-            OutboundEndpoint endpoint;
+
             // If there is no filter assume that the endpoint can accept the
             // message. Endpoints will be processed in order to only the last
-            // (if any) of the the endpoints may not have a filter
+            // (if any) of the the targets may not have a filter
             //Try each endpoint in the list. If there is no match for any of them we drop out and throw an exception
             for (int j = 0; j < endpoints.size(); j++)
             {
-                endpoint = (OutboundEndpoint) endpoints.get(counter.next());
-
-                if (endpoint.getFilter() == null || endpoint.getFilter().accept(part))
+                MessageProcessor target =  endpoints.get(counter.next());
+                OutboundEndpoint endpoint = target instanceof OutboundEndpoint ? (OutboundEndpoint) target : null;
+                if (endpoint == null || endpoint.getFilter() == null || endpoint.getFilter().accept(part))
                 {
                     if (logger.isDebugEnabled())
                     {
@@ -169,11 +172,11 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
      * If this option is true (the default)
      * then the first message part is routed to the first endpoint, the
      * second part to the second endpoint, etc, with the nth part going to
-     * the (n modulo number of endpoints) endpoint.
+     * the (n modulo number of targets) endpoint.
      * If false then the messages will be distributed equally amongst all
-     * endpoints.
+     * targets.
      * <p/>
-     * The behaviour changes if the endpoints have filters since the message part will get routed
+     * The behaviour changes if the targets have filters since the message part will get routed
      * based on the next endpoint that follows the above rule AND passes the endpoint filter.
      *
      * @return true if deterministic has been set to true
@@ -187,11 +190,11 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
      * If this option is true (the default)
      * then the first message part is routed to the first endpoint, the
      * second part to the second endpoint, etc, with the nth part going to
-     * the (n modulo number of endpoints) endpoint.
+     * the (n modulo number of targets) endpoint.
      * If false then the messages will be distributed equally amongst all
-     * endpoints.
+     * targets.
      * <p/>
-     * The behaviour changes if the endpoints have filters since the message part will get routed
+     * The behaviour changes if the targets have filters since the message part will get routed
      * based on the next endpoint that follows the above rule AND passes the endpoint filter.
      *
      * @param deterministic the value to set
@@ -204,11 +207,11 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
 
     /**
      * The default behaviour for splitter routers is to round-robin across
-     * endpoints. When using filters on endpoints it is sometimes desirable to use only the filters to
-     * control which endpoint the split message part goes too. For example, if you have 3 endpoints where
+     * targets. When using filters on targets it is sometimes desirable to use only the filters to
+     * control which endpoint the split message part goes too. For example, if you have 3 targets where
      * two have a filter but the last does not, you'll need to disable round robin since the 3rd endpoint
-     * may end up routing a message that one of the other endpoints should have routed.
-     * Generally it is good practice to either configure all endpoints with filters or none, in this case
+     * may end up routing a message that one of the other targets should have routed.
+     * Generally it is good practice to either configure all targets with filters or none, in this case
      * there is not need to set this property.
      *
      * @return true if disabled
@@ -220,11 +223,11 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
 
     /**
      * The default behaviour for splitter routers is to round-robin across
-     * endpoints. When using filters on endpoints it is sometimes desirable to use only the filters to
-     * control which endpoint the split message part goes too. For example, if you have 3 endpoints where
+     * targets. When using filters on targets it is sometimes desirable to use only the filters to
+     * control which endpoint the split message part goes too. For example, if you have 3 targets where
      * two have a filter but the last does not, you'll need to disable round robin since the 3rd endpoint
-     * may end up routing a message that one of the other endpoints should have routed.
-     * Generally it is good practice to either configure all endpoints with filters or none, in this case
+     * may end up routing a message that one of the other targets should have routed.
+     * Generally it is good practice to either configure all targets with filters or none, in this case
      * there is not need to set this property.
      *
      * @param disableRoundRobin true if disabled
@@ -235,7 +238,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
     }
 
     /**
-     * If none of the endpoints match a split message part i.e. each endpoint has a
+     * If none of the targets match a split message part i.e. each endpoint has a
      * filter for a certain message part. This flag controls whether the part is ignorred or an
      * exceptin is thrown.
      *
@@ -247,7 +250,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
     }
 
     /**
-     * If none of the endpoints match a split message part i.e. each endpoint has a
+     * If none of the targets match a split message part i.e. each endpoint has a
      * filter for a certain message part. This flag controls whether the part is ignorred or an
      * exceptin is thrown.
      *
@@ -277,7 +280,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
 
         public int next()
         {
-            return counter.getAndIncrement() % getEndpoints().size();
+            return counter.getAndIncrement() % getTargets().size();
         }
 
     }

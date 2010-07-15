@@ -14,9 +14,9 @@ import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -25,17 +25,17 @@ import org.mule.transport.NullPayload;
 
 /**
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
- * endpoints using the result of the first as the input for the second.
+ * targets using the result of the first as the input for the second.
  */
-public class ChainingRouter extends FilteringOutboundRouter
+public class ChainingRouter extends FilteringOutboundRouter implements RoutingMessageProcessor
 {
     @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if (endpoints == null || endpoints.size() == 0)
+        if (targets == null || targets.size() == 0)
         {
-            throw new InitialisationException(CoreMessages.objectIsNull("endpoints"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("targets"), this);
         }
     }
 
@@ -43,29 +43,28 @@ public class ChainingRouter extends FilteringOutboundRouter
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
         MuleEvent resultToReturn = null;
-        if (endpoints == null || endpoints.size() == 0)
+        if (targets == null || targets.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        final int endpointsCount = endpoints.size();
+        final int endpointsCount = targets.size();
         if (logger.isDebugEnabled())
         {
-            logger.debug("About to chain " + endpointsCount + " endpoints.");
+            logger.debug("About to chain " + endpointsCount + " targets.");
         }
 
         // need that ref for an error message
-        OutboundEndpoint endpoint = null;
+        MessageProcessor endpoint = null;
         try
         {
             MuleMessage intermediaryResult = message;
 
             for (int i = 0; i < endpointsCount; i++)
             {
-                endpoint = getEndpoint(i, intermediaryResult);
+                endpoint = getTarget(i, intermediaryResult);
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);
@@ -78,7 +77,7 @@ public class ChainingRouter extends FilteringOutboundRouter
 
                 if (!lastEndpointInChain)
                 {
-                    MuleEvent event1 = sendRequest(session, intermediaryResult, endpoint, true);
+                    MuleEvent event1 = sendRequest(event, intermediaryResult, endpoint, true);
                     MuleMessage localResult = event1 == null ? null : event1.getMessage();
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
@@ -103,7 +102,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                         // if there was an error in the first link of the chain, make sure we propagate back
                         // any exception payloads alongside the NullPayload
                         resultToReturn = intermediaryResult == null ? null : new DefaultMuleEvent(intermediaryResult, event);
-                        logger.warn("Chaining router cannot process any further endpoints. "
+                        logger.warn("Chaining router cannot process any further targets. "
                                     + "There was no result returned from endpoint invocation: " + endpoint);
                         break;
                     }
@@ -112,21 +111,12 @@ public class ChainingRouter extends FilteringOutboundRouter
                 {
                     // ok, the last call,
                     // use the 'sync/async' method parameter
-                    if (endpoint.isSynchronous())
+                    resultToReturn = sendRequest(event, intermediaryResult, endpoint, true);
+                    if (logger.isDebugEnabled())
                     {
-                        resultToReturn = sendRequest(session, intermediaryResult, endpoint, true);
-                        if (logger.isDebugEnabled())
-                        {
-                            MuleMessage resultMessage = resultToReturn == null ? null : resultToReturn.getMessage();
-                            logger.debug("Received final Chain result '" + i + "': "
-                                         + (resultMessage == null ? "null" : resultMessage.toString()));
-                        }
-                    }
-                    else
-                    {
-                        // reset the previous call result to avoid confusion
-                        resultToReturn = null;
-                        sendRequest(session, intermediaryResult, endpoint, false);
+                        MuleMessage resultMessage = resultToReturn == null ? null : resultToReturn.getMessage();
+                        logger.debug("Received final Chain result '" + i + "': "
+                            + (resultMessage == null ? "null" : resultMessage.toString()));
                     }
                 }
             }
@@ -137,6 +127,22 @@ public class ChainingRouter extends FilteringOutboundRouter
             throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
         }
         return resultToReturn;
+    }
+
+    /**
+     * Add a new destination router
+     */
+    public void addRoute(MessageProcessor processor)
+    {
+        addTarget(processor);
+    }
+
+    /**
+     * Remove a new destination router
+     */
+    public void removeRoute(MessageProcessor processor)
+    {
+        removeTarget(processor);
     }
 
     /**
@@ -157,7 +163,7 @@ public class ChainingRouter extends FilteringOutboundRouter
      * <li>replyTo
      * </ul>
      * @param localResult result of the last endpoint invocation
-     * @param intermediaryResult the message travelling across the endpoints
+     * @param intermediaryResult the message travelling across the targets
      */
     protected void processIntermediaryResult(MuleMessage localResult, MuleMessage intermediaryResult)
     {

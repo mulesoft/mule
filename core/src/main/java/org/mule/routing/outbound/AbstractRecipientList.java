@@ -17,6 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -32,11 +34,11 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractRecipientList</code> is used to dispatch a single event to
- * multiple recipients over the same transport. The recipient endpoints can be
+ * multiple recipients over the same transport. The recipient targets can be
  * configured statically or can be obtained from the message payload.
  */
 
-public abstract class AbstractRecipientList extends FilteringOutboundRouter
+public abstract class AbstractRecipientList extends FilteringOutboundRouter implements RoutingMessageProcessor
 {
     /**
      * logger used by this class
@@ -51,7 +53,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleSession session = event.getSession();
 
         List recipients = this.getRecipients(message);
         List<MuleEvent> results = new ArrayList<MuleEvent>();
@@ -70,7 +71,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        MuleMessage result;
         OutboundEndpoint endpoint;
         MuleMessage request;
 
@@ -88,11 +88,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             {
                 if (sync)
                 {
-                    results.add(sendRequest(session, request, endpoint, true));
+                    results.add(sendRequest(event, request, endpoint, true));
                 }
                 else
                 {
-                    sendRequest(session, request, endpoint, false);
+                    sendRequest(event, request, endpoint, false);
                 }
             }
             catch (MuleException e)
@@ -175,9 +175,25 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         this.synchronous = synchronous;
     }
 
-    public boolean isDynamicEndpoints()
+    public boolean isDynamicTargets()
     {
         return true;
+    }
+
+    /**
+     * Add a new destination router
+     */
+    public void addRoute(MessageProcessor processor)
+    {
+        addTarget(processor);
+    }
+
+    /**
+     * Remove a new destination router
+     */
+    public void removeRoute(MessageProcessor processor)
+    {
+        removeTarget(processor);
     }
 
     protected abstract List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException;

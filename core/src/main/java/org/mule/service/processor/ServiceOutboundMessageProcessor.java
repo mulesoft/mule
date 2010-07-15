@@ -84,7 +84,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
             else
             {
                 logger.debug("Outbound router on service '" + service.getName()
-                             + "' doesn't have any endpoints configured.");
+                             + "' doesn't have any targets configured.");
             }
         }
         return event;

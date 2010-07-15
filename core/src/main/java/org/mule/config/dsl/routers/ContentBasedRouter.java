@@ -10,12 +10,15 @@
 package org.mule.config.dsl.routers;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
 /**
@@ -27,24 +30,15 @@ public class ContentBasedRouter extends AbstractOutboundRouter
     public MuleEvent route(MuleEvent theEvent) throws MessagingException
     {
         MuleMessage message = theEvent.getMessage();
-        MuleSession session = theEvent.getSession();
 
-        for (OutboundEndpoint endpoint : endpoints)
+        for (MessageProcessor target : targets)
         {
             if (isMatch(message))
             {
                 try
                 {
-                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
-                    if (endpoint.getMessageExchangePattern().hasResponse())
-                    {
-                        return endpoint.process(event);
-                    }
-                    else
-                    {
-                        endpoint.process(event);
-                        return null;
-                    }
+                    MuleEvent event = RequestContext.cloneAndUpdateEventEndpoint(theEvent, target);
+                        return target.process(event);
                 }
                 catch (MuleException e)
                 {
@@ -58,9 +52,17 @@ public class ContentBasedRouter extends AbstractOutboundRouter
 
     public boolean isMatch(MuleMessage message) throws MessagingException
     {
-        for (OutboundEndpoint endpoint : endpoints)
+        for (MessageProcessor target : targets)
         {
-            if (endpoint.getFilter() == null || endpoint.getFilter().accept(message))
+            if (target instanceof ImmutableEndpoint)
+            {
+                ImmutableEndpoint endpoint = (ImmutableEndpoint)target;
+                if (endpoint.getFilter() == null || endpoint.getFilter().accept(message))
+                {
+                    return true;
+                }
+            }
+            else
             {
                 return true;
             }

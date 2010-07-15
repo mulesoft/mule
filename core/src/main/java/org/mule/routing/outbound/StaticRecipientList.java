@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to multiple
- * recipients over the same transport. The recipient endpoints for this router can be
+ * recipients over the same transport. The recipient targets for this router can be
  * configured statically on the router itself.
  */
 

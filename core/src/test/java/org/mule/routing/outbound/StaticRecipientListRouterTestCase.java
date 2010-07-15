@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -51,9 +52,9 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         router.setRecipients(recipients);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
         router.setMuleContext(muleContext);
 
         assertEquals(2, router.getRecipients().size());
@@ -61,7 +62,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
 
-       // Set up the mock endpoints as we discover them
+       // Set up the mock targets as we discover them
         final List<Mock> mockEndpoints = new ArrayList<Mock>();
         router.setMockEndpointListener(new MockEndpointListener()
         {
@@ -96,16 +97,16 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         router.setRecipients(recipients);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(endpoint1);
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
         router.setMuleContext(muleContext);
 
         assertEquals(2, router.getRecipients().size());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
-        // note this router clones endpoints so that the endpointUri can be
+        // note this router clones targets so that the endpointUri can be
         // changed
 
         // The static recipient list router duplicates the message for each endpoint
@@ -114,7 +115,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         message = new DefaultMuleMessage("test event", muleContext);
         final MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
-        // Set up the mock endpoints as we discover them
+        // Set up the mock targets as we discover them
          final List<Mock> mockEndpoints = new ArrayList<Mock>();
          router.setMockEndpointListener(new MockEndpointListener()
          {
@@ -149,9 +150,9 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         router.setRecipients(recipients);
 
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(endpoint1);
-        router.setEndpoints(endpoints);
+        router.setTargets(endpoints);
 
         assertEquals(1, router.getRecipients().size());
 
@@ -169,7 +170,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         session.verify();
     }
 
-    /** subclass the router, so that we can mock the endpoints it creates dynamically.  */
+    /** subclass the router, so that we can mock the targets it creates dynamically.  */
     public static class MockingStaticRecipientList extends StaticRecipientList
     {
         private Map<String, Mock> recipients = new HashMap<String, Mock>();

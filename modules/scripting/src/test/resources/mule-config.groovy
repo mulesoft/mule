@@ -200,7 +200,7 @@ outboundRouter.muleContext = muleContext
 epBuilder = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("appleInEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
-outboundRouter.addEndpoint(epFactory.getOutboundEndpoint(epBuilder))
+outboundRouter.addTarget(epFactory.getOutboundEndpoint(epBuilder))
 service.outboundRouter.addRouter(outboundRouter)
 
 //Response Router
@@ -220,7 +220,7 @@ service.exceptionListener = dces
 
 // properties
 // Since MULE-1933, Service no longer has properties and most properties are set on endpoint.
-// So lets continue to test properties, but on endpoints instead.
+// So lets continue to test properties, but on targets instead.
 endpointBuilderWithProps = new EndpointURIEndpointBuilder("test://endpointWithProps", muleContext)
 endpointBuilderWithProps.name = "endpointWithProps"
 endpointBuilderWithProps.properties = [

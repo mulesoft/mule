@@ -16,6 +16,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.routing.RoutingTarget;
 
 /**
  * Restrict exceptions to debug log messages
@@ -31,7 +32,7 @@ public class QuietExceptionStrategy extends AbstractExceptionListener
     }
 
     @Override
-    public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable e)
+    public void handleRoutingException(MuleMessage message, RoutingTarget target, Throwable e)
     {
         logger.debug("Ignoring", e);
     }

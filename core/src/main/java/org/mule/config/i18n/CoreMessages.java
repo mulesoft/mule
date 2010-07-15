@@ -21,6 +21,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
@@ -130,9 +131,9 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 23);
     }
 
-    public static Message failedToRouterViaEndpoint(ImmutableEndpoint endpoint)
+    public static Message failedToRouterViaEndpoint(RoutingTarget target)
     {
-        return factory.createMessage(BUNDLE_PATH, 30, endpoint);
+        return factory.createMessage(BUNDLE_PATH, 30, target);
     }
 
     public static Message lifecycleErrorCannotUseConnector(String name, String lifecyclePhase)

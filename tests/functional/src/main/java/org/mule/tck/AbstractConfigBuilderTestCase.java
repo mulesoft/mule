@@ -18,6 +18,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.InterfaceBinding;
@@ -101,7 +102,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testEndpointConfig();
 
-        // test that endpoints have been resolved on endpoints
+        // test that targets have been resolved on targets
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("UTF-8-TEST", endpoint.getEncoding());
@@ -329,7 +330,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
         OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
-        OutboundEndpoint outEndpoint = outRouter.getEndpoints().get(0);
+        MessageProcessor outEndpoint = outRouter.getTargets().get(0);
         assertNotNull(outEndpoint);
     }
 
