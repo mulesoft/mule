@@ -14,6 +14,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.routing.IdempotentMessageFilter;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.SerializableToByteArray;
 
@@ -32,7 +33,7 @@ import java.security.NoSuchAlgorithmException;
  * unique identifiers.
  */
 
-public class IdempotentSecureHashMessageProcessor extends IdempotentMessageProcessor
+public class IdempotentSecureHashMessageProcessor extends IdempotentMessageFilter
 {
     private String messageDigestAlgorithm = "SHA-256";
 

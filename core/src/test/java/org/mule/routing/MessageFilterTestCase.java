@@ -42,15 +42,53 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
     public void testFilterFail() throws Exception
     {
         InterceptingMessageProcessor mp = getMessageFilter(new EqualsFilter(null));
-        SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
-        mp.setListener(listener);
+        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+        mp.setListener(out);
 
         MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
 
         MuleEvent resultEvent = mp.process(inEvent);
 
-        assertNull(listener.event);
+        assertNull(out.event);
         assertNull(resultEvent);
+    }
+    
+    @Test
+    public void testFilterPassUnacceptedMP() throws Exception
+    {
+        MessageFilter mp = getMessageFilter(new EqualsFilter(TEST_MESSAGE));
+        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+        SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
+        mp.setListener(out);
+        mp.setUnacceptedMessageProcessor(unaccepted);
+
+        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+
+        MuleEvent resultEvent = mp.process(inEvent);
+
+        assertNotNull(out.event);
+        assertSame(inEvent, out.event);
+        assertEquals(inEvent, resultEvent);
+        assertNull(unaccepted.event);
+    }
+
+    @Test
+    public void testFilterFailUnacceptedMP() throws Exception
+    {
+        MessageFilter mp = getMessageFilter(new EqualsFilter(null));
+        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
+        SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
+        mp.setListener(out);
+        mp.setUnacceptedMessageProcessor(unaccepted);
+
+        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+
+        MuleEvent resultEvent = mp.process(inEvent);
+
+        assertNull(out.event);
+        assertEquals(inEvent, resultEvent);
+        assertNotNull(unaccepted.event);
+        assertSame(inEvent, unaccepted.event);
     }
 
     protected MessageFilter getMessageFilter(Filter filter)

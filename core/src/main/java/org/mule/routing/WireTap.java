@@ -8,13 +8,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.processor.AbstractMessageObserver;
 
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
@@ -28,7 +30,7 @@ import org.mule.api.routing.filter.Filter;
  * error sending to the wiretap output no exception will be thrown but rather an
  * error logged.
  * <p>
- * <b>EIP Pattern Reference:</b> {@link http://www.eaipatterns.com/WireTap.html}
+ * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/WireTap.html}
  */
 public class WireTap extends AbstractMessageObserver
 

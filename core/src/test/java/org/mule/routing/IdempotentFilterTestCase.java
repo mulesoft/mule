@@ -8,36 +8,36 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
-import com.mockobjects.dynamic.Mock;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
+import com.mockobjects.dynamic.Mock;
 
-public class IdempotentMessageProcessorTestCase extends AbstractMuleTestCase
+
+public class IdempotentFilterTestCase extends AbstractMuleTestCase
 {
-    public IdempotentMessageProcessorTestCase()
-    {
-        setStartContext(true);
-    }
 
     public void testIdempotentReceiver() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", getTestService());
+        Service service = getTestService();
+        session.matchAndReturn("getFlowConstruct", service);
 
 
-        IdempotentMessageProcessor ir = new IdempotentMessageProcessor();
+        IdempotentMessageFilter ir = new IdempotentMessageFilter();
         ir.setIdExpression("#[header:id]");
+        ir.setFlowConstruct(service);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setProperty("id", "1", PropertyScope.OUTBOUND);
