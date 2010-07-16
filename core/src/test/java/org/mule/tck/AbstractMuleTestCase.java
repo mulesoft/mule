@@ -438,7 +438,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             {
                 muleContext.start();
             }
-            client = muleContext.getClientInterface();
+            client = muleContext.getClient();
 
             doSetUp();
         }

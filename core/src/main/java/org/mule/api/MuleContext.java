@@ -220,5 +220,5 @@ public interface MuleContext extends Lifecycle
 
     boolean isStarting();
     
-    LocalMuleClient getClientInterface();
+    LocalMuleClient getClient();
 }

@@ -622,7 +622,7 @@ public class DefaultMuleContext implements MuleContext
         return shutdownScreen;
     }
 
-    public LocalMuleClient getClientInterface()
+    public LocalMuleClient getClient()
     {
         return localMuleClient;
     }

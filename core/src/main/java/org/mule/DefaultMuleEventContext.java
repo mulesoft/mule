@@ -65,7 +65,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         this.event = event;
         this.session = event.getSession();
         this.muleContext = event.getMuleContext();
-        this.clientInterface = muleContext.getClientInterface();
+        this.clientInterface = muleContext.getClient();
     }
 
     /**
