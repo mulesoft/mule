@@ -54,7 +54,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
         router.setMuleContext(muleContext);
 
         assertEquals(2, router.getRecipients().size());
@@ -99,7 +99,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(endpoint1);
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
         router.setMuleContext(muleContext);
 
         assertEquals(2, router.getRecipients().size());
@@ -152,7 +152,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add(endpoint1);
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         assertEquals(1, router.getRecipients().size());
 

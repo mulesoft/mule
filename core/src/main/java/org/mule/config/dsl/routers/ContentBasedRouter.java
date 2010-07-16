@@ -9,15 +9,12 @@
  */
 package org.mule.config.dsl.routers;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
@@ -31,7 +28,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
     {
         MuleMessage message = theEvent.getMessage();
 
-        for (MessageProcessor target : targets)
+        for (MessageProcessor target : routes)
         {
             if (isMatch(message))
             {
@@ -52,7 +49,7 @@ public class ContentBasedRouter extends AbstractOutboundRouter
 
     public boolean isMatch(MuleMessage message) throws MessagingException
     {
-        for (MessageProcessor target : targets)
+        for (MessageProcessor target : routes)
         {
             if (target instanceof ImmutableEndpoint)
             {

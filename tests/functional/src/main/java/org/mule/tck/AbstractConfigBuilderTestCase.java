@@ -17,7 +17,6 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
@@ -330,7 +329,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
         OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
-        MessageProcessor outEndpoint = outRouter.getTargets().get(0);
+        MessageProcessor outEndpoint = outRouter.getRoutes().get(0);
         assertNotNull(outEndpoint);
     }
 

@@ -43,7 +43,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Endpoint", "test://endpoint?exchange-pattern=request-response");
         ListMessageSplitter router = new ListMessageSplitter();
         router.setFilter(null);
-        router.addTarget(endpoint);
+        router.addRoute(endpoint);
         router.setMuleContext(muleContext);
 
         List<String> payload = new ArrayList<String>();
@@ -86,17 +86,17 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         asyncSplitter.setMuleContext(muleContext);
         asyncSplitter.setDisableRoundRobin(true);
         asyncSplitter.setFilter(new PayloadTypeFilter(List.class));
-        asyncSplitter.addTarget((OutboundEndpoint) mockendpoint1.proxy());
-        asyncSplitter.addTarget((OutboundEndpoint) mockendpoint2.proxy());
-        asyncSplitter.addTarget((OutboundEndpoint) mockendpoint3.proxy());
+        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint1.proxy());
+        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint2.proxy());
+        asyncSplitter.addRoute((OutboundEndpoint) mockendpoint3.proxy());
 
         ListMessageSplitter syncSplitter = new ListMessageSplitter();
         syncSplitter.setMuleContext(muleContext);
         syncSplitter.setDisableRoundRobin(true);
         syncSplitter.setFilter(new PayloadTypeFilter(List.class));
-        syncSplitter.addTarget((OutboundEndpoint) mockendpoint4.proxy());
-        syncSplitter.addTarget((OutboundEndpoint) mockendpoint5.proxy());
-        syncSplitter.addTarget((OutboundEndpoint) mockendpoint6.proxy());
+        syncSplitter.addRoute((OutboundEndpoint) mockendpoint4.proxy());
+        syncSplitter.addRoute((OutboundEndpoint) mockendpoint5.proxy());
+        syncSplitter.addRoute((OutboundEndpoint) mockendpoint6.proxy());
         List<Object> payload = new ArrayList<Object>();
         payload.add(new Apple());
         payload.add(new Apple());

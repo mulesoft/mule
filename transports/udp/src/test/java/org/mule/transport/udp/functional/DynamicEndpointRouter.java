@@ -13,7 +13,6 @@ package org.mule.transport.udp.functional;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -33,14 +32,14 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
         MuleMessage message = event.getMessage();
         MuleEvent result = null;
 
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
         try
         {
-            MessageProcessor ep = targets.get(0);
+            MessageProcessor ep = routes.get(0);
             EndpointURI newUri;
 
             if (ep instanceof OutboundEndpoint)
@@ -65,7 +64,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, targets.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, routes.get(0), e);
         }
 
         return result;

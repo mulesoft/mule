@@ -200,7 +200,7 @@ outboundRouter.muleContext = muleContext
 epBuilder = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("appleInEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
-outboundRouter.addTarget(epFactory.getOutboundEndpoint(epBuilder))
+outboundRouter.addRoute(epFactory.getOutboundEndpoint(epBuilder))
 service.outboundRouter.addRouter(outboundRouter)
 
 //Response Router

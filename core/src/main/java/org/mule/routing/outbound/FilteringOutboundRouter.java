@@ -68,13 +68,13 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
         MuleMessage message = event.getMessage();
 
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), 
                 message, null);
         }
 
-        MessageProcessor ep = getTarget(0, message);
+        MessageProcessor ep = getRoute(0, message);
 
         try
         {
@@ -111,7 +111,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         catch (TransformerException e)
         {
             throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
-                targets.get(0), e);
+                routes.get(0), e);
         }
         
         return getFilter().accept(message);
@@ -128,7 +128,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     }
 
     @Override
-    public void addTarget(MessageProcessor target)
+    public void addRoute(MessageProcessor target)
     {
         if (!useTemplates)
         {
@@ -141,7 +141,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                 }
             }
         }
-        super.addTarget(target);
+        super.addRoute(target);
     }
 
     /**
@@ -155,19 +155,19 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
      * @throws CouldNotRouteOutboundMessageException if the template causs the
      *             endpoint to become illegal or malformed
      */
-    public MessageProcessor getTarget(int index, MuleMessage message)
+    public MessageProcessor getRoute(int index, MuleMessage message)
         throws CouldNotRouteOutboundMessageException
     {
         if (!useTemplates)
         {
-            return targets.get(index);
+            return routes.get(index);
         }
         else
         {
-            MessageProcessor mp = targets.get(index);
+            MessageProcessor mp = routes.get(index);
             if (!(mp instanceof ImmutableEndpoint))
             {
-                return targets.get(index);
+                return routes.get(index);
             }
             OutboundEndpoint ep = (OutboundEndpoint) mp;
             String uri = ep.getEndpointURI().getUri().toString();

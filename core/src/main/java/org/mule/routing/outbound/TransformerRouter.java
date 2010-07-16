@@ -42,7 +42,7 @@ public class TransformerRouter extends AbstractOutboundRouter
             catch (TransformerException e)
             {
                 throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
-                    targets.get(0), e);
+                    routes.get(0), e);
             }
         }
         return message == null ? null : new DefaultMuleEvent(message, event);

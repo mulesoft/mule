@@ -59,7 +59,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         router1.setFilter(filter);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
-        router1.setTargets(endpoints);
+        router1.setRoutes(endpoints);
 
         FilteringOutboundRouter router2 = new FilteringOutboundRouter();
         PayloadTypeFilter filter2 = new PayloadTypeFilter();
@@ -67,7 +67,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         router2.setFilter(filter2);
         endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router2.setTargets(endpoints);
+        router2.setRoutes(endpoints);
 
         messageRouter.addRouter(router1);
         assertEquals(1, messageRouter.getRouters().size());
@@ -96,7 +96,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         router3.setFilter(new PayloadTypeFilter(Object.class));
         endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router3.setTargets(endpoints);
+        router3.setRoutes(endpoints);
         messageRouter.addRouter(router3);
 
         // now the message should be routed twice to different targets

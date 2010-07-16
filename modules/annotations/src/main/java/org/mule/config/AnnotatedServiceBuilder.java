@@ -286,7 +286,7 @@ public class AnnotatedServiceBuilder
             outboundEndpoint = tryOutboundEndpointAnnotation(annotation, ChannelType.Outbound);
             if (outboundEndpoint != null)
             {
-                router.addTarget(outboundEndpoint);
+                router.addRoute(outboundEndpoint);
             }
         }
 

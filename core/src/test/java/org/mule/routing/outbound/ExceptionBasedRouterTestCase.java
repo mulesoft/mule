@@ -73,7 +73,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         assertEquals(filter, router.getFilter());
 
@@ -118,7 +118,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         assertEquals(filter, router.getFilter());
 
@@ -159,7 +159,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         assertEquals(filter, router.getFilter());
 
@@ -204,8 +204,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addTarget((OutboundEndpoint) mockendpoint1.proxy());
-        router.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint1.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
@@ -242,8 +242,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addTarget((OutboundEndpoint) mockendpoint1.proxy());
-        router.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint1.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
@@ -281,8 +281,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.setMuleContext(muleContext);
-        router.addTarget((OutboundEndpoint) mockendpoint1.proxy());
-        router.addTarget((OutboundEndpoint) mockendpoint2.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint1.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint2.proxy());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);

@@ -79,7 +79,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         MuleMessage message = new DefaultMuleMessage("test,mule,message", muleContext);
 
@@ -96,8 +96,8 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint4.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint5.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint6.proxy());
-        router.getTargets().clear();
-        router.setTargets(endpoints);
+        router.getRoutes().clear();
+        router.setRoutes(endpoints);
 
         message = new DefaultMuleMessage("test,mule,message", muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null);

@@ -280,7 +280,7 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
 
         public int next()
         {
-            return counter.getAndIncrement() % getTargets().size();
+            return counter.getAndIncrement() % getRoutes().size();
         }
 
     }

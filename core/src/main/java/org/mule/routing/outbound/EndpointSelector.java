@@ -13,11 +13,9 @@ package org.mule.routing.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -143,7 +141,7 @@ public class EndpointSelector extends FilteringOutboundRouter
 
     protected MessageProcessor lookupEndpoint(String endpointName) throws MuleException
     {
-        for (MessageProcessor target : targets)
+        for (MessageProcessor target : routes)
         {
             if (target instanceof ImmutableEndpoint)
             {

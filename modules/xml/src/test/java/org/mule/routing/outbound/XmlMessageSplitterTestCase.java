@@ -86,9 +86,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         namespaces.put("e", "http://www.example.com");
         syncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
         syncXmlSplitter.setNamespaces(namespaces);
-        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint4.proxy());
-        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint5.proxy());
-        syncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint6.proxy());
+        syncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint4.proxy());
+        syncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint5.proxy());
+        syncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint6.proxy());
 
         // setup async splitter
         asyncXmlSplitter = new XmlMessageSplitter();
@@ -97,9 +97,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         asyncXmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
         asyncXmlSplitter.setNamespaces(namespaces);
-        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint1.proxy());
-        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint2.proxy());
-        asyncXmlSplitter.addTarget((OutboundEndpoint) mockendpoint3.proxy());
+        asyncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint1.proxy());
+        asyncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint2.proxy());
+        asyncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint3.proxy());
 
         syncXmlSplitter.setMuleContext(muleContext);
         asyncXmlSplitter.setMuleContext(muleContext);

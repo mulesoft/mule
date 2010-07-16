@@ -67,7 +67,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setTargets(new ArrayList<MessageProcessor>(endpoints));
+        router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
 
         assertEquals(filter, router.getFilter());
         session.matchAndReturn("getFlowConstruct", getTestService("TEST", Apple.class));
@@ -94,7 +94,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]&exchange-pattern=request-response");
         assertNotNull(endpoint3);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
-        router.addTarget((OutboundEndpoint) mockendpoint3.proxy());
+        router.addRoute((OutboundEndpoint) mockendpoint3.proxy());
 
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("barValue", "bar");
@@ -103,7 +103,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
 
-        ImmutableEndpoint ep = (ImmutableEndpoint) router.getTarget(2, message);
+        ImmutableEndpoint ep = (ImmutableEndpoint) router.getRoute(2, message);
         assertEquals("test://foo?bar&exchange-pattern=request-response", ep.getEndpointURI().toString());
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
@@ -130,7 +130,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         endpoints.clear();
         endpoints.add((OutboundEndpoint) mep1.proxy());
         endpoints.add((OutboundEndpoint) mep2.proxy());
-        router.setTargets(new ArrayList<MessageProcessor>(endpoints));
+        router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
 

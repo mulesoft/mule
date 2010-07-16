@@ -33,43 +33,43 @@ public interface OutboundRouter extends Router, MessageProcessor
     /**
      * Sets a list of MessageProcessor instances associated with this router
      * 
-     * @param targets a list of MessageProcessor instances
+     * @param routes a list of MessageProcessor instances
      */
-    void setTargets(List<MessageProcessor> targets);
+    void setRoutes(List<MessageProcessor> routes);
 
     /**
      * Gets a list of MessageProcessor instances associated with this router
      * 
      * @return a list of MessageProcessor instances
      */
-    List<MessageProcessor> getTargets();
+    List<MessageProcessor> getRoutes();
 
     /**
-     * Adds a target to this router
+     * Adds a route to this router
      * 
-     * @param target the target to add to the router
+     * @param route the route to add to the router
      */
-    void addTarget(MessageProcessor target);
+    void addRoute(MessageProcessor route);
 
     /**
-     * Removes a specific target from the router
+     * Removes a specific route from the router
      * 
-     * @param target the target to remove
-     * @return true if the target was removed
+     * @param route the route to remove
+     * @return true if the route was removed
      */
-    boolean removeTarget(MessageProcessor target);
+    boolean removeRoute(MessageProcessor route);
 
     /**
      * This method is responsible for routing the Message. The logic for this method
      * will change for each type of router depending on expected behaviour. For
      * example, a MulticastingRouter might just iterate through the list of
-     * assoaciated targets sending the message. Another type of router such as the
-     * ExceptionBasedRouter will hit the first endpoint, if it fails try the second,
+     * assoaciated routes sending the message. Another type of router such as the
+     * ExceptionBasedRouter will hit the first route, if it fails try the second,
      * and so on. Most router implementations will extends the
      * FilteringOutboundRouter which implements all the common logic need for a
      * router.
      * 
-     * @param event the event to send via one or more targets on this router
+     * @param event the event to send via one or more routes on this router
      * @throws MessagingException if any errors occur during the sending of messages
      * @see org.mule.routing.outbound.FilteringOutboundRouter
      * @see org.mule.routing.outbound.ExceptionBasedRouter
@@ -96,37 +96,37 @@ public interface OutboundRouter extends Router, MessageProcessor
     void setTransactionConfig(TransactionConfig transactionConfig);
 
     /**
-     * Gets the replyTo endpoint for any outgoing messages. This will then be used by
+     * Gets the replyTo route for any outgoing messages. This will then be used by
      * other Mule routers to send replies back for this message. If the underlying
      * protocol supports replyTo messages, such as Jms, a Jms Destination will be
      * attached to the outbound message
      * 
-     * @return the replyTo endpoint or null if one has not been set.
+     * @return the replyTo route or null if one has not been set.
      */
     String getReplyTo();
 
     /**
-     * Sets the replyTo endpoint for any outgoing messages. This will then be used by
+     * Sets the replyTo route for any outgoing messages. This will then be used by
      * other Mule routers to send replies back for this message. If the underlying
      * protocol supports replyTo messages, such as Jms, a Jms Destination will be
      * attached to the outbound message
      * 
-     * @param replyTo endpoint string to use
+     * @param replyTo route string to use
      */
     void setReplyTo(String replyTo);
 
     /**
-     * Determines whether this router supports dynamic endpoint. i.e. targets that
-     * are not configured at design time. Endpoints might be pulled from the message
+     * Determines whether this router supports dynamic route. i.e. routes that
+     * are not configured at design time. routes might be pulled from the message
      * or payload.
      */
-    boolean isDynamicTargets();
+    boolean isDynamicRoutes();
 
     /**
-     * @param name the target identifier
-     * @return the target or null if the target is not registered
+     * @param name the route identifier
+     * @return the route or null if the route is not registered
      */
-    MessageProcessor getTarget(String name);
+    MessageProcessor getRoute(String name);
     
     /**
      * Determines is this router requires a new message copy.

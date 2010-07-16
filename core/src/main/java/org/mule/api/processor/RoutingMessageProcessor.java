@@ -29,7 +29,8 @@ public interface RoutingMessageProcessor extends MessageProcessor
      * Removes a message processor from the list of routes
      * 
      * @param processor destination message processor to remove
+     * @return true if the route was removed
      */
-    void removeRoute(MessageProcessor processor);
+    boolean removeRoute(MessageProcessor processor);
 
 }

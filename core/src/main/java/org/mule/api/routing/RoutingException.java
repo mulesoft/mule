@@ -12,7 +12,6 @@ package org.mule.api.routing;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
@@ -29,38 +28,38 @@ public class RoutingException extends MessagingException
      */
     private static final long serialVersionUID = 2478458847072048645L;
 
-    protected final transient RoutingTarget target;
+    protected final transient RoutingTarget route;
 
-    public RoutingException(MuleMessage message, RoutingTarget target)
+    public RoutingException(MuleMessage message, RoutingTarget route)
     {
-        super(generateMessage(null, target), message);
-        this.target = target;
+        super(generateMessage(null, route), message);
+        this.route = route;
     }
 
-    public RoutingException(MuleMessage message, RoutingTarget target, Throwable cause)
+    public RoutingException(MuleMessage message, RoutingTarget route, Throwable cause)
     {
-        super(generateMessage(null, target), message, cause);
-        this.target = target;
+        super(generateMessage(null, route), message, cause);
+        this.route = route;
     }
 
-    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget target)
+    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget route)
     {
-        super(generateMessage(message, target), muleMessage);
-        this.target = target;
+        super(generateMessage(message, route), muleMessage);
+        this.route = route;
     }
 
     public RoutingException(Message message,
                             MuleMessage muleMessage,
-                            RoutingTarget target,
+                            RoutingTarget route,
                             Throwable cause)
     {
-        super(generateMessage(message, target), muleMessage, cause);
-        this.target = target;
+        super(generateMessage(message, route), muleMessage, cause);
+        this.route = route;
     }
 
-    public RoutingTarget getTarget()
+    public RoutingTarget getRoute()
     {
-        return target;
+        return route;
     }
 
     private static Message generateMessage(Message message, RoutingTarget target)

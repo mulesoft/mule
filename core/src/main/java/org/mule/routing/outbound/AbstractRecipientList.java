@@ -175,25 +175,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         this.synchronous = synchronous;
     }
 
-    public boolean isDynamicTargets()
+    public boolean isDynamicRoutes()
     {
         return true;
-    }
-
-    /**
-     * Add a new destination router
-     */
-    public void addRoute(MessageProcessor processor)
-    {
-        addTarget(processor);
-    }
-
-    /**
-     * Remove a new destination router
-     */
-    public void removeRoute(MessageProcessor processor)
-    {
-        removeTarget(processor);
     }
 
     protected abstract List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException;

@@ -40,7 +40,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException(null, endpoint);
-        assertSame(endpoint, rex.getTarget());
+        assertSame(endpoint, rex.getRoute());
     }
 
 }

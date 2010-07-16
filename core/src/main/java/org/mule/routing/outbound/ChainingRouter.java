@@ -33,7 +33,7 @@ public class ChainingRouter extends FilteringOutboundRouter implements RoutingMe
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             throw new InitialisationException(CoreMessages.objectIsNull("targets"), this);
         }
@@ -45,12 +45,12 @@ public class ChainingRouter extends FilteringOutboundRouter implements RoutingMe
         MuleMessage message = event.getMessage();
 
         MuleEvent resultToReturn = null;
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        final int endpointsCount = targets.size();
+        final int endpointsCount = routes.size();
         if (logger.isDebugEnabled())
         {
             logger.debug("About to chain " + endpointsCount + " targets.");
@@ -64,7 +64,7 @@ public class ChainingRouter extends FilteringOutboundRouter implements RoutingMe
 
             for (int i = 0; i < endpointsCount; i++)
             {
-                endpoint = getTarget(i, intermediaryResult);
+                endpoint = getRoute(i, intermediaryResult);
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);
@@ -127,22 +127,6 @@ public class ChainingRouter extends FilteringOutboundRouter implements RoutingMe
             throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
         }
         return resultToReturn;
-    }
-
-    /**
-     * Add a new destination router
-     */
-    public void addRoute(MessageProcessor processor)
-    {
-        addTarget(processor);
-    }
-
-    /**
-     * Remove a new destination router
-     */
-    public void removeRoute(MessageProcessor processor)
-    {
-        removeTarget(processor);
     }
 
     /**

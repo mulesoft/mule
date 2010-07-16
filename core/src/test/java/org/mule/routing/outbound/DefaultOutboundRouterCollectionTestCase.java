@@ -327,7 +327,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public List<MessageProcessor> getTargets()
+        public List<MessageProcessor> getRoutes()
         {
             List<MessageProcessor> list = new ArrayList<MessageProcessor>();
             try
@@ -368,7 +368,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public List<MessageProcessor> getTargets()
+        public List<MessageProcessor> getRoutes()
         {
             List<MessageProcessor> list = new ArrayList<MessageProcessor>();
             try

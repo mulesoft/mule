@@ -199,7 +199,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check first Router
         OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof OutboundPassThroughRouter);
-        assertEquals(1, route1.getTargets().size());
+        assertEquals(1, route1.getRoutes().size());
     }
 
     public void testBindingConfig()
@@ -229,8 +229,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertEquals(1, service.getOutboundRouter().getRouters().size());
         OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
-        assertEquals(1, router.getTargets().size());
-        MessageProcessor mp = router.getTargets().get(0);
+        assertEquals(1, router.getRoutes().size());
+        MessageProcessor mp = router.getRoutes().get(0);
         assertNotNull(mp);
         assertTrue(mp instanceof ImmutableEndpoint);
         ImmutableEndpoint endpoint = (ImmutableEndpoint) mp;

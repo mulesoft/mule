@@ -30,27 +30,27 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public void addTarget(MessageProcessor target)
+    public void addRoute(MessageProcessor target)
     {
         if (target == null)
         {
             return;
         }
-        if (targets.size() == 1)
+        if (routes.size() == 1)
         {
             throw new IllegalArgumentException("Only one target can be set on the PassThrough router");
         }
-        super.addTarget(target);
+        super.addRoute(target);
     }
 
     @Override
-    public void setTargets(List<MessageProcessor> endpoints)
+    public void setRoutes(List<MessageProcessor> endpoints)
     {
         if (endpoints.size() > 1)
         {
             throw new IllegalArgumentException("Only one endpoint can be set on the PassThrough router");
         }
-        super.setTargets(endpoints);
+        super.setRoutes(endpoints);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             return event;
         }

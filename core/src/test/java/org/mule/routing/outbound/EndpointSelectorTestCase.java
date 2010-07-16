@@ -63,7 +63,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint3.proxy());
 
         router = new EndpointSelector();
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
         router.setMuleContext(muleContext);
         router.initialise();
     }

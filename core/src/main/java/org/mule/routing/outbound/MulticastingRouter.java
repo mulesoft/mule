@@ -15,7 +15,6 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -38,7 +37,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
     {
         MuleMessage message = event.getMessage();
 
-        if (targets == null || targets.size() == 0)
+        if (routes == null || routes.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
@@ -52,16 +51,16 @@ public class MulticastingRouter extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(targets.size());
+                message.setCorrelationGroupSize(routes.size());
             }
         }
 
-        List<MuleEvent> results = new ArrayList<MuleEvent>(targets.size());
+        List<MuleEvent> results = new ArrayList<MuleEvent>(routes.size());
         try
         {
-            for (int i = 0; i < targets.size(); i++)
+            for (int i = 0; i < routes.size(); i++)
             {
-                MessageProcessor mp = targets.get(i);
+                MessageProcessor mp = routes.get(i);
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
                 if(endpoint == null || endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
                 {
@@ -84,7 +83,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, targets.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, routes.get(0), e);
         }
         return resultsHandler.aggregateResults(results, event, muleContext);
     }

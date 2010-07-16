@@ -141,7 +141,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)
         {
             OutboundRouter router = (OutboundRouter) iterator.next();
-            if (router.getTargets().size() > 0 || router.isDynamicTargets())
+            if (router.getRoutes().size() > 0 || router.isDynamicRoutes())
             {
                 return true;
             }

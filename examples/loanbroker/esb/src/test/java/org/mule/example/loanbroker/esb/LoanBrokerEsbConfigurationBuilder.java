@@ -156,7 +156,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         // out
         OutboundRouterCollection loanBrokerServiceOutbound = new DefaultOutboundRouterCollection();
         OutboundPassThroughRouter outboundPassThroughRouter = new OutboundPassThroughRouter();
-        outboundPassThroughRouter.addTarget(CreditAgency.buildOutboundEndpoint());
+        outboundPassThroughRouter.addRoute(CreditAgency.buildOutboundEndpoint());
         loanBrokerServiceOutbound.addRouter(outboundPassThroughRouter);
         loanBrokerService.setOutboundRouter(loanBrokerServiceOutbound);
         // reply
@@ -196,7 +196,7 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         OutboundRouterCollection creditAgencyGatewayServiceOutbound = new DefaultOutboundRouterCollection();
         FilteringOutboundRouter creditAgencyGatewayServiceOutboundRouter = new FilteringOutboundRouter();
 
-        creditAgencyGatewayServiceOutboundRouter.addTarget(LenderGateway.buildOutboundEndpoint());
+        creditAgencyGatewayServiceOutboundRouter.addRoute(LenderGateway.buildOutboundEndpoint());
         creditAgencyGatewayServiceOutbound.addRouter(creditAgencyGatewayServiceOutboundRouter);
         creditAgencyGatewayService.setOutboundRouter(creditAgencyGatewayServiceOutbound);
 
@@ -215,10 +215,10 @@ public class LoanBrokerEsbConfigurationBuilder extends AbstractConfigurationBuil
         FilteringOutboundRouter lenderGatewayServiceInboundOutboundRouter = new FilteringOutboundRouter();
         EndpointBuilder eb3 = (EndpointBuilder) LenderService.clone();
         eb3.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        lenderGatewayServiceInboundOutboundRouter.addTarget(eb3.buildOutboundEndpoint());
+        lenderGatewayServiceInboundOutboundRouter.addRoute(eb3.buildOutboundEndpoint());
         EndpointBuilder eb4 = (EndpointBuilder) BankingGateway.clone();
         eb4.addTransformer(ObjectToJMSMessage);
-        lenderGatewayServiceInboundOutboundRouter.addTarget(eb4.buildOutboundEndpoint());
+        lenderGatewayServiceInboundOutboundRouter.addRoute(eb4.buildOutboundEndpoint());
         lenderGatewayServiceInboundOutbound.addRouter(lenderGatewayServiceInboundOutboundRouter);
         lenderGatewayService.setOutboundRouter(lenderGatewayServiceInboundOutbound);
 

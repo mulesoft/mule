@@ -52,7 +52,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
@@ -86,7 +86,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         assertEquals(filter, router.getFilter());
 
@@ -128,7 +128,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint1.proxy());
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);

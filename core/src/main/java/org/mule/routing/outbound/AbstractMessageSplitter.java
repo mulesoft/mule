@@ -41,7 +41,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
 
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
-        SplitMessage splitMessage = getMessageParts(message, getTargets());
+        SplitMessage splitMessage = getMessageParts(message, getRoutes());
 
         // Cache the properties here because for some message types getting the
         // properties can be expensive
@@ -124,19 +124,4 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
      */
     protected abstract SplitMessage getMessageParts(MuleMessage message, List <MessageProcessor> endpoints);
 
-    /**
-     * Add a new destination router
-     */
-    public void addRoute(MessageProcessor processor)
-    {
-        addTarget(processor);
-    }
-
-    /**
-     * Remove a new destination router
-     */
-    public void removeRoute(MessageProcessor processor)
-    {
-        removeTarget(processor);
-    }
 }

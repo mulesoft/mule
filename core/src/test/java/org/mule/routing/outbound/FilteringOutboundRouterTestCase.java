@@ -51,7 +51,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
         List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockEndpoint.proxy());
-        router.setTargets(endpoints);
+        router.setRoutes(endpoints);
 
         // Default is now true
         assertTrue(router.isUseTemplates());
@@ -102,7 +102,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add((OutboundEndpoint) mockEndpoint.proxy());
-        router.setTargets(new ArrayList<MessageProcessor>(endpoints));
+        router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
 
         // Default is now true
         assertTrue(router.isUseTemplates());
@@ -127,7 +127,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
         endpoints.add(endpoint1);
-        router.setTargets(new ArrayList<MessageProcessor>(endpoints));
+        router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
 
         assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
@@ -137,7 +137,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
 
         assertTrue(router.isMatch(message));
-        OutboundEndpoint ep = (OutboundEndpoint) router.getTarget(0, message);
+        OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, message);
         // MULE-2690: assert that templated targets are not mutated
         assertNotSame(endpoint1, ep);
         // assert that the returned endpoint has a resolved URI

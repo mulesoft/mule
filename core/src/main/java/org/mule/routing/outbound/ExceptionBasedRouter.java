@@ -52,11 +52,11 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
 
         if (recipients == null)
         {
-            int endpointsCount = targets.size();
+            int endpointsCount = routes.size();
             recipients = new ArrayList(endpointsCount);
             for (int i = 0; i < endpointsCount; i++)
             {
-                recipients.add(getTarget(i, message));
+                recipients.add(getRoute(i, message));
             }
         }        
         

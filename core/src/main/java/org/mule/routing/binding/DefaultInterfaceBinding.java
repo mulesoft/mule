@@ -106,7 +106,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
         if (e instanceof OutboundEndpoint)
         {
             outboundRouter = new OutboundPassThroughRouter();
-            outboundRouter.addTarget((OutboundEndpoint) e);
+            outboundRouter.addRoute((OutboundEndpoint) e);
             outboundRouter.setTransactionConfig(e.getTransactionConfig());
         }
         else
@@ -135,7 +135,7 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
     {
         if (outboundRouter != null)
         {
-            MessageProcessor target = outboundRouter.getTargets().get(0);
+            MessageProcessor target = outboundRouter.getRoutes().get(0);
             return target instanceof ImmutableEndpoint ? (ImmutableEndpoint) target : null;
         }
         else

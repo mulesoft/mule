@@ -137,7 +137,7 @@ public abstract class AbstractExceptionListener
         if (t != null)
         {
             RoutingException re = (RoutingException) t;
-            handleRoutingException(re.getMuleMessage(), re.getTarget(), e);
+            handleRoutingException(re.getMuleMessage(), re.getRoute(), e);
             return;
         }
 
@@ -391,7 +391,7 @@ public abstract class AbstractExceptionListener
                 // now anyway.
             }
         };
-        router.setTargets(new ArrayList<MessageProcessor>(getEndpoints()));
+        router.setRoutes(new ArrayList<MessageProcessor>(getEndpoints()));
         router.setMuleContext(muleContext);
         return router;
     }
