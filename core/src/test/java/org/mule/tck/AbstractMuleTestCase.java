@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
@@ -99,6 +100,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
 
     protected static MuleContext muleContext;
+
+    protected static LocalMuleClient client;
 
     /**
      * This flag controls whether the text boxes will be logged when starting each test case.
@@ -435,6 +438,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             {
                 muleContext.start();
             }
+            client = muleContext.getClientInterface();
 
             doSetUp();
         }
