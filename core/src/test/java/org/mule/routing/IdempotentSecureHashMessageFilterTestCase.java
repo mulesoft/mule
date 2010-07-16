@@ -1,5 +1,5 @@
 /*
- * $Id: IdempotentMessageProcessorTestCase.java 17050 2010-04-20 02:52:45Z dfeist $
+ * $Id: IdempotentSecureHashMessageProcessorTestCase.java 17050 2010-04-20 02:52:45Z dfeist $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -17,15 +17,19 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.api.transport.PropertyScope;
+import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
 import com.mockobjects.dynamic.Mock;
 
 
-public class IdempotentFilterTestCase extends AbstractMuleTestCase
+public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleTestCase
 {
+    public IdempotentSecureHashMessageFilterTestCase()
+    {
+        setStartContext(true);
+    }
 
     public void testIdempotentReceiver() throws Exception
     {
@@ -35,24 +39,27 @@ public class IdempotentFilterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getFlowConstruct", service);
 
 
-        IdempotentMessageFilter ir = new IdempotentMessageFilter();
-        ir.setIdExpression("#[header:id]");
+        IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
         ir.setFlowConstruct(service);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
-        okMessage.setProperty("id", "1", PropertyScope.OUTBOUND);
         MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
 
         // This one will process the event on the target endpoint
         event = ir.process(event);
         assertNotNull(event);
 
-         // This will not process, because the ID is a duplicate
+         // This will not process, because the message is a duplicate
         okMessage = new DefaultMuleMessage("OK", muleContext);
-        okMessage.setProperty("id", "1", PropertyScope.OUTBOUND);
         event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
         event = ir.process(event);
         assertNull(event);
+
+        // This will process, because the message  is not a duplicate
+        okMessage = new DefaultMuleMessage("Not OK", muleContext);
+        event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
+        event = ir.process(event);
+        assertNotNull(event);
     }
 
 }

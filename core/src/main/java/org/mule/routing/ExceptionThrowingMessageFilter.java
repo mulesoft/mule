@@ -26,7 +26,14 @@ public class ExceptionThrowingMessageFilter extends MessageFilter
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {
-        throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
+        if (unacceptedMessageProcessor != null)
+        {
+            return super.handleUnaccepted(event);
+        }
+        else
+        {
+            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
+        }
     }
 
 }

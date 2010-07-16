@@ -8,13 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.routing.IdempotentMessageFilter;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.SerializableToByteArray;
 
@@ -22,7 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * <code>IdempotentSecureHashReceiver</code> ensures that only unique messages are
+ * <code>IdempotentSecureHashMessageFilter</code> ensures that only unique messages are
  * received by a service. It does this by calculating the SHA-256 hash of the message
  * itself. This provides a value with an infinitesimally small chance of a collision. This
  * can be used to filter message duplicates. Please keep in mind that the hash is
@@ -33,7 +32,7 @@ import java.security.NoSuchAlgorithmException;
  * unique identifiers.
  */
 
-public class IdempotentSecureHashMessageProcessor extends IdempotentMessageFilter
+public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter
 {
     private String messageDigestAlgorithm = "SHA-256";
 
