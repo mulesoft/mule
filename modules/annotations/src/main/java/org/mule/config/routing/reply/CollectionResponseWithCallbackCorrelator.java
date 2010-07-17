@@ -17,8 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.routing.AggregationException;
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings. This callback allows the
@@ -46,7 +46,7 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
      *          if the aggregation fails. In
      *          this scenario the whole event group is removed and passed to the
      *          exception handler for this componenet.
-     * @see {@link org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(org.mule.routing.inbound.EventGroup)}
+     * @see {@link org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(org.mule.routing.EventGroup)}
      */
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {

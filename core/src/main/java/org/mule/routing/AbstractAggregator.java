@@ -8,27 +8,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.routing.EventCorrelator;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.MuleMessageInfoMapping;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.routing.correlation.EventCorrelator;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 import javax.resource.spi.work.WorkException;
 
 /**
- * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
- * single message.
+ * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message.
  */
 
-public abstract class AbstractEventAggregatingMessageProcessor implements MessageProcessor
+public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
 {
 
     protected EventCorrelator eventCorrelator;
@@ -41,7 +39,8 @@ public abstract class AbstractEventAggregatingMessageProcessor implements Messag
     {
         if (eventCorrelator == null)
         {
-            eventCorrelator = new EventCorrelator(getCorrelatorCallback(event), getMessageInfoMapping(), event.getMuleContext());
+            eventCorrelator = new EventCorrelator(getCorrelatorCallback(event), next, getMessageInfoMapping(),
+                event.getMuleContext());
             if (timeout != 0)
             {
                 eventCorrelator.setTimeout(timeout);
@@ -60,7 +59,6 @@ public abstract class AbstractEventAggregatingMessageProcessor implements Messag
 
     protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleEvent event);
 
-
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         ensureInitialised(event);
@@ -69,7 +67,7 @@ public abstract class AbstractEventAggregatingMessageProcessor implements Messag
         {
             return null;
         }
-        return new DefaultMuleEvent(msg, event);
+        return processNext(new DefaultMuleEvent(msg, event));
     }
 
     public int getTimeout()
@@ -92,7 +90,7 @@ public abstract class AbstractEventAggregatingMessageProcessor implements Messag
         this.failOnTimeout = failOnTimeout;
     }
 
-        public MessageInfoMapping getMessageInfoMapping()
+    public MessageInfoMapping getMessageInfoMapping()
     {
         return messageInfoMapping;
     }

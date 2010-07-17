@@ -15,8 +15,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.ResequenceCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.correlation.ResequenceCorrelatorCallback;
 
 import java.util.Comparator;
 

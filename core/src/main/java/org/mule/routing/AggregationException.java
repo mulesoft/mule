@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.Message;
-import org.mule.routing.inbound.EventGroup;
 import org.mule.transport.NullPayload;
 
 /**

@@ -9,8 +9,8 @@
  */
 package org.mule.routing.response;
 
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * A simple aggregator that will keep collecting events until a timeout is reached.  It will then 

@@ -8,16 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.ResequenceMessagesCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import org.mule.routing.inbound.CorrelationSequenceComparator;
 
 import java.util.Comparator;
@@ -29,11 +27,11 @@ import java.util.Comparator;
  * parts so that another router such as the <i>CorrelationEventResequencer</i> can
  * receive the parts and reorder or merge them.
  */
-public class CorrelationEventResequencingMessageProcessor extends AbstractEventAggregatingMessageProcessor
+public class Resequencer extends AbstractAggregator
 {
     protected Comparator eventComparator;
 
-    public CorrelationEventResequencingMessageProcessor()
+    public Resequencer()
     {
         super();
         this.setEventComparator(new CorrelationSequenceComparator());
@@ -64,15 +62,4 @@ public class CorrelationEventResequencingMessageProcessor extends AbstractEventA
         return new ResequenceMessagesCorrelatorCallback(getEventComparator(), event.getMuleContext());
     }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        ensureInitialised(event);
-        MuleMessage msg = eventCorrelator.process(event);
-        if (msg == null)
-        {
-            return null;
-        }
-        return new DefaultMuleEvent(msg, event);
-    }
 }

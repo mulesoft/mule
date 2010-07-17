@@ -17,9 +17,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
-import org.mule.routing.EventCorrelator;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.EventCorrelator;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for implementing
@@ -45,7 +45,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             setTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
         }
-        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), getMessageInfoMapping(), muleContext);
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), null, getMessageInfoMapping(), muleContext);
         eventCorrelator.setTimeout(getTimeout());
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
         super.initialise();

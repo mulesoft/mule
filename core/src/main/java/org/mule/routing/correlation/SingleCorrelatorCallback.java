@@ -7,12 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.routing.correlation;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

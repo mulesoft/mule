@@ -7,14 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.routing.correlation;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.AggregationException;
+import org.mule.routing.EventGroup;
 
 import java.text.MessageFormat;
 
@@ -69,7 +70,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     /**
      * @return <code>true</code> if the correlation size is not set or exactly the
      *         expected size of the event group.
-     * @see org.mule.routing.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.inbound.EventGroup) 
+     * @see org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(org.mule.routing.EventGroup) 
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {

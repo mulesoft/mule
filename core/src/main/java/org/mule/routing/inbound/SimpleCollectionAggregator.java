@@ -9,8 +9,8 @@
  */
 package org.mule.routing.inbound;
 
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * This router will return all aggregated events as a {@link org.mule.api.MuleMessageCollection}.

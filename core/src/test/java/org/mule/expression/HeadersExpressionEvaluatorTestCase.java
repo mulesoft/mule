@@ -13,7 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.routing.CorrelationPropertiesExpressionEvaluator;
+import org.mule.routing.correlation.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.UUID;
 

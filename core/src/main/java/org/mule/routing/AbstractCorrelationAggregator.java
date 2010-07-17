@@ -8,22 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.routing.AggregationException;
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID and
  * CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to manage
  * message groups.
  */
-public abstract class AbstractCorrelationAggregatingMessageProcessor extends AbstractEventAggregatingMessageProcessor
+public abstract class AbstractCorrelationAggregator extends AbstractAggregator
 {
 
     @Override
@@ -44,7 +42,7 @@ public abstract class AbstractCorrelationAggregatingMessageProcessor extends Abs
         @Override
         public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
         {
-            return AbstractCorrelationAggregatingMessageProcessor.this.aggregateEvents(events);
+            return AbstractCorrelationAggregator.this.aggregateEvents(events);
         }
     }
 

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -19,19 +19,20 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
+import org.mule.routing.AbstractAggregator;
 import org.mule.routing.AggregationException;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Iterator;
 import java.util.Map;
 
-public class EventAggregatorTestCase extends AbstractMuleTestCase
+public class AggregatorTestCase extends AbstractMuleTestCase
 {
 
-    public EventAggregatorTestCase()
+    public AggregatorTestCase()
     {
         setStartContext(true);
     }
@@ -62,7 +63,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         assertEquals("test event A test event B test event C ", result.getMessageAsString());
     }
 
-    public static class TestEventAggregator extends AbstractEventAggregatingMessageProcessor
+    public static class TestEventAggregator extends AbstractAggregator
     {
         protected final int eventThreshold;
         protected int eventCount = 0;

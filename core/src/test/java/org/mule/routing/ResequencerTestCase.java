@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -19,20 +19,21 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.ResequenceMessagesCorrelatorCallback;
+import org.mule.routing.EventGroup;
+import org.mule.routing.Resequencer;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import org.mule.routing.inbound.CorrelationSequenceComparator;
-import org.mule.routing.inbound.EventGroup;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class CorrelationEventResequencingMessageProcessorTestCase extends AbstractMuleTestCase
+public class ResequencerTestCase extends AbstractMuleTestCase
 {
 
-    public CorrelationEventResequencingMessageProcessorTestCase()
+    public ResequencerTestCase()
     {
         setStartContext(true);
     }
@@ -91,7 +92,7 @@ public class CorrelationEventResequencingMessageProcessorTestCase extends Abstra
         assertEquals("test event C", results.get(2).toString());
     }
 
-    public static class TestEventResequencer extends CorrelationEventResequencingMessageProcessor
+    public static class TestEventResequencer extends Resequencer
     {
         private int eventCount = 0;
         private int eventthreshold = 1;

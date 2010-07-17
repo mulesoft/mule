@@ -17,8 +17,8 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.AnnotationsMessages;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,7 +48,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
      *
      * @param events event group to consider
      * @return true if the event group size is 1 or greater
-     * @see {@link org.mule.routing.EventCorrelatorCallback#shouldAggregateEvents(EventGroup)}
+     * @see {@link org.mule.routing.correlation.EventCorrelatorCallback#shouldAggregateEvents(EventGroup)}
      */
     public boolean shouldAggregateEvents(EventGroup events)
     {

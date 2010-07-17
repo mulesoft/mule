@@ -19,8 +19,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.ResequenceCorrelatorCallback;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.correlation.ResequenceCorrelatorCallback;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 

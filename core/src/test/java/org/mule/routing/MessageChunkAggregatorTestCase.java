@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -18,13 +18,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
+import org.mule.routing.MessageChunkAggregator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-public class MessageChunkAggregatingMessageProcessorTestCase extends AbstractMuleTestCase
+public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
 {
 
-    public MessageChunkAggregatingMessageProcessorTestCase()
+    public MessageChunkAggregatorTestCase()
     {
         setStartContext(true);
     }
@@ -35,7 +36,7 @@ public class MessageChunkAggregatingMessageProcessorTestCase extends AbstractMul
         Service testService = getTestService("test", Apple.class);
         assertNotNull(testService);
 
-        MessageChunkAggregatingMessageProcessor router = new MessageChunkAggregatingMessageProcessor();
+        MessageChunkAggregator router = new MessageChunkAggregator();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);

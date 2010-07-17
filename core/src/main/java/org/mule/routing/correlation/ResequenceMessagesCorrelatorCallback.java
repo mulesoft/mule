@@ -7,28 +7,39 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.routing.correlation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.AggregationException;
+import org.mule.routing.EventGroup;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
- * Note that the {@link #aggregateEvents(org.mule.routing.inbound.EventGroup)} method only resequences the events and
+ * Note that the {@link #aggregateEvents(org.mule.routing.EventGroup)} method only resequences the events and
  * returns an MuleEvent[] wrapped in a MuleMessage impl.  This means that this callback can ONLY be used with a
  * {@link org.mule.routing.inbound.CorrelationEventResequencer}
  */
-public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
+public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCallback
 {
-    protected Comparator<MuleEvent> eventComparator;
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(ResequenceMessagesCorrelatorCallback.class);
 
-    public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator, MuleContext muleContext)
+    protected Comparator eventComparator;
+    protected MuleContext muleContext;
+
+    public ResequenceMessagesCorrelatorCallback(Comparator eventComparator, MuleContext muleContext)
     {
         super(muleContext);
         this.eventComparator = eventComparator;
@@ -42,26 +53,26 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
      *
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws AggregationException
+     * @throws org.mule.routing.AggregationException
      *          if the aggregation fails. in this scenario the
      *          whole event group is removed and passed to the exception handler
      *          for this componenet
      */
-    @Override
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        MuleEvent results[];
-        if (events == null || events.size() == 0)
+        List<Object> resultMessages = new ArrayList<Object>();
+        if (events != null && events.size() > 0)
         {
-            results = EventGroup.EMPTY_EVENTS_ARRAY;
-        }
-        else
-        {
-            results = events.toArray();
+            MuleEvent[] results = events.toArray();
             Arrays.sort(results, eventComparator);
+            for (MuleEvent result : results)
+            {
+                resultMessages.add(result.getMessage().getPayload());   
+            }
         }
-        //This is a bit of a hack since we wrap the the collection of events in a Mule Message to pass back
-        return new DefaultMuleMessage(results, muleContext);
+
+        //This is a bit of a hack since we return a collection of message payloads on one message
+        return new DefaultMuleMessage(resultMessages, muleContext);
     }
 
 }

@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanQuote;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
 
 import java.util.Iterator;
 

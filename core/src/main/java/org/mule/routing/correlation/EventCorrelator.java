@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.routing;
+package org.mule.routing.correlation;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleSession;
@@ -15,13 +15,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
 import org.mule.util.MapUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.Latch;
@@ -41,6 +42,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -94,9 +96,11 @@ public class EventCorrelator
     private EventCorrelatorCallback callback;
 
     private AtomicBoolean timerStarted = new AtomicBoolean(false);
+    
+    private MessageProcessor timeoutMessageProcessor;
 
 
-    public EventCorrelator(EventCorrelatorCallback callback, MessageInfoMapping messageInfoMapping, MuleContext context)
+    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext context)
     {
         if (callback == null)
         {
@@ -113,8 +117,7 @@ public class EventCorrelator
         this.callback = callback;
         this.messageInfoMapping = messageInfoMapping;
         this.context = context;
-
-
+        this.timeoutMessageProcessor = timeoutMessageProcessor;
     }
 
     public void enableTimeoutMonitor() throws WorkException
@@ -568,11 +571,6 @@ public class EventCorrelator
 
                         final FlowConstruct service = group.toArray()[0].getFlowConstruct();
 
-                        if (!(service instanceof Service))
-                        {
-                            throw new UnsupportedOperationException("EventAggregator is only supported with Service");
-                        }
-                        
                         if (isFailOnTimeout())
                         {
                             context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
@@ -602,8 +600,21 @@ public class EventCorrelator
                                     if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
                                     {
                                         // TODO which use cases would need a sync reply event returned?
-                                        ((Service) service).dispatchEvent(newEvent);
-                                        expiredAndDispatchedGroups.put(group.getGroupId(), group.getCreated());
+                                        if (timeoutMessageProcessor != null)
+                                        {
+                                            timeoutMessageProcessor.process(newEvent);
+                                        }
+                                        else
+                                        {
+                                            if (!(service instanceof Service))
+                                            {
+                                                throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+                                            }
+
+                                            ((Service) service).dispatchEvent(newEvent);
+                                        }
+                                        expiredAndDispatchedGroups.put(group.getGroupId(),
+                                            group.getCreated());
                                     }
                                     else
                                     {

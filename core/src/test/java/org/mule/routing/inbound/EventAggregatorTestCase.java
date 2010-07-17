@@ -21,8 +21,9 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.AggregationException;
-import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.EventGroup;
 import org.mule.routing.LoggingCatchAllStrategy;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 

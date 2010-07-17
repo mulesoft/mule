@@ -16,8 +16,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
-import org.mule.routing.EventCorrelator;
-import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelator;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 import javax.resource.spi.work.WorkException;
 
@@ -38,7 +38,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     @Override
     public void initialise() throws InitialisationException
     {
-        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), getMessageInfoMapping(), muleContext);
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), null, getMessageInfoMapping(), muleContext);
         if (timeout != 0)
         {
             eventCorrelator.setTimeout(timeout);

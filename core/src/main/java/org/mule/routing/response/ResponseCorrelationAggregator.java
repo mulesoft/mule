@@ -13,8 +13,8 @@ package org.mule.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a

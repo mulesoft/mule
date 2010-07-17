@@ -12,9 +12,9 @@ package org.mule.example.loanbroker.routers;
 
 import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.EventGroup;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.routing.response.ResponseCorrelationAggregator;
 
 /**

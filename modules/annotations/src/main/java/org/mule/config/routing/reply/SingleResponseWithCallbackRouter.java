@@ -9,7 +9,7 @@
  */
 package org.mule.config.routing.reply;
 
-import org.mule.routing.EventCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
  * The router configured to handle reply messages when the {@link org.mule.api.annotations.routing.Reply}

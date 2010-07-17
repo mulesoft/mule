@@ -10,8 +10,8 @@
 
 package org.mule.routing.response;
 
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.SingleCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.correlation.SingleCorrelatorCallback;
 
 /**
  * Handles single event responses from a replyTo address. If multiple responses will be received 

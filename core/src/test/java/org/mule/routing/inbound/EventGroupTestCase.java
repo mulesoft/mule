@@ -13,6 +13,7 @@ package org.mule.routing.inbound;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.routing.EventGroup;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.UUID;
 

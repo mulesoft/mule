@@ -8,33 +8,32 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor;
+package org.mule.routing;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.routing.inbound.CorrelationSequenceComparator;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.SerializationException;
 import org.apache.commons.lang.SerializationUtils;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.routing.AggregationException;
-import org.mule.routing.CollectionCorrelatorCallback;
-import org.mule.routing.EventCorrelatorCallback;
-import org.mule.routing.inbound.CorrelationSequenceComparator;
-import org.mule.routing.inbound.EventGroup;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-
-public class MessageChunkAggregatingMessageProcessor extends AbstractEventAggregatingMessageProcessor
+public class MessageChunkAggregator extends AbstractAggregator
 {
     public static final int DEFAULT_BUFFER_SIZE = 4096;
 
     protected Comparator eventComparator;
 
-    public MessageChunkAggregatingMessageProcessor()
+    public MessageChunkAggregator()
     {
         super();
         eventComparator= new CorrelationSequenceComparator();
