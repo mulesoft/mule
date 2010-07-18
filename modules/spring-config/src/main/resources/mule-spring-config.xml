@@ -6,7 +6,7 @@
        default-init-method="initialise">
     <!-- Marker for MULE-4813-->    
 
-    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+    <bean id="_muleCustomEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
         <property name="propertyEditorRegistrars">
             <list>
                 <bean class="org.mule.config.spring.editors.MulePropertyEditorRegistrar"/>
@@ -28,5 +28,4 @@
         <!-- other processors may be applied later -->
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
-
 </beans>
