@@ -86,20 +86,20 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         Apple apple = new Apple(true);
         properties.put("apple", apple);
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties, muleContext);
-        assertTrue(message.getProperty("boolean", PropertyScope.OUTBOUND, false));
-        assertEquals(new Integer(24), message.getProperty("number", PropertyScope.OUTBOUND, 0));
-        assertEquals(new Byte((byte)24), message.getProperty("number", PropertyScope.OUTBOUND, new Byte((byte)0)));
-        assertEquals(new Long(24), message.getProperty("number", PropertyScope.OUTBOUND, 0l));
-        assertEquals(new Float(24.3), message.getProperty("decimal", PropertyScope.OUTBOUND, 0f));
-        Double d = message.getProperty("decimal", PropertyScope.OUTBOUND, 0d);
+        assertTrue(message.getOutboundProperty("boolean", false));
+        assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
+        assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
+        assertEquals(new Long(24), message.getOutboundProperty("number", 0l));
+        assertEquals(new Float(24.3), message.getOutboundProperty("decimal", 0f));
+        Double d = message.getOutboundProperty("decimal", 0d);
         assertEquals(new Double(24.3), d);
 
-        assertEquals("true", message.getProperty("boolean", PropertyScope.OUTBOUND, ""));
+        assertEquals("true", message.getOutboundProperty("boolean", ""));
 
-        assertEquals(apple, message.getProperty("apple", PropertyScope.OUTBOUND, null));
+        assertEquals(apple, message.getOutboundProperty("apple", null));
         try
         {
-            message.getProperty("apple", PropertyScope.OUTBOUND, new Orange());
+            message.getOutboundProperty("apple", new Orange());
             fail("Orange is not assignable to Apple");
         }
         catch (IllegalArgumentException e)
@@ -108,11 +108,11 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         }
 
         //Test null
-        assertNull(message.getProperty("banana", PropertyScope.OUTBOUND, null));
-        assertNull(message.getProperty("blah", PropertyScope.OUTBOUND, null));
+        assertNull(message.getOutboundProperty("banana"));
+        assertNull(message.getOutboundProperty("blah"));
 
         //Test default value
-        assertEquals(new Float(24.3), message.getProperty("blah", PropertyScope.OUTBOUND, 24.3f));
+        assertEquals(new Float(24.3), message.getOutboundProperty("blah", 24.3f));
 
     }
     
@@ -239,6 +239,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     private void assertOutboundMessageProperty(String key, MuleMessage message)
     {
         // taking advantage of the fact here that key and value are the same
-        assertEquals(key, message.getProperty(key, PropertyScope.OUTBOUND));
+        assertEquals(key, message.getOutboundProperty(key));
     }
 }

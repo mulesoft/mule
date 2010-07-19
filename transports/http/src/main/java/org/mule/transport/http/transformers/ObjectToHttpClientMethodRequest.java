@@ -167,7 +167,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 Boolean encode =  msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.INVOCATION, null);
                 if (encode == null)
                 {
-                    encode = msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.OUTBOUND, true);
+                    encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
                 }
                 
                 if (encode)
