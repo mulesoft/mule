@@ -157,10 +157,10 @@ public class ProxyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/greeter-proxy", msg, null);
         String resString = result.getPayloadAsString();
-        
-        assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-          result.getOutboundProperty("http.status").equals(HttpConstants.SC_OK));
-        
+
+        assertEquals("Status code should not be 'OK' when the proxied endpoint returns a fault",
+                     HttpConstants.SC_OK, result.getOutboundProperty("http.status"));
+
         assertTrue(resString.indexOf("Fault") != -1);
     }
 
