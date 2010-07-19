@@ -28,7 +28,7 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" exchange-pattern="request-response"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </pass-through-router>
             </outbound>
         </service>

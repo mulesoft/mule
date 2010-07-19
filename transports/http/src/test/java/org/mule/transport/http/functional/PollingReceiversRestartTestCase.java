@@ -24,6 +24,7 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         setStartContext(false);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "polling-receivers-restart-test.xml";
@@ -31,7 +32,6 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
 
     public void testPollingReceiversRestart() throws Exception
     {
-
         muleContext.start();
 
         Object ftc = getComponent("Test");
@@ -57,7 +57,4 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         muleContext.dispose();
         assertTrue("No polls performed", pollCounter.get() > 0);
     }
-
-
 }
-
