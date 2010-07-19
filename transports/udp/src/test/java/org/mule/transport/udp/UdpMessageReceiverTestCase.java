@@ -22,7 +22,7 @@ import com.mockobjects.dynamic.Mock;
 
 public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
         endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
@@ -34,13 +34,14 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return new UdpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
+        UdpConnector connector = new UdpConnector(muleContext);
+        connector.initialise();
+        
         EndpointBuilder builder = new EndpointURIEndpointBuilder("udp://localhost:10100", muleContext);
-        builder.setConnector(new UdpConnector(muleContext));
-        return muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint(builder);
+        builder.setConnector(connector);
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
     }
-
 }
