@@ -413,7 +413,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     @Deprecated
     public Object getProperty(String name, Object defaultValue)
     {
-        Object property = message.getProperty(name);
+        Object property = message.getOutboundProperty(name);
 
         if (property == null)
         {
