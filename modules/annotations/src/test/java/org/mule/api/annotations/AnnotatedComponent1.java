@@ -11,6 +11,8 @@ package org.mule.api.annotations;
 
 import org.mule.api.annotations.expressions.Mule;
 import org.mule.api.annotations.expressions.XPath;
+import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.param.Payload;
 
 import org.dom4j.Document;
 
@@ -18,8 +20,8 @@ public class AnnotatedComponent1
 {
     public Object doSomething(
             @XPath("/foo/bar") String bar,
-            @Mule("message.payload(org.dom4j.Document)") Document doc,
-            @Mule("message.header(name)") String name)
+            @Payload Document doc,
+            @InboundHeaders("name") String name)
     {
         return bar + ":" + name + ":" + doc.asXML();
     }

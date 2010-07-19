@@ -113,7 +113,7 @@ public final class ExpressionUtils
                 Object value = msg.getProperty(name, scope);
                 if (value == null && required)
                 {
-                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("Headers", name));
+                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers", scope.getScopeName() + ":" + name));
                 }
                 else if(value!=null)
                 {
@@ -147,7 +147,7 @@ public final class ExpressionUtils
                 Object value = msg.getProperty(name, scope);
                 if (value == null && required)
                 {
-                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("HeadersList", name));
+                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers-list", scope.getScopeName() + ":" + name));
                 }
                 else if(value!=null)
                 {
@@ -167,7 +167,7 @@ public final class ExpressionUtils
             Object result = msg.getProperty(expression.trim(), defaultScope);
             if (result == null && required)
             {
-                throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("Header", expression));
+                throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("header", defaultScope.getScopeName() + ":" + expression));
 
             }
             return (T) result;

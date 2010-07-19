@@ -35,26 +35,55 @@ import java.util.Set;
 import net.sf.cglib.proxy.Enhancer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A Mule {@link org.mule.api.model.EntryPointResolver} implementation that will resolve methods on a service class
- * that has the {@link org.mule.api.annotations.Entrypoint} annotation. It will transform the received message to
- * match the arguments on the annotated method and will honor any parameter annotations such as {@link org.mule.api.annotations.expressions.XPath}
- * or {@link org.mule.api.annotations.expressions.Mule} annotations.
+ * that have Mule expression annotations such as {@link org.mule.api.annotations.param.Payload}, {@link org.mule.api.annotations.param.InboundHeaders} or {@link org.mule.api.annotations.expressions.XPath}.
+ * It will transform the received message to match the annotated method arguments. For example -
+ * <code>
+ * public Object doSomething(
+ *         &#64;XPath ("/foo/bar") String bar,
+ *         &#64;Payload Document doc,
+ *         &#64;InboundHeaders("name") String name)
+ *  {
+ *      //do stuff
+ *  }
+ * </code>
+ *
+ * The component methodf above will be invoked by running the XPath expression on the payload, adding a second parameter as
+ * the payload itself and passing in the header 'name' as the third parameter.
+ *
+ * There are some rules for how components with annotations will be processed -
+ * <ul>
+ * <li>For components with more than one method annotated with Mule expression annotations the method name to call needs
+ * to be set on the incoming message or endpoint using the {@link org.mule.api.config.MuleProperties#MULE_METHOD_PROPERTY} key.</li>
+ * <li>If the component has only one method annotated with Mule expression annotations there is no need to set the method name to invoke</li>
+ * <li>Every parameter on the method needs to be annotated</li>
+ * </ul>
+ *
+ * @see org.mule.api.annotations.param.Payload
+ * @see org.mule.api.annotations.param.InboundHeaders
+ * @see org.mule.api.annotations.param.InboundAttachments
+ * @see org.mule.api.annotations.param.OutboundHeaders
+ * @see org.mule.api.annotations.param.OutboundAttachments
+ * @see org.mule.api.annotations.expressions.XPath
+ * @see org.mule.api.annotations.expressions.Groovy
+ * @see org.mule.api.annotations.expressions.Mule
+ *
+ * @since 3.0
+ *
  */
 public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 {
-    private Set<String> ignoredMethods = new HashSet<String>(Arrays.asList("equals",
-            "getInvocationHandler", "set*", "toString",
-            "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"));
 
-    private volatile boolean firstTime = true;
+    private AtomicBoolean firstTime = new AtomicBoolean(true);
 
     private Map<Method, Transformer> transformerCache = new ConcurrentHashMap();
 
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
-        if (firstTime)
+        if (firstTime.getAndSet(false))
         {
             try
             {
@@ -124,7 +153,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 
     protected Object[] getPayloadForMethod(Method method, Object component, MuleEventContext context) throws TransformerException, InitialisationException
     {
-        Object[] payload;
+        Object[] payload = null;
         Method m = method;
         //If we are using cglib enhanced service objects, we need to read annotations from the real component class
         if (Enhancer.isEnhanced(component.getClass()))
@@ -138,19 +167,10 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
                 throw new TransformerException(CoreMessages.createStaticMessage(e.getMessage()), e);
             }
         }
+
         if (AnnotationUtils.getParamAnnotationsWithMeta(m, Evaluator.class).size() > 0)
         {
             payload = getPayloadFromMessageWithAnnotations(m, context);
-        }
-        else
-        {
-            payload = getPayloadFromMessage(context);
-            List methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils.getClassTypes(payload), true, true, ignoredMethods);
-            if (methods.size() == 0 && m.getParameterTypes().length == 1)
-            {
-                Object temp = context.getMessage().getPayload(m.getParameterTypes()[0]);
-                payload = new Object[]{temp};
-            }
         }
         return payload;
     }
@@ -199,6 +219,5 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
                 this.addMethodByName(method, context);
             }
         }
-        firstTime = false;
     }
 }
