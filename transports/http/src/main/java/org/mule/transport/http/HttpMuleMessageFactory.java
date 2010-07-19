@@ -267,16 +267,18 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             String connection = (String) headers.get(HttpConstants.HEADER_CONNECTION);
             if ((connection != null) && connection.equalsIgnoreCase("close"))
             {
-                headerValue = "false";
+                headerValue = Boolean.FALSE.toString();
             }
             else
             {
-                headerValue = "true";
+                headerValue = Boolean.TRUE.toString();
             }
         }
         else
         {
-            headerValue = (headers.get(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
+            headerValue = (headers.get(HttpConstants.HEADER_CONNECTION) != null
+                            ? Boolean.TRUE.toString()
+                            : Boolean.FALSE.toString());
         }
 
         headers.put(HttpConstants.HEADER_CONNECTION, headerValue);
