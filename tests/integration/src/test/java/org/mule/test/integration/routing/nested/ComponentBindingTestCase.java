@@ -19,10 +19,9 @@ import java.util.Date;
 
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
-    private static final int RECEIVE_TIMEOUT = 7000;
-
     private static final int number = 0xC0DE;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/nested/interface-binding-test.xml";
@@ -44,7 +43,7 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         Date message = new Date();
         client.dispatch(prefix + "invoker.in", message, null);
-        MuleMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);
+        MuleMessage reply = client.request(prefix + "invoker.out", getTestTimeoutSecs());
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         assertEquals(NullPayload.getInstance(), reply.getPayload());
