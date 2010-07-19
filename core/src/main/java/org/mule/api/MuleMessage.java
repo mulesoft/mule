@@ -69,7 +69,7 @@ public interface MuleMessage extends Serializable
     Object getProperty(String key);
 
     /**
-     * Set a property on the message
+     * Set a property on the message. This method will now set a value on the outbound scope only.
      * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
      *  
      * @param key the key on which to associate the value
@@ -77,6 +77,21 @@ public interface MuleMessage extends Serializable
      */
     @Deprecated
     void setProperty(String key, Object value);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
+    void setInboundProperty(String key, Object value);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
+    void setInvocationProperty(String key, Object value);
+
+    /**
+     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
+     */
+    void setOutboundProperty(String key, Object value);
 
     /**
      * Set a property on the message
@@ -155,6 +170,36 @@ public interface MuleMessage extends Serializable
      * @return the property value or null if the property does not exist in the specified scope
      */
     Object getProperty(String name, PropertyScope scope);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getInboundProperty(String name, T defaultValue);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getInboundProperty(String name);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getInvocationProperty(String name, T defaultValue);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getInvocationProperty(String name);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getOutboundProperty(String name, T defaultValue);
+
+    /**
+     * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)
+     */
+    <T> T getOutboundProperty(String name);
 
     /**
      * Gets a property from the message with a given scope and provides a default value if the property is not

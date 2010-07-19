@@ -376,6 +376,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return originalPayload;
     }
 
+    public void setInboundProperty(String key, Object value)
+    {
+        setProperty(key, value, PropertyScope.INBOUND);
+    }
+
+    public void setInvocationProperty(String key, Object value)
+    {
+        setProperty(key, value, PropertyScope.INVOCATION);
+    }
+
+    public void setOutboundProperty(String key, Object value)
+    {
+        setProperty(key, value, PropertyScope.OUTBOUND);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -569,6 +584,36 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         return properties.getProperty(name, scope);
+    }
+
+    public <T> T getInboundProperty(String name, T defaultValue)
+    {
+        return getProperty(name, PropertyScope.INBOUND, defaultValue);
+    }
+
+    public <T> T getInboundProperty(String name)
+    {
+        return getProperty(name, PropertyScope.INBOUND, (T) null);
+    }
+
+    public <T> T getInvocationProperty(String name, T defaultValue)
+    {
+        return getProperty(name, PropertyScope.INVOCATION, defaultValue);
+    }
+
+    public <T> T getInvocationProperty(String name)
+    {
+        return getInvocationProperty(name, (T) null);
+    }
+
+    public <T> T getOutboundProperty(String name, T defaultValue)
+    {
+        return getProperty(name, PropertyScope.OUTBOUND, defaultValue);
+    }
+
+    public <T> T getOutboundProperty(String name)
+    {
+        return getOutboundProperty(name, (T) null);
     }
 
     /**
