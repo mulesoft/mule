@@ -2417,7 +2417,19 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         sb.append(nl);
         sb.append("  supportedProtocols=").append(supportedProtocols);
         sb.append(nl);
-        sb.append("  serviceOverrides=").append(ObjectUtils.defaultIfNull(serviceOverrides, "<none>"));
+        sb.append("  serviceOverrides=");
+        if (serviceOverrides != null)
+        {
+            for (Map.Entry<Object, Object> entry : serviceOverrides.entrySet())
+            {
+                sb.append(nl);
+                sb.append("    ").append(String.format("%s=%s", entry.getKey(), entry.getValue()));
+            }
+        }
+        else
+        {
+            sb.append("<none>");
+        }
         sb.append(nl);
         sb.append('}');
         sb.append(nl);
