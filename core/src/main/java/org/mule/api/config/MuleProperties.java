@@ -144,6 +144,7 @@ public class MuleProperties
     // TODO BL-76: remove me!
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
     public static final String EXCHANGE_PATTERN = "exchange-pattern";
+    public static final String EXCHANGE_PATTERN_CAMEL_CASE = "exchangePattern";
 
     /**
      * The prefix for any Mule-specific properties set in the system properties

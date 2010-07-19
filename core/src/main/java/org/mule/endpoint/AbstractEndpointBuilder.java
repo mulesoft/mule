@@ -125,7 +125,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             }
         }
 
-        String mepString = (String)properties.get(MuleProperties.EXCHANGE_PATTERN);
+        String mepString = (String) properties.get(MuleProperties.EXCHANGE_PATTERN_CAMEL_CASE);
         if (StringUtils.isNotEmpty(mepString))
         {
             setExchangePattern(MessageExchangePattern.fromString(mepString));

@@ -10,7 +10,7 @@
         <service name="test">
             <inbound>
                 <atom:inbound-endpoint address="http://foo.com" acceptedMimeTypes="foo/bar" 
-                    lastUpdate="2009-10-01" exchange-pattern="request-response"/>
+                    lastUpdate="2009-10-01" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>
