@@ -30,75 +30,75 @@
             <log-component />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="echo" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="echo"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="fromMessageExceptionProcess">
             <inbound>
-                <bpm:inbound-endpoint process="exception" exchange-pattern="one-way"/>
+                <bpm:inbound-endpoint process="exception"/>
             </inbound>
             <log-component />
             <outbound>
                 <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueC" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint path="queueD" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="queueC"/>
+                    <vm:outbound-endpoint path="queueD"/>
                 </bpm:outbound-router>
             </outbound>
         </service>
 
         <service name="fromForkedProcess">
             <inbound>
-                <bpm:inbound-endpoint process="fork" exchange-pattern="one-way"/>
+                <bpm:inbound-endpoint process="fork"/>
             </inbound>
             <log-component />
             <outbound>
                 <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueA" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint path="echo" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint path="queueB" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="queueA"/>
+                    <vm:outbound-endpoint path="echo"/>
+                    <vm:outbound-endpoint path="queueB"/>
                 </bpm:outbound-router>
             </outbound>
         </service>
 
         <service name="fromVariablesProcess">
             <inbound>
-                <bpm:inbound-endpoint process="variables" exchange-pattern="one-way"/>
+                <bpm:inbound-endpoint process="variables"/>
             </inbound>
             <log-component />
             <outbound>
                 <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueA" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint path="queueB" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="queueA"/>
+                    <vm:outbound-endpoint path="queueB"/>
                 </bpm:outbound-router>
             </outbound>
         </service>
 
         <service name="ServiceA" initialState="stopped">
             <inbound>
-                <vm:inbound-endpoint path="queueA" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="queueA"/>
             </inbound>
             <test:component>
                 <test:return-data>Response A</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <bpm:outbound-endpoint process="fork" exchange-pattern="one-way"/>
+                    <bpm:outbound-endpoint process="fork"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="ServiceB">
             <inbound>
-                <vm:inbound-endpoint path="queueB" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="queueB"/>
             </inbound>
             <test:component>
                 <test:return-data>Response B</test:return-data>
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <bpm:outbound-endpoint process="fork" exchange-pattern="one-way"/>
+                    <bpm:outbound-endpoint process="fork"/>
                 </pass-through-router>
             </outbound>
         </service>

@@ -11,6 +11,7 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 
 import java.util.Date;
@@ -21,7 +22,7 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 {
     static
     {
-           System.setProperty( PROPERTY_MULE_TEST_TIMEOUT, "300");
+        System.setProperty(PROPERTY_MULE_TEST_TIMEOUT, "300");
     }
 
     @Override
@@ -37,14 +38,14 @@ public class VariablesTestCase extends AbstractJbpmTestCase
         {
             Map<String, Object> props = new HashMap<String, Object>();
             props.put("foo", "bar");
-            MuleMessage response = client.send("bpm://variables", "data", props);  
-            String processId = (String) bpms.getId(response.getPayload());
+            MuleMessage response = client.send("bpm://variables", "data", props);
+            String processId = (String)bpms.getId(response.getPayload());
             assertNotNull(processId);
 
             response = client.request("vm://queueA", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getProperty("foo"));
-            assertEquals(0.75, response.getProperty("fraction"));
+            assertEquals("bar", response.getProperty("foo", PropertyScope.OUTBOUND));
+            assertEquals(0.75, response.getProperty("fraction", PropertyScope.OUTBOUND));
 
             // Advance the process
             props = new HashMap<String, Object>();
@@ -54,10 +55,10 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 
             response = client.request("vm://queueB", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getProperty("foo"));
-            assertEquals(0.75, response.getProperty("fraction"));
-            assertEquals("berry", response.getProperty("straw"));
-            assertTrue(response.getProperty("time") instanceof Date);
+            assertEquals("bar", response.getProperty("foo", PropertyScope.OUTBOUND));
+            assertEquals(0.75, response.getProperty("fraction", PropertyScope.OUTBOUND));
+            assertEquals("berry", response.getProperty("straw",  PropertyScope.OUTBOUND));
+            assertTrue(response.getProperty("time", PropertyScope.OUTBOUND) instanceof Date);
         }
         finally
         {
