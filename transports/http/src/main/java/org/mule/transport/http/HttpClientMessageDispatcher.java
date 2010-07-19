@@ -389,7 +389,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected boolean returnException(MuleEvent event, HttpMethod httpMethod)
     {
-        String disableCheck = (String) event.getMessage().getProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, PropertyScope.INVOCATION);
+        String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         if (disableCheck == null)
         {
             disableCheck = (String) event.getMessage().getProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, PropertyScope.OUTBOUND); 

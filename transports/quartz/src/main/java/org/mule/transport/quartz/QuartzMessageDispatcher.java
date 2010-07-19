@@ -72,7 +72,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         // populate from invocation and outbound scopes only
         for (String key : msg.getPropertyNames(PropertyScope.INVOCATION))
         {
-            jobDataMap.put(key, msg.getProperty(key, PropertyScope.INVOCATION));
+            jobDataMap.put(key, msg.getInvocationProperty(key));
         }
         for (String key : msg.getPropertyNames(PropertyScope.OUTBOUND))
         {

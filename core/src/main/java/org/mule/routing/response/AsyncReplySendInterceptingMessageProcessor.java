@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
@@ -39,9 +38,8 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
         MuleEvent resultEvent = processNext(event);
 
         // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-        final String replyToStop = (String) resultEvent.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, PropertyScope.INVOCATION);
-        if (resultEvent != null
-            && !BooleanUtils.toBoolean(replyToStop))
+        final String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+        if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
         {
             processReplyTo(event, resultEvent, replyToHandler, replyTo);
         }

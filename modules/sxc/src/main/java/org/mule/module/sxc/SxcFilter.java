@@ -12,7 +12,6 @@ package org.mule.module.sxc;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transport.PropertyScope;
 
 import com.envoisolutions.sxc.xpath.XPathBuilder;
 
@@ -40,7 +39,7 @@ public class SxcFilter implements Filter
 
     public boolean accept(MuleMessage msg)
     {
-         Object accept = msg.getProperty(toString(), PropertyScope.INVOCATION);
+        Object accept = msg.getInvocationProperty(toString());
          
          if (accept == null && SxcFilteringOutboundRouter.getCurrentMessage() == null) 
          {

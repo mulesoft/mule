@@ -191,7 +191,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
         if (contentType == null)
         {
-            contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INVOCATION);
+            contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         }
 
         // MULE-4047 Don't explicitly set the content-type to a default value here, 

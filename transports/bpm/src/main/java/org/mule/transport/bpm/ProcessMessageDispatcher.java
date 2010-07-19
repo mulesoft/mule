@@ -102,7 +102,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
 
         // Retrieve the parameters
-        Object processType = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_TYPE, PropertyScope.INVOCATION);
+        Object processType = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_TYPE);
 
         // TODO MULE-1220 The processId for BPM is sort of like a session and so we could probably use
@@ -113,11 +113,11 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         //TODO this is redundent but I'm not sure what the correct behaviour is
         if (StringUtils.isNotEmpty(processIdField))
         {
-            processId = event.getMessage().getProperty(processIdField, PropertyScope.INVOCATION);
+            processId = event.getMessage().getInvocationProperty(processIdField);
         }
         // If processId is explicitly set for the message, this overrides the
         // processIdField.
-        processId = event.getMessage().getProperty(ProcessConnector.PROPERTY_PROCESS_ID, PropertyScope.INVOCATION, null);
+        processId = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_ID);
         if (processId == null)
         {
             processId = event.getMessage().getOutboundProperty(ProcessConnector.PROPERTY_PROCESS_ID); 
@@ -129,7 +129,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
             ProcessConnector.ACTION_ADVANCE);
         processVariables.remove(ProcessConnector.PROPERTY_ACTION);
 
-        Object transition = event.getMessage().getProperty(ProcessConnector.PROPERTY_TRANSITION, PropertyScope.INVOCATION);
+        Object transition = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_TRANSITION);
         processVariables.remove(ProcessConnector.PROPERTY_TRANSITION);
 
         // Decode the URI, for example:

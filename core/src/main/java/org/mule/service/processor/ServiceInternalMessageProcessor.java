@@ -71,7 +71,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
             // CXF)
             if (resultEvent != null)
             {
-                String replyToStop = (String) resultEvent.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, PropertyScope.INVOCATION);
+                String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
                 if (!event.isSynchronous() || !BooleanUtils.toBoolean(replyToStop))
                 {
                     processReplyTo(event, resultEvent, replyToHandler, replyTo);

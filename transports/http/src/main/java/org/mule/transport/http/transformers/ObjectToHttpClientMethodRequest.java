@@ -164,7 +164,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 String paramName = URLEncoder.encode(getBodyParam, outputEncoding);
 
                 String paramValue;
-                Boolean encode =  msg.getProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, PropertyScope.INVOCATION, null);
+                Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
                 if (encode == null)
                 {
                     encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);

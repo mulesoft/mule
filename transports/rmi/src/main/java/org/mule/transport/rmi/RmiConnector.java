@@ -221,7 +221,7 @@ public class RmiConnector extends AbstractJndiConnector
             }
         }
 
-        Class[] argTypes = getArgTypes(event.getMessage().getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, PropertyScope.INVOCATION), event);
+        Class[] argTypes = getArgTypes(event.getMessage().getInvocationProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES), event);
 
         try
         {
