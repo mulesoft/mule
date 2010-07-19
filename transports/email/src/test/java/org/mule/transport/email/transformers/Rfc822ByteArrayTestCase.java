@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.email.SmtpConnector;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -51,8 +52,8 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws MuleException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "smtp");
+        ImmutableEndpoint endpoint = 
+            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(SmtpConnector.SMTP);
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);
