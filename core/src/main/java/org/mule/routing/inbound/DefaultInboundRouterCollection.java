@@ -22,7 +22,7 @@ import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
-import org.mule.source.StartablePatternAwareCompositeMessageSource;
+import org.mule.source.StartableCompositeMessageSource;
 import org.mule.util.StringMessageUtils;
 
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
     implements InboundRouterCollection
 {
     
-    protected CompositeMessageSource compositeMessageSource = new StartablePatternAwareCompositeMessageSource();
+    protected CompositeMessageSource compositeMessageSource = new StartableCompositeMessageSource();
     
     @SuppressWarnings("unchecked")
     protected final List<InboundEndpoint> endpoints = new CopyOnWriteArrayList();

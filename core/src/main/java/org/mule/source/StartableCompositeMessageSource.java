@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,17 +41,17 @@ import org.apache.commons.logging.LogFactory;
  * messages will be lost.
  * <li>Message will only be received from endpoints if the connector is also started.
  */
-public class StartablePatternAwareCompositeMessageSource
+public class StartableCompositeMessageSource
     implements CompositeMessageSource, Startable, Stoppable, FlowConstructAware
 {
-    protected static final Log log = LogFactory.getLog(StartablePatternAwareCompositeMessageSource.class);
+    protected static final Log log = LogFactory.getLog(StartableCompositeMessageSource.class);
 
     protected MessageProcessor listener;
     protected AtomicBoolean started = new AtomicBoolean(false);
+    protected final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
+    protected AtomicBoolean starting = new AtomicBoolean(false);
+    protected FlowConstruct flowConstruct;
     private MessageProcessor internalListener = new InternalMessageProcessor();
-    private final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
-    private AtomicBoolean starting = new AtomicBoolean(false);
-    private FlowConstruct flowConstruct;
 
     public void addSource(MessageSource source) throws MuleException
     {

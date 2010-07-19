@@ -19,13 +19,13 @@ import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
-public class StartablePatternAwareCompositeMessageSourceTestCase extends AbstractMuleTestCase
+public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCase
 {
-    SensingNullMessageProcessor listener;
-    SensingNullMessageProcessor listener2;
-    StartablePatternAwareCompositeMessageSource sourceAgregator;
-    MuleEvent testEvent;
-    NullMessageSource source;
+    protected SensingNullMessageProcessor listener;
+    protected SensingNullMessageProcessor listener2;
+    protected StartableCompositeMessageSource compositeSource;
+    protected MuleEvent testEvent;
+    protected NullMessageSource source;
 
     @Override
     protected void doSetUp() throws Exception
@@ -33,15 +33,20 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
         super.doSetUp();
         listener = getSensingNullMessageProcessor();
         listener2 = getSensingNullMessageProcessor();
-        sourceAgregator = new StartablePatternAwareCompositeMessageSource();
+        compositeSource = getCompositeSource();
         testEvent = getTestEvent(TEST_MESSAGE);
         source = new NullMessageSource(testEvent);
+    }
+    
+    protected StartableCompositeMessageSource getCompositeSource()
+    {
+        return new StartableCompositeMessageSource();
     }
 
     public void testAddSourceStopped() throws MuleException
     {
-        sourceAgregator.setListener(listener);
-        sourceAgregator.addSource(source);
+        compositeSource.setListener(listener);
+        compositeSource.addSource(source);
 
         source.triggerSource();
         assertNull(listener.event);
@@ -50,17 +55,17 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
         source.triggerSource();
         assertNull(listener.event);
 
-        sourceAgregator.start();
+        compositeSource.start();
         source.triggerSource();
         assertEquals(testEvent, listener.event);
     }
 
     public void testAddSourceStarted() throws MuleException
     {
-        sourceAgregator.setListener(listener);
-        sourceAgregator.start();
+        compositeSource.setListener(listener);
+        compositeSource.start();
 
-        sourceAgregator.addSource(source);
+        compositeSource.addSource(source);
 
         source.triggerSource();
         assertEquals(testEvent, listener.event);
@@ -68,30 +73,30 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
 
     public void testRemoveSource() throws MuleException
     {
-        sourceAgregator.setListener(listener);
-        sourceAgregator.addSource(source);
-        sourceAgregator.start();
+        compositeSource.setListener(listener);
+        compositeSource.addSource(source);
+        compositeSource.start();
 
         source.triggerSource();
         assertEquals(testEvent, listener.event);
         listener.clear();
 
-        sourceAgregator.removeSource(source);
+        compositeSource.removeSource(source);
         source.triggerSource();
         assertNull(listener.event);
     }
 
     public void testSetListenerStarted() throws MuleException
     {
-        sourceAgregator.addSource(source);
-        sourceAgregator.setListener(listener);
-        sourceAgregator.start();
+        compositeSource.addSource(source);
+        compositeSource.setListener(listener);
+        compositeSource.start();
 
         source.triggerSource();
         assertEquals(testEvent, listener.event);
 
         listener.clear();
-        sourceAgregator.setListener(listener2);
+        compositeSource.setListener(listener2);
 
         source.triggerSource();
         assertNull(listener.event);
@@ -100,23 +105,23 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
 
     public void testStart() throws MuleException
     {
-        sourceAgregator.setListener(listener);
-        sourceAgregator.addSource(source);
+        compositeSource.setListener(listener);
+        compositeSource.addSource(source);
 
         source.triggerSource();
         assertNull(listener.event);
 
-        sourceAgregator.start();
+        compositeSource.start();
         source.triggerSource();
         assertEquals(testEvent, listener.event);
     }
 
     public void testStartNoListener() throws MuleException
     {
-        sourceAgregator.addSource(source);
+        compositeSource.addSource(source);
         try
         {
-            sourceAgregator.start();
+            compositeSource.start();
             fail("Exception excepted");
         }
         catch (Exception e)
@@ -127,16 +132,16 @@ public class StartablePatternAwareCompositeMessageSourceTestCase extends Abstrac
 
     public void testStop() throws MuleException
     {
-        sourceAgregator.setListener(listener);
-        sourceAgregator.addSource(source);
-        sourceAgregator.start();
+        compositeSource.setListener(listener);
+        compositeSource.addSource(source);
+        compositeSource.start();
 
-        sourceAgregator.stop();
+        compositeSource.stop();
         source.triggerSource();
         assertNull(listener.event);
     }
 
-    class NullMessageSource implements MessageSource, Startable, Stoppable
+    protected class NullMessageSource implements MessageSource, Startable, Stoppable
     {
         MuleEvent event;
         MessageProcessor listener;
