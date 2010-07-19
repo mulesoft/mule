@@ -40,7 +40,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setMuleContext(muleContext);
 
         MuleMessage msg = new DefaultMuleMessage("message", muleContext);
-        msg.setProperty("addedProperty", "originalValue", PropertyScope.OUTBOUND);
+        msg.setOutboundProperty("addedProperty", "originalValue");
         MuleEventContext ctx = getTestEventContext(msg);
         // context clones message
         msg = ctx.getMessage();
@@ -85,7 +85,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
-        msg.setProperty("public-house", "Bar", PropertyScope.OUTBOUND);
+        msg.setOutboundProperty("public-house", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
@@ -123,7 +123,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
-        msg.setProperty("badProperty", "badValue", PropertyScope.OUTBOUND);
+        msg.setOutboundProperty("badProperty", "badValue");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());

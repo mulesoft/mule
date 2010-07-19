@@ -29,7 +29,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.ConnectException;
@@ -385,7 +384,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
-            message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress, PropertyScope.OUTBOUND);
+            message.setOutboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
         }
 
         public void release()
@@ -523,9 +522,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                          + "' is being rejected since it does not match the filter on this endpoint: "
                          + endpoint);
         }
-        message.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,
-                            String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE),
-                            PropertyScope.OUTBOUND);
+        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
         return message;
     }
 }

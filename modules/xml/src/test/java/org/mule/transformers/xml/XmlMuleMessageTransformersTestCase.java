@@ -32,8 +32,8 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         msg.setEncoding("UTF-8");
         msg.setCorrelationId("1234");
         msg.setInvocationProperty("number", 1);
-        msg.setProperty("object", new Apple(), PropertyScope.OUTBOUND);
-        msg.setProperty("string", "hello", PropertyScope.OUTBOUND);
+        msg.setOutboundProperty("object", new Apple());
+        msg.setOutboundProperty("string", "hello");
 
         String xml = (String) t1.transform(msg);
         assertNotNull(xml);

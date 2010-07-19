@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
 
@@ -68,6 +67,6 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
         {
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession, PropertyScope.OUTBOUND);
+        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession);
     }
 }

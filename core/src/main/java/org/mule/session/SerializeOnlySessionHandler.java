@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
@@ -62,7 +61,7 @@ public class SerializeOnlySessionHandler implements SessionHandler
         {
             logger.debug("Adding serialized Session header to message: " + serializedSession);
         }
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession, PropertyScope.OUTBOUND);
+        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession);
     }
     
     protected MuleSession removeNonSerializableProperties(MuleSession session)

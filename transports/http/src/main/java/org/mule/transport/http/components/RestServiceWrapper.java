@@ -21,7 +21,6 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transport.PropertyScope;
 import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -193,7 +192,7 @@ public class RestServiceWrapper extends AbstractComponent
         // if post
         {
             StringBuffer requestBodyBuffer = new StringBuffer();
-            event.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE, PropertyScope.OUTBOUND);
+            event.getMessage().setOutboundProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();

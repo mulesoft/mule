@@ -97,7 +97,7 @@ public class OutboundHeadersExpressionEvaluator implements ExpressionEvaluator
 
         public Object put(String key, Object value)
         {
-            message.setProperty(key, value, PropertyScope.OUTBOUND);
+            message.setOutboundProperty(key, value);
             return value;
         }
 

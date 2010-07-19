@@ -16,7 +16,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.codec.Base64Decoder;
@@ -126,7 +125,7 @@ public class LegacySessionHandler implements SessionHandler
             logger.debug("Adding session header to message: " + sessionString);
         }
         sessionString = (String) encoder.transform(sessionString);
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString, PropertyScope.OUTBOUND);
+        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString);
     }
     
     /**

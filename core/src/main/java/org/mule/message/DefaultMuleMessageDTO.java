@@ -83,7 +83,7 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
             String prefix = s.substring(0, i);
             if (prefix.equals(PropertyScope.OUTBOUND.getScopeName()))
             {
-                message.setProperty(s.substring(i + 1), getProperty(s), PropertyScope.OUTBOUND);
+                message.setOutboundProperty(s.substring(i + 1), getProperty(s));
             }
             else if (prefix.equals(PropertyScope.SESSION.getScopeName()))
             {

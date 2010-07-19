@@ -50,7 +50,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractIntercep
                 Object propertyValue = event.getMessage().getProperty(propertyName, PropertyScope.OUTBOUND);
                 if (propertyValue != null)
                 {
-                    responseEvent.getMessage().setProperty(propertyName, propertyValue, PropertyScope.OUTBOUND);
+                    responseEvent.getMessage().setOutboundProperty(propertyName, propertyValue);
                 }
             }
         }

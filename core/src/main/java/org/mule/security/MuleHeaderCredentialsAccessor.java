@@ -13,7 +13,6 @@ package org.mule.security;
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CredentialsAccessor;
-import org.mule.api.transport.PropertyScope;
 
 /**
  * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user credentials
@@ -28,6 +27,6 @@ public class MuleHeaderCredentialsAccessor implements CredentialsAccessor
 
     public void setCredentials(MuleEvent event, Object credentials)
     {
-        event.getMessage().setProperty(MuleProperties.MULE_USER_PROPERTY, credentials, PropertyScope.OUTBOUND);
+        event.getMessage().setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, credentials);
     }
 }

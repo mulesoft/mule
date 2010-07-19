@@ -26,7 +26,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -104,7 +103,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             Map<String, String> customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
             request.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
-        request.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET", PropertyScope.OUTBOUND);
+        request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 
         MuleSession session = new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext());
 

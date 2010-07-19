@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 
 import org.apache.commons.logging.Log;
@@ -79,7 +78,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
                 logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
                              + code);
             }
-            message.setProperty(propName, code, PropertyScope.OUTBOUND);
+            message.setOutboundProperty(propName, code);
         }
     }
 

@@ -36,7 +36,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
@@ -61,7 +60,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -745,8 +743,8 @@ public class MuleClient implements Disposable
 
             if (user != null)
             {
-                message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
-                    user.getUsername(), user.getPassword()), PropertyScope.OUTBOUND);
+                message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
+                        user.getUsername(), user.getPassword()));
             }
             DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
             return event;

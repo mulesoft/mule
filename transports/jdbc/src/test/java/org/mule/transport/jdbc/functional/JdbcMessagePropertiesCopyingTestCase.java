@@ -12,7 +12,6 @@ package org.mule.transport.jdbc.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
@@ -32,8 +31,8 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
         
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         // provide a valid type header so the JDBC query actually returns something
-        message.setProperty("type", 1, PropertyScope.OUTBOUND);
-        message.setProperty(PROPERTY_KEY, PROPERTY_VALUE, PropertyScope.OUTBOUND);
+        message.setOutboundProperty("type", 1);
+        message.setOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE);
         
         MuleMessage result = client.send("vm://in", message);
         assertNotNull(result);

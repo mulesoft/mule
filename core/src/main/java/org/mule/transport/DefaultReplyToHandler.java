@@ -22,7 +22,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.service.AbstractService;
@@ -86,7 +85,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             Object propertyValue = event.getMessage().getInboundProperty(propertyName);
             if (propertyValue != null)
             {
-                replyToEvent.getMessage().setProperty(propertyName, propertyValue, PropertyScope.OUTBOUND);
+                replyToEvent.getMessage().setOutboundProperty(propertyName, propertyValue);
             }
         }
 

@@ -136,17 +136,17 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             String cc = context.getCacheControl();
             if (cl > -1)
             {
-                response.setProperty("Content-Length", Long.toString(cl), PropertyScope.OUTBOUND);
+                response.setOutboundProperty("Content-Length", Long.toString(cl));
             }
             if (cc != null && cc.length() > 0)
             {
-                response.setProperty("Cache-Control", cc, PropertyScope.OUTBOUND);
+                response.setOutboundProperty("Cache-Control", cc);
             }
 
             MimeType ct = context.getContentType();
             if (ct != null)
             {
-                response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct.toString(), PropertyScope.OUTBOUND);
+                response.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct.toString());
             }
 
             String[] names = context.getHeaderNames();
@@ -162,7 +162,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
 //                        response.setDateHeader(name, ((Date)value).getTime());
                     else
                     {
-                        response.setProperty(name, value.toString(), PropertyScope.OUTBOUND);
+                        response.setOutboundProperty(name, value.toString());
                     }
                 }
             }

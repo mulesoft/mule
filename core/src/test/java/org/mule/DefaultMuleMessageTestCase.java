@@ -143,10 +143,10 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     public void testPreviousMessageConstructorWithMuleMessageAsPayloadAndMuleMessageAsPrevious()
     {
         MuleMessage payload = createMuleMessage();
-        payload.setProperty("payload", "payload", PropertyScope.OUTBOUND);
+        payload.setOutboundProperty("payload", "payload");
         
         MuleMessage previous = createMuleMessage();
-        previous.setProperty("previous", "previous", PropertyScope.OUTBOUND);
+        previous.setOutboundProperty("previous", "previous");
         
         MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
         assertEquals("MULE_MESSAGE", message.getPayload());
@@ -158,7 +158,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     public void testClearProperties()
     {
         MuleMessage payload = createMuleMessage();
-        payload.setProperty("foo", "fooValue", PropertyScope.OUTBOUND);
+        payload.setOutboundProperty("foo", "fooValue");
         payload.setInvocationProperty("bar", "barValue");
 
         assertEquals(1, payload.getPropertyNames(PropertyScope.INVOCATION).size());
@@ -232,7 +232,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     private MuleMessage createMuleMessage()
     {
         MuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", muleContext);
-        previousMessage.setProperty("MuleMessage", "MuleMessage", PropertyScope.OUTBOUND);
+        previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;
     }
 

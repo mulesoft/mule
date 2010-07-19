@@ -11,7 +11,6 @@
 package org.mule.transport.cxf.support;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -52,8 +51,8 @@ public class MuleProtocolHeadersOutInterceptor
         {
             method = HttpConstants.METHOD_POST;
         }
-        
-        muleMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method, PropertyScope.OUTBOUND);
+
+        muleMsg.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         
         Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(Message.PROTOCOL_HEADERS));
         if (reqHeaders != null)
@@ -62,8 +61,8 @@ public class MuleProtocolHeadersOutInterceptor
             {
                 String key = e.getKey();
                 String val = format(e.getValue());
-                
-                muleMsg.setProperty(key, val, PropertyScope.OUTBOUND);
+
+                muleMsg.setOutboundProperty(key, val);
             }
         }   
         
@@ -78,7 +77,7 @@ public class MuleProtocolHeadersOutInterceptor
         Object val = message.get(cxfHeader);
         if (val != null)
         {
-            muleMsg.setProperty(muleHeader, val, PropertyScope.OUTBOUND);
+            muleMsg.setOutboundProperty(muleHeader, val);
         }
     }
 

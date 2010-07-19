@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.util.Enumeration;
@@ -130,7 +129,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
             Destination replyTo = jmsMessage.getJMSReplyTo();
             if (replyTo != null)
             {
-                muleMessage.setProperty(JmsConstants.JMS_REPLY_TO, replyTo, PropertyScope.OUTBOUND);
+                muleMessage.setOutboundProperty(JmsConstants.JMS_REPLY_TO, replyTo);
             }
 
             muleMessage.setReplyTo(replyTo);

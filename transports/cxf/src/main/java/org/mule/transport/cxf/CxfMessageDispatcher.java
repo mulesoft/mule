@@ -234,7 +234,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         {
             soapAction = parseSoapAction(soapAction, bop.getName(), event);
             props.put(SoapBindingConstants.SOAP_ACTION, soapAction);
-            message.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction, PropertyScope.OUTBOUND);
+            message.setOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
         }
         
         Map<String, Object> ctx = new HashMap<String, Object>();

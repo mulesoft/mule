@@ -17,7 +17,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -40,7 +39,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
         ir.setFlowConstruct(service);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
-        okMessage.setProperty("id", "1", PropertyScope.OUTBOUND);
+        okMessage.setOutboundProperty("id", "1");
         MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
 
         // This one will process the event on the target endpoint
@@ -49,7 +48,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
 
          // This will not process, because the ID is a duplicate
         okMessage = new DefaultMuleMessage("OK", muleContext);
-        okMessage.setProperty("id", "1", PropertyScope.OUTBOUND);
+        okMessage.setOutboundProperty("id", "1");
         event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());
         event = ir.process(event);
         assertNull(event);

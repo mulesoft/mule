@@ -12,7 +12,6 @@ package org.mule.transport.cxf.support;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.http.HttpConstants;
 
@@ -49,11 +48,8 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
         Collection<Attachment> atts = message.getAttachments();
         if (atts != null)
         {
-            muleMsg.setProperty(CxfConstants.ATTACHMENTS, atts, 
-                PropertyScope.OUTBOUND);
-            muleMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,
-                                muleMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE),
-                                PropertyScope.OUTBOUND);
+            muleMsg.setOutboundProperty(CxfConstants.ATTACHMENTS, atts);
+            muleMsg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, muleMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
         }
     }
 

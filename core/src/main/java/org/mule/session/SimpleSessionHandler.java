@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.SessionHandler;
 
 import org.apache.commons.logging.Log;
@@ -45,7 +44,7 @@ public class SimpleSessionHandler implements SessionHandler
 
     public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, session, PropertyScope.OUTBOUND);
+        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, session);
     }
     
     /**
