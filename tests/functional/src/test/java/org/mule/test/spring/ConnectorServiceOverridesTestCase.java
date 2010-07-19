@@ -94,7 +94,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         TestConnector connector = lookupDummyConnector();
         TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
         
-        MessageExchangePattern defaultMep = serviceDescriptor.getDefaultExchangePatern();
+        MessageExchangePattern defaultMep = serviceDescriptor.getDefaultExchangePattern();
         
         assertEquals(MessageExchangePattern.REQUEST_RESPONSE, defaultMep);
     }

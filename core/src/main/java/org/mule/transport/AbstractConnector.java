@@ -2539,7 +2539,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     {
         try
         {
-            return serviceDescriptor.getDefaultExchangePatern();
+            return serviceDescriptor.getDefaultExchangePattern();
         }
         catch (TransportServiceException tse)
         {

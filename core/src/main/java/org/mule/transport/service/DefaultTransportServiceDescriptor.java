@@ -595,7 +595,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return outboundExchangePatterns;
     }
 
-    public MessageExchangePattern getDefaultExchangePatern() throws TransportServiceException
+    public MessageExchangePattern getDefaultExchangePattern() throws TransportServiceException
     {
         if (defaultExchangePattern == null)
         {
