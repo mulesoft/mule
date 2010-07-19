@@ -136,7 +136,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             }
 
             // See if the the client explicitly handles connection persistence
-            String connHeader = msg.getOutboundProperty(HttpConstants.HEADER_CONNECTION, null);
+            String connHeader = msg.getOutboundProperty(HttpConstants.HEADER_CONNECTION);
             if (connHeader != null)
             {
                 if (connHeader.equalsIgnoreCase("keep-alive"))

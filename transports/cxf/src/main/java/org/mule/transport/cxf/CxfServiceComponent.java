@@ -188,7 +188,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     private String getWsdlUri(MuleEventContext eventContext, String reqPath) 
     {
         EndpointURI epUri = eventContext.getEndpointURI();
-        String host = (String) eventContext.getMessage().getProperty("Host", PropertyScope.INBOUND, epUri.getHost());
+        String host = eventContext.getMessage().getInboundProperty("Host", epUri.getHost());
         String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
         return epUri.getScheme() + "://" + host + ctx;
     }

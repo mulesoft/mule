@@ -335,7 +335,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected void parseUse(MuleEvent event, Call call)
     {
         // Set use: Endcoded/Literal
-        String use = event.getMessage().getOutboundProperty(AxisConnector.USE, null);
+        String use = event.getMessage().getOutboundProperty(AxisConnector.USE);
         if (use != null)
         {
             Use u = Use.getUse(use);
@@ -356,7 +356,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
-        String style = event.getMessage().getOutboundProperty(AxisConnector.STYLE, null);
+        String style = event.getMessage().getOutboundProperty(AxisConnector.STYLE);
         if (style != null)
         {
             Style s = Style.getStyle(style);

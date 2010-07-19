@@ -96,7 +96,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
 
         assertEquals("true", message.getOutboundProperty("boolean", ""));
 
-        assertEquals(apple, message.getOutboundProperty("apple", null));
+        assertEquals(apple, message.getOutboundProperty("apple"));
         try
         {
             message.getOutboundProperty("apple", new Orange());

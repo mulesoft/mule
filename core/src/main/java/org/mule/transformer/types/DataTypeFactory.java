@@ -11,7 +11,6 @@ package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
-import org.mule.api.transport.PropertyScope;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
@@ -106,26 +105,26 @@ public class DataTypeFactory
             type = mm.getPayload().getClass();
             //TODO better mime handling, see MULE-4639
             //case insensitive
-            mime = mm.getProperty("Content-Type", PropertyScope.INBOUND, null);
-            if(mime==null)
+            mime = mm.getInboundProperty("Content-Type");
+            if (mime == null)
             {
                 //case insensitive
-                mime = mm.getProperty("ContentType", PropertyScope.INBOUND, null);
+                mime = mm.getInboundProperty("ContentType");
             }
         }
-        else if(o instanceof DataHandler)
+        else if (o instanceof DataHandler)
         {
-            mime = ((DataHandler)o).getContentType();
+            mime = ((DataHandler) o).getContentType();
         }
-        else if(o instanceof DataSource)
+        else if (o instanceof DataSource)
         {
-            mime = ((DataSource)o).getContentType();
+            mime = ((DataSource) o).getContentType();
         }
 
-        if(mime!=null)
+        if (mime != null)
         {
             int i = mime.indexOf(";");
-            mime = (i >-1 ? mime.substring(0, i) : mime);
+            mime = (i > -1 ? mime.substring(0, i) : mime);
             //TODO set the charset on the DataType when the field is introduced BL-140
         }
         else
