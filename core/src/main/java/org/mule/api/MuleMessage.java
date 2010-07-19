@@ -519,11 +519,5 @@ public interface MuleMessage extends Serializable
      */
     Object getOriginalPayload();
 
-    /**
-     * @deprecated use {@link #getOriginalPayload()}
-     */
-    @Deprecated
-    Object getOrginalPayload();
-
     MuleContext getMuleContext();
 }

@@ -369,15 +369,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /**
-     * @deprecated use {@link #getOriginalPayload()}
-     */
-    @Deprecated
-    public Object getOrginalPayload()
-    {
-        return getOriginalPayload();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public Object getOriginalPayload()
