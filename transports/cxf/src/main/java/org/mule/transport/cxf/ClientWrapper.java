@@ -533,7 +533,7 @@ public class ClientWrapper
 
         if (method == null)
         {
-            method = (String) event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            method = event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
 
         if (method == null)

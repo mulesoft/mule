@@ -40,8 +40,8 @@ public class HttpSessionHandler implements SessionHandler
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
-        
-        Cookie[] cookies = (Cookie[]) message.getOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+
+        Cookie[] cookies = message.getOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
         if (cookies != null && cookies.length > 0)
         {
             byte[] serializedSession = Base64.decode(cookies[0].getValue());
