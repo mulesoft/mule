@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultExceptionStrategy;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -99,6 +100,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -2531,5 +2533,41 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
         });
         return builder.build();
+    }
+    
+    public MessageExchangePattern getDefaultExchangePattern()
+    {
+        try
+        {
+            return serviceDescriptor.getDefaultExchangePatern();
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new MuleRuntimeException(tse);
+        }
+    }
+    
+    public List<MessageExchangePattern> getInboundExchangePatterns()
+    {
+        try
+        {
+            return serviceDescriptor.getInboundExchangePatterns();
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new MuleRuntimeException(tse);
+        }
+    }
+
+    public List<MessageExchangePattern> getOutboundExchangePatterns()
+    {
+        try
+        {
+            return serviceDescriptor.getOutboundExchangePatterns();
+        }
+        catch (TransportServiceException tse)
+        {
+            throw new MuleRuntimeException(tse);
+        }
     }
 }

@@ -10,6 +10,7 @@
 
 package org.mule.api.transport;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -26,6 +27,7 @@ import org.mule.api.retry.RetryPolicyTemplate;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * <code>Connector</code> is the mechanism used to connect to external systems
@@ -200,4 +202,20 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     MuleContext getMuleContext();
 
     RetryPolicyTemplate getRetryPolicyTemplate();
+
+    /**
+     * @return the default {@link MessageExchangePattern} as configured in the
+     *         transport's service descriptor.
+     */
+    MessageExchangePattern getDefaultExchangePattern();
+    
+    /**
+     * @return List of exchange patterns that this connector supports for inbound endpoints.
+     */
+    List<MessageExchangePattern> getInboundExchangePatterns();
+    
+    /**
+     * @return List of exchange patterns that this connector supports for outbound endpoints.
+     */
+    List<MessageExchangePattern> getOutboundExchangePatterns();
 }

@@ -61,7 +61,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         super();
         this.uriBuilder = builder;
         this.muleContext = builder.getMuleContext();
-        this.messageExchangePattern = MessageExchangePattern.ONE_WAY;
     }
 
     public EndpointURIEndpointBuilder(String address, MuleContext muleContext)

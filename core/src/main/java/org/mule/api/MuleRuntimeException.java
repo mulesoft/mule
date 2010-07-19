@@ -41,4 +41,12 @@ public class MuleRuntimeException extends RuntimeException
     {
         super(message.getMessage(), cause);
     }
+
+    /**
+     * @param cause the exception that triggered this exception
+     */
+    public MuleRuntimeException(Throwable cause)
+    {
+        super(cause);
+    }
 }

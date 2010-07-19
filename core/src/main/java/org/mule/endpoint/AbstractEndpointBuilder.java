@@ -128,8 +128,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             setExchangePattern(MessageExchangePattern.fromString(mepString));
         }
 
-        //synchronous = messageExchangePattern == MessageExchangePattern.REQUEST_RESPONSE;
-
         responseTimeout = getIntegerProperty(properties, PROPERTY_RESPONSE_TIMEOUT, responseTimeout);
         responsePropertiesList = (String) properties.get(PROPERTY_RESPONSE_PROPERTIES);
     }
@@ -160,16 +158,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
     {
-        // use an explicit value here to avoid caching
-        Map<Object, Object> properties = getProperties();
-        // this sets values used below, if they appear as properties
-        setPropertiesFromProperties(properties);
-
-        if (uriBuilder == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
-        }
-        uriBuilder.setMuleContext(muleContext);
+        prepareToBuildEndpoint();
+        
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
@@ -183,6 +173,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         List<Transformer> transformers = getInboundTransformers(connector, endpointURI);
         List<Transformer> responseTransformers = getInboundEndpointResponseTransformers(connector, endpointURI);
 
+        checkInboundExchangePattern();
+        
         boolean synchronous = getSynchronous(connector, endpointURI);
 
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
@@ -195,22 +187,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
     {
-        // use an explicit value here to avoid caching
-        Map<Object, Object> properties = getProperties();
-        // this sets values used below, if they appear as properties
-        setPropertiesFromProperties(properties);
-
-        if (uriBuilder == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
-        }
-        uriBuilder.setMuleContext(muleContext);
-
+        prepareToBuildEndpoint();
+        
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
         Connector connector = getConnector();
-
         if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
@@ -219,6 +201,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         List<Transformer> transformers = getOutboundTransformers(connector, endpointURI);
         List<Transformer> responseTransformers = getOutboundEndpointResponseTransformers(connector, endpointURI);
+
+        checkOutboundExchangePattern();
 
         boolean synchronous = getSynchronous(connector, endpointURI);
 
@@ -229,6 +213,52 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors, 
                 responseMessageProcessors);
+    }
+    
+    protected void prepareToBuildEndpoint()
+    {
+        // use an explicit value here to avoid caching
+        Map<Object, Object> props = getProperties();
+        // this sets values used below, if they appear as properties
+        setPropertiesFromProperties(props);
+        
+        if (uriBuilder == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectIsNull("uriBuilder"));
+        }
+        uriBuilder.setMuleContext(muleContext);
+    }
+
+    protected void checkInboundExchangePattern() throws EndpointException
+    {
+        Connector conn = getConnector();
+        initExchangePatternFromConnectorDefault(conn);
+
+        if (conn.getInboundExchangePatterns().contains(messageExchangePattern) == false)
+        {
+            throw new EndpointException(CoreMessages.exchangePatternForEndpointNotSupported(
+                messageExchangePattern, "inbound", uriBuilder.getEndpoint()));
+        }
+    }
+    
+    private void checkOutboundExchangePattern() throws EndpointException
+    {
+        Connector conn = getConnector();
+        initExchangePatternFromConnectorDefault(conn);
+
+        if (conn.getOutboundExchangePatterns().contains(messageExchangePattern) == false)
+        {
+            throw new EndpointException(CoreMessages.exchangePatternForEndpointNotSupported(
+                messageExchangePattern, "outbound", uriBuilder.getEndpoint()));
+        }
+    }
+    
+    protected void initExchangePatternFromConnectorDefault(Connector conn)
+    {
+        if (messageExchangePattern == null)
+        {
+            messageExchangePattern = conn.getDefaultExchangePattern();
+        }
     }
 
     protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)

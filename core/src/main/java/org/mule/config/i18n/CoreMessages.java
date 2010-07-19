@@ -11,6 +11,7 @@
 package org.mule.config.i18n;
 
 import org.mule.AbstractExceptionListener;
+import org.mule.MessageExchangePattern;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -1298,5 +1299,11 @@ public class CoreMessages extends MessageFactory
     public static Message failedToFindEntrypointForComponent(String message)
     {
         return factory.createMessage(BUNDLE_PATH, 322, message);
+    }
+
+    public static Message exchangePatternForEndpointNotSupported(MessageExchangePattern mep, 
+        String direction, EndpointURI endpointURI)
+    {
+        return factory.createMessage(BUNDLE_PATH, 323, mep.name(), direction, endpointURI);
     }
 }
