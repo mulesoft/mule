@@ -12,6 +12,7 @@ package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
 import org.mule.api.service.Service;
+import org.mule.config.ExceptionHelper;
 import org.mule.tck.FunctionalTestCase;
 
 import java.beans.ExceptionListener;
@@ -89,7 +90,7 @@ public class CxfConnectorLifecycleTestCase extends FunctionalTestCase
     {
         public void exceptionThrown(Exception exception)
         {
-            fail(exception.getMessage());
+            fail(exception.getMessage() + ", Root cause: " + ExceptionHelper.getRootException(exception));
         }
     }
 }
