@@ -45,10 +45,8 @@ public class DispatchTestCase extends FunctionalTestCase
                     {
                         for (int i = 0; i < 20; i++) 
                         {
-                                client.dispatch("http://localhost:63081/services/Echo",
-                                    new DefaultMuleMessage(buf, muleContext),
-                                    props);
-
+                            client.dispatch("http://localhost:63081/services/Echo", 
+                                new DefaultMuleMessage(buf, muleContext), props);
                         }
                     }
                     catch (MuleException e)
@@ -61,7 +59,7 @@ public class DispatchTestCase extends FunctionalTestCase
         }
         
         int count = 0;
-        while (client.request("vm://queue", 500) != null) 
+        while (client.request("vm://queue", 1000) != null) 
         {
             count++;
         }
@@ -69,6 +67,7 @@ public class DispatchTestCase extends FunctionalTestCase
         assertEquals(200, count);
     }
     
+    @Override
     protected String getConfigResources()
     {
         return "dispatch-conf.xml";
