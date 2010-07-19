@@ -11,7 +11,6 @@
 package org.mule.test.spring;
 
 import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MuleMessageFactory;
@@ -20,7 +19,6 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageReceiver;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.XaTransactionFactory;
-import org.mule.transport.DefaultMuleMessageFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 
 import java.util.Arrays;
@@ -89,14 +87,6 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         
         List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
         assertEquals(expected, meps);
-    }
-
-    public static class MockMuleMessageFactory extends DefaultMuleMessageFactory
-    {
-        public MockMuleMessageFactory(MuleContext context)
-        {
-            super(context);
-        }
     }
 }
 
