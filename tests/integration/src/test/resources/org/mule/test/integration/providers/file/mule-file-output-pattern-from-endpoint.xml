@@ -11,10 +11,10 @@
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <outbound-endpoint address="file://FirstWrite"  exchange-pattern="request-response">
+                    <outbound-endpoint address="file://FirstWrite">
                         <property key="outputPattern" value="export.txt"/>
                     </outbound-endpoint>
-                    <outbound-endpoint address="file://SecondWrite"  exchange-pattern="request-response">
+                    <outbound-endpoint address="file://SecondWrite">
                         <property key="outputPattern" value="export.txt.OK"/>
                     </outbound-endpoint>
                 </multicasting-router>
