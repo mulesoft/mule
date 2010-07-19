@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.transport.file;
 
-import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
 
@@ -18,6 +17,7 @@ import java.io.File;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
+    @Override
     public void testBasic() throws Exception
     {
         String myDirName = "myout";
@@ -36,25 +36,21 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
             // This may fail if this directory contains other directories.
             assertTrue(myDir.delete());
         }
-        try
-        {
-            assertFalse(FileUtils.newFile(myDir, myFileName).exists());
 
-            MuleClient client = new MuleClient(muleContext);
-            client.send("vm://fileappend", "Hello1", null);
-            // To ensure exception is thrown here outbound endpoint must be sync.
-            fail("Expected exception: java.lang.IllegalArgumentException: Configuring 'outputAppend' on a file endpoint is no longer supported. You may configure it on a file connector instead.");
-        }
-        catch (Exception e)
-        {
-            // java.lang.IllegalArgumentException: configuring outputAppend on the
-            // file endpoint is no longer support. You can configure a the File
-            // connector instead.
-            assertEquals(DispatchException.class, e.getClass());
-        }
+        // output directory may not exist before dispatching to the endpoint with invalid
+        // configuration
+        File outputFile = FileUtils.newFile(myDir, myFileName);
+        assertFalse(outputFile.exists());
+        
+        // this should throw java.lang.IllegalArgumentException: Configuring 'outputAppend' on a 
+        // file endpoint is no longer supported. You may configure it on a file connector instead.
+        MuleClient client = new MuleClient(muleContext);
+        client.dispatch("vm://fileappend", "Hello1", null);
 
+        assertFalse(outputFile.exists());
     }
-
+    
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
