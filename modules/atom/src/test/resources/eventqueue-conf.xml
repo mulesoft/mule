@@ -25,8 +25,8 @@
     <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="0" startDelay="0">
         <quartz:event-generator-job/>
     </quartz:endpoint>
+    
     <model name="testModel">
-
         <!--  service name="entryEventPublisher">
         <component class="org.mule.providers.atom.event.EntryEventPublisher"/>
         <inbound-router>
@@ -51,7 +51,7 @@
         -->
         <service name="blobEventPublisher">
             <inbound>
-                <inbound-endpoint ref="quartz.in" exchange-pattern="request-response"/>
+                <inbound-endpoint ref="quartz.in"/>
             </inbound>
             <component class="org.mule.module.atom.event.BlobEventPublisher"/>
             <outbound>
