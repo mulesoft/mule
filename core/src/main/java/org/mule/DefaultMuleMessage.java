@@ -61,6 +61,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
+    protected static final String NOT_SET = "<not set>";
+
     private static final long serialVersionUID = 1541720810851984844L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
     private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
@@ -844,7 +846,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         buf.append(nl);
         buf.append("  payload=").append(getPayload().getClass().getName());
         buf.append(nl);
-        buf.append("  correlationId=").append(getCorrelationId());
+        buf.append("  correlationId=").append(StringUtils.defaultString(getCorrelationId(), NOT_SET));
         buf.append(nl);
         buf.append("  correlationGroup=").append(getCorrelationGroupSize());
         buf.append(nl);
@@ -852,7 +854,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         buf.append(nl);
         buf.append("  encoding=").append(getEncoding());
         buf.append(nl);
-        buf.append("  exceptionPayload=").append(exceptionPayload);
+        buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
         buf.append(nl);
         buf.append(StringMessageUtils.headersToString(this));
         // no new line here, as headersToString() adds one
