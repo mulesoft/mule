@@ -28,7 +28,6 @@ import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.MuleEndpointURI;
@@ -203,7 +202,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 if (!ignoreProperty(prop))
                 {
                     //inbound endpoint properties are in the invocation scope
-                    message.setProperty(prop, value, PropertyScope.INVOCATION);
+                    message.setInvocationProperty(prop, value);
                 }
             }
         }

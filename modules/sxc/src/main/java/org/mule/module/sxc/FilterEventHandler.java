@@ -12,7 +12,6 @@ package org.mule.module.sxc;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transport.PropertyScope;
 
 import com.envoisolutions.sxc.xpath.XPathEvent;
 import com.envoisolutions.sxc.xpath.XPathEventHandler;
@@ -37,7 +36,7 @@ public class FilterEventHandler extends XPathEventHandler
         try 
         {
             MuleMessage msg = SxcFilteringOutboundRouter.getCurrentMessage();
-            msg.setProperty(filter.toString(), true, PropertyScope.INVOCATION);
+            msg.setInvocationProperty(filter.toString(), true);
             
             if (router.testMatch(msg))
             {
@@ -46,6 +45,7 @@ public class FilterEventHandler extends XPathEventHandler
         }
         catch (UndefinedMatchException e) 
         {
+            // ignore
         }
         catch (RoutingException e)
         {

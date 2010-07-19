@@ -91,7 +91,7 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
             }
             else
             {
-                message.setProperty(s.substring(i + 1), getProperty(s), PropertyScope.INVOCATION);
+                message.setInvocationProperty(s.substring(i + 1), getProperty(s));
             }
         }
         message.setReplyTo(getReplyTo());

@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.routing.EventGroup;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -88,7 +87,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
         //Setting a callback is optional
         if(callback!=null)
         {
-            event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, callback, PropertyScope.INVOCATION);
+            event.getMessage().setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, callback);
             try
             {
                 return ((Service) event.getFlowConstruct()).getComponent().process(event).getMessage();

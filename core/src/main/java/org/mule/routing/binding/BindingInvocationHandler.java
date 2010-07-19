@@ -17,7 +17,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.InterfaceBinding;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
@@ -27,7 +26,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -79,7 +77,7 @@ public class BindingInvocationHandler implements InvocationHandler
         MuleMessage message = createMuleMessage(args);
 
         // Some transports such as Axis, RMI and EJB can use the method information
-        message.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName(), PropertyScope.INVOCATION);
+        message.setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName());
 
         InterfaceBinding router = routers.get(method.getName());
         if (router == null)
