@@ -30,6 +30,11 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
     private static String CUSTOM_RESPONSE = " customResponse";
 
+    public ResponseTransformerScenariosTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     @Override
     protected String getConfigResources()
     {

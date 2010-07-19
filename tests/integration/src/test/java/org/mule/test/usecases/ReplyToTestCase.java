@@ -22,7 +22,12 @@ import org.mule.transport.NullPayload;
 public class ReplyToTestCase extends FunctionalTestCase
 {
     static final long RECEIVE_DELAY = 3000;
-    
+
+    public ReplyToTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     @Override
     protected String getConfigResources()
     {
