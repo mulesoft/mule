@@ -85,7 +85,7 @@
                <outbound>
                     <pass-through-router>
                          <smtp:outbound-endpoint user="${user}" password="${password}" host="${host}" 
-                             from="${from}" subject="Your order has been placed!" exchange-pattern="request-response">
+                             from="${from}" subject="Your order has been placed!">
                               <transformers>
                                     <custom-transformer class="org.mule.example.bookstore.transformers.OrderToEmailTransformer" />
                                     <email:string-to-email-transformer />
