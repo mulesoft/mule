@@ -159,7 +159,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     {
         MuleMessage payload = createMuleMessage();
         payload.setProperty("foo", "fooValue", PropertyScope.OUTBOUND);
-        payload.setProperty("bar", "barValue", PropertyScope.INVOCATION);
+        payload.setInvocationProperty("bar", "barValue");
 
         assertEquals(1, payload.getPropertyNames(PropertyScope.INVOCATION).size());
         assertEquals(2, payload.getPropertyNames(PropertyScope.OUTBOUND).size());

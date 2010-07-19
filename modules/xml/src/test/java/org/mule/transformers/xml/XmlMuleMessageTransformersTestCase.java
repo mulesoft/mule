@@ -31,7 +31,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setEncoding("UTF-8");
         msg.setCorrelationId("1234");
-        msg.setProperty("number", Integer.valueOf(1), PropertyScope.INVOCATION);
+        msg.setInvocationProperty("number", 1);
         msg.setProperty("object", new Apple(), PropertyScope.OUTBOUND);
         msg.setProperty("string", "hello", PropertyScope.OUTBOUND);
 
