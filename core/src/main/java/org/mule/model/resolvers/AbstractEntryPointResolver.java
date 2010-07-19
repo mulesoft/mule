@@ -55,17 +55,12 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Method getMethodByName(String methodName, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getFlowConstruct().getName())
-                .append(".").append(methodName);
-        Method method = (Method) methodCache.get(key.toString());
-        return method;
+        return (Method) methodCache.get(methodName);
     }
 
     protected Method addMethodByName(Method method, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getFlowConstruct().getName())
-                .append(".").append(method.getName());
-        Method previousMethod = (Method) methodCache.putIfAbsent(key.toString(), method);
+        Method previousMethod = (Method) methodCache.putIfAbsent(method.getName(), method);
         return (previousMethod != null ? previousMethod : method);
     }
 

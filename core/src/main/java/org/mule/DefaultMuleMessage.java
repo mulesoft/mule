@@ -578,14 +578,69 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.getProperty(name, scope);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String name, PropertyScope scope, T defaultValue)
     {
         assertAccess(READ);
-        @SuppressWarnings("unchecked")
-        final T result = (T) properties.getProperty(name, scope);
-        if (result == null)
+        T result;
+
+        //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
+        //about primitive types being cast to a generic type
+        if(defaultValue instanceof Boolean)
         {
-            return defaultValue;
+            result = (T)(Boolean)ObjectUtils.getBoolean(getProperty(name, scope), (Boolean)defaultValue);
+        }
+        else if(defaultValue instanceof Byte)
+        {
+            result = (T)(Byte)ObjectUtils.getByte(getProperty(name, scope), (Byte)defaultValue);
+        }
+        else if(defaultValue instanceof Integer)
+        {
+            result = (T)(Integer)ObjectUtils.getInt(getProperty(name, scope), (Integer)defaultValue);
+        }
+        else if(defaultValue instanceof Short)
+        {
+            result = (T)(Short)ObjectUtils.getShort(getProperty(name, scope), (Short)defaultValue);
+        }
+        else if(defaultValue instanceof Long)
+        {
+            result = (T)(Long)ObjectUtils.getLong(getProperty(name, scope), (Long)defaultValue);
+        }
+        else if(defaultValue instanceof Float)
+        {
+            result = (T)(Float)ObjectUtils.getFloat(getProperty(name, scope), (Float)defaultValue);
+        }
+        else if(defaultValue instanceof Double)
+        {
+            result = (T)(Double)ObjectUtils.getDouble(getProperty(name, scope), (Double)defaultValue);
+        }
+        else if(defaultValue instanceof String)
+        {
+            result = (T)(String)ObjectUtils.getString(getProperty(name, scope), (String)defaultValue);
+        }
+        else
+        {
+            Object temp = getProperty(name, scope);
+            if(temp==null)
+            {
+                return defaultValue;
+            }
+            else if(defaultValue==null)
+            {
+                return (T)temp;
+            }
+            //If defaultValue is set and the result is not null, then validate that they are assignable
+            else if(defaultValue.getClass().isAssignableFrom(temp.getClass()))
+            {
+                result = (T)temp;
+            }
+            else
+            {
+                throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(temp.getClass(), defaultValue.getClass()).getMessage());
+            }
         }
         return result;
     }
@@ -931,8 +986,20 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void clearProperties()
     {
         assertAccess(WRITE);
-        properties.clearProperties();
+        //Inbound scope is read-only
+        properties.clearProperties(PropertyScope.INVOCATION);
+        properties.clearProperties(PropertyScope.OUTBOUND);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void clearProperties(PropertyScope scope)
+    {
+        assertAccess(WRITE);
+        properties.clearProperties(scope);
+    }
+
 
     /**
      * {@inheritDoc}

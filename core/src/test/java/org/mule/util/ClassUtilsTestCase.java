@@ -71,6 +71,26 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    public void testLoadClassOfType() throws Exception
+    {
+
+        Class<? extends Exception> clazz = ClassUtils.loadClass("java.lang.IllegalArgumentException", getClass(), Exception.class);
+        assertNotNull(clazz);
+
+        assertEquals(clazz.getName(), "java.lang.IllegalArgumentException");
+
+        try
+        {
+            ClassUtils.loadClass("java.lang.UnsupportedOperationException", getClass(), String.class);            
+            fail("IllegalArgumentException should be thrown since class is not of expected type");
+        }
+        catch (IllegalArgumentException e)
+        {
+            // expected
+        }
+
+    }
+
     public void testInstanciateClass() throws Exception
     {
         Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange");

@@ -14,29 +14,13 @@ import org.mule.api.annotations.expressions.XPath;
 
 import org.dom4j.Document;
 
-/**
- * TODO
- */
-
-@Service(name = "aComponent")
-public class AnnotatedComponent
+public class AnnotatedComponent1
 {
-    @Entrypoint
     public Object doSomething(
             @XPath("/foo/bar") String bar,
             @Mule("message.payload(org.dom4j.Document)") Document doc,
             @Mule("message.header(name)") String name)
     {
         return bar + ":" + name + ":" + doc.asXML();
-    }
-
-    public String getSomething()
-    {
-        return "something";
-    }
-
-    public String doSomethingElse(Object something)
-    {
-        return "somethingElse";
     }
 }

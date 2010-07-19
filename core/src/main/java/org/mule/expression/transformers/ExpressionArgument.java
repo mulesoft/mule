@@ -13,8 +13,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.ExpressionConfig;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Collection;
 
@@ -127,13 +130,23 @@ public class ExpressionArgument implements MuleContextAware
         {
             if (!getReturnClass().isInstance(result))
             {
-                throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(),
-                    getReturnClass()));
+                //If the return type does not match, lets attempt to transform it before throwing an error
+                try
+                {
+                    Transformer t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.createFromObject(result), DataTypeFactory.create(getReturnClass()));
+                    result = t.transform(result);
+                }
+                catch (TransformerException e)
+                {
+                    throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(),
+                    getReturnClass()), e);
+                }
+
             }
-            if(result instanceof Collection && ((Collection)result).size()==0 && !isOptional())
-            {
-                throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(this.getEvaluator(), this.getExpression()));
-            }
+//            if(result instanceof Collection && ((Collection)result).size()==0 && !isOptional())
+//            {
+//                throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(this.getEvaluator(), this.getExpression()));
+//            }
         }
         return result;
     }

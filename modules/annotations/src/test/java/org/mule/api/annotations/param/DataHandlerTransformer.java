@@ -7,14 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.expression;
+package org.mule.api.annotations.param;
+
+import org.mule.api.annotations.Transformer;
+
+import java.io.IOException;
+
+import javax.activation.DataHandler;
 
 /**
- * Constnts for Headers and Attachment processing shared by a number of the Expression evaluators
+ * TODO
  */
-public interface ExpressionConstants
+public class DataHandlerTransformer
 {
-    public static final String DELIM = ",";
-    public static final String ALL_ARGUMENT = "*";
-    public static final String OPTIONAL_ARGUMENT = "?";
+    @Transformer
+    public String dataHandlerToObject(DataHandler source) throws IOException
+    {
+        return (String)source.getContent();
+    }
 }

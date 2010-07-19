@@ -9,6 +9,13 @@
  */
 package org.mule.model.resolvers;
 
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.model.EntryPointResolver;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ClassUtils;
+
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * An {@link org.mule.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
@@ -17,8 +24,30 @@ package org.mule.model.resolvers;
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
+
+    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.impl.model.resolvers.AnnotatedEntryPointResolver";
     public LegacyEntryPointResolverSet()
     {
+        //Annotations support is not part of Mule core, but we want default handling for annotations we have
+        //work-arounds like this to avoid importing annotation classes
+        //See MULE-4962 for details
+        try
+        {
+            Class<? extends EntryPointResolver> annotatedEntrypointResolver =
+                    ClassUtils.loadClass(ANNOTATED_ENTRYPOINT_RESOLVER_CLASS, getClass(), EntryPointResolver.class);
+            addEntryPointResolver(ClassUtils.instanciateClass(annotatedEntrypointResolver, ClassUtils.NO_ARGS));
+        }
+        catch (ClassNotFoundException e)
+        {
+            if(logger.isDebugEnabled())
+            {
+                logger.warn("Mule annotations module is not on your classpath, annotations cannot be used on components");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(CoreMessages.cannotLoadFromClasspath(ANNOTATED_ENTRYPOINT_RESOLVER_CLASS));
+        }
         addEntryPointResolver(new MethodHeaderPropertyEntryPointResolver());
         addEntryPointResolver(new CallableEntryPointResolver());
 
@@ -26,10 +55,5 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
         //In Mule 1.x you could call setXX methods as service methods by default
         preTransformResolver.removeIgnoredMethod("set*");
         addEntryPointResolver(preTransformResolver);
-
-        ReflectionEntryPointResolver postTransformResolver = new ReflectionEntryPointResolver();
-        //In Mule 1.x you could call setXX methods as service methods by default
-        postTransformResolver.removeIgnoredMethod("set*");
-        addEntryPointResolver(postTransformResolver);
     }
 }

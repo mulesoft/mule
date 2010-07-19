@@ -14,6 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
@@ -163,7 +164,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         catch (TransformerException e)
         {
             //Expected
-            assertTrue(e.getMessage().contains("Expression Evaluator \"header\" with expression \"bar\" returned null but a value was required"));
+            assertTrue(e.getCause() instanceof RequiredValueException);
         }
     }
     

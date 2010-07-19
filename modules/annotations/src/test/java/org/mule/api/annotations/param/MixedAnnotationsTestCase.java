@@ -1,0 +1,109 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.api.annotations.param;
+
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.util.StringDataSource;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class MixedAnnotationsTestCase extends FunctionalTestCase
+{
+    private MuleMessage muleMessage;
+
+    public MixedAnnotationsTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "mixed-annotations.xml";
+    }
+
+    @Before
+    @Override
+    public void doSetUp() throws Exception
+    {
+        Map<String, Object> props = new HashMap<String, Object>(3);
+        props.put("foo", "fooValue");
+        props.put("bar", "barValue");
+        props.put("baz", "bazValue");
+
+        muleMessage = new DefaultMuleMessage("test", props, muleContext);
+
+        try
+        {
+            muleMessage.addAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
+            muleMessage.addAttachment("bar", new DataHandler(new StringDataSource("barValue")));
+            muleMessage.addAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testProcessAllAnnotated() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage message = client.send("vm://allAnnotated", muleMessage);
+        assertNotNull("return message from MuleClient.send() should not be null", message);
+        assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
+        Map result = (Map) message.getPayload();
+        assertEquals(3, result.size());
+
+        //Payload
+        assertEquals("test", result.get("payload"));
+
+        //Headers
+        assertNotNull(result.get("inboundHeaders"));
+        Map headers = (Map)result.get("inboundHeaders");
+        assertEquals(2, headers.size());
+        assertEquals("fooValue", headers.get("foo"));
+        assertEquals("barValue", headers.get("bar"));
+
+        //Attachments
+        assertNotNull(result.get("inboundAttachments"));
+        Map attachments = (Map)result.get("inboundAttachments");
+        assertEquals(3, attachments.size());
+        assertNotNull(attachments.get("foo"));
+        assertNotNull(attachments.get("bar"));
+        assertNotNull(attachments.get("baz"));
+
+    }
+
+    @Test
+    public void testPayloadNotAnnotated() throws Exception
+    {
+        //When using param annotations every param needs t obe annotated
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage message = client.send("vm://someAnnotated", muleMessage);
+        assertNotNull("return message from MuleClient.send() should not be null", message);
+        assertNotNull(message.getExceptionPayload());
+        assertTrue(message.getExceptionPayload().getRootException() instanceof IllegalArgumentException);
+        assertEquals("wrong number of arguments", message.getExceptionPayload().getRootException().getMessage());
+    }
+
+}

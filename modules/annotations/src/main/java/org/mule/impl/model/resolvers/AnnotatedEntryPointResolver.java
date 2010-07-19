@@ -9,15 +9,14 @@
  */
 package org.mule.impl.model.resolvers;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
-import org.mule.api.annotations.Entrypoint;
+import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.utils.AnnotationHelper;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -27,7 +26,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +42,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  * match the arguments on the annotated method and will honor any parameter annotations such as {@link org.mule.api.annotations.expressions.XPath}
  * or {@link org.mule.api.annotations.expressions.Mule} annotations.
  */
-public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver implements MuleContextAware
+public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 {
     private Set<String> ignoredMethods = new HashSet<String>(Arrays.asList("equals",
             "getInvocationHandler", "set*", "toString",
@@ -53,13 +51,6 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
     private volatile boolean firstTime = true;
 
     private Map<Method, Transformer> transformerCache = new ConcurrentHashMap();
-
-    protected MuleContext muleContext;
-
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
 
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
@@ -77,20 +68,43 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
             }
         }
 
+        if(methodCache.size()==0)
+        {
+            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            result.setErrorMessage("Component: " + component + " doesn't have any annotated methods, skipping.");
+            return result;
+        }
+
         Object[] payload;
-        Method method;
+        Method method = null;
         //We remove the property here as a workaround to MULE-4769
-        String methodName = (String) context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        Object tempMethod = context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY, PropertyScope.INVOCATION);
+        String methodName = null;
+        if (tempMethod != null && tempMethod instanceof Method)
+        {
+            method = (Method) tempMethod;
+        }
+        else
+        {
+            methodName = (String)tempMethod;
+        }
+
         //If a method param is set use that over anything else. This is used by the @Reply Callbacks and where annotations are set
         //on the method
         if (methodName != null)
         {
-            method = getMethodByName(methodName, component);
+            method = getMethodByName(methodName, context);
             if (method == null)
             {
+                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+                result.setErrorMessage("Method not found: " + methodName + " on object: " + component.getClass() + ". If the component is a proxy there needs to be an interface on the proxy that defines this method");
+                return result;
                 //TODO i18n
-                throw new IllegalArgumentException("Method not found: " + methodName + " on object: " + component.getClass() + ". If the component is a proxy there needs to be an interface on the proxy that defines this method");
             }
+            payload = getPayloadForMethod(method, component, context);
+        }
+        else if (method != null)
+        {
             payload = getPayloadForMethod(method, component, context);
         }
         else if (methodCache.size() == 1)
@@ -100,16 +114,9 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         }
         else
         {
-            payload = getPayloadFromMessage(context);
-
-            method = getMethodByArguments(component, payload);
-
-            if (method == null)
-            {
-                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
-                result.setErrorMessage("@Entrypoint annotation not set on any methods of the service component: " + component);
-                return result;
-            }
+            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            result.setErrorMessage("Component: " + component + " has more than one method annotated, which means the target method name needs to be set on the event");
+            return result;
         }
         return invokeMethod(component, method,
                 (method.getParameterTypes().length == 0 ? ClassUtils.NO_ARGS : payload));
@@ -120,7 +127,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         Object[] payload;
         Method m = method;
         //If we are using cglib enhanced service objects, we need to read annotations from the real component class
-        if(Enhancer.isEnhanced(component.getClass()))
+        if (Enhancer.isEnhanced(component.getClass()))
         {
             try
             {
@@ -131,7 +138,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
                 throw new TransformerException(CoreMessages.createStaticMessage(e.getMessage()), e);
             }
         }
-        if (AnnotationUtils.methodHasParamAnnotations(m))
+        if (AnnotationUtils.getParamAnnotationsWithMeta(m, Evaluator.class).size() > 0)
         {
             payload = getPayloadFromMessageWithAnnotations(m, context);
         }
@@ -153,7 +160,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         ExpressionTransformer trans = (ExpressionTransformer) transformerCache.get(method);
         if (trans == null)
         {
-            trans = AnnotationHelper.getTransformerForMethodWithAnnotations(method, muleContext);
+            trans = AnnotationHelper.getTransformerForMethodWithAnnotations(method, context.getMuleContext());
             transformerCache.put(method, trans);
         }
 
@@ -187,43 +194,11 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver impl
         for (int i = 0; i < component.getClass().getMethods().length; i++)
         {
             Method method = component.getClass().getMethods()[i];
-            if (method.isAnnotationPresent(Entrypoint.class))
+            if (AnnotationUtils.getParamAnnotationsWithMeta(method, Evaluator.class).size() > 0)
             {
                 this.addMethodByName(method, context);
             }
         }
         firstTime = false;
-//        if (methodCache.size() == 0)
-//        {
-//            throw new IllegalStateException(AnnotationsMessages.serviceHasNoEntrypoint(component.getClass()).getMessage());
-//        }
-    }
-
-    protected Method getMethodByName(String name, Object object)
-    {
-        Set<Class> classes = new HashSet<Class>();
-        Class clazz = object.getClass();
-
-        
-        if(Proxy.isProxyClass(clazz))
-        {
-            classes.addAll(Arrays.asList(clazz.getInterfaces()));
-        }
-        else
-        {
-            classes.add(object.getClass());
-        }
-
-        for (Class aClass : classes)
-        {
-            for (Method m : aClass.getMethods())
-            {
-                if (m.getName().equals(name))
-                {
-                    return m;
-                }
-            }
-        }
-        return null;
     }
 }

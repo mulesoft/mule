@@ -38,6 +38,11 @@ public class AnnotationUtils
 
     public static List<AnnotationMetaData> getParamAnnotations(Method method)
     {
+        return getParamAnnotationsWithMeta(method, null);
+    }
+
+    public static List<AnnotationMetaData> getParamAnnotationsWithMeta(Method method, Class<? extends Annotation> metaAnnotation)
+    {
         List<AnnotationMetaData> annos = new ArrayList<AnnotationMetaData>();
 
         for (int i = 0; i < method.getParameterAnnotations().length; i++)
@@ -45,8 +50,10 @@ public class AnnotationUtils
             for (int j = 0; j < method.getParameterAnnotations()[i].length; j++)
             {
                 Annotation annotation = method.getParameterAnnotations()[i][j];
-                annos.add(new AnnotationMetaData(method.getDeclaringClass(), method, ElementType.PARAMETER, annotation));
-
+                if(metaAnnotation==null || annotation.annotationType().isAnnotationPresent(metaAnnotation))
+                {
+                    annos.add(new AnnotationMetaData(method.getDeclaringClass(), method, ElementType.PARAMETER, annotation));
+                }
             }
         }
         return annos;

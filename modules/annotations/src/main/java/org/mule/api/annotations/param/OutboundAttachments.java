@@ -14,13 +14,13 @@ import java.lang.annotation.Target;
  * you may want to add attachments such as images or documents.
  * <p/>
  * This annotation must only be defined on a parameter of type {@link java.util.Map}. The elements in the map will be
- * of type {@link javax.activation.DataHandler}, thus the annotated parameter should be {@link java.util.Map&lt;java.lang.String, javax.activation.DataHandler&gt;}
+ * of type {@link javax.activation.DataHandler}, thus the annotated parameter should be defined as {@link java.util.Map&lt;java.lang.String, javax.activation.DataHandler&gt;}
  * Where the key is the attachment name and the value is the handler for the attachment.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Evaluator("sendAttachments")
+@Evaluator("outboundAttachments")
 public @interface OutboundAttachments
 {
 }

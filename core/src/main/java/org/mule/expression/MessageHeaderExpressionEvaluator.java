@@ -31,32 +31,17 @@ public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator, Ex
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        Object result;
-        boolean required;
-        if (expression.endsWith(OPTIONAL_ARGUMENT))
-        {
-            expression = expression.substring(0, expression.length() - OPTIONAL_ARGUMENT.length());
-            required = false;
-        }
-        else
-        {
-            required = true;
-        }
-
-        result = ExpressionUtils.getPropertyWithScope(expression, message);
+        Object result = ExpressionUtils.getPropertyWithScope(expression, message);
         
         //Should this fallback be in its own expression evaluator i.e. #[endpoint-param:foo] ??
         //I'm not sure because this way there is a fallback where the message doesn't have a value the
         //endpoint can define a default
-        if (result == null && RequestContext.getEventContext() != null)
-        {
-            result = RequestContext.getEventContext().getEndpointURI().getParams().get(expression);
-        }
+//        if (result == null && RequestContext.getEventContext() != null)
+//        {
+//            result = RequestContext.getEventContext().getEndpointURI().getParams().get(expression);
+//        }
 
-        if (result == null && required)
-        {
-            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
-        }
+
         return result;
     }
 

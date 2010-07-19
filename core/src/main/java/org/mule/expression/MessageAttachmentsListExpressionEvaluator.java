@@ -14,12 +14,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.filters.WildcardFilter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.activation.DataHandler;
 
 /**
  * Looks up the attachment(s) on the message using the expression given. The expression can contain a comma-separated list
@@ -38,20 +41,25 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
     {
         boolean required;
 
-        List result;
-        if (ALL_ARGUMENT.equals(expression))
+        List<DataHandler> result;
+        //Enable Wildcard matching
+        if (expression.contains(ALL_ARGUMENT))
         {
-            result = new ArrayList(message.getAttachmentNames().size());
+            WildcardFilter filter = new WildcardFilter(expression);
+            result = new ArrayList<DataHandler>(message.getAttachmentNames().size());
             for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
             {
                 String name = (String) iterator.next();
-                result.add(message.getAttachment(name));
+                if(filter.accept(name))
+                {
+                    result.add(message.getAttachment(name));
+                }
             }
         }
         else
         {
             StringTokenizer tokenizer = new StringTokenizer(expression, DELIM);
-            result = new ArrayList(tokenizer.countTokens());
+            result = new ArrayList<DataHandler>(tokenizer.countTokens());
             while (tokenizer.hasMoreTokens())
             {
                 String s = tokenizer.nextToken();
@@ -65,7 +73,7 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
                 {
                     required = true;
                 }
-                Object val = message.getAttachment(s);
+                DataHandler val = message.getAttachment(s);
                 if (val != null)
                 {
                     result.add(val);
@@ -78,11 +86,11 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
         }
         if (result.size() == 0)
         {
-            return Collections.emptyList();
+            return Collections.unmodifiableList(Collections.<DataHandler>emptyList());
         }
         else
         {
-            return result;
+            return Collections.unmodifiableList(result);
         }
     }
 

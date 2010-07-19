@@ -13,6 +13,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.routing.correlation.CorrelationPropertiesExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.UUID;
@@ -30,9 +32,9 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void doSetUp()
     {
         props = new HashMap<String, Object>(3);
-        props.put("foo", "moo");
-        props.put("bar", "mar");
-        props.put("baz", "maz");
+        props.put("foo", "foovalue");
+        props.put("bar", "barvalue");
+        props.put("baz", "bazvalue");
     }
 
     public void testSingleHeader() throws Exception
@@ -43,12 +45,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + found
         Object result = eval.evaluate("foo", message);
         assertNotNull(result);
-        assertEquals("moo", result);
+        assertEquals("foovalue", result);
 
         // Value not required + found
         result = eval.evaluate("foo?", message);
         assertNotNull(result);
-        assertEquals("moo", result);
+        assertEquals("foovalue", result);
 
         // Value not required + not found
         result = eval.evaluate("fool?", message);
@@ -84,18 +86,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("moo"));
-        assertTrue(((Map)result).values().contains("maz"));
-        assertFalse(((Map)result).values().contains("mar"));
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertFalse(((Map)result).values().contains("barvalue"));
 
         // Value not required + found
         result = eval.evaluate("foo?, baz", message);
         assertNotNull(result);        
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("moo"));
-        assertTrue(((Map)result).values().contains("maz"));
-        assertFalse(((Map)result).values().contains("mar"));
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertFalse(((Map)result).values().contains("barvalue"));
         
         // Value not required + not found
         result = eval.evaluate("fool?", message);
@@ -114,18 +116,73 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
             //Expected
         }
 
-        //Test count
-        assertEquals(3, eval.evaluate("{count}", message));
-
         //Test all
         result = eval.evaluate("*", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(3, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("moo"));
-        assertTrue(((Map)result).values().contains("maz"));
-        assertTrue(((Map)result).values().contains("mar"));
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
     }
+
+public void testHeadersWithScopes() throws Exception
+    {
+        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        message.setProperty("faz", "fazvalue", PropertyScope.INVOCATION);
+
+        Object result = eval.evaluate("OUTBOUND:foo, OUTBOUND:baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(2, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+
+        //Setting the scope once will set the default for following names
+        result = eval.evaluate("OUTBOUND:foo, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(2, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+
+        result = eval.evaluate("OUTBOUND:foo, OUTBOUND:baz, INVOCATION:faz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("fazvalue"));
+
+        result = eval.evaluate("OUTBOUND:foo, baz, INVOCATION:faz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("fazvalue"));
+
+
+        try
+        {
+            eval.evaluate("OUTBOUND:foo, baz, faz", message);
+            fail("faz is not in outbound scope and is not optional");
+        }
+        catch (RequiredValueException e)
+        {
+            //expected
+        }
+
+        result = eval.evaluate("OUTBOUND:foo, faz?, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(2, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+
+    }
+
 
     public void testListHeaders() throws Exception
     {
@@ -137,20 +194,20 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("maz"));
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
         // redundant since we already know that the map is of size 2
-        assertFalse(((List)result).contains("mar"));
+        assertFalse(((List)result).contains("barvalue"));
 
         // Value not required + found
         result = eval.evaluate("foo?, baz", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("maz"));
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
         // redundant since we already know that the map is of size 2
-        assertFalse(((List)result).contains("mar"));        
+        assertFalse(((List)result).contains("barvalue"));        
 
         // Value not required + not found
         result = eval.evaluate("fool?", message);
@@ -168,18 +225,138 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //Expected
         }
-        
-        //Test All
-        result = eval.evaluate("*", message);
+    }
+
+    public void testListHeadersWithScopes() throws Exception
+    {
+        MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        message.setProperty("faz", "fazvalue", PropertyScope.INVOCATION);
+
+        Object result = eval.evaluate("OUTBOUND:foo, OUTBOUND:baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        // redundant since we already know that the map is of size 2
+        assertFalse(((List)result).contains("barvalue"));
+
+        //Setting the scope once will set the default for following names
+        result = eval.evaluate("OUTBOUND:foo, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+
+        result = eval.evaluate("OUTBOUND:foo, OUTBOUND:baz, INVOCATION:faz", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(3, ((List)result).size());
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("maz"));
-        assertTrue(((List)result).contains("mar"));
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        // redundant since we already know that the map is of size 2
+        assertTrue(((List)result).contains("fazvalue"));
+
+        try
+        {
+            eval.evaluate("OUTBOUND:foo, baz, faz", message);
+            fail("faz is not in outbound scope and is not optional");
+        }
+        catch (RequiredValueException e)
+        {
+            //expected
+        }
+
+        result = eval.evaluate("OUTBOUND:foo, faz?, baz", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+
+    }
+
+    public void testListHeadersWithWildcard() throws Exception
+    {
+        MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+
+        // Wildcard match all
+        Object result = eval.evaluate("*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(3, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertTrue(((List)result).contains("barvalue"));
+
+        // Wildcard
+        result = eval.evaluate("ba*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertTrue(((List)result).contains("barvalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+
+        // Wildcard no match
+        result = eval.evaluate("x*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
+
+        // Comma separated Wildcards
+        result = eval.evaluate("ba*, f*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(3, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertTrue(((List)result).contains("barvalue"));
     }
 
 
+    public void testMapHeadersWithWildcards() throws Exception
+    {
+        MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
+
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+
+        //Test all
+        Object result = eval.evaluate("*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+
+        // Wildcard
+        result = eval.evaluate("ba*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(2, ((Map)result).size());
+        assertFalse(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+
+        // Wildcard no match
+        result = eval.evaluate("x*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
+
+        //Test comma separated list of wildcards
+        result = eval.evaluate("ba*, f*", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+    }
+    
     public void testSingleHeaderUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -187,12 +364,12 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         // Value required + found
         Object result = muleContext.getExpressionManager().evaluate("#[header:foo]", message);
         assertNotNull(result);
-        assertEquals("moo", result);
+        assertEquals("foovalue", result);
 
         // Value not required + found
         result = muleContext.getExpressionManager().evaluate("#[header:foo?]", message);
         assertNotNull(result);
-        assertEquals("moo", result);
+        assertEquals("foovalue", result);
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[header:fool?]", message);
@@ -221,18 +398,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("moo"));
-        assertTrue(((Map)result).values().contains("maz"));
-        assertFalse(((Map)result).values().contains("mar"));
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertFalse(((Map)result).values().contains("barvalue"));
 
         // Value not required + found
         result = muleContext.getExpressionManager().evaluate("#[headers:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof Map);
         assertEquals(2, ((Map)result).size());
-        assertTrue(((Map)result).values().contains("moo"));
-        assertTrue(((Map)result).values().contains("maz"));
-        assertFalse(((Map)result).values().contains("mar"));
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertFalse(((Map)result).values().contains("barvalue"));
         
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers:fool?]", message);
@@ -251,7 +428,46 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
             //expected
         }
 
-        assertEquals(3, muleContext.getExpressionManager().evaluate("#[headers:{count}]", message));
+    }
+
+    public void testMapHeadersWithWildcardsUsingManager() throws Exception
+    {
+
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+
+        // All headers
+        Object result = muleContext.getExpressionManager().evaluate("#[headers:*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+
+        // Wildcard headers
+        result = muleContext.getExpressionManager().evaluate("#[headers:ba*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(2, ((Map)result).size());
+        assertFalse(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+
+        //Wildcard no match
+        result = muleContext.getExpressionManager().evaluate("#[headers:x*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
+
+        // comma-separated list of wildcards
+        result = muleContext.getExpressionManager().evaluate("#[headers:ba*, f*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(3, ((Map)result).size());
+        assertTrue(((Map)result).values().contains("foovalue"));
+        assertTrue(((Map)result).values().contains("bazvalue"));
+        assertTrue(((Map)result).values().contains("barvalue"));
+
     }
 
     public void testListHeadersUsingManager() throws Exception
@@ -263,18 +479,18 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("maz"));
-        assertFalse(((List)result).contains("mar"));
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertFalse(((List)result).contains("barvalue"));
 
         // Value not required + found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:foo?, baz]", message);
         assertNotNull(result);
         assertTrue(result instanceof List);
         assertEquals(2, ((List)result).size());
-        assertTrue(((List)result).contains("moo"));
-        assertTrue(((List)result).contains("maz"));
-        assertFalse(((List)result).contains("mar"));        
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertFalse(((List)result).contains("barvalue"));        
 
         // Value not required + not found
         result = muleContext.getExpressionManager().evaluate("#[headers-list:fool?]", message);
@@ -292,6 +508,44 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //expected
         }
+    }
+
+    public void testListHeadersWithWildCardsUsingManager() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+
+        // All
+        Object result = muleContext.getExpressionManager().evaluate("#[headers-list:*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(3, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertTrue(((List)result).contains("barvalue"));
+
+        // wildcard
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(2, ((List)result).size());
+        assertFalse(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertTrue(((List)result).contains("barvalue"));
+
+        // wildcard no match
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:x*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(0, ((List)result).size());
+
+        // Comma list of wildcards
+        result = muleContext.getExpressionManager().evaluate("#[headers-list:ba*, f*]", message);
+        assertNotNull(result);
+        assertTrue(result instanceof List);
+        assertEquals(3, ((List)result).size());
+        assertTrue(((List)result).contains("foovalue"));
+        assertTrue(((List)result).contains("bazvalue"));
+        assertTrue(((List)result).contains("barvalue"));
     }
     
     public void testCorrelationManagerCorrelationId()

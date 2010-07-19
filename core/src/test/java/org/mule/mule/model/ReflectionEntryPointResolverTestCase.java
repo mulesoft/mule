@@ -11,7 +11,10 @@
 package org.mule.mule.model;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleEventContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.model.InvocationResult;
+import org.mule.api.transport.PropertyScope;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -23,6 +26,13 @@ import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.transport.NullPayload;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
+import org.mockito.cglib.proxy.Enhancer;
+import org.mockito.cglib.proxy.MethodInterceptor;
+import org.mockito.cglib.proxy.MethodProxy;
 
 public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
 {
@@ -99,5 +109,47 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
         assertEquals("bite", result.getMethodCalled());
+    }
+
+    public void testAnnotatedMethodOnProxyWithMethodSet() throws Exception
+    {
+        ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
+
+        Enhancer e = new Enhancer();
+        e.setSuperclass(WaterMelon.class);
+        e.setCallback(new DummyMethodCallback());
+        Object proxy = e.create();
+
+        MuleEventContext context = getTestEventContext("Blah");
+        InvocationResult result = resolver.invoke(proxy, context);
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+    }
+
+    private class DummyMethodCallback implements MethodInterceptor
+    {
+        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable
+        {
+            System.out.println("before: " + method.getName());
+            Object r = proxy.invokeSuper(obj, args);
+            System.out.println("after: " + method.getName());
+
+            //Add handler code here
+            return r;
+        }
+    }
+
+    private class DummyComponentProxyHandler implements InvocationHandler
+    {
+        private Object component;
+
+        private DummyComponentProxyHandler(Object component)
+        {
+            this.component = component;
+        }
+
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+        {
+            return method.invoke(component, args);
+        }
     }
 }

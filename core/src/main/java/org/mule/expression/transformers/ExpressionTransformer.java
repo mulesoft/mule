@@ -53,6 +53,10 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
             }
             catch (RequiredValueException e)
             {
+                if(!argument.isOptional())
+                {
+                    throw e;
+                }
                 logger.warn(e.getMessage());
             }
             catch (ExpressionRuntimeException e)

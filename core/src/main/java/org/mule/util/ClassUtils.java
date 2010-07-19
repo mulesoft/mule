@@ -198,8 +198,29 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return The Class instance
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
-    public static Class loadClass(final String className, final Class<?> callingClass)
-            throws ClassNotFoundException
+    public static Class loadClass(final String className, final Class<?> callingClass) throws ClassNotFoundException
+    {
+        return loadClass(className, callingClass, Object.class);
+    }
+    /**
+     * Load a class with a given name. <p/> It will try to load the class in the
+     * following order:
+     * <ul>
+     * <li>From
+     * {@link Thread#getContextClassLoader() Thread.currentThread().getContextClassLoader()}
+     * <li>Using the basic {@link Class#forName(java.lang.String) }
+     * <li>From
+     * {@link Class#getClassLoader() ClassLoaderUtil.class.getClassLoader()}
+     * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
+     * </ul>
+     *
+     * @param className    The name of the class to load
+     * @param callingClass The Class object of the calling object
+     * @param type the class type to expect to load
+     * @return The Class instance
+     * @throws ClassNotFoundException If the class cannot be found anywhere.
+     */
+    public static <T extends Class> T loadClass(final String className, final Class<?> callingClass, T type) throws ClassNotFoundException
     {
         Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
@@ -277,7 +298,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             throw new ClassNotFoundException(className);
         }
 
-        return clazz;
+        if(type.isAssignableFrom(clazz))
+        {
+            return (T)clazz;
+        }
+        else
+        {
+            throw new IllegalArgumentException(String.format("Loaded class '%s' is not assignable from type '%s'", clazz.getName(), type.getName()));
+        }
     }
 
     /**
@@ -317,7 +345,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
     }
 
-    public static Object instanciateClass(Class<?> clazz, Object... constructorArgs)
+    public static <T> T instanciateClass(Class<? extends T> clazz, Object... constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException
     {
@@ -363,7 +391,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                     + argsString);
         }
 
-        return ctor.newInstance(constructorArgs);
+        return (T)ctor.newInstance(constructorArgs);
     }
 
     public static Object instanciateClass(String name, Object... constructorArgs)

@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Evaluator("sendHeaders")
+@Evaluator("outboundHeaders")
 public @interface OutboundHeaders
 {
 }

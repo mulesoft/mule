@@ -35,59 +35,8 @@ public class MessageHeadersExpressionEvaluator implements ExpressionEvaluator, E
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        boolean required;
 
-        Map result;
-        if (ALL_ARGUMENT.equals(expression))
-        {
-            result = new HashMap(message.getPropertyNames().size());
-            for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
-            {
-                String name = (String) iterator.next();
-                result.put(name, message.getProperty(name));
-            }
-        }
-        else if(COUNT_ARGUMENT.equals(expression))
-        {
-            return message.getPropertyNames().size();
-        }
-        else
-        {
-            StringTokenizer tokenizer = new StringTokenizer(expression, DELIM);
-            result = new HashMap(tokenizer.countTokens());
-            while (tokenizer.hasMoreTokens())
-            {
-                String s = tokenizer.nextToken();
-                s = s.trim();
-                if (s.endsWith(OPTIONAL_ARGUMENT))
-                {
-                    s = s.substring(0, s.length() - OPTIONAL_ARGUMENT.length());
-                    required = false;
-                }
-                else
-                {
-                    required = true;
-                }
-                
-                Object val = message.getProperty(s);
-                if (val != null)
-                {
-                    result.put(s, val);
-                }
-                else if (required)
-                {
-                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(NAME, expression));
-                }
-            }
-        }
-        if (result.size() == 0)
-        {
-            return Collections.emptyMap();
-        }
-        else
-        {
-            return result;
-        }
+        return ExpressionUtils.getPropertyWithScope(expression, message, Map.class);
     }
 
     /**

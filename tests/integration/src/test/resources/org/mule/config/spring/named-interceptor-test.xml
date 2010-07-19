@@ -30,7 +30,7 @@
     <model name="model">
         <service name="service">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <spring-object bean="target"/>

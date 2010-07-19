@@ -74,7 +74,6 @@ public class AnnotatedServiceObjectProcessor implements PreInitProcessor, MuleCo
         //Always support the callable interface
         resolverSet.addEntryPointResolver(new CallableEntryPointResolver());
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
-        resolver.setMuleContext(context);
         resolverSet.addEntryPointResolver(resolver);
 
         Model model = null;

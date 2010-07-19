@@ -24,13 +24,7 @@
                                        port="63081"
                                        path="services/Echo"
                                        exchange-pattern="request-response"
-                                       keep-alive="true">
-                    <transformers>
-                        <message-properties-transformer>
-                            <add-message-property key="MULE_REPLYTO" value="#[groovy:message.getProperty('MULE_REPLYTO', org.mule.api.transport.PropertyScope.INBOUND)]"/>
-                        </message-properties-transformer>
-                    </transformers>
-                </http:inbound-endpoint>
+                                       keep-alive="true"/>
             </inbound>
             <echo-component/>
         </service>

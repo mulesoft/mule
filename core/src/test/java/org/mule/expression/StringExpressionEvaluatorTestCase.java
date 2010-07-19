@@ -35,9 +35,9 @@ public class StringExpressionEvaluatorTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(new Apple(), props, muleContext);
         StringExpressionEvaluator extractor = new StringExpressionEvaluator();
         extractor.setMuleContext(muleContext);
-        Object o = extractor.evaluate("payload is #[function:shortPayloadClass] and has #[headers:{count}] headers", message);
+        Object o = extractor.evaluate("payload is #[function:shortPayloadClass] and has foo=#[header:foo] header", message);
         assertNotNull(o);
-        assertEquals("payload is Apple and has 3 headers", o.toString());
+        assertEquals("payload is Apple and has foo=moo header", o.toString());
 
         o = extractor.evaluate("literal string", message);
         assertNotNull(o);
@@ -48,9 +48,9 @@ public class StringExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testStringUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), props, muleContext);
-        Object o = muleContext.getExpressionManager().evaluate("#[string:payload is #[function:shortPayloadClass] and has #[headers:{count}] headers]", message);
+        Object o = muleContext.getExpressionManager().evaluate("#[string:payload is #[function:shortPayloadClass] and has foo=#[header:foo] header]", message);
         assertNotNull(o);
-        assertEquals("payload is Apple and has 3 headers", o.toString());
+        assertEquals("payload is Apple and has foo=moo header", o.toString());
 
         o = muleContext.getExpressionManager().evaluate("#[string:literal string]", message);
         assertNotNull(o);

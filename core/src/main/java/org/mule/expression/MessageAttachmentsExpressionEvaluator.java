@@ -13,17 +13,23 @@ package org.mule.expression;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.filters.WildcardFilter;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+
+import javax.activation.DataHandler;
 
 /**
  * Looks up the attachment(s) on the message using the expression given. The expression can contain a comma-separated list
- * of header names to lookup. A {@link java.util.Map} of key value pairs is returned.
+ * of header names to lookup. A {@link java.util.Map&lt;String, DataHandler&gt;} of key value pairs is returned.
  *
  * @see MessageAttachmentsListExpressionEvaluator
  * @see MessageAttachmentExpressionEvaluator
@@ -38,24 +44,25 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
     {
         boolean required;
 
-        Map result;
-        if (ALL_ARGUMENT.equals(expression))
+        Map<String, DataHandler> result;
+        //Enable wildcard matching
+        if (expression.contains(ALL_ARGUMENT))
         {
-            result = new HashMap(message.getAttachmentNames().size());
+            WildcardFilter filter = new WildcardFilter(expression);
+            result = new HashMap<String, DataHandler>(message.getAttachmentNames().size());
             for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
             {
                 String name = (String) iterator.next();
-                result.put(name, message.getAttachment(name));
+                if(filter.accept(name))
+                {
+                    result.put(name, message.getAttachment(name));
+                }
             }
-        }
-        else if(COUNT_ARGUMENT.equals(expression))
-        {
-            return message.getAttachmentNames().size();
         }
         else
         {
             StringTokenizer tokenizer = new StringTokenizer(expression, DELIM);
-            result = new HashMap(tokenizer.countTokens());
+            result = new HashMap<String, DataHandler>(tokenizer.countTokens());
             while (tokenizer.hasMoreTokens())
             {
                 String s = tokenizer.nextToken();
@@ -69,7 +76,7 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
                 {
                     required = true;
                 }
-                Object val = message.getAttachment(s);
+                DataHandler val = message.getAttachment(s);
                 if (val != null)
                 {
                     result.put(s, val);
@@ -82,11 +89,11 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
         }
         if (result.size() == 0)
         {
-            return Collections.emptyMap();
+            return Collections.unmodifiableMap(Collections.<String, DataHandler>emptyMap());
         }
         else
         {
-            return result;
+            return Collections.unmodifiableMap(result);
         }
     }
 

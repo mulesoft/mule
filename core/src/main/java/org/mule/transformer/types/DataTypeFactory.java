@@ -11,6 +11,7 @@ package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transport.PropertyScope;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
@@ -19,6 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 /**
  * Factory class used to create {@link org.mule.api.transformer.DataType} objects based on the 
@@ -68,6 +72,7 @@ public class DataTypeFactory
         {
             return new SimpleDataType(type.getInterfaces()[0], mimeType);
         }
+
         return new SimpleDataType(type, mimeType);
     }
 
@@ -100,14 +105,30 @@ public class DataTypeFactory
             MuleMessage mm = (MuleMessage) o;
             type = mm.getPayload().getClass();
             //TODO better mime handling, see MULE-4639
-            mime = mm.getStringProperty("Content-Type", null);
-            if(mime!=null)
+            //case insensitive
+            mime = mm.getProperty("Content-Type", PropertyScope.INBOUND, null);
+            if(mime==null)
             {
-                int i = mime.indexOf(";");
-                mime = (i >-1 ? mime.substring(0, i) : mime);
+                //case insensitive
+                mime = mm.getProperty("ContentType", PropertyScope.INBOUND, null);
             }
         }
-        if(mime==null)
+        else if(o instanceof DataHandler)
+        {
+            mime = ((DataHandler)o).getContentType();
+        }
+        else if(o instanceof DataSource)
+        {
+            mime = ((DataSource)o).getContentType();
+        }
+
+        if(mime!=null)
+        {
+            int i = mime.indexOf(";");
+            mime = (i >-1 ? mime.substring(0, i) : mime);
+            //TODO set the charset on the DataType when the field is introduced BL-140
+        }
+        else
         {
             mime = MimeTypes.ANY;
         }
