@@ -24,7 +24,7 @@ public class FilterCounter implements Filter
      */
     public boolean accept(MuleMessage message)
     {
-        if(message.getInboundProperty("pass") != null && message.getInboundProperty("pass").equals("true"))
+        if ("true".equals(message.getInboundProperty("pass")))
         {
             counter.incrementAndGet();
             return true;
