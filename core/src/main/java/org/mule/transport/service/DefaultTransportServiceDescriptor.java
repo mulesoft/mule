@@ -69,6 +69,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private MuleContext muleContext;
     private List<MessageExchangePattern> inboundExchangePatterns;
     private List<MessageExchangePattern> outboundExchangePatterns;
+    private String defaultExchangePattern;
 
     private ClassLoader classLoader;
 
@@ -101,6 +102,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         
         mepsString = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, props);
         initOutboundExchangePatterns(mepsString);
+        
+        defaultExchangePattern = removeProperty(MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, props);
     }
 
     public void setOverrides(Properties props)
@@ -574,5 +577,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 "Outbound exchange patterns", getService()));
         }
         return outboundExchangePatterns;
+    }
+
+    public MessageExchangePattern getDefaultExchangePatern() throws TransportServiceException
+    {
+        if (defaultExchangePattern == null)
+        {
+            throw new TransportServiceException(CoreMessages.objectNotSetInService(
+                "Default exchange pattern", getService()));
+        }
+        
+        return MessageExchangePattern.fromString(defaultExchangePattern);
     }
 }

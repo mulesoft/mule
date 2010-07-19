@@ -80,4 +80,6 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
     List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException;
 
     List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException;
+    
+    MessageExchangePattern getDefaultExchangePatern() throws TransportServiceException;
 }

@@ -103,6 +103,7 @@ public class MuleProperties
     public static final String CONNECTOR_META_ENDPOINT_BUILDER = "meta.endpoint.builder";
     public static final String CONNECTOR_INBOUND_EXCHANGE_PATTERNS = "inbound.exchange.patterns";
     public static final String CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS = "outbound.exchange.patterns";
+    public static final String CONNECTOR_DEFAULT_EXCHANGE_PATTERN = "default.exchange.pattern";
     // End Connector Service descriptor properties
 
     public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
@@ -150,4 +151,5 @@ public class MuleProperties
     public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
     public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
     public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
+
 }
