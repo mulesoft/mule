@@ -54,10 +54,12 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://test?exchangePattern=request-response");
         assertNotNull(endpoint1);
 
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://test?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", 
+            "test://test?exchangePattern=request-response");
         assertNotNull(endpoint2);
 
         mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -91,7 +93,8 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
-        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]&exchange-pattern=request-response");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", 
+            "test://foo?[barValue]&exchangePattern=request-response");
         assertNotNull(endpoint3);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
         router.addRoute((OutboundEndpoint) mockendpoint3.proxy());
@@ -102,9 +105,8 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
         MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
-
         ImmutableEndpoint ep = (ImmutableEndpoint) router.getRoute(2, message);
-        assertEquals("test://foo?bar&exchange-pattern=request-response", ep.getEndpointURI().toString());
+        assertEquals("test://foo?bar&exchangePattern=request-response", ep.getEndpointURI().toString());
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);

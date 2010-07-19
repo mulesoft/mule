@@ -42,7 +42,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
         
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://Test1Provider?exchangePattern=request-response");
         assertNotNull(endpoint1);
 
         Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -94,7 +95,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         session.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://Test1Provider?exchangePattern=request-response");
         assertNotNull(endpoint1);
         Mock mockEndpoint = RouterTestUtils.getMockEndpoint(endpoint1);
         FilteringOutboundRouter router = new FilteringOutboundRouter();

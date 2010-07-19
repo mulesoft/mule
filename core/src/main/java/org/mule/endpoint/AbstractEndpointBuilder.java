@@ -117,7 +117,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             {
                 logger.warn(String.format(
                     "Deprecated 'synchronous' flag found on endpoint '%s', please replace with "
-                                    + "e.g. 'exchange-pattern=request-response", uriBuilder.getEndpoint()));
+                                    + "e.g. 'exchangePattern=request-response", uriBuilder.getEndpoint()));
             }
             else
             {

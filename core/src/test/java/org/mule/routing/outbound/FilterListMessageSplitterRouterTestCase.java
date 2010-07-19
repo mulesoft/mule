@@ -52,7 +52,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         router.addRoute((OutboundEndpoint) mockendpoint2.proxy());
         router.addRoute((OutboundEndpoint) mockendpoint3.proxy());
 
-        List payload = new ArrayList();
+        List<Object> payload = new ArrayList<Object>();
         payload.add(new Apple());
         payload.add(new Apple());
         payload.add(new Orange());
@@ -69,9 +69,14 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         mockendpoint2.verify();
         mockendpoint3.verify();
 
-        endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1?exchange-pattern=request-response", null, new PayloadTypeFilter(Apple.class), null);
-        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?exchange-pattern=request-response", null, new PayloadTypeFilter(Orange.class), null);
-        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?exchange-pattern=request-response");
+        endpoint1 = getTestOutboundEndpoint("Test1endpoint", 
+            "test://endpointUri.1?exchangePattern=request-response", null, 
+            new PayloadTypeFilter(Apple.class), null);
+        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", 
+            "test://endpointUri.2?exchangePattern=request-response", null, 
+            new PayloadTypeFilter(Orange.class), null);
+        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", 
+            "test://endpointUri.3?exchangePattern=request-response");
         mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
@@ -80,7 +85,6 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         router.addRoute((OutboundEndpoint) mockendpoint1.proxy());
         router.addRoute((OutboundEndpoint) mockendpoint2.proxy());
         router.addRoute((OutboundEndpoint) mockendpoint3.proxy());
-
 
         message = new DefaultMuleMessage(payload, muleContext);
 
@@ -95,10 +99,9 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
         assertTrue(resultMessage.getPayload() instanceof List);
-        assertEquals(((List) resultMessage.getPayload()).size(), 4);
+        assertEquals(((List<?>) resultMessage.getPayload()).size(), 4);
         mockendpoint1.verify();
         mockendpoint2.verify();
         mockendpoint3.verify();
     }
-
 }

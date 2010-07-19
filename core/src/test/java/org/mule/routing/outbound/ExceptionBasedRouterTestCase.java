@@ -97,15 +97,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         OutboundEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy1?exchange-pattern=request-response");
+            .getOutboundEndpoint("test://Dummy1?exchangePattern=request-response");
 
         OutboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy2?exchange-pattern=request-response");
+            .getOutboundEndpoint("test://Dummy2?exchangePattern=request-response");
 
         OutboundEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("test://Dummy3?exchange-pattern=request-response");
+            .getOutboundEndpoint("test://Dummy3?exchangePattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
@@ -197,8 +197,10 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", 
+            "test://Failure?exchangePattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", 
+            "test://Success?exchangePattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
@@ -235,8 +237,10 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=one-way");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", 
+            "test://Failure?exchangePattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", 
+            "test://Success?exchangePattern=one-way");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
 
@@ -275,8 +279,10 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock mockSession = MuleTestUtils.getMockSession();
         mockSession.matchAndReturn("getFlowConstruct", getTestService());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure?exchange-pattern=request-response");
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", 
+            "test://Failure?exchangePattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", 
+            "test://Success?exchangePattern=request-response");
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
         ExceptionBasedRouter router = new ExceptionBasedRouter();
@@ -300,9 +306,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         final MuleSession session = (MuleSession)mockSession.proxy();
         // 1st failure
-        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), exPayloadMessageEvent);
+        mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), 
+            exPayloadMessageEvent);
         // next endpoint
-        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), expectedResultEvent);
+        mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), 
+            expectedResultEvent);
         MuleEvent actualResult = router.route(new OutboundRoutingTestEvent(message, session));
         mockendpoint1.verify();
         mockendpoint2.verify();

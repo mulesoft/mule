@@ -91,8 +91,8 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint1);
 
         List<String> recipients = new ArrayList<String>();
-        recipients.add("test://recipient1?exchange-pattern=request-response");
-        recipients.add("test://recipient2?exchange-pattern=request-response");
+        recipients.add("test://recipient1?exchangePattern=request-response");
+        recipients.add("test://recipient2?exchangePattern=request-response");
         MockingStaticRecipientList router = createObject(MockingStaticRecipientList.class);
 
         router.setRecipients(recipients);
@@ -126,7 +126,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
              }
          });
 
-        router.getRecipients().add("test://recipient3?exchange-pattern=request-response");
+        router.getRecipients().add("test://recipient3?exchangePattern=request-response");
         MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();

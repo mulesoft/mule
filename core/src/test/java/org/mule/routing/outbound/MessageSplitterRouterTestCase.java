@@ -48,9 +48,12 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         Mock mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         //Sync targets  org.python.core.__builtin__
-        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
-        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
-        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
+        OutboundEndpoint endpoint4 = getTestOutboundEndpoint("Test4Endpoint", 
+            "test://endpointUri.4?exchangePattern=request-response");
+        OutboundEndpoint endpoint5 = getTestOutboundEndpoint("Test5Endpoint", 
+            "test://endpointUri.5?exchangePattern=request-response");
+        OutboundEndpoint endpoint6 = getTestOutboundEndpoint("Test6Endpoint", 
+            "test://endpointUri.6?exchangePattern=request-response");
         Mock mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         Mock mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         Mock mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

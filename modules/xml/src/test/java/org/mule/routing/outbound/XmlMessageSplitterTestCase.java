@@ -67,9 +67,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         // setup async targets
-        endpoint4 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1?exchange-pattern=request-response");
-        endpoint5 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?exchange-pattern=request-response");
-        endpoint6 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?exchange-pattern=request-response");
+        endpoint4 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1?exchangePattern=request-response");
+        endpoint5 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2?exchangePattern=request-response");
+        endpoint6 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3?exchangePattern=request-response");
         mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

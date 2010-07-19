@@ -59,9 +59,9 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         mockendpoint3 = RouterTestUtils.getMockEndpoint(endpoint3);
 
         // setup sync targets
-        endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchange-pattern=request-response");
-        endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchange-pattern=request-response");
-        endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchange-pattern=request-response");
+        endpoint4 = getTestOutboundEndpoint("Test4Endpoint", "test://endpointUri.4?exchangePattern=request-response");
+        endpoint5 = getTestOutboundEndpoint("Test5Endpoint", "test://endpointUri.5?exchangePattern=request-response");
+        endpoint6 = getTestOutboundEndpoint("Test6Endpoint", "test://endpointUri.6?exchangePattern=request-response");
         mockendpoint4 = RouterTestUtils.getMockEndpoint(endpoint4);
         mockendpoint5 = RouterTestUtils.getMockEndpoint(endpoint5);
         mockendpoint6 = RouterTestUtils.getMockEndpoint(endpoint6);

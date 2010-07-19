@@ -45,7 +45,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=one-way");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://Test1Provider?exchangePattern=one-way");
         assertNotNull(endpoint1);
 
         OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");

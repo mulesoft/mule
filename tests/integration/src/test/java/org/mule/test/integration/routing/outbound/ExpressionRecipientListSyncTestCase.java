@@ -31,9 +31,9 @@ public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
         String message = "test";
         MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>(3);
-        props.put("recipient1", "vm://service1.queue?exchange-pattern=request-response");
-        props.put("recipient2", "vm://service2.queue?exchange-pattern=request-response");
-        props.put("recipient3", "vm://service3.queue?exchange-pattern=request-response");
+        props.put("recipient1", "vm://service1.queue?exchangePattern=request-response");
+        props.put("recipient2", "vm://service2.queue?exchangePattern=request-response");
+        props.put("recipient3", "vm://service3.queue?exchangePattern=request-response");
         MuleMessage result = client.send("vm://distributor.queue", message, props);
 
         assertNotNull(result);

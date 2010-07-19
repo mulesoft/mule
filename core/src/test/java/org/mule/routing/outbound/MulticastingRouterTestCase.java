@@ -72,10 +72,12 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getFlowConstruct", getTestService());
         session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://Test1Provider?exchangePattern=request-response");
         assertNotNull(endpoint1);
 
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", 
+            "test://Test2Provider?exchangePattern=request-response");
         assertNotNull(endpoint2);
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
         Mock mockendpoint2 = RouterTestUtils.getMockEndpoint(endpoint2);
@@ -114,10 +116,12 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getFlowConstruct", getTestService());
         session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
+            "test://Test1Provider?exchangePattern=request-response");
         assertNotNull(endpoint1);
 
-        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://Test2Provider?exchange-pattern=request-response");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", 
+            "test://Test2Provider?exchangePattern=request-response");
         assertNotNull(endpoint2);
 
         Mock mockendpoint1 = RouterTestUtils.getMockEndpoint(endpoint1);
@@ -150,7 +154,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         Object payload = message.getPayload();
         if (payload instanceof List)
         {
-            payload = ((List) payload).get(0);
+            payload = ((List<?>) payload).get(0);
         }
         return payload.toString();
     }

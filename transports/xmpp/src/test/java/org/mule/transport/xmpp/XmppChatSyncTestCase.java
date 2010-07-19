@@ -26,7 +26,7 @@ public class XmppChatSyncTestCase extends XmppMessageSyncTestCase
     @Override
     public void testRequestSync() throws Exception
     {
-        doTestRequest("xmpp://CHAT/mule2@localhost?exchange-pattern=request-response");
+        doTestRequest("xmpp://CHAT/mule2@localhost?exchangePattern=request-response");
     }
 
     @Override

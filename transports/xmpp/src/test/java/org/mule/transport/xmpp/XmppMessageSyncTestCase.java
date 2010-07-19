@@ -67,7 +67,7 @@ public class XmppMessageSyncTestCase extends AbstractXmppTestCase
 
     public void testRequestSync() throws Exception
     {
-        doTestRequest("xmpp://MESSAGE/mule2@localhost?exchange-pattern=request-response");
+        doTestRequest("xmpp://MESSAGE/mule2@localhost?exchangePattern=request-response");
     }
     
     protected void doTestRequest(String url) throws Exception
