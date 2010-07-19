@@ -19,7 +19,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.http.HttpConnector;
@@ -109,10 +108,10 @@ public class CxfServiceComponentTestCase extends AbstractMuleTestCase
         final String basePath = "someBasePath";
         
         final MuleMessage muleReqMsg = new DefaultMuleMessage("some object", muleContext);
-        muleReqMsg.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method, PropertyScope.INBOUND);
-        muleReqMsg.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
-        muleReqMsg.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, basePath, PropertyScope.INBOUND);
-        muleReqMsg.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, "\"" + someActionProperty + "\"", PropertyScope.INBOUND);
+        muleReqMsg.setInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        muleReqMsg.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
+        muleReqMsg.setInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, basePath);
+        muleReqMsg.setInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY, "\"" + someActionProperty + "\"");
 
         // configure expectations.
         when(ctx.getMessage()).thenReturn(muleReqMsg);

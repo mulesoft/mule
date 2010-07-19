@@ -224,7 +224,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 path = path.substring(0, i);
             }
 
-            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
+            message.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
             
             if (logger.isDebugEnabled())
             {
@@ -239,8 +239,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
-                message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                        HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()), PropertyScope.INBOUND);
+                message.setInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
+                                           HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
 
                 preRouteMessage(message);
                 MuleMessage returnMessage = receiver.routeMessage(message);

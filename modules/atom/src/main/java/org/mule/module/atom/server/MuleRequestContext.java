@@ -197,7 +197,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         {
             case REQUEST:
                 // note it's not a usual Mule property scope, abdera puts and checks for things here
-                request.setProperty(name, value, PropertyScope.INBOUND);
+                request.setInboundProperty(name, value);
                 break;
             case SESSION:
                 event.getSession().setProperty(name, value);

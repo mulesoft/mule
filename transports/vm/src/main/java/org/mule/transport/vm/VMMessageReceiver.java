@@ -135,7 +135,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         for (String name : props)
         {
             final Object value = newMessage.removeProperty(name, PropertyScope.OUTBOUND);
-            newMessage.setProperty(name, value, PropertyScope.INBOUND);
+            newMessage.setInboundProperty(name, value);
         }
     }
 
