@@ -18,7 +18,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
@@ -122,7 +121,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             String correlationIDString = replyToMessage.getJMSCorrelationID();
             if (StringUtils.isBlank(correlationIDString))
             {
-                correlationIDString = (String) eventMsg.getProperty(JmsConstants.JMS_MESSAGE_ID, PropertyScope.INBOUND);
+                correlationIDString = eventMsg.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
@@ -195,14 +194,14 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         // If JMS correlation ID exists in the incoming message - use it for the outbound message;
         // otherwise use JMS Message ID
         MuleMessage eventMsg = event.getMessage();
-        Object jmsCorrelationId = eventMsg.getProperty("JMSCorrelationID", PropertyScope.INBOUND);
+        String jmsCorrelationId = eventMsg.getInboundProperty("JMSCorrelationID");
         if (jmsCorrelationId == null)
         {
-            jmsCorrelationId = eventMsg.getProperty("JMSMessageID", PropertyScope.INBOUND);
+            jmsCorrelationId = eventMsg.getInboundProperty("JMSMessageID");
         }
         if (jmsCorrelationId != null)
         {
-            replyToMessage.setJMSCorrelationID(jmsCorrelationId.toString());
+            replyToMessage.setJMSCorrelationID(jmsCorrelationId);
         }
         if (logger.isDebugEnabled())
         {

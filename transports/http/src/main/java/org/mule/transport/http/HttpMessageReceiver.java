@@ -48,7 +48,6 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.logging.Log;
@@ -218,7 +217,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             MuleMessage message = createMuleMessage(request);
 
-            String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
+            String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
             int i = path.indexOf('?');
             if (i > -1)
             {
@@ -229,7 +228,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             
             if (logger.isDebugEnabled())
             {
-                logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND));
+                logger.debug(message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
             }
 
             // determine if the request path on this request denotes a different receiver
@@ -366,8 +365,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse buildFailureResponse(RequestLine requestLine, MuleMessage message) throws TransformerException
         {
             EndpointURI uri = endpoint.getEndpointURI();
-            String failedPath = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort()
-                    + message.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND);
+            String failedPath = String.format("%s://%s:%d%s",
+                                              uri.getScheme(), uri.getHost(), uri.getPort(),
+                                              message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
 
             if (logger.isDebugEnabled())
             {
@@ -398,7 +398,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected MessageReceiver getTargetReceiver(MuleMessage message, ImmutableEndpoint ep)
             throws ConnectException
     {
-        String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
+        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         int i = path.indexOf('?');
         if (i > -1)
         {
@@ -519,7 +519,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         if (logger.isDebugEnabled())
         {
             logger.debug("Message request '"
-                         + message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND)
+                         + message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
                          + "' is being rejected since it does not match the filter on this endpoint: "
                          + endpoint);
         }

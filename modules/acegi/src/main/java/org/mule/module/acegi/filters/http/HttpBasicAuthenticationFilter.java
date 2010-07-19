@@ -128,7 +128,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
                 username, password);
-            authRequest.setDetails(event.getMessage().getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.INBOUND));
+            authRequest.setDetails(event.getMessage().getInboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
 
             Authentication authResult;
 

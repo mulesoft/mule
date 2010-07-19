@@ -103,7 +103,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
             case LOCALES:
                 return null;
             case PROTOCOL:
-                return request.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.INBOUND);
+                return request.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
             case REMOTEADDRESS:
                 return null;
             case REMOTEHOST:
@@ -211,7 +211,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         switch (scope)
         {
             case REQUEST:
-                return request.getProperty(name, PropertyScope.INBOUND);
+                return request.getInboundProperty(name);
             case SESSION:
                 if (event.getSession() != null)
                 {
@@ -260,7 +260,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 
     public String getHeader(String name)
     {
-        Object prop = request.getProperty(name, PropertyScope.INBOUND);
+        Object prop = request.getInboundProperty(name);
         if (prop == null)
         {
             return null;

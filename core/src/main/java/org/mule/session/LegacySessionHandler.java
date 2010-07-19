@@ -50,8 +50,8 @@ public class LegacySessionHandler implements SessionHandler
     {
          MuleSession session = new DefaultMuleSession(message.getMuleContext());
 
-         String sessionId = (String) message.getProperty(MuleProperties.MULE_SESSION_ID_PROPERTY, PropertyScope.INBOUND);
-         Object sessionHeader = message.getProperty(MuleProperties.MULE_SESSION_PROPERTY, PropertyScope.INBOUND);
+         String sessionId = message.getInboundProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
+         Object sessionHeader = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
          if (sessionId != null)
          {

@@ -36,7 +36,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
-        String serializedEncodedSession = (String) message.getProperty(MuleProperties.MULE_SESSION_PROPERTY, PropertyScope.INBOUND);
+        String serializedEncodedSession = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
         
         if (serializedEncodedSession != null)
         {

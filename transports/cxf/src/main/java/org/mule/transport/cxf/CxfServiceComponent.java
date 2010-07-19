@@ -138,8 +138,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     protected Object generateWSDLOrXSD(MuleEventContext eventContext, String req)
         throws EndpointNotFoundException, IOException
     {
-        // TODO: Is there a way to make this not so ugly?       
-        String ctxUri = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND);
+        String ctxUri = eventContext.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
         String wsdlUri = getWsdlUri(eventContext, req);
         String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
         
@@ -189,7 +188,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     {
         EndpointURI epUri = eventContext.getEndpointURI();
         String host = eventContext.getMessage().getInboundProperty("Host", epUri.getHost());
-        String ctx = (String) eventContext.getMessage().getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND);
+        String ctx = eventContext.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         return epUri.getScheme() + "://" + host + ctx;
     }
     
@@ -199,15 +198,15 @@ public class CxfServiceComponent implements Callable, Lifecycle
         {
             final MessageImpl m = new MessageImpl();
             final MuleMessage muleReqMsg = ctx.getMessage();
-            String method = (String) muleReqMsg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND);
-            
-            String ct = (String) muleReqMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
+            String method = muleReqMsg.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+
+            String ct = muleReqMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
             if (ct != null) 
             {
                 m.put(Message.CONTENT_TYPE, ct);
             }
-            
-            String path = (String) muleReqMsg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND);
+
+            String path = muleReqMsg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
             if (path == null) 
             {
                 path = "";
@@ -217,7 +216,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             {
                 m.put(Message.HTTP_REQUEST_METHOD, method);
                 m.put(Message.PATH_INFO, path);
-                Object basePath = muleReqMsg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND);
+                Object basePath = muleReqMsg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
                 m.put(Message.BASE_PATH, basePath);
                 
                 method = method.toUpperCase();
@@ -413,7 +412,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
     protected String getSoapAction(MuleMessage message)
     {
-        String action = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY, PropertyScope.INBOUND);
+        String action = message.getInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
 
         if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2)
         {

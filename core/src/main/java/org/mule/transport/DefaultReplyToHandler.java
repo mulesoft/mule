@@ -83,7 +83,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         List<String> responseProperties = endpoint.getResponseProperties();
         for (String propertyName : responseProperties)
         {
-            Object propertyValue = event.getMessage().getProperty(propertyName, PropertyScope.INBOUND);
+            Object propertyValue = event.getMessage().getInboundProperty(propertyName);
             if (propertyValue != null)
             {
                 replyToEvent.getMessage().setProperty(propertyName, propertyValue, PropertyScope.OUTBOUND);

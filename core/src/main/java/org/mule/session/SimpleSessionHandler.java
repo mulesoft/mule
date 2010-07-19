@@ -32,7 +32,7 @@ public class SimpleSessionHandler implements SessionHandler
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
-        return (MuleSession) message.getProperty(MuleProperties.MULE_SESSION_PROPERTY, PropertyScope.INBOUND);
+        return message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
     }
 
     /**

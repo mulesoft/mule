@@ -43,8 +43,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
         // Transports such as SOAP need to ignore the method property
-        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean) context.getMessage().getProperty(
-                MuleProperties.MULE_IGNORE_METHOD_PROPERTY, PropertyScope.INBOUND));
+        boolean ignoreMethod = BooleanUtils.toBoolean(context.getMessage().<Boolean>getInboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         if (ignoreMethod)
         {
@@ -63,7 +62,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         Object methodProp = context.getMessage().removeProperty(getMethodProperty(), PropertyScope.INVOCATION);
         if (methodProp == null)
         {
-            methodProp = context.getMessage().getProperty(getMethodProperty(), PropertyScope.INBOUND);
+            methodProp = context.getMessage().getInboundProperty(getMethodProperty());
         }
         if (methodProp == null)
         {

@@ -180,15 +180,15 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         {
             status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
         }
-        
-        String version = (String) msg.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.INBOUND);
+
+        String version = msg.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
         if (version == null)
         {
             version = HttpConstants.HTTP11;
         }
         String date = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US).format(new Date());
 
-        String contentType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND);
+        String contentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType == null)
         {
             contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);

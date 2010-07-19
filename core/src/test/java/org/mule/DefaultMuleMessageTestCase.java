@@ -191,7 +191,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     private void assertInboundAndOutboundMessageProperties(MuleMessage original)
     {
         assertOutboundMessageProperty("MuleMessage", original);
-        assertEquals("MessageProperties", original.getProperty("MessageProperties", PropertyScope.INBOUND));
+        assertEquals("MessageProperties", original.getInboundProperty("MessageProperties"));
     }
 
     //

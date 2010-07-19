@@ -23,7 +23,7 @@ public class MuleHeaderCredentialsAccessor implements CredentialsAccessor
 {
     public Object getCredentials(MuleEvent event)
     {
-        return event.getMessage().getProperty(MuleProperties.MULE_USER_PROPERTY, PropertyScope.INBOUND);
+        return event.getMessage().getInboundProperty(MuleProperties.MULE_USER_PROPERTY);
     }
 
     public void setCredentials(MuleEvent event, Object credentials)

@@ -51,9 +51,9 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
         {
             muleMsg.setProperty(CxfConstants.ATTACHMENTS, atts, 
                 PropertyScope.OUTBOUND);
-            muleMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE, 
-                muleMsg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.INBOUND), 
-                PropertyScope.OUTBOUND);
+            muleMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,
+                                muleMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE),
+                                PropertyScope.OUTBOUND);
         }
     }
 
