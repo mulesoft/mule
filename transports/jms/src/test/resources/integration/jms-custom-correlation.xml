@@ -49,7 +49,7 @@
 
         <service name="TestService1">
             <inbound>
-                <inbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
+                <inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
             </inbound>
             <test:component appendString=" #[mule:context.serviceName]"/>
         </service>
