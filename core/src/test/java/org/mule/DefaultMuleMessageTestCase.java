@@ -171,17 +171,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         payload.clearProperties(PropertyScope.OUTBOUND);
         assertEquals(0, payload.getPropertyNames(PropertyScope.OUTBOUND).size());
 
-        //TODO
-//        try
-//        {
-//            payload.clearProperties(PropertyScope.INBOUND);
-//            fail("inbound scope is read only");
-//        }
-//        catch (UnsupportedOperationException e)
-//        {
-//            //expected
-//        }
-
+       //See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here
     }
     
     //
