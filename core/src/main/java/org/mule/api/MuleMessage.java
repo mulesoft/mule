@@ -94,12 +94,17 @@ public interface MuleMessage extends Serializable
     void setOutboundProperty(String key, Object value);
 
     /**
-     * Set a property on the message
+     * Set a property on the message. End-users should prefer more
+     * scope-specific methods for readability. This one is more intended for programmatic
+     * scope manipulation and Mule internal use.
      *
      * @param key the key on which to associate the value
      * @param value the property value
      * @param scope The scope at which to set the property at
      * @see PropertyScope
+     * @see #setInboundProperty(String, Object)
+     * @see #setInvocationProperty(String, Object)
+     * @see #setOutboundProperty(String, Object) 
      */
     void setProperty(String key, Object value, PropertyScope scope);
 
@@ -163,11 +168,16 @@ public interface MuleMessage extends Serializable
     Object getProperty(String name, Object defaultValue);
 
     /**
-     * Gets a property from the message with a given scope
+     * Gets a property from the message with a given scope. End-users should prefer more
+     * scope-specific methods for readability. This one is more intended for programmatic
+     * scope manipulation and Mule internal use.
      *
      * @param name the name or key of the property. This must be non-null.
      * @param scope The scope of the property to retrieve. This must be non-null.
      * @return the property value or null if the property does not exist in the specified scope
+     * @see #getInboundProperty(String)
+     * @see #getOutboundProperty(String)
+     * @see #getInvocationProperty(String)
      */
     Object getProperty(String name, PropertyScope scope);
 
