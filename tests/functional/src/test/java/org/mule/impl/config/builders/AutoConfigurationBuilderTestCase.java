@@ -24,7 +24,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 
 public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
 {
-    @Override
+
     protected MuleContext createMuleContext() throws Exception
     {
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
@@ -34,7 +34,7 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
     public void testConfigureSpring() throws ConfigurationException, InitialisationException
     {
         ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder(
-            "org/mule/test/spring/config2/test-xml-mule2-config.xml");
+            "org/mule/test/spring/config1/test-xml-mule2-config.xml");
         configurationBuilder.configure(muleContext);
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase
