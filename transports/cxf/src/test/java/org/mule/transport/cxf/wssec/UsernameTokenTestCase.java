@@ -10,11 +10,14 @@
 
 package org.mule.transport.cxf.wssec;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.concurrent.Latch;
 
-import org.apache.hello_world_soap_http.GreeterImpl;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class UsernameTokenTestCase extends FunctionalTestCase
 {
+    private Latch greetLatch;
+    
     @Override
     protected String getConfigResources()
     {
@@ -26,30 +29,19 @@ public class UsernameTokenTestCase extends FunctionalTestCase
     {
         ClientPasswordCallback.setPassword("secret");        
         super.doSetUp();
+        
+        greetLatch = getGreeter().getLatch();
     }
 
     public void testUsernameToken() throws Exception
     {
-        GreeterImpl impl = getGreeter();
-        
-        int i = 0;
-        while (i++ < 1000)
-        {
-            if (impl.getInvocationCount() > 0)
-            {
-                break;
-            }
-            Thread.sleep(50);
-        }
-        
-        assertEquals(1, impl.getInvocationCount());
+        assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
     }
 
-    private GreeterImpl getGreeter() throws Exception
+    private GreeterWithLatch getGreeter() throws Exception
     {
         Object instance = getComponent("greeterService");
-        
-        return (GreeterImpl) instance;
+        return (GreeterWithLatch) instance;
     }
 }
 

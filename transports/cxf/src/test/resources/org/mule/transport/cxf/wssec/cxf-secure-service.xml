@@ -50,7 +50,8 @@
                 </cxf:inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+<!--                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />-->
+                <singleton-object class="org.mule.transport.cxf.wssec.GreeterWithLatch" />
             </component>
         </service>
 
