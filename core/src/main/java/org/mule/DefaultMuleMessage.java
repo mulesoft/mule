@@ -581,7 +581,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public <T> T getProperty(String name, PropertyScope scope, T defaultValue)
     {
         assertAccess(READ);
@@ -589,53 +588,53 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
         //about primitive types being cast to a generic type
-        if(defaultValue instanceof Boolean)
+        if (defaultValue instanceof Boolean)
         {
-            result = (T)(Boolean)ObjectUtils.getBoolean(getProperty(name, scope), (Boolean)defaultValue);
+            result = (T) (Boolean) ObjectUtils.getBoolean(getProperty(name, scope), (Boolean) defaultValue);
         }
-        else if(defaultValue instanceof Byte)
+        else if (defaultValue instanceof Byte)
         {
-            result = (T)(Byte)ObjectUtils.getByte(getProperty(name, scope), (Byte)defaultValue);
+            result = (T) (Byte) ObjectUtils.getByte(getProperty(name, scope), (Byte) defaultValue);
         }
-        else if(defaultValue instanceof Integer)
+        else if (defaultValue instanceof Integer)
         {
-            result = (T)(Integer)ObjectUtils.getInt(getProperty(name, scope), (Integer)defaultValue);
+            result = (T) (Integer) ObjectUtils.getInt(getProperty(name, scope), (Integer) defaultValue);
         }
-        else if(defaultValue instanceof Short)
+        else if (defaultValue instanceof Short)
         {
-            result = (T)(Short)ObjectUtils.getShort(getProperty(name, scope), (Short)defaultValue);
+            result = (T) (Short) ObjectUtils.getShort(getProperty(name, scope), (Short) defaultValue);
         }
-        else if(defaultValue instanceof Long)
+        else if (defaultValue instanceof Long)
         {
-            result = (T)(Long)ObjectUtils.getLong(getProperty(name, scope), (Long)defaultValue);
+            result = (T) (Long) ObjectUtils.getLong(getProperty(name, scope), (Long) defaultValue);
         }
-        else if(defaultValue instanceof Float)
+        else if (defaultValue instanceof Float)
         {
-            result = (T)(Float)ObjectUtils.getFloat(getProperty(name, scope), (Float)defaultValue);
+            result = (T) (Float) ObjectUtils.getFloat(getProperty(name, scope), (Float) defaultValue);
         }
-        else if(defaultValue instanceof Double)
+        else if (defaultValue instanceof Double)
         {
-            result = (T)(Double)ObjectUtils.getDouble(getProperty(name, scope), (Double)defaultValue);
+            result = (T) (Double) ObjectUtils.getDouble(getProperty(name, scope), (Double) defaultValue);
         }
-        else if(defaultValue instanceof String)
+        else if (defaultValue instanceof String)
         {
-            result = (T)(String)ObjectUtils.getString(getProperty(name, scope), (String)defaultValue);
+            result = (T) (String) ObjectUtils.getString(getProperty(name, scope), (String) defaultValue);
         }
         else
         {
             Object temp = getProperty(name, scope);
-            if(temp==null)
+            if (temp == null)
             {
                 return defaultValue;
             }
-            else if(defaultValue==null)
+            else if (defaultValue == null)
             {
-                return (T)temp;
+                return (T) temp;
             }
             //If defaultValue is set and the result is not null, then validate that they are assignable
-            else if(defaultValue.getClass().isAssignableFrom(temp.getClass()))
+            else if (defaultValue.getClass().isAssignableFrom(temp.getClass()))
             {
-                result = (T)temp;
+                result = (T) temp;
             }
             else
             {
