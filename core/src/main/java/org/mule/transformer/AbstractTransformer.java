@@ -37,7 +37,6 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,8 +48,6 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
-
-    protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
     protected MuleContext muleContext;
 
@@ -319,9 +316,8 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Applying transformer " + getName() + " (" + getClass().getName() + ")");
-            logger.debug("Object before transform: "
-                    + StringMessageUtils.truncate(StringMessageUtils.toString(payload), DEFAULT_TRUNCATE_LENGTH, false));
+            logger.debug(String.format("Applying transformer %s (%s)", getName(), getClass().getName()));
+            logger.debug(String.format("Object before transform: %s", StringMessageUtils.toString(payload)));
         }
 
         Object result;
@@ -334,8 +330,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Object after transform: "
-                    + StringMessageUtils.truncate(StringMessageUtils.toString(result), DEFAULT_TRUNCATE_LENGTH, false));
+            logger.debug(String.format("Object after transform: %s", StringMessageUtils.toString(result)));
         }
 
         result = checkReturnClass(result);
