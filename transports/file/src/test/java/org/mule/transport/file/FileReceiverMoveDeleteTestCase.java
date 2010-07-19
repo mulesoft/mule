@@ -10,15 +10,15 @@
 
 package org.mule.transport.file;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.endpoint.URIBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
@@ -33,6 +33,14 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        // get rid of a warning that complains about two transformers with the same data type
+        muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
+    }
 
     public void testMoveAndDeleteStreaming() throws Exception
     {
@@ -161,7 +169,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         Service service = new SedaService(muleContext);
         service.setName("moveDeleteBridgeService");
         String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
-        org.mule.api.transformer.Transformer transformer = null;
+        Transformer transformer = null;
         if (streaming)
         {
             if (filePayload)
@@ -184,15 +192,17 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
                 transformer = new FileMessageFactoryAssertingTransformer(byte[].class);
             }
         }
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
+        
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(url, muleContext);
         endpointBuilder.addTransformer(transformer);
         if (filePayload)
         {
             endpointBuilder.addTransformer(new NoActionTransformer());
         }
-        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        service.getInboundRouter().addEndpoint(
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
+        InboundEndpoint endpoint = 
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+        service.getInboundRouter().addEndpoint(endpoint);
+        
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();
         testComponent.setMuleContext(muleContext);
@@ -205,8 +215,8 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
                 assertEquals(TEST_MESSAGE, context.transformMessageToString());
             }
         });
-
         testComponent.initialise();
+        
         final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(testComponent));
         component.setMuleContext(muleContext);
         service.setComponent(component);

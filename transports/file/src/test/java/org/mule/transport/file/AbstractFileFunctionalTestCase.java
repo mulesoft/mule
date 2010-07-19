@@ -34,6 +34,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 
     private File tmpDir;
 
+    @Override
     protected String getConfigResources()
     {
         return "file-functional-test.xml";
@@ -55,15 +56,8 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 
     protected File initForRequest() throws Exception
     {
-        tmpDir = File.createTempFile("mule-file-test-", "-dir");
-        tmpDir.delete();
-        tmpDir.mkdir();
-        tmpDir.deleteOnExit();
-        File target = File.createTempFile("mule-file-test-", ".txt", tmpDir);
-        Writer out = new FileWriter(target);
-        out.write(TEST_MESSAGE);
-        out.close();
-        target.deleteOnExit();
+        createTempDirectory();
+        File target = createAndPopulateTempFile();
 
         // define the readFromDirectory on the connector
         FileConnector connector = (FileConnector) muleContext.getRegistry().lookupConnector(
@@ -72,6 +66,24 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         logger.debug("Directory is " + connector.getReadFromDirectory());
 
         waitForFileSystem();
+        return target;
+    }
+    
+    private void createTempDirectory() throws Exception
+    {
+        tmpDir = File.createTempFile("mule-file-test-", "-dir");
+        tmpDir.delete();
+        tmpDir.mkdir();
+    }
+    
+    private File createAndPopulateTempFile() throws Exception
+    {
+        File target = File.createTempFile("mule-file-test-", ".txt", tmpDir);
+        
+        Writer out = new FileWriter(target);
+        out.write(TEST_MESSAGE);
+        out.close();
+        
         return target;
     }
 
@@ -89,6 +101,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE, result);
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
