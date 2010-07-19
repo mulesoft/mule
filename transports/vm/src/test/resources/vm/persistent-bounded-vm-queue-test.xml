@@ -21,7 +21,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint address="vm://out" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint address="vm://out"/>
                 </pass-through-router>
             </outbound>
             <threading-profile maxThreadsActive="1"/>
