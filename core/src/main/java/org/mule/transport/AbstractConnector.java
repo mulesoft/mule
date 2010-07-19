@@ -100,7 +100,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -1034,7 +1033,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * subclassing connector needs to delay the start lifecycle due to a dependence
      * on an external system. Most users can ignore this.
      *
-     * @param true to stop the connector starting through normal lifecycle. It will
+     * @param initialStateStopped true to stop the connector starting through normal lifecycle. It will
      *             be the responsibility of the code that sets this property to start the
      *             connector
      * @since 3.0.0
@@ -2397,17 +2396,31 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(120);
+        final String nl = System.getProperty("line.separator");
         sb.append(ClassUtils.getSimpleName(this.getClass()));
-        sb.append("{name=").append(name);
-        sb.append(", lifecycle=").append(
-                lifecycleManager == null ? "not in lifecycle" : lifecycleManager.getCurrentPhase());
-        sb.append(", this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(", numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
-        sb.append(", createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
-        sb.append(", connected=").append(connected);
-        sb.append(", supportedProtocols=").append(supportedProtocols);
-        sb.append(", serviceOverrides=").append(serviceOverrides);
+        // format message for multi-line output, single-line is not readable
+        sb.append(nl);
+        sb.append("{");
+        sb.append(nl);
+        sb.append("  name=").append(name);
+        sb.append(nl);
+        sb.append("  lifecycle=").append(
+                lifecycleManager == null ? "<not in lifecycle>" : lifecycleManager.getCurrentPhase());
+        sb.append(nl);
+        sb.append("  this=").append(Integer.toHexString(System.identityHashCode(this)));
+        sb.append(nl);
+        sb.append("  numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
+        sb.append(nl);
+        sb.append("  createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
+        sb.append(nl);
+        sb.append("  connected=").append(connected);
+        sb.append(nl);
+        sb.append("  supportedProtocols=").append(supportedProtocols);
+        sb.append(nl);
+        sb.append("  serviceOverrides=").append(serviceOverrides);
+        sb.append(nl);
         sb.append('}');
+        sb.append(nl);
         return sb.toString();
     }
 
