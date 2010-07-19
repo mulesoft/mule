@@ -7,12 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.rss;
 
 import org.mule.tck.FunctionalTestCase;
 
 public class RssFunctionalTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "rss-test-config.xml";
@@ -29,6 +31,5 @@ public class RssFunctionalTestCase extends FunctionalTestCase
         assertTrue(component2.getCount() > 2);
 
         assertTrue(component.getCount() >= component2.getCount());
-
     }
 }
