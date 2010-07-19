@@ -578,7 +578,7 @@ public class ClientWrapper
         Method method = defaultMethod;
         if (method == null)
         {
-            String opName = (String) event.getMessage().getProperty(CxfConstants.OPERATION);
+            String opName = event.getMessage().getOutboundProperty(CxfConstants.OPERATION);
             if (opName != null) 
             {
                 method = getMethodFromOperation(opName);

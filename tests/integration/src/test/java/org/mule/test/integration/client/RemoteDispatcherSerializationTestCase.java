@@ -72,7 +72,7 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
         MuleMessage m = n.getMessage();
         assertTrue(m.getPayload() instanceof Apple);
         assertTrue(((Apple)m.getPayload()).isWashed());
-        assertEquals("value1", m.getProperty("key1"));
+        assertEquals("value1", m.getOutboundProperty("key1"));
 
     }
 }

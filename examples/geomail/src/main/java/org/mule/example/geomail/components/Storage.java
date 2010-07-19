@@ -42,15 +42,15 @@ public class Storage implements Callable
             System.err.println(key + " = " + message.getProperty(key));
         }
 
-        String ip = (String)message.getProperty("ip");
+        String ip = message.getOutboundProperty("ip");
         if (ip == null)
         {
             throw new IllegalStateException("'ip' property should have been set on MuleMessage.");
         }
 
-        String from = (String)message.getProperty("from.email.address");
+        String from = message.getOutboundProperty("from.email.address");
 
-        Sender sender = (Sender)message.getPayload();
+        Sender sender = (Sender) message.getPayload();
         sender.setIp(ip);
         sender.setEmail(from);
 

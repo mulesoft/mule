@@ -151,7 +151,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         Thread.sleep(2000);
 
         assertNotNull(message);
-        assertEquals(inFile.getName(), message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+        assertEquals(inFile.getName(), message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
 
         assertNotNull(message.getPayload());
         if (streaming)

@@ -246,7 +246,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
             }
         }
 
-        return null != message.getProperty(key);
+        return null != message.getOutboundProperty(key);
     }
 
     protected void setCredentials()
@@ -264,7 +264,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public Credentials getCredentials()
     {
-        return (credentials != null ? credentials : (MuleCredentials) message.getProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY));
+        MuleCredentials creds = message.getOutboundProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY);
+        return (credentials != null ? credentials : creds);
     }
 
     Object getCachedMessage()

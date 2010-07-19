@@ -136,7 +136,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             }
 
             // See if the the client explicitly handles connection persistence
-            String connHeader = msg.getStringProperty(HttpConstants.HEADER_CONNECTION, null);
+            String connHeader = msg.getOutboundProperty(HttpConstants.HEADER_CONNECTION, null);
             if (connHeader != null)
             {
                 if (connHeader.equalsIgnoreCase("keep-alive"))
@@ -149,7 +149,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
                 }
             }
 
-            if ("HEAD".equalsIgnoreCase(msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, null)))
+            final String method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            if ("HEAD".equalsIgnoreCase(method))
             {
                 // this is a head request, we don't want to send the actual content
                 response.setBody((MuleMessage) null);
@@ -213,7 +214,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
         response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
         response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
-        if (msg.getProperty(HttpConstants.HEADER_EXPIRES) == null)
+        if (msg.getOutboundProperty(HttpConstants.HEADER_EXPIRES) == null)
         {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
@@ -243,7 +244,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 
         //TODO: This is the legacy way of setting custom headers and can be removed in 3.0
         // Custom responseHeaderNames
-        Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        Map customHeaders = msg.getOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null)
         {
             Map.Entry entry;

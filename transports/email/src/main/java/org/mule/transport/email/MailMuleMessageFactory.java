@@ -109,16 +109,16 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             String listName = MailUtils.toListHeader(name);
             String value = header.getValue();
 
-            if (null == muleMessage.getProperty(name))
+            if (null == muleMessage.getOutboundProperty(name))
             {
-                muleMessage.setProperty(name, value);
+                muleMessage.setOutboundProperty(name, value);
             }
 
-            Object listPropertyValue = muleMessage.getProperty(listName);
+            Object listPropertyValue = muleMessage.getOutboundProperty(listName);
             if (null == listPropertyValue)
             {
                 listPropertyValue = new LinkedList<Object>();
-                muleMessage.setProperty(listName, listPropertyValue);
+                muleMessage.setOutboundProperty(listName, listPropertyValue);
             }
             if (listPropertyValue instanceof List<?>)
             {
@@ -144,7 +144,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             for (Map.Entry<String, Part> entry : attachments.entrySet())
             {
                 Part part = entry.getValue();
-                String name = entry.getKey().toString();
+                String name = entry.getKey();
 
                 muleMessage.addAttachment(name, part.getDataHandler());
                 addAttachmentHeaders(name, part, muleMessage);
@@ -163,8 +163,8 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         
         if (headers.size() > 0)
         {
-            muleMessage.setProperty(
-                name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX, headers);
+            muleMessage.setOutboundProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
+                                            headers);
         }
     }
 }

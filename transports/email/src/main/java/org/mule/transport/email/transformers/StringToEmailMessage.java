@@ -74,7 +74,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
             headers.putAll(customHeaders);
         }
 
-        Properties otherHeaders = (Properties) message.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
+        Properties otherHeaders = message.getOutboundProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
                 //TODO Whats going on here?

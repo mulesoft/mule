@@ -40,7 +40,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 int index = (int) countDown.getCount() - 1;
-                assertEquals(context.getMessage().getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME), FILE_NAMES[index]);
+                assertEquals(FILE_NAMES[index], context.getMessage().getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
                 countDown.countDown();
             }
         };

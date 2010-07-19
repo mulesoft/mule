@@ -55,9 +55,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertNull(msg.getProperty("oBjeCt", PropertyScope.INVOCATION));
         assertNull(msg.getProperty("oBjeCt", PropertyScope.SESSION));
 
-        assertEquals("hello", msg.getProperty("string"));
+        assertEquals("hello", msg.getOutboundProperty("string"));
         //with different case
-        assertEquals("hello", msg.getProperty("String"));
+        assertEquals("hello", msg.getOutboundProperty("String"));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getProperty("string", PropertyScope.INBOUND));
         assertNull(msg.getProperty("string", PropertyScope.INVOCATION));

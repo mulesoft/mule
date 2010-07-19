@@ -46,7 +46,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
             {
                 MuleMessage msg = context.getMessage();
                 assertTrue(callbackMade.compareAndSet(false, true));
-                assertNotNull(msg.getProperty(HttpsConnector.LOCAL_CERTIFICATES));
+                assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
             }
         };
         testComponent.setEventCallback(callback);

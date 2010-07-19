@@ -60,8 +60,8 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
         receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
         callPreRoute(receiver, message);
         
-        assertNotNull(message.getProperty(SslConnector.PEER_CERTIFICATES));
-        assertNotNull(message.getProperty(SslConnector.LOCAL_CERTIFICATES));
+        assertNotNull(message.getOutboundProperty(SslConnector.PEER_CERTIFICATES));
+        assertNotNull(message.getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
     }
 
     private SslMessageReceiver setupMockSslMessageReciever() throws Exception

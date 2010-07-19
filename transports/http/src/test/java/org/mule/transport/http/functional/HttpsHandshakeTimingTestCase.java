@@ -85,7 +85,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         invokePreRouteMessage(work, message);
-        assertNotNull(message.getProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS));
+        assertNotNull(message.getOutboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS));
     }
 
     private void invokeHandshakeCompleted(Work work, MockSslSocket socket) throws Exception

@@ -40,8 +40,8 @@ public class HttpRequestBodyToParamMap extends AbstractMessageAwareTransformer
 
         try
         {
-            String httpMethod = (String) message.getProperty("http.method");
-            String contentType = (String) message.getProperty("Content-Type");
+            String httpMethod = message.getOutboundProperty("http.method");
+            String contentType = message.getOutboundProperty("Content-Type");
             
             boolean isGet = HttpConstants.METHOD_GET.equalsIgnoreCase(httpMethod);
             boolean isPost = HttpConstants.METHOD_POST.equalsIgnoreCase(httpMethod);
@@ -92,7 +92,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageAwareTransformer
         Object existingValue = paramMap.get(key);
         if (existingValue != null)
         {
-            List<Object> values = null;
+            List<Object> values;
             if (existingValue instanceof List<?>)
             {
                 values = (List<Object>) existingValue;

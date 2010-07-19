@@ -95,8 +95,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             else
             {
                 MuleMessage msg = context.getMessage();
-                assertEquals("param1", msg.getProperty("stringParam"));
-                assertTrue(msg.getProperty("objectParam") instanceof Apple);
+                assertEquals("param1", msg.getOutboundProperty("stringParam"));
+                assertTrue(msg.getOutboundProperty("objectParam") instanceof Apple);
                 assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
                 assertEquals(12345, msg.getIntProperty("integerParam", 0));
                 assertEquals(123456789, msg.getLongProperty("longParam", 0));
@@ -112,8 +112,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 
         public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
         {
-            assertEquals("param1", msg.getProperty("stringParam"));
-            assertTrue(msg.getProperty("objectParam") instanceof Apple);
+            assertEquals("param1", msg.getOutboundProperty("stringParam"));
+            assertTrue(msg.getOutboundProperty("objectParam") instanceof Apple);
             assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
             assertEquals(12345, msg.getIntProperty("integerParam", 0));
             assertEquals(123456789, msg.getLongProperty("longParam", 0));

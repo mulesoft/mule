@@ -159,7 +159,7 @@ public class ProxyTestCase extends FunctionalTestCase
         String resString = result.getPayloadAsString();
         
         assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
-          result.getProperty("http.status").equals(HttpConstants.SC_OK));
+          result.getOutboundProperty("http.status").equals(HttpConstants.SC_OK));
         
         assertTrue(resString.indexOf("Fault") != -1);
     }

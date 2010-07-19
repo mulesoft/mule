@@ -28,7 +28,7 @@ public class JettyHttpBadEncodingFunctionalTestCase extends JettyHttpEncodingFun
         msg.setEncoding("UTFF-912");
         MuleMessage reply = client.send("clientEndpoint", msg);
         assertNotNull(reply);
-        assertEquals("500", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals("500", reply.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertNotNull(reply.getExceptionPayload());
     }
 

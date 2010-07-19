@@ -49,8 +49,8 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     private void assertMessageProperties(MuleMessage message)
     {
         assertEquals(tempFile.getName(), 
-            message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
-        assertEquals(tempFile.getParent(), message.getProperty(FileConnector.PROPERTY_DIRECTORY));
+            message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+        assertEquals(tempFile.getParent(), message.getOutboundProperty(FileConnector.PROPERTY_DIRECTORY));
     }
 }
 

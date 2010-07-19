@@ -45,8 +45,8 @@ public class PropsComponent implements Callable
         else
         {
             logger.debug("Verifying: " + context.getFlowConstruct().getName());
-            assertEquals("param1", context.getMessage().getProperty("stringParam"));
-            assertEquals(testObjectProperty, context.getMessage().getProperty("objectParam"));
+            assertEquals("param1", context.getMessage().getOutboundProperty("stringParam"));
+            assertEquals(testObjectProperty, context.getMessage().getOutboundProperty("objectParam"));
             logger.debug("Verifying done: " + context.getFlowConstruct().getName());
         }
 

@@ -183,7 +183,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Holder<MuleMessage> holder = new Holder<MuleMessage>();
         props.put("holder", holder); 
         // Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
@@ -229,7 +229,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         
         // Set custom soap action if set on the event or endpoint
         final MuleMessage message = event.getMessage();
-        String soapAction = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        String soapAction = message.getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, bop.getName(), event);

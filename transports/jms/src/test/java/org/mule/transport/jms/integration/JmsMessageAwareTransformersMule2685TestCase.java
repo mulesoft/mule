@@ -67,7 +67,8 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         MuleMessage result1 = (MuleMessage) trans.transform(message);
 
         // Check that transformer 1 set message property ok.
-        assertEquals("vm://recipient1, vm://recipient1, vm://recipient3", result1.getProperty("recipients"));
+        assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
+                     result1.getOutboundProperty("recipients"));
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
         Message result2 = (Message) trans2.transform(result1);
@@ -98,7 +99,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
             String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
             logger.debug("Setting recipients to '" + recipients + "'");
-            message.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
+            message.setOutboundProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
             return message;
         }
 

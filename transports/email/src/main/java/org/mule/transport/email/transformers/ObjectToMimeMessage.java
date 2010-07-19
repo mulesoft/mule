@@ -18,7 +18,6 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -68,17 +67,16 @@ public class ObjectToMimeMessage extends StringToEmailMessage
 
     protected void addBodyPartHeaders(BodyPart part, String name, MuleMessage message)
     {
-        Map<?, ?> headers = (Map<?, ?>) message.getProperty(
+        Map<String, String> headers = message.getOutboundProperty(
             name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
 
         if (null != headers)
         {
-            for (Iterator<?> it = headers.keySet().iterator(); it.hasNext();)
+            for (String key : headers.keySet())
             {
                 try
                 {
-                    String key = (String)it.next();
-                    part.setHeader(key, (String)headers.get(key));
+                    part.setHeader(key, headers.get(key));
                 }
                 catch (MessagingException me)
                 {

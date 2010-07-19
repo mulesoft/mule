@@ -576,11 +576,11 @@ public class FtpConnector extends AbstractConnector
 
     private String getFilename(ImmutableEndpoint endpoint, MuleMessage message) throws IOException
     {
-        String filename = (String) message.getProperty(FtpConnector.PROPERTY_FILENAME);
+        String filename = message.getOutboundProperty(FtpConnector.PROPERTY_FILENAME);
         String outPattern = (String) endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
         if (outPattern == null)
         {
-            outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, getOutputPattern());
+            outPattern = message.getOutboundProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN, getOutputPattern());
         }
         if (outPattern != null || filename == null)
         {
@@ -625,7 +625,7 @@ public class FtpConnector extends AbstractConnector
         if (!client.changeWorkingDirectory(path))
         {
             throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                       path, new Integer(client.getReplyCode())));
+                                                       path, client.getReplyCode()));
         }
         return client;
     }

@@ -35,7 +35,7 @@ public class SaveCertificatesCallback implements EventCallback
         // surely it would if it was thread scribbling?
         Thread.sleep(100);
 
-        Certificate[] certs = (Certificate[]) context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES);
+        Certificate[] certs = context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES);
         certificates.add(certs);
     }
 

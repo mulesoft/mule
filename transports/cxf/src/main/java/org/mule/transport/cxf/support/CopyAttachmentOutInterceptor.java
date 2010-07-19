@@ -36,7 +36,7 @@ public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor
     {
         MuleEvent event = RequestContext.getEvent();
         
-        Collection<Attachment> a = (Collection<Attachment>) event.getMessage().getProperty(CxfConstants.ATTACHMENTS);
+        Collection<Attachment> a = event.getMessage().getOutboundProperty(CxfConstants.ATTACHMENTS);
         
         if (a != null) 
         {

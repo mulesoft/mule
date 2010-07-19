@@ -37,7 +37,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("object", new Apple());
-        props.put("number", Integer.valueOf(1));
+        props.put("number", 1);
         props.put("string", "hello");
         testObject = new DefaultMuleMessage("test", props, muleContext);
         
@@ -82,8 +82,8 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     {
         try
         {
-            ByteArrayOutputStream bs = null;
-            ObjectOutputStream os = null;
+            ByteArrayOutputStream bs;
+            ObjectOutputStream os;
 
             bs = new ByteArrayOutputStream();
             os = new ObjectOutputStream(bs);
@@ -153,15 +153,15 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     
     private boolean compareObjectProperties(MuleMessage src, MuleMessage result)
     {
-        Object sourceObjectProperty = src.getProperty("object");
-        Object resultObjectProperty = result.getProperty("object");
+        Object sourceObjectProperty = src.getOutboundProperty("object");
+        Object resultObjectProperty = result.getOutboundProperty("object");
         return sourceObjectProperty.equals(resultObjectProperty);
     }
     
     private boolean compareStringProperties(MuleMessage src, MuleMessage result)
     {
-        Object sourceStringProperty = src.getProperty("string");
-        Object resultStringProperty = result.getProperty("string");
+        Object sourceStringProperty = src.getOutboundProperty("string");
+        Object resultStringProperty = result.getOutboundProperty("string");
         return sourceStringProperty.equals(resultStringProperty);
     }
 

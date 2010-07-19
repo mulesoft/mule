@@ -29,7 +29,7 @@ public class SaveCertificateCallback implements EventCallback
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
-        certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+        certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
         called.set(true);
     }
 

@@ -43,7 +43,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         assertTrue(files.length > 0);
         for (int i = 0; i < files.length; i++)
         {
-            assertTrue(files[i].getName().equals(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
+            assertTrue(files[i].getName().equals(message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME)));
             files[i].delete();
         }
     }

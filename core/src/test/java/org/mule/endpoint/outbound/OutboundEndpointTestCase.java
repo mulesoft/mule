@@ -246,7 +246,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
             assertEquals(testOutboundEvent, event);
         }
         assertEquals(TEST_MESSAGE, event.getMessageAsString());
-        assertEquals("value1", event.getMessage().getProperty("prop1"));
+        assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
         return event;
     }
 

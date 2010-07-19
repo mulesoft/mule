@@ -63,13 +63,13 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
         assertNotNull(notificationMsg);
 
         // MULE_USER should be allowed in
-        assertEquals("alan", notificationMsg.getProperty(MuleProperties.MULE_USER_PROPERTY));
+        assertEquals("alan", notificationMsg.getOutboundProperty(MuleProperties.MULE_USER_PROPERTY));
 
         // mule properties should be removed
-        assertNull(notificationMsg.getProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
+        assertNull(notificationMsg.getOutboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         // custom properties should be allowed in
-        assertEquals(myProperty, notificationMsg.getProperty(myProperty));
+        assertEquals(myProperty, notificationMsg.getOutboundProperty(myProperty));
     }
 
     public void onNotification(ServerNotification notification)

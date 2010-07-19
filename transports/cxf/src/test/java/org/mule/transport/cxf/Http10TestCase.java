@@ -34,7 +34,7 @@ public class Http10TestCase extends FunctionalTestCase
         assertEquals("Hello Dan", result.getPayload());
         
         result = client.request("vm://out", 1000);
-        assertFalse("chunked".equals(result.getProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
+        assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
     }
 
     public void testHttp10TransformerOnProtocol() throws Exception
@@ -46,7 +46,7 @@ public class Http10TestCase extends FunctionalTestCase
         assertEquals("Hello Dan", result.getPayload());
         
         result = client.request("vm://out", 1000);
-        assertFalse("chunked".equals(result.getProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
+        assertFalse("chunked".equals(result.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING)));
     }
 
     protected String getConfigResources()

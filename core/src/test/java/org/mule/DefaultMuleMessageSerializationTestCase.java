@@ -24,7 +24,6 @@ import java.io.InputStream;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.apache.commons.lang.SerializationUtils;
 
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCase
@@ -34,12 +33,12 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
     public void testSerializablePayload() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        message.setProperty("foo", "bar");
+        message.setOutboundProperty("foo", "bar");
         
         MuleMessage deserializedMessage = serializationRoundtrip(message);
         
         assertEquals(TEST_MESSAGE, deserializedMessage.getPayload());
-        assertEquals("bar", deserializedMessage.getProperty("foo"));
+        assertEquals("bar", deserializedMessage.getOutboundProperty("foo"));
     }
     
     public void testNonSerializablePayload() throws Exception
@@ -49,7 +48,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
         muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
         
         MuleMessage message = new DefaultMuleMessage(new NonSerializable(), muleContext);
-        message.setProperty("foo", "bar");
+        message.setOutboundProperty("foo", "bar");
         
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
@@ -61,7 +60,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
         MuleMessage message = new DefaultMuleMessage(stream, muleContext);
-        message.setProperty("foo", "bar");
+        message.setOutboundProperty("foo", "bar");
         
         MuleMessage deserializedMessage = serializationRoundtrip(message);
         

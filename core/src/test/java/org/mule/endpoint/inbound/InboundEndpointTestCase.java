@@ -308,7 +308,7 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         MuleEvent event = inboundListener.sensedEvent;
         assertEquals(inMessage, event.getMessage());
         assertEquals(TEST_MESSAGE, event.getMessageAsString());
-        assertEquals("value1", event.getMessage().getProperty("prop1"));
+        assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
         return event;
     }
 

@@ -112,9 +112,9 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessage message = factory.create(method, encoding);
         assertNotNull(message);
         assertEquals("/services/Echo", message.getPayloadAsString());
-        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
-        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getProperty(HttpConnector.HTTP_VERSION_PROPERTY));
-        assertEquals("200", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(HttpConstants.METHOD_GET, message.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY));
+        assertEquals("200", message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
     
     public void testHttpMethodPost() throws Exception
@@ -126,9 +126,9 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessage message = factory.create(method, encoding);
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, message.getPayloadAsString());
-        assertEquals(HttpConstants.METHOD_POST, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY));
-        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getProperty(HttpConnector.HTTP_VERSION_PROPERTY));
-        assertEquals("200", message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(HttpConstants.METHOD_POST, message.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        assertEquals(HttpVersion.HTTP_1_1.toString(), message.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY));
+        assertEquals("200", message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
     
     private HttpMethod createMockHttpMethod(String method, InputStream body) throws Exception
