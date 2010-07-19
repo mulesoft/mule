@@ -13,6 +13,8 @@ package org.mule;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
@@ -73,6 +75,46 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(TEST_MESSAGE, message.getPayload());
         assertOutboundMessageProperty("MessageProperties", message);
     }
+
+    public void testMessagePropertiesAccessors()
+    {
+        Map<String, Object> properties = createMessageProperties();
+
+        properties.put("number", "24");
+        properties.put("decimal", "24.3");
+        properties.put("boolean", "true");
+        Apple apple = new Apple(true);
+        properties.put("apple", apple);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties, muleContext);
+        assertTrue(message.getProperty("boolean", PropertyScope.OUTBOUND, false));
+        assertEquals(new Integer(24), message.getProperty("number", PropertyScope.OUTBOUND, 0));
+        assertEquals(new Byte((byte)24), message.getProperty("number", PropertyScope.OUTBOUND, new Byte((byte)0)));
+        assertEquals(new Long(24), message.getProperty("number", PropertyScope.OUTBOUND, 0l));
+        assertEquals(new Float(24.3), message.getProperty("decimal", PropertyScope.OUTBOUND, 0f));
+        Double d = message.getProperty("decimal", PropertyScope.OUTBOUND, 0d);
+        assertEquals(new Double(24.3), d);
+
+        assertEquals("true", message.getProperty("boolean", PropertyScope.OUTBOUND, ""));
+
+        assertEquals(apple, message.getProperty("apple", PropertyScope.OUTBOUND, null));
+        try
+        {
+            message.getProperty("apple", PropertyScope.OUTBOUND, new Orange());
+            fail("Orange is not assignable to Apple");
+        }
+        catch (IllegalArgumentException e)
+        {
+            //expected
+        }
+
+        //Test null
+        assertNull(message.getProperty("banana", PropertyScope.OUTBOUND, null));
+        assertNull(message.getProperty("blah", PropertyScope.OUTBOUND, null));
+
+        //Test default value
+        assertEquals(new Float(24.3), message.getProperty("blah", PropertyScope.OUTBOUND, 24.3f));
+
+    }
     
     public void testMessagePropertiesConstructorWithMuleMessageAsPayload()
     {
@@ -101,16 +143,45 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     public void testPreviousMessageConstructorWithMuleMessageAsPayloadAndMuleMessageAsPrevious()
     {
         MuleMessage payload = createMuleMessage();
-        payload.setProperty("payload", "payload");
+        payload.setProperty("payload", "payload", PropertyScope.OUTBOUND);
         
         MuleMessage previous = createMuleMessage();
-        previous.setProperty("previous", "previous");
+        previous.setProperty("previous", "previous", PropertyScope.OUTBOUND);
         
         MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
         assertEquals("MULE_MESSAGE", message.getPayload());
         assertOutboundMessageProperty("MuleMessage", message);
         assertOutboundMessageProperty("payload", message);
         assertEquals(previous.getUniqueId(), message.getUniqueId());
+    }
+
+    public void testClearProperties()
+    {
+        MuleMessage payload = createMuleMessage();
+        payload.setProperty("foo", "fooValue", PropertyScope.OUTBOUND);
+        payload.setProperty("bar", "barValue", PropertyScope.INVOCATION);
+
+        assertEquals(1, payload.getPropertyNames(PropertyScope.INVOCATION).size());
+        assertEquals(2, payload.getPropertyNames(PropertyScope.OUTBOUND).size());
+        assertEquals(0, payload.getPropertyNames(PropertyScope.INBOUND).size());
+
+        payload.clearProperties(PropertyScope.INVOCATION);
+        assertEquals(0, payload.getPropertyNames(PropertyScope.INVOCATION).size());
+
+        payload.clearProperties(PropertyScope.OUTBOUND);
+        assertEquals(0, payload.getPropertyNames(PropertyScope.OUTBOUND).size());
+
+        //TODO
+//        try
+//        {
+//            payload.clearProperties(PropertyScope.INBOUND);
+//            fail("inbound scope is read only");
+//        }
+//        catch (UnsupportedOperationException e)
+//        {
+//            //expected
+//        }
+
     }
     
     //
@@ -171,7 +242,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     private MuleMessage createMuleMessage()
     {
         MuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", muleContext);
-        previousMessage.setProperty("MuleMessage", "MuleMessage");
+        previousMessage.setProperty("MuleMessage", "MuleMessage", PropertyScope.OUTBOUND);
         return previousMessage;
     }
 

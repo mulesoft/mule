@@ -45,10 +45,20 @@ public interface MuleMessage extends Serializable
     void addProperties(Map<String, Object> properties, PropertyScope scope);
 
     /**
-     * Removes all properties on this message
+     * Removes all properties on this message in the {@link org.mule.api.transport.PropertyScope#INVOCATION} and
+     * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
+     * @deprecated use {@link #clearProperties(org.mule.api.transport.PropertyScope)} instead
      */
     void clearProperties();
 
+    /**
+     * Removes all properties on this message in the given scope. Note that the INBOUND scope is
+     * read-only, so attempting to clear this scopee will result in an UnsupportedOperationException.
+     *
+     * @param scope the property scope to clear
+     * @throws UnsupportedOperationException if scope specified is {@link org.mule.api.transport.PropertyScope#INBOUND}
+     */
+    void clearProperties(PropertyScope scope);
     /**
      /**
      *
@@ -60,7 +70,7 @@ public interface MuleMessage extends Serializable
 
     /**
      * Set a property on the message
-     * @deprecated
+     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
      *  
      * @param key the key on which to associate the value
      * @param value the property value
@@ -79,11 +89,13 @@ public interface MuleMessage extends Serializable
     void setProperty(String key, Object value, PropertyScope scope);
 
     /**
-     * Removes a property on this message
-     * 
+     * Removes a property on this message.
+     *
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
+     * @deprecated use {@link #removeProperty(String, org.mule.api.transport.PropertyScope)}
      */
+    @Deprecated
     Object removeProperty(String key);
 
     /**
@@ -97,7 +109,7 @@ public interface MuleMessage extends Serializable
 
     /**
      * @return all property keys on this message
-     * @deprecated
+     * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
     @Deprecated
     Set<String> getPropertyNames();
@@ -119,7 +131,7 @@ public interface MuleMessage extends Serializable
      * ensure a unique id
      * 
      * @return a unique message id. The Id should never be null. If the underlying
-     *         transport does not have the notion of a message Id, one shuold be
+     *         transport does not have the notion of a message Id, one should be
      *         generated. The generated Id should be a UUID.
      */
     String getUniqueId();
@@ -127,8 +139,8 @@ public interface MuleMessage extends Serializable
     /**
      * Gets a property from the message
      * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * @param name the name or key of the property. This must be non-null.
+     * @param defaultValue a default value if the property doesn't exist in the event. This can be null.
      * @return the property value or the defaultValue if the property does not exist
      * @deprecated
      */
@@ -138,12 +150,24 @@ public interface MuleMessage extends Serializable
     /**
      * Gets a property from the message with a given scope
      *
-     * @param name the name or key of the property
-     * @param scope The scope of the property to retrieve
-     * @return the property value or the defaultValue if the property does not exist in the specified scope
+     * @param name the name or key of the property. This must be non-null.
+     * @param scope The scope of the property to retrieve. This must be non-null.
+     * @return the property value or null if the property does not exist in the specified scope
      */
     Object getProperty(String name, PropertyScope scope);
 
+    /**
+     * Gets a property from the message with a given scope and provides a default value if the property is not
+     * present on the message in the scope specified.  The method will also type check against the default value
+     * to ensure that the value is of the correct type.  If null is used for the default value no type checking is
+     * done.
+     * @param name the name or key of the property. This must be non-null.
+     * @param scope The scope of the property to retrieve.  This must be non-null.
+     * @param defaultValue the value to return if the property is not in the scope provided. Can be null
+     * @param <T> the defaultValue type ,this is used to validate the property value type
+     * @return the property value or the defaultValue if the property does not exist in the specified scope
+     * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
+     */
     <T> T getProperty(String name, PropertyScope scope, T defaultValue);
 
     /**
@@ -343,10 +367,10 @@ public interface MuleMessage extends Serializable
     void addAttachment(String name, DataHandler dataHandler) throws Exception;
 
     /**
-     * Remove an attahcment form this message with the specifed name
-     * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignorred
-     * @throws Exception different messaging systems handle attachments differnetly, as such some will throw an exception
-     * if an attahcment does dot exist.
+     * Remove an attachment form this message with the specified name
+     * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignored
+     * @throws Exception different messaging systems handle attachments differently, as such some will throw an exception
+     * if an attachment does dot exist.
      */
     void removeAttachment(String name) throws Exception;
 
