@@ -47,6 +47,7 @@ public class ServiceOverridesDefinitionParser extends ChildDefinitionParser
         addOverride(overrides, element, "sessionHandler", MuleProperties.CONNECTOR_SESSION_HANDLER);
         addOverride(overrides, element, "inboundExchangePatterns", MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS);
         addOverride(overrides, element, "outboundExchangePatterns", MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS);
+        addOverride(overrides, element, "defaultExchangePattern", MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN);
         builder.getRawBeanDefinition().setSource(overrides);
 
         getBeanAssembler(element, builder).extendTarget(getPropertyName(element), overrides, false);

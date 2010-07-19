@@ -17,6 +17,7 @@ import java.util.Properties;
 
 public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "smtp-namespace-config.xml";
@@ -75,9 +76,9 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testEndpoint() throws MuleException
     {
-        testEndpoint("global1", SmtpConnector.SMTP);
-        testEndpoint("global2", SmtpConnector.SMTP);
-        testEndpoint("global1s", SmtpsConnector.SMTPS);
-        testEndpoint("global2s", SmtpsConnector.SMTPS);
+        testOutboundEndpoint("global1", SmtpConnector.SMTP);
+        testOutboundEndpoint("global2", SmtpConnector.SMTP);
+        testOutboundEndpoint("global1s", SmtpsConnector.SMTPS);
+        testOutboundEndpoint("global2s", SmtpsConnector.SMTPS);
     }
 }

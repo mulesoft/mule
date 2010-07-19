@@ -67,10 +67,10 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testEndpoint() throws MuleException
     {
-        testEndpoint("global1", Pop3Connector.POP3);
-        testEndpoint("global2", Pop3Connector.POP3);
-        testEndpoint("global1s", Pop3sConnector.POP3S);
-        testEndpoint("global2s", Pop3sConnector.POP3S);
+        testInboundEndpoint("global1", Pop3Connector.POP3);
+        testInboundEndpoint("global2", Pop3Connector.POP3);
+        testInboundEndpoint("global1s", Pop3sConnector.POP3S);
+        testInboundEndpoint("global2s", Pop3sConnector.POP3S);
     }
 
 }

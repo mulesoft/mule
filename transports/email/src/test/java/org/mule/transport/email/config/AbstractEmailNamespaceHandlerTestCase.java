@@ -15,11 +15,22 @@ import org.mule.tck.FunctionalTestCase;
 
 public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
-    protected void testEndpoint(String name, String protocolName) throws MuleException
+    protected void testInboundEndpoint(String name, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
+        testEndpoint(endpoint, protocolName);
+    }
+
+    protected void testOutboundEndpoint(String name, String protocolName) throws MuleException
+    {
+        ImmutableEndpoint endpoint =
+            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(name);
+        testEndpoint(endpoint, protocolName);
+    }
+
+    private void testEndpoint(ImmutableEndpoint endpoint, String protocolName)
+    {
         assertNotNull(endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull(address);
@@ -31,5 +42,4 @@ public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTe
         assertNotNull(protocol);
         assertEquals(protocolName, protocol);
     }
-
 }

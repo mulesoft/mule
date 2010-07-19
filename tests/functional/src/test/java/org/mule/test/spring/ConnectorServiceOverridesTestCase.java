@@ -88,6 +88,16 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         List<MessageExchangePattern> expected = Arrays.asList(MessageExchangePattern.REQUEST_RESPONSE);
         assertEquals(expected, meps);
     }
+
+    public void testOverrideDefaultExchangePattern() throws Exception
+    {
+        TestConnector connector = lookupDummyConnector();
+        TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
+        
+        MessageExchangePattern defaultMep = serviceDescriptor.getDefaultExchangePatern();
+        
+        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, defaultMep);
+    }
 }
 
 

@@ -10,6 +10,7 @@
         <service-overrides 
             xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"
             messageFactory="org.mule.test.spring.MockMuleMessageFactory"
-            inboundExchangePatterns="request-response" outboundExchangePatterns="request-response"/>
+            inboundExchangePatterns="request-response" outboundExchangePatterns="request-response"
+            defaultExchangePattern="request-response"/>
     </custom-connector>
 </mule>

@@ -49,6 +49,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         super(NO_INITIAL_EMAIL, protocol, port);
     }
 
+    @Override
     public Connector createConnector() throws Exception
     {
         SmtpConnector c = new SmtpConnector(muleContext);

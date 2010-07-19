@@ -97,12 +97,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointUriBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
         
-        String mepsString = removeProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, props);
-        initInboundExchangePatterns(mepsString);
-        
-        mepsString = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, props);
-        initOutboundExchangePatterns(mepsString);
-        
+        initInboundExchangePatterns(props);        
+        initOutboundExchangePatterns(props);
         defaultExchangePattern = removeProperty(MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, props);
     }
 
@@ -151,11 +147,9 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             endpointUriBuilder = temp;
         }
         
-        temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, null);
-        initInboundExchangePatterns(temp);
-        
-        temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, null);
-        initOutboundExchangePatterns(temp);
+        initInboundExchangePatterns(props);
+        initOutboundExchangePatterns(props);
+        defaultExchangePattern = props.getProperty(MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, null);
     }
 
     public void setMuleContext(MuleContext context)
@@ -531,21 +525,43 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return this.exceptionMappings;
     }
 
-    protected void initInboundExchangePatterns(String mepsString)
+    protected void initInboundExchangePatterns(Properties properties)
     {
-        inboundExchangePatterns = parseExchangePatterns(mepsString);
+        // it's valid to configure no inbound exchange patterns but it's invalid to have
+        // no key for inbound exchange patterns
+        if (!properties.keySet().contains(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS))
+        {
+            inboundExchangePatterns = null;
+        }
+        else
+        {
+            String mepsString = 
+                removeProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, properties);
+            inboundExchangePatterns = parseExchangePatterns(mepsString);
+        }
     }
 
-    protected void initOutboundExchangePatterns(String mepsString)
+    protected void initOutboundExchangePatterns(Properties properties)
     {
-        outboundExchangePatterns = parseExchangePatterns(mepsString);
+        // it's valid to configure no outbound exchange patterns but it's invalid to have
+        // no key for outbound exchange patterns
+        if (!properties.keySet().contains(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS))
+        {
+            outboundExchangePatterns = null;
+        }
+        else
+        {
+            String mepsString = 
+                removeProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, properties);
+            outboundExchangePatterns = parseExchangePatterns(mepsString);
+        }
     }
 
     protected List<MessageExchangePattern> parseExchangePatterns(String mepsString)
     {
         if (StringUtils.isEmpty(mepsString))
         {
-            return null;
+            return Collections.emptyList();
         }
         
         List<MessageExchangePattern> mepList = new ArrayList<MessageExchangePattern>();

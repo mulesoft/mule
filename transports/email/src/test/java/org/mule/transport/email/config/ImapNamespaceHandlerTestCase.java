@@ -63,10 +63,10 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testEndpoint() throws MuleException
     {
-        testEndpoint("global1", ImapConnector.IMAP);
-        testEndpoint("global2", ImapConnector.IMAP);
-        testEndpoint("global1s", ImapsConnector.IMAPS);
-        testEndpoint("global2s", ImapsConnector.IMAPS);
+        testInboundEndpoint("global1", ImapConnector.IMAP);
+        testInboundEndpoint("global2", ImapConnector.IMAP);
+        testInboundEndpoint("global1s", ImapsConnector.IMAPS);
+        testInboundEndpoint("global2s", ImapsConnector.IMAPS);
     }
 
 }
