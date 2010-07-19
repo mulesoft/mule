@@ -70,10 +70,14 @@ public interface MuleMessage extends Serializable
 
     /**
      * Set a property on the message. This method will now set a value on the outbound scope only.
-     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
-     *  
+     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
+     * preferrably any of the scope-specific set methods.
+     *
      * @param key the key on which to associate the value
      * @param value the property value
+     * @see #setInboundProperty(String, Object)
+     * @see #setInvocationProperty(String, Object)
+     * @see #setOutboundProperty(String, Object)
      */
     @Deprecated
     void setProperty(String key, Object value);
