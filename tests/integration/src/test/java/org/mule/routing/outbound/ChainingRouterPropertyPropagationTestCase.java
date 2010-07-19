@@ -54,7 +54,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
                 MuleMessage msg = context.getMessage();
                 assertTrue(hop2made.compareAndSet(false, true));
                 // this is a service callback, props are on the inbound
-                assertEquals("Property not propagated from the first hop.", "hop1", msg.getProperty("TICKET", PropertyScope.INBOUND));
+                assertEquals("Property not propagated from the first hop.", "hop1", msg.getInboundProperty("TICKET"));
                 FunctionalTestComponent ftc = (FunctionalTestComponent) component;
                 ftc.setReturnData(msg.getPayload() + " Hop2 ACK");
             }

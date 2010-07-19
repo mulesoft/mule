@@ -10,7 +10,6 @@
 package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
@@ -37,14 +36,14 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase
         assertEquals(NullPayload.getInstance(), result.getPayload());
         //TODO Even though the component returns a null the remoteSync is honoured.
         // I don't think this is right for Out-Optional-In, but probably should be the behaviour for Out-In
-        assertEquals("Received", result.getProperty("externalApp", PropertyScope.INBOUND));
+        assertEquals("Received", result.getInboundProperty("externalApp"));
 
         Map props = new HashMap();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);
         assertEquals("bar header received", result.getPayload());
-        assertEquals("Received", result.getProperty("externalApp", PropertyScope.INBOUND));
+        assertEquals("Received", result.getInboundProperty("externalApp"));
     }
 }
 // END SNIPPET: full-class

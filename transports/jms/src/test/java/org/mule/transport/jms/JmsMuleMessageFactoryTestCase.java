@@ -12,7 +12,6 @@ package org.mule.transport.jms;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 import com.mockobjects.dynamic.C;
@@ -71,6 +70,6 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
         // message factory populates the inbound scope
-        assertEquals("bar", message.getProperty("foo", PropertyScope.INBOUND));
+        assertEquals("bar", message.getInboundProperty("foo"));
     }
 }

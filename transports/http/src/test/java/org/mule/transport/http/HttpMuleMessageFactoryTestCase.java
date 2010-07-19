@@ -13,7 +13,6 @@ package org.mule.transport.http;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -64,8 +63,8 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertNotNull(message);
         assertEquals("/services/Echo", message.getPayload());
         // note that on this level it's only message factory, and it adds messages from http request to the inbound scope
-        assertEquals(HttpConstants.METHOD_GET, message.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND));
-        assertEquals("foo-value", message.getProperty("foo-header", PropertyScope.INBOUND));
+        assertEquals(HttpConstants.METHOD_GET, message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
+        assertEquals("foo-value", message.getInboundProperty("foo-header"));
     }
     
     public void testInvalidPayloadOnHttpMuleMessageFactory() throws Exception

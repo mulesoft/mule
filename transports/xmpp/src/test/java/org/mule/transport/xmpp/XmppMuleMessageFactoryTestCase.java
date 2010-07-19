@@ -12,7 +12,6 @@ package org.mule.transport.xmpp;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.util.UUID;
 
@@ -62,7 +61,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     
     private void assertInboundProperty(Object expected, MuleMessage message, String key)
     {
-        Object value = message.getProperty(key, PropertyScope.INBOUND);
+        Object value = message.getInboundProperty(key);
         assertEquals(expected, value);
     }
 }

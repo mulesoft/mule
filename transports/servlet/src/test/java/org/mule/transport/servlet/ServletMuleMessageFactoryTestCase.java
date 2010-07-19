@@ -12,7 +12,6 @@ package org.mule.transport.servlet;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
@@ -169,7 +168,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         
     private void assertInboundScopedProperty(Object expected, MuleMessage message, String key)
     {
-        Object value = message.getProperty(key, PropertyScope.INBOUND);
+        Object value = message.getInboundProperty(key);
         assertEquals(expected, value);
     }
     
@@ -177,14 +176,14 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     {
         String propertyKey = ServletConnector.PARAMETER_PROPERTY_PREFIX + key;
         // message factory puts props in the inbound scope
-        Object value = message.getProperty(propertyKey, PropertyScope.INBOUND);
+        Object value = message.getInboundProperty(propertyKey);
         assertEquals(expected, value);
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> retrieveMapProperty(MuleMessage message, String key)
     {
-        return (Map<String, Object>) message.getProperty(key, PropertyScope.INBOUND);
+        return message.getInboundProperty(key);
     }
 
     private Object buildGetRequestWithContentType(String contentType)

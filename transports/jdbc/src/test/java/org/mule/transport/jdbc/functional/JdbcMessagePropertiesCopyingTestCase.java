@@ -39,6 +39,6 @@ public class JdbcMessagePropertiesCopyingTestCase extends AbstractJdbcFunctional
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals(PROPERTY_VALUE, result.getProperty(PROPERTY_KEY, PropertyScope.INBOUND));
+        assertEquals(PROPERTY_VALUE, result.getInboundProperty(PROPERTY_KEY));
     }
 }

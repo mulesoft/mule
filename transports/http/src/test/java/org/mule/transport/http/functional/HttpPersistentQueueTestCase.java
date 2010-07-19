@@ -12,7 +12,6 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -84,8 +83,8 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
             MuleMessage message = context.getMessage();
-                        
-            Object httpMethod = message.getProperty("http.method", PropertyScope.INBOUND);
+
+            Object httpMethod = message.getInboundProperty("http.method");
             if (HttpConstants.METHOD_GET.equals(httpMethod))
             {
                 assertEquals("/services/Echo?foo=bar", message.getPayloadAsString());
@@ -99,8 +98,8 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
                 fail("invalid HTTP method : " + httpMethod);
             }
             
-            assertEquals("true", message.getProperty(HttpConstants.HEADER_CONNECTION, PropertyScope.INBOUND));
-            assertEquals("true", message.getProperty(HttpConstants.HEADER_KEEP_ALIVE, PropertyScope.INBOUND));
+            assertEquals("true", message.getInboundProperty(HttpConstants.HEADER_CONNECTION));
+            assertEquals("true", message.getInboundProperty(HttpConstants.HEADER_KEEP_ALIVE));
             
             messageDidArrive.countDown();            
         }

@@ -63,7 +63,7 @@ public class Mule4412TestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertEquals("wrong message received : " + reply.getPayloadAsString(), TEST_MESSAGE,
             reply.getPayloadAsString());
-        assertEquals("'pass' property value not correct", "true", reply.getProperty("pass", PropertyScope.INBOUND));
+        assertEquals("'pass' property value not correct", "true", reply.getInboundProperty("pass"));
 
         // make sure there are no more messages
         assertNull(client.request("vm://asyncResponse", RECEIVE_TIMEOUT_MS));

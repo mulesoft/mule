@@ -12,7 +12,6 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -45,9 +44,9 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
                 public void eventReceived(final MuleEventContext context, final Object component) throws Exception
                 {
                     MuleMessage msg = context.getMessage();
-                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND));
-                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, PropertyScope.INBOUND));
-                    assertEquals("/", msg.getProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, PropertyScope.INBOUND));
+                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
                 }
             };
         

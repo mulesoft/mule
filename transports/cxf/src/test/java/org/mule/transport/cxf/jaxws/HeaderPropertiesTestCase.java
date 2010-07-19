@@ -43,7 +43,7 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 MuleMessage msg = context.getMessage();
-                assertEquals("BAR", msg.getProperty("FOO", PropertyScope.INBOUND));
+                assertEquals("BAR", msg.getInboundProperty("FOO"));
                 assertNull(msg.getProperty("clientClass", PropertyScope.INVOCATION));
             }
         };

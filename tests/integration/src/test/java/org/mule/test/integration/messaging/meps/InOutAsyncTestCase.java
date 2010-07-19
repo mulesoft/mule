@@ -11,7 +11,6 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -39,7 +38,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals("got it!", result.getPayloadAsString());
 
-        final Object foo = result.getProperty("foo", PropertyScope.INBOUND);
+        final Object foo = result.getInboundProperty("foo");
         assertNotNull(foo);
         assertEquals("bar", foo);
     }
