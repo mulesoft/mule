@@ -64,4 +64,15 @@ endpoint.builder=org.mule.endpoint.SocketEndpointURIBuilder
 endpoint.builder=org.mule.transport.${ModuleNameLower}.${ModuleName}EndpointURIBuilder
 #end
 
+#if( $hasReceiver == "y")
+# The message exchange patterns supported for receiving messages
+inbound.exchange.patterns=one-way, request-response
+#end
+#if( $hasDispatcher == "y")
+# The message exchange patterns supported for sending messages
+outbound.exchange.patterns=one-way, request-response
+#end
+# The message exchange pattern to use when none is configured on an endpoint
+default.exchange.pattern=one-way
+
 # For more information see - ${ServiceDescriptorDocumentationUrl}
