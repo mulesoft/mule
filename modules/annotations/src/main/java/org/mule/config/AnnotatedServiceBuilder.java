@@ -19,9 +19,7 @@ import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.meta.Router;
 import org.mule.api.annotations.meta.RouterType;
-import org.mule.api.annotations.routing.Bind;
 import org.mule.api.annotations.routing.Reply;
-import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -32,26 +30,20 @@ import org.mule.api.object.ObjectFactory;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
-import org.mule.config.endpoint.AnnotatedEndpointData;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
-import org.mule.config.endpoint.MEP;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.registry.RegistryMap;
-import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.util.BeanUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -117,9 +109,6 @@ public class AnnotatedServiceBuilder
         processInbound(componentFactoryClass, serviceDescriptor);
 
         processOutbound(componentFactoryClass, serviceDescriptor);
-
-        //check for Nested bindings
-        processEndpointBindings(componentFactoryClass, serviceDescriptor);
 
         //Check for Async reply Config
         processReply(componentFactoryClass, serviceDescriptor);
@@ -354,42 +343,5 @@ public class AnnotatedServiceBuilder
 
         //Lets process the reply routers
         processReplyRouters(componentFactoryClass, service);
-    }
-
-    //TODO Move this to an Object processor
-
-    protected void processEndpointBindings(Class componentFactoryClass, org.mule.api.service.Service service) throws MuleException
-    {
-        Field[] fields = componentFactoryClass.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++)
-        {
-            Field field = fields[i];
-            if (field.isAnnotationPresent(Bind.class))
-            {
-                Bind binding = field.getAnnotation(Bind.class);
-
-                AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.OutIn, binding);
-                epd.setConnectorName(binding.connector());
-                epd.setAddress(binding.uri());
-
-                org.mule.api.routing.InterfaceBinding router = new DefaultInterfaceBinding();
-                router.setInterface(field.getType());
-                if (!StringUtils.isBlank(binding.method()))
-                {
-                    router.setMethod(getValue(binding.method()));
-                    for (int j = 0; j < componentFactoryClass.getMethods().length; j++)
-                    {
-                        Method m = componentFactoryClass.getMethods()[j];
-                        if (m.getName().equals(router.getMethod()))
-                        {
-                            epd.setMEPUsingMethod(m, false);
-                            break;
-                        }
-                    }
-                }
-                router.setEndpoint(helper.processEndpoint(epd));
-                ((JavaComponent) service.getComponent()).getBindingCollection().addRouter(router);
-            }
-        }
     }
 }
