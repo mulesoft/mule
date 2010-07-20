@@ -22,11 +22,11 @@ import javax.activation.DataHandler;
  */
 public class OutboundAttachmentsAnnotationComponent
 {
-    public Map processAttachments(@OutboundAttachments Map<String, DataHandler> attachments)
+    public Map<?, ?> processAttachments(@OutboundAttachments Map<String, DataHandler> attachments)
     {
         attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
         //Verify that we receive any outbound attachments already set on the message
-        if(attachments.containsKey("foo"))
+        if (attachments.containsKey("foo"))
         {
             //Overwrite the existing attachment to signal that we received it
             attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
@@ -35,9 +35,8 @@ public class OutboundAttachmentsAnnotationComponent
     }
 
     //Can only use the {@link OutboundAttachments} annotation on Map parameters
-    public List invalidParamType(@OutboundAttachments List attachments)
+    public List<?> invalidParamType(@OutboundAttachments List<?> attachments)
     {
         return attachments;
     }
-
 }

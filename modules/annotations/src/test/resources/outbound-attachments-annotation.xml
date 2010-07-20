@@ -11,7 +11,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <model name="main">
-
         <service name="attachments1">
             <inbound>
                 <inbound-endpoint address="vm://attachment?method=processAttachments" exchange-pattern="request-response"/>
@@ -38,7 +37,5 @@
             </inbound>
             <component class="org.mule.api.annotations.param.OutboundAttachmentsAnnotationComponent"/>
         </service>
-
     </model>
-
 </mule>

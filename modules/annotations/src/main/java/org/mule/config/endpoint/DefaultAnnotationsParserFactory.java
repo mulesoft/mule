@@ -29,6 +29,7 @@ import org.mule.config.expression.XPathAnnotationParser;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.parsers.InboundAttachmentsAnnotationParser;
 import org.mule.config.parsers.InboundHeadersAnnotationParser;
+import org.mule.config.parsers.OutboundAttachmentsAnnotationParser;
 import org.mule.config.parsers.PayloadAnnotationParser;
 import org.mule.config.processors.AnnotatedServiceObjectProcessor;
 import org.mule.config.processors.DirectBindAnnotationProcessor;
@@ -90,6 +91,7 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         registerExpressionParser(new InboundHeadersAnnotationParser());
         registerExpressionParser(new CustomEvaluatorAnnotationParser());
         registerExpressionParser(new InboundAttachmentsAnnotationParser());
+        registerExpressionParser(new OutboundAttachmentsAnnotationParser());
         registerExpressionParser(new FunctionAnnotationParser());
         registerExpressionParser(new XPathAnnotationParser());
         registerExpressionParser(new BeanAnnotationParser());

@@ -17,8 +17,6 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-import org.junit.Test;
-
 public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     public OutboundAttachmentsAnnotationTestCase()
@@ -32,31 +30,27 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         return "outbound-attachments-annotation.xml";
     }
 
-
-    @Test
     public void testProcessAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachment", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String, DataHandler> result = (Map) message.getPayload();
+        Map<String, DataHandler> result = getMapPayload(message);
         assertEquals("barValue", result.get("bar").getContent());
     }
 
-    @Test
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachment2", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String, DataHandler> result = (Map) message.getPayload();
+        Map<String, DataHandler> result = getMapPayload(message);
         assertEquals("barValue", result.get("bar").getContent());
         assertEquals("fooValue", result.get("foo").getContent());
     }
 
-    @Test
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -64,5 +58,11 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertNotNull(message.getExceptionPayload());
         assertTrue(message.getExceptionPayload().getRootException() instanceof IllegalArgumentException);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, DataHandler> getMapPayload(MuleMessage message)
+    {
+        return (Map<String, DataHandler>) message.getPayload();
     }
 }
