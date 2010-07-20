@@ -15,5 +15,5 @@ org.mule.transport.soap.axis.AxisServiceUsingCxfEndpointTestCase
 # MULE-4573
 org.mule.transport.soap.axis.AxisConnectorLifecycleTestCase
 
-# temporary exclude
+# MULE-4969
 org.mule.transport.soap.axis.functional.AxisSoapHeadersTestCase
