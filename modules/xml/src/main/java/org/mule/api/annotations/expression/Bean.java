@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.annotations.expressions;
+package org.mule.api.annotations.expression;
 
 import org.mule.api.annotations.meta.Evaluator;
 
@@ -18,13 +18,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ * Allows method parameters to be configured as bean expressions for example:
+ *
+ * public Object doSomething(@Bean("person.age") int age)
+ *
+ * @see org.mule.module.xml.expression.BeanPayloadExpressionEvaluator
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Evaluator("xpath")
-public @interface XPath
+@Evaluator("bean")
+public @interface Bean
 {
     String value();
 

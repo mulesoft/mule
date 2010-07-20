@@ -7,11 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.expression;
+package org.mule.module.xml.config;
 
-import org.mule.api.annotations.expressions.XPath;
+import org.mule.api.annotations.expression.XPath;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
@@ -22,9 +22,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * TODO
+ * Used to parse Bean parameter annotations
+ *
+ * @see org.mule.api.annotations.expression.XPath
+ * @see org.mule.module.xml.expression.XPathExpressionEvaluator
  */
-public class XPathAnnotationParser implements ExpressionParser
+public class XPathAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {

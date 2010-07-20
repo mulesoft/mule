@@ -7,31 +7,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.expression;
+package org.mule.module.xml.config;
 
-import org.mule.api.annotations.expressions.Bean;
+import org.mule.api.annotations.expression.Bean;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
 import java.lang.annotation.Annotation;
 
 /**
- * Used to parse Bean annotations
+ * Used to parse Bean parameter annotations
  *
- * @see org.mule.config.annotations.expressions.Bean
+ * @see org.mule.api.annotations.expression.Bean
  * @see org.mule.module.xml.expression.BeanPayloadExpressionEvaluator
  */
-public class BeanAnnotationParser implements ExpressionParser
+public class BeanAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Bean) annotation).value(), evaluator.value(), null), ((Bean) annotation).required(), parameterType);
-            return arg;
+            return new ExpressionArgument(null, new ExpressionConfig(((Bean) annotation).value(), evaluator.value(), null), ((Bean) annotation).required(), parameterType);
         }
         else
         {
