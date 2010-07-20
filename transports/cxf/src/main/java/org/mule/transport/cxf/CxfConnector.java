@@ -407,21 +407,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         }
     }
 
-    @Override
-    public boolean isSyncEnabled(String protocol)
-    {
-        protocol = protocol.toLowerCase();
-        if (protocol.equals("http") || protocol.equals("https") || protocol.equals("ssl") || protocol.equals("tcp")
-                || protocol.equals("servlet"))
-        {
-            return true;
-        }
-        else
-        {
-            return super.isSyncEnabled(protocol);
-        }
-    }
-
     public Server getServer(String uri)
     {
         return uriToServer.get(uri);

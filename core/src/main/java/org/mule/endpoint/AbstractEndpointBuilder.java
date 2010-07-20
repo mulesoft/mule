@@ -295,26 +295,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             return messageExchangePattern.hasResponse();
         }
 
-        // TODO this will go away once all configs are updated to use MEPs
-        return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector,
-            endpointURI.getScheme());
+        throw new UnsupportedOperationException("getSynchronous, no MEP defined");
     }
 
-    protected boolean getDefaultSynchronous(Connector connector, String protocol)
+    protected RetryPolicyTemplate getRetryPolicyTemplate(Connector conn)
     {
-        if (connector != null && connector.isSyncEnabled(protocol))
-        {
-            return true;
-        }
-        else
-        {
-            throw new UnsupportedOperationException("no default implemented");
-        }
-    }
-
-    protected RetryPolicyTemplate getRetryPolicyTemplate(Connector connector)
-    {
-        return retryPolicyTemplate != null ? retryPolicyTemplate : connector.getRetryPolicyTemplate();
+        return retryPolicyTemplate != null ? retryPolicyTemplate : conn.getRetryPolicyTemplate();
     }
 
     protected TransactionConfig getTransactionConfig()

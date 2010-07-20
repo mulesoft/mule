@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -145,16 +144,6 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
 
     boolean isResponseEnabled();
     
-    /**
-     * Used to define is this connectors endpoints' should be synchronous by default rather than 
-     * using Mule's instance wide default. The endpoint is passed through to this method so that 
-     * transports like Axis/CXF can determine if synchronous should be default depending on the 
-     * endpoint transport e.g. http/vm/jms etc.
-     * 
-     * @see ImmutableEndpoint#isSynchronous()
-     */
-    boolean isSyncEnabled(String protocol);
-
     /**
      * Make a specific request to the underlying transport
      *
