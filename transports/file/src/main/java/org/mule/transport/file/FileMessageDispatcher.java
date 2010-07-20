@@ -59,8 +59,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         {
             if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
             {
-                event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
-                        message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
+                event.getMessage().setOutboundProperty(FileConnector.PROPERTY_FILENAME,
+                                                       message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
             }
 
             if (data instanceof byte[])

@@ -223,7 +223,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         String token = auth.getCredentials().toString();
         header.append(new String(Base64.encodeBase64(token.getBytes())));
 
-        event.getMessage().setStringProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        event.getMessage().setOutboundProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
     }
 
 }

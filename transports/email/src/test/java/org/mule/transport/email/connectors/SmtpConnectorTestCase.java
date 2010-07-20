@@ -105,7 +105,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         //muleContext.getRegistry().registerComponent(service);
 
         MuleMessage message = new DefaultMuleMessage(MESSAGE, muleContext);
-        message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
+        message.setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         MuleSession session = getTestSession(getTestService("apple", Apple.class), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, new ResponseOutputStream(System.out));
         endpoint.process(event);

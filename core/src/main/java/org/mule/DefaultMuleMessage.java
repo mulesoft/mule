@@ -976,7 +976,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
-        setStringProperty(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
+        setOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
     }
 
     /**
@@ -998,7 +998,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
+     * @deprecated
      */
+    @Deprecated
     public void setStringProperty(String name, String value)
     {
         assertAccess(WRITE);

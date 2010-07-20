@@ -118,7 +118,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
         else
         {
-            message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
+            message.setOutboundProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
             response = routeMessage(message);
         }
         
