@@ -15,7 +15,6 @@ import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.routing.ExpressionFilter;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.filter.Filter;
-import org.mule.config.expression.ExpressionFilterParser;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.OrFilter;
 import org.mule.routing.inbound.SelectiveConsumer;
@@ -25,7 +24,7 @@ import java.lang.reflect.Member;
 import java.util.StringTokenizer;
 
 /**
- * Responsible for converting a {@link org.mule.config.annotations.routing.ExpressionFilter} annotation to a
+ * Responsible for converting a {@link org.mule.api.annotations.routing.ExpressionFilter} annotation to a
  * {@link org.mule.routing.filters.ExpressionFilter} instance for use on an inbound channel.
  */
 public class ExpressionFilterAnnotationParser implements RouterAnnotationParser

@@ -11,16 +11,21 @@ package org.mule.config.expression;
 
 import org.mule.api.annotations.expressions.Mule;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
 import java.lang.annotation.Annotation;
 
 /**
- * TODO
+ * Used to parse Mule parameter annotations
+ *
+ * @see org.mule.expression.MuleExpressionEvaluator
+ * @see org.mule.api.annotations.expressions.Mule
+ *
+ * @since 3.0
  */
-public class MuleAnnotationParser implements ExpressionParser
+public class MuleAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class parameterType)
     {
@@ -36,9 +41,8 @@ public class MuleAnnotationParser implements ExpressionParser
                 val += "(" + parameterType.getName() + ")";
             }
 
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(val, evaluator.value(), null),
+            return new ExpressionArgument(null, new ExpressionConfig(val, evaluator.value(), null),
                     muleAnnotation.required(), parameterType);
-            return arg;
         }
         else
         {

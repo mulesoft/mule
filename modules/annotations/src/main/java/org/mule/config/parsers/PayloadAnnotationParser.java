@@ -11,7 +11,7 @@ package org.mule.config.parsers;
 
 import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.param.Payload;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
@@ -21,7 +21,7 @@ import java.lang.annotation.Annotation;
  * Responsible for parsing the {@link org.mule.api.annotations.param.Payload} annotation.  This is an iBeans
  * framework class and cannot be used in any other context.
  */
-public class PayloadAnnotationParser implements ExpressionParser
+public class PayloadAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {

@@ -17,8 +17,8 @@ import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.config.expression.ExpressionAnnotationsHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.utils.AnnotationHelper;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.model.resolvers.AbstractEntryPointResolver;
 import org.mule.transport.NullPayload;
@@ -26,11 +26,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -51,7 +47,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  *  }
  * </code>
  *
- * The component methodf above will be invoked by running the XPath expression on the payload, adding a second parameter as
+ * The component method above will be invoked by running the XPath expression on the payload, adding a second parameter as
  * the payload itself and passing in the header 'name' as the third parameter.
  *
  * There are some rules for how components with annotations will be processed -
@@ -180,7 +176,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         ExpressionTransformer trans = (ExpressionTransformer) transformerCache.get(method);
         if (trans == null)
         {
-            trans = AnnotationHelper.getTransformerForMethodWithAnnotations(method, context.getMuleContext());
+            trans = ExpressionAnnotationsHelper.getTransformerForMethodWithAnnotations(method, context.getMuleContext());
             transformerCache.put(method, trans);
         }
 

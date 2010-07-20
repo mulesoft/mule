@@ -11,7 +11,7 @@ package org.mule.config.parsers;
 
 import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.param.InboundHeaders;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.ExpressionConstants;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
@@ -27,7 +27,7 @@ import java.util.Map;
  * Responsible for parsing the {@link org.mule.api.annotations.param.InboundHeaders} annotation.  This is an iBeans
  * framework class and cannot be used in any other context.
  */
-public class InboundHeadersAnnotationParser implements ExpressionParser
+public class InboundHeadersAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {

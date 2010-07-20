@@ -9,20 +9,19 @@
  */
 package org.mule.api.annotations;
 
-import org.mule.api.annotations.expressions.Mule;
-import org.mule.api.annotations.expressions.XPath;
+import org.mule.api.annotations.expressions.Function;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.tck.testmodels.fruit.FruitBowl;
 
-import org.dom4j.Document;
 
 public class AnnotatedComponent1
 {
     public Object doSomething(
-            @XPath("/foo/bar") String bar,
-            @Payload Document doc,
-            @InboundHeaders("name") String name)
+            @Function("payloadClass") String className,
+            @Payload FruitBowl fruitBowl,
+            @InboundHeaders("foo") String foo)
     {
-        return bar + ":" + name + ":" + doc.asXML();
+        return className + ":" + foo + ":" + fruitBowl.getClass();
     }
 }

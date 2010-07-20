@@ -15,10 +15,11 @@ import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.http.ReleasingInputStream;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
         assertEquals(dt, trans.getReturnDataType());
 
         assertEquals(1, trans.getSourceDataTypes().size());
-        assertEquals(DataTypeFactory.create(ReleasingInputStream.class), trans.getSourceDataTypes().get(0));
+        assertEquals(DataTypeFactory.create(InputStream.class), trans.getSourceDataTypes().get(0));
         assertEquals(5, trans.getPriorityWeighting());
     }
 
@@ -64,7 +65,7 @@ public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
         DataType dt = DataTypeFactory.create(ArrayList.class, String.class, null);
         assertEquals(dt, trans.getReturnDataType());
         assertEquals(3, trans.getSourceDataTypes().size());
-        assertTrue(trans.getSourceDataTypes().contains(DataTypeFactory.create(ReleasingInputStream.class)));
+        assertTrue(trans.getSourceDataTypes().contains(DataTypeFactory.create(BufferedInputStream.class)));
         assertTrue(trans.getSourceDataTypes().contains(DataTypeFactory.create(FileInputStream.class)));
         assertTrue(trans.getSourceDataTypes().contains(DataTypeFactory.create(ByteArrayInputStream.class)));
         assertEquals(9, trans.getPriorityWeighting());
@@ -72,13 +73,13 @@ public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
 
 
     @Transformer
-    public ArrayList dummy(ReleasingInputStream in)
+    public ArrayList dummy(InputStream in)
     {
         return new ArrayList();
     }
 
     @Transformer(sourceTypes = {FileInputStream.class, ByteArrayInputStream.class}, priorityWeighting = 9)
-    public ArrayList<String> dummy2(ReleasingInputStream in)
+    public ArrayList<String> dummy2(BufferedInputStream in)
     {
         return new ArrayList<String>();
     }

@@ -11,7 +11,7 @@ package org.mule.config.expression;
 
 import org.mule.api.annotations.expressions.Function;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
@@ -19,8 +19,13 @@ import java.lang.annotation.Annotation;
 
 /**
  * Used to parse Function annotations
+ *
+ * @see org.mule.expression.FunctionExpressionEvaluator
+ * @see org.mule.api.annotations.expressions.Function
+ *
+ * @since 3.0
  */
-public class FunctionAnnotationParser implements ExpressionParser
+public class FunctionAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {

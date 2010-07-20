@@ -15,8 +15,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.expression.ExpressionAnnotationsHelper;
 import org.mule.config.i18n.AnnotationsMessages;
-import org.mule.config.utils.AnnotationHelper;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -108,7 +108,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         {
             try
             {
-                paramTransformer = AnnotationHelper.getTransformerForMethodWithAnnotations(transformMethod, muleContext);
+                paramTransformer = ExpressionAnnotationsHelper.getTransformerForMethodWithAnnotations(transformMethod, muleContext);
             }
             catch (TransformerException e)
             {

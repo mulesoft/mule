@@ -16,6 +16,10 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.component.simple.EchoComponent;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.FruitBowl;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -24,26 +28,28 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-
 public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 {
-    public static final String TEST_PAYLOAD = "<foo><bar>Hello</bar></foo>";
+    public static final Fruit[] TEST_PAYLOAD = new Fruit[]{new Apple(), new Banana()};
+
+    public void doSetUp() throws Exception
+    {
+        muleContext.getRegistry().registerObject("trans", new Transformers());
+    }
 
     public void testAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         AnnotatedComponent2 component = new AnnotatedComponent2();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
-        context.getMessage().setInboundProperty("name", "Ross");
+        context.getMessage().setInboundProperty("foo", "fooValue");
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doSomething", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
         //We need to parse the xml to normalise it so that the final assert passes
-        Document doc = DocumentHelper.parseText(TEST_PAYLOAD);
-        assertEquals("Hello:Ross:" + doc.asXML(), result.getResult());
+
+        assertEquals(TEST_PAYLOAD.getClass().getName() + ":fooValue:" + FruitBowl.class, result.getResult());
     }
 
     public void testDefaultAnnotatedMethod() throws Exception
@@ -51,13 +57,14 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         AnnotatedComponent1 component = new AnnotatedComponent1();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
-        context.getMessage().setInboundProperty("name", "Ross");
+        context.getMessage().setInboundProperty("foo", "fooValue");
         //No need to set the method property if the component only has a single annotated method
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+
         //We need to parse the xml to normalise it so that the final assert passes
-        Document doc = DocumentHelper.parseText(TEST_PAYLOAD);
-        assertEquals("Hello:Ross:" + doc.asXML(), result.getResult());
+        assertEquals(TEST_PAYLOAD.getClass().getName() + ":fooValue:" + FruitBowl.class, result.getResult());
+
     }
 
     public void testAnnotatedMethodWithoutMethodHeader() throws Exception
@@ -111,6 +118,19 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 
             //Add handler code here
             return r;
+        }
+    }
+
+    public class Transformers
+    {
+        @Transformer
+        public FruitBowl createPerson(Fruit[] fruit)
+        {
+            if (fruit == null || fruit.length == 0)
+            {
+                throw new IllegalArgumentException("fruit[]");
+            }
+            return new FruitBowl(fruit);
         }
     }
 }

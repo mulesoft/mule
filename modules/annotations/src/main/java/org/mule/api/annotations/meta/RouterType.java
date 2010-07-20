@@ -7,18 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.expression;
-
-import org.mule.expression.transformers.ExpressionArgument;
-
-import java.lang.annotation.Annotation;
+package org.mule.api.annotations.meta;
 
 /**
  * TODO
  */
-public interface ExpressionParser
+public enum RouterType
 {
-    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType);
-
-    public boolean supports(Annotation annotation);
+    Inbound,
+    Outbound,
+    ReplyTo
 }

@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A Correlator that correlates one message at a time, esscentially a RPC callback. This callback allows the
- * user to set a callback method on the service component that recieves the message. Any changes made in the
+ * A Correlator that correlates one message at a time, essentially a RPC callback. This callback allows the
+ * user to set a callback method on the service component that receives the message. Any changes made in the
  * callback method will be sent back to the client that initiated the request.
  */
 public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCallback

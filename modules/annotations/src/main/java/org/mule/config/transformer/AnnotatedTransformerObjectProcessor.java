@@ -14,13 +14,10 @@ import org.mule.api.MuleException;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.PreInitProcessor;
-import org.mule.config.i18n.AnnotationsMessages;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -34,6 +31,15 @@ public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, Mu
 {
 
     private MuleContext muleContext;
+
+    public AnnotatedTransformerObjectProcessor()
+    {
+    }
+
+    public AnnotatedTransformerObjectProcessor(MuleContext muleContext)
+    {
+        setMuleContext(muleContext);
+    }
 
     public void setMuleContext(MuleContext context)
     {

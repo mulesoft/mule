@@ -7,10 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.utils;
+package org.mule.config.expression;
 
 import org.mule.api.MuleContext;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 /**
  * TODO
  */
-public class AnnotationHelper
+public class ExpressionAnnotationsHelper
 {
     public static ExpressionTransformer getTransformerForMethodWithAnnotations(Method method, MuleContext context) throws TransformerException, InitialisationException
     {
@@ -63,7 +63,7 @@ public class AnnotationHelper
             throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
         }
         
-        ExpressionParser parser = factory.getExpressionParser(annotation);
+        ExpressionAnnotationParser parser = factory.getExpressionParser(annotation);
         if (parser == null)
         {
             throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());

@@ -15,8 +15,8 @@ import org.mule.config.transformer.AnnotatedTransformerProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.http.ReleasingInputStream;
 
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -28,7 +28,7 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testTransformerRegistration() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("dummy", ReleasingInputStream.class);
+        Method m = getClass().getDeclaredMethod("dummy", InputStream.class);
         AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(5, getClass(), m, new Class[]{}, null, null);
 
         DataType dt = DataTypeFactory.create(ArrayList.class, Object.class, null);
@@ -41,7 +41,7 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
     @Test
     public void testTransformerRegistration2() throws Exception
     {
-        Method m = getClass().getDeclaredMethod("dummy2", ReleasingInputStream.class);
+        Method m = getClass().getDeclaredMethod("dummy2", InputStream.class);
         AnnotatedTransformerProxy trans = new AnnotatedTransformerProxy(5, getClass(), m, new Class[]{}, null, null);
 
         DataType dt = DataTypeFactory.create(ArrayList.class, String.class, null);
@@ -53,13 +53,13 @@ public class CollectionTransformerTestCase extends AbstractMuleTestCase
 
 
     @Transformer
-    public ArrayList dummy(ReleasingInputStream in)
+    public ArrayList dummy(InputStream in)
     {
         return new ArrayList();
     }
 
     @Transformer
-    public ArrayList<String> dummy2(ReleasingInputStream in)
+    public ArrayList<String> dummy2(InputStream in)
     {
         return new ArrayList<String>();
     }

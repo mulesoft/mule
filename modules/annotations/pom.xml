@@ -12,10 +12,10 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-annotations</artifactId>
-    <name>Annotations Module</name>
+    <name>Mule Annotations</name>
     <packaging>jar</packaging>
-    <description>Annotations for configuring Mule at various levels such as services, endpoints, entry points and
-        routers.
+    <description>Annotations for configuring Mule at various levels such as services, entry points, transformers and
+        expressions.
     </description>
 
     <dependencies>
@@ -25,34 +25,13 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-quartz</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${springVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${springVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.mule.transports</groupId>-->
+            <!--<artifactId>mule-transport-vm</artifactId>-->
+            <!--<version>${version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>jsr330-api</artifactId>
@@ -65,55 +44,32 @@
             <version>${cglibVersion}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.mule.modules</groupId>-->
+            <!--<artifactId>mule-module-client</artifactId>-->
+            <!--<version>${version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>org.mule.modules</groupId>-->
+            <!--<artifactId>mule-module-scripting</artifactId>-->
+            <!--<version>${version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        
+        <!--<dependency>-->
+            <!--<groupId>org.mule.tests</groupId>-->
+            <!--<artifactId>mule-tests-functional</artifactId>-->
+            <!--<version>${version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-scripting</artifactId>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-email</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stdio</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>

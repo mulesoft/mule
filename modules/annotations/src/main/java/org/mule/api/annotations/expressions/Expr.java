@@ -18,17 +18,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ * Allows method parameters to be configured with result of one or more Mule expressions
+ *
+ * public Object save(Object foo, @Expr("#[header:X-User]-#[function:UUID]") String id)
+ *
+ * @see org.mule.expression.FunctionExpressionEvaluator
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Evaluator("custom")
-public @interface CustomEvaluator
+@Evaluator("string")
+public @interface Expr
 {
     public abstract String value();
-
-    public abstract String evaluator();
 
     public abstract boolean required() default true;
 }
