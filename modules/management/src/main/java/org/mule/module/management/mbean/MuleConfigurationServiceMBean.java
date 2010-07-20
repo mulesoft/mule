@@ -10,7 +10,6 @@
 
 package org.mule.module.management.mbean;
 
-
 /**
  * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the
  * Mule server configuration. This is read-only after start-up
@@ -19,8 +18,6 @@ package org.mule.module.management.mbean;
 public interface MuleConfigurationServiceMBean
 {
     String DEFAULT_JMX_NAME = "name=Configuration";
-
-    boolean isSynchronous();
 
     int getSynchronousEventTimeout();
 

@@ -298,11 +298,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
-    public boolean isDefaultSynchronousEndpoints()
-    {
-        return synchronous;
-    }
-
     public void setDefaultSynchronousEndpoints(boolean synchronous)
     {
         if (verifyContextNotStarted())

@@ -551,11 +551,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return muleConfiguration.isClientMode();
     }
 
-    public boolean isDefaultSynchronousEndpoints()
-    {
-        return muleConfiguration.isDefaultSynchronousEndpoints();
-    }
-
     public boolean isEnableStreaming()
     {
         return muleConfiguration.isEnableStreaming();

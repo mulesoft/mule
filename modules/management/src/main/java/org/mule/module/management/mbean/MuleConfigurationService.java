@@ -28,11 +28,6 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         this.muleConfiguration = muleConfiguration;
     }
 
-    public boolean isSynchronous()
-    {
-        return muleConfiguration.isDefaultSynchronousEndpoints();
-    }
-
     public int getSynchronousEventTimeout()
     {
         return muleConfiguration.getDefaultResponseTimeout();

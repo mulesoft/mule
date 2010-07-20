@@ -63,7 +63,6 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
         assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(), ep.getResponseTimeout());
-        assertEquals(muleContext.getConfiguration().isDefaultSynchronousEndpoints(), ep.isSynchronous());
         assertTrue("ep.getRetryPolicyTemplate() = " + ep.getRetryPolicyTemplate().getClass(), ep.getRetryPolicyTemplate() instanceof NoRetryPolicyTemplate);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);

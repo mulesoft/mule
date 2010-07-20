@@ -35,6 +35,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.DefaultMuleConfiguration;
@@ -322,16 +323,12 @@ public class MuleClient implements Disposable
             throw new MessagingException(CoreMessages.objectNotRegistered("Service", componentName),
                 message);
         }
-        List trans = null;
+        List<Transformer> trans = null;
         if (transformers != null)
         {
             trans = TransformerUtils.getTransformers(transformers, muleContext);
         }
 
-        if (!muleContext.getConfiguration().isDefaultSynchronousEndpoints())
-        {
-            logger.warn("The mule muleContext is not running synchronously, a null message payload will be returned");
-        }
         MuleSession session = new DefaultMuleSession(service, muleContext);
         ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);

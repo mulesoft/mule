@@ -16,8 +16,6 @@ package org.mule.api.config;
  */
 public interface MuleConfiguration
 {
-    boolean isDefaultSynchronousEndpoints();
-
     int getDefaultResponseTimeout();
 
     String getWorkingDirectory();

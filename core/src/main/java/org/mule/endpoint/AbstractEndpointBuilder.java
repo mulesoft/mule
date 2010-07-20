@@ -308,9 +308,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         else
         {
-            // default MEP is one-way
-            // MessageExchangePattern.one_way.hasResponse();
-            return muleContext.getConfiguration().isDefaultSynchronousEndpoints();
+            throw new UnsupportedOperationException("no default implemented");
         }
     }
 
