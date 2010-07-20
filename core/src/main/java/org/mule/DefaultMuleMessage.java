@@ -807,10 +807,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationSequence()
     {
         assertAccess(READ);
-        Integer seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null);
+        // need to wrap with another getInt() as some transports operate on it as a String
+        Integer seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null),-1);
         if (seq == null)
         {
-            seq = getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, -1);
+            seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, null), -1);
         }
 
         return seq;
@@ -832,10 +833,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public int getCorrelationGroupSize()
     {
         assertAccess(READ);
-        Integer groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null);
+        // need to wrap with another getInt() as some transports operate on it as a String
+        Integer groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null), -1);
         if (groupSize == null)
         {
-            groupSize = getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, -1);
+            groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, null), -1);
         }
 
         return groupSize;

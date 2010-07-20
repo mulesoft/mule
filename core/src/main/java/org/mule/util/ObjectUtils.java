@@ -77,18 +77,18 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             if (answer instanceof Boolean)
             {
-                return ((Boolean) answer).booleanValue();
+                return (Boolean) answer;
 
             }
             else if (answer instanceof String)
             {
-                return Boolean.valueOf((String) answer).booleanValue();
+                return Boolean.valueOf((String) answer);
 
             }
             else if (answer instanceof Number)
             {
                 Number n = (Number) answer;
-                return ((n.intValue() > 0) ? Boolean.TRUE : Boolean.FALSE).booleanValue();
+                return (n.intValue() > 0) ? Boolean.TRUE : Boolean.FALSE;
             }
             else
             {
@@ -125,7 +125,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Byte.valueOf((String) answer).byteValue();
+                return Byte.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
@@ -162,7 +162,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Short.valueOf((String) answer).shortValue();
+                return Short.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
@@ -199,7 +199,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Integer.valueOf((String) answer).intValue();
+                return Integer.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
@@ -236,7 +236,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Long.valueOf((String) answer).longValue();
+                return Long.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
@@ -274,7 +274,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Float.valueOf((String) answer).floatValue();
+                return Float.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
@@ -312,7 +312,7 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         {
             try
             {
-                return Double.valueOf((String) answer).doubleValue();
+                return Double.valueOf((String) answer);
             }
             catch (NumberFormatException e)
             {
