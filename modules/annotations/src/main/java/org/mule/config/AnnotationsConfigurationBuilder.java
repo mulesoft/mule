@@ -11,7 +11,7 @@ package org.mule.config;
 
 import org.mule.api.MuleContext;
 import org.mule.config.builders.AbstractConfigurationBuilder;
-import org.mule.config.endpoint.DefaultAnnotationsParserFactory;
+import org.mule.config.endpoint.RegistryBackedAnnotationsParserFactory;
 
 /**
  * Enables Mule annotation processing so that annotated objects registered with the Mule registry will automatically
@@ -35,6 +35,6 @@ public class AnnotationsConfigurationBuilder extends AbstractConfigurationBuilde
 
     protected AnnotationsParserFactory createAnnotationsParserFactory()
     {
-        return new DefaultAnnotationsParserFactory();
+        return new RegistryBackedAnnotationsParserFactory();
     }
 }

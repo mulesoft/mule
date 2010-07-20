@@ -14,6 +14,8 @@
     <bean name="_muleNotificationManager"
           class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
+    <bean name="_muleAnnotationsProcessor" class="org.mule.config.spring.processors.MuleServiceAnnotationsProcessor"/>
+
     <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
 
     <mule:mule>

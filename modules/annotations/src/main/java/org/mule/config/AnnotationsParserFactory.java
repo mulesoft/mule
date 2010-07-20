@@ -11,17 +11,15 @@ package org.mule.config;
 
 import org.mule.api.EndpointAnnotationParser;
 import org.mule.api.RouterAnnotationParser;
-import org.mule.api.expression.ExpressionParser;
-import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.expression.ExpressionAnnotationParser;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.List;
 
 /**
  * Defines a common interface to find all Endpoint annotation parsers for a context.  Endpoint parsers may be
  * customized depending on the underlying platform.
- * This is not an interface that users should ever need to use or customize, but iBeans on different platforms
+ * This is not an interface that users should ever need to use or customize, but Mule on different platforms
  * can customize how the endpoints are created from the annotations.
  * <p/>
  * There are 3 types of annotation parser -
@@ -30,7 +28,8 @@ import java.util.List;
  * 3. Expression : translates into an expression, usually these are configured on method parameters so that an expression
  * will get evaluated on the parameter before being passed into the method.
  *
- * @since 3.0.0
+ * @since 3.0
+ *
  */
 public interface AnnotationsParserFactory
 {
@@ -56,11 +55,11 @@ public interface AnnotationsParserFactory
      * @return the expression annotation parser that can parse the supplied annotation or null if a matching parser
      *         not found
      */
-    ExpressionParser getExpressionParser(Annotation annotation);
+    ExpressionAnnotationParser getExpressionParser(Annotation annotation);
 
     /**
      * Retrieves a parser for the given annotation, where the annotation is a Router annotation; one annotated with
-     * the {@link org.mule.api.annotations.routing.Router} annotation. the parameters passed in can be used to validate the use of
+     * the {@link org.mule.api.annotations.meta.Router} annotation. the parameters passed in can be used to validate the use of
      * the annotation, i.e. you may want to restrict annotations to only be configured on concrete classes.
      * <p/>
      *
@@ -73,11 +72,4 @@ public interface AnnotationsParserFactory
      */
     RouterAnnotationParser getRouterParser(Annotation annotation, Class<?> aClass, Member member);
 
-    /**
-     * A list of Object processors that should be registered for this factory.  typically, these will be object
-     * processors that process annotations on objects that get put ni the registry.
-     *
-     * @return the list of processors to be used or an empty list.
-     */
-    List<ObjectProcessor> getProcessors();
 }
