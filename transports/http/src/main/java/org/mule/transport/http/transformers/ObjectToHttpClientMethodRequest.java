@@ -434,7 +434,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null
                         && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
             {
-                headerValue = msg.getStringProperty(headerName, scope, null);
+                headerValue = msg.getProperty(headerName, scope);
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
                 {
                     headerName = new StringBuffer(30).append("X-").append(headerName).toString();

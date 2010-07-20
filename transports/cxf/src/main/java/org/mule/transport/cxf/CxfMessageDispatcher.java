@@ -257,7 +257,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     {
         for (String name : message.getPropertyNames(scope))
         {
-            String header = message.getStringProperty(name, scope, null);
+            String header = message.getProperty(name, scope);
             if ((header != null) && (!header.startsWith("MULE")))
             {
                 props.put(name, header);

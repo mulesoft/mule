@@ -775,10 +775,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getCorrelationId()
     {
         assertAccess(READ);
-        String correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND, null);
+        String correlationId = getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         if (correlationId == null)
         {
-            correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.INBOUND, null);
+            correlationId = getInboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         }
 
         return correlationId;
