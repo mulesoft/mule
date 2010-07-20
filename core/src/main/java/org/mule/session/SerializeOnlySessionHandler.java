@@ -69,8 +69,9 @@ public class SerializeOnlySessionHandler implements SessionHandler
         Object prop;
         for (Iterator iterator = session.getPropertyNamesAsSet().iterator(); iterator.hasNext();)
         {
-            prop = iterator.next();            
-            if (!(session.getProperty(prop) instanceof Serializable))
+            prop = iterator.next();
+            final Object value = session.getProperty(prop);
+            if (!(value instanceof Serializable))
             {
                 logger.warn("Property " + prop + " is not serializable, it will not be preserved as part of the MuleSession");
                 session.removeProperty(prop);
