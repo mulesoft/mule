@@ -337,7 +337,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         }
         for (String name : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))
         {
-            final String value = msg.getStringProperty(name, PropertyScope.OUTBOUND, "");
+            final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
             properties.put(name, value);
         }
 

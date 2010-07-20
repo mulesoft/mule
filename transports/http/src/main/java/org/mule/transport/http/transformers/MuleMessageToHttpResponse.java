@@ -234,7 +234,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
             String value = msg.getInvocationProperty(headerName);
             if (value == null)
             {
-                value = msg.getStringProperty(headerName, PropertyScope.OUTBOUND, null);
+                value = msg.getOutboundProperty(headerName);
             }
             if (value != null)
             {
@@ -269,7 +269,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
 
         // Mule properties
-        String user = msg.getStringProperty(MuleProperties.MULE_USER_PROPERTY, PropertyScope.OUTBOUND, null);
+        String user = msg.getOutboundProperty(MuleProperties.MULE_USER_PROPERTY);
         if (user != null)
         {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));

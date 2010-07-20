@@ -126,7 +126,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     {
         Object src = msg.getPayload();
 
-        String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.OUTBOUND, null);
+        String endpointString = msg.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         if (endpointString == null)
         {
             endpointString = msg.getInvocationProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
@@ -141,7 +141,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
         if (method == null)
         {
-            method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.OUTBOUND, "POST");
+            method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
         }
         try
         {
@@ -158,8 +158,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                                                                 HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 if (getBodyParam == null)
                 {
-                    msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND,
-                                          HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
+                    msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                                            HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 }
                 String paramName = URLEncoder.encode(getBodyParam, outputEncoding);
 
@@ -197,7 +197,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
-                String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND, null);
+                String paramName = msg.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
                 if (paramName == null)
                 {
                     paramName = msg.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
@@ -263,8 +263,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else
             {
                 // TODO we should probably set other properties here
-                String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, PropertyScope.OUTBOUND,
-                                                           HttpConstants.HTTP11);
+                String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
                 {
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);

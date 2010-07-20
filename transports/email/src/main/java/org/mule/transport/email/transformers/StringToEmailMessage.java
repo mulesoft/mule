@@ -12,7 +12,6 @@ package org.mule.transport.email.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
@@ -162,7 +161,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
      */
     protected String lookupProperty(MuleMessage message, String propName, String defaultValue)
     {
-        String value = message.getStringProperty(propName, PropertyScope.OUTBOUND, null);
+        String value = message.getOutboundProperty(propName);
         if (value == null)
         {
             value = message.getInvocationProperty(propName, defaultValue);
