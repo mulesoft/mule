@@ -14,6 +14,7 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
+
 import java.lang.annotation.Annotation;
 
 /**
@@ -22,7 +23,7 @@ import java.lang.annotation.Annotation;
  */
 public class PayloadAnnotationParser implements ExpressionParser
 {
-    public ExpressionArgument parse(Annotation annotation, Class parameterType)
+    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
@@ -33,7 +34,6 @@ public class PayloadAnnotationParser implements ExpressionParser
         {
             throw new IllegalArgumentException("The @Evaluator annotation must be set on an Expression Annotation");
         }
-
     }
 
     public boolean supports(Annotation annotation)

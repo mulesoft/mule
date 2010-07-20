@@ -18,7 +18,7 @@ import java.lang.annotation.Annotation;
  */
 public interface ExpressionParser
 {
-    public ExpressionArgument parse(Annotation annotation, Class parameterType);
+    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType);
 
     public boolean supports(Annotation annotation);
 }

@@ -9,8 +9,8 @@
  */
 package org.mule.config.expression;
 
-import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.expressions.XPath;
+import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
  */
 public class XPathAnnotationParser implements ExpressionParser
 {
-    public ExpressionArgument parse(Annotation annotation, Class parameterType)
+    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         String eval = "xpath";
@@ -46,7 +46,6 @@ public class XPathAnnotationParser implements ExpressionParser
         {
             throw new IllegalArgumentException("The @Evaluator annotation must be set on an Expression Annotation");
         }
-
     }
 
     public boolean supports(Annotation annotation)

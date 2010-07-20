@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class InboundHeadersAnnotationParser implements ExpressionParser
 {
-    public ExpressionArgument parse(Annotation annotation, Class parameterType)
+    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
 
@@ -59,7 +59,6 @@ public class InboundHeadersAnnotationParser implements ExpressionParser
         {
             throw new IllegalArgumentException("The @Evaluator annotation must be set on an Expression Annotation");
         }
-
     }
 
     public boolean supports(Annotation annotation)

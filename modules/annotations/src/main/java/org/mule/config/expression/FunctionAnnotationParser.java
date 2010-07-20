@@ -22,7 +22,7 @@ import java.lang.annotation.Annotation;
  */
 public class FunctionAnnotationParser implements ExpressionParser
 {
-    public ExpressionArgument parse(Annotation annotation, Class parameterType)
+    public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
@@ -34,7 +34,6 @@ public class FunctionAnnotationParser implements ExpressionParser
         {
             throw new IllegalArgumentException("The @Evaluator annotation must be set on an Expression Annotation");
         }
-
     }
 
     public boolean supports(Annotation annotation)
