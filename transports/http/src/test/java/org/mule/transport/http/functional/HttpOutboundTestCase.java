@@ -25,7 +25,12 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     private static final int LISTEN_PORT = 60215;
     private Latch testLatch = new Latch();
     private String httpMethod;
-    
+
+    public HttpOutboundTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     protected MockHttpServer getHttpServer(CountDownLatch latch)
     {
         return new SimpleHttpServer(LISTEN_PORT, latch, testLatch);

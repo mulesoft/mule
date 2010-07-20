@@ -16,6 +16,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
     public SpringNamespaceConfigBuilderTestCase()
     {
         super(false);
+        setDisposeManagerPerSuite(true);
     }
 
     @Override

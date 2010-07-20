@@ -49,6 +49,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     public SpringNamespaceConfigBuilderV2TestCase()
     {
         super(true);
+        setDisposeManagerPerSuite(true);
     }
 
     public String getConfigResources()
