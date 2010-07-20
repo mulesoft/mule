@@ -208,7 +208,6 @@ public class HttpConnector extends TcpConnector
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param service the service for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
@@ -366,8 +365,8 @@ public class HttpConnector extends TcpConnector
         else if (event!=null && event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION) != null &&
                 httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION)==null)
         {
-            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION,
-                                        event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION).toString());
+            String auth = event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION);
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, auth);
         }
         else
         {
