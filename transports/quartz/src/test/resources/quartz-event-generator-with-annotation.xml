@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <model>
+        <service name="QuartzEventGenerator">
+            <component class="org.mule.transport.quartz.ScheduleComponent"/>
+            <outbound matchAll="true">
+                <filtering-router>
+                    <vm:outbound-endpoint path="intervalQueue" exchange-pattern="one-way"/>
+                    <expression-filter evaluator="groovy" expression="payload.contains('interval')"/>
+                </filtering-router>
+                <filtering-router>
+                    <vm:outbound-endpoint path="cronQueue" exchange-pattern="one-way"/>
+                    <expression-filter evaluator="groovy" expression="payload.contains('cron')"/>
+                </filtering-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
