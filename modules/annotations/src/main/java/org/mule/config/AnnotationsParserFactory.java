@@ -45,7 +45,7 @@ public interface AnnotationsParserFactory
      * @return the endpoint annotation parser that can parse the supplied annotation or null if a matching parser
      *         not found
      */
-    EndpointAnnotationParser getEndpointParser(Annotation annotation, Class aClass, Member member);
+    EndpointAnnotationParser getEndpointParser(Annotation annotation, Class<?> aClass, Member member);
 
     /**
      * Retrieves a parser for the given annotation, where the annotation is an Expression annotation; one annotated with
@@ -71,7 +71,7 @@ public interface AnnotationsParserFactory
      * @return the router annotation parser that can parse the supplied annotation or null if a matching parser
      *         not found
      */
-    RouterAnnotationParser getRouterParser(Annotation annotation, Class aClass, Member member);
+    RouterAnnotationParser getRouterParser(Annotation annotation, Class<?> aClass, Member member);
 
     /**
      * A list of Object processors that should be registered for this factory.  typically, these will be object
@@ -80,5 +80,4 @@ public interface AnnotationsParserFactory
      * @return the list of processors to be used or an empty list.
      */
     List<ObjectProcessor> getProcessors();
-
 }

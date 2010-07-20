@@ -16,13 +16,9 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.util.StringDataSource;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class MixedAnnotationsTestCase extends FunctionalTestCase
 {
@@ -39,10 +35,11 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         return "mixed-annotations.xml";
     }
 
-    @Before
     @Override
     public void doSetUp() throws Exception
     {
+        super.doSetUp();
+        
         Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("foo", "fooValue");
         props.put("bar", "barValue");
@@ -61,17 +58,15 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
             e.printStackTrace();
             fail(e.getMessage());
         }
-
     }
 
-    @Test
     public void testProcessAllAnnotated() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://allAnnotated", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(3, result.size());
 
         //Payload
@@ -79,22 +74,20 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
 
         //Headers
         assertNotNull(result.get("inboundHeaders"));
-        Map headers = (Map)result.get("inboundHeaders");
+        Map<?, ?> headers = (Map<?, ?>)result.get("inboundHeaders");
         assertEquals(2, headers.size());
         assertEquals("fooValue", headers.get("foo"));
         assertEquals("barValue", headers.get("bar"));
 
         //Attachments
         assertNotNull(result.get("inboundAttachments"));
-        Map attachments = (Map)result.get("inboundAttachments");
+        Map<?, ?> attachments = (Map<?, ?>)result.get("inboundAttachments");
         assertEquals(3, attachments.size());
         assertNotNull(attachments.get("foo"));
         assertNotNull(attachments.get("bar"));
         assertNotNull(attachments.get("baz"));
-
     }
 
-    @Test
     public void testPayloadNotAnnotated() throws Exception
     {
         //When using param annotations every param needs t obe annotated
@@ -105,5 +98,4 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof IllegalArgumentException);
         assertEquals("wrong number of arguments", message.getExceptionPayload().getRootException().getMessage());
     }
-
 }

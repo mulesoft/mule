@@ -9,7 +9,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <model name="main">
-
         <service name="mixed1">
             <inbound>
                 <inbound-endpoint address="vm://allAnnotated?method=processAllAnnotated" exchange-pattern="request-response"/>
@@ -24,5 +23,4 @@
             <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
         </service>
     </model>
-
 </mule>

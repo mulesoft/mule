@@ -21,9 +21,6 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-import org.junit.Before;
-import org.junit.Test;
-
 public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     private MuleMessage muleMessage;
@@ -39,10 +36,11 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         return "inbound-attachments-annotation.xml";
     }
 
-    @Before
     @Override
     public void doSetUp() throws Exception
     {
+        super.doSetUp();
+        
         muleMessage = new DefaultMuleMessage("test", muleContext);
 
         try
@@ -59,7 +57,6 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     }
 
-    @Test
     public void testSingleAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -70,7 +67,6 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     }
 
 
-    @Test
     public void testSingleAttachmentWithType() throws Exception
     {
         //These should really be in core, but the @Transformer annotation is not in core
@@ -83,7 +79,6 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
-    @Test
     public void testSingleAttachmentOptional() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -92,7 +87,6 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("faz not set", message.getPayload());
     }
 
-    @Test
     public void testSingleAttachmentWithTypeNoMatchingTransform() throws Exception
     {
         //TODO this test still works because
@@ -103,21 +97,19 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
-    @Test
     public void testMapAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachments", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String, DataHandler> result = (Map) message.getPayload();
+        Map<String, DataHandler> result = getMapPayload(message);
         assertEquals(2, result.size());
         assertEquals("fooValue", result.get("foo").getContent());
         assertEquals("barValue", result.get("bar").getContent());
         assertNull(result.get("baz"));
     }
-
-    @Test
+    
     public void testMapAttachmentsMissing() throws Exception
     {
         muleMessage.removeAttachment("foo");
@@ -128,21 +120,19 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
-    @Test
     public void testMapSingleAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://singleAttachmentMap", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String,  DataHandler> result = (Map) message.getPayload();
+        Map<String,  DataHandler> result = getMapPayload(message);
         assertEquals(1, result.size());
         assertEquals("fooValue", result.get("foo").getContent());
         assertNull(result.get("bar"));
         assertNull(result.get("baz"));
     }
 
-    @Test
     public void testMapAttachmentsOptional() throws Exception
     {
         muleMessage.removeAttachment("baz");
@@ -151,14 +141,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://attachmentsOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String, DataHandler> result = (Map) message.getPayload();
+        Map<String, DataHandler> result = getMapPayload(message);
         assertEquals(2, result.size());
         assertEquals("fooValue", result.get("foo").getContent());
         assertEquals("barValue", result.get("bar").getContent());
         assertNull(result.get("baz"));
     }
 
-    @Test
     public void testMapAttachmentsAllOptional() throws Exception
     {
         muleMessage.removeAttachment("foo");
@@ -169,14 +158,12 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://attachmentsAllOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(0, result.size());
     }
 
-    @Test
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
-
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsUnmodifiable", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
@@ -184,14 +171,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
-    @Test
     public void testMapAttachmentsAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsAll", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<String, DataHandler> result = message.getPayload(Map.class);
+        Map<String, DataHandler> result = getMapPayload(message);
         //Will include all Mule attachments too
         assertTrue(result.size() >= 3);
         assertEquals("fooValue", result.get("foo").getContent());
@@ -199,14 +185,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("bazValue", result.get("baz").getContent());
     }
 
-    @Test
     public void testMapAttachmentsWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = message.getPayload(Map.class);
+        Map<?, ?> result = message.getPayload(Map.class);
         //Will match on ba*
         assertEquals(2, result.size());
         assertNull(result.get("foo"));
@@ -214,14 +199,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNotNull(result.get("baz"));
     }
 
-    @Test
     public void testMapAttachmentsMultiWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsMultiWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match on ba*, f*
         assertEquals(3, result.size());
 
@@ -230,21 +214,19 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNotNull(result.get("baz"));
     }
 
-    @Test
     public void testListAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsList", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(3, result.size());
         assertTrue(result.contains("fooValue"));
         assertTrue(result.contains("barValue"));
         assertTrue(result.contains("bazValue"));
     }
 
-    @Test
     public void testListAttachmentsWithOptional() throws Exception
     {
         muleMessage.removeAttachment("baz");
@@ -252,13 +234,12 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://attachmentsListOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(2, result.size());
         assertTrue(result.contains("fooValue"));
         assertTrue(result.contains("barValue"));
     }
 
-    @Test
     public void testListAttachmentsWithAllOptional() throws Exception
     {
         muleMessage.removeAttachment("foo");
@@ -269,11 +250,10 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://attachmentsListAllOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(0, result.size());
     }
 
-    @Test
     public void testListAttachmentsWithMissing() throws Exception
     {
         muleMessage.removeAttachment("bar");
@@ -284,19 +264,17 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
-    @Test
     public void testSingleListAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://singleAttachmentList", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(1, result.size());
         assertTrue(result.contains("fooValue"));
     }
 
-    @Test
     public void testListAttachmentsUnmodifiable() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -306,14 +284,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
-    @Test
     public void testListAttachmentsAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListAll", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will include all Mule attachments too
         assertTrue(result.size() >= 3);
         assertTrue(result.contains("fooValue"));
@@ -321,14 +298,13 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
-    @Test
     public void testListAttachmentsWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will match all attachments with ba*
         assertEquals(2, result.size());
         assertFalse(result.contains("fooValue"));
@@ -337,18 +313,23 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     }
 
-    @Test
     public void testListAttachmentsMultiWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListMultiWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will match all attachments with ba* and f*
         assertEquals(3, result.size());
         assertTrue(result.contains("fooValue"));
         assertTrue(result.contains("barValue"));
         assertTrue(result.contains("bazValue"));
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, DataHandler> getMapPayload(MuleMessage message)
+    {
+        return (Map<String, DataHandler>) message.getPayload();
     }
 }

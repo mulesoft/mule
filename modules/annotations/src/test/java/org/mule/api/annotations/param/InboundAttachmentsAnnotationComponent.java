@@ -9,8 +9,6 @@
  */
 package org.mule.api.annotations.param;
 
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.util.StringDataSource;
 
 import java.io.IOException;

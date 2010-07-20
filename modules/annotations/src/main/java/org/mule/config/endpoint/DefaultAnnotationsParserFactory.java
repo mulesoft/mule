@@ -27,7 +27,9 @@ import org.mule.config.expression.MuleAnnotationParser;
 import org.mule.config.expression.OgnlAnnotationParser;
 import org.mule.config.expression.XPathAnnotationParser;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.parsers.InboundAttachmentsAnnotationParser;
 import org.mule.config.parsers.InboundHeadersAnnotationParser;
+import org.mule.config.parsers.PayloadAnnotationParser;
 import org.mule.config.processors.AnnotatedServiceObjectProcessor;
 import org.mule.config.processors.DirectBindAnnotationProcessor;
 import org.mule.config.processors.InjectAnnotationProcessor;
@@ -84,8 +86,10 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
 
         //Expression parsers
         registerExpressionParser(new MuleAnnotationParser());
+        registerExpressionParser(new PayloadAnnotationParser());
         registerExpressionParser(new InboundHeadersAnnotationParser());
         registerExpressionParser(new CustomEvaluatorAnnotationParser());
+        registerExpressionParser(new InboundAttachmentsAnnotationParser());
         registerExpressionParser(new FunctionAnnotationParser());
         registerExpressionParser(new XPathAnnotationParser());
         registerExpressionParser(new BeanAnnotationParser());
@@ -102,7 +106,7 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         registerObjectProcessor(new NamedAnnotationProcessor());//Add support for JSR-330
     }
 
-    public EndpointAnnotationParser getEndpointParser(Annotation annotation, Class aClass, Member member)
+    public EndpointAnnotationParser getEndpointParser(Annotation annotation, Class<?> aClass, Member member)
     {
         for (EndpointAnnotationParser parser : endpointParsers)
         {
@@ -126,7 +130,7 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         return null;
     }
 
-    public RouterAnnotationParser getRouterParser(Annotation annotation, Class aClass, Member member)
+    public RouterAnnotationParser getRouterParser(Annotation annotation, Class<?> aClass, Member member)
     {
         for (RouterAnnotationParser parser : routerParsers)
         {

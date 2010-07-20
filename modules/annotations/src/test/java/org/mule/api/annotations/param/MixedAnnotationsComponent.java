@@ -20,7 +20,9 @@ import javax.activation.DataHandler;
  */
 public class MixedAnnotationsComponent
 {
-    public Map processAllAnnotated(@Payload String payload, @InboundHeaders("foo, bar") Map headers, @InboundAttachments("*") Map<String, DataHandler> attachments)
+    public Map<?, ?> processAllAnnotated(@Payload String payload, 
+        @InboundHeaders("foo, bar") Map<?, ?> headers, 
+        @InboundAttachments("*") Map<String, DataHandler> attachments)
     {
         Map<String, Object> m = new HashMap<String, Object>(3);
         m.put("payload", payload);
@@ -29,7 +31,9 @@ public class MixedAnnotationsComponent
         return m;
     }
 
-    public Map processPayloadNotAnnotated(String payload, @InboundHeaders("foo, bar") Map headers, @InboundAttachments("*") List<DataHandler> attachments)
+    public Map<?, ?> processPayloadNotAnnotated(String payload, 
+        @InboundHeaders("foo, bar") Map<?, ?> headers, 
+        @InboundAttachments("*") List<DataHandler> attachments)
     {
         Map<String, Object> m = new HashMap<String, Object>(3);
         m.put("payload", payload);
@@ -37,5 +41,4 @@ public class MixedAnnotationsComponent
         m.put("inboundAttachments", attachments);
         return m;
     }
-
 }
