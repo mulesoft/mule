@@ -64,8 +64,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8988", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertEquals("chunked", reply.getStringProperty(HttpConstants.HEADER_TRANSFER_ENCODING, null));
-        assertNull(reply.getStringProperty(HttpConstants.HEADER_CONTENT_LENGTH, null));
+        assertEquals("chunked", reply.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
+        assertNull(reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
 
     public void testNoChunkingContentLength() throws Exception
@@ -74,8 +74,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8987", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertNotSame("chunked", reply.getStringProperty(HttpConstants.HEADER_TRANSFER_ENCODING, null));
-        assertNotNull(reply.getStringProperty(HttpConstants.HEADER_CONTENT_LENGTH, null));
+        assertNotSame("chunked", reply.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
+        assertNotNull(reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
     
 }

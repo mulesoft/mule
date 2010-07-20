@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
 
-        String ct = reply.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
+        String ct = reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
         assertEquals("text/xml", ct);
         
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());

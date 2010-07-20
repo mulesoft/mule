@@ -342,10 +342,10 @@ public class HttpConnector extends TcpConnector
         if (event != null && event.getCredentials() != null)
         {
             MuleMessage msg = event.getMessage();
-            String authScopeHost = msg.getStringProperty(HTTP_PREFIX + "auth.scope.host", event.getEndpoint().getEndpointURI().getHost());
+            String authScopeHost = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.host", event.getEndpoint().getEndpointURI().getHost());
             int authScopePort = msg.getIntProperty(HTTP_PREFIX + "auth.scope.port", event.getEndpoint().getEndpointURI().getPort());
-            String authScopeRealm = msg.getStringProperty(HTTP_PREFIX + "auth.scope.realm", AuthScope.ANY_REALM);
-            String authScopeScheme = msg.getStringProperty(HTTP_PREFIX + "auth.scope.scheme", AuthScope.ANY_SCHEME);
+            String authScopeRealm = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.realm", AuthScope.ANY_REALM);
+            String authScopeScheme = msg.getOutboundProperty(HTTP_PREFIX + "auth.scope.scheme", AuthScope.ANY_SCHEME);
             client.getState().setCredentials(
                 new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                 new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(

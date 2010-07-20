@@ -264,8 +264,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());
 
         // Outbound endcodin property is added
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(), actual.getStringProperty(
-            org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY, null));
+        assertEquals(muleContext.getConfiguration().getDefaultEncoding(),
+                     actual.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY));
 
     }
 

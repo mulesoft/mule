@@ -138,7 +138,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             return;
         }
         int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        etag = message.getStringProperty(HttpConstants.HEADER_ETAG, null);
+        etag = message.getOutboundProperty(HttpConstants.HEADER_ETAG);
 
         if ((status != HttpConstants.SC_NOT_MODIFIED || !checkEtag))
         {

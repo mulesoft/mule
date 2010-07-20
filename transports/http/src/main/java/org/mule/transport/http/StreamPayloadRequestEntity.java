@@ -47,8 +47,7 @@ public class StreamPayloadRequestEntity implements RequestEntity
 
     public String getContentType()
     {
-        return event.getMessage().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, 
-            HttpConstants.DEFAULT_CONTENT_TYPE);
+        return event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
     }
 }
 

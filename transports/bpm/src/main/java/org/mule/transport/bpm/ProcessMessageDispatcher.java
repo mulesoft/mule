@@ -89,8 +89,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 
                 // Store the endpoint on which the message was received as a process
                 // variable.
-                String originatingEndpoint = event.getMessage().getStringProperty(
-                    MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, null);
+                String originatingEndpoint = event.getMessage().getOutboundProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY);
                 if (StringUtils.isNotEmpty(originatingEndpoint))
                 {
                     processVariables.put(ProcessConnector.PROCESS_VARIABLE_INCOMING_SOURCE,

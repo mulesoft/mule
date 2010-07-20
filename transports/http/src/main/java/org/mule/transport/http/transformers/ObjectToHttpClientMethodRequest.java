@@ -300,7 +300,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             String mimeType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
 
             // Ensure that we have a cached representation of the message if we're using HTTP 1.0
-            String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+            String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
             if (HttpConstants.HTTP10.equals(httpVersion))
             {
                 try

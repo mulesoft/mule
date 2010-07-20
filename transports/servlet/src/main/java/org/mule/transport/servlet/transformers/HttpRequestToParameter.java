@@ -35,24 +35,23 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
     @Override
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        String payloadParam = message.getStringProperty(
-            AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME, 
-            AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
-        
-        String payload = message.getStringProperty(payloadParam, null);
+        String payloadParam = message.getOutboundProperty(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME,
+                                                          AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
+
+        String payload = message.getOutboundProperty(payloadParam);
         if (payload == null)
         {
             // Plain text
-            String contentType = 
-                message.getStringProperty(ServletConnector.CONTENT_TYPE_PROPERTY_KEY, null);
+            String contentType =
+                    message.getOutboundProperty(ServletConnector.CONTENT_TYPE_PROPERTY_KEY);
             if ((contentType == null) || contentType.startsWith("text/"))
             {
                 try
                 {
                     InputStream is = (InputStream) message.getPayload();
-                    
-                    String characterEncoding = 
-                        message.getStringProperty(ServletConnector.CHARACTER_ENCODING_PROPERTY_KEY, null);
+
+                    String characterEncoding =
+                            message.getOutboundProperty(ServletConnector.CHARACTER_ENCODING_PROPERTY_KEY);
                     BufferedReader reader;
                     if (characterEncoding != null)
                     {

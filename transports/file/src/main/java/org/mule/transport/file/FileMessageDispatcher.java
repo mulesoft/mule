@@ -22,6 +22,7 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -57,10 +58,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
         try
         {
-            if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
+            if (event.getMessage().getOutboundProperty(FileConnector.PROPERTY_FILENAME) == null)
             {
                 event.getMessage().setOutboundProperty(FileConnector.PROPERTY_FILENAME,
-                                                       message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
+                                                       message.getOutboundProperty(FileConnector.PROPERTY_FILENAME,
+                                                                                   StringUtils.EMPTY));
             }
 
             if (data instanceof byte[])

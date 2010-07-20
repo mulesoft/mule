@@ -514,7 +514,7 @@ public class FileConnector extends AbstractConnector
             throws MuleException
     {
         String address = endpoint.getEndpointURI().getAddress();
-        String writeToDirectory = message.getStringProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
+        String writeToDirectory = message.getOutboundProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY);
         if (writeToDirectory == null)
         {
             writeToDirectory = getWriteToDirectory();
@@ -528,7 +528,7 @@ public class FileConnector extends AbstractConnector
         String outPattern = (String) endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
         if (outPattern == null)
         {
-            outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+            outPattern = message.getOutboundProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
         }
         if (outPattern == null)
         {
@@ -542,7 +542,7 @@ public class FileConnector extends AbstractConnector
             }
             else
             {
-                filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+                filename = message.getOutboundProperty(FileConnector.PROPERTY_FILENAME);
                 if (filename == null)
                 {
                     filename = generateFilename(message, null);

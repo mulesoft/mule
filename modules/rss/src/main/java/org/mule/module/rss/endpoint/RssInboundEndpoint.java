@@ -139,7 +139,7 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint implements Inboun
 
     private String getMime(MuleMessage m)
     {
-        String mimeType = m.getStringProperty("Content-Type", null);
+        String mimeType = m.getOutboundProperty("Content-Type");
         if (m == null)
         {
             return null;

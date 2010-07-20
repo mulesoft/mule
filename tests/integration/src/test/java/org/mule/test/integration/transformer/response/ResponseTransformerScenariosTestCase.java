@@ -91,10 +91,10 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         assertNotNull(message);
         // Ensure MuleMessageToHttpResponse was used before sending response
 
-        String server = message.getStringProperty(HttpConstants.HEADER_SERVER, null);
+        String server = message.getOutboundProperty(HttpConstants.HEADER_SERVER);
         assertTrue(server.startsWith("Mule"));
-        
-        String dateStr = message.getStringProperty(HttpConstants.HEADER_DATE, null);
+
+        String dateStr = message.getOutboundProperty(HttpConstants.HEADER_DATE);
         SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
         Date msgDate = format.parse(dateStr);
         assertTrue(new Date().after(msgDate));
@@ -108,10 +108,10 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:4447", "request", null);
         assertNotNull(message);
 
-        String server = message.getStringProperty(HttpConstants.HEADER_SERVER, null);
+        String server = message.getOutboundProperty(HttpConstants.HEADER_SERVER);
         assertTrue(server.startsWith("Mule"));
-        
-        String dateStr = message.getStringProperty(HttpConstants.HEADER_DATE, null);
+
+        String dateStr = message.getOutboundProperty(HttpConstants.HEADER_DATE);
         SimpleDateFormat format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
         Date msgDate = format.parse(dateStr);
         assertTrue(new Date().after(msgDate));

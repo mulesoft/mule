@@ -50,9 +50,9 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends
 
         assertNotNull(result);
         assertEquals(TEST_MESSAGE, result.getMessageAsString());
-        assertEquals(MY_PROPERTY_VAL, result.getMessage().getStringProperty(MY_PROPERTY_KEY, null));
-        assertEquals(MULE_CORRELATION_ID_VAL, result.getMessage().getStringProperty(
-            MuleProperties.MULE_CORRELATION_ID_PROPERTY, null));
+        assertEquals(MY_PROPERTY_VAL, result.getMessage().getOutboundProperty(MY_PROPERTY_KEY));
+        assertEquals(MULE_CORRELATION_ID_VAL,
+                     result.getMessage().getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
     }
 
     @Override

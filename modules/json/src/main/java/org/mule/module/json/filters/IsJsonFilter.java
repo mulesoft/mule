@@ -12,6 +12,7 @@ package org.mule.module.json.filters;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 
@@ -39,7 +40,9 @@ public class IsJsonFilter implements Filter
 
     public boolean accept(MuleMessage obj)
     {
-        if (obj.getStringProperty("Content-Type", "").contains("application/json"))
+        // TODO should be checking inbound IMO
+        final String contentType = obj.getOutboundProperty("Content-Type", StringUtils.EMPTY);
+        if (contentType.contains("application/json"))
         {
             return true;
         }

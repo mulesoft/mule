@@ -24,8 +24,8 @@ public class ETagComponent implements org.mule.api.lifecycle.Callable
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
         MuleMessage message = eventContext.getMessage();
-        
-        String etag = message.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
+
+        String etag = message.getOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH);
         if ((etag != null) && etag.equals(ETAG_VALUE))
         {
             message = new DefaultMuleMessage(StringUtils.EMPTY, eventContext.getMuleContext());

@@ -91,9 +91,9 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
                 return data;
             }
         }
-        
-        String httpMethod = message.getStringProperty("http.method", "GET");
-        String request = message.getStringProperty("http.request", null);
+
+        String httpMethod = message.getOutboundProperty("http.method", "GET");
+        String request = message.getOutboundProperty("http.request");
 
         int i = request.indexOf('?');
         String query = request.substring(i + 1);

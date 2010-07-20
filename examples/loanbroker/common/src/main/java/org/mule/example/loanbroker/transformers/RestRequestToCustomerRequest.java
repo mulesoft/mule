@@ -54,7 +54,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageAwareTransforme
 
     protected String getParam(MuleMessage message, String name) throws NullPointerException
     {
-        String value = message.getStringProperty(name, null);
+        String value = message.getOutboundProperty(name);
         if (value == null)
         {
             throw new IllegalArgumentException("Parameter '" + name + "' must be set on the request");

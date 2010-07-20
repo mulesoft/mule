@@ -99,7 +99,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
 
     public boolean isMatch(MuleEvent muleEvent) throws MessagingException
     {
-        String contentType = muleEvent.getMessage().getStringProperty("Content-Type", null);
+        String contentType = muleEvent.getMessage().getOutboundProperty("Content-Type");
         if (contentType != null)
         {
             int i = contentType.indexOf(";");
