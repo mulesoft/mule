@@ -9,8 +9,8 @@
  */
 package org.mule.config.expression;
 
-import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.expressions.Mule;
+import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.expression.ExpressionParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -30,7 +30,7 @@ public class MuleAnnotationParser implements ExpressionParser
             Mule muleAnnotation = (Mule)annotation;
             String val = muleAnnotation.value();
 
-            if("message.payload".equals(val))
+            if ("message.payload".equals(val))
             {
                 //Match the param type and attempt to auto convert
                 val += "(" + parameterType.getName() + ")";

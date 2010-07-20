@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  */
 public class AnnotationHelper
 {
-     public static ExpressionTransformer getTransformerForMethodWithAnnotations(Method method, MuleContext context) throws TransformerException, InitialisationException
+    public static ExpressionTransformer getTransformerForMethodWithAnnotations(Method method, MuleContext context) throws TransformerException, InitialisationException
     {
         ExpressionTransformer trans = new ExpressionTransformer();
         trans.setMuleContext(context);
@@ -49,7 +49,8 @@ public class AnnotationHelper
         return trans;
     }
 
-    static synchronized ExpressionArgument parseAnnotation(Annotation annotation, Class paramType, MuleContext muleContext)
+    static synchronized ExpressionArgument parseAnnotation(Annotation annotation, 
+        Class<?> paramType, MuleContext muleContext)
     {
         AnnotationsParserFactory factory;
         try
@@ -61,6 +62,7 @@ public class AnnotationHelper
             //TODO better exception message
             throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
         }
+        
         ExpressionParser parser = factory.getExpressionParser(annotation);
         if (parser == null)
         {

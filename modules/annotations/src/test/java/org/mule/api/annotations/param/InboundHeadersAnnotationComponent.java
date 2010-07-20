@@ -44,43 +44,43 @@ public class InboundHeadersAnnotationComponent
         return apple;
     }
 
-    public Map processHeaders(@InboundHeaders("foo, bar") Map headers)
+    public Map<?, ?> processHeaders(@InboundHeaders("foo, bar") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processHeadersAll(@InboundHeaders("*") Map headers)
+    public Map<?, ?> processHeadersAll(@InboundHeaders("*") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processHeadersWildcard(@InboundHeaders("MULE_*") Map headers)
+    public Map<?, ?> processHeadersWildcard(@InboundHeaders("MULE_*") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processHeadersMultiWildcard(@InboundHeaders("MULE_*, ba*") Map headers)
+    public Map<?, ?> processHeadersMultiWildcard(@InboundHeaders("MULE_*, ba*") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processSingleMapHeader(@InboundHeaders("foo") Map headers)
+    public Map<?, ?> processSingleMapHeader(@InboundHeaders("foo") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processHeadersOptional(@InboundHeaders("foo, bar, baz?") Map headers)
+    public Map<?, ?> processHeadersOptional(@InboundHeaders("foo, bar, baz?") Map<?, ?> headers)
     {
         return headers;
     }
 
-    public Map processHeadersAllOptional(@InboundHeaders("foo?, bar?") Map headers)
+    public Map<?, ?> processHeadersAllOptional(@InboundHeaders("foo?, bar?") Map<?, ?> headers)
     {
         return headers;
     }
 
 
-    public Map processUnmodifiableHeaders(@InboundHeaders("foo, bar") Map headers)
+    public Map<?, ?> processUnmodifiableHeaders(@InboundHeaders("foo, bar") Map<String, Object> headers)
     {
         //Should throw UnsupportedOperationException
         headers.put("car", "carValue");
@@ -92,44 +92,44 @@ public class InboundHeadersAnnotationComponent
         return headers;
     }
 
-    public List processHeadersList(@InboundHeaders("foo, bar, baz") List headers)
+    public List<?> processHeadersList(@InboundHeaders("foo, bar, baz") List<?> headers)
     {
         return headers;
     }
 
-    public List processHeadersListAll(@InboundHeaders("*") List headers)
+    public List<?> processHeadersListAll(@InboundHeaders("*") List<?> headers)
     {
         return headers;
     }
 
-    public List processSingleHeaderList(@InboundHeaders("foo") List headers)
+    public List<?> processSingleHeaderList(@InboundHeaders("foo") List<?> headers)
     {
         return headers;
     }
 
-    public List processHeadersListOptional(@InboundHeaders("foo, bar, baz?") List headers)
+    public List<?> processHeadersListOptional(@InboundHeaders("foo, bar, baz?") List<?> headers)
     {
         return headers;
     }
 
-    public List processHeadersListAllOptional(@InboundHeaders("foo?, bar?") List headers)
+    public List<?> processHeadersListAllOptional(@InboundHeaders("foo?, bar?") List<?> headers)
     {
         return headers;
     }
 
-    public List processUnmodifiableHeadersList(@InboundHeaders("foo, bar") List headers)
+    public List<?> processUnmodifiableHeadersList(@InboundHeaders("foo, bar") List<Object> headers)
     {
         //Should throw UnsupportedOperationException
         headers.add("carValue");
         return headers;
     }
 
-    public List processHeadersListWildcard(@InboundHeaders("MULE_*") List headers)
+    public List<?> processHeadersListWildcard(@InboundHeaders("MULE_*") List<?> headers)
     {
         return headers;
     }
 
-    public List processHeadersListMultiWildcard(@InboundHeaders("MULE_*, ba*") List headers)
+    public List<?> processHeadersListMultiWildcard(@InboundHeaders("MULE_*, ba*") List<?> headers)
     {
         return headers;
     }
@@ -138,5 +138,4 @@ public class InboundHeadersAnnotationComponent
     {
         return headers;
     }
-
 }

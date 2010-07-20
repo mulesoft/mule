@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
 public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 {
     private Map<String, Object> props;
@@ -40,16 +37,17 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         return "inbound-headers-annotation.xml";
     }
 
-    @Before
-    public void doSetUp()
+    @Override
+    public void doSetUp() throws Exception
     {
+        super.doSetUp();
+        
         props = new HashMap<String, Object>(3);
         props.put("foo", "fooValue");
         props.put("bar", "barValue");
         props.put("baz", "bazValue");
     }
 
-    @Test
     public void testSingleHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -58,7 +56,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
-    @Test
     public void testSingleHeaderOptional() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -68,7 +65,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
     }
 
 
-    @Test
     public void testSingleHeaderWithType() throws Exception
     {
         Apple apple = new Apple();
@@ -80,7 +76,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(apple, message.getPayload());
     }
 
-    @Test
     public void testSingleHeaderWithBaseType() throws Exception
     {
         Apple apple = new Apple();
@@ -92,21 +87,19 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(apple, message.getPayload());
     }
 
-    @Test
     public void testMapHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headers", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(2, result.size());
         assertEquals("fooValue", result.get("foo"));
         assertEquals("barValue", result.get("bar"));
         assertNull(result.get("baz"));
     }
 
-    @Test
     public void testMapHeadersMissing() throws Exception
     {
         props.remove("foo");
@@ -117,21 +110,19 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
-    @Test
     public void testMapSingleHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://singleHeaderMap", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(1, result.size());
         assertEquals("fooValue", result.get("foo"));
         assertNull(result.get("bar"));
         assertNull(result.get("baz"));
     }
 
-    @Test
     public void testMapHeadersOptional() throws Exception
     {
         props.remove("baz");
@@ -140,14 +131,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(2, result.size());
         assertEquals("fooValue", result.get("foo"));
         assertEquals("barValue", result.get("bar"));
         assertNull(result.get("baz"));
     }
 
-    @Test
     public void testMapHeadersAllOptional() throws Exception
     {
         props.clear();
@@ -156,12 +146,11 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersAllOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //We just wan tot make sure we don't return null collections
         assertEquals(0, result.size());
     }
 
-    @Test
     public void testMapHeadersUnmodifiable() throws Exception
     {
 
@@ -172,14 +161,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
-    @Test
     public void testMapHeadersAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersAll", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will include all Mule headers too
         assertTrue(result.size() >= 3);
         assertEquals("fooValue", result.get("foo"));
@@ -187,14 +175,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("bazValue", result.get("baz"));
     }
 
-    @Test
     public void testMapHeadersWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match all Mule headers
         assertEquals(3, result.size());
         assertEquals(result.get(MuleProperties.MULE_ENCODING_PROPERTY), "UTF-8");
@@ -202,14 +189,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
 
-    @Test
     public void testMapHeadersMultiWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersMultiWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match all Mule headers
         assertEquals(5, result.size());
 
@@ -224,7 +210,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 
     }
 
-    @Test
     public void testMapHeadersWithGenerics() throws Exception
     {
         props.put("apple", new Apple());
@@ -235,7 +220,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersWithGenerics", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match all Mule headers
         assertEquals(2, result.size());
 
@@ -244,23 +229,19 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("banana"));
     }
 
-
-
-    @Test
     public void testListHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersList", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(3, result.size());
         assertTrue(result.contains("fooValue"));
         assertTrue(result.contains("barValue"));
         assertTrue(result.contains("bazValue"));
     }
 
-    @Test
     public void testListHeadersWithOptional() throws Exception
     {
         props.remove("baz");
@@ -268,13 +249,12 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersListOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(2, result.size());
         assertTrue(result.contains("fooValue"));
         assertTrue(result.contains("barValue"));
     }
 
-    @Test
     public void testListHeadersWithMissing() throws Exception
     {
         props.remove("bar");
@@ -285,19 +265,17 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
-    @Test
     public void testSingleListHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://singleHeaderList", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         assertEquals(1, result.size());
         assertTrue(result.contains("fooValue"));
     }
 
-    @Test
     public void testListHeadersUnmodifiable() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -307,14 +285,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
-    @Test
     public void testListHeadersAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersListAll", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will include all Mule headers too
         assertTrue(result.size() >= 3);
         assertTrue(result.contains("fooValue"));
@@ -322,7 +299,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
-    @Test
     public void testMapHeadersListAllOptional() throws Exception
     {
         props.clear();
@@ -331,19 +307,18 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersListAllOptional", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //We just want ot make sure we don't return null collections
         assertEquals(0, result.size());
     }
 
-    @Test
     public void testListHeadersWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersListWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will match all Mule headers
         assertEquals(3, result.size());
         //MULE_ENCODING
@@ -353,14 +328,13 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         //The last value is the encoded session
     }
 
-    @Test
     public void testListHeadersMultiWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://headersListMultiWildcard", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will match on MULE_* and ba*
         assertEquals(5, result.size());
 
@@ -379,7 +353,6 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
-    @Test
     public void testListHeadersWithGenerics() throws Exception
     {
         Apple apple = new Apple();
@@ -393,7 +366,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://headersListWithGenerics", null, props);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
-        List result = (List) message.getPayload();
+        List<?> result = (List<?>) message.getPayload();
         //Will match all Mule headers
         assertEquals(2, result.size());
 
