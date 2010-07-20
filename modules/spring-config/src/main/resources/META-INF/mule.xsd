@@ -422,13 +422,6 @@
                 </xsd:annotation>
             </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false">
-            <xsd:annotation>
-                <xsd:documentation>
-                    If true, all requests to endpoints will wait for a response.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="defaultResponseTimeout" type="xsd:string" default="10000">
             <xsd:annotation>
                 <xsd:documentation>
