@@ -7,27 +7,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.expression;
+package org.mule.module.scripting.config;
 
-import org.mule.api.annotations.expressions.Groovy;
+import org.mule.api.annotations.expression.Groovy;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
 import java.lang.annotation.Annotation;
 
 
-public class GroovyAnnotationParser implements ExpressionParser
+public class GroovyAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Groovy) annotation).value(),
+            return new ExpressionArgument(null, new ExpressionConfig(((Groovy) annotation).value(),
                     evaluator.value(), null), ((Groovy) annotation).required(), parameterType);
-            return arg;
         }
         else
         {
