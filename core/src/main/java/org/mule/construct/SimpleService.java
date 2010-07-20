@@ -54,7 +54,8 @@ public class SimpleService extends AbstractFlowConstruct
     protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        // TODO add builder.chain(statisticsInterceptingMessageProcess)
+        // TODO (DDO) add builder.chain(statisticsInterceptingMessageProcess)
+        // TODO (DDO) autowire REST/WS annotated components
         builder.chain(component);
     }
 
@@ -63,8 +64,10 @@ public class SimpleService extends AbstractFlowConstruct
     {
         super.validateConstruct();
 
-        // TODO Ensure messageSource is a single InboundEndpoint (not composite)?
-        // TODO Ensure InboundEndpoint messageSource has supported Exchange Pattern
+        // TODO (DDO) Ensure messageSource is a single InboundEndpoint (not
+        // composite)?
+        // TODO (DDO) Ensure InboundEndpoint messageSource has supported Exchange
+        // Pattern
     }
 
     public Component getComponent()

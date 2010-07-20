@@ -27,8 +27,6 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
         return SimpleServiceFactoryBean.class;
     }
 
-    // TODO support child elements: abstract-component, abstract-exception-strategy
-
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {

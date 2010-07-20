@@ -10,24 +10,54 @@
 
 package org.mule.config.spring.factories;
 
+import java.beans.ExceptionListener;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.AbstractFlowConstruct;
+import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.service.DefaultServiceExceptionStrategy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public abstract class AbstractFlowConstructFactoryBean
-    implements FactoryBean, ApplicationContextAware, MuleContextAware, Initialisable
+    implements FactoryBean, InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
 {
+    private static final NullFlowConstruct NULL_FLOW_CONSTRUCT = new NullFlowConstruct("noop", null);
+
+    /*
+     * Shameful hack, read FIXME below
+     */
+    private static final class NullFlowConstruct extends AbstractFlowConstruct
+    {
+        public NullFlowConstruct(String name, MuleContext muleContext)
+        {
+            super(name, muleContext);
+        }
+
+        @Override
+        protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+        {
+            // NOOP
+        }
+    }
+
     protected ApplicationContext applicationContext;
     protected MuleContext muleContext;
     protected String name;
-    protected AbstractFlowConstruct flowConstruct;
+
+    // FIXME (DDO) terrible hack to get around the first call to getObject that
+    // comes too soon (nothing is injected yet)
+    protected AbstractFlowConstruct flowConstruct = NULL_FLOW_CONSTRUCT;
+
+    // TODO (DDO) should this be looked-up in registry?
+    protected ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();
 
     public boolean isSingleton()
     {
@@ -49,17 +79,18 @@ public abstract class AbstractFlowConstructFactoryBean
         this.name = name;
     }
 
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
+    }
+
+    public void afterPropertiesSet() throws Exception
+    {
+        flowConstruct = createFlowConstruct();
+    }
+
     public void initialise() throws InitialisationException
     {
-        try
-        {
-            flowConstruct = createFlowConstruct();
-        }
-        catch (MuleException me)
-        {
-            throw new InitialisationException(me, this);
-        }
-
         flowConstruct.initialise();
     }
 

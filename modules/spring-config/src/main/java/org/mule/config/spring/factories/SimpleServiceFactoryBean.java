@@ -26,14 +26,19 @@ import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 
+//TODO (DDO) move most of this code to a SimpleServiceBuilder class in core and extend it here
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
+    // TODO (DDO) should this come from somewhere else?
+    private static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
+
     private EndpointBuilder endpointBuilder;
     private String address;
     private List<Transformer> transformers;
     private List<Transformer> responseTransformers;
     private String componentClass;
     private String componentBeanName;
+    private Component component;
 
     public Class<?> getObjectType()
     {
@@ -43,7 +48,15 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     @Override
     protected AbstractFlowConstruct createFlowConstruct() throws MuleException
     {
-        return new SimpleService(muleContext, name, buildInboundEndpoint(), buildComponent());
+        SimpleService simpleService = new SimpleService(muleContext, name, buildInboundEndpoint(),
+            getOrBuildComponent());
+
+        if (exceptionListener != null)
+        {
+            simpleService.setExceptionListener(exceptionListener);
+        }
+
+        return simpleService;
     }
 
     public void setEndpoint(EndpointBuilder endpointBuilder)
@@ -76,6 +89,11 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         this.componentBeanName = componentBeanName;
     }
 
+    public void setComponent(Component component)
+    {
+        this.component = component;
+    }
+
     private InboundEndpoint buildInboundEndpoint() throws MuleException
     {
         if (endpointBuilder == null)
@@ -89,11 +107,19 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         return endpointBuilder.buildInboundEndpoint();
     }
 
-    private Component buildComponent()
+    private Component getOrBuildComponent()
     {
-        ObjectFactory objectFactory = getComponentObjectFactory();
-        DefaultJavaComponent component = new DefaultJavaComponent(objectFactory);
-        component.setEntryPointResolverSet(new LegacyEntryPointResolverSet());
+        if (component == null)
+        {
+            ObjectFactory objectFactory = getComponentObjectFactory();
+            component = new DefaultJavaComponent(objectFactory);
+        }
+
+        if (component instanceof DefaultJavaComponent)
+        {
+            ((DefaultJavaComponent) component).setEntryPointResolverSet(DEFAULT_ENTRY_POINT_RESOLVER_SET);
+        }
+
         return component;
     }
 
