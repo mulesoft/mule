@@ -18,22 +18,23 @@ import org.mule.api.expression.ExpressionParser;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.AnnotationsParserFactory;
+import org.mule.config.expression.BeanAnnotationParser;
+import org.mule.config.expression.CustomEvaluatorAnnotationParser;
 import org.mule.config.expression.ExpressionFilterAnnotationParser;
 import org.mule.config.expression.FunctionAnnotationParser;
 import org.mule.config.expression.GroovyAnnotationParser;
 import org.mule.config.expression.MuleAnnotationParser;
 import org.mule.config.expression.OgnlAnnotationParser;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.processors.AnnotatedServiceObjectProcessor;
-import org.mule.config.processors.InjectAnnotationProcessor;
-import org.mule.config.processors.DirectBindAnnotationProcessor;
-import org.mule.config.processors.NamedAnnotationProcessor;
-import org.mule.config.routing.SplitterRouterParser;
-import org.mule.config.routing.IdempotentRouterParser;
-import org.mule.config.routing.WireTapRouterParser;
-import org.mule.config.expression.BeanAnnotationParser;
-import org.mule.config.expression.CustomEvaluatorAnnotationParser;
 import org.mule.config.expression.XPathAnnotationParser;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.parsers.InboundHeadersAnnotationParser;
+import org.mule.config.processors.AnnotatedServiceObjectProcessor;
+import org.mule.config.processors.DirectBindAnnotationProcessor;
+import org.mule.config.processors.InjectAnnotationProcessor;
+import org.mule.config.processors.NamedAnnotationProcessor;
+import org.mule.config.routing.IdempotentRouterParser;
+import org.mule.config.routing.SplitterRouterParser;
+import org.mule.config.routing.WireTapRouterParser;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -83,6 +84,7 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
 
         //Expression parsers
         registerExpressionParser(new MuleAnnotationParser());
+        registerExpressionParser(new InboundHeadersAnnotationParser());
         registerExpressionParser(new CustomEvaluatorAnnotationParser());
         registerExpressionParser(new FunctionAnnotationParser());
         registerExpressionParser(new XPathAnnotationParser());
@@ -99,7 +101,6 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
         registerObjectProcessor(new InjectAnnotationProcessor());//Add support for JSR-330
         registerObjectProcessor(new NamedAnnotationProcessor());//Add support for JSR-330
     }
-
 
     public EndpointAnnotationParser getEndpointParser(Annotation annotation, Class aClass, Member member)
     {
@@ -193,5 +194,4 @@ public class DefaultAnnotationsParserFactory implements AnnotationsParserFactory
             throw new MuleRuntimeException(CoreMessages.failedToCreate(processor.getClass().getName()), e);
         }
     }
-
 }
