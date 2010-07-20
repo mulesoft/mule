@@ -11,7 +11,6 @@
 package org.mule.transport.servlet.jetty.functional;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -36,8 +35,8 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
-        assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND));
-        assertEquals("text/baz;charset=UTF-16BE", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND).toString());
+        assertEquals("200", reply.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals("text/baz;charset=UTF-16BE", reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
         assertEquals("UTF-16BE", reply.getEncoding());
         assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
     }
@@ -52,8 +51,8 @@ public class JettyHttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
         MuleMessage reply = client.send("clientEndpoint2", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
-        assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND));
-        assertEquals("text/plain;charset=UTF-8", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND).toString());
+        assertEquals("200", reply.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals("text/plain;charset=UTF-8", reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
         assertEquals("UTF-8", reply.getEncoding());
     }
 

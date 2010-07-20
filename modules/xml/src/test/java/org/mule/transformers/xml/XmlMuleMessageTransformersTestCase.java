@@ -47,9 +47,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         msg = (MuleMessage) result;
 
         assertEquals("test", msg.getPayloadAsString());
-        assertEquals(new Apple(), msg.getProperty("object", PropertyScope.OUTBOUND));
+        assertEquals(new Apple(), msg.getOutboundProperty("object"));
         //with different case
-        assertEquals(new Apple(), msg.getProperty("oBjeCt", PropertyScope.OUTBOUND));
+        assertEquals(new Apple(), msg.getOutboundProperty("oBjeCt"));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("oBjeCt"));
         assertNull(msg.getInvocationProperty("oBjeCt"));
@@ -60,15 +60,15 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertEquals("hello", msg.getOutboundProperty("String"));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("string"));
-        assertNull(msg.getProperty("string", PropertyScope.INVOCATION));
+        assertNull(msg.getInvocationProperty("string"));
         assertNull(msg.getProperty("string", PropertyScope.SESSION));
 
-        assertEquals(new Integer(1), msg.getProperty("number", PropertyScope.INVOCATION));
+        assertEquals(1, msg.getInvocationProperty("number"));
         //with different case
-        assertEquals(new Integer(1), msg.getProperty("NUMBER", PropertyScope.INVOCATION));
+        assertEquals(1, msg.getInvocationProperty("NUMBER"));
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("number"));
-        assertNull(msg.getProperty("number", PropertyScope.OUTBOUND));
+        assertNull(msg.getOutboundProperty("number"));
         assertNull(msg.getProperty("number", PropertyScope.SESSION));
 
         assertEquals("1234", msg.getCorrelationId());

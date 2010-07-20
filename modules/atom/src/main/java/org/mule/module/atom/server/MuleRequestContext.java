@@ -117,9 +117,9 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
             case AUTHTYPE:
                 return null; // TODO
             case CONTENTLENGTH:
-                return request.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, PropertyScope.OUTBOUND);
+                return request.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH);
             case CONTENTTYPE:
-                return request.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+                return request.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
             case CONTEXTPATH:
                 return ""; // TODO
             case LOCALADDR:

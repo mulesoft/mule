@@ -10,11 +10,6 @@
 
 package org.mule.client;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-import static org.mockito.Mockito.verify;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
@@ -23,7 +18,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -31,6 +25,11 @@ import java.util.Map;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.verify;
 
 public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
 {
@@ -70,9 +69,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         verify(outboundEndpoint).process((MuleEvent) argument.capture());
 
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
-        assertSame(message.getProperty(PROP_KEY_1, PropertyScope.OUTBOUND), argument.getValue()
-            .getMessage()
-            .getProperty(PROP_KEY_1, PropertyScope.OUTBOUND));
+        assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
+                .getMessage().getOutboundProperty(PROP_KEY_1));
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
 
         assertSame(responseEvent.getMessage(), response);
@@ -108,9 +106,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         verify(outboundEndpoint).process((MuleEvent) argument.capture());
 
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
-        assertSame(message.getProperty(PROP_KEY_1, PropertyScope.OUTBOUND), argument.getValue()
-            .getMessage()
-            .getProperty(PROP_KEY_1, PropertyScope.OUTBOUND));
+        assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
+                .getMessage().getOutboundProperty(PROP_KEY_1));
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
     }
 
@@ -124,9 +121,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         verify(outboundEndpoint).process((MuleEvent) argument.capture());
 
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
-        assertSame(message.getProperty(PROP_KEY_1, PropertyScope.OUTBOUND), argument.getValue()
-            .getMessage()
-            .getProperty(PROP_KEY_1, PropertyScope.OUTBOUND));
+        assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
+                .getMessage().getOutboundProperty(PROP_KEY_1));
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
 
         assertSame(responseEvent.getMessage(), response);
@@ -157,9 +153,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         verify(outboundEndpoint).process((MuleEvent) argument.capture());
 
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
-        assertSame(message.getProperty(PROP_KEY_1, PropertyScope.OUTBOUND), argument.getValue()
-            .getMessage()
-            .getProperty(PROP_KEY_1, PropertyScope.OUTBOUND));
+        assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
+                .getMessage().getOutboundProperty(PROP_KEY_1));
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
 
         assertSame(responseEvent.getMessage(), response);
@@ -209,9 +204,8 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         verify(outboundEndpoint).process((MuleEvent) argument.capture());
 
         assertSame(message.getPayload(), argument.getValue().getMessage().getPayload());
-        assertSame(message.getProperty(PROP_KEY_1, PropertyScope.OUTBOUND), argument.getValue()
-            .getMessage()
-            .getProperty(PROP_KEY_1, PropertyScope.OUTBOUND));
+        assertSame(message.getOutboundProperty(PROP_KEY_1), argument.getValue()
+                .getMessage().getOutboundProperty(PROP_KEY_1));
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
 
         assertSame(responseEvent.getMessage(), response);

@@ -12,7 +12,6 @@ package org.mule.transport.cxf.jaxws;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -44,7 +43,7 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
             {
                 MuleMessage msg = context.getMessage();
                 assertEquals("BAR", msg.getInboundProperty("FOO"));
-                assertNull(msg.getProperty("clientClass", PropertyScope.INVOCATION));
+                assertNull(msg.getInvocationProperty("clientClass"));
             }
         };
         testComponent.setEventCallback(callback);

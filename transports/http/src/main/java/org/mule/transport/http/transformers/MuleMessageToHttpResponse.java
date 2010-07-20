@@ -169,7 +169,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
     {
         HttpResponse response = new HttpResponse();
 
-        Object tmp = msg.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
+        Object tmp = msg.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
         int status = HttpConstants.SC_OK;
 
         if (tmp != null)
@@ -218,8 +218,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
-        
-        String etag = (String) msg.getProperty(HttpConstants.HEADER_ETAG, PropertyScope.OUTBOUND);
+
+        String etag = msg.getOutboundProperty(HttpConstants.HEADER_ETAG);
         if (etag != null)
         {
             response.setHeader(new Header(HttpConstants.HEADER_ETAG, etag));
@@ -261,7 +261,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         //attach the outbound properties to the message
         for (String headerName : msg.getPropertyNames(PropertyScope.OUTBOUND))
         {
-            Object v = msg.getProperty(headerName, PropertyScope.OUTBOUND);
+            Object v = msg.getOutboundProperty(headerName);
             if (v != null)
             {
                 response.setHeader(new Header(headerName, v.toString()));

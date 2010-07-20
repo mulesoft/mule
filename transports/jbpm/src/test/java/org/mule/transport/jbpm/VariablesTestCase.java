@@ -11,7 +11,6 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 
 import java.util.Date;
@@ -44,8 +43,8 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 
             response = client.request("vm://queueA", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getProperty("foo", PropertyScope.OUTBOUND));
-            assertEquals(0.75, response.getProperty("fraction", PropertyScope.OUTBOUND));
+            assertEquals("bar", response.getOutboundProperty("foo"));
+            assertEquals(0.75, response.getOutboundProperty("fraction"));
 
             // Advance the process
             props = new HashMap<String, Object>();
@@ -55,10 +54,10 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 
             response = client.request("vm://queueB", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getProperty("foo", PropertyScope.OUTBOUND));
-            assertEquals(0.75, response.getProperty("fraction", PropertyScope.OUTBOUND));
-            assertEquals("berry", response.getProperty("straw",  PropertyScope.OUTBOUND));
-            assertTrue(response.getProperty("time", PropertyScope.OUTBOUND) instanceof Date);
+            assertEquals("bar", response.getOutboundProperty("foo"));
+            assertEquals(0.75, response.getOutboundProperty("fraction"));
+            assertEquals("berry", response.getOutboundProperty("straw"));
+            assertTrue(response.getOutboundProperty("time") instanceof Date);
         }
         finally
         {

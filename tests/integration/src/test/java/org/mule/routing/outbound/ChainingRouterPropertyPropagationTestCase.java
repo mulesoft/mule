@@ -13,7 +13,6 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -72,7 +71,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         assertTrue("Second callback never fired", hop2made.get());
         assertEquals("Hop1 ACK Hop2 ACK", reply.getPayload());
         assertEquals("hop1", reply.getOutboundProperty("TICKET"));
-        assertEquals("10000", reply.getProperty("TTL", PropertyScope.OUTBOUND));
+        assertEquals("10000", reply.getOutboundProperty("TTL"));
     }
 
 }

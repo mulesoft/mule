@@ -46,7 +46,7 @@ public final class PropertyScope implements Serializable
 
     /**
      * Defines the scope for any properties set on the session. Mule utilises the underlying transport for controlling the
-     * session where possible i.e. HttpSession. But Mule will fallback to an internal session mechanisim where a session is
+     * session where possible i.e. HttpSession. But Mule will fallback to an internal session mechanism where a session is
      * encoded on the message with an expiry time associated with it.
      */
     public static final PropertyScope SESSION = new PropertyScope(SESSION_NAME, 3);

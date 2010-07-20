@@ -76,7 +76,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         }
         for (String key : msg.getPropertyNames(PropertyScope.OUTBOUND))
         {
-            jobDataMap.put(key, msg.getProperty(key, PropertyScope.OUTBOUND));
+            jobDataMap.put(key, msg.getOutboundProperty(key));
         }
 
         if (jobConfig instanceof ScheduledDispatchJobConfig) 

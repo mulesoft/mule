@@ -18,8 +18,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.tcp.TcpConnector;
 
@@ -365,11 +363,11 @@ public class HttpConnector extends TcpConnector
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
         }
         //TODO MULE-4501 this sohuld be removed and handled only in the ObjectToHttpRequest transformer
-        else if (event!=null && event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND)!=null &&
+        else if (event!=null && event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION) != null &&
                 httpMethod.getRequestHeader(HttpConstants.HEADER_AUTHORIZATION)==null)
         {
             httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION,
-                    event.getMessage().getProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.OUTBOUND).toString());
+                                        event.getMessage().getOutboundProperty(HttpConstants.HEADER_AUTHORIZATION).toString());
         }
         else
         {

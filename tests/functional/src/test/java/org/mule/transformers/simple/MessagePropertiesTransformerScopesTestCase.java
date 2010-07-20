@@ -38,8 +38,8 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTest
 
         msg = (DefaultMuleMessage) add.transform(msg, null);
 
-        assertEquals("bar", msg.getProperty("foo", PropertyScope.INVOCATION));
-        assertNull(msg.getProperty("foo", PropertyScope.OUTBOUND));
+        assertEquals("bar", msg.getInvocationProperty("foo"));
+        assertNull(msg.getOutboundProperty("foo"));
         assertNull(msg.getProperty("foo", PropertyScope.SESSION));
 
         // Remove property from the wrong scope
@@ -50,7 +50,7 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTest
         deleteWrongScope.setMuleContext(muleContext);
 
         msg = (DefaultMuleMessage) deleteWrongScope.transform(msg, null);
-        assertEquals("bar", msg.getProperty("foo", PropertyScope.INVOCATION));
+        assertEquals("bar", msg.getInvocationProperty("foo"));
 
         // Remove property from the correct scope
         
@@ -60,7 +60,7 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTest
         delete.setMuleContext(muleContext);
 
         msg = (DefaultMuleMessage) delete.transform(msg, null);
-        assertNull(msg.getProperty("foo", PropertyScope.INVOCATION));
-        assertEquals("baz", msg.getProperty("foo2", PropertyScope.INVOCATION));
+        assertNull(msg.getInvocationProperty("foo"));
+        assertEquals("baz", msg.getInvocationProperty("foo2"));
     }
 }

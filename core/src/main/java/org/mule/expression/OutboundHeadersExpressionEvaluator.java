@@ -92,7 +92,7 @@ public class OutboundHeadersExpressionEvaluator implements ExpressionEvaluator
 
         public Object get(Object key)
         {
-            return message.getProperty(key.toString(), PropertyScope.OUTBOUND);
+            return message.getOutboundProperty(key.toString());
         }
 
         public Object put(String key, Object value)

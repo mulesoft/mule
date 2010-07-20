@@ -298,8 +298,8 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         {
             result = new DefaultMuleMessage(response, transportResponse, connector.getMuleContext());
         }
-        
-        String statusCode = (String) transportResponse.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND);
+
+        String statusCode = transportResponse.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
         if (statusCode != null && Integer.parseInt(statusCode) != HttpConstants.SC_OK)
         {
             String payload;

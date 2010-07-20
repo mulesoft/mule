@@ -51,7 +51,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         // property values will be different
         assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames());
 
-        assertEquals("overwrittenValue", transformed.getProperty("addedProperty", PropertyScope.OUTBOUND));
+        assertEquals("overwrittenValue", transformed.getOutboundProperty("addedProperty"));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("originalValue", transformed.getProperty("addedProperty", PropertyScope.INVOCATION));
+        assertEquals("originalValue", transformed.getInvocationProperty("addedProperty"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("Bar", transformed.getProperty("Foo", PropertyScope.OUTBOUND));
+        assertEquals("Bar", transformed.getOutboundProperty("Foo"));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
 
-        assertEquals("Bar", transformed.getProperty("Baz", PropertyScope.INVOCATION));
+        assertEquals("Bar", transformed.getInvocationProperty("Baz"));
     }
 
     @Test

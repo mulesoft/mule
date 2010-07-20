@@ -298,7 +298,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         if (!(msg.getPayload() instanceof NullPayload))
         {
             // See if we have a MIME type set
-            String mimeType = (String)msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+            String mimeType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
 
             // Ensure that we have a cached representation of the message if we're using HTTP 1.0
             String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);

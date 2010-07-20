@@ -13,7 +13,6 @@ package org.mule.endpoint.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.PropertyScope;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 import java.util.List;
@@ -46,8 +45,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractIntercep
             List<String> responseProperties = endpoint.getResponseProperties();
             for (String propertyName : responseProperties)
             {
-                // TODO this piece of code looks moot now, may need to go
-                Object propertyValue = event.getMessage().getProperty(propertyName, PropertyScope.OUTBOUND);
+                Object propertyValue = event.getMessage().getOutboundProperty(propertyName);
                 if (propertyValue != null)
                 {
                     responseEvent.getMessage().setOutboundProperty(propertyName, propertyValue);

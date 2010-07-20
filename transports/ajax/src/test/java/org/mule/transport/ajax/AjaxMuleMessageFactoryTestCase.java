@@ -12,7 +12,6 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.api.transport.PropertyScope;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -61,7 +60,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertNotNull(message);
         assertEquals(JSON_STRING, message.getPayload());
         assertEquals("/reply", message.getReplyTo());
-        assertEquals("mp-value", message.getProperty("message-property", PropertyScope.INVOCATION));
+        assertEquals("mp-value", message.getInvocationProperty("message-property"));
     }
     
     public void testMapPayloadWithoutData() throws Exception

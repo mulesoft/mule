@@ -27,6 +27,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This object maintains a scoped map of properties.  This means that certain properties will only be visible under some
  * scopes. The scopes supported by Mule are:
@@ -50,6 +53,8 @@ public class MessagePropertiesContext implements Serializable
      * The order that properties should be read in.
      */
     private final static List<PropertyScope> SCOPE_ORDER = new ArrayList<PropertyScope>();
+
+    private Log logger = LogFactory.getLog(getClass());
 
     static
     {
@@ -308,6 +313,12 @@ public class MessagePropertiesContext implements Serializable
             if (RequestContext.getEvent() != null)
             {
                 RequestContext.getEvent().getSession().setProperty(key, value);
+            }
+            else
+            {
+                logger.warn(String.format("Detected an attempt to set a session property, " +
+                                          "but MuleEvent isn't available in this thread. Key/value: %s=%s",
+                                          key, value));
             }
         }
         else

@@ -20,7 +20,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transformer.TransformerChain;
@@ -252,7 +251,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
     {
-        Object o = msg.getProperty(prop, PropertyScope.OUTBOUND);
+        Object o = msg.getOutboundProperty(prop);
         if (o == null)
         {
             o = event.getEndpoint().getProperty(prop);
@@ -380,7 +379,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Http response is: " + message.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.OUTBOUND));
+            logger.debug("Http response is: " + message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         }
 
         message.setExceptionPayload(ep);
@@ -392,7 +391,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
         if (disableCheck == null)
         {
-            disableCheck = (String) event.getMessage().getProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, PropertyScope.OUTBOUND); 
+            disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK); 
         }
         return httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START
                 && !BooleanUtils.toBoolean(disableCheck);

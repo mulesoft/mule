@@ -22,7 +22,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.api.transport.PropertyScope;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
@@ -141,8 +140,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
     {
         if (result != null && replyToHandler != null)
         {
-            // TODO event.getProperty() is confusing, rework it - takes PropertyScope as a default value, not scope 
-            String requestor = (String) result.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, PropertyScope.OUTBOUND);
+            String requestor = result.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
             if ((requestor != null && !requestor.equals(service.getName())) || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);

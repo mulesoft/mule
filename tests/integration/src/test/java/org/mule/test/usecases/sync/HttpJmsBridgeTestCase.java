@@ -11,7 +11,6 @@
 package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -40,6 +39,6 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
         MuleMessage msg = client.request("vm://out", 10000);
         assertNotNull(msg);
         assertEquals(payload, msg.getPayloadAsString());
-        assertEquals("value", msg.getProperty(customHeader, PropertyScope.OUTBOUND));
+        assertEquals("value", msg.getOutboundProperty(customHeader));
     }
 }
