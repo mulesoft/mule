@@ -15,8 +15,6 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.Map;
 
-import org.junit.Test;
-
 public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
 {
     public OutboundHeadersAnnotationTestCase()
@@ -30,31 +28,27 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         return "outbound-headers-annotation.xml";
     }
 
-
-    @Test
     public void testProcessHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://header", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals("barValue", result.get("bar"));
     }
 
-    @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://header2", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map result = (Map) message.getPayload();
+        Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals("barValue", result.get("bar"));
         assertEquals("fooValue", result.get("foo"));
     }
 
-    @Test
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

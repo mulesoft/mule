@@ -9,7 +9,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <model name="main">
-
         <service name="payload1">
             <inbound>
                 <inbound-endpoint address="vm://payload1?method=processNoTransformString" exchange-pattern="request-response"/>
@@ -30,7 +29,5 @@
             </inbound>
             <component class="org.mule.api.annotations.param.PayloadAnnotationComponent"/>
         </service>
-
     </model>
-
 </mule>

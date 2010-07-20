@@ -17,13 +17,13 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
@@ -80,7 +80,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
     public void testNonMuleAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
-        MuleEventContext event = getTestEventContext(new HashMap());
+        MuleEventContext event = getTestEventContext(new HashMap<Object, Object>());
         event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "nonExpressionAnnotation", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(new AnnotatedComponent2(), event);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
@@ -101,7 +101,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
     }
 
-    private class DummyMethodCallback implements MethodInterceptor
+    static class DummyMethodCallback implements MethodInterceptor
     {
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable
         {
@@ -113,20 +113,4 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
             return r;
         }
     }
-    
-    private class DummyComponentProxyHandler implements InvocationHandler
-    {
-        private Object component;
-
-        private DummyComponentProxyHandler(Object component)
-        {
-            this.component = component;
-        }
-
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            return method.invoke(component, args);
-        }
-    }
 }
-

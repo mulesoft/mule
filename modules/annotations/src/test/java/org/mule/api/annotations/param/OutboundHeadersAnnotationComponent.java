@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class OutboundHeadersAnnotationComponent
 {
-    public Map processHeaders(@OutboundHeaders Map<String, Object> headers)
+    public Map<String, Object> processHeaders(@OutboundHeaders Map<String, Object> headers)
     {
         headers.put("bar", "barValue");
         //Verify that we receive any outbound headers already set on the message
@@ -30,9 +30,8 @@ public class OutboundHeadersAnnotationComponent
     }
 
     //Can only use the {@link OutboundHeaders} annotation on Map parameters
-    public List invalidParamType(@OutboundHeaders List headers)
+    public List<?> invalidParamType(@OutboundHeaders List<?> headers)
     {
         return headers;
     }
-
 }

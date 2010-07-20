@@ -9,7 +9,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <model name="main">
-
         <service name="headers1">
             <inbound>
                 <inbound-endpoint address="vm://header?method=processHeaders" exchange-pattern="request-response"/>
@@ -34,7 +33,5 @@
             </inbound>
             <component class="org.mule.api.annotations.param.OutboundHeadersAnnotationComponent"/>
         </service>
-
     </model>
-
 </mule>
