@@ -57,7 +57,8 @@ public class VariablesTestCase extends AbstractJbpmTestCase
             assertEquals("bar", response.getOutboundProperty("foo"));
             assertEquals(0.75, response.getOutboundProperty("fraction"));
             assertEquals("berry", response.getOutboundProperty("straw"));
-            assertTrue(response.getOutboundProperty("time") instanceof Date);
+            final Object o = response.getOutboundProperty("time");
+            assertTrue(o instanceof Date);
         }
         finally
         {
