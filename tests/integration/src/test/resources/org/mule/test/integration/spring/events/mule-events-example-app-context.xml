@@ -23,14 +23,10 @@
         <spring:property name="subscriptions">
             <spring:list>
                 <spring:value>jms://orders.queue</spring:value>
-                <!--            <spring:value>pop3://user:password@mail.myrestaurant.com?transformers=EmailMessageToString,StringToOrder</spring:value>-->
                 <spring:value>axis:http://localhost:44444/mule/orderManager</spring:value>
             </spring:list>
         </spring:property>
     </spring:bean>
-
-
-    <!--    <spring:bean id="EmailMessageToString" class="org.mule.transport.email.transformers.EmailMessageToString"/>-->
 
     <spring:bean id="StringToOrder"
         class="org.mule.test.integration.spring.events.StringToOrder">

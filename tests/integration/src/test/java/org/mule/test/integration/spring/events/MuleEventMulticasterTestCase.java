@@ -18,20 +18,17 @@ import org.mule.tck.functional.EventCallback;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
- * example config in the documentation. This test is not run when building this
- * module as it relies on JMS; it's used to verify that the example config works.
- */
-public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
+public class MuleEventMulticasterTestCase extends FunctionalTestCase
 {
-    private final AtomicInteger eventCount = new AtomicInteger(0);
+    final AtomicInteger eventCount = new AtomicInteger(0);
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
         eventCount.set(0);
@@ -86,5 +83,4 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", (result.getPayload()));
     }
-
 }
