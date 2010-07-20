@@ -11,8 +11,8 @@ package org.mule.api.annotations.routing;
 
 import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
-import org.mule.api.annotations.routing.Router;
-import org.mule.api.annotations.routing.RouterType;
+import org.mule.api.annotations.meta.Router;
+import org.mule.api.annotations.meta.RouterType;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
