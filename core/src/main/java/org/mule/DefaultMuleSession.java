@@ -236,9 +236,10 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
-    public Object getProperty(Object key)
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(Object key)
     {
-        return properties.get(key);
+        return (T) properties.get(key);
     }
 
     /**

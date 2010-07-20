@@ -98,7 +98,7 @@ public interface MuleSession extends Serializable
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
-    Object getProperty(Object key);
+    <T> T getProperty(Object key);
 
     /**
      * Will retrieve a session level property and remove it from the session

@@ -23,9 +23,7 @@ import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Initiates or advances a workflow process from an outgoing Mule event.
@@ -230,10 +228,8 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 
     protected void populateProcessVariables(MuleEvent event, Map processVariables, PropertyScope propertyScope)
     {
-        final Set<String> propNames = event.getMessage().getPropertyNames(propertyScope);
-        for (Iterator iterator = propNames.iterator(); iterator.hasNext();)
+        for (String propertyName : event.getMessage().getPropertyNames(propertyScope))
         {
-            String propertyName = (String) iterator.next();
             // The session property can become rather large and causes problems with DB persistence.
             if (!propertyName.equals(MuleProperties.MULE_SESSION_PROPERTY))
             {

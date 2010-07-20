@@ -252,7 +252,7 @@ public final class StringMessageUtils
                 for (Object name : names)
                 {
                     Object value = m.getProperty(name.toString(), scope);
-                    if(name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
+                    if (name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
                     {
                         value = "****";
                     }

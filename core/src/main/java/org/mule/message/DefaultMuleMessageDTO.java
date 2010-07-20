@@ -51,7 +51,7 @@ public class DefaultMuleMessageDTO extends BaseMessageDTO
     {
         for (String key : message.getPropertyNames(scope))
         {
-            setProperty(scope.getScopeName() + "#" + key, message.getProperty(key, scope));
+            setProperty(String.format("%s#%s", scope.getScopeName(), key), message.getProperty(key, scope));
         }
     }
 

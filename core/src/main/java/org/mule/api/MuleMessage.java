@@ -166,7 +166,10 @@ public interface MuleMessage extends Serializable
      * @param name the name or key of the property. This must be non-null.
      * @param defaultValue a default value if the property doesn't exist in the event. This can be null.
      * @return the property value or the defaultValue if the property does not exist
-     * @deprecated
+     * @deprecated use scope-aware methods instead
+     * @see #getInboundProperty(String)
+     * @see #getOutboundProperty(String)
+     * @see #getInvocationProperty(String) 
      */
     @Deprecated
     Object getProperty(String name, Object defaultValue);
@@ -183,7 +186,7 @@ public interface MuleMessage extends Serializable
      * @see #getOutboundProperty(String)
      * @see #getInvocationProperty(String)
      */
-    Object getProperty(String name, PropertyScope scope);
+    <T> T getProperty(String name, PropertyScope scope);
 
     /**
      * @see #getProperty(String, org.mule.api.transport.PropertyScope, Object)

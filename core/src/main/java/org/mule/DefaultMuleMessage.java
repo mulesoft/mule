@@ -580,10 +580,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public Object getProperty(String name, PropertyScope scope)
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(String name, PropertyScope scope)
     {
         assertAccess(READ);
-        return properties.getProperty(name, scope);
+        return (T) properties.getProperty(name, scope);
     }
 
     public <T> T getInboundProperty(String name, T defaultValue)

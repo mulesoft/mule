@@ -22,13 +22,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mule.expression.ExpressionConstants.*;
+import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  *
  */
 public final class ExpressionUtils
 {
+
     private ExpressionUtils()
     {
         // don't instantiate
@@ -45,7 +48,7 @@ public final class ExpressionUtils
     public static <T> T getPropertyWithScope(String expression, MuleMessage msg, Class<T> type)
     {
         PropertyScope defaultScope = getScope(expression);
-        if(defaultScope!=null)
+        if (defaultScope != null)
         {
             // cut-off leading scope and separator
             expression = expression.substring(defaultScope.getScopeName().length() + 1);
@@ -64,7 +67,7 @@ public final class ExpressionUtils
                 Map<String, Object> props = new HashMap<String, Object>();
                 for (String name : msg.getPropertyNames(defaultScope))
                 {
-                    if(filter.accept(name))
+                    if (filter.accept(name))
                     {
                         props.put(name, msg.getProperty(name, defaultScope));
                     }
@@ -76,7 +79,7 @@ public final class ExpressionUtils
                 List<Object> values = new ArrayList<Object>();
                 for (String name : msg.getPropertyNames(defaultScope))
                 {
-                    if(filter.accept(name))
+                    if (filter.accept(name))
                     {
                         values.add(msg.getProperty(name, defaultScope));
                     }
@@ -98,11 +101,13 @@ public final class ExpressionUtils
                 boolean required = true;
                 name = name.trim();
                 PropertyScope scope = getScope(name);
-                if(scope!=null)
+                if (scope != null)
                 {
                     // cut-off leading scope and separator
                     name = name.substring(scope.getScopeName().length() + 1);
-                } else {
+                }
+                else
+                {
                     scope = defaultScope;
                 }
                 if (name.endsWith(OPTIONAL_ARGUMENT))
@@ -115,7 +120,7 @@ public final class ExpressionUtils
                 {
                     throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers", scope.getScopeName() + ":" + name));
                 }
-                else if(value!=null)
+                else if (value != null)
                 {
                     props.put(name, value);
                 }
@@ -131,11 +136,13 @@ public final class ExpressionUtils
                 boolean required = true;
                 name = name.trim();
                 PropertyScope scope = getScope(name);
-                if(scope!=null)
+                if (scope != null)
                 {
                     // cut-off leading scope and separator
                     name = name.substring(scope.getScopeName().length() + 1);
-                } else {
+                }
+                else
+                {
                     scope = defaultScope;
                 }
                 if (name.endsWith(OPTIONAL_ARGUMENT))
@@ -149,7 +156,7 @@ public final class ExpressionUtils
                 {
                     throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers-list", scope.getScopeName() + ":" + name));
                 }
-                else if(value!=null)
+                else if (value != null)
                 {
                     values.add(value);
                 }
@@ -177,7 +184,7 @@ public final class ExpressionUtils
     private static Map<String, Object> returnMap(Map<String, Object> props, PropertyScope scope)
     {
         Map<String, Object> p = (props.size() == 0 ? Collections.<String, Object>emptyMap() : props);
-        if(scope.equals(PropertyScope.INBOUND))
+        if (scope.equals(PropertyScope.INBOUND))
         {
             p = Collections.unmodifiableMap(p);
         }
@@ -187,7 +194,7 @@ public final class ExpressionUtils
     private static List<Object> returnList(List<Object> values, PropertyScope scope)
     {
         List<Object> l = (values.size() == 0 ? Collections.<Object>emptyList() : values);
-        if(scope.equals(PropertyScope.INBOUND))
+        if (scope.equals(PropertyScope.INBOUND))
         {
             l = Collections.unmodifiableList(l);
         }

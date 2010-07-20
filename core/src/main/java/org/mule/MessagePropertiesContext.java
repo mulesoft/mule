@@ -156,24 +156,25 @@ public class MessagePropertiesContext implements Serializable
         return getProperty(key, PropertyScope.OUTBOUND);
     }
 
-    public Object getProperty(String key, PropertyScope scope)
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(String key, PropertyScope scope)
     {
         if (scope == null)
         {
-            return getProperty(key, PropertyScope.OUTBOUND);
+            return (T) getProperty(key, PropertyScope.OUTBOUND);
         }
 
-        Object value = null;
+        T value = null;
         if (PropertyScope.SESSION.equals(scope))
         {
             if (RequestContext.getEvent() != null)
             {
-                value = RequestContext.getEvent().getSession().getProperty(key);
+                value = (T) RequestContext.getEvent().getSession().getProperty(key);
             }
         }
         else
         {
-            value = scopedMap.get(scope).get(key);
+            value = (T) scopedMap.get(scope).get(key);
         }
         return value;
     }

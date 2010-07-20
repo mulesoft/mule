@@ -419,7 +419,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                         + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
                 }
 
-                Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, scope);
+                Map customHeaders = msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, scope);
                 if (customHeaders != null)
                 {
                     for (Iterator headerItr = customHeaders.entrySet().iterator(); headerItr.hasNext();)

@@ -21,7 +21,6 @@ import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class AxisCleanAndAddProperties
@@ -45,9 +44,8 @@ public class AxisCleanAndAddProperties
 
     protected static void populateProps(Map<String, Object> props, MuleMessage currentMessage, PropertyScope scope)
     {
-        for (Iterator iterator = currentMessage.getPropertyNames(scope).iterator(); iterator.hasNext();)
+        for (String name : currentMessage.getPropertyNames(scope))
         {
-            String name = (String)iterator.next();
             if (!StringUtils.equals(name, AxisConnector.SOAP_METHODS)
                 && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
                 && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
