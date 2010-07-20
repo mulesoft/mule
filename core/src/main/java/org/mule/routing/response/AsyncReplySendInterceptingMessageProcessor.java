@@ -70,7 +70,7 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
     {
         if (result != null && replyToHandler != null)
         {
-            String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+            String requestor = result.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
             if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName())) || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);

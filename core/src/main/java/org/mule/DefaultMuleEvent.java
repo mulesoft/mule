@@ -398,29 +398,27 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * @see org.mule.api.MuleEvent#getProperty(java.lang.String)
-     * @deprecated
+     * @see #getMessage()
+     * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
      */
     @Deprecated
     public Object getProperty(String name)
     {
-        return getProperty(name, /* defaultValue */null);
+        throw new UnsupportedOperationException("Method's behavior has changed in Mule 3, use " +
+                                                "event.getMessage() and suitable scope-aware property access " +
+                                                "methods on it");
     }
 
     /**
-     * @deprecated
+     * @see #getMessage()
+     * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
      */
     @Deprecated
     public Object getProperty(String name, Object defaultValue)
     {
-        Object property = message.getOutboundProperty(name);
-
-        if (property == null)
-        {
-            property = session.getProperty(name);
-        }
-
-        return (property == null ? defaultValue : property);
+        throw new UnsupportedOperationException("Method's behavior has changed in Mule 3, use " +
+                                                "event.getMessage() and suitable scope-aware property access " +
+                                                "methods on it");
     }
 
     public ImmutableEndpoint getEndpoint()
