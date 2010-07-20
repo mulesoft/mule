@@ -302,17 +302,6 @@ public interface MuleMessage extends Serializable
      */
     void setDoubleProperty(String name, double value);
 
-    /**
-     * Gets a String property from the message
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     * @deprecated
-     */
-    @Deprecated
-    String getStringProperty(String name, String defaultValue);
-
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
