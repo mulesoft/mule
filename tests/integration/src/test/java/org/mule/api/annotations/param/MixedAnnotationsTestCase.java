@@ -32,7 +32,7 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "mixed-annotations.xml";
+        return "org/mule/test/annotations/mixed-annotations.xml";
     }
 
     @Override

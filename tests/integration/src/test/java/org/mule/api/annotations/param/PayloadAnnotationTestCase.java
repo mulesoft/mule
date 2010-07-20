@@ -27,7 +27,7 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "payload-annotation.xml";
+        return "org/mule/test/annotations/payload-annotation.xml";
     }
 
     public void testPayloadNoTransform() throws Exception

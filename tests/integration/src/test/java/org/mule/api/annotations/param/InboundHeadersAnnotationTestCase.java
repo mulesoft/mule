@@ -34,7 +34,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "inbound-headers-annotation.xml";
+        return "org/mule/test/annotations/inbound-headers-annotation.xml";
     }
 
     @Override

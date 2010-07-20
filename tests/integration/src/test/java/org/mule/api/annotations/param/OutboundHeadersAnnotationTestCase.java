@@ -25,7 +25,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "outbound-headers-annotation.xml";
+        return "org/mule/test/annotations/outbound-headers-annotation.xml";
     }
 
     public void testProcessHeader() throws Exception

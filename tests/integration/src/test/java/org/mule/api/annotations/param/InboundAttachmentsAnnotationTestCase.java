@@ -33,7 +33,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "inbound-attachments-annotation.xml";
+        return "org/mule/test/annotations/inbound-attachments-annotation.xml";
     }
 
     @Override

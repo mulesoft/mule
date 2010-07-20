@@ -27,7 +27,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "outbound-attachments-annotation.xml";
+        return "org/mule/test/annotations/outbound-attachments-annotation.xml";
     }
 
     public void testProcessAttachment() throws Exception
