@@ -182,9 +182,9 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.isSynchronous();
     }
     
-    public MessageExchangePattern getMessageExchangePattern()
+    public MessageExchangePattern getExchangePattern()
     {
-        return endpoint.getMessageExchangePattern();
+        return endpoint.getExchangePattern();
     }
 
     public MuleMessage request(long timeout) throws Exception

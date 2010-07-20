@@ -121,7 +121,7 @@ public class EndpointService implements EndpointServiceMBean
 
     public MessageExchangePattern getMessageExchangePattern()
     {
-        return endpoint.getMessageExchangePattern();
+        return endpoint.getExchangePattern();
     }
     
     public String getComponentName()

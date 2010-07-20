@@ -180,7 +180,7 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
      */
     boolean isSynchronous();
 
-    MessageExchangePattern getMessageExchangePattern();
+    MessageExchangePattern getExchangePattern();
     
     /**
      * The timeout value for waiting for a response from a remote invocation or back channel. Mule 

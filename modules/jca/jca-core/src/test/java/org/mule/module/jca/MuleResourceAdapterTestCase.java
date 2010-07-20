@@ -241,7 +241,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertEquals("testEndpoint", endpoint.getEndpointURI().getAddress());
-        assertEquals(MessageExchangePattern.ONE_WAY, endpoint.getMessageExchangePattern());
+        assertEquals(MessageExchangePattern.ONE_WAY, endpoint.getExchangePattern());
     }
 
     protected void testJcaService(Service service)

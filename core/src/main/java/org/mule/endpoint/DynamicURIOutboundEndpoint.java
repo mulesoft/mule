@@ -173,9 +173,9 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.isSynchronous();
     }
     
-    public MessageExchangePattern getMessageExchangePattern()
+    public MessageExchangePattern getExchangePattern()
     {
-        return endpoint.getMessageExchangePattern();
+        return endpoint.getExchangePattern();
     }
 
     public List<String> getResponseProperties()

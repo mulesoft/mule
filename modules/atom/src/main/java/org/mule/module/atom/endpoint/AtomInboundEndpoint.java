@@ -49,7 +49,7 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
         super(ie.getConnector(), ie.getEndpointURI(), ie.getTransformers(), ie.getResponseTransformers(), 
             ie.getName(), ie.getProperties(), ie.getTransactionConfig(), ie.getFilter(), 
             ie.isDeleteUnacceptedMessages(), ie.getSecurityFilter(), ie.isSynchronous(), 
-            ie.getMessageExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
+            ie.getExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
             ie.getEncoding(), ie.getEndpointBuilderName(), ie.getMuleContext(), ie.getRetryPolicyTemplate(), 
             ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors());
         this.splitFeed = splitFeed;

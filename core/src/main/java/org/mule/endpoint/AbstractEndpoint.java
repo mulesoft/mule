@@ -440,7 +440,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return synchronous;
     }
 
-    public MessageExchangePattern getMessageExchangePattern()
+    public MessageExchangePattern getExchangePattern()
     {
         return messageExchangePattern;
     }

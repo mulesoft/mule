@@ -93,7 +93,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(mockFilter, endpoint.getFilter());
                 assertEquals(deleteUnacceptedMessages, endpoint.isDeleteUnacceptedMessages());
                 assertEquals(mockEndpointSecurityFilter, endpoint.getSecurityFilter());
-                assertEquals(messageExchangePattern, endpoint.getMessageExchangePattern());
+                assertEquals(messageExchangePattern, endpoint.getExchangePattern());
                 assertEquals(responseTimeout, endpoint.getResponseTimeout());
                 assertEquals(initialState, endpoint.getInitialState());
                 assertEquals(endpointEncoding, endpoint.getEncoding());

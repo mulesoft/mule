@@ -236,7 +236,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
     {
         InboundEndpoint endpoint = client.createInboundEndpoint(TEST_URI, TEST_MEP);
         assertEquals(TEST_URI, endpoint.getEndpointURI().getUri().toString());
-        assertEquals(TEST_MEP, endpoint.getMessageExchangePattern());
+        assertEquals(TEST_MEP, endpoint.getExchangePattern());
     }
 
     public void testOutboundEndpointCreation() throws MuleException
@@ -244,7 +244,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         OutboundEndpoint endpoint = client.createOutboundEndpoint(TEST_URI, TEST_MEP, new Long(
             TEST_RESPONSE_TIMEOUT));
         assertEquals(TEST_URI, endpoint.getEndpointURI().getUri().toString());
-        assertEquals(TEST_MEP, endpoint.getMessageExchangePattern());
+        assertEquals(TEST_MEP, endpoint.getExchangePattern());
         assertEquals(TEST_RESPONSE_TIMEOUT, endpoint.getResponseTimeout());
     }
 
