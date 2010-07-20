@@ -7,11 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.expression;
+package org.mule.module.ognl.config;
 
-import org.mule.api.annotations.expressions.Ognl;
+import org.mule.api.annotations.expression.Ognl;
 import org.mule.api.annotations.meta.Evaluator;
-import org.mule.api.expression.ExpressionParser;
+import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 
@@ -20,16 +20,15 @@ import java.lang.annotation.Annotation;
 /**
  * TODO
  */
-public class OgnlAnnotationParser implements ExpressionParser
+public class OgnlAnnotationParser implements ExpressionAnnotationParser
 {
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Ognl) annotation).value(),
+            return new ExpressionArgument(null, new ExpressionConfig(((Ognl) annotation).value(),
                     evaluator.value(), null), ((Ognl) annotation).required(), parameterType);
-            return arg;
         }
         else
         {
