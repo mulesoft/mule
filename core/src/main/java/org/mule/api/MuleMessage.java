@@ -170,6 +170,7 @@ public interface MuleMessage extends Serializable
      * @see #getInboundProperty(String)
      * @see #getOutboundProperty(String)
      * @see #getInvocationProperty(String) 
+     * @see #getSessionProperty(String)
      */
     @Deprecated
     Object getProperty(String name, Object defaultValue);
@@ -185,6 +186,7 @@ public interface MuleMessage extends Serializable
      * @see #getInboundProperty(String)
      * @see #getOutboundProperty(String)
      * @see #getInvocationProperty(String)
+     * @see #getSessionProperty(String)
      */
     <T> T getProperty(String name, PropertyScope scope);
 
@@ -582,4 +584,8 @@ public interface MuleMessage extends Serializable
     Object getOriginalPayload();
 
     MuleContext getMuleContext();
+
+    <T> T getSessionProperty(String name, T defaultValue);
+
+    <T> T getSessionProperty(String name);
 }

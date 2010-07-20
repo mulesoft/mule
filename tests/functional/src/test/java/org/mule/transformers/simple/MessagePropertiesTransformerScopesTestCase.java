@@ -40,7 +40,7 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTest
 
         assertEquals("bar", msg.getInvocationProperty("foo"));
         assertNull(msg.getOutboundProperty("foo"));
-        assertNull(msg.getProperty("foo", PropertyScope.SESSION));
+        assertNull(msg.getSessionProperty("foo"));
 
         // Remove property from the wrong scope
         

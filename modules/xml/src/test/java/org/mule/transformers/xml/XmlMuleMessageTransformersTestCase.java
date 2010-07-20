@@ -13,7 +13,6 @@ package org.mule.transformers.xml;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
@@ -53,7 +52,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("oBjeCt"));
         assertNull(msg.getInvocationProperty("oBjeCt"));
-        assertNull(msg.getProperty("oBjeCt", PropertyScope.SESSION));
+        assertNull(msg.getSessionProperty("oBjeCt"));
 
         assertEquals("hello", msg.getOutboundProperty("string"));
         //with different case
@@ -61,7 +60,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("string"));
         assertNull(msg.getInvocationProperty("string"));
-        assertNull(msg.getProperty("string", PropertyScope.SESSION));
+        assertNull(msg.getSessionProperty("string"));
 
         assertEquals(1, msg.getInvocationProperty("number"));
         //with different case
@@ -69,7 +68,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         //Make sure we don't have the property in a different scope
         assertNull(msg.getInboundProperty("number"));
         assertNull(msg.getOutboundProperty("number"));
-        assertNull(msg.getProperty("number", PropertyScope.SESSION));
+        assertNull(msg.getSessionProperty("number"));
 
         assertEquals("1234", msg.getCorrelationId());
         assertEquals("UTF-8", msg.getEncoding());

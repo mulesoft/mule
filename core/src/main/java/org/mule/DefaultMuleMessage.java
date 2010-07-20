@@ -391,6 +391,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         setProperty(key, value, PropertyScope.OUTBOUND);
     }
 
+    public void setSessionProperty(String key, Object value)
+    {
+        setProperty(key, value, PropertyScope.SESSION);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -615,6 +620,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public <T> T getOutboundProperty(String name)
     {
         return getOutboundProperty(name, (T) null);
+    }
+
+    public <T> T getSessionProperty(String name, T defaultValue)
+    {
+        return getProperty(name, PropertyScope.SESSION, defaultValue);
+    }
+
+    public <T> T getSessionProperty(String name)
+    {
+        return getSessionProperty(name, (T) null);
     }
 
     /**
