@@ -19,9 +19,9 @@ import org.dom4j.io.SAXReader;
 
 public class SchemaDefaultsTestCase extends AbstractMuleTestCase
 {
-    private static String MULE_CORE_SCHEMA_FILE = "META-INF/mule.xsd";
     private Document schema;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -39,9 +39,6 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
     {
         Element configurationType = (Element) schema.selectSingleNode("/xsd:schema/xsd:complexType[@name='configurationType']");
 
-        assertEquals(Boolean.toString(muleContext.getConfiguration().isDefaultSynchronousEndpoints()),
-            configurationType.selectSingleNode("xsd:attribute[@name='defaultSynchronousEndpoints']/@default")
-                .getStringValue());
         assertEquals(muleContext.getConfiguration().getDefaultResponseTimeout(),
             configurationType.numberValueOf("xsd:attribute[@name='defaultResponseTimeout']/@default")
                 .intValue());
@@ -52,5 +49,4 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
             configurationType.numberValueOf("xsd:attribute[@name='shutdownTimeout']/@default")
                 .intValue());
     }
-
 }

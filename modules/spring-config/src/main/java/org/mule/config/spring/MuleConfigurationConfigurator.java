@@ -58,10 +58,10 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         MuleConfiguration configuration = muleContext.getConfiguration();
         if (configuration instanceof DefaultMuleConfiguration)
         {
-            ((DefaultMuleConfiguration) configuration).setDefaultSynchronousEndpoints(config.isDefaultSynchronousEndpoints());
-            ((DefaultMuleConfiguration) configuration).setDefaultResponseTimeout(config.getDefaultResponseTimeout());
-            ((DefaultMuleConfiguration) configuration).setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
-            ((DefaultMuleConfiguration) configuration).setShutdownTimeout(config.getShutdownTimeout());
+            DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
+            defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
+            defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
+            defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
             return configuration;
         }
         else
@@ -70,7 +70,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         }
     }
 
-    public Class getObjectType()
+    public Class<?> getObjectType()
     {
         return MuleConfiguration.class;
     }

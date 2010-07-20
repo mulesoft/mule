@@ -355,7 +355,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     
     public void testMuleConfiguration()
     {
-        assertTrue(muleContext.getConfiguration().isDefaultSynchronousEndpoints());
         assertEquals(10,muleContext.getConfiguration().getDefaultResponseTimeout());
         assertEquals(20,muleContext.getConfiguration().getDefaultTransactionTimeout());
         assertEquals(30,muleContext.getConfiguration().getShutdownTimeout());

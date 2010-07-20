@@ -8,8 +8,7 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <configuration defaultSynchronousEndpoints="true" defaultResponseTimeout="10" defaultTransactionTimeout="20"
-        shutdownTimeout="30">
+    <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30">
         <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
                                    maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
     </configuration>

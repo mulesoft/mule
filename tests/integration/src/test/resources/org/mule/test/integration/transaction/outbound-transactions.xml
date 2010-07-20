@@ -15,7 +15,7 @@
            http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
 
 
-    <configuration defaultSynchronousEndpoints="false" defaultResponseTimeout="5000"/>
+    <configuration defaultResponseTimeout="5000"/>
     
     <jms:activemq-connector name="jmsConnector" specification="1.1"/>
     
