@@ -13,11 +13,15 @@ package org.mule.transport.email.connectors;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.ResponseOutputStream;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -61,32 +65,30 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     }
 
     /**
-     * The SmtpConnector does not accept listeners, so the test in the
-     * superclass makes no sense here.  Instead, we simply check that
-     * a listener is rejected.
+     * The SmtpConnector does not accept listeners, so the test in the superclass makes no sense 
+     * here. The SMTP transport does not even support inbound endpoints, as SMTP is an outbound
+     * transport only so you cannot even create an inbound endpoint to register as listener.
      */
     @Override
     public void testConnectorListenerSupport() throws Exception
     {
-        // TODO re-enable once outbound routers have been reworked to be message processors
-//        Connector connector = getConnector();
-//        assertNotNull(connector);
-//
-//        Service service = getTestService("anApple", Apple.class);
-//        //muleContext.getRegistry().registerComponent(service);
-//        EndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
-//        builder.setName("test");
-//        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-//            builder);
-//        try
-//        {
-//            connector.registerListener(endpoint, getSensingNullMessageProcessor(), service);
-//            fail("SMTP connector does not accept listeners");
-//        }
-//        catch (Exception e)
-//        {
-//            assertNotNull("expected", e);
-//        }
+        // do nothing
+    }
+    
+    public void testSmtpDoesNotSupportOutboundEndpoints() throws MuleException
+    {
+        EndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
+        builder.setName("test");
+
+        try
+        {
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            fail("Inbound SMTP endpoints are not supported");
+        }
+        catch (EndpointException ex)
+        {
+            // expected
+        }
     }
 
     public void testSend() throws Exception
