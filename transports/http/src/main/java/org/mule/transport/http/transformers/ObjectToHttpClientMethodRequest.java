@@ -129,7 +129,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         String endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.OUTBOUND, null);
         if (endpointString == null)
         {
-            endpointString = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, PropertyScope.INVOCATION, null); 
+            endpointString = msg.getInvocationProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         }
         if (endpointString == null)
         {
@@ -138,7 +138,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                             MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 
-        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INVOCATION, null);
+        String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
         if (method == null)
         {
             method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.OUTBOUND, "POST");
@@ -154,8 +154,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-                String getBodyParam = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.INVOCATION,
-                                                                  HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
+                String getBodyParam = msg.getInvocationProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                                                                HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 if (getBodyParam == null)
                 {
                     msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND,
@@ -200,7 +200,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.OUTBOUND, null);
                 if (paramName == null)
                 {
-                    paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, PropertyScope.INVOCATION, null);
+                    paramName = msg.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
                 }
 
                 if (src instanceof Map)

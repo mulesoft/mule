@@ -26,6 +26,7 @@ import org.mule.transport.cxf.security.WebServiceSecurityException;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
+import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -331,7 +332,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         // propagate only invocation- and outbound-scoped properties
         for (String name : event.getMessage().getPropertyNames(PropertyScope.INVOCATION))
         {
-            final String value = msg.getStringProperty(name, PropertyScope.INVOCATION, "");
+            final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
             properties.put(name, value);
         }
         for (String name : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))

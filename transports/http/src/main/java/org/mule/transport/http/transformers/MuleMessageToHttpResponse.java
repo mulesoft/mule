@@ -231,7 +231,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 
         for (String headerName : headerNames)
         {
-            String value = msg.getStringProperty(headerName, PropertyScope.INVOCATION, null);
+            String value = msg.getInvocationProperty(headerName);
             if (value == null)
             {
                 value = msg.getStringProperty(headerName, PropertyScope.OUTBOUND, null);

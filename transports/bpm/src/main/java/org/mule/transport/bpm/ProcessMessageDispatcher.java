@@ -123,8 +123,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_ID);
 
         // Default action is "advance"
-        String action = event.getMessage().getStringProperty(ProcessConnector.PROPERTY_ACTION, PropertyScope.INVOCATION,
-            ProcessConnector.ACTION_ADVANCE);
+        String action = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_ACTION, ProcessConnector.ACTION_ADVANCE);
         processVariables.remove(ProcessConnector.PROPERTY_ACTION);
 
         Object transition = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_TRANSITION);

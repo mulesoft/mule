@@ -165,7 +165,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
         String value = message.getStringProperty(propName, PropertyScope.OUTBOUND, null);
         if (value == null)
         {
-            value = message.getStringProperty(propName, PropertyScope.INVOCATION, defaultValue);
+            value = message.getInvocationProperty(propName, defaultValue);
         }
         return value;
     }
