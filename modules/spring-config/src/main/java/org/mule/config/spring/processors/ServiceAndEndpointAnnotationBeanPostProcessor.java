@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring;
+package org.mule.config.spring.processors;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
@@ -17,7 +17,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * A Spring post processor that wraps the Mule {@link AnnotatedServiceObjectProcessor}. The
+ * A Spring post processor that wraps the Mule {@link org.mule.config.processors.AnnotatedServiceObjectProcessor}. The
  * service is analyzed and created before the bean is initialized.
  */
 public class ServiceAndEndpointAnnotationBeanPostProcessor implements BeanPostProcessor, MuleContextAware

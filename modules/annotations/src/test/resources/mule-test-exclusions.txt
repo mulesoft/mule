@@ -1,2 +1,0 @@
-org.mule.api.annotations.example.HelloComponentFunctionalTestCase
-org.mule.api.annotations.example.HelloComponentFunctionalSpringTestCase
