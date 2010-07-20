@@ -18,12 +18,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.module.atom.server.MuleRequestContext;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -80,7 +80,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             }
             MuleMessage msg = event.getMessage();
             IRI baseIri = initBaseUri(event.getEndpointURI());
-            String contextPath = msg.getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, PropertyScope.INBOUND, "");
+            String contextPath = msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
 
             Provider provider = abderaServiceComponent.getProvider();
             MuleRequestContext reqcontext = new MuleRequestContext(provider,

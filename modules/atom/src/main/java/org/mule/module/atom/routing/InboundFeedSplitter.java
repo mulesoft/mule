@@ -17,7 +17,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.atom.transformers.ObjectToFeed;
 import org.mule.routing.AbstractRouter;
 
@@ -95,7 +94,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
 
     public boolean isMatch(MuleEvent muleEvent) throws MessagingException
     {
-        String contentType = muleEvent.getMessage().getStringProperty("Content-Type", PropertyScope.INBOUND, null);
+        String contentType = muleEvent.getMessage().getInboundProperty("Content-Type");
         if (contentType != null)
         {
             int i = contentType.indexOf(";");

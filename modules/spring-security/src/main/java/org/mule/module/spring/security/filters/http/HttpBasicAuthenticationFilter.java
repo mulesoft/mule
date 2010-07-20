@@ -21,7 +21,6 @@ import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.spring.security.SpringAuthenticationAdapter;
 import org.mule.module.spring.security.i18n.SpringSecurityMessages;
@@ -104,7 +103,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     public void authenticateInbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
-        String header = event.getMessage().getStringProperty(HttpConstants.HEADER_AUTHORIZATION, PropertyScope.INBOUND, null);
+        String header = event.getMessage().getInboundProperty(HttpConstants.HEADER_AUTHORIZATION);
 
         if (logger.isDebugEnabled())
         {

@@ -101,8 +101,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
         // if http request
         String requestPath = parseHttpRequestProperty(
-            eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
-                PropertyScope.INBOUND, StringUtils.EMPTY));
+                eventContext.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY));
         
 
         if (requestPath.indexOf('?') > -1)

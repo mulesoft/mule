@@ -11,9 +11,9 @@ package org.mule.module.atom.server;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
 
     private static String getMethod(MuleMessage request)
     {
-        return request.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.INBOUND, "");
+        return request.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, StringUtils.EMPTY);
     }
 
     public Locale getPreferredLocale()

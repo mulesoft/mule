@@ -17,7 +17,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.soap.component.AbstractWebServiceWrapperComponent;
@@ -34,7 +33,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
         String tempUrl;
         if (addressFromMessage)
         {
-            tempUrl = event.getMessage().getStringProperty(WS_SERVICE_URL, PropertyScope.INBOUND, null);
+            tempUrl = event.getMessage().getInboundProperty(WS_SERVICE_URL);
             if (tempUrl == null)
             {
                 throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(WS_SERVICE_URL)

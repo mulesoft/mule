@@ -11,7 +11,6 @@
 package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 import org.mule.transport.jms.JmsConstants;
@@ -66,7 +65,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
 
     private void assertJmsMessageIdPresent(MuleMessage message)
     {
-        String messageId = message.getStringProperty(JmsConstants.JMS_MESSAGE_ID, PropertyScope.INBOUND, null);
+        String messageId = message.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
         assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
     }
 }
