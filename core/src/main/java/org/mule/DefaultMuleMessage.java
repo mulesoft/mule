@@ -987,24 +987,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getStringProperty(String name, String defaultValue)
     {
         assertAccess(READ);
-        return properties.getStringProperty(name, defaultValue);
-    }
-
-    public String getStringProperty(String name, PropertyScope scope, String defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getStringProperty(name, scope, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
-    @Deprecated
-    public void setStringProperty(String name, String value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, value, PropertyScope.OUTBOUND);
+        return properties.getStringProperty(name, PropertyScope.OUTBOUND, defaultValue);
     }
 
     /**

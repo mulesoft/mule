@@ -313,17 +313,6 @@ public interface MuleMessage extends Serializable
     @Deprecated
     String getStringProperty(String name, String defaultValue);
 
-    String getStringProperty(String name, PropertyScope scope, String defaultValue);
-
-
-
-    /**
-     * Sets a String property on the message
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    void setStringProperty(String name, String value);
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
