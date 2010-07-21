@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * <ul>
  * <li>now - Returns a {@link java.sql.Timestamp} with the current time.</li>
  * <li>date - Returns a {@link java.util.Date} with the current time.</li>
- * <li>dateStamp - Returns a {@link java.lang.String} that contains the current date formatted according to {@link #DEFAULT_DATE_FORMAT}.</li>
+ * <li>dateStamp - Returns a {@link java.lang.String} that contains the current date formatted according to {@link org.mule.expression.FunctionExpressionEvaluator#DEFAULT_DATE_FORMAT}.</li>
  * <li>dateStamp-dd-MM-yyyy - Returns a {@link java.lang.String} that contains the current date formatted according to the format passed into the function.</li>
  * <li>uuid - Returns a globally unique identifier</li>
  * <li>hostname - Returns the hostname of the machine Mule is running on</li>
@@ -39,7 +39,8 @@ import java.lang.annotation.Target;
 @Evaluator("function")
 public @interface Function
 {
-    public abstract String value();
-
-    public abstract boolean required() default true;
+    /**
+     * @return the function expression to execute
+     */
+    String value();
 }

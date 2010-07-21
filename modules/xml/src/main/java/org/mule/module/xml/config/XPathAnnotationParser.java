@@ -14,15 +14,18 @@ import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
+import org.mule.module.xml.i18n.XmlMessages;
 
 import java.lang.annotation.Annotation;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Used to parse Bean parameter annotations
+ * Used to parse Bean parameter annotations. Note this annotation only supports the Jaxp API and w3c Dom.  There is
+ * not Dom4J support.
  *
  * @see org.mule.api.annotations.expression.XPath
  * @see org.mule.module.xml.expression.XPathExpressionEvaluator
@@ -32,18 +35,38 @@ public class XPathAnnotationParser implements ExpressionAnnotationParser
     public ExpressionArgument parse(Annotation annotation, Class<?> parameterType)
     {
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
-        String eval = "xpath";
+        String eval = "xpath2";
+        String type;
         if (evaluator != null)
         {
             if (parameterType.equals(Node.class) || parameterType.equals(org.dom4j.Node.class) ||
                     parameterType.equals(Element.class) || parameterType.equals(org.dom4j.Element.class) ||
                     parameterType.equals(Document.class) || parameterType.equals(org.dom4j.Document.class))
             {
-                eval = "xpath-node";
+                type = "[node]";
             }
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((XPath) annotation).value(),
-                    eval, null), ((XPath) annotation).required(), parameterType);
-            return arg;
+            else if(NodeList.class.isAssignableFrom(parameterType))
+            {
+                type = "[nodeset]";
+            }
+            else if(Boolean.class.isAssignableFrom(parameterType))
+            {
+                type = "[boolean]";
+            }
+            else if(Double.class.isAssignableFrom(parameterType))
+            {
+                type = "[number]";
+            }
+            else if(String.class.isAssignableFrom(parameterType))
+            {
+                type = "[string]";
+            }
+            else
+            {
+                throw new IllegalArgumentException(XmlMessages.xpathResultTypeNotSupported(parameterType).getMessage());
+            }
+            return new ExpressionArgument(null, new ExpressionConfig(type + ((XPath) annotation).value(),
+                    eval, null), ((XPath) annotation).optional(), parameterType);
         }
         else
         {

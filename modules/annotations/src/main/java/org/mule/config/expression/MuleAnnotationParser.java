@@ -42,7 +42,7 @@ public class MuleAnnotationParser implements ExpressionAnnotationParser
             }
 
             return new ExpressionArgument(null, new ExpressionConfig(val, evaluator.value(), null),
-                    muleAnnotation.required(), parameterType);
+                    muleAnnotation.optional(), parameterType);
         }
         else
         {

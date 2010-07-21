@@ -36,11 +36,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Evaluator("groovy")
-public @interface
-        Groovy
+public @interface Groovy
 {
-    public abstract String value();
+    String value();
 
-    public abstract boolean required() default true;
+    boolean optional() default false;
     
 }

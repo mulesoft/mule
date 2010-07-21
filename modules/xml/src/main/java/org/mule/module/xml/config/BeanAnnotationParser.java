@@ -30,7 +30,7 @@ public class BeanAnnotationParser implements ExpressionAnnotationParser
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            return new ExpressionArgument(null, new ExpressionConfig(((Bean) annotation).value(), evaluator.value(), null), ((Bean) annotation).required(), parameterType);
+            return new ExpressionArgument(null, new ExpressionConfig(((Bean) annotation).value(), evaluator.value(), null), ((Bean) annotation).optional(), parameterType);
         }
         else
         {

@@ -26,7 +26,7 @@ public class GroovyAnnotationParser implements ExpressionAnnotationParser
         if (evaluator != null)
         {
             return new ExpressionArgument(null, new ExpressionConfig(((Groovy) annotation).value(),
-                    evaluator.value(), null), ((Groovy) annotation).required(), parameterType);
+                    evaluator.value(), null), ((Groovy) annotation).optional(), parameterType);
         }
         else
         {

@@ -28,7 +28,7 @@ public class OgnlAnnotationParser implements ExpressionAnnotationParser
         if (evaluator != null)
         {
             return new ExpressionArgument(null, new ExpressionConfig(((Ognl) annotation).value(),
-                    evaluator.value(), null), ((Ognl) annotation).required(), parameterType);
+                    evaluator.value(), null), ((Ognl) annotation).optional(), parameterType);
         }
         else
         {

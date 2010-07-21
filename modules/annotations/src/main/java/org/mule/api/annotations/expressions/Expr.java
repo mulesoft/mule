@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 @Evaluator("string")
 public @interface Expr
 {
-    public abstract String value();
+    String value();
 
-    public abstract boolean required() default true;
+    boolean optional() default false;
 }

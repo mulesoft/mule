@@ -32,8 +32,7 @@ public class FunctionAnnotationParser implements ExpressionAnnotationParser
         Evaluator evaluator = annotation.annotationType().getAnnotation(Evaluator.class);
         if (evaluator != null)
         {
-            ExpressionArgument arg = new ExpressionArgument(null, new ExpressionConfig(((Function) annotation).value(), evaluator.value(), null), ((Function) annotation).required(), parameterType);
-            return arg;
+            return new ExpressionArgument(null, new ExpressionConfig(((Function) annotation).value(), evaluator.value(), null), false, parameterType);
         }
         else
         {

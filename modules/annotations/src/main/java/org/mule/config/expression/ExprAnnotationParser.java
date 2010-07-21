@@ -33,7 +33,7 @@ public class ExprAnnotationParser implements ExpressionAnnotationParser
         if (evaluator != null)
         {
             return new ExpressionArgument(null, new ExpressionConfig(((Expr) annotation).value(),
-                    evaluator.value(), null), ((Expr) annotation).required(), parameterType);
+                    evaluator.value(), null), ((Expr) annotation).optional(), parameterType);
         }
         else
         {

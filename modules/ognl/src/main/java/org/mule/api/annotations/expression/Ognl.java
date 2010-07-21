@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 @Evaluator("ognl")
 public @interface Ognl
 {
-    public abstract String value();
+    String value();
 
-    public abstract boolean required() default true;
+    boolean optional() default false;
 }

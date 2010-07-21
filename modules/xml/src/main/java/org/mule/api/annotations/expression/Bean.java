@@ -32,5 +32,5 @@ public @interface Bean
 {
     String value();
 
-    boolean required() default true;
+    boolean optional() default false;
 }

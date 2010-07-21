@@ -29,5 +29,5 @@ public @interface Mule
 {
     String value();
 
-    public abstract boolean required() default true;
+    boolean optional() default false;
 }
