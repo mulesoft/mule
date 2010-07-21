@@ -697,15 +697,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public long getLongProperty(String name, long defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getLongProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
         assertAccess(READ);

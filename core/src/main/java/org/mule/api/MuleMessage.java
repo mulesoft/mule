@@ -244,15 +244,6 @@ public interface MuleMessage extends Serializable
     int getIntProperty(String name, int defaultValue);
 
     /**
-     * Gets a long property from the message
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    long getLongProperty(String name, long defaultValue);
-
-    /**
      * Gets a boolean property from the message
      * 
      * @param name the name or key of the property
