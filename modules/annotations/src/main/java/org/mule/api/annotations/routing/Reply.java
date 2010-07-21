@@ -21,13 +21,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation that allows developers to configure a reply channel. Mule will wait on the reply channel before
- * returning. Typically, the @Reply annotation is only used when the @Publish annotation is used, since the result of
- * dispatching to a {@link Publish} channel will be returned on the @Reply channel.
+ * An annotation that allows developers to configure an asynchronous reply endpoint on a component. Mule will wait on the reply endpoint before
+ * returning. Typically, the @Reply annotation is only used when there is an outbound endpoint configured on the component, since the result of
+ * dispatching to an outbound endpoint will be returned on the @Reply endpoint.
  * <p/>
- * The @Reply annotation creates an asynchronous reply channel for a remote service to reply to. In the case of
- * JMS, this would listen on the JMSReplyTo address. In the case of other Mule services, the transport can set up a
- * reply channel.
+ * The @Reply annotation creates an asynchronous reply endpoint for a remote service to reply to. In the case of
+ * JMS, this would listen on the JMSReplyTo address. In the case of other Mule services, the transport defined in the replyTo address can set up a
+ * reply endpoint.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -57,10 +57,8 @@ public @interface Reply
      * Many transports such as HTTP do not need a connector to be present, since Mule can create
      * a default one as needed.
      * <p/>
-     * The connector reference can be a reference to a connector in the local registry or a reference
-     * to an object in Galaxy.
+     * The connector reference can be a reference to a connector in the local registry 
      * <p/>
-     * TODO: describe how connectors are created
      *
      * @return the connector name associated with the endpoint
      */
@@ -95,7 +93,7 @@ public @interface Reply
      * When false, if no message is received the router will stop waiting without throwing an exception.
      * If a 'callback' method is set, the method will be invoked with a {@link org.mule.transport.NullPayload}.
      * If the expected message is received after the timeout, it will be ignored but Mule will fire a
-     * {@link org.mule.context.notification.RoutingNotification.MISSED_ASYNC_REPLY}
+     * {@link org.mule.context.notification.RoutingNotification#MISSED_ASYNC_REPLY}
      * notification with the received message.
      *
      * @return true if the reply channel will throw an exception if a reply is not received before the timeout elapses.
