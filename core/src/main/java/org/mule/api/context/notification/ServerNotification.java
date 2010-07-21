@@ -13,6 +13,7 @@ package org.mule.api.context.notification;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
@@ -105,8 +106,11 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     protected static String generateId(MuleContext context)
     {
-        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId()
-               + "." + context.getConfiguration().getId();
+        MuleConfiguration conf = context.getConfiguration();
+        return String.format("%s.%s.%s",
+                             conf.getDomainId(),
+                             conf.getClusterId(),
+                             conf.getId());
     }
 
     protected static MuleMessage cloneMessage(MuleMessage message)
