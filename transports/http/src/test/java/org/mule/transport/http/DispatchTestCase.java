@@ -21,10 +21,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 public class DispatchTestCase extends FunctionalTestCase
 {
     public void testEchoService() throws Exception
     {
+        final int THREADS = 10;
+        final CountDownLatch latch = new CountDownLatch(THREADS);
+
         final MuleClient client = new MuleClient(muleContext);
         
         final byte[] buf = new byte[8192];
@@ -33,7 +39,7 @@ public class DispatchTestCase extends FunctionalTestCase
         client.send("http://localhost:63081/services/Echo",
             new DefaultMuleMessage(new ByteArrayInputStream(buf), muleContext));
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < THREADS; i++)
         {
             new Thread(new Runnable() 
             {
@@ -48,18 +54,26 @@ public class DispatchTestCase extends FunctionalTestCase
                             client.dispatch("http://localhost:63081/services/Echo", 
                                 new DefaultMuleMessage(buf, muleContext), props);
                         }
+
                     }
                     catch (MuleException e)
                     {
                         e.printStackTrace();
                     }
+                    finally
+                    {
+                        latch.countDown();
+                    }
                 }
                 
             }).start();
         }
-        
+
+        //wait for somewhere close to 15 seconds before the test times out
+        latch.await(40, TimeUnit.SECONDS);
+
         int count = 0;
-        while (client.request("vm://queue", 3000) != null) 
+        while (client.request("vm://queue", RECEIVE_TIMEOUT) != null)
         {
             count++;
         }
