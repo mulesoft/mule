@@ -10,35 +10,29 @@
 
 package org.mule.config.spring.factories;
 
+import java.beans.ExceptionListener;
 import java.util.List;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.SimpleService;
-import org.mule.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.construct.builders.ConstructBuilders;
+import org.mule.construct.builders.SimpleServiceBuilder;
 import org.mule.object.PrototypeObjectFactory;
 
-//TODO (DDO) move most of this code to a SimpleServiceBuilder class in core and extend it here
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
-    // TODO (DDO) should this come from somewhere else?
-    private static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
-
-    private EndpointBuilder endpointBuilder;
-    private String address;
-    private List<Transformer> transformers;
-    private List<Transformer> responseTransformers;
     private String componentClass;
     private String componentBeanName;
     private Component component;
+
+    private final SimpleServiceBuilder newSimpleService = ConstructBuilders.buildSimpleService();
 
     public Class<?> getObjectType()
     {
@@ -48,35 +42,37 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     @Override
     protected AbstractFlowConstruct createFlowConstruct() throws MuleException
     {
-        SimpleService simpleService = new SimpleService(muleContext, name, buildInboundEndpoint(),
-            getOrBuildComponent());
+        return newSimpleService.serving(getOrBuildComponent()).in(muleContext);
+    }
 
-        if (exceptionListener != null)
-        {
-            simpleService.setExceptionListener(exceptionListener);
-        }
+    public void setName(String name)
+    {
+        newSimpleService.named(name);
+    }
 
-        return simpleService;
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        newSimpleService.withExceptionListener(exceptionListener);
     }
 
     public void setEndpoint(EndpointBuilder endpointBuilder)
     {
-        this.endpointBuilder = endpointBuilder;
+        newSimpleService.receivingOn(endpointBuilder);
     }
 
     public void setAddress(String address)
     {
-        this.address = address;
+        newSimpleService.receivingOn(address);
     }
 
     public void setTransformers(List<Transformer> transformers)
     {
-        this.transformers = transformers;
+        newSimpleService.transformingRequestsWith(transformers);
     }
 
     public void setResponseTransformers(List<Transformer> responseTransformers)
     {
-        this.responseTransformers = responseTransformers;
+        newSimpleService.transformingResponseWith(responseTransformers);
     }
 
     public void setComponentClass(String componentClass)
@@ -94,30 +90,12 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         this.component = component;
     }
 
-    private InboundEndpoint buildInboundEndpoint() throws MuleException
-    {
-        if (endpointBuilder == null)
-        {
-            endpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(address);
-        }
-
-        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        endpointBuilder.setTransformers(transformers);
-        endpointBuilder.setResponseTransformers(responseTransformers);
-        return endpointBuilder.buildInboundEndpoint();
-    }
-
     private Component getOrBuildComponent()
     {
         if (component == null)
         {
             ObjectFactory objectFactory = getComponentObjectFactory();
             component = new DefaultJavaComponent(objectFactory);
-        }
-
-        if (component instanceof DefaultJavaComponent)
-        {
-            ((DefaultJavaComponent) component).setEntryPointResolverSet(DEFAULT_ENTRY_POINT_RESOLVER_SET);
         }
 
         return component;

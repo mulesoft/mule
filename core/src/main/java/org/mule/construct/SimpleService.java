@@ -10,10 +10,12 @@
 
 package org.mule.construct;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.interceptor.LoggingInterceptor;
@@ -55,7 +57,6 @@ public class SimpleService extends AbstractFlowConstruct
     {
         builder.chain(new LoggingInterceptor());
         // TODO (DDO) add builder.chain(statisticsInterceptingMessageProcess)
-        // TODO (DDO) autowire REST/WS annotated components
         builder.chain(component);
     }
 
@@ -64,10 +65,18 @@ public class SimpleService extends AbstractFlowConstruct
     {
         super.validateConstruct();
 
-        // TODO (DDO) Ensure messageSource is a single InboundEndpoint (not
-        // composite)?
-        // TODO (DDO) Ensure InboundEndpoint messageSource has supported Exchange
-        // Pattern
+        if (!(messageSource instanceof InboundEndpoint))
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("SimpleService only works with a single inbound endpoint."));
+        }
+
+        if (!((InboundEndpoint) messageSource).getExchangePattern().equals(
+            MessageExchangePattern.REQUEST_RESPONSE))
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("SimpleService only works with a request-response inbound endpoint."));
+        }
     }
 
     public Component getComponent()

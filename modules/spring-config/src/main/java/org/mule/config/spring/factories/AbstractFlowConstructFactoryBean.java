@@ -10,8 +10,6 @@
 
 package org.mule.config.spring.factories;
 
-import java.beans.ExceptionListener;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -19,7 +17,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -50,14 +47,10 @@ public abstract class AbstractFlowConstructFactoryBean
 
     protected ApplicationContext applicationContext;
     protected MuleContext muleContext;
-    protected String name;
 
     // FIXME (DDO) terrible hack to get around the first call to getObject that
     // comes too soon (nothing is injected yet)
     protected AbstractFlowConstruct flowConstruct = NULL_FLOW_CONSTRUCT;
-
-    // TODO (DDO) should this be looked-up in registry?
-    protected ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();
 
     public boolean isSingleton()
     {
@@ -72,16 +65,6 @@ public abstract class AbstractFlowConstructFactoryBean
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public void setExceptionListener(ExceptionListener exceptionListener)
-    {
-        this.exceptionListener = exceptionListener;
     }
 
     public void afterPropertiesSet() throws Exception
