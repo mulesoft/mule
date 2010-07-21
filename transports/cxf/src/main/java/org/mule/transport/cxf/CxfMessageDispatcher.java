@@ -26,6 +26,7 @@ import org.mule.transport.cxf.security.WebServiceSecurityException;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
@@ -257,7 +258,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     {
         for (String name : message.getPropertyNames(scope))
         {
-            String header = message.getStringProperty(name, scope, null);
+            String header = ObjectUtils.getString(message.getProperty(name, scope), null);
             if ((header != null) && (!header.startsWith("MULE")))
             {
                 props.put(name, header);

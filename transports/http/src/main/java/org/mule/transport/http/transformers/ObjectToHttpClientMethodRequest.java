@@ -24,6 +24,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
@@ -434,7 +435,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null
                         && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
             {
-                headerValue = msg.getStringProperty(headerName, scope, null);
+                headerValue = ObjectUtils.getString(msg.getProperty(headerName, scope), null);
                 if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
                 {
                     headerName = new StringBuffer(30).append("X-").append(headerName).toString();

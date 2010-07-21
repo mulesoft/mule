@@ -52,7 +52,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -776,10 +775,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getCorrelationId()
     {
         assertAccess(READ);
-        String correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.OUTBOUND, null);
+        String correlationId = getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         if (correlationId == null)
         {
-            correlationId = getStringProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, PropertyScope.INBOUND, null);
+            correlationId = getInboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         }
 
         return correlationId;
@@ -978,33 +977,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         setOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public String getStringProperty(String name, String defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getStringProperty(name, defaultValue);
-    }
-
-    public String getStringProperty(String name, PropertyScope scope, String defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getStringProperty(name, scope, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
-    @Deprecated
-    public void setStringProperty(String name, String value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, value, PropertyScope.OUTBOUND);
     }
 
     /**
