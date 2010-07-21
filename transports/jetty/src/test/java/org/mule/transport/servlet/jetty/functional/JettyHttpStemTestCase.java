@@ -36,6 +36,7 @@ public class JettyHttpStemTestCase extends FunctionalTestCase
     {
         MuleMessage result = client.send(url, "Hello", null);
         assertEquals(value, result.getPayloadAsString());
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        final int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(200, status);
     }
 }

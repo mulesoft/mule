@@ -89,7 +89,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
 
-        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        int status = m.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
@@ -106,7 +106,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
         MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
-        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        int status = m.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
     }
 

@@ -385,7 +385,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
         if (awaitResponse)
         {
-            int timeout = message.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+            int timeout = message.getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
             if (timeout >= 0)
             {
                 event.setTimeout(timeout);

@@ -44,7 +44,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://localhost:60211/mycomponent-notfound", "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
-        assertEquals(404, result.getIntProperty("http.status", 0));
+        final int status = result.getOutboundProperty("http.status", 0);
+        assertEquals(404, status);
 
         // Test that after the exception the endpoints still receive events
         sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);

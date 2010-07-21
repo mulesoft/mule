@@ -67,8 +67,9 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(HTTP_ENDPOINT + "/" + TEST_BAD_MESSAGE, "mule", props);
-        
-        assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+
+        final int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(HttpConstants.SC_NOT_ACCEPTABLE, status);
         assertNotNull(result.getExceptionPayload());
     }   
 }

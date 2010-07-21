@@ -32,7 +32,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
         //TODO RM: What should really be returned when doing an async request?
         assertNotNull(reply.getPayload());
-        assertEquals(reply.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0), 200);
+        int status = reply.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(status, 200);
         assertEquals(0, reply.getPayloadAsString().length());
     }
 

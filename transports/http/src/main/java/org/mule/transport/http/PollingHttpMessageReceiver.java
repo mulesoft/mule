@@ -129,7 +129,8 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             message = result.getMessage();
         }
 
-        if (message.getIntProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1) == 0 && discardEmptyContent)
+        final int contentLength = message.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1);
+        if (contentLength == 0 && discardEmptyContent)
         {
             if (logger.isDebugEnabled())
             {
@@ -137,7 +138,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             }
             return;
         }
-        int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        int status = message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         etag = message.getOutboundProperty(HttpConstants.HEADER_ETAG);
 
         if ((status != HttpConstants.SC_NOT_MODIFIED || !checkEtag))

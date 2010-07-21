@@ -29,7 +29,8 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractInboundMes
         MuleEvent result = mp.process(event);
 
         assertNotNull(result);
-        assertEquals(500, result.getMessage().getIntProperty("status", 0));
+        final int status = result.getMessage().getOutboundProperty("status", 0);
+        assertEquals(500, status);
 
     }
 }

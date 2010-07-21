@@ -49,6 +49,7 @@ public interface MuleMessage extends Serializable
      * {@link org.mule.api.transport.PropertyScope#OUTBOUND}.
      * @deprecated use {@link #clearProperties(org.mule.api.transport.PropertyScope)} instead
      */
+    @Deprecated
     void clearProperties();
 
     /**
@@ -233,15 +234,6 @@ public interface MuleMessage extends Serializable
      * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
      */
     <T> T getProperty(String name, PropertyScope scope, T defaultValue);
-
-    /**
-     * Gets an integer property from the message
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    int getIntProperty(String name, int defaultValue);
 
 
     /**

@@ -167,8 +167,8 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
 
     private boolean compareIntProperties(MuleMessage src, MuleMessage result)
     {
-        int sourceIntProperty = src.getIntProperty("number", -1);
-        int resultIntProperty = result.getIntProperty("number", -2);
+        int sourceIntProperty = src.getOutboundProperty("number", -1);
+        int resultIntProperty = result.getOutboundProperty("number", -2);
         return (sourceIntProperty == resultIntProperty);
     }
 

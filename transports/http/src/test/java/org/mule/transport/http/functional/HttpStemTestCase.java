@@ -55,6 +55,7 @@ public class HttpStemTestCase extends FunctionalTestCase
          
         MuleMessage result = client.send(url, "Hello World", null);
         assertEquals("Hello World Received", result.getPayloadAsString());
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        final int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(200, status);
     }
 }

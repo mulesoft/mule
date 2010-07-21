@@ -98,7 +98,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 final Object o = msg.getOutboundProperty("objectParam");
                 assertTrue(o instanceof Apple);
                 assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
-                assertEquals(12345, msg.getIntProperty("integerParam", 0));
+                assertEquals(12345, msg.<Integer>getOutboundProperty("integerParam", 0).intValue());
                 assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
                 assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
                 assertNotNull(msg.getAttachment("test1"));
@@ -116,7 +116,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             final Object o = msg.getOutboundProperty("objectParam");
             assertTrue(o instanceof Apple);
             assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
-            assertEquals(12345, msg.getIntProperty("integerParam", 0));
+            assertEquals(12345, msg.<Integer>getOutboundProperty("integerParam", 0).intValue());
             assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
             assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
             return msg;

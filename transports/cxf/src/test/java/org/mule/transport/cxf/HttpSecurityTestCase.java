@@ -71,7 +71,8 @@ public class HttpSecurityTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send("cxfOutbound", "Hello", null);
 
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        final int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        assertEquals(200, status);
     }
 
     @Override

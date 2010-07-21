@@ -20,7 +20,7 @@ public class OutboundEventTimeoutMessageProcessor implements MessageProcessor
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        int timeout = event.getMessage().getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+        int timeout = event.getMessage().getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
         if (timeout >= 0)
         {
             event.setTimeout(timeout);

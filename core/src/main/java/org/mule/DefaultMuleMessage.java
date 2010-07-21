@@ -688,15 +688,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public int getIntProperty(String name, int defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getIntProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void setCorrelationId(String id)
     {
         assertAccess(WRITE);

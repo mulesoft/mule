@@ -204,7 +204,8 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
 
         assertMessageSentSame(false);
         assertEquals(responseEvent.getMessage(), result.getMessage());
-        assertEquals(500, result.getMessage().getIntProperty("status", 0));
+        final int status = result.getMessage().getOutboundProperty("status", 0);
+        assertEquals(500, status);
     }
 
     public void testResponseTransformerExceptionDetailAfterRequestFlowInterupt() throws Exception
@@ -227,7 +228,8 @@ public class InboundEndpointTestCase extends AbstractInboundMessageProcessorTest
         assertNotNull(result);
         assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
             result.getMessage().getPayloadAsString());
-        assertEquals(403, result.getMessage().getIntProperty("status", 0));
+        final int status = result.getMessage().getOutboundProperty("status", 0);
+        assertEquals(403, status);
 
         assertNotNull(result.getMessage().getExceptionPayload());
         assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
