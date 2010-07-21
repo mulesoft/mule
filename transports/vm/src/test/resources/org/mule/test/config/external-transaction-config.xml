@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule
-    xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
@@ -35,7 +33,7 @@
             <inbound>
                 <vm:inbound-endpoint path="entry" connector-ref="vm-normal" exchange-pattern="one-way">
                     <xa-transaction action="ALWAYS_JOIN" interactWithExternal="true"/>
-                    </vm:inbound-endpoint>
+                </vm:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>
             <outbound>
