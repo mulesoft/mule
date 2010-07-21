@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.TemplateParser;
@@ -175,7 +176,7 @@ public class DefaultExpressionManager implements ExpressionManager
         //TODO Handle empty collections || (result instanceof Collection && ((Collection)result).size()==0)
         if (failIfNull && (result == null))
         {
-            throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
+            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull(evaluator, expression));
         }
         if (logger.isDebugEnabled())
         {
