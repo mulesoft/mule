@@ -67,4 +67,9 @@ public class XmlMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 10);
     }
+
+    public static Message xpathResultTypeNotSupported(Class<?> paramType)
+    {
+        return factory.createMessage(BUNDLE_PATH, 11, paramType);
+    }
 }
