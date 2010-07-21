@@ -179,11 +179,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         checkInboundExchangePattern();
 
-        boolean synchronous = getSynchronous(connector, endpointURI);
-
         return new DefaultInboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), 
             messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
             getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
             getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors);
@@ -209,11 +207,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         checkOutboundExchangePattern();
 
-        boolean synchronous = getSynchronous(connector, endpointURI);
-
         return new DefaultOutboundEndpoint(connector, endpointURI, transformers, responseTransformers,
             getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), synchronous,
+            getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), 
             messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
             getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
             responsePropertiesList, getMessageProcessorsFactory(), messageProcessors,
@@ -285,17 +281,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 throw new EndpointException(e);
             }
         }
-    }
-
-    protected boolean getSynchronous(Connector connector, EndpointURI endpointURI)
-    {
-        // MEP overrides the sync flag
-        if (messageExchangePattern != null)
-        {
-            return messageExchangePattern.hasResponse();
-        }
-
-        throw new UnsupportedOperationException("getSynchronous, no MEP defined");
     }
 
     protected RetryPolicyTemplate getRetryPolicyTemplate(Connector conn)

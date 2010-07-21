@@ -84,10 +84,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
                     sendMessage.setCorrelationSequence(correlationSequence++);
                 }
 
-                //Use sync config from endpoint
-                boolean synchronous = part.getEndpoint().isSynchronous();
-
-                if (synchronous)
+                if (part.getEndpoint().getExchangePattern().hasResponse())
                 {
                     results.add(sendRequest(event, sendMessage, part.getEndpoint(), true));
                 }

@@ -14,10 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
@@ -29,6 +27,7 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,6 +48,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
 
     private Boolean synchronous;
 
+    @Override
     public MuleEvent route(MuleEvent event)
         throws RoutingException
     {
@@ -83,7 +83,8 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             endpoint = getRecipientEndpoint(request, recipient);
 
-            boolean sync = (this.synchronous==null ? endpoint.isSynchronous() : this.synchronous.booleanValue());
+            boolean sync = (this.synchronous == null ? 
+                endpoint.getExchangePattern().hasResponse() : this.synchronous.booleanValue());
             try
             {
                 if (sync)
@@ -175,6 +176,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         this.synchronous = synchronous;
     }
 
+    @Override
     public boolean isDynamicRoutes()
     {
         return true;

@@ -105,7 +105,7 @@ public class VMConnector extends AbstractConnector
     @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        if (!endpoint.isSynchronous())
+        if (!endpoint.getExchangePattern().hasResponse())
         {
             queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }

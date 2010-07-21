@@ -295,7 +295,8 @@ public class CxfServiceComponent implements Callable, Lifecycle
             // Account for the case where reply-to needs to be handled at the protocol, and not cxf, level.
             boolean protocolReplyTo = false;
             InboundEndpoint endpoint = receiver.getEndpoint();
-            if (endpoint.isSynchronous() && receiver.getEndpoint().getEndpointURI().getScheme().equals("jms"))
+            if (endpoint.getExchangePattern().hasResponse() && 
+                receiver.getEndpoint().getEndpointURI().getScheme().equals("jms"))
             {
                 protocolReplyTo = true;
                 // Disable CXF replyTo

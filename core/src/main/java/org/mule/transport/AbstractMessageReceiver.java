@@ -159,7 +159,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
 
         // TODO MULE-4622
         final Object o = message.getInboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-        if (ObjectUtils.getBoolean(o, false) && !endpoint.isSynchronous())
+        if (ObjectUtils.getBoolean(o, false) && !endpoint.getExchangePattern().hasResponse())
         {
             logger.warn("MuleClient.send() was used but inbound endpoint "
                         + endpoint.getEndpointURI().getUri().toString()

@@ -269,7 +269,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             // HACK because CXF expects a QName for the service
             initServiceName(svcCls, name, namespace, svcFac);
 
-            boolean sync = endpoint.isSynchronous();
+            boolean sync = endpoint.getExchangePattern().hasResponse();
             // default to synchronous if using http
             if (endpoint.getEndpointURI().getScheme().startsWith("http")
                 || endpoint.getEndpointURI().getScheme().startsWith("servlet"))

@@ -65,7 +65,6 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final Filter mockFilter = mock(Filter.class);
         final boolean deleteUnacceptedMessages = true;
         final EndpointSecurityFilter mockEndpointSecurityFilter = mock(EndpointSecurityFilter.class);
-        final boolean synchronous = true;
         final MessageExchangePattern messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
         final int responseTimeout = 5;
         final String initialState = "state1";
@@ -112,7 +111,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         // configuration
         new AbstractEndpoint(mockConnector, uri, inputTransformers, outputTransformers, name, properties,
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
-            synchronous, messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
+            messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
             messageProcessors, responseMessageProcessors)
         {

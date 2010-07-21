@@ -34,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -113,11 +114,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     private final EndpointSecurityFilter securityFilter;
 
-    /**
-     * whether events received by this endpoint should execute in a single thread
-     */
-    private final boolean synchronous;
-
     private final MessageExchangePattern messageExchangePattern;
     
     /**
@@ -150,7 +146,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             Filter filter,
                             boolean deleteUnacceptedMessages,
                             EndpointSecurityFilter securityFilter,
-                            boolean synchronous,
                             MessageExchangePattern messageExchangePattern,
                             int responseTimeout,
                             String initialState,
@@ -185,20 +180,19 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.retryPolicyTemplate = retryPolicyTemplate;
 
         if (transactionConfig != null && transactionConfig.getFactory() != null &&
-                transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
-                transactionConfig.getAction() != TransactionConfig.ACTION_NEVER)
+            transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
+            transactionConfig.getAction() != TransactionConfig.ACTION_NEVER)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Endpoint has a transaction configuration. Defaulting to synchronous. Endpoint is: " + toString());
+                logger.debug("Endpoint has a transaction configuration. Defaulting to REQUEST_RESPONSE. Endpoint is: " + toString());
             }
-            this.synchronous = true;
+            this.messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
         }
         else
         {
-            this.synchronous = synchronous;
+            this.messageExchangePattern = messageExchangePattern;
         }
-        this.messageExchangePattern = messageExchangePattern;
 
         this.messageProcessorsFactory = messageProcessorsFactory;
         if (messageProcessors == null)
@@ -374,7 +368,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && equal(name, other.name) && equal(properties, other.properties)
                 && responseTimeout == other.responseTimeout
                 && equal(responseTransformers, other.responseTransformers)
-                && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
+                && equal(securityFilter, other.securityFilter)
                 && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
@@ -390,7 +384,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 // don't include lifecycle state as lifecycle code includes hashing
                 // initialised,
                 name, properties, new Integer(responseTimeout),
-                responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
+                responseTransformers, securityFilter, messageExchangePattern, transactionConfig,
                 transformers});
     }
 
@@ -425,19 +419,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public EndpointSecurityFilter getSecurityFilter()
     {
         return securityFilter;
-    }
-
-    /**
-     * Determines if requests originating from this endpoint should be synchronous
-     * i.e. execute in a single thread and possibly return an result. This property
-     * is only used when the endpoint is of type 'receiver'
-     *
-     * @return whether requests on this endpoint should execute in a single thread.
-     *         This property is only used when the endpoint is of type 'receiver'
-     */
-    public boolean isSynchronous()
-    {
-        return synchronous;
     }
 
     public MessageExchangePattern getExchangePattern()

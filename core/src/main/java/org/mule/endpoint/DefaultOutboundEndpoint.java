@@ -49,7 +49,6 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    Filter filter,
                                    boolean deleteUnacceptedMessage,
                                    EndpointSecurityFilter securityFilter,
-                                   boolean synchronous,
                                    MessageExchangePattern messageExchangePattern,
                                    int responseTimeout,
                                    String initialState,
@@ -63,7 +62,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    List <MessageProcessor> responseMessageProcessors)
     {
         super(connector, endpointUri, transformers, responseTransformers, name, properties, 
-            transactionConfig, filter, deleteUnacceptedMessage, securityFilter, synchronous, 
+            transactionConfig, filter, deleteUnacceptedMessage, securityFilter, 
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, endpointBuilderName, 
             muleContext, retryPolicyTemplate,  messageProcessorsFactory, messageProcessors, 
             responseMessageProcessors);

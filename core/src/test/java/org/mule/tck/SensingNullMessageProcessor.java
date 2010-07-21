@@ -21,7 +21,7 @@ public class SensingNullMessageProcessor implements MessageProcessor
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         this.event = event;
-        if (event.getEndpoint().isSynchronous())
+        if (event.getEndpoint().getExchangePattern().hasResponse())
         {
             return event;
         }

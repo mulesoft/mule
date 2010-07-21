@@ -96,7 +96,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
                             + ", as there are more targets available.");
             }
 
-            if (!lastEndpoint || endpoint.isSynchronous())
+            if (!lastEndpoint || endpoint.getExchangePattern().hasResponse())
             {
                 try
                 {

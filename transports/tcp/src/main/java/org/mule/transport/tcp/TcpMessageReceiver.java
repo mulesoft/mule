@@ -249,6 +249,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 underlyingIn = new BufferedInputStream(socket.getInputStream());
                 dataIn = new TcpInputStream(underlyingIn)
                 {
+                    @Override
                     public void close() throws IOException
                     {
                         // Don't actually close the stream, we just want to know if the
@@ -357,11 +358,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
+        @Override
         protected void bindTransaction(Transaction tx) throws TransactionException
         {
             //nothing to do
         }
 
+        @Override
         protected Object getNextMessage(Object resource) throws Exception
         {
             long keepAliveTimeout = ((TcpConnector)connector).getKeepAliveTimeout();
@@ -417,7 +420,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected void handleResults(List messages) throws Exception
         {            
             //should send back only if remote synch is set or no outbound endpoints
-            if (endpoint.isSynchronous())
+            if (endpoint.getExchangePattern().hasResponse())
             {
                 for (Iterator iterator = messages.iterator(); iterator.hasNext();)
                 {

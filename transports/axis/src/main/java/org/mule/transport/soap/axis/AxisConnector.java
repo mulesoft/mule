@@ -382,7 +382,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
         }
 
-        boolean sync = receiver.getEndpoint().isSynchronous();
+        boolean sync = receiver.getEndpoint().getExchangePattern().hasResponse();
         
         EndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         serviceEndpointbuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));

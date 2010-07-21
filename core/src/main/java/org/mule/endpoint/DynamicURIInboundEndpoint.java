@@ -176,11 +176,6 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         return endpoint.isReadOnly();
     }
-
-    public boolean isSynchronous()
-    {
-        return endpoint.isSynchronous();
-    }
     
     public MessageExchangePattern getExchangePattern()
     {

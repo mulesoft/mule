@@ -12,6 +12,7 @@ package org.mule.test.integration;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -138,7 +139,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     {
         ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://hello?exchangePattern=request-response&responseTimeout=2002&connector=testConnector1");
-        assertTrue(ep.isSynchronous());
+        assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getExchangePattern());
         assertEquals(2002, ep.getResponseTimeout());
         assertTrue(ep instanceof InboundEndpoint);
 

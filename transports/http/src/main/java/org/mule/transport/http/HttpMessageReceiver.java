@@ -47,6 +47,7 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.logging.Log;
@@ -501,7 +502,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
             factory.setCookieSpec(cookieSpec);
             
-            factory.setSynchronous(endpoint.isSynchronous());
+            factory.setSynchronous(endpoint.getExchangePattern().hasResponse());
 
             muleMessageFactory = factory;
         }

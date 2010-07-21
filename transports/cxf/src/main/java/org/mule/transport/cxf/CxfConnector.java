@@ -246,7 +246,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         String scheme = ep.getScheme().toLowerCase();
 
         InboundEndpoint originalEndpoint = receiver.getEndpoint();
-        boolean sync = originalEndpoint.isSynchronous();
 
         // If we are using sockets then we need to set the endpoint name appropiately
         // and if using http/https
@@ -261,7 +260,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
 
         EndpointBuilder protocolEndpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        protocolEndpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
+        protocolEndpointBuilder.setExchangePattern(originalEndpoint.getExchangePattern());
         protocolEndpointBuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
         protocolEndpointBuilder.setTransactionConfig(originalEndpoint.getTransactionConfig());
 

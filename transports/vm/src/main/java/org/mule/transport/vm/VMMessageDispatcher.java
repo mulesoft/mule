@@ -38,6 +38,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         this.connector = (VMConnector) endpoint.getConnector();
     }
 
+    @Override
     protected void doDispatch(final MuleEvent event) throws Exception
     {
         EndpointURI endpointUri = endpoint.getEndpointURI();
@@ -64,6 +65,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected MuleMessage doSend(final MuleEvent event) throws Exception
     {
         MuleMessage retMessage;
@@ -102,14 +104,16 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         return retMessage;
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
-        if (!endpoint.isSynchronous())
+        if (!endpoint.getExchangePattern().hasResponse())
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(
@@ -117,6 +121,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method

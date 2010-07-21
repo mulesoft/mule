@@ -55,7 +55,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             connect();
 
-            if (endpoint.isSynchronous())
+            if (endpoint.getExchangePattern().hasResponse())
             {
                 MuleMessage resultMessage = doSend(event);
                 if (resultMessage != null)
@@ -118,7 +118,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         boolean remoteSync = false;
         if (event.getEndpoint().getConnector().isResponseEnabled())
         {
-            remoteSync = event.getEndpoint().isSynchronous() || doSend;
+            boolean hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
+            remoteSync = hasResponse || doSend;
             if (remoteSync)
             {
                 // service will be null for client calls

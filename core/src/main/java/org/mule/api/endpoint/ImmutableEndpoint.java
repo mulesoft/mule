@@ -170,16 +170,6 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
     
     List <MessageProcessor> getResponseMessageProcessors();
     
-    /**
-     * Determines if requests originating from this endpoint should be synchronous
-     * i.e. execute in a single thread and possibly return an result. This property
-     * is only used when the endpoint is of type 'receiver'
-     *
-     * @return whether requests on this endpoint should execute in a single thread.
-     *         This property is only used when the endpoint is of type 'receiver'
-     */
-    boolean isSynchronous();
-
     MessageExchangePattern getExchangePattern();
     
     /**
