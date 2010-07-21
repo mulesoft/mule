@@ -218,9 +218,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    private DefaultMuleMessage(DefaultMuleMessage message)
+    public DefaultMuleMessage(MuleMessage message)
     {
-        this(message.getPayload(), message, message.muleContext);
+        this(message.getPayload(), message, message.getMuleContext());
     }
 
     private void setMuleContext(MuleContext context)
@@ -1230,19 +1230,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public boolean isConsumable()
     {
         return isConsumedFromAdditional(this.getPayload().getClass());
-    }
-
-    public static MuleMessage copy(MuleMessage message)
-    {
-        if (message instanceof DefaultMuleMessage)
-        {
-            return new DefaultMuleMessage((DefaultMuleMessage) message);
-        }
-        else
-        {
-            //Very unlikely to happen unless a user des something odd
-            throw new IllegalArgumentException("In order to clone a message it must be assignable from: " + DefaultMuleMessage.class.getName());
-        }
     }
 
     private void writeObject(ObjectOutputStream out) throws Exception

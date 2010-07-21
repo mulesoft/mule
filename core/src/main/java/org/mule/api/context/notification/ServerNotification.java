@@ -10,15 +10,15 @@
 
 package org.mule.api.context.notification;
 
-import java.util.EventObject;
-import java.util.Map;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
+
+import java.util.EventObject;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -117,7 +117,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         }
         synchronized (message)
         {
-            return DefaultMuleMessage.copy(message);
+            return new DefaultMuleMessage(message);
         }
     }
 
