@@ -115,10 +115,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         {
             return null;
         }
-        synchronized (message)
-        {
-            return new DefaultMuleMessage(message);
-        }
+        return new DefaultMuleMessage(message);
     }
 
     public int getAction()
