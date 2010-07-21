@@ -11,12 +11,14 @@
 package org.mule.transport.cxf;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.tck.AbstractMuleTestCase;
@@ -101,6 +103,7 @@ public class CxfServiceComponentTestCase extends AbstractMuleTestCase
         final String method = "GET";
         final Server server = mock(Server.class);
         final Destination destination = mock(Destination.class);
+        final EndpointURI uri = mock(EndpointURI.class);
         final InboundEndpoint endpoint = mock(InboundEndpoint.class);
         final MessageObserver messageObserver = mock(MessageObserver.class);
         final String someActionProperty = "someActionProperty";
@@ -120,6 +123,10 @@ public class CxfServiceComponentTestCase extends AbstractMuleTestCase
         when(server.getDestination()).thenReturn(destination);
         when(receiver.getEndpoint()).thenReturn(endpoint);
         when(destination.getMessageObserver()).thenReturn(messageObserver);
+        when(endpoint.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+        when(endpoint.getEndpointURI()).thenReturn(uri);
+        when(uri.getScheme()).thenReturn("http");
+        
         doAnswer(new Answer<Object>()
         {
             public Object answer(InvocationOnMock invocation) throws Throwable

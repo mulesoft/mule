@@ -296,7 +296,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             boolean protocolReplyTo = false;
             InboundEndpoint endpoint = receiver.getEndpoint();
             if (endpoint.getExchangePattern().hasResponse() && 
-                receiver.getEndpoint().getEndpointURI().getScheme().equals("jms"))
+                endpoint.getEndpointURI().getScheme().equals("jms"))
             {
                 protocolReplyTo = true;
                 // Disable CXF replyTo
