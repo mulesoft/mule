@@ -18,7 +18,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
@@ -49,7 +48,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event =
                 new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                        (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session);
+                                     service.getInboundRouter().getEndpoints().get(0), session);
         service.sendEvent(event);
     }
 
@@ -98,7 +97,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 assertEquals("param1", msg.getOutboundProperty("stringParam"));
                 final Object o = msg.getOutboundProperty("objectParam");
                 assertTrue(o instanceof Apple);
-                assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
+                assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
                 assertEquals(12345, msg.getIntProperty("integerParam", 0));
                 assertEquals(123456789, msg.getLongProperty("longParam", 0));
                 assertEquals(true, msg.getBooleanProperty("booleanParam", false));
@@ -116,7 +115,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");
             assertTrue(o instanceof Apple);
-            assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
+            assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
             assertEquals(12345, msg.getIntProperty("integerParam", 0));
             assertEquals(123456789, msg.getLongProperty("longParam", 0));
             assertEquals(true, msg.getBooleanProperty("booleanParam", false));

@@ -253,15 +253,6 @@ public interface MuleMessage extends Serializable
     long getLongProperty(String name, long defaultValue);
 
     /**
-     * Gets a double property from the message
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
-    double getDoubleProperty(String name, double defaultValue);
-
-    /**
      * Gets a boolean property from the message
      * 
      * @param name the name or key of the property
@@ -285,22 +276,6 @@ public interface MuleMessage extends Serializable
      * @param value the property value
      */
     void setIntProperty(String name, int value);
-
-    /**
-     * Sets a long property on the message
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    void setLongProperty(String name, long value);
-
-    /**
-     * Sets a double property on the message
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    void setDoubleProperty(String name, double value);
 
 
     /**

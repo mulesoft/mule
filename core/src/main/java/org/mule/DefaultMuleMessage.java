@@ -543,20 +543,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     //** {@inheritDoc} */
-    public double getDoubleProperty(String name, double defaultValue)
-    {
-        assertAccess(READ);
-        return properties.getDoubleProperty(name, defaultValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDoubleProperty(String name, double value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, Double.valueOf(value), PropertyScope.OUTBOUND);
-    }
 
     /**
      * {@inheritDoc}
@@ -742,15 +728,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         setProperty(name, Integer.valueOf(value), PropertyScope.OUTBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLongProperty(String name, long value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, Long.valueOf(value), PropertyScope.OUTBOUND);
     }
 
     /**
