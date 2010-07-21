@@ -100,7 +100,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
                 assertEquals(12345, msg.getIntProperty("integerParam", 0));
                 assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
-                assertEquals(true, msg.getBooleanProperty("booleanParam", false));
+                assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
                 assertNotNull(msg.getAttachment("test1"));
             }
             return null;

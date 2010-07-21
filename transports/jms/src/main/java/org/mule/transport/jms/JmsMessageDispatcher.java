@@ -127,8 +127,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
             // Should we be caching sessions? Note this is not part of the JMS spec.
             // and is turned off by default.
-            else if (event.getMessage().getBooleanProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY,
-                    connector.isCacheJmsSessions()))
+            else if (event.getMessage().getOutboundProperty(JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions()))
             {
                 sessionManaged = false;
                 cached = true;

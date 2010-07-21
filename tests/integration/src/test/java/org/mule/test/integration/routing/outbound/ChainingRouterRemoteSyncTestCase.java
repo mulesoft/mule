@@ -52,7 +52,7 @@ public class ChainingRouterRemoteSyncTestCase extends FunctionalTestCase
 
         MuleMessage jmsMessage = muleClient.request("jms://out2", FunctionalTestCase.RECEIVE_TIMEOUT);
         assertEquals("test [REMOTESYNC RESPONSE] [REMOTESYNC RESPONSE 2]", jmsMessage.getPayloadAsString());
-        assertFalse(jmsMessage.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false));
+        assertFalse(jmsMessage.getOutboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false));
     }
 
 }

@@ -32,7 +32,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://invoker.in", TEST_MESSAGE, null);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
-        assertTrue(response.getBooleanProperty(PROCESSED, false));
+        assertTrue(response.getOutboundProperty(PROCESSED, false));
         String expected = "Hello " + TEST_MESSAGE + " " + MAGIC_NUMBER;
         assertEquals(expected, response.getPayload());
     }
