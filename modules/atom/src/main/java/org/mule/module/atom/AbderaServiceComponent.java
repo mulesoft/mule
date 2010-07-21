@@ -131,7 +131,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             };
             DefaultMuleMessage response = new DefaultMuleMessage(payload, muleContext);
 
-            response.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, context.getStatus());
+            response.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, context.getStatus());
             long cl = context.getContentLength();
             String cc = context.getCacheControl();
             if (cl > -1)

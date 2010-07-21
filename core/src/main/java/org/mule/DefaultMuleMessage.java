@@ -697,15 +697,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public void setIntProperty(String name, int value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, Integer.valueOf(value), PropertyScope.OUTBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void setCorrelationId(String id)
     {
         assertAccess(WRITE);
@@ -789,7 +780,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setCorrelationSequence(int sequence)
     {
         assertAccess(WRITE);
-        setIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
+        setOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
     }
 
     /**
@@ -812,7 +803,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
-        setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+        setOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
 
     /**

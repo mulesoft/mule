@@ -243,14 +243,6 @@ public interface MuleMessage extends Serializable
      */
     int getIntProperty(String name, int defaultValue);
 
-    /**
-     * Sets a integerproperty on the message
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    void setIntProperty(String name, int value);
-
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by

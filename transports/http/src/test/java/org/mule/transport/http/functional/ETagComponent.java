@@ -29,10 +29,10 @@ public class ETagComponent implements org.mule.api.lifecycle.Callable
         if ((etag != null) && etag.equals(ETAG_VALUE))
         {
             message = new DefaultMuleMessage(StringUtils.EMPTY, eventContext.getMuleContext());
-            message.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_MODIFIED);
+            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_MODIFIED);
         }
         
-        message.setProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);        
+        message.setOutboundProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);        
         return message;
     }
 }

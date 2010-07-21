@@ -39,7 +39,6 @@ import org.mule.transaction.TransactionCoordination;
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -315,7 +314,7 @@ public class DefaultMuleEventContext implements MuleEventContext
             {
                 MuleMessage muleMessage = new DefaultMuleMessage(message, event.getMessage(),
                     event.getMuleContext());
-                muleMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
+                muleMessage.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(muleMessage);
             }
         };
@@ -348,7 +347,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
+                message.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message);
             }
         };
@@ -383,7 +382,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
+                message.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointUri);
             }
         };
@@ -420,7 +419,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             public Object call() throws Exception
             {
-                message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
+                message.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointName);
             }
         };

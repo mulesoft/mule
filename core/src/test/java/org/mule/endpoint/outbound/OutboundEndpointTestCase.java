@@ -201,7 +201,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
         testOutboundEvent.getMessage()
-            .setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+            .setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
 
         endpoint.process(testOutboundEvent);
 

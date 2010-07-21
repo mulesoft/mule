@@ -182,7 +182,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         }
         MuleMessage msg = event.getMessage();
         msg.setOutboundProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, realmHeader);
-        msg.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
+        msg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
     }
 
     /**
