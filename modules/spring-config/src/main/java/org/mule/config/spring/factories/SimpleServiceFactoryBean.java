@@ -16,23 +16,23 @@ import java.util.List;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.Transformer;
-import org.mule.component.DefaultJavaComponent;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.SimpleService;
 import org.mule.construct.builders.ConstructBuilders;
 import org.mule.construct.builders.SimpleServiceBuilder;
-import org.mule.object.PrototypeObjectFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
 
+/**
+ * Builds SimpleService instances by using the SimpleServiceBuilder.
+ */
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
-    private String componentClass;
-    private String componentBeanName;
-    private Component component;
-
     private final SimpleServiceBuilder newSimpleService = ConstructBuilders.buildSimpleService();
+
+    private SpringBeanLookup springBeanLookup;
 
     public Class<?> getObjectType()
     {
@@ -40,9 +40,20 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     }
 
     @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        super.setApplicationContext(applicationContext);
+
+        if (springBeanLookup != null)
+        {
+            springBeanLookup.setApplicationContext(applicationContext);
+        }
+    }
+
+    @Override
     protected AbstractFlowConstruct createFlowConstruct() throws MuleException
     {
-        return newSimpleService.serving(getOrBuildComponent()).in(muleContext);
+        return newSimpleService.in(muleContext);
     }
 
     public void setName(String name)
@@ -77,40 +88,19 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 
     public void setComponentClass(String componentClass)
     {
-        this.componentClass = componentClass;
+        newSimpleService.serving(componentClass);
     }
 
     public void setComponentBeanName(String componentBeanName)
     {
-        this.componentBeanName = componentBeanName;
+        springBeanLookup = new SpringBeanLookup();
+        springBeanLookup.setBean(componentBeanName);
+        newSimpleService.serving(springBeanLookup);
     }
 
     public void setComponent(Component component)
     {
-        this.component = component;
+        newSimpleService.serving(component);
     }
 
-    private Component getOrBuildComponent()
-    {
-        if (component == null)
-        {
-            ObjectFactory objectFactory = getComponentObjectFactory();
-            component = new DefaultJavaComponent(objectFactory);
-        }
-
-        return component;
-    }
-
-    private ObjectFactory getComponentObjectFactory()
-    {
-        if (componentBeanName != null)
-        {
-            SpringBeanLookup sbl = new SpringBeanLookup();
-            sbl.setApplicationContext(applicationContext);
-            sbl.setBean(componentBeanName);
-            return sbl;
-        }
-
-        return new PrototypeObjectFactory(componentClass);
-    }
 }

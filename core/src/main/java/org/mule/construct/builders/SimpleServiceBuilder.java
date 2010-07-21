@@ -20,9 +20,12 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.Transformer;
+import org.mule.component.DefaultJavaComponent;
 import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.object.PrototypeObjectFactory;
 
 /**
  * Fluent API for the creation of a SimpleService.
@@ -72,6 +75,16 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder
     {
         this.responseTransformers = responseTransformers;
         return this;
+    }
+
+    public SimpleServiceBuilder serving(String componentClass)
+    {
+        return serving(new PrototypeObjectFactory(componentClass));
+    }
+
+    public SimpleServiceBuilder serving(ObjectFactory objectFactory)
+    {
+        return serving(new DefaultJavaComponent(objectFactory));
     }
 
     public SimpleServiceBuilder serving(Component component)
