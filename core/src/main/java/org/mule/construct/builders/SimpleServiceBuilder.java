@@ -29,6 +29,7 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
  */
 public class SimpleServiceBuilder extends AbstractFlowConstructBuilder
 {
+    // TODO (DDO) unit test
     protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
 
     protected String address;

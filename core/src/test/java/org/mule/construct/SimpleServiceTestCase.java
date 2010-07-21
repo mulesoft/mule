@@ -10,10 +10,8 @@
 
 package org.mule.construct;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.component.AbstractComponent;
@@ -41,34 +39,13 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
         return simpleService;
     }
 
-    public void testSendWithSynchronousEndpoint() throws Exception
+    public void testProcess() throws Exception
     {
         simpleService.initialise();
         simpleService.start();
-        MuleEvent response = dims.process(MuleTestUtils.getTestEvent("hello",
-            getSynchronousTestInboundEndpoint(), muleContext));
+        MuleEvent response = dims.process(MuleTestUtils.getTestInboundEvent("hello", muleContext));
 
         assertEquals("olleh", response.getMessageAsString());
-    }
-
-    public void testSendEvenIfEndpointIsAsynchronous() throws Exception
-    {
-        simpleService.initialise();
-        simpleService.start();
-        MuleEvent response = dims.process(MuleTestUtils.getTestEvent("hello",
-            getAsynchronousTestInboundEndpoint(), muleContext));
-
-        assertEquals("olleh", response.getMessageAsString());
-    }
-
-    private InboundEndpoint getAsynchronousTestInboundEndpoint() throws Exception
-    {
-        return getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
-    }
-
-    private InboundEndpoint getSynchronousTestInboundEndpoint() throws Exception
-    {
-        return getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE);
     }
 
     private static class DirectInboundMessageSource implements MessageSource
