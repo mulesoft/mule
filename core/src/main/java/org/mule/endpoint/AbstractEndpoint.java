@@ -365,11 +365,14 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && equal(initialState, other.initialState)
                 // don't include lifecycle state as lifecycle code includes hashing
                 // && equal(initialised, other.initialised)
-                && equal(name, other.name) && equal(properties, other.properties)
+                && equal(messageExchangePattern, other.messageExchangePattern)
+                && equal(name, other.name) 
+                && equal(properties, other.properties)
                 && responseTimeout == other.responseTimeout
                 && equal(responseTransformers, other.responseTransformers)
                 && equal(securityFilter, other.securityFilter)
-                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
+                && equal(transactionConfig, other.transactionConfig) 
+                && equal(transformers, other.transformers);
     }
 
     @Override
@@ -383,8 +386,13 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 initialState,
                 // don't include lifecycle state as lifecycle code includes hashing
                 // initialised,
-                name, properties, new Integer(responseTimeout),
-                responseTransformers, securityFilter, messageExchangePattern, transactionConfig,
+                messageExchangePattern,
+                name,
+                properties, 
+                Integer.valueOf(responseTimeout),
+                responseTransformers, 
+                securityFilter, 
+                transactionConfig,
                 transformers});
     }
 
