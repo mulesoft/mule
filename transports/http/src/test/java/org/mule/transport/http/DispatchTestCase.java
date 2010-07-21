@@ -59,7 +59,7 @@ public class DispatchTestCase extends FunctionalTestCase
         }
         
         int count = 0;
-        while (client.request("vm://queue", 1000) != null) 
+        while (client.request("vm://queue", 3000) != null) 
         {
             count++;
         }
