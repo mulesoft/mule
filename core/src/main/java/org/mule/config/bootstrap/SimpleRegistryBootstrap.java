@@ -106,8 +106,9 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
             try
             {
                 URL url = (URL) e.nextElement();
-                if (logger.isInfoEnabled()) {
-                    logger.info("Reading bootstrap file: " + url.toString());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Reading bootstrap file: " + url.toString());
                 }
                 Properties p = new Properties();
                 p.load(url.openStream());
@@ -298,7 +299,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     {
         for (Map.Entry<Object, Object> entry : props.entrySet())
         {
-            registerObject(entry.getKey() + "#" + UUID.getUUID(), (String)entry.getValue(), registry);
+            final String key = String.format("%s#%s", entry.getKey(), UUID.getUUID());
+            registerObject(key, (String) entry.getValue(), registry);
         }
         props.clear();
     }
