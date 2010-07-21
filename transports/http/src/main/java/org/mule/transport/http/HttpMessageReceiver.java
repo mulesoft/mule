@@ -502,7 +502,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
             factory.setCookieSpec(cookieSpec);
             
-            factory.setSynchronous(endpoint.getExchangePattern().hasResponse());
+            factory.setExchangePattern(endpoint.getExchangePattern());
 
             muleMessageFactory = factory;
         }

@@ -10,6 +10,7 @@
 
 package org.mule.transport.http;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.api.transport.MuleMessageFactory;
@@ -84,7 +85,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     public void testHttpRequestPostPayload() throws Exception
     {
         HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
-        factory.setSynchronous(false);
+        factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
         HttpRequest request = createPostHttpRequest();
         MuleMessage message = factory.create(request, encoding);

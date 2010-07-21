@@ -11,6 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -39,8 +40,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     private static Log log = LogFactory.getLog(HttpMuleMessageFactory.class);
     
     private boolean enableCookies = false;
-    private String cookieSpec = null;
-    private boolean synchronous = true;
+    private String cookieSpec;
+    private MessageExchangePattern exchangePattern;
 
     public HttpMuleMessageFactory(MuleContext context)
     {
@@ -86,7 +87,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             // Passing along the InputStream doesn't work because the
             // HttpConnection gets closed and closes the InputStream, often
             // before it can be read.
-            if (!synchronous)
+            if (!exchangePattern.hasResponse())
             {
                 log.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
                 body = IOUtils.toByteArray((InputStream) body);
@@ -308,8 +309,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         this.cookieSpec = cookieSpec;
     }
 
-    public void setSynchronous(boolean flag)
+    public void setExchangePattern(MessageExchangePattern mep)
     {
-        synchronous = flag;
+        exchangePattern = mep;
     }
 }
