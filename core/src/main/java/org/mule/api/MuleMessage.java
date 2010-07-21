@@ -65,6 +65,10 @@ public interface MuleMessage extends Serializable
      *
      * @deprecated use the overloaded version with an explicit lookup scope. This method will
      * now use only the outbound scope.
+     * @see #getInboundProperty(String)
+     * @see #getOutboundProperty(String)
+     * @see #getInvocationProperty(String)
+     * @see #getSessionProperty(String)
      */
     @Deprecated
     Object getProperty(String key);
@@ -79,6 +83,7 @@ public interface MuleMessage extends Serializable
      * @see #setInboundProperty(String, Object)
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object)
+     * @see #setSessionProperty(String, Object)
      */
     @Deprecated
     void setProperty(String key, Object value);
@@ -110,6 +115,7 @@ public interface MuleMessage extends Serializable
      * @see #setInboundProperty(String, Object)
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object) 
+     * @see #setSessionProperty(String, Object)
      */
     void setProperty(String key, Object value, PropertyScope scope);
 
@@ -499,4 +505,6 @@ public interface MuleMessage extends Serializable
     <T> T getSessionProperty(String name, T defaultValue);
 
     <T> T getSessionProperty(String name);
+
+    void setSessionProperty(String key, Object value);
 }
