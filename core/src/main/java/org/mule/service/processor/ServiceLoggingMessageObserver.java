@@ -26,7 +26,7 @@ public class ServiceLoggingMessageObserver extends AbstractMessageObserver
     @Override
     public void observe(MuleEvent event)
     {
-        if (event.isSynchronous())
+        if (event.getEndpoint().getExchangePattern().hasResponse())
         {
             if (logger.isDebugEnabled())
             {

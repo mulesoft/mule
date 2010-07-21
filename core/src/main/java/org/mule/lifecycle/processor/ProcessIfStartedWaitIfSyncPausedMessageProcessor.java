@@ -27,7 +27,7 @@ public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends
     @Override
     protected MuleEvent processNext(MuleEvent event) throws MuleException
     {
-        if (event.isSynchronous())
+        if (event.getEndpoint().getExchangePattern().hasResponse())
         {
             return super.processNext(event);
         }

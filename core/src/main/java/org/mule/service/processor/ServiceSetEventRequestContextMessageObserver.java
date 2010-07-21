@@ -16,12 +16,11 @@ import org.mule.processor.AbstractMessageObserver;
 
 public class ServiceSetEventRequestContextMessageObserver extends AbstractMessageObserver
 {
-
     @Override
     public void observe(MuleEvent event)
     {
         // DF: I've no idea why we only do this for sync
-        if (event.isSynchronous())
+        if (event.getEndpoint().getExchangePattern().hasResponse())
         {
             event = OptimizedRequestContext.unsafeSetEvent(event);
         }

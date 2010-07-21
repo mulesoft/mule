@@ -31,7 +31,7 @@ public class ServiceOutboundStatisticsObserver extends AbstractMessageObserver
         ServiceStatistics stats = service.getStatistics();
         if (service.getOutboundRouter().hasEndpoints() && stats.isEnabled())
         {
-            if (event.isSynchronous())
+            if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 stats.incSentEventSync();
             }

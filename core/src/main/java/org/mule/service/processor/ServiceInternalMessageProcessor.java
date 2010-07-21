@@ -71,7 +71,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
             if (resultEvent != null)
             {
                 String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
-                if (!event.isSynchronous() || !BooleanUtils.toBoolean(replyToStop))
+                if (!event.getEndpoint().getExchangePattern().hasResponse() || !BooleanUtils.toBoolean(replyToStop))
                 {
                     processReplyTo(event, resultEvent, replyToHandler, replyTo);
                 }
@@ -90,7 +90,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
                 exceptionListener.exceptionThrown(new MessagingException(
                     CoreMessages.eventProcessingFailedFor(service.getName()), event.getMessage(), e));
             }
-            if (event.isSynchronous())
+            if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 if (resultEvent == null)
                 {

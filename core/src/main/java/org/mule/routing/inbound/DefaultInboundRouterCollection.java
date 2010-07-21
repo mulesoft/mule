@@ -178,7 +178,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection
                 }
             }
         }
-        if (event.isSynchronous())
+        if (event.getEndpoint().getExchangePattern().hasResponse())
         {
             // This is required if the Router short-circuits the service and diverts
             // processing elsewhere

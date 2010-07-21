@@ -23,6 +23,7 @@ import org.mule.api.service.Service;
  */
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
+    @Override
     public synchronized MuleEvent doCatchMessage(MuleEvent event)
         throws RoutingException
     {
@@ -35,7 +36,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
-            if (event.isSynchronous())
+            if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
                 MuleMessage responseMessage = ((Service) event.getFlowConstruct()).sendEvent(event);

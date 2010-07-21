@@ -431,7 +431,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         StringBuffer buf = new StringBuffer(64);
         buf.append("MuleEvent: ").append(getId());
-        buf.append(", sync=").append(isSynchronous());
         buf.append(", stop processing=").append(isStopFurtherProcessing());
         buf.append(", ").append(endpoint);
 
@@ -512,11 +511,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     public int hashCode()
     {
         return 29 * id.hashCode() + (message != null ? message.hashCode() : 0);
-    }
-
-    public boolean isSynchronous()
-    {
-        return endpoint.isSynchronous();
     }
 
     public int getTimeout()

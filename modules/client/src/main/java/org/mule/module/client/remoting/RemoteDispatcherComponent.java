@@ -170,7 +170,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession());
             event = RequestContext.setEvent(event);
 
-            if (context.isSynchronous())
+            if (context.getExchangePattern().hasResponse())
             {
                 result = service.sendEvent(event);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();

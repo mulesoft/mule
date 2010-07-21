@@ -668,19 +668,14 @@ public class DefaultMuleEventContext implements MuleEventContext
         return event.getOutputStream();
     }
 
-    /**
-     * Determines whether the was sent synchrounously or not
-     * 
-     * @return true if the event is synchronous
-     */
-    public boolean isSynchronous()
-    {
-        return event.isSynchronous();
-    }
-
     public EndpointURI getEndpointURI()
     {
         return event.getEndpoint().getEndpointURI();
+    }
+    
+    public MessageExchangePattern getExchangePattern()
+    {
+        return event.getEndpoint().getExchangePattern();
     }
 
     /**

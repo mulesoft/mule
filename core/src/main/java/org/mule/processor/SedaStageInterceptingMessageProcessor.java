@@ -90,7 +90,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         {
             return event;
         }
-        else if (event.isSynchronous() || event.getEndpoint().getTransactionConfig().isTransacted())
+        else if (event.getEndpoint().getExchangePattern().hasResponse() || 
+                  event.getEndpoint().getTransactionConfig().isTransacted())
         {
             return processNext(event);
         }
@@ -101,6 +102,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
     }
 
+    @Override
     protected void processAsync(MuleEvent event) throws MuleException
     {
         try
@@ -165,6 +167,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             super(event);
         }
 
+        @Override
         protected void doRun()
         {
             try

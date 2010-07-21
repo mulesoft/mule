@@ -22,10 +22,10 @@ import org.mule.api.MuleEventContext;
  */
 public class ResponseWriterCallback extends CounterCallback
 {
-
+    @Override
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
-        if (context.isSynchronous())
+        if (context.getExchangePattern().hasResponse())
         {
             throw new IllegalStateException("The ResponseWriterCallback should not be used for synchronous tests as it will cause two copies of the message to be written back to the client");
         }
@@ -39,6 +39,5 @@ public class ResponseWriterCallback extends CounterCallback
 
         context.getOutputStream().write(result.getBytes());
         context.getOutputStream().flush();
-    }
-    
+    } 
 }

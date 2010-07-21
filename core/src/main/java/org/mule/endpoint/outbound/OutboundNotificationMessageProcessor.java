@@ -44,7 +44,7 @@ public class OutboundNotificationMessageProcessor extends AbstractMessageObserve
             }
 
             int notificationAction;
-            if (event.isSynchronous())
+            if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 notificationAction = EndpointMessageNotification.MESSAGE_SENT;
             }

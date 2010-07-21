@@ -28,7 +28,7 @@ public class ServiceStatisticsMessageObserver extends AbstractMessageObserver
     {
         if (service.getStatistics().isEnabled())
         {
-            if (event.isSynchronous())
+            if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 service.getStatistics().incReceivedEventSync();
             }

@@ -209,13 +209,6 @@ public interface MuleEvent
     void setStopFurtherProcessing(boolean stopFurtherProcessing);
 
     /**
-     * Determines whether the was sent synchrounously or not
-     * 
-     * @return true if the event is synchronous
-     */
-    boolean isSynchronous();
-
-    /**
      * The number of milliseconds to wait for a return event when running
      * synchronously. 0 wait forever -1 try and receive, but do not wait or a
      * positive millisecond value

@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -137,6 +138,7 @@ public interface MuleEventContext
      *             service or the events fails during dispatch
      * @deprecated
      */
+    @Deprecated
     MuleMessage sendEvent(Object message) throws MuleException;
 
     /**
@@ -150,6 +152,7 @@ public interface MuleEventContext
      *             the transport for the endpoint
      * @deprecated
      */
+    @Deprecated
     MuleMessage sendEvent(MuleMessage message) throws MuleException;
 
     /**
@@ -164,6 +167,7 @@ public interface MuleEventContext
      *             the transport for the endpoint
      * @deprecated
      */
+    @Deprecated
     MuleMessage sendEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
 
     /**
@@ -281,6 +285,7 @@ public interface MuleEventContext
      *             service or the events fails during dispatch
      * @deprecated
      */
+    @Deprecated
     void dispatchEvent(MuleMessage message) throws MuleException;
 
     /**
@@ -292,6 +297,7 @@ public interface MuleEventContext
      *             service or the events fails during dispatch
      * @deprecated
      */
+    @Deprecated
     void dispatchEvent(Object payload) throws MuleException;
 
     /**
@@ -306,6 +312,7 @@ public interface MuleEventContext
      *             the transport for the endpoint
      * @deprecated
      */
+    @Deprecated
     void dispatchEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
 
     /**
@@ -365,6 +372,7 @@ public interface MuleEventContext
      * @throws MuleException if the request operation fails
      * @deprecated
      */
+    @Deprecated
     MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
     FlowConstruct getFlowConstruct();
@@ -409,13 +417,8 @@ public interface MuleEventContext
      */
     OutputStream getOutputStream();
 
-    /**
-     * Determines whether the was sent synchrounously or not
-     * 
-     * @return true if the event is synchronous
-     */
-    boolean isSynchronous();
-
+    MessageExchangePattern getExchangePattern();
+    
     /**
      * Returns a reference to the Endpoint Uri for this context This is the endpoint
      * on which the event was received
