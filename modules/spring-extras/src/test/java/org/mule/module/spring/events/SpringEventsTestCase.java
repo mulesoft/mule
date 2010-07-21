@@ -25,7 +25,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -33,8 +32,9 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 public class SpringEventsTestCase extends FunctionalTestCase
 {
-    private static final int NUMBER_OF_MESSAGES = 10;
+    protected static final int DEFAULT_LATCH_TIMEOUT = 5000;
 
+    private static final int NUMBER_OF_MESSAGES = 10;
     private volatile AtomicInteger eventCounter1;
     private volatile AtomicInteger eventCounter2;
 
@@ -86,7 +86,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         multicaster.addApplicationListener(subscriptionBean);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
-        assertTrue(whenFinished.await(3000, TimeUnit.MILLISECONDS));
+        assertTrue(whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(1, eventCounter1.get());
         eventCounter1.set(0);
 
@@ -112,7 +112,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, eventCounter1.get());
     }
 
@@ -144,7 +144,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             "applicationEventMulticaster")).applicationContext;
         context.publishEvent(new TestApplicationEvent(context));
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, eventCounter1.get());
     }
 
@@ -162,7 +162,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             "applicationEventMulticaster")).applicationContext;
         context.publishEvent(new TestApplicationEvent(context));
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(2, eventCounter1.get());
     }
 
@@ -178,7 +178,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(1, eventCounter1.get());
     }
 
@@ -215,8 +215,8 @@ public class SpringEventsTestCase extends FunctionalTestCase
         // send asynchronously
         this.doSend("vm://event.multicaster", "Test Spring MuleEvent", NUMBER_OF_MESSAGES);
 
-        whenFinished1.await(3000, TimeUnit.MILLISECONDS);
-        whenFinished2.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished1.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        whenFinished2.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(NUMBER_OF_MESSAGES, eventCounter1.get());
         assertEquals(NUMBER_OF_MESSAGES, eventCounter2.get());
     }
@@ -236,7 +236,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         // publish asynchronously
         this.doPublish(event, NUMBER_OF_MESSAGES);
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         assertEquals(NUMBER_OF_MESSAGES, eventCounter1.get());
     }
 
@@ -261,8 +261,8 @@ public class SpringEventsTestCase extends FunctionalTestCase
         // publish asynchronously
         this.doPublish(event, 1);
 
-        whenFinished.await(3000, TimeUnit.MILLISECONDS);
-        assertTrue(transformerLatch.await(3000, TimeUnit.MILLISECONDS));
+        whenFinished.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertTrue(transformerLatch.await(DEFAULT_LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(1, eventCounter1.get());
     }
 
