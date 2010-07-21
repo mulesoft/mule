@@ -244,14 +244,6 @@ public interface MuleMessage extends Serializable
     int getIntProperty(String name, int defaultValue);
 
     /**
-     * Sets a boolean property on the message
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
-    void setBooleanProperty(String name, boolean value);
-
-    /**
      * Sets a integerproperty on the message
      * 
      * @param name the property name or key

@@ -48,7 +48,6 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -313,7 +312,7 @@ public class RemoteDispatcher implements Disposable
                                              boolean synchronous) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, synchronous);
+        message.setOutboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, synchronous);
         setCredentials(message);
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, RemoteDispatcherNotification.ACTION_INVOKE,
             "mule://" + component);

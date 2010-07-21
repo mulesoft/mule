@@ -173,7 +173,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // the payload is already encoded, switch off encoding it in the transformer
         String encodedPayload = "encoded%20payload";
         MuleMessage message = setupRequestContext("http://mycompany.com/", encodedPayload);
-        message.setBooleanProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, false);
+        message.setOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, false);
         
         ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object result = transformer.transform(message);

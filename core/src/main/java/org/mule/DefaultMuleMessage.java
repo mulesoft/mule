@@ -697,15 +697,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public void setBooleanProperty(String name, boolean value)
-    {
-        assertAccess(WRITE);
-        setProperty(name, Boolean.valueOf(value), PropertyScope.OUTBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void setIntProperty(String name, int value)
     {
         assertAccess(WRITE);
