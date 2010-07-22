@@ -30,7 +30,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.xml.sax.InputSource;
 
-public class CloseStreanOnMuleExceptionTestCase extends FunctionalTestCase
+public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
 
     private String xmlText = "<test attribute=\"1\"/>";
