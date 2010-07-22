@@ -10,16 +10,12 @@
 
 package org.mule.construct.builder;
 
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -30,26 +26,17 @@ import org.mule.object.PrototypeObjectFactory;
  */
 public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService>
 {
-    // TODO (DDO) unit test
     protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
 
-    protected List<Transformer> transformers;
-    protected List<Transformer> responseTransformers;
     protected Component component;
 
-    public SimpleServiceBuilder transformingRequestsWith(List<Transformer> transformers)
+    @Override
+    protected MessageExchangePattern getInboundMessageExchangePattern()
     {
-        this.transformers = transformers;
-        return this;
+        return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    public SimpleServiceBuilder transformingResponseWith(List<Transformer> responseTransformers)
-    {
-        this.responseTransformers = responseTransformers;
-        return this;
-    }
-
-    public SimpleServiceBuilder serving(String componentClass)
+    public SimpleServiceBuilder serving(Class<?> componentClass)
     {
         return serving(new PrototypeObjectFactory(componentClass));
     }
@@ -80,21 +67,7 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     @Override
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        return new SimpleService(muleContext, name, buildInboundEndpoint(muleContext), component);
-    }
-
-    private InboundEndpoint buildInboundEndpoint(MuleContext muleContext) throws MuleException
-    {
-        if (endpointBuilder == null)
-        {
-            endpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(address);
-        }
-
-        // forced to request-response for SimpleService
-        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        endpointBuilder.setTransformers(transformers);
-        endpointBuilder.setResponseTransformers(responseTransformers);
-        return endpointBuilder.buildInboundEndpoint();
+        return new SimpleService(muleContext, name, buildMessageSource(muleContext), component);
     }
 
 }
