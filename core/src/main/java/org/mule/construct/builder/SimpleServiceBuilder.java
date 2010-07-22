@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct.builders;
+package org.mule.construct.builder;
 
 import java.beans.ExceptionListener;
 import java.util.List;

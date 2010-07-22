@@ -20,8 +20,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.SimpleService;
-import org.mule.construct.builders.ConstructBuilders;
-import org.mule.construct.builders.SimpleServiceBuilder;
+import org.mule.construct.builder.ConstructBuilders;
+import org.mule.construct.builder.SimpleServiceBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 

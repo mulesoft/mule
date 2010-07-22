@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.construct.builders;
+package org.mule.construct.builder;
 
 /**
  * A helper class for creating flow construct builders.
