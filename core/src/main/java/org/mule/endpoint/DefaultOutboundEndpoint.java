@@ -72,6 +72,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         responseProperties.add(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
         responseProperties.add(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+        responseProperties.add(MuleProperties.MULE_SESSION_PROPERTY);
         // Add any additional properties specified by the user.
         String[] props = StringUtils.splitAndTrim(responsePropertiesList, ",");
         if (props != null)

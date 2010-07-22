@@ -44,16 +44,16 @@ import java.util.Map;
 
 public class FilteringOutboundRouter extends AbstractOutboundRouter
 {
+    protected ExpressionManager expressionManager;
+
     private List<Transformer> transformers = new LinkedList<Transformer>();
 
     private Filter filter;
 
     private boolean useTemplates = true;
-
     // We used Square templates as they can exist as part of an URI.
-    private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
-    protected ExpressionManager expressionManager;
+    private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
     @Override
     public void initialise() throws InitialisationException
@@ -78,7 +78,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
         try
         {
-                result = sendRequest(event, message, ep, true);
+            result = sendRequest(event, message, ep, true);
         }
         catch (MuleException e)
         {
@@ -178,7 +178,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             }
 
             Map props = new HashMap();
-            // Also add the endpoint propertie so that users can set fallback values
+            // Also add the endpoint properties so that users can set fallback values
             // when the property is not set on the event
             props.putAll(ep.getProperties());
             for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
@@ -186,6 +186,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                 Object value = message.getOutboundProperty(propertyKey);
                 props.put(propertyKey, value);
             }
+
+            propagateMagicProperties(message, message);
 
             if (!parser.isContainsTemplate(uri))
             {

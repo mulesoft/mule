@@ -70,7 +70,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
         returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        
+
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property
         // anyway as it should never be true from a replyTo dispatch
         returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);

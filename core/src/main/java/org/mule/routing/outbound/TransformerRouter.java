@@ -38,6 +38,7 @@ public class TransformerRouter extends AbstractOutboundRouter
             {
                 Object payload = transformer.transform(message.getPayload());
                 message = new DefaultMuleMessage(payload, message, muleContext);
+                propagateMagicProperties(message, message);
             }
             catch (TransformerException e)
             {

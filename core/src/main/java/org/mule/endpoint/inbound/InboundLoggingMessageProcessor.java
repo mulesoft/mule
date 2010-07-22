@@ -32,7 +32,7 @@ public class InboundLoggingMessageProcessor extends AbstractMessageObserver
         MuleMessage message = event.getMessage();
         if (logger.isDebugEnabled())
         {
-            logger.debug("Message Received from: " + endpoint.getEndpointURI());
+            logger.debug("Message Received on: " + endpoint.getEndpointURI());
         }
         if (logger.isTraceEnabled())
         {

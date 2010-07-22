@@ -32,6 +32,7 @@ import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -47,6 +48,18 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     public static final int ENABLE_CORRELATION_IF_NOT_SET = 0;
     public static final int ENABLE_CORRELATION_ALWAYS = 1;
     public static final int ENABLE_CORRELATION_NEVER = 2;
+
+    /**
+     * These properties are automatically propagated by Mule from inbound to outbound
+     */
+    protected static List<String> magicProperties = Arrays.asList(
+        MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+        MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+        MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+        MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+        MuleProperties.MULE_SESSION_PROPERTY
+    );
+
     /**
      * logger used by this class
      */
@@ -393,6 +406,23 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
 
         return route.process(event);
+    }
+
+    /**
+     * Propagates a number of internal system properties to handle correlation, session, etc. Note that
+     * in and out params can be the same message object when not dealing with replies.
+     * @see #magicProperties
+     */
+    protected void propagateMagicProperties(MuleMessage in, MuleMessage out)
+    {
+        for (String name : magicProperties)
+        {
+            Object value = in.getInboundProperty(name);
+            if (value != null)
+            {
+                out.setOutboundProperty(name, value);
+            }
+        }
     }
 
 }
