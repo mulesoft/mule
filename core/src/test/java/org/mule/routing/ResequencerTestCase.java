@@ -62,14 +62,8 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(resultEvent);
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        final Object payload = resultMessage.getPayload();
-        assertEquals(MuleEvent[].class, payload.getClass());
-        MuleEvent[] results = (MuleEvent[]) payload;
-        assertEquals(3, results.length);
 
-        assertEquals("test event B", results[0].getMessage().getPayload().toString());
-        assertEquals("test event C", results[1].getMessage().getPayload().toString());
-        assertEquals("test event A", results[2].getMessage().getPayload().toString());
+        assertEquals("test event A", resultMessage.getPayload().toString());
 
         // set a resequencing comparator. We need to reset the router since it will not process the same event group
         //twice
@@ -80,15 +74,11 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNull(router.process(event3));
 
         resultEvent = router.process(event1);
-        assertNotNull(results);
+        assertNotNull(resultEvent);
         resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        results = (MuleEvent[]) resultMessage.getPayload();
-        assertEquals(3, results.length);
-
-        assertEquals("test event A", results[0].getMessage().getPayload().toString());
-        assertEquals("test event B", results[1].getMessage().getPayload().toString());
-        assertEquals("test event C", results[2].getMessage().getPayload().toString());
+;
+        assertEquals("test event C", resultMessage.getPayload().toString());
     }
 
     public static class TestEventResequencer extends Resequencer
