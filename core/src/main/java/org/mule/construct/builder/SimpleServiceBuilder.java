@@ -10,7 +10,6 @@
 
 package org.mule.construct.builder;
 
-import java.beans.ExceptionListener;
 import java.util.List;
 
 import org.mule.MessageExchangePattern;
@@ -18,7 +17,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.Transformer;
@@ -30,40 +28,14 @@ import org.mule.object.PrototypeObjectFactory;
 /**
  * Fluent API for the creation of a SimpleService.
  */
-public class SimpleServiceBuilder extends AbstractFlowConstructBuilder
+public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService>
 {
     // TODO (DDO) unit test
     protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
 
-    protected String address;
-    protected EndpointBuilder endpointBuilder;
     protected List<Transformer> transformers;
     protected List<Transformer> responseTransformers;
     protected Component component;
-
-    public SimpleServiceBuilder named(String name)
-    {
-        this.name = name;
-        return this;
-    }
-
-    public SimpleServiceBuilder withExceptionListener(ExceptionListener exceptionListener)
-    {
-        this.exceptionListener = exceptionListener;
-        return this;
-    }
-
-    public SimpleServiceBuilder receivingOn(EndpointBuilder endpointBuilder)
-    {
-        this.endpointBuilder = endpointBuilder;
-        return this;
-    }
-
-    public SimpleServiceBuilder receivingOn(String address)
-    {
-        this.address = address;
-        return this;
-    }
 
     public SimpleServiceBuilder transformingRequestsWith(List<Transformer> transformers)
     {
@@ -105,14 +77,10 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder
         return this;
     }
 
-    public SimpleService in(MuleContext muleContext) throws MuleException
+    @Override
+    protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        SimpleService simpleService = new SimpleService(muleContext, name, buildInboundEndpoint(muleContext),
-            component);
-
-        addExceptionListener(simpleService);
-
-        return simpleService;
+        return new SimpleService(muleContext, name, buildInboundEndpoint(muleContext), component);
     }
 
     private InboundEndpoint buildInboundEndpoint(MuleContext muleContext) throws MuleException

@@ -12,18 +12,53 @@ package org.mule.construct.builder;
 
 import java.beans.ExceptionListener;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.service.DefaultServiceExceptionStrategy;
 
-public abstract class AbstractFlowConstructBuilder
+public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
     protected static final DefaultServiceExceptionStrategy DEFAULT_SERVICE_EXCEPTION_STRATEGY = new DefaultServiceExceptionStrategy();
 
     protected String name;
-
+    protected String address;
+    protected EndpointBuilder endpointBuilder;
     protected ExceptionListener exceptionListener;
 
-    // TODO (DDO) pull more setters from SimpleServiceBuilder
+    public T named(String name)
+    {
+        this.name = name;
+        return (T) this;
+    }
+
+    public T withExceptionListener(ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
+        return (T) this;
+    }
+
+    public T receivingOn(EndpointBuilder endpointBuilder)
+    {
+        this.endpointBuilder = endpointBuilder;
+        return (T) this;
+    }
+
+    public T receivingOn(String address)
+    {
+        this.address = address;
+        return (T) this;
+    }
+
+    public F in(MuleContext muleContext) throws MuleException
+    {
+        F flowConstruct = buildFlowConstruct(muleContext);
+        addExceptionListener(flowConstruct);
+        return flowConstruct;
+    }
+
+    protected abstract F buildFlowConstruct(MuleContext muleContext) throws MuleException;
 
     protected void addExceptionListener(AbstractFlowConstruct flowConstruct)
     {
