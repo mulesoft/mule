@@ -62,7 +62,9 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(resultEvent);
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        MuleEvent[] results = (MuleEvent[]) resultMessage.getPayload();
+        final Object payload = resultMessage.getPayload();
+        assertEquals(MuleEvent[].class, payload.getClass());
+        MuleEvent[] results = (MuleEvent[]) payload;
         assertEquals(3, results.length);
 
         assertEquals("test event B", results[0].getMessage().getPayload().toString());
