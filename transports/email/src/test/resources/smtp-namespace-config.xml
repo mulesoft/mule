@@ -37,12 +37,8 @@
         <smtps:tls-trust-store path="empty.jks" storePassword="password"/>
     </smtps:connector>
 
-    <smtp:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"
-        exchange-pattern="one-way"/>
-    <smtp:endpoint name="global2" address="smtp://bob:secret@localhost:123"
-        exchange-pattern="one-way"/>
-    <smtps:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"
-        exchange-pattern="one-way"/>
-    <smtps:endpoint name="global2s" address="smtps://bob:secret@localhost:123"
-        exchange-pattern="one-way"/>
+    <smtp:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>
+    <smtp:endpoint name="global2" address="smtp://bob:secret@localhost:123"/>
+    <smtps:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"/>
+    <smtps:endpoint name="global2s" address="smtps://bob:secret@localhost:123"/>
 </mule>

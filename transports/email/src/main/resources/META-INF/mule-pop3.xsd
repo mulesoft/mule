@@ -39,7 +39,11 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <!-- 
+                The only valid exchange-pattern is one-way which is the default. No need to make 
+                the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -48,7 +52,11 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <!-- 
+                The only valid exchange-pattern is one-way which is the default. No need to make 
+                the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>

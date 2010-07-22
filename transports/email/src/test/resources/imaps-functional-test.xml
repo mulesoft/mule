@@ -25,8 +25,7 @@
     <model name="test">
         <service name="relay">
             <inbound>
-                <imaps:inbound-endpoint user="bob" password="password" host="localhost" 
-                    port="65444" exchange-pattern="one-way"/>
+                <imaps:inbound-endpoint user="bob" password="password" host="localhost" port="65444"/>
             </inbound>
             <outbound>
                 <pass-through-router>

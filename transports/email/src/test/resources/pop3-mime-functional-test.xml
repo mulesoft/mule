@@ -20,7 +20,7 @@
         <service name="relay">
             <inbound>
                 <pop3:inbound-endpoint user="bob" password="password" host="localhost" 
-                    port="65445" transformer-refs="noActionTransformer" exchange-pattern="one-way"/>
+                    port="65445" transformer-refs="noActionTransformer"/>
             </inbound>
             <outbound>
                 <pass-through-router>

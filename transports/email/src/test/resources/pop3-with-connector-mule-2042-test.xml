@@ -19,7 +19,7 @@
                 <!-- adding the connector-ref here was causing issues
                      this should be identical to pop3-functional-test apart from this -->
                 <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="65435" 
-                    connector-ref="pop3Connector" exchange-pattern="one-way"/>
+                    connector-ref="pop3Connector"/>
             </inbound>
             <outbound>
                 <pass-through-router>

@@ -16,8 +16,7 @@
     <model name="test">
         <service name="relay">
             <inbound>
-                <pop3:inbound-endpoint user="bob" password="password" host="localhost" 
-                    port="65435" exchange-pattern="one-way"/>
+                <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="65435"/>
             </inbound>
             <outbound>
                 <pass-through-router>

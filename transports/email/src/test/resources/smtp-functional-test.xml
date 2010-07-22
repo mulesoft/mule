@@ -23,8 +23,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <smtp:outbound-endpoint host="localhost" port="65437" to="bob@example.com"
-                        exchange-pattern="one-way"/>
+                    <smtp:outbound-endpoint host="localhost" port="65437" to="bob@example.com"/>
                 </pass-through-router>
             </outbound>
         </service>

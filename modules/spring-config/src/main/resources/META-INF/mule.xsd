@@ -1712,11 +1712,17 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="globalEndpointType">
+    <xsd:complexType name="globalEndpointTypeWithoutExchangePattern">
         <xsd:complexContent>
             <xsd:extension base="abstractGlobalEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="globalEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="allExchangePatterns"/>    
             </xsd:extension>
         </xsd:complexContent>
@@ -1739,11 +1745,17 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="inboundEndpointType">
+    <xsd:complexType name="inboundEndpointTypeWithoutExchangePattern">
         <xsd:complexContent>
             <xsd:extension base="abstractInboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="allExchangePatterns"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1766,12 +1778,18 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="outboundEndpointType">
+    <xsd:complexType name="outboundEndpointTypeWithoutExchangePattern">
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attributeGroup ref="allExchangePatterns"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="outboundEndpointTypeWithoutExchangePattern">
+                <xsd:attributeGroup ref="allExchangePatterns"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1988,6 +2006,20 @@
             </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
+    <xsd:attributeGroup name="oneWayOnlyExchangePattern">
+        <xsd:attribute name="exchange-pattern">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="one-way"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+    
 
     <!--==============================================================-->
     <!--   Filter elements                                            -->

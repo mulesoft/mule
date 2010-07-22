@@ -20,8 +20,7 @@
         <service name="relay">
             <inbound>
                 <imap:inbound-endpoint user="bob" password="password" host="localhost" port="65443"
-                                       transformer-refs="noActionTransformer" 
-                                       exchange-pattern="one-way"/>
+                    transformer-refs="noActionTransformer" />
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -29,7 +28,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

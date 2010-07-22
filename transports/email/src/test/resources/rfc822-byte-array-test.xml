@@ -8,6 +8,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.0/mule-smtp.xsd">
 
-    <smtp:endpoint name="smtp" host="localhost" exchange-pattern="one-way"/>
+    <smtp:endpoint name="smtp" host="localhost"/>
 
 </mule>
