@@ -103,6 +103,7 @@
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundPropertyAttributes"/>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -117,6 +118,7 @@
                     <xsd:group ref="mule:defaultEndpointElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -133,6 +135,7 @@
                 </xsd:sequence>
                 <xsd:attributeGroup ref="inboundPropertyAttributes"/>
                 <xsd:attributeGroup ref="generalPropertyAttributes"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -168,7 +171,6 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-    
 
     <xsd:group name="inboundPropertyElements">
         <xsd:sequence>
@@ -317,5 +319,4 @@
             <xsd:enumeration value="LITERAL" />
         </xsd:restriction>
     </xsd:simpleType>
-
 </xsd:schema>

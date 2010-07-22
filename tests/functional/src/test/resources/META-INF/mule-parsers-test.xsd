@@ -128,6 +128,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
                 <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -151,6 +152,7 @@
                 <xsd:group ref="mule:defaultEndpointElements"/>
                 <xsd:attribute name="address" type="xsd:string"/>
                 <xsd:attribute name="ref" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
                 <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
