@@ -70,23 +70,25 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
                                                           Transformer responseTransformer)
         throws EndpointException, InitialisationException
     {
-        return createTestOutboundEndpoint(null, null, transformer, responseTransformer, true, null);
+        return createTestOutboundEndpoint(null, null, transformer, responseTransformer, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
     }
 
     protected OutboundEndpoint createTestOutboundEndpoint(Filter filter,
                                                           EndpointSecurityFilter securityFilter,
-                                                          boolean sync,
+                                                          MessageExchangePattern exchangePattern,
                                                           TransactionConfig txConfig)
         throws InitialisationException, EndpointException
     {
-        return createTestOutboundEndpoint(filter, securityFilter, null, null, sync, txConfig);
+        return createTestOutboundEndpoint(filter, securityFilter, null, null, exchangePattern, 
+            txConfig);
     }
 
     protected OutboundEndpoint createTestOutboundEndpoint(Filter filter,
                                                           EndpointSecurityFilter securityFilter,
                                                           Transformer transformer,
                                                           Transformer responseTransformer,
-                                                          boolean sync,
+                                                          MessageExchangePattern exchangePattern,
                                                           TransactionConfig txConfig)
         throws EndpointException, InitialisationException
     {
@@ -102,7 +104,7 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         {
             endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
         }
-        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
+        endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);
         customizeEndpointBuilder(endpointBuilder);
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();

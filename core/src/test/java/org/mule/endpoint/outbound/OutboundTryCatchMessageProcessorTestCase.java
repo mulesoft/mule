@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
@@ -80,7 +81,8 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
     public void testCatchRuntimeExceptionAsync() throws Exception
     {
 
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, false, null);
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 
+            MessageExchangePattern.ONE_WAY, null);
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
@@ -125,7 +127,8 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
 
     public void testCatchDispatchExceptionAsync() throws Exception
     {
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, false, null);
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 
+            MessageExchangePattern.ONE_WAY, null);
         InterceptingMessageProcessor mp = new OutboundTryCatchMessageProcessor(endpoint);
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
@@ -145,16 +148,17 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         assertNotNull(exceptionListener.sensedException);
     }
 
+    @Override
     protected OutboundEndpoint createTestOutboundEndpoint(Filter filter,
                                                           EndpointSecurityFilter securityFilter,
                                                           Transformer transformer,
                                                           Transformer responseTransformer,
-                                                          boolean sync,
+                                                          MessageExchangePattern exchangePattern,
                                                           TransactionConfig txConfig)
         throws EndpointException, InitialisationException
     {
         OutboundEndpoint endpoint = super.createTestOutboundEndpoint(filter, securityFilter, transformer,
-            responseTransformer, sync, txConfig);
+            responseTransformer, exchangePattern, txConfig);
         endpoint.getConnector().setExceptionListener(exceptionListener);
         return endpoint;
     }
@@ -165,7 +169,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
         {
             throw new IllegalStateException();
         }
-    };
+    }
 
     static class DispatchExceptionThrowingMessageProcessr implements MessageProcessor
     {
@@ -174,7 +178,7 @@ public class OutboundTryCatchMessageProcessorTestCase extends AbstractOutboundMe
             throw new DispatchException(CoreMessages.createStaticMessage("exception"), event.getMessage(),
                 event.getEndpoint());
         }
-    };
+    }
 
     static class TestExceptionListener implements ExceptionListener
     {

@@ -47,7 +47,8 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
     public MuleMessage generateSynchronousEvent(String endpoint, Object payload, Map messageProperties) throws MuleException
     {
         logger.debug("Executing process is sending an event (synchronously) to Mule endpoint = " + endpoint);
-        MuleMessage response = generateEvent(endpoint, payload, messageProperties, true);
+        MuleMessage response = generateEvent(endpoint, payload, messageProperties, 
+            MessageExchangePattern.REQUEST_RESPONSE);
         if (logger.isDebugEnabled())
         {
             logger.debug("Synchronous response is " + (response != null ? response.getPayload() : null));
@@ -76,7 +77,8 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    protected MuleMessage generateEvent(String endpoint, Object payload, Map messageProperties, boolean synchronous) throws MuleException
+    protected MuleMessage generateEvent(String endpoint, Object payload, Map messageProperties, 
+        MessageExchangePattern exchangePattern) throws MuleException
     {
         MuleMessage message;
         if (payload instanceof MuleMessage)
@@ -95,11 +97,11 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             //TODO should probably cache this
             EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry()
                 .lookupEndpointFactory().getEndpointBuilder(endpoint);
-            endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
+            endpointBuilder.setExchangePattern(exchangePattern);
             OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
 
             DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
-            if (synchronous)
+            if (exchangePattern.hasResponse())
             {
                 MuleEvent resultEvent = ep.process(event);
                 if (resultEvent != null)
@@ -151,7 +153,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         {
             try
             {
-                generateEvent(endpoint, payload, messageProperties, false);
+                generateEvent(endpoint, payload, messageProperties, MessageExchangePattern.ONE_WAY);
             }
             catch (Exception e)
             {

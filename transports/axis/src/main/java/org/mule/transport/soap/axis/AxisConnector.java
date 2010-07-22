@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -382,10 +381,8 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
             logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
         }
 
-        boolean sync = receiver.getEndpoint().getExchangePattern().hasResponse();
-        
         EndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
-        serviceEndpointbuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
+        serviceEndpointbuilder.setExchangePattern(receiver.getEndpoint().getExchangePattern());
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
         serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers().isEmpty() ? null

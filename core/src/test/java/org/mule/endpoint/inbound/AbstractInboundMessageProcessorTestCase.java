@@ -61,23 +61,24 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
                                                         Transformer responseTransformer)
         throws EndpointException, InitialisationException
     {
-        return createTestInboundEndpoint(null, null, transformer, responseTransformer, true, null);
+        return createTestInboundEndpoint(null, null, transformer, responseTransformer, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
     }
 
     protected InboundEndpoint createTestInboundEndpoint(Filter filter,
                                                         EndpointSecurityFilter securityFilter,
-                                                        boolean sync,
+                                                        MessageExchangePattern exchangePattern,
                                                         TransactionConfig txConfig)
         throws InitialisationException, EndpointException
     {
-        return createTestInboundEndpoint(filter, securityFilter, null, null, sync, txConfig);
+        return createTestInboundEndpoint(filter, securityFilter, null, null, exchangePattern, txConfig);
     }
 
     protected InboundEndpoint createTestInboundEndpoint(Filter filter,
                                                         EndpointSecurityFilter securityFilter,
                                                         Transformer transformer,
                                                         Transformer responseTransformer,
-                                                        boolean sync,
+                                                        MessageExchangePattern exchangePattern,
                                                         TransactionConfig txConfig)
         throws EndpointException, InitialisationException
     {
@@ -92,7 +93,7 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         {
             endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
         }
-        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(sync));
+        endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
         return endpoint;

@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -47,7 +48,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
     public void testDefaultFlowSync() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
@@ -67,7 +69,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
     public void testDefaultFlowAsync() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, false, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.ONE_WAY, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
@@ -79,8 +82,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
     public void testSecurityFilterAccept() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), null, null,
-            true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), 
+            null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
@@ -102,8 +105,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
         muleContext.registerListener(securityNotificationListener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), null, null,
-            true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), 
+            null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         RequestContext.setEvent(testOutboundEvent);
@@ -129,7 +132,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         endpoint.process(outboundEvent);
 
@@ -147,7 +151,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, false, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.ONE_WAY, null);
         MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         endpoint.process(outboundEvent);
 
@@ -163,7 +168,7 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
     public void testTransformers() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
-            new ResponseAppendTransformer(), true, null);
+            new ResponseAppendTransformer(), MessageExchangePattern.REQUEST_RESPONSE, null);
         MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
         MuleEvent result = endpoint.process(outboundEvent);
 
@@ -179,7 +184,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
     public void testConnectorNotStarted() throws Exception
     {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
         endpoint.getConnector().stop();
         try
@@ -198,7 +204,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
         int testTimeout = 999;
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, true, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
         testOutboundEvent.getMessage()
             .setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
@@ -273,17 +280,17 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
                                                       EndpointSecurityFilter securityFilter,
                                                       Transformer in,
                                                       Transformer response,
-                                                      boolean sync,
+                                                      MessageExchangePattern exchangePattern,
                                                       TransactionConfig txConfig) throws Exception
     {
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(filter, securityFilter, in, response, sync,
-            txConfig);
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(filter, securityFilter, in, response,
+            exchangePattern, txConfig);
         dispacher = new FakeMessageDispatcher(endpoint);
         Connector connector = endpoint.getConnector();
         connector.setDispatcherFactory(new TestMessageDispatcherFactory()
         {
-
-            public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
+            @Override
+            public MessageDispatcher create(OutboundEndpoint ep) throws MuleException
             {
                 return dispacher;
             }
@@ -318,7 +325,6 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
             sensedDispatchEvent = event;
             latch.countDown();
         }
-
     }
 
 }

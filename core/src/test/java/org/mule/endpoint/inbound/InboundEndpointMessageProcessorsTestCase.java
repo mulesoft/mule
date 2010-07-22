@@ -12,6 +12,7 @@ package org.mule.endpoint.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -40,7 +41,8 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMes
     {
         super.doSetUp();
         inMessage = createTestRequestMessage();
-        endpoint = createTestInboundEndpoint(null, null, null, null, true, null);
+        endpoint = createTestInboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         requestEvent = createTestRequestEvent(endpoint);
     }
 

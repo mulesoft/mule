@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.inbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -24,7 +25,8 @@ public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInbou
     @Test
     public void testFilterPass() throws Exception
     {
-        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), true, null);
+        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         InterceptingMessageProcessor mp = new InboundSecurityFilterMessageProcessor(endpoint);
         TestListener listner = new TestListener();
         mp.setListener(listner);
@@ -40,7 +42,8 @@ public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInbou
     @Test
     public void testFilterFail() throws Exception
     {
-        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), true, null);
+        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         InterceptingMessageProcessor mp = new InboundSecurityFilterMessageProcessor(endpoint);
         TestListener listner = new TestListener();
         mp.setListener(listner);

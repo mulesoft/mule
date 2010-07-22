@@ -102,7 +102,7 @@ public class DefaultMuleConnection implements MuleConnection
     public MuleMessage send(String url, Object payload, Map messageProperties) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, true);
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE);
         MuleEvent event = getEvent(message, endpoint);
 
         try
@@ -154,12 +154,13 @@ public class DefaultMuleConnection implements MuleConnection
         }
     }
     
-    protected OutboundEndpoint getOutboundEndpoint(String uri, boolean synchronous) throws MuleException
+    protected OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern exchangePattern) 
+        throws MuleException
     {
         EndpointBuilder endpointBuilder = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getEndpointBuilder(uri);
-        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
+        endpointBuilder.setExchangePattern(exchangePattern);
         return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
     }
 

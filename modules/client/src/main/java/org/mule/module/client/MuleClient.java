@@ -61,6 +61,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -266,7 +267,7 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, false, null);
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
         MuleEvent event = getEvent(message, endpoint);
         try
         {
@@ -631,7 +632,8 @@ public class MuleClient implements Disposable
      */
     public MuleMessage send(String url, MuleMessage message, int timeout) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, true, timeout);
+        OutboundEndpoint endpoint = 
+            getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         
         MuleEvent event = getEvent(message, endpoint);
         event.setTimeout(timeout);
@@ -773,8 +775,8 @@ public class MuleClient implements Disposable
         return endpoint;
     }
 
-    protected OutboundEndpoint getOutboundEndpoint(String uri, boolean synchronous, Integer responseTimeout)
-        throws MuleException
+    protected OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern exchangePattern, 
+        Integer responseTimeout) throws MuleException
     {
         // There was a potential leak here between get() and putIfAbsent(). This
         // would cause the endpoint that was created to be used rather an endpoint
@@ -782,21 +784,20 @@ public class MuleClient implements Disposable
         // thread. To avoid this we test for the result of putIfAbsent result and if
         // it is non-null then an endpoint was created and added concurrently and we
         // return this instance instead.
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + synchronous
-                                                                                 + ":" + responseTimeout);
+        String key = String.format("%1s:%2s:%3s", uri, exchangePattern, responseTimeout);
+        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(key);
         if (endpoint == null)
         {
-            EndpointBuilder endpointBuilder = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(synchronous));
+            EndpointBuilder endpointBuilder = 
+                muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(uri);
+            endpointBuilder.setExchangePattern(exchangePattern);
             if (responseTimeout != null && responseTimeout > 0)
             {
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
             endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
-                uri + ":" + synchronous + ":" + responseTimeout, endpoint);
+            OutboundEndpoint concurrentlyAddedEndpoint = 
+                (OutboundEndpoint) outboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
                 return concurrentlyAddedEndpoint;
@@ -864,7 +865,8 @@ public class MuleClient implements Disposable
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, true, null);
+        OutboundEndpoint endpoint = 
+            getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
         MuleEvent event = getEvent(message, endpoint);
         try
         {

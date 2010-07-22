@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -17,7 +18,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -34,7 +34,8 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundM
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        endpoint = createOutboundEndpoint(null, null, null, null, true, null);
+        endpoint = createOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
     }
 
@@ -61,9 +62,10 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundM
                                                       EndpointSecurityFilter securityFilter,
                                                       Transformer in,
                                                       Transformer response,
-                                                      boolean sync,
+                                                      MessageExchangePattern exchangePattern,
                                                       TransactionConfig txConfig) throws Exception
     {
-        return createTestOutboundEndpoint(filter, securityFilter, in, response, sync, txConfig);
+        return createTestOutboundEndpoint(filter, securityFilter, in, response, exchangePattern, 
+            txConfig);
     }
 }

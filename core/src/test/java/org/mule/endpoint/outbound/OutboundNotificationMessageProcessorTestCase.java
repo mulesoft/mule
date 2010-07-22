@@ -10,6 +10,7 @@
 
 package org.mule.endpoint.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -26,7 +27,8 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
         TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, false, null);
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.ONE_WAY, null);
         MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
         MuleEvent event = createTestOutboundEvent(endpoint);
         mp.process(event);
@@ -38,7 +40,6 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(event.getMessage().getPayload(),
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
-
     }
 
     public void testSend() throws Exception
@@ -46,7 +47,8 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
         TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
         muleContext.registerListener(listener);
 
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, true, null);
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
         MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
         MuleEvent event = createTestOutboundEvent(endpoint);
         mp.process(event);
@@ -58,7 +60,6 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(event.getMessage().getPayload(),
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
-
     }
 
 }
