@@ -11,7 +11,7 @@
         streaming="false"/>
 
     <file:endpoint name="globalEP"  path="target/FilterOnGlobalFileEndpointTestCase/testdir" 
-        connector-ref="fileConnector" exchange-pattern="one-way">
+        connector-ref="fileConnector">
         <file:filename-wildcard-filter pattern="*.xml"/>
     </file:endpoint>
 </mule>

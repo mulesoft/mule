@@ -154,7 +154,7 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">                
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
             </xsd:extension>
@@ -165,7 +165,7 @@
                  substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <xsd:extension base="mule:outboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>
             </xsd:extension>
@@ -175,7 +175,7 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="outboundAttributes"/>

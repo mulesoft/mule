@@ -41,7 +41,7 @@
     <model>
         <service name="Test" initialState="stopped">
             <inbound>
-                <file:inbound-endpoint path="./target" connector-ref="thirdConnector" exchange-pattern="one-way">
+                <file:inbound-endpoint path="./target" connector-ref="thirdConnector">
                     <file:filename-regex-filter pattern="(^SemDirector_Report-\d)(.*)(tab$)" caseSensitive="false"/>
                 </file:inbound-endpoint>
             </inbound>

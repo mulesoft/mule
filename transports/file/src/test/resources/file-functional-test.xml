@@ -19,9 +19,9 @@
 
     <file:connector name="recursiveConnector" fileAge="0" autoDelete="true" pollingFrequency="10" recursive="true"/>
 
-    <file:endpoint path="./.mule/in" name="get" connector-ref="recursiveConnector" exchange-pattern="one-way"/>
+    <file:endpoint path="./.mule/in" name="get" connector-ref="recursiveConnector"/>
 
-    <file:endpoint path="test" name="send" connector-ref="sendConnector" exchange-pattern="one-way"/>
+    <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
 
     <vm:connector name="vmQueue"/>
     
