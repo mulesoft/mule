@@ -37,11 +37,6 @@ public class Storage implements Callable
         System.err.println("Correlation ID: " + message.getCorrelationId());
         System.err.println("Sequence Number: " + message.getCorrelationSequence());
 
-        for (String key : message.getPropertyNames())
-        {
-            System.err.println(key + " = " + message.getProperty(key));
-        }
-
         String ip = message.getOutboundProperty("ip");
         if (ip == null)
         {
