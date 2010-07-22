@@ -17,7 +17,7 @@
     <model name="main">
         <service name="bridge1">
             <inbound>
-                <file:inbound-endpoint path=".mule/test-data/in" exchange-pattern="one-way"
+                <file:inbound-endpoint path=".mule/test-data/in" 
                     moveToDirectory=".mule/test-data/processing" pollingFrequency="10000000"/>
             </inbound>
             <outbound>
@@ -37,8 +37,8 @@
                     <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
                         <auto-transformer returnClass="java.lang.String"/>
                     </stdio:outbound-endpoint>
-                    <file:outbound-endpoint path=".mule/test-data/out" exchange-pattern="one-way"
-                        encoding="UTF8" outputPattern="foo.txt.processed"/>
+                    <file:outbound-endpoint path=".mule/test-data/out" encoding="UTF8"
+                        outputPattern="foo.txt.processed"/>
                 </multicasting-router>
             </outbound>
         </service>

@@ -117,7 +117,7 @@
 
             <outbound>
                 <filtering-router>
-                    <file:outbound-endpoint path="test-data/exceptions" exchange-pattern="one-way"
+                    <file:outbound-endpoint path="test-data/exceptions" 
                                             outputPattern="Exception-[function:uuid].xml"
                                             transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML"/>
                     <!-- Check ErrorMessage.getThrowable() exception type -->
@@ -129,8 +129,7 @@
                                             host="${smtp.host}" port="${smtp.port}"
                                             to="${email.toAddress}" from="${email.fromAddress}"
                                             subject="${email.subject}"
-                                            transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"
-                                            exchange-pattern="one-way"/>
+                                            transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
                     <!-- Check ErrorMessage.getThrowable() exception type -->
                     <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.lifecycle.FatalException"/>
                 </filtering-router>
