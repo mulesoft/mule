@@ -55,7 +55,11 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <!-- 
+                The only valid exchange-pattern is request-response which is the default. No need to 
+                make  the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attribute name="path" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -70,7 +74,11 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <!-- 
+                The only valid exchange-pattern is request-response which is the default. No need to 
+                make  the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:attribute name="path" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
