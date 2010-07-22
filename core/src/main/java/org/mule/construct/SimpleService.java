@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
@@ -56,7 +57,7 @@ public class SimpleService extends AbstractFlowConstruct
     protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        // TODO (DDO) add builder.chain(statisticsInterceptingMessageProcess)
+        builder.chain(new FlowConstructStatisticsMessageObserver());
         builder.chain(component);
     }
 

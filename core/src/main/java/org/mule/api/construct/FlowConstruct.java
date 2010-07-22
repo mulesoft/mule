@@ -10,10 +10,11 @@
 
 package org.mule.api.construct;
 
+import java.beans.ExceptionListener;
+
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
-
-import java.beans.ExceptionListener;
+import org.mule.api.management.stats.Statistics;
 
 /**
  * <p>
@@ -38,6 +39,11 @@ public interface FlowConstruct extends LifecycleStateEnabled
      */
     ExceptionListener getExceptionListener();
 
-    MuleContext getMuleContext();
+    /**
+     * @return The statistics holder used by this flow construct to keep track of its
+     *         activity.
+     */
+    Statistics getStatistics();
 
+    MuleContext getMuleContext();
 }

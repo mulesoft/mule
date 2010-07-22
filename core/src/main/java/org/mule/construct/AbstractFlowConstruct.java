@@ -29,9 +29,11 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.management.stats.Statistics;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.source.MessageSource;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
 
@@ -60,16 +62,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     protected MessageSource messageSource;
     protected MessageProcessor messageProcessorChain;
     protected ExceptionListener exceptionListener;
-
     protected final FlowConstructLifecycleManager lifecycleManager;
-
     protected final MuleContext muleContext;
+    protected final Statistics statistics;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this);
+        this.statistics = new ServiceStatistics(name);
     }
 
     public final void initialise() throws InitialisationException
@@ -182,10 +184,10 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * The default implementation of this methods uses a
      * {@link InterceptingChainMessageProcessorBuilder} and allows a chain of
      * {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(InterceptingChainMessageProcessorBuilder)} method but
-     * if you wish to use another {@link MessageProcessorBuilder} or just a single
-     * {@link MessageProcessor} then this method can be overridden and return a
-     * single {@link MessageProcessor} instead.
+     * {@link #configureMessageProcessors(InterceptingChainMessageProcessorBuilder)}
+     * method but if you wish to use another {@link MessageProcessorBuilder} or just
+     * a single {@link MessageProcessor} then this method can be overridden and
+     * return a single {@link MessageProcessor} instead.
      */
     protected void createMessageProcessor()
     {
@@ -229,6 +231,11 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public Statistics getStatistics()
+    {
+        return statistics;
     }
 
     protected void doInitialise() throws InitialisationException
