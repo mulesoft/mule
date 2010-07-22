@@ -40,8 +40,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <quartz:outbound-endpoint jobName="myService2" repeatInterval="1000" 
-                        repeatCount="1" exchange-pattern="one-way">
+                    <quartz:outbound-endpoint jobName="myService2" repeatInterval="1000" repeatCount="1">
                         <quartz:custom-job-from-message evaluator="payload" expression=""/>
                     </quartz:outbound-endpoint>
                 </pass-through-router>

@@ -80,7 +80,11 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <!-- 
+                The only valid exchange-pattern is one-way which is the default. No need to make 
+                the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:outboundEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
                     <xsd:element ref="abstract-job" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
@@ -98,7 +102,11 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <!-- 
+                The only valid exchange-pattern is one-way which is the default. No need to make 
+                the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
                     <xsd:element ref="abstract-job" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
@@ -116,7 +124,11 @@
     </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <!-- 
+                The only valid exchange-pattern is one-way which is the default. No need to make 
+                the exchange-pattern attribute configurable.  
+            -->
+            <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
                     <xsd:element ref="abstract-job" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>

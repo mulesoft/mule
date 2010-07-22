@@ -10,14 +10,13 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
 
-    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000" exchange-pattern="one-way">
+    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000">
        <quartz:scheduled-dispatch-job>
            <quartz:job-endpoint address="vm://quartz.in"/>
        </quartz:scheduled-dispatch-job>
     </quartz:endpoint>
 
-    <quartz:endpoint name="expressionSchedulerEndpoint" jobName="myExpressionService" 
-        repeatInterval="1000" exchange-pattern="one-way">
+    <quartz:endpoint name="expressionSchedulerEndpoint" jobName="myExpressionService" repeatInterval="1000">
        <quartz:scheduled-dispatch-job>
            <quartz:job-endpoint address="vm://#[header:INBOUND:ENDPOINT_NAME]"/>
        </quartz:scheduled-dispatch-job>

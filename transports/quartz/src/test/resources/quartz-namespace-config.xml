@@ -55,7 +55,7 @@
 
             <inbound>
                 <quartz:inbound-endpoint name="qEP1" cronExpression="0 0 12 * * ?" jobName="job1" 
-                    connector-ref="quartzConnector1" exchange-pattern="one-way">
+                    connector-ref="quartzConnector1">
                     <quartz:event-generator-job>
                         <quartz:payload>foo</quartz:payload>
                     </quartz:event-generator-job>
@@ -74,7 +74,7 @@
             </description>
             <inbound>
                 <quartz:inbound-endpoint name="qEP2" repeatCount="10" repeatInterval="1000" jobName="job2"
-                                         connector-ref="quartzConnector1" exchange-pattern="one-way">
+                                         connector-ref="quartzConnector1">
                     <quartz:event-generator-job >
                         <quartz:payload file="payload-data.txt"/>
                     </quartz:event-generator-job>
@@ -100,7 +100,7 @@
             <outbound>
                 <pass-through-router>
                     <quartz:outbound-endpoint name="qEP3" repeatInterval="1000" jobName="job3"
-                                              connector-ref="quartzConnector1" exchange-pattern="one-way">
+                                              connector-ref="quartzConnector1">
                         <quartz:custom-job-from-message evaluator="header" expression="jobConfig"/>
                     </quartz:outbound-endpoint>
                 </pass-through-router>
@@ -124,7 +124,7 @@
             <outbound>
                 <pass-through-router>
                     <quartz:outbound-endpoint name="qEP4" repeatCount="0" cronExpression="0 11 1 8 * ?" jobName="job4"
-                                              connector-ref="quartzConnector1" exchange-pattern="one-way">
+                                              connector-ref="quartzConnector1">
                         <quartz:custom-job job-ref="custJob"/>
                     </quartz:outbound-endpoint>
                 </pass-through-router>
@@ -144,7 +144,7 @@
             <inbound>
 
                 <quartz:inbound-endpoint name="qEP5" cronExpression="0 0/5 14 * * ?" jobName="job5"
-                                         connector-ref="quartzConnector1" exchange-pattern="one-way">
+                                         connector-ref="quartzConnector1">
                     <quartz:endpoint-polling-job>
                         <quartz:job-endpoint address="file:///N/drop-data/in" timeout="4000"/>
                     </quartz:endpoint-polling-job>
@@ -169,8 +169,7 @@
             <outbound>
                 <pass-through-router>
                     <quartz:outbound-endpoint name="qEP6" repeatCount="0" cronExpression="0 15 10 * * ? *"
-                                              jobName="job6" connector-ref="quartzConnector1"
-                                              exchange-pattern="one-way">
+                                              jobName="job6" connector-ref="quartzConnector1">
                         <quartz:scheduled-dispatch-job>
                             <quartz:job-endpoint ref="scheduledDispatchEndpoint"/>
                         </quartz:scheduled-dispatch-job>

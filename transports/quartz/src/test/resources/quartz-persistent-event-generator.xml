@@ -15,8 +15,7 @@
     <model>
         <service name="QuartzEventGenerator">
             <inbound>
-                <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="1"
-                    exchange-pattern="one-way">
+                <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000" repeatCount="1">
                     <quartz:event-generator-job>
                         <quartz:payload>Test Message</quartz:payload>
                     </quartz:event-generator-job>

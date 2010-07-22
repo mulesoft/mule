@@ -21,8 +21,7 @@
         <spring:constructor-arg ref="latch" />
     </spring:bean>
     
-    <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="1"
-        exchange-pattern="one-way">
+    <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="1">
         <quartz:custom-job job-ref="job" />
     </quartz:endpoint>
 

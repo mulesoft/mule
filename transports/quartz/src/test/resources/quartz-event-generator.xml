@@ -10,8 +10,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd">
 
-    <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="1"
-        exchange-pattern="one-way">
+    <quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="1">
         <quartz:event-generator-job>
             <quartz:payload>TRIGGER STRING</quartz:payload>
         </quartz:event-generator-job>

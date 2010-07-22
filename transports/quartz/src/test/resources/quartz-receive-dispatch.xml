@@ -14,8 +14,7 @@
 
     <vm:connector name="vmQueueConnector"/>
 
-    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000"
-        exchange-pattern="one-way">
+    <quartz:endpoint name="schedulerEndpoint" jobName="myService" repeatInterval="1000">
         <quartz:endpoint-polling-job>
             <quartz:job-endpoint address="vm://event.queue"/>
         </quartz:endpoint-polling-job>

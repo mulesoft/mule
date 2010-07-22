@@ -16,14 +16,14 @@
         use a start delay for the quartz endpoints to avoid timing problems with the test case
     -->
     <quartz:endpoint name="quartz.in.1" jobName="myService1" startDelay="2500"
-                     repeatInterval="1000" repeatCount="3" exchange-pattern="one-way">
+                     repeatInterval="1000" repeatCount="3">
         <quartz:event-generator-job>
             <quartz:payload>foo</quartz:payload>
         </quartz:event-generator-job>
     </quartz:endpoint>
 
     <quartz:endpoint name="quartz.in.2" jobName="myService2" startDelay="2500"
-                     repeatInterval="1000" repeatCount="1" exchange-pattern="one-way">
+                     repeatInterval="1000" repeatCount="1">
         <quartz:event-generator-job/>
     </quartz:endpoint>
 
