@@ -320,7 +320,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     {
         Service service = getTestService();
         InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
-        service.getInboundRouter().addEndpoint(endpoint);
+        service.getMessageSource().addSource(endpoint);
         connector = (TestConnector) endpoint.getConnector();
 
         assertEquals(0, connector.receivers.size());

@@ -18,8 +18,6 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InboundRouter;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -35,13 +33,14 @@ import org.mule.interceptor.InterceptorStack;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.TimerInterceptor;
 import org.mule.model.seda.SedaService;
+import org.mule.routing.IdempotentMessageFilter;
+import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
-import org.mule.routing.inbound.IdempotentReceiver;
-import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -182,13 +181,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testInboundRouterConfig2()
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
-        assertNotNull(service.getInboundRouter());
-        InboundRouterCollection messageRouter = service.getInboundRouter();
+        assertNotNull(service.getMessageSource());
+        ServiceCompositeMessageSource messageRouter = service.getMessageSource();
         assertNotNull(messageRouter.getCatchAllStrategy());
-        assertEquals(2, messageRouter.getRouters().size());
-        InboundRouter router = (InboundRouter) messageRouter.getRouters().get(0);
-        assertTrue(router instanceof SelectiveConsumer);
-        SelectiveConsumer sc = (SelectiveConsumer) router;
+        assertEquals(2, messageRouter.getMessageProcessors().size());
+        MessageProcessor router = messageRouter.getMessageProcessors().get(0);
+        assertTrue(router instanceof MessageFilter);
+        MessageFilter sc = (MessageFilter) router;
 
         assertNotNull(sc.getFilter());
         Filter filter = sc.getFilter();
@@ -196,8 +195,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(filter instanceof PayloadTypeFilter);
         assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
-        InboundRouter router2 = (InboundRouter) messageRouter.getRouters().get(1);
-        assertTrue(router2 instanceof IdempotentReceiver);
+        MessageProcessor router2 = messageRouter.getMessageProcessors().get(1);
+        assertTrue(router2 instanceof IdempotentMessageFilter);
     }
 
     public void testThreadingConfig() throws DefaultMuleException
@@ -309,7 +308,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         Service service = muleContext.getRegistry().lookupService("appleComponent2");
-        InboundEndpoint inEndpoint = service.getInboundRouter().getEndpoint(
+        InboundEndpoint inEndpoint = service.getMessageSource().getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertNotNull(inEndpoint.getProperties());
@@ -320,7 +319,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         Service apple = muleContext.getRegistry().lookupService("appleComponent2");
-        InboundEndpoint inEndpoint = apple.getInboundRouter().getEndpoint("transactedInboundEndpoint");
+        InboundEndpoint inEndpoint = apple.getMessageSource().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertEquals(1, apple.getOutboundRouter().getRouters().size());
         assertNotNull(inEndpoint.getTransactionConfig());

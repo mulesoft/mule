@@ -12,9 +12,9 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.routing.AbstractCorrelationAggregator;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
-import org.mule.routing.inbound.AbstractCorrelationAggregator;
 
 /**
  * <code>TestResponseAggregator</code> is a mock response Agrregator object used for
@@ -27,7 +27,7 @@ public class TestCorrelationAggregator extends AbstractCorrelationAggregator
     @Override
     protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        return new DefaultMuleMessage("test", muleContext);
+        return new DefaultMuleMessage("test", events.toMessageCollection().getMuleContext());
     }
 
     public String getTestProperty()

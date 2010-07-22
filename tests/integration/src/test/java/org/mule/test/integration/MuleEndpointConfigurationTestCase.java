@@ -82,9 +82,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // test inbound
         Service service = muleContext.getRegistry().lookupService("TestComponent4");
         assertNotNull(service);
-        assertNotNull(service.getInboundRouter().getEndpoints());
-        assertEquals(1, service.getInboundRouter().getEndpoints().size());
-        ImmutableEndpoint endpoint = service.getInboundRouter().getEndpoints().get(0);
+        assertNotNull(service.getMessageSource().getEndpoints());
+        assertEquals(1, service.getMessageSource().getEndpoints().size());
+        ImmutableEndpoint endpoint = service.getMessageSource().getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());

@@ -15,9 +15,12 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.filter.Filter;
 import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
+import org.mule.module.atom.routing.EntryLastUpdatedFilter;
+import org.mule.module.atom.routing.InboundFeedSplitter;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.util.StringUtils;
 
@@ -91,7 +94,16 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
         try
         {
             Date date = formatDate(getLastUpdate());
-            AtomInboundEndpoint in = new AtomInboundEndpoint(isSplitFeed(), date, getAcceptedMimeTypes(), super.buildInboundEndpoint());
+            if (isSplitFeed())
+            {
+                Filter filter = new EntryLastUpdatedFilter(date);
+                InboundFeedSplitter splitter = new InboundFeedSplitter();
+                splitter.setEntryFilter(filter);
+                splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
+                addMessageProcessor(splitter);
+            }
+            AtomInboundEndpoint in = new AtomInboundEndpoint(isSplitFeed(), date, getAcceptedMimeTypes(),
+                super.buildInboundEndpoint());
             in.registerSupportedProtocol("http");
             in.registerSupportedProtocol("https");
             in.registerSupportedProtocol("vm");

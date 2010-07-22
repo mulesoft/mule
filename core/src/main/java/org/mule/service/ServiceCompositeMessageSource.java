@@ -12,15 +12,19 @@ package org.mule.service;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.MessageFilter;
 import org.mule.source.StartableCompositeMessageSource;
 import org.mule.util.StringMessageUtils;
@@ -36,10 +40,18 @@ import java.util.List;
 public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable
 {
 
+    public static List instances = new ArrayList();
+    
+    public static List getInstances()
+    {
+        return instances;
+    }
+
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
     protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
-    protected InterceptingMessageProcessor catchAllStrategy = new InternalCatchAllMessageProcessor();;
+    protected MessageProcessor catchAllStrategy;
+    private final InterceptingMessageProcessor internalCatchAllStrategy = new InternalCatchAllMessageProcessor();;
 
     public void initialise() throws InitialisationException
     {
@@ -55,8 +67,24 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             }
         }
 
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof Initialisable)
+            {
+                ((Initialisable) processor).initialise();
+            }
+        }
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof FlowConstructAware)
+            {
+                ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+            }
+        }
+
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(processors);
+        builder.chain(new StopFurtherMessageProcessingMessageProcessor());
         // Stats
         builder.chain(new AbstractInterceptingMessageProcessor()
         {
@@ -71,6 +99,32 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         });
         builder.chain(listener);
         listener = builder.build();
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof Startable)
+            {
+                ((Startable) processor).start();
+            }
+        }
+        super.start();
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        super.stop();
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof Stoppable)
+            {
+                ((Stoppable) processor).stop();
+            }
+        }
     }
 
     public void setMessageProcessors(List<MessageProcessor> processors)
@@ -96,7 +150,6 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             for (InboundEndpoint endpoint : endpoints)
             {
                 addSource(endpoint);
-                endpoints.add(endpoint);
             }
         }
         else
@@ -105,10 +158,24 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         }
     }
 
-    public void addEndpoint(InboundEndpoint endpoint) throws MuleException
+    @Override
+    public void addSource(MessageSource source) throws MuleException
     {
-        addSource(endpoint);
-        endpoints.add(endpoint);
+        super.addSource(source);
+        if (source instanceof InboundEndpoint)
+        {
+            endpoints.add((InboundEndpoint) source);
+        }
+    }
+
+    @Override
+    public void removeSource(MessageSource source) throws MuleException
+    {
+        super.removeSource(source);
+        if (source instanceof InboundEndpoint)
+        {
+            endpoints.remove((InboundEndpoint) source);
+        }
     }
 
     public List<InboundEndpoint> getEndpoints()
@@ -121,19 +188,45 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         return processors;
     }
 
-    public void setCatchAllStrategy(MessageProcessor catchAllStrategy)
-    {
-        this.catchAllStrategy.setListener(catchAllStrategy);
-    }
-
     public RouterStatistics getStatistics()
     {
         return statistics;
     }
 
+    /**
+     * @param name the Endpoint identifier
+     * @return the Endpoint or <code>null</code> if the endpointUri is not registered
+     * @see org.mule.api.routing.InboundRouterCollection
+     */
+    public InboundEndpoint getEndpoint(String name)
+    {
+        for (InboundEndpoint endpoint : endpoints)
+        {
+            if (endpoint.getName().equals(name))
+            {
+                return endpoint;
+            }
+        }
+        return null;
+    }
+
+    public void setCatchAllStrategy(MessageProcessor catchAllStrategy)
+    {
+        if (catchAllStrategy instanceof AbstractCatchAllStrategy)
+        {
+            ((AbstractCatchAllStrategy) catchAllStrategy).setStatistics(statistics);
+        }
+        this.catchAllStrategy = catchAllStrategy;
+        this.internalCatchAllStrategy.setListener(catchAllStrategy);
+    }
+
+    public MessageProcessor getCatchAllStrategy()
+    {
+        return catchAllStrategy;
+    }
+
     class InternalCatchAllMessageProcessor extends AbstractInterceptingMessageProcessor
     {
-
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             if (getStatistics().isEnabled())
@@ -172,6 +265,21 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
                     }
                 }
                 return null;
+            }
+        }
+    }
+
+    class StopFurtherMessageProcessingMessageProcessor extends AbstractInterceptingMessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            if (!event.isStopFurtherProcessing())
+            {
+                return processNext(event);
+            }
+            else
+            {
+                return event;
             }
         }
     }

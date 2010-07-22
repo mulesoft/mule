@@ -14,7 +14,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.SecurityProvider;
 import org.mule.api.service.Service;
-import org.mule.module.spring.security.SpringProviderAdapter;
 import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.security.MuleSecurityManager;
 import org.mule.tck.FunctionalTestCase;
@@ -53,9 +52,9 @@ public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("echo");
         assertNotNull(service);
-        assertEquals(1, service.getInboundRouter().getEndpoints().size());
+        assertEquals(1, service.getMessageSource().getEndpoints().size());
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
         assertNotNull(endpoint.getSecurityFilter());
         assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }

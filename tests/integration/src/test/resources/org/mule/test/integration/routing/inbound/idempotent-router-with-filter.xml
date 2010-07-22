@@ -20,9 +20,10 @@
             <inbound>
                 <inbound-endpoint address="vm://FromTestCase" exchange-pattern="one-way"/>
                 <!-- Only strings should be allowed in -->
-                <idempotent-receiver-router>
+				<selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.String" />
-                </idempotent-receiver-router>
+				</selective-consumer-router>
+                <idempotent-receiver-router/>
             </inbound>
             <outbound>
                 <pass-through-router>

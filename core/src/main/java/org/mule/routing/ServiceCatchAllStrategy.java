@@ -20,6 +20,7 @@ import org.mule.api.service.Service;
 /**
  * <code>ServiceCatchAllStrategy</code> is used to catch any events and forward the
  * events to the service as is.
+ * @deprecated
  */
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {

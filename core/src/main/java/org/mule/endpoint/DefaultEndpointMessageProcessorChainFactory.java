@@ -15,7 +15,6 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpointDecorator;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
@@ -23,7 +22,6 @@ import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
-import org.mule.endpoint.outbound.OutboundEndpointDecoratorMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
@@ -97,13 +95,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
         list.add(new OutboundEndpointPropertyMessageProcessor());
-
-        // TODO MULE-4872
-        if (endpoint instanceof OutboundEndpointDecorator)
-        {
-            list.add(new OutboundEndpointDecoratorMessageProcessor((OutboundEndpointDecorator) endpoint));
-        }
-        
         list.add(new OutboundSecurityFilterMessageProcessor(endpoint));
         list.add(new OutboundTryCatchMessageProcessor(endpoint));
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));

@@ -32,13 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementation of {@link CompositeMessageSource} that propagates both injection of
- * {@link FlowConstruct} and lifecycle to nested {@link MessageSource}s.
+ * Implementation of {@link CompositeMessageSource} that propagates both injection of {@link FlowConstruct}
+ * and lifecycle to nested {@link MessageSource}s.
  * <p>
  * <li>This message source cannot be started without a listener set.
  * <li>If sources are added when this composie is started they will be started as well.
- * <li>If a {@link MessageSource} is started in isolation when composite is stopped then
- * messages will be lost.
+ * <li>If a {@link MessageSource} is started in isolation when composite is stopped then messages will be
+ * lost.
  * <li>Message will only be received from endpoints if the connector is also started.
  */
 public class StartableCompositeMessageSource
@@ -51,13 +51,15 @@ public class StartableCompositeMessageSource
     protected final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
     protected AtomicBoolean starting = new AtomicBoolean(false);
     protected FlowConstruct flowConstruct;
-    private MessageProcessor internalListener = new InternalMessageProcessor();
+    private final MessageProcessor internalListener = new InternalMessageProcessor();
 
     public void addSource(MessageSource source) throws MuleException
     {
-        sources.add(source);
+        synchronized (sources)
+        {
+            sources.add(source);
+        }
         source.setListener(internalListener);
-        
         if (started.get())
         {
             if (source instanceof FlowConstructAware)
@@ -77,7 +79,10 @@ public class StartableCompositeMessageSource
         {
             ((Stoppable) source).stop();
         }
-        sources.remove(source);
+        synchronized (sources)
+        {
+            sources.remove(source);
+        }
     }
 
     public void start() throws MuleException
@@ -86,7 +91,7 @@ public class StartableCompositeMessageSource
         {
             throw new LifecycleException(CoreMessages.objectIsNull("listener"), this);
         }
-        
+
         synchronized (sources)
         {
             starting.set(true);
@@ -101,7 +106,7 @@ public class StartableCompositeMessageSource
                     ((Startable) source).start();
                 }
             }
-            
+
             started.set(true);
             starting.set(false);
         }
@@ -118,7 +123,7 @@ public class StartableCompositeMessageSource
                     ((Stoppable) source).stop();
                 }
             }
-            
+
             started.set(false);
         }
     }
@@ -137,7 +142,8 @@ public class StartableCompositeMessageSource
     @Override
     public String toString()
     {
-        return String.format("%s [listener=%s, sources=%s, started=%s]", getClass().getSimpleName(), listener, sources, started);
+        return String.format("%s [listener=%s, sources=%s, started=%s]", getClass().getSimpleName(),
+            listener, sources, started);
     }
 
     private class InternalMessageProcessor implements MessageProcessor
@@ -146,7 +152,7 @@ public class StartableCompositeMessageSource
         {
             super();
         }
-        
+
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             if (started.get() || starting.get())
@@ -155,9 +161,9 @@ public class StartableCompositeMessageSource
             }
             else
             {
-                log.warn(String.format("A message was receieved from MessageSource, but message source is stopped. Message will be discarded.%n" +
-                                       "  Message: %s%n" +
-                                       "  MessageSource:%s", event, this));
+                log.warn(String.format(
+                    "A message was receieved from MessageSource, but message source is stopped. Message will be discarded.%n"
+                                    + "  Message: %s%n" + "  MessageSource:%s", event, this));
                 return null;
             }
 

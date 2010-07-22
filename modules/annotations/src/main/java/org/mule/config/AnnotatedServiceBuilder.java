@@ -27,6 +27,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.api.object.ObjectFactory;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -156,7 +157,7 @@ public class AnnotatedServiceBuilder
                 {
                     inboundEndpoint.getProperties().put(MuleProperties.MULE_METHOD_PROPERTY, annotation.getElementName());
                 }
-                service.getInboundRouter().addEndpoint(inboundEndpoint);
+                service.getMessageSource().addSource(inboundEndpoint);
             }
         }
 
@@ -175,7 +176,7 @@ public class AnnotatedServiceBuilder
                 RouterAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
                 if (parser != null)
                 {
-                    service.getInboundRouter().addRouter(parser.parseRouter(annotation));
+                    service.getMessageSource().addMessageProcessor(parser.parseRouter(annotation));
                 }
                 else
                 {
@@ -199,14 +200,14 @@ public class AnnotatedServiceBuilder
                 RouterAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
                 if (parser != null)
                 {
-                    org.mule.api.routing.Router router = parser.parseRouter(metaData.getAnnotation());
+                    MessageProcessor router = parser.parseRouter(metaData.getAnnotation());
                     //Todo, wrap lifecycle
                     if (router instanceof MuleContextAware)
                     {
                         ((MuleContextAware) router).setMuleContext(context);
                     }
-                    router.initialise();
-                    service.getResponseRouter().addRouter(router);
+                    //router.initialise();
+                    //service.getResponseRouter().addRouter(router);
                     break;
                 }
                 else

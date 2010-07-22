@@ -810,7 +810,7 @@ public class MuleClient implements Disposable
         throws MuleException
     {
         // as we are bypassing the message transport layer we need to check that
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)

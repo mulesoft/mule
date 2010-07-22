@@ -36,58 +36,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     public static final String JETTY_SERVLET_CONNECTOR_NAME = "_jettyConnector";
 
     public JettyHttpMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-            throws CreateException
+        throws CreateException
     {
         super(connector, flowConstruct, endpoint);
-
-        if (!(flowConstruct instanceof Service))
-        {
-            throw new UnsupportedOperationException("JettyHttpMessageReceiver is only supported with Service");
-        }
-        Service service = (Service) flowConstruct;
-
-        if ("rest".equals(endpoint.getEndpointURI().getScheme()))
-        {
-            // We need to have a Servlet Connector pointing to our servlet so the Servlets can
-            // find the listeners for incoming requests
-            ServletConnector scon = (ServletConnector) new TransportFactory(connector.getMuleContext()).getConnectorByProtocol("servlet");
-            if (scon == null)
-            {
-                scon = new ServletConnector(connector.getMuleContext());
-                scon.setName(JETTY_SERVLET_CONNECTOR_NAME);
-                scon.setServletUrl(endpoint.getEndpointURI().getAddress());
-                try
-                {
-                    connector.getMuleContext().getRegistry().registerConnector(scon);
-                }
-                catch (MuleException e)
-                {
-                    throw new CreateException(e, this);
-                }
-            }
-
-            try
-            {
-                String path = endpoint.getEndpointURI().getPath();
-                if (StringUtils.isEmpty(path))
-                {
-                    path = "/";
-                }
-
-                MuleContext muleContext = connector.getMuleContext();
-                URIBuilder uriBuilder = new URIBuilder("servlet://" + path.substring(1), muleContext);
-                EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uriBuilder);
-                endpointBuilder.setTransformers(endpoint.getTransformers());
-                InboundEndpoint ep = 
-                    muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-                scon.registerListener(ep, service.getInboundRouter(), service);
-            }
-            catch (Exception e)
-            {
-                throw new CreateException(e, this);
-            }
-        }
-
     }
 
     @Override

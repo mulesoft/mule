@@ -12,11 +12,11 @@ package org.mule.config.routing;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
+import org.mule.api.annotations.routing.WireTap;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.Router;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.converters.PropertiesConverter;
-import org.mule.api.annotations.routing.WireTap;
 import org.mule.config.endpoint.AnnotatedEndpointData;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
 import org.mule.config.endpoint.MEP;
@@ -47,7 +47,7 @@ public class WireTapRouterParser implements RouterAnnotationParser, MuleContextA
         }
     }
 
-    public Router parseRouter(Annotation annotation) throws MuleException
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
         WireTap wireTap = (WireTap) annotation;
 
@@ -58,9 +58,9 @@ public class WireTapRouterParser implements RouterAnnotationParser, MuleContextA
         epd.setAddress(wireTap.endpoint());
         epd.setFilter(wireTap.filter());
         epd.setTransformers(wireTap.transformers());
-        org.mule.routing.inbound.WireTap wireTapRouter = new org.mule.routing.inbound.WireTap();
+        org.mule.routing.WireTap wireTapRouter = new org.mule.routing.WireTap();
         OutboundEndpoint endpoint = (OutboundEndpoint) helper.processEndpoint(epd);
-        wireTapRouter.setEndpoint(endpoint);
+        wireTapRouter.setTap(endpoint);
         return wireTapRouter;
     }
 

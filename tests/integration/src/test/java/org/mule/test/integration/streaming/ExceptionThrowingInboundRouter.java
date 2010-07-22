@@ -10,14 +10,13 @@
 
 package org.mule.test.integration.streaming;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.routing.inbound.SelectiveConsumer;
+import org.mule.routing.MessageFilter;
 
-public class ExceptionThrowingInboundRouter extends SelectiveConsumer
+public class ExceptionThrowingInboundRouter extends MessageFilter
 {
     @Override
-    public boolean isMatch(MuleEvent event) throws MessagingException
+    public boolean accept(MuleEvent event)
     {
         throw new RuntimeException();
     }

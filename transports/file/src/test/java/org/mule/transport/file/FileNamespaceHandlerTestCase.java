@@ -96,7 +96,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("Test");
         assertNotNull(service);
-        List endpoints = service.getInboundRouter().getEndpoints();
+        List endpoints = service.getMessageSource().getEndpoints();
         assertEquals(1, endpoints.size());
 
         InboundEndpoint endpoint = (InboundEndpoint) endpoints.get(0);

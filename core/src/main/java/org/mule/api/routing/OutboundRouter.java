@@ -87,7 +87,6 @@ public interface OutboundRouter extends Router, MessageProcessor
      * @param message the current message to evaluate
      * @return true if the event should be processed by this router
      * @throws MessagingException if the event cannot be evaluated
-     * @see org.mule.routing.inbound.SelectiveConsumer
      */
     boolean isMatch(MuleMessage message) throws MessagingException;
 

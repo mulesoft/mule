@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * @see InboundRouter
  * @see org.mule.api.routing.InboundRouterCollection
  * @see org.mule.api.routing.RouterCollection
+ * @deprecated
  */
 public class SelectiveConsumer extends AbstractRouter implements InboundRouter
 {

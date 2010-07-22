@@ -9,12 +9,11 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.routing.Router;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.routing.inbound.ForwardingConsumer;
-import org.mule.routing.inbound.IdempotentReceiver;
-import org.mule.routing.inbound.IdempotentSecureHashReceiver;
-import org.mule.routing.inbound.SelectiveConsumer;
+import org.mule.routing.IdempotentMessageFilter;
+import org.mule.routing.IdempotentSecureHashMessageFilter;
+import org.mule.routing.MessageFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
@@ -28,17 +27,11 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         return "core-namespace-routers.xml";
     }
 
-    public void testForwardingRouter() throws Exception
-    {
-        Router r = lookupInboundRouterFromService("ForwardingRouter");
-        assertTrue(r instanceof ForwardingConsumer);
-    }
-
     public void testIdempotentSecureHashReceiverRouter() throws Exception
     {
-        Router r = lookupInboundRouterFromService("IdempotentSecureHashReceiverRouter");
-        assertTrue(r instanceof IdempotentSecureHashReceiver);
-        IdempotentSecureHashReceiver router = (IdempotentSecureHashReceiver)r;
+        MessageProcessor r = lookupInboundRouterFromService("IdempotentSecureHashReceiverRouter");
+        assertTrue(r instanceof IdempotentSecureHashMessageFilter);
+        IdempotentSecureHashMessageFilter router = (IdempotentSecureHashMessageFilter)r;
         assertEquals("SHA-128", router.getMessageDigestAlgorithm());
         assertNotNull(router.getStore());
         assertTrue(router.getStore() instanceof InMemoryObjectStore);
@@ -52,9 +45,9 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
      public void testIdempotentReceiverRouter() throws Exception
     {
-        Router r = lookupInboundRouterFromService("IdempotentReceiverRouter");
-        assertTrue(r instanceof IdempotentReceiver);
-        IdempotentReceiver router = (IdempotentReceiver)r;
+        MessageProcessor r = lookupInboundRouterFromService("IdempotentReceiverRouter");
+        assertTrue(r instanceof IdempotentMessageFilter);
+        IdempotentMessageFilter router = (IdempotentMessageFilter)r;
         assertEquals("#[message:id]-#[message:correlationId]", router.getIdExpression());
         assertNotNull(router.getStore());
         assertTrue(router.getStore() instanceof TextFileObjectStore);
@@ -69,17 +62,17 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
     public void testSelectiveConsumerRouter() throws Exception
     {
-        Router r = lookupInboundRouterFromService("SelectiveConsumerRouter");
-        assertTrue(r instanceof SelectiveConsumer);
+        MessageProcessor r = lookupInboundRouterFromService("SelectiveConsumerRouter");
+        assertTrue(r instanceof MessageFilter);
     }
 
-    protected Router lookupInboundRouterFromService(String serviceName) throws Exception
+    protected MessageProcessor lookupInboundRouterFromService(String serviceName) throws Exception
     {
         Service c = muleContext.getRegistry().lookupService(serviceName);
         assertNotNull(c);
-        List routers = c.getInboundRouter().getRouters();
+        List routers = c.getMessageSource().getMessageProcessors();
         assertEquals(1, routers.size());
-        assertTrue(routers.get(0) instanceof Router);
-        return (Router) routers.get(0);
+        assertTrue(routers.get(0) instanceof MessageProcessor);
+        return (MessageProcessor) routers.get(0);
     }
 }

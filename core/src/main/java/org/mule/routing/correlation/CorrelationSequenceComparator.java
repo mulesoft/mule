@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: CorrelationSequenceComparator.java 18181 2010-07-13 13:46:53Z dirk.olmes $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.inbound;
+package org.mule.routing.correlation;
 
 import org.mule.api.MuleEvent;
 

@@ -10,10 +10,6 @@
 
 package org.mule.construct;
 
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -26,7 +22,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleState;
-import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.management.stats.Statistics;
@@ -36,6 +31,11 @@ import org.mule.api.source.MessageSource;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
+
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -54,7 +54,7 @@ import org.mule.util.ClassUtils;
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
  * lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle, LifecycleStateEnabled
+public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -231,6 +231,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public MessageSource getMessageSource()
+    {
+        return messageSource;
+    }
+
+    public void setMessageSource(MessageSource messageSource)
+    {
+        this.messageSource = messageSource;
     }
 
     public Statistics getStatistics()

@@ -7,20 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.atom.endpoint;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.InboundEndpointDecorator;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultInboundEndpoint;
-import org.mule.module.atom.routing.EntryLastUpdatedFilter;
-import org.mule.module.atom.routing.InboundFeedSplitter;
 import org.mule.module.atom.transformers.ObjectToFeed;
 
 import java.util.Date;
@@ -31,7 +26,7 @@ import java.util.Set;
 /**
  * An ATOM endpoint is used for polling an ATOM feed and processing the feed entries
  */
-public class AtomInboundEndpoint extends DefaultInboundEndpoint implements InboundEndpointDecorator
+public class AtomInboundEndpoint extends DefaultInboundEndpoint 
 {
     private boolean splitFeed;
 
@@ -87,28 +82,6 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
         return supportedProtocols.contains(protocol);
     }
 
-
-    public void onListenerAdded(FlowConstruct flowConstruct) throws MuleException
-    {
-        if (!(flowConstruct instanceof Service))
-        {
-            throw new IllegalArgumentException(
-                "Only the Service flow constuct is supported by the axis transport");
-        }
-        Service service = (Service) flowConstruct;
-        
-        if (isSplitFeed())
-        {
-            Filter filter = new EntryLastUpdatedFilter(getLastUpdate());
-            InboundFeedSplitter splitter = new InboundFeedSplitter();
-            splitter.setEntryFilter(filter);
-            splitter.setMuleContext(getMuleContext());
-            splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
-            splitter.initialise();
-            service.getInboundRouter().addRouter(splitter);
-        }
-    }
-
     public boolean onMessage(MuleMessage message) throws MuleException
     {
         String mimeType = getMime(message);
@@ -117,21 +90,27 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint implements Inbou
         {
             if (mimeType == null)
             {
-                throw new MessagingException(CoreMessages.createStaticMessage("Mime type not set on message, cannot validate that message is an AtomInboundEndpointFactoryBean feed"), message);
+                throw new MessagingException(
+                    CoreMessages.createStaticMessage("Mime type not set on message, cannot validate that message is an AtomInboundEndpointFactoryBean feed"),
+                    message);
             }
             else
             {
-                throw new MessagingException(CoreMessages.createStaticMessage("Mime type not supported '" + mimeType + "', supported types are: " + getAcceptedMimeTypes()), message);
+                throw new MessagingException(CoreMessages.createStaticMessage("Mime type not supported '"
+                                                                              + mimeType
+                                                                              + "', supported types are: "
+                                                                              + getAcceptedMimeTypes()),
+                    message);
             }
         }
         else if (mimeType == null)
         {
-            logger.warn("Mime type not set on message, but connector protocol '" + getProtocol() + "' does not explicitly support mimeTypes. Message type will not be validated");
+            logger.warn("Mime type not set on message, but connector protocol '" + getProtocol()
+                        + "' does not explicitly support mimeTypes. Message type will not be validated");
         }
         message.applyTransformers(inTransform);
         return true;
     }
-
 
     public boolean isMimeSupported(String mime)
     {

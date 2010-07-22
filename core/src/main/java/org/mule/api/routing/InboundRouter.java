@@ -52,7 +52,6 @@ public interface InboundRouter extends Router
      * @param event the current event to evaluate
      * @return true if the event should be processed by this router
      * @throws MessagingException if the event cannot be evaluated
-     * @see org.mule.routing.inbound.SelectiveConsumer
      */
     boolean isMatch(MuleEvent event) throws MessagingException;
 }

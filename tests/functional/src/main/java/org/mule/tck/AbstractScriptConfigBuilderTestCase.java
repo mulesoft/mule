@@ -18,7 +18,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.BindingCollection;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -30,6 +29,7 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -98,7 +98,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        ImmutableEndpoint ep = service.getInboundRouter().getEndpoint("Orange");
+        ImmutableEndpoint ep = service.getMessageSource().getEndpoint("Orange");
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
         assertNotNull(responseTransformers);
@@ -253,13 +253,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, endpoint.getTransformers().size());
         assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
 
-        assertEquals(2, service.getInboundRouter().getEndpoints().size());
-        assertNotNull(service.getInboundRouter().getCatchAllStrategy());
-        assertTrue(service.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
-        ForwardingCatchAllStrategy fcas = (ForwardingCatchAllStrategy)service.getInboundRouter().getCatchAllStrategy();
+        assertEquals(2, service.getMessageSource().getEndpoints().size());
+        assertNotNull(service.getMessageSource().getCatchAllStrategy());
+        assertTrue(service.getMessageSource().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
+        ForwardingCatchAllStrategy fcas = (ForwardingCatchAllStrategy)service.getMessageSource().getCatchAllStrategy();
         assertNotNull(fcas.getEndpoint());
         assertEquals("test://catch.all", fcas.getEndpoint().getEndpointURI().toString());
-        endpoint = service.getInboundRouter().getEndpoint("orangeEndpoint");
+        endpoint = service.getMessageSource().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
@@ -284,10 +284,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testInboundRouterConfig()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertNotNull(service.getInboundRouter());
-        InboundRouterCollection messageRouter = service.getInboundRouter();
+        assertNotNull(service.getMessageSource());
+        ServiceCompositeMessageSource messageRouter = service.getMessageSource();
         assertNotNull(messageRouter.getCatchAllStrategy());
-        assertEquals(0, messageRouter.getRouters().size());
+        assertEquals(0, messageRouter.getMessageProcessors().size());
         assertTrue(messageRouter.getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
         assertEquals(2, messageRouter.getEndpoints().size());
     }

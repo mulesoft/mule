@@ -29,11 +29,11 @@ import org.mule.context.notification.ServiceNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.cxf.transport.MuleUniversalTransport;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -333,8 +333,7 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
 
         receiver.setEndpoint(receiverEndpoint);
 
-        outerProtocolService.setInboundRouter(new DefaultInboundRouterCollection());
-        outerProtocolService.getInboundRouter().addEndpoint(protocolEndpoint);
+        outerProtocolService.getMessageSource().setEndpoints(CollectionUtils.singletonList(protocolEndpoint));
 
         // Add outer services to map so that we can easily look them on on user
         // service lifecycle notifications

@@ -152,7 +152,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(filter3);
         assertTrue(filter3 instanceof JmsPropertyFilter);
 
-        InboundEndpoint inboundEndpoint = (InboundEndpoint) muleContext.getRegistry().lookupService("testService").getInboundRouter().getEndpoints().get(0);
+        InboundEndpoint inboundEndpoint = (InboundEndpoint) muleContext.getRegistry().lookupService("testService").getMessageSource().getEndpoints().get(0);
         assertNotNull(inboundEndpoint);
         assertEquals(1, inboundEndpoint.getProperties().size());
         assertEquals("testCustomDurableName", inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY));

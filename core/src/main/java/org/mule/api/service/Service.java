@@ -24,6 +24,7 @@ import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.service.ServiceCompositeMessageSource;
 
 import java.io.Serializable;
 
@@ -84,16 +85,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      */
     boolean isPaused();
     
-    /**
-     * Inbound Routers control how events are received by a service. If no router is
-     * set. A default will be used that uses the inboundProvider set on his
-     * descriptor.
-     * 
-     * @return the inbound router for this service. This will always return a valid
-     *         router.
-     * @see InboundRouterCollection
-     */
-    InboundRouterCollection getInboundRouter();
+    ServiceCompositeMessageSource getMessageSource();
 
     /**
      * Outbound Routers control how events are published by a service once. the
@@ -131,15 +123,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      */
     Model getModel();
 
-    /**
-     * Inbound Routers control how events are received by a service. If no router is
-     * set. A default will be used that uses the inboundProvider set on his
-     * descriptor.
-     *
-     * @param router the inbound router for this service
-     * @see InboundRouterCollection
-     */
-    void setInboundRouter(InboundRouterCollection router);
+    void setMessageSource(ServiceCompositeMessageSource messageSource);
 
     /**
      * Outbound Routers control how events are published by a service once. the

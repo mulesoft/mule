@@ -12,7 +12,7 @@ package org.mule.config.routing;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.routing.Splitter;
-import org.mule.api.routing.Router;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.outbound.ExpressionMessageSplitter;
 
 import java.lang.annotation.Annotation;
@@ -24,7 +24,7 @@ import java.lang.reflect.Member;
  */
 public class SplitterRouterParser implements RouterAnnotationParser
 {
-    public Router parseRouter(Annotation annotation) throws MuleException
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
         Splitter splitter = (Splitter) annotation;
         ExpressionMessageSplitter router = new ExpressionMessageSplitter();

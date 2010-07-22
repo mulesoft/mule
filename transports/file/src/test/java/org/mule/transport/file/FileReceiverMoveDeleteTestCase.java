@@ -201,7 +201,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
         InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-        service.getInboundRouter().addEndpoint(endpoint);
+        service.getMessageSource().addSource(endpoint);
         
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();

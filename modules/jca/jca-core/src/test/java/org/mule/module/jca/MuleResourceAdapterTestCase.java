@@ -16,9 +16,9 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.model.seda.SedaModel;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.lang.reflect.Method;
@@ -156,7 +156,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         testEndpoint(service);
 
         // Check endpoint
-        ImmutableEndpoint endpoint2 = service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint2 = service.getMessageSource().getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
         // Check service implementation
@@ -231,7 +231,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
 
     protected void testEndpoint(Service service)
     {
-        InboundRouterCollection inboundRouterCollection = service.getInboundRouter();
+        ServiceCompositeMessageSource inboundRouterCollection = service.getMessageSource();
         ImmutableEndpoint endpoint = inboundRouterCollection.getEndpoints().get(0);
         assertEndpointAttributes(endpoint);
     }
@@ -250,11 +250,11 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         // routers
         assertNotNull(service);
 
-        assertNotNull(service.getInboundRouter());
+        assertNotNull(service.getMessageSource());
 
         // InboundPassThroughRouter is now set in runtime rather than in service creation as in 1.4.x
         // assertEquals(1, service.getInboundRouter().getRouters().size());
-        assertEquals(0, service.getInboundRouter().getRouters().size());
+        assertEquals(0, service.getMessageSource().getMessageProcessors().size());
     }
 
 }

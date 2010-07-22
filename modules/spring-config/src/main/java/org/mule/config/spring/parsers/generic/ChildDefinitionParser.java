@@ -46,6 +46,18 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser
     }
 
     /**
+     * 
+     * @param setterMethod
+     * @param clazz
+     * @param singleton  determines is bean should be singleton or not
+     */
+    public ChildDefinitionParser(String setterMethod, Class clazz, boolean singleton)
+    {
+        this(setterMethod, clazz);
+        this.singleton = singleton;
+    }
+    
+    /**
      * The class (which is inferred from the class attribute if null here) is checked to be
      * a subclass of the constraint
      * @param setterMethod The target method (where the child will be injected)

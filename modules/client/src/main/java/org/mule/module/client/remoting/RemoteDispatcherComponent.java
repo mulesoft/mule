@@ -286,7 +286,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
             service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
 
-            service.getInboundRouter().addEndpoint(endpoint);
+            service.getMessageSource().addSource(endpoint);
 
             return service;
         }

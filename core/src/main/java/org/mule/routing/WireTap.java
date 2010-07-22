@@ -13,6 +13,7 @@ package org.mule.routing;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.processor.AbstractFilteringMessageProcessor;
@@ -70,6 +71,12 @@ public class WireTap extends AbstractMessageObserver
         this.tap = tap;
     }
 
+    @Deprecated
+    public void setEndpoint(OutboundEndpoint endpoint)
+    {
+        this.tap = endpoint;
+    }
+    
     public Filter getFilter()
     {
         return filter;

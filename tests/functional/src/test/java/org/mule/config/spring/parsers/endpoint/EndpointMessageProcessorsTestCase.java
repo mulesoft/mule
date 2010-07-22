@@ -62,7 +62,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     public void testLocalEndpoints() throws MuleException
     {
         ImmutableEndpoint endpoint = 
-            muleContext.getRegistry().lookupService("localEndpoints").getInboundRouter().getEndpoint("ep3");
+            muleContext.getRegistry().lookupService("localEndpoints").getMessageSource().getEndpoint("ep3");
 
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

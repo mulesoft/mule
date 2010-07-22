@@ -13,7 +13,6 @@ package org.mule.service;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
-import org.mule.api.registry.Registry;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.QueueProfile;
@@ -44,8 +43,8 @@ public class ServiceTestCase extends AbstractMuleTestCase
 
         service = new SedaService(muleContext);
         service.setName("testService");
-        service.getInboundRouter().addEndpoint(inboundEndpoint1);
-        service.getInboundRouter().addEndpoint(inboundEndpoint2);
+        service.getMessageSource().addSource(inboundEndpoint1);
+        service.getMessageSource().addSource(inboundEndpoint2);
         Model model = new SedaModel();
         model.setMuleContext(muleContext);
         model.initialise();

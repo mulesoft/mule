@@ -14,8 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.routing.inbound.CorrelationSequenceComparator;
 
 import java.util.Arrays;
 import java.util.Comparator;

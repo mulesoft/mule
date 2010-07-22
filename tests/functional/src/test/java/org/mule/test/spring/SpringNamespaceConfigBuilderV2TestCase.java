@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -25,6 +24,7 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
@@ -116,7 +116,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     {
         Service d = muleContext.getRegistry().lookupService("testPropertiesComponent");
         assertNotNull(d);
-        final InboundRouterCollection router = d.getInboundRouter();
+        final ServiceCompositeMessageSource router = d.getMessageSource();
         assertNotNull(router);
         final List endpoints = router.getEndpoints();
         assertNotNull(endpoints);

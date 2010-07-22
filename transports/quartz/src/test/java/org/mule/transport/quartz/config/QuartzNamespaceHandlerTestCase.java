@@ -84,7 +84,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService1");
         assertNotNull(service);
 
-        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP1");
+        InboundEndpoint ep = service.getMessageSource().getEndpoint("qEP1");
         assertNotNull(ep);
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EventGeneratorJobConfig);
@@ -97,7 +97,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService2");
         assertNotNull(service);
 
-        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP2");
+        InboundEndpoint ep = service.getMessageSource().getEndpoint("qEP2");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EventGeneratorJobConfig);
         EventGeneratorJobConfig config = (EventGeneratorJobConfig)ep.getProperty("jobConfig");
@@ -140,7 +140,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService5");
         assertNotNull(service);
 
-        InboundEndpoint ep = service.getInboundRouter().getEndpoint("qEP5");
+        InboundEndpoint ep = service.getMessageSource().getEndpoint("qEP5");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof EndpointPollingJobConfig);
         EndpointPollingJobConfig config = (EndpointPollingJobConfig)ep.getProperty("jobConfig");

@@ -320,7 +320,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     {
         String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
 
-        for (Iterator iterator = axisComponent.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
+        for (Iterator iterator = axisComponent.getMessageSource().getEndpoints().iterator(); iterator.hasNext();)
         {
             ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
             if (endpointKey.startsWith(endpoint.getEndpointURI().getAddress()))
@@ -414,7 +414,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         receiver.setEndpoint(receiverEndpoint);
 
         
-        axisComponent.getInboundRouter().addEndpoint(serviceEndpoint);
+        axisComponent.getMessageSource().addSource(serviceEndpoint);
     }
 
     private String getCounterEndpointKey(EndpointURI endpointURI)

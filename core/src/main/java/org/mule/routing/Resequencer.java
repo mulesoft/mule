@@ -13,10 +13,11 @@ package org.mule.routing;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
-import org.mule.routing.inbound.CorrelationSequenceComparator;
 
 import java.util.Comparator;
 
@@ -60,6 +61,24 @@ public class Resequencer extends AbstractAggregator
     protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
     {
         return new ResequenceMessagesCorrelatorCallback(getEventComparator(), event.getMuleContext());
+    }
+    
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        ensureInitialised(event);
+        MuleMessage msg = eventCorrelator.process(event);
+        if (msg == null)
+        {
+            return null;
+        }
+        MuleEvent last = null;
+        for (MuleEvent muleEvent : (MuleEvent[]) msg.getPayload())
+        {
+            last = processNext(muleEvent);
+        }
+        // Respect existing bahaviour by returning last event
+        return last;
     }
 
 }

@@ -44,9 +44,9 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
     {
         Service service = muleContext.getRegistry().lookupService("echo");
         assertNotNull(service);
-        assertEquals(1, service.getInboundRouter().getEndpoints().size());
+        assertEquals(1, service.getMessageSource().getEndpoints().size());
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
         assertNotNull(endpoint.getSecurityFilter());
         assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }

@@ -26,7 +26,6 @@ import org.mule.context.notification.TransactionNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.AbstractService;
@@ -131,8 +130,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addRoute(outProvider);
         service.getOutboundRouter().addRouter(router);
-        service.setInboundRouter(new DefaultInboundRouterCollection());
-        service.getInboundRouter().addEndpoint(endpoint);
+        service.getMessageSource().addSource(endpoint);
 
         // these tests no longer work - they need replacing with config driven tests
         // furthemore, nothing is read from service properties any more

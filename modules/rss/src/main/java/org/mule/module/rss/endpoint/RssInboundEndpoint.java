@@ -12,15 +12,9 @@ package org.mule.module.rss.endpoint;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.InboundEndpointDecorator;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultInboundEndpoint;
-import org.mule.module.rss.routing.EntryLastUpdatedFilter;
-import org.mule.module.rss.routing.InboundFeedSplitter;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
 
 import java.util.Date;
@@ -31,7 +25,7 @@ import java.util.Set;
 /**
  * TODO
  */
-public class RssInboundEndpoint extends DefaultInboundEndpoint implements InboundEndpointDecorator
+public class RssInboundEndpoint extends DefaultInboundEndpoint
 {
     private boolean splitFeed;
 
@@ -85,27 +79,6 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint implements Inboun
     public boolean isProtocolSupported(String protocol)
     {
         return supportedProtocols.contains(protocol);
-    }
-
-
-    public void onListenerAdded(FlowConstruct flowConstruct) throws MuleException
-    {
-        if (!(flowConstruct instanceof Service))
-        {
-            throw new IllegalArgumentException(
-                "Only the Service flow constuct is supported by the axis transport");
-        }
-        Service service = (Service) flowConstruct;
-        if (isSplitFeed())
-        {
-            Filter filter = new EntryLastUpdatedFilter(getLastUpdate());
-            InboundFeedSplitter splitter = new InboundFeedSplitter();
-            splitter.setEntryFilter(filter);
-            splitter.setMuleContext(getMuleContext());
-            splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
-            splitter.initialise();
-            service.getInboundRouter().addRouter(splitter);
-        }
     }
 
     public boolean onMessage(MuleMessage message) throws MuleException

@@ -23,6 +23,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -115,6 +116,8 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // Must not use transformers
             endpointBuilder.setTransformers(Collections.<Transformer>emptyList());
             endpointBuilder.setResponseTransformers(Collections.<Transformer>emptyList());
+            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>emptyList());
+            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(

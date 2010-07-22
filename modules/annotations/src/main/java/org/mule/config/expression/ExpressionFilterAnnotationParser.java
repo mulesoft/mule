@@ -13,11 +13,11 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.routing.ExpressionFilter;
-import org.mule.api.routing.Router;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.OrFilter;
-import org.mule.routing.inbound.SelectiveConsumer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -29,9 +29,9 @@ import java.util.StringTokenizer;
  */
 public class ExpressionFilterAnnotationParser implements RouterAnnotationParser
 {
-    public Router parseRouter(Annotation annotation) throws MuleException
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
-        SelectiveConsumer router = new SelectiveConsumer();
+        MessageFilter router = new MessageFilter();
         StringTokenizer st = new StringTokenizer(((ExpressionFilter)annotation).value(), "AND,OR", true);
         Filter f = new ExpressionFilterParser().parseFilterString(((ExpressionFilter)annotation).value());
         while ( st.hasMoreTokens())
@@ -65,7 +65,7 @@ public class ExpressionFilterAnnotationParser implements RouterAnnotationParser
         }
 
         router.setFilter(f);
-        return router;
+        return null;//   router;
     }
 
     public boolean supports(Annotation annotation, Class clazz, Member member)

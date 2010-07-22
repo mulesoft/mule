@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.inbound;
+package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;

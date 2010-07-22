@@ -21,7 +21,6 @@ import org.mule.routing.binding.DefaultBindingCollection
 import org.mule.routing.binding.DefaultInterfaceBinding
 import org.mule.routing.filters.MessagePropertyFilter
 import org.mule.routing.filters.PayloadTypeFilter
-import org.mule.routing.inbound.DefaultInboundRouterCollection
 import org.mule.routing.outbound.OutboundPassThroughRouter
 import org.mule.routing.response.DefaultResponseRouterCollection
 import org.mule.security.MuleSecurityManager
@@ -172,13 +171,12 @@ epBuilder.muleContext = muleContext
 epBuilder.setProperty("testLocal", "value1")
 epBuilder.filter = new PayloadTypeFilter(String.class)
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
-service.inboundRouter = new DefaultInboundRouterCollection()
-service.inboundRouter.addEndpoint(epFactory.getInboundEndpoint(epBuilder))
-service.inboundRouter.addEndpoint(orangeEndpoint)
+service.messageSource.addSource(epFactory.getInboundEndpoint(epBuilder))
+service.messageSource.addSource(orangeEndpoint)
 
 catchAllStrategy = new ForwardingCatchAllStrategy()
 catchAllStrategy.endpoint = createOutboundEndpoint("test://catch.all", null)
-service.inboundRouter.catchAllStrategy = catchAllStrategy
+service.messageSource.catchAllStrategy = catchAllStrategy
 
 //Nested Router
 bindingCollection = new DefaultBindingCollection();

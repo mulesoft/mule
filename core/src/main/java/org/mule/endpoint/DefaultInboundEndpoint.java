@@ -15,10 +15,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -90,6 +94,10 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         try
         {
+            if (getMessageProcessorChain() instanceof Startable)
+            {
+                ((Startable) getMessageProcessorChain()).start();
+            }
             getConnector().registerListener(this, getMessageProcessorChain(), flowConstruct);
         }
         catch (Exception e)
@@ -103,6 +111,10 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         try
         {
             getConnector().unregisterListener(this);
+            if (getMessageProcessorChain() instanceof Stoppable)
+            {
+                ((Stoppable) getMessageProcessorChain()).stop();
+            }
         }
         catch (Exception e)
         {
@@ -114,7 +126,16 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     public MessageProcessor createMessageProcessorChain() throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        return factory.createInboundMessageProcessorChain(this, listener);
+        MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, listener);
+        if (processorChain instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) processorChain).setFlowConstruct(flowConstruct);
+        }
+        if (processorChain instanceof Initialisable)
+        {
+            ((Initialisable) processorChain).initialise();
+        }
+        return processorChain;
     }
 
     public void setFlowConstruct(FlowConstruct flowConstruct)

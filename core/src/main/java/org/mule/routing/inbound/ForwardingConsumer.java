@@ -16,55 +16,52 @@ import org.mule.api.MuleException;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
+import org.mule.routing.MessageFilter;
 
 /**
- * <code>ForwardingConsumer</code> is used to forward an incoming event over
- * another transport without invoking a service. This can be used to implement a
- * bridge accross different transports.
+ * <code>ForwardingConsumer</code> is used to forward an incoming event over another transport without
+ * invoking a service. This can be used to implement a bridge accross different transports.
+ * @deprecated
  */
-public class ForwardingConsumer extends SelectiveConsumer
+public class ForwardingConsumer extends MessageFilter
 {
     @Override
-    public MuleEvent[] process(MuleEvent event) throws MessagingException
+    public MuleEvent processNext(MuleEvent event) throws MessagingException
     {
-        if (super.process(event) != null)
+        if (!(event.getFlowConstruct() instanceof Service))
         {
-            if (!(event.getFlowConstruct() instanceof Service))
-            {
-                throw new UnsupportedOperationException("ForwardingConsumer is only supported with Service");
-            }
+            throw new UnsupportedOperationException("ForwardingConsumer is only supported with Service");
+        }
 
-            OutboundRouterCollection router = ((Service) event.getFlowConstruct()).getOutboundRouter();
+        OutboundRouterCollection router = ((Service) event.getFlowConstruct()).getOutboundRouter();
 
-            // Set the stopFurtherProcessing flag to true to inform the
-            // DefaultInboundRouterCollection not to route these events to the service
-            event.setStopFurtherProcessing(true);
+        // Set the stopFurtherProcessing flag to true to inform the
+        // DefaultInboundRouterCollection not to route these events to the service
+        event.setStopFurtherProcessing(true);
 
-            if (router == null)
+        if (router == null)
+        {
+            logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
+            return event;
+        }
+        else
+        {
+            try
             {
-                logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
-                return new MuleEvent[]{event};
-            }
-            else
-            {
-                try
+                MuleEvent resultEvent = router.process(event);
+                if (resultEvent != null)
                 {
-                    MuleEvent resultEvent = router.process(event);
-                    if (resultEvent != null)
-                    {
-                        return new MuleEvent[]{resultEvent};
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return resultEvent;
                 }
-                catch (MuleException e)
+                else
                 {
-                    throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+                    return null;
                 }
+            }
+            catch (MuleException e)
+            {
+                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        return null;
     }
 }

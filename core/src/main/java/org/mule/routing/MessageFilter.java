@@ -30,6 +30,10 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     protected Filter filter;
     protected MessageProcessor unacceptedMessageProcessor;
 
+    public MessageFilter()
+    {
+    }
+
     public MessageFilter(Filter filter)
     {
         this.filter = filter;
@@ -93,6 +97,11 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     public Filter getFilter()
     {
         return filter;
+    }
+
+    public void setFilter(Filter filter)
+    {
+        this.filter = filter;
     }
 
 }

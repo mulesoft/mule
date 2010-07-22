@@ -48,9 +48,10 @@
                 <inbound-endpoint ref="CustomerRequests" exchange-pattern="one-way"/>
                 <!-- Loan quotes from banks -->
                 <inbound-endpoint ref="LoanBrokerQuotes"/>
-                <custom-inbound-router class="org.mule.example.loanbroker.routers.BankQuotesInboundAggregator">
+                <selective-consumer-router>
                     <payload-type-filter expectedType="org.mule.example.loanbroker.messages.LoanQuote"/>
-                </custom-inbound-router>
+                </selective-consumer-router>
+                <custom-inbound-router class="org.mule.example.loanbroker.routers.BankQuotesInboundAggregator"/>
                 <custom-catch-all-strategy class="org.mule.routing.ServiceCatchAllStrategy"/>
             </inbound>
 

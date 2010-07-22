@@ -13,14 +13,10 @@ package org.mule.transport.email.connectors;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transformer.NoActionTransformer;
 import org.mule.transport.email.transformers.EmailMessageToString;
 
 import java.util.HashMap;
@@ -73,9 +69,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         InboundEndpoint ep = 
             muleContext.getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(getTestEndpointURI());
-        InboundRouterCollection inboundRouter = new DefaultInboundRouterCollection();
-        inboundRouter.addEndpoint(ep);
-        service.setInboundRouter(inboundRouter);
+        service.getMessageSource().addSource(ep);
         muleContext.getRegistry().registerService(service);
         //muleContext.applyLifecycle(service);
         if (!muleContext.isStarted())

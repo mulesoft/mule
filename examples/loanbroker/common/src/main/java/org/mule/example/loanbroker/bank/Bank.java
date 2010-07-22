@@ -68,7 +68,7 @@ public class Bank implements ServiceAware, Serializable, BankService
     {
         this.bankName = service.getName(); 
 
-        List endpoints = service.getInboundRouter().getEndpoints();
+        List endpoints = service.getMessageSource().getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
             throw new IllegalArgumentException("Bank is expected to have exactly 1 incoming endpoint.");

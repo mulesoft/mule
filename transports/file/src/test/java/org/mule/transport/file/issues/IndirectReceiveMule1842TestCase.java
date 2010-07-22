@@ -36,7 +36,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         
         InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
-        relay.getInboundRouter().addEndpoint(endpoint);
+        relay.getMessageSource().addSource(endpoint);
         relay.stop();
         relay.start();
 

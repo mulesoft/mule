@@ -15,11 +15,10 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
-import org.mule.routing.AbstractRouter;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -37,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * Will split the feed into entries.  This router also filters out any entries that are older than the last one read
  * The filter can be configured with a date from which to accept feed entries
  */
-public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
+public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
 {
     /**
      * logger used by this class
@@ -56,7 +55,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
         acceptedContentTypes.add("application/rss");
     }
 
-    public MuleEvent[] process(MuleEvent muleEvent) throws MessagingException
+    public MuleEvent process(MuleEvent muleEvent) throws MessagingException
     {
         try
         {
@@ -78,7 +77,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
 
             for (SyndEntry entry : entries)
             {
-                MuleMessage m = new DefaultMuleMessage(entry, getMuleContext());
+                MuleMessage m = new DefaultMuleMessage(entry, muleEvent.getMuleContext());
                 if (entryFilter != null && !entryFilter.accept(m))
                 {
                     continue;
@@ -88,16 +87,19 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
                 events.add(e);
 
             }
-
-            return events.toArray(new MuleEvent[]{});
+            for (MuleEvent event : events)
+            {
+                processNext(event);
+            }
         }
         catch (MuleException e)
         {
             throw new MessagingException(e.getI18nMessage(), muleEvent.getMessage(), e);
         }
+        return null;
     }
 
-    public boolean isMatch(MuleEvent muleEvent) throws MessagingException
+    public boolean accept(MuleEvent muleEvent)
     {
         String contentType = muleEvent.getMessage().getOutboundProperty("Content-Type");
         if (contentType != null)

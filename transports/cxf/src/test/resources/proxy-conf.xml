@@ -25,7 +25,6 @@
                 <cxf:inbound-endpoint address="http://localhost:63081/services/greeterProxy"
                     serviceClass="org.apache.hello_world_soap_http.GreeterImpl"
                     exchange-pattern="request-response"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <pass-through-router>

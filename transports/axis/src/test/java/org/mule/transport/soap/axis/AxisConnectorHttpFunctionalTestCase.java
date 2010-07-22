@@ -57,7 +57,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
             // TODO MULE-2228 Simplify this API
             Service c = MuleTestUtils.getTestService("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
             InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(getComponentWithoutInterfacesEndpoint());
-            c.getInboundRouter().addEndpoint(ep);
+            c.getMessageSource().addSource(ep);
             muleContext.getRegistry().registerService(c);
             fail("Expected exception");
         }

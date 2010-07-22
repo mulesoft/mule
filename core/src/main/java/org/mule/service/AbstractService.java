@@ -29,7 +29,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
@@ -89,17 +88,14 @@ public abstract class AbstractService implements Service
      */
     protected String name;
 
-    protected InboundRouterCollection inboundRouter = new DefaultInboundRouterCollection();
-
     protected OutboundRouterCollection outboundRouter = new DefaultOutboundRouterCollection();
 
     protected ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
 
-    protected MessageSource inboundMessageSource;
+    protected ServiceCompositeMessageSource messageSource = new ServiceCompositeMessageSource();
     protected MessageSource asyncReplyMessageSource;
 
     protected MessageProcessor messageProcessorChain;
-    protected MessageProcessor serviceOnlyMessageProcessorChain;
 
     /**
      * Determines the initial state of this service when the model starts. Can be
@@ -162,11 +158,10 @@ public abstract class AbstractService implements Service
                         exceptionListener = getModel().getExceptionListener();
                     }
 
-                    inboundMessageSource = (((DefaultInboundRouterCollection) inboundRouter).getMessageSource());
                     asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
-                    if (inboundMessageSource instanceof FlowConstructAware)
+                    if (messageSource instanceof FlowConstructAware)
                     {
-                        ((FlowConstructAware) inboundMessageSource).setFlowConstruct(object);
+                        ((FlowConstructAware) messageSource).setFlowConstruct(object);
                     }
                     if (asyncReplyMessageSource instanceof FlowConstructAware)
                     {
@@ -350,9 +345,9 @@ public abstract class AbstractService implements Service
 
     protected void doStop() throws MuleException
     {
-        if (inboundMessageSource instanceof Stoppable)
+        if (messageSource instanceof Stoppable)
         {
-            ((Stoppable) inboundMessageSource).stop();
+            ((Stoppable) messageSource).stop();
         }
         if (asyncReplyMessageSource instanceof Stoppable)
         {
@@ -382,9 +377,9 @@ public abstract class AbstractService implements Service
             ((Startable) messageProcessorChain).start();
         }
 
-        if (inboundMessageSource instanceof Startable)
+        if (messageSource instanceof Startable)
         {
-            ((Startable) inboundMessageSource).start();
+            ((Startable) messageSource).start();
         }
         if (asyncReplyMessageSource instanceof Startable)
         {
@@ -404,7 +399,6 @@ public abstract class AbstractService implements Service
             ((Disposable) messageProcessorChain).dispose();
         }
         responseRouter.dispose();
-        inboundRouter.dispose();
         muleContext.getStatistics().remove(stats);
     }
 
@@ -418,11 +412,11 @@ public abstract class AbstractService implements Service
         {
             stats.setOutboundRouterStat(outboundRouter.getStatistics());
         }
-        stats.setInboundRouterStat(inboundRouter.getStatistics());
+        stats.setInboundRouterStat(messageSource.getStatistics());
         stats.setComponentStat(component.getStatistics());
 
         buildServiceMessageProcessorChain();
-        inboundMessageSource.setListener(messageProcessorChain);
+        messageSource.setListener(messageProcessorChain);
         asyncReplyMessageSource.setListener(getResponseRouter());
 
         // Component is not in chain
@@ -436,8 +430,7 @@ public abstract class AbstractService implements Service
         }
         ((AbstractRouterCollection) responseRouter).setMuleContext(muleContext);
         responseRouter.initialise();
-        ((AbstractRouterCollection) inboundRouter).setMuleContext(muleContext);
-        inboundRouter.initialise();
+        messageSource.initialise();
     }
 
     public void forceStop() throws MuleException
@@ -475,11 +468,6 @@ public abstract class AbstractService implements Service
         builder.setName("Service '"+name+"' Processor Chain");
         builder.chain(getServiceStartedAssertingMessageProcessor());
         addMessageProcessors(builder);
-
-        // Used by deprecated send() and dispatch() methods only
-        serviceOnlyMessageProcessorChain = builder.build();
-
-        builder.chainBefore(inboundRouter);
         messageProcessorChain = builder.build();
 
         if (messageProcessorChain instanceof FlowConstructAware)
@@ -508,13 +496,13 @@ public abstract class AbstractService implements Service
     @Deprecated
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
-        serviceOnlyMessageProcessorChain.process(event);
+        messageProcessorChain.process(event);
     }
 
     @Deprecated
     public MuleMessage sendEvent(MuleEvent event) throws MuleException
     {
-        MuleEvent resultEvent = serviceOnlyMessageProcessorChain.process(event);
+        MuleEvent resultEvent = messageProcessorChain.process(event);
         if (resultEvent != null)
         {
             return resultEvent.getMessage();
@@ -564,14 +552,14 @@ public abstract class AbstractService implements Service
         this.exceptionListener = exceptionListener;
     }
 
-    public InboundRouterCollection getInboundRouter()
+    public ServiceCompositeMessageSource getMessageSource()
     {
-        return inboundRouter;
+        return messageSource;
     }
 
-    public void setInboundRouter(InboundRouterCollection inboundRouter)
+    public void setMessageSource(ServiceCompositeMessageSource inboundMessageSource)
     {
-        this.inboundRouter = inboundRouter;
+        this.messageSource = inboundMessageSource;
     }
 
     public OutboundRouterCollection getOutboundRouter()

@@ -26,10 +26,9 @@ import org.mule.util.store.InMemoryObjectStore;
 import java.text.MessageFormat;
 
 /**
- * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed
- * on. It does this by checking the unique ID of the incoming message. Note that the
- * underlying endpoint must support unique message IDs for this to work, otherwise a
- * <code>UniqueIdNotSupportedException</code> is thrown.<br>
+ * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed on. It does this by
+ * checking the unique ID of the incoming message. Note that the underlying endpoint must support unique
+ * message IDs for this to work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
  * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/IdempotentReceiver.html}
  */
@@ -44,7 +43,7 @@ public class IdempotentMessageFilter extends MessageFilter implements FlowConstr
 
     public IdempotentMessageFilter()
     {
-        super(null);
+        super();
     }
 
     public void initialise() throws InitialisationException

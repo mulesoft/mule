@@ -27,7 +27,6 @@ import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.InboundEndpointDecorator;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -1310,10 +1309,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         receiver.initialise();
         receivers.put(receiverKey, receiver);
         flowConstructByEndpoint.put(endpoint.getName(), flowConstruct);
-        if (endpoint instanceof InboundEndpointDecorator)
-        {
-            ((InboundEndpointDecorator) endpoint).onListenerAdded(flowConstruct);
-        }
 
         if (isConnected())
         {

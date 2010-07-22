@@ -9,7 +9,7 @@
  */
 package org.mule.api;
 
-import org.mule.api.routing.Router;
+import org.mule.api.processor.MessageProcessor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -28,7 +28,7 @@ public interface RouterAnnotationParser
      * @return a new Router configuration based on the current annotation
      * @throws MuleException if the inbound endpoint cannot be created. A Mule-specific error will be thrown.
      */
-    public Router parseRouter(Annotation annotation) throws MuleException;
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException;
 
     /**
      * Determines whether this parser can process the current annotation. The clazz and member params are passed in

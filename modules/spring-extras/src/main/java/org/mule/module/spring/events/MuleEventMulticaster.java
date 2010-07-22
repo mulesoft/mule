@@ -33,7 +33,6 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -47,6 +46,7 @@ import org.mule.model.seda.SedaService;
 import org.mule.module.spring.i18n.SpringMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -579,9 +579,9 @@ public class MuleEventMulticaster
 
                 // check whether the endpoint has already been set on the
                 // MuleEventMulticastor
-                if (service.getInboundRouter().getEndpoint(ep.getName()) == null)
+                if (service.getMessageSource().getEndpoint(ep.getName()) == null)
                 {
-                    service.getInboundRouter().addEndpoint(ep);
+                    service.getMessageSource().addSource(ep);
                 }
             }
         }
@@ -620,7 +620,7 @@ public class MuleEventMulticaster
             s.setName(serviceName);
             s.setModel(muleContext.getRegistry().lookupSystemModel());
             s.setQueueProfile(new QueueProfile());
-            s.getInboundRouter().addEndpoint(
+            s.getMessageSource().addSource(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));
             s.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(listener)));
             muleContext.getRegistry().registerService(s);
@@ -702,13 +702,13 @@ public class MuleEventMulticaster
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
-            service.getInboundRouter().addEndpoint(
+            service.getMessageSource().addSource(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://*"));
         }
         else
         {
             // Set multiple inbound subscriptions on the descriptor
-            InboundRouterCollection messageRouter = service.getInboundRouter();
+            ServiceCompositeMessageSource messageRouter = service.getMessageSource();
 
             for (int i = 0; i < subscriptions.length; i++)
             {
@@ -719,7 +719,7 @@ public class MuleEventMulticaster
                 endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(!asynchronous));
                 InboundEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder);
 
-                messageRouter.addEndpoint(endpoint);
+                messageRouter.addSource(endpoint);
             }
         }
         DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(this));

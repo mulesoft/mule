@@ -26,7 +26,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("service");
         assertNotNull(service);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
         assertNotNull(endpoint);
 
         assertProperty(endpoint, "global-only", "global");

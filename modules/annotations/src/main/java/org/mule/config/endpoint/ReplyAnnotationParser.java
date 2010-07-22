@@ -11,9 +11,9 @@ package org.mule.config.endpoint;
 
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
-import org.mule.api.annotations.routing.Reply;
-import org.mule.api.routing.Router;
 import org.mule.api.annotations.meta.Channel;
+import org.mule.api.annotations.routing.Reply;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.routing.reply.AbstractResponseCallbackAggregator;
 import org.mule.config.routing.reply.SingleResponseWithCallbackRouter;
 import org.mule.util.StringUtils;
@@ -41,7 +41,7 @@ public class ReplyAnnotationParser extends AbstractEndpointAnnotationParser impl
         return Reply.class.getAnnotation(Channel.class).identifer();
     }
 
-    public Router parseRouter(Annotation annotation) throws MuleException
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
         AbstractResponseCallbackAggregator router;
         Reply reply = (Reply) annotation;
@@ -53,7 +53,7 @@ public class ReplyAnnotationParser extends AbstractEndpointAnnotationParser impl
         router.setTimeout(reply.replyTimeout());
         router.setFailOnTimeout(reply.failOnTimeout());
 
-        return router;
+        return null;//router;
     }
 
     @Override

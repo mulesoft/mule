@@ -286,7 +286,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         String name = "JcaService#" + endpointFactory.hashCode();
         Service service = new JcaService(muleContext);
         service.setName(name);
-        service.getInboundRouter().addEndpoint(endpoint);
+        service.getMessageSource().addSource(endpoint);
 
         // Set endpointFactory rather than endpoint here, so we can obtain a
         // new endpoint instance from factory for each incoming message in

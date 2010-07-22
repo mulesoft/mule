@@ -13,12 +13,12 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.atom.transformers.ObjectToFeed;
-import org.mule.routing.AbstractRouter;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * certain entries, the most common use of this would be to filter out entries that have already been read
  * by using the {@link org.mule.module.atom.routing.EntryLastUpdatedFilter} filter.
  */
-public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
+public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
 {
     /**
      * logger used by this class
@@ -54,7 +54,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
         acceptedContentTypes.add("application/atom+xml");
     }
 
-    public MuleEvent[] process(MuleEvent muleEvent) throws MessagingException
+    public MuleEvent process(MuleEvent muleEvent) throws MuleException
     {
         try
         {
@@ -75,7 +75,7 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
             entries.addAll(feed.getEntries());
             for (Entry entry : entries)
             {
-                MuleMessage m = new DefaultMuleMessage(entry, getMuleContext());
+                MuleMessage m = new DefaultMuleMessage(entry, muleEvent.getMuleContext());
                 if (entryFilter != null && !entryFilter.accept(m))
                 {
                     continue;
@@ -84,15 +84,19 @@ public class InboundFeedSplitter extends AbstractRouter implements InboundRouter
                 MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getFlowConstruct(), muleEvent);
                 events.add(e);
             }
-            return events.toArray(new MuleEvent[]{});
+            for (MuleEvent event : events)
+            {
+                processNext(event);
+            }
         }
         catch (TransformerException e)
         {
             throw new MessagingException(e.getI18nMessage(), muleEvent.getMessage(), e);
         }
+        return null;
     }
 
-    public boolean isMatch(MuleEvent muleEvent) throws MessagingException
+    public boolean accept(MuleEvent muleEvent)
     {
         String contentType = muleEvent.getMessage().getInboundProperty("Content-Type");
         if (contentType != null)

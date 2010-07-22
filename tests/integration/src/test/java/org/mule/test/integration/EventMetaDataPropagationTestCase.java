@@ -18,6 +18,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
@@ -46,9 +47,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("component1");
         MuleSession session = new DefaultMuleSession(service, muleContext);
-        MuleEvent event =
-                new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-                                     service.getInboundRouter().getEndpoints().get(0), session);
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
+            (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0), session);
         service.sendEvent(event);
     }
 

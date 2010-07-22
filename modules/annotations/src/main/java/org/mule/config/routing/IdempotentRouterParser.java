@@ -11,9 +11,9 @@ package org.mule.config.routing;
 
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
-import org.mule.api.routing.Router;
 import org.mule.api.annotations.routing.Idempotent;
-import org.mule.routing.inbound.IdempotentReceiver;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.routing.IdempotentMessageFilter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -24,13 +24,13 @@ import java.lang.reflect.Member;
  */
 public class IdempotentRouterParser implements RouterAnnotationParser
 {
-    public Router parseRouter(Annotation annotation) throws MuleException
+    public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
         Idempotent router = (Idempotent) annotation;
 
       //  if (router.type() == Idempotent.Type.ID)
        // {
-            return new IdempotentReceiver();
+            return new IdempotentMessageFilter();
       //  }
 //        else //if (router.type() == Idempotent.Type.HASH)
 //        {
