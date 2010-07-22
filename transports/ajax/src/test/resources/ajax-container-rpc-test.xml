@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
 
-    <ajax:servlet-endpoint name="endpoint1" path="/request" exchange-pattern="one-way"/>
+    <ajax:servlet-endpoint name="endpoint1" path="/request"/>
 
     <model name="main">
         <service name="testComponent">

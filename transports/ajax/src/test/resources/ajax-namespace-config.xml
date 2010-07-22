@@ -11,6 +11,6 @@
 
     <ajax:servlet-connector name="connector2"/>
 
-    <ajax:endpoint name="endpoint1" address="http://0.0.0.0:58080/service/request" exchange-pattern="one-way"/>
-    <ajax:servlet-endpoint name="endpoint2" path="service/response" exchange-pattern="one-way"/>
+    <ajax:endpoint name="endpoint1" address="http://0.0.0.0:58080/service/request"/>
+    <ajax:servlet-endpoint name="endpoint2" path="service/response"/>
 </mule>
