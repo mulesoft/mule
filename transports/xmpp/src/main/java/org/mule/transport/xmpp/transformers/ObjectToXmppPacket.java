@@ -12,6 +12,7 @@ package org.mule.transport.xmpp.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
@@ -52,27 +53,27 @@ public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
                     muleMessage.getExceptionPayload().getMessage()));
         }
 
-        for (String propertyName : muleMessage.getPropertyNames())
+        for (String propertyName : muleMessage.getPropertyNames(PropertyScope.OUTBOUND))
         {
             if (propertyName.equals(XmppConnector.XMPP_THREAD))
             {
-                result.setThread((String) muleMessage.getProperty(propertyName));
+                result.setThread((String) muleMessage.getOutboundProperty(propertyName));
             }
             else if (propertyName.equals(XmppConnector.XMPP_SUBJECT))
             {
-                result.setSubject((String) muleMessage.getProperty(propertyName));
+                result.setSubject((String) muleMessage.getOutboundProperty(propertyName));
             }
             else if (propertyName.equals(XmppConnector.XMPP_FROM))
             {
-                result.setFrom((String) muleMessage.getProperty(propertyName));
+                result.setFrom((String) muleMessage.getOutboundProperty(propertyName));
             }
             else if (propertyName.equals(XmppConnector.XMPP_TO))
             {
-                result.setTo((String) muleMessage.getProperty(propertyName));
+                result.setTo((String) muleMessage.getOutboundProperty(propertyName));
             }
             else
             {
-                result.setProperty(propertyName, muleMessage.getProperty(propertyName));
+                result.setProperty(propertyName, muleMessage.<Object>getOutboundProperty(propertyName));
             }
         }
 

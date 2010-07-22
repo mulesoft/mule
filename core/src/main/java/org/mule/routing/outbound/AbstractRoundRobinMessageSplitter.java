@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.HashMap;
@@ -96,10 +97,9 @@ public class AbstractRoundRobinMessageSplitter extends AbstractMessageSplitter
         // Cache the properties here because for some message types getting the
         // properties can be expensive
         Map props = new HashMap();
-        for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+        for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
         {
-            String propertyKey = (String) iterator.next();
-            Object value = message.getProperty(propertyKey);
+            Object value = message.getOutboundProperty(propertyKey);
             if (value != null)
                 props.put(propertyKey, value);
         }

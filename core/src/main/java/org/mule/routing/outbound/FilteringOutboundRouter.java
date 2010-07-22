@@ -26,13 +26,13 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -181,10 +181,10 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             // Also add the endpoint propertie so that users can set fallback values
             // when the property is not set on the event
             props.putAll(ep.getProperties());
-            for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+            for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
             {
-                String propertyKey = (String) iterator.next();
-                props.put(propertyKey, message.getProperty(propertyKey));
+                Object value = message.getOutboundProperty(propertyKey);
+                props.put(propertyKey, value);
             }
 
             if (!parser.isContainsTemplate(uri))

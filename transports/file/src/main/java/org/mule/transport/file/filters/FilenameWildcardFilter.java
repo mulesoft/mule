@@ -59,7 +59,8 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
     public boolean accept(MuleMessage message)
     {
         // TODO revisit, shouldn't it be looking in the inbound scope?
-        return accept(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+        Object filename = message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
+        return accept(filename);
     }
 
 }

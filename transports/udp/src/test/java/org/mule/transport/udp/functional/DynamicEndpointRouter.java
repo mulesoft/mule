@@ -19,6 +19,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -30,7 +31,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
-        MuleEvent result = null;
+        MuleEvent result;
 
         if (routes == null || routes.size() == 0)
         {
@@ -44,12 +45,12 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
 
             if (ep instanceof OutboundEndpoint)
             {
-                for (String propertyKey : message.getPropertyNames())
+                for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
                 {
-                    Object propertyValue = message.getProperty(propertyKey);
+                    Object propertyValue = message.getOutboundProperty(propertyKey);
                     if (propertyKey.equalsIgnoreCase("packet.port"))
                     {
-                        int port = ((Integer) propertyValue).intValue();
+                        int port = (Integer) propertyValue;
                         newUri = new MuleEndpointURI("udp://localhost:" + port, muleContext);
                         if (logger.isDebugEnabled())
                         {

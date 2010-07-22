@@ -20,6 +20,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -290,12 +291,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected void setCustomProperties(MuleEvent event, Call call)
     {
-        for (Iterator iter = event.getMessage().getPropertyNames().iterator(); iter.hasNext();)
+        for (String key : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))
         {
-            String key = (String)iter.next();
             if (!(key.startsWith(MuleProperties.PROPERTY_PREFIX)))
             {
-                Object value = event.getMessage().getProperty(key);
+                Object value = event.getMessage().getOutboundProperty(key);
                 if (value != null)
                 {
                     call.setProperty(key, value);
@@ -486,10 +486,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap();
         MuleMessage msg = event.getMessage();
-        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        for (String propertyKey : msg.getPropertyNames(PropertyScope.OUTBOUND))
         {
-            String propertyKey = (String)iterator.next();
-            properties.put(propertyKey, msg.getProperty(propertyKey));
+            Object value = msg.getOutboundProperty(propertyKey);
+            properties.put(propertyKey, value);
         }
         properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());
