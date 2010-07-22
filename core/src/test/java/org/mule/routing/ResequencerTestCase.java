@@ -19,8 +19,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.routing.EventGroup;
-import org.mule.routing.Resequencer;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import org.mule.routing.inbound.CorrelationSequenceComparator;
@@ -28,7 +26,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class ResequencerTestCase extends AbstractMuleTestCase
 {
@@ -65,12 +62,12 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(resultEvent);
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        List results = (List) resultMessage.getPayload();
-        assertEquals(3, results.size());
+        MuleEvent[] results = (MuleEvent[]) resultMessage.getPayload();
+        assertEquals(3, results.length);
 
-        assertEquals("test event B", results.get(0).toString());
-        assertEquals("test event C", results.get(1).toString());
-        assertEquals("test event A", results.get(2).toString());
+        assertEquals("test event B", results[0].getMessage().getPayload().toString());
+        assertEquals("test event C", results[1].getMessage().getPayload().toString());
+        assertEquals("test event A", results[2].getMessage().getPayload().toString());
 
         // set a resequencing comparator. We need to reset the router since it will not process the same event group
         //twice
@@ -84,12 +81,12 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(results);
         resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-        results = (List) resultMessage.getPayload();
-        assertEquals(3, results.size());
+        results = (MuleEvent[]) resultMessage.getPayload();
+        assertEquals(3, results.length);
 
-        assertEquals("test event A", results.get(0).toString());
-        assertEquals("test event B", results.get(1).toString());
-        assertEquals("test event C", results.get(2).toString());
+        assertEquals("test event A", results[0].getMessage().getPayload().toString());
+        assertEquals("test event B", results[1].getMessage().getPayload().toString());
+        assertEquals("test event C", results[2].getMessage().getPayload().toString());
     }
 
     public static class TestEventResequencer extends Resequencer

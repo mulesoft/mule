@@ -18,10 +18,8 @@ import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
@@ -60,19 +58,10 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
      */
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        List<Object> resultMessages = new ArrayList<Object>();
-        if (events != null && events.size() > 0)
-        {
-            MuleEvent[] results = events.toArray();
-            Arrays.sort(results, eventComparator);
-            for (MuleEvent result : results)
-            {
-                resultMessages.add(result.getMessage().getPayload());   
-            }
-        }
-
-        //This is a bit of a hack since we return a collection of message payloads on one message
-        return new DefaultMuleMessage(resultMessages, muleContext);
+        MuleEvent[] results = (events == null) ? new MuleEvent[0] : events.toArray();
+        Arrays.sort(results, eventComparator);
+        //This is a bit of a hack since we return a collection of events on one message
+        return new DefaultMuleMessage(results, muleContext);
     }
 
 }
