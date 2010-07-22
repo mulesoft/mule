@@ -42,8 +42,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
 
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertTrue(response.getPayload() instanceof String);
-        assertTrue((String) response.getPayload() == "Mule is the best!");
+        assertEquals("Mule is the best!", response.getPayload());
     }
 
     public void testWithInvalidData()
