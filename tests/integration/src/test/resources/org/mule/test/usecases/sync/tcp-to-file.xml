@@ -19,7 +19,7 @@
             <null-component/>
             <outbound>
                 <pass-through-router>
-                    <file:outbound-endpoint path="temp/tests/mule" exchange-pattern="one-way"/>
+                    <file:outbound-endpoint path="temp/tests/mule"/>
                 </pass-through-router>
             </outbound>
         </service>    

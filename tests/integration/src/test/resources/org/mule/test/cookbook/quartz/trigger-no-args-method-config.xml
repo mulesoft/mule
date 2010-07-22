@@ -23,7 +23,7 @@
                 NulePayload object will be used and the method on the component will be matched by Mule.
             </description>
             <inbound>
-                <quartz:inbound-endpoint jobName="myServiceJob" repeatInterval="1000" exchange-pattern="one-way">
+                <quartz:inbound-endpoint jobName="myServiceJob" repeatInterval="1000">
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>
