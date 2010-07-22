@@ -80,10 +80,10 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
         }
         finally
         {
-            assertTrue(FileUtils.newFile(myDir, myFileName1).delete());
-            assertTrue(FileUtils.newFile(myDir2, myFileName2).delete());
-            assertTrue(myDir.delete());
-            assertTrue(myDir2.delete());
+            FileUtils.newFile(myDir, myFileName1).delete();
+            FileUtils.newFile(myDir2, myFileName2).delete();
+            myDir.delete();
+            myDir2.delete();
         }
     }
 }
