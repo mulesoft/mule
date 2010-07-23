@@ -73,9 +73,9 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         //twice
         router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
-        router.initialise();
-        
         router.setEventComparator(new EventPayloadComparator());
+        router.initialise();
+
 
         assertNull(router.process(event2));
         assertNull(router.process(event3));
