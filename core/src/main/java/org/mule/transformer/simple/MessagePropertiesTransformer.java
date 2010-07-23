@@ -46,7 +46,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     private Map<String, String> renameProperties;
     private String getProperty;
     private boolean overwrite = true;
-    // outbound it the default scope
+    // outbound is the default scope
     private PropertyScope scope = PropertyScope.OUTBOUND;
 
     private MuleContext muleContext;
