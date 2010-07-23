@@ -14,6 +14,7 @@ import org.mule.DefaultMuleSession;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
@@ -42,7 +43,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -573,11 +573,12 @@ public class EventCorrelator
 
                         if (isFailOnTimeout())
                         {
-                            context.fireNotification(new RoutingNotification(group.toMessageCollection(), null,
+                            final MuleMessageCollection messageCollection = group.toMessageCollection();
+                            context.fireNotification(new RoutingNotification(messageCollection, null,
                                                                              RoutingNotification.CORRELATION_TIMEOUT));
                             service.getExceptionListener().exceptionThrown(
                                     new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                                    group.toMessageCollection()));
+                                                                    messageCollection));
                         }
                         else
                         {
