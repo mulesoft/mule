@@ -143,7 +143,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     @SuppressWarnings("unchecked")
     public Iterator<MuleEvent> iterator()
     {
-        synchronized (this)
+        synchronized (events)
         {
             if (events.isEmpty())
             {
@@ -163,7 +163,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public MuleEvent[] toArray()
     {
-        synchronized (this)
+        synchronized (events)
         {
             if (events.isEmpty())
             {
@@ -181,7 +181,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void addEvent(MuleEvent event)
     {
-        synchronized (this)
+        synchronized (events)
         {
             events.add(event);
         }
@@ -194,7 +194,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void removeEvent(MuleEvent event)
     {
-        synchronized (this)
+        synchronized (events)
         {
             events.remove(event);
         }
@@ -217,7 +217,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public int size()
     {
-        synchronized (this)
+        synchronized (events)
         {
             return events.size();
         }
@@ -239,7 +239,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void clear()
     {
-        synchronized (this)
+        synchronized (events)
         {
             events.clear();
         }
@@ -254,7 +254,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
         buf.append("id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
 
-        synchronized (this)
+        synchronized (events)
         {
             int currentSize = events.size();
             buf.append(", current events=").append(currentSize);
@@ -283,11 +283,18 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
 
     public MuleMessageCollection toMessageCollection()
     {
-        if(events.size()==0) return new DefaultMessageCollection(null);
-        MuleMessageCollection col = new DefaultMessageCollection(events.get(0).getMuleContext());
-        for (MuleEvent event : events)
+        MuleMessageCollection col;
+        synchronized (events)
         {
-            col.addMessage(event.getMessage());
+            if (events.isEmpty())
+            {
+                col = new DefaultMessageCollection(null);
+            }
+            col = new DefaultMessageCollection(events.get(0).getMuleContext());
+            for (MuleEvent event : events)
+            {
+                col.addMessage(event.getMessage());
+            }
         }
         return col;
     }
