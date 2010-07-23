@@ -24,7 +24,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
 
     public void testDispatch() throws Exception
     {
-        TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, 
@@ -44,7 +44,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractOutbou
 
     public void testSend() throws Exception
     {
-        TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, 
