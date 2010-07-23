@@ -18,7 +18,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.routing.MessageChunkAggregator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -37,6 +36,8 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
         assertNotNull(testService);
 
         MessageChunkAggregator router = new MessageChunkAggregator();
+        router.setMuleContext(muleContext);
+        router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);

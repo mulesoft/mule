@@ -43,6 +43,8 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(testService);
 
         TestEventResequencer router = new TestEventResequencer(3);
+        router.setMuleContext(muleContext);
+        router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
@@ -70,6 +72,9 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         // set a resequencing comparator. We need to reset the router since it will not process the same event group
         //twice
         router = new TestEventResequencer(3);
+        router.setMuleContext(muleContext);
+        router.initialise();
+        
         router.setEventComparator(new EventPayloadComparator());
 
         assertNull(router.process(event2));
