@@ -204,12 +204,6 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("payload", message.getPayload());
         //For backward compatability
         bindings.put("src", message.getPayload());
-
-        // Set any message properties as variables for the script.
-        for (String propertyName : message.getPropertyNames())
-        {
-            bindings.put(propertyName, message.getProperty(propertyName));
-        }
     }
 
     public void populateBindings(Bindings bindings, MuleEvent event)
@@ -222,7 +216,7 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put("flowConstruct", event.getFlowConstruct());
         if (event.getFlowConstruct() instanceof Service)
         {
-            bindings.put("service", (Service) event.getFlowConstruct());
+            bindings.put("service", event.getFlowConstruct());
         }
     }
     
