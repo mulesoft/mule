@@ -50,7 +50,7 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
      */
     public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        MuleEvent receivedEvent = (MuleEvent) events.iterator().next();
+        MuleEvent receivedEvent = events.iterator().next();
         MuleMessage result = super.aggregateEvents(events);
         MuleEvent event = new DefaultMuleEvent(result, receivedEvent.getEndpoint(), receivedEvent.getFlowConstruct(), receivedEvent);
 

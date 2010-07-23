@@ -22,7 +22,6 @@ import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.lang.SerializationUtils;
 
 public class MessageChunkingTestCase extends FunctionalTestCase

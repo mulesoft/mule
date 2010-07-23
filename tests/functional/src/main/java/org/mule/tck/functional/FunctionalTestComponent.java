@@ -27,7 +27,6 @@ import org.mule.util.SystemUtils;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -246,7 +245,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
 
         //Time to wait before returning
-        if(waitTime > 0)
+        if (waitTime > 0)
         {
             try
             {

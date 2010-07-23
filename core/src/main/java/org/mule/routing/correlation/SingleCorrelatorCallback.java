@@ -62,7 +62,7 @@ public class SingleCorrelatorCallback implements EventCorrelatorCallback
      */
     public MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {
-        return ((MuleEvent) events.iterator().next()).getMessage();
+        return events.iterator().next().getMessage();
     }
 
     public EventGroup createEventGroup(MuleEvent event, Object id)

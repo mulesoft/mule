@@ -13,15 +13,13 @@ package org.mule.routing;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.routing.AbstractAggregator;
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -74,7 +72,7 @@ public class AggregatorTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
+        protected EventCorrelatorCallback getCorrelatorCallback(final MuleContext muleContext)
         {
             return new EventCorrelatorCallback()
             {

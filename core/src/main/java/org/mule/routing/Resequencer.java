@@ -10,10 +10,11 @@
 
 package org.mule.routing;
 
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -39,13 +40,13 @@ public class Resequencer extends AbstractAggregator
     }
 
     @Override
-    public void ensureInitialised(MuleEvent event) throws MuleException
+    public void initialise() throws InitialisationException
     {
         if (eventComparator == null)
         {
-            throw new DefaultMuleException(CoreMessages.objectIsNull("eventComparator"));
+            throw new InitialisationException(CoreMessages.objectIsNull("eventComparator"), this);
         }
-        super.ensureInitialised(event);
+        super.initialise();
     }
 
     public Comparator getEventComparator()
@@ -58,15 +59,14 @@ public class Resequencer extends AbstractAggregator
         this.eventComparator = eventComparator;
     }
 
-    protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), event.getMuleContext());
+        return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext);
     }
     
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ensureInitialised(event);
         MuleMessage msg = eventCorrelator.process(event);
         if (msg == null)
         {

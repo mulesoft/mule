@@ -11,10 +11,13 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
@@ -26,42 +29,43 @@ import javax.resource.spi.work.WorkException;
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message.
  */
 
-public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
+public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor implements Initialisable, MuleContextAware
 {
 
     protected EventCorrelator eventCorrelator;
+    protected MuleContext muleContext;
     private MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
-    private int timeout = 0;
 
+    private int timeout = 0;
     private boolean failOnTimeout = true;
 
-    protected void ensureInitialised(MuleEvent event) throws MuleException
+    public void initialise() throws InitialisationException
     {
-        if (eventCorrelator == null)
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, getMessageInfoMapping(), muleContext);
+        if (timeout != 0)
         {
-            eventCorrelator = new EventCorrelator(getCorrelatorCallback(event), next, getMessageInfoMapping(),
-                event.getMuleContext());
-            if (timeout != 0)
+            eventCorrelator.setTimeout(timeout);
+            eventCorrelator.setFailOnTimeout(isFailOnTimeout());
+            try
             {
-                eventCorrelator.setTimeout(timeout);
-                eventCorrelator.setFailOnTimeout(isFailOnTimeout());
-                try
-                {
-                    eventCorrelator.enableTimeoutMonitor();
-                }
-                catch (WorkException e)
-                {
-                    throw new DefaultMuleException(e);
-                }
+                eventCorrelator.enableTimeoutMonitor();
+            }
+            catch (WorkException e)
+            {
+                throw new InitialisationException(e, this);
             }
         }
     }
 
-    protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleEvent event);
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ensureInitialised(event);
         MuleMessage msg = eventCorrelator.process(event);
         if (msg == null)
         {

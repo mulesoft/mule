@@ -76,7 +76,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
      */
     public MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {
-        MuleEvent event = (MuleEvent) events.iterator().next();
+        MuleEvent event = events.iterator().next();
         
         if (!(event.getFlowConstruct() instanceof Service))
         {
@@ -85,7 +85,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
         }
 
         //Setting a callback is optional
-        if(callback!=null)
+        if (callback!=null)
         {
             event.getMessage().setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, callback);
             try

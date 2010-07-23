@@ -33,7 +33,7 @@
                 <vm:inbound-endpoint path="chunking.channel" exchange-pattern="one-way"/>
                 <message-chunking-aggregator-router/>
             </inbound>
-            <test:component appendString=" Received"/>
+            <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
 
         <!-- this has changed slightly from 1.x; we need to stop the functional test component from
@@ -55,7 +55,7 @@
                 <vm:inbound-endpoint path="chunking.object.channel" exchange-pattern="one-way"/>
                 <message-chunking-aggregator-router/>
             </inbound>
-            <test:component doInboundTransform="false"/>
+            <test:component doInboundTransform="false" logMessageDetails="true"/>
             <!--<component>-->
                 <!--<singleton-object class="org.mule.tck.functional.FunctionalTestComponent">-->
                     <!--<property key="asString" value="false"/>-->

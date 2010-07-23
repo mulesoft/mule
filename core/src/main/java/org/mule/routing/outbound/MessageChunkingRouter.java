@@ -22,8 +22,6 @@ import org.mule.config.i18n.CoreMessages;
  * A router that breaks up the current message onto smaller parts and sends them to the
  * same destination. The Destination service needs to have a MessageChunkingAggregator
  * inbound router in order to rebuild the message at the other end.
- * 
- * @see org.mule.routing.inbound.MessageChunkingAggregator
  */
 public class MessageChunkingRouter extends FilteringOutboundRouter
 {
@@ -61,7 +59,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
         }
         else if (messageSize > 0)
         {
-            byte[] data = new byte[0];
+            byte[] data;
             try
             {
                 data = message.getPayloadAsBytes();
@@ -78,10 +76,10 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                 parts++;
             }
             int len = messageSize;
-            MuleMessage part = null;
+            MuleMessage part;
             int count = 0;
             int pos = 0;
-            byte[] buffer = null;
+            byte[] buffer;
             try
             {
                 for (; count < parts; count++)
@@ -100,7 +98,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
 
                     if (logger.isInfoEnabled())
                     {
-                        logger.info("sending part " + count + " of " + parts);
+                        logger.info(String.format("sending part %d of %d (seq # %d)", count + 1, parts, count));
                     }
                     super.route(new DefaultMuleEvent(part, event.getEndpoint(), session));
                     if (logger.isInfoEnabled())

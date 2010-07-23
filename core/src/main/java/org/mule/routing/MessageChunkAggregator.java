@@ -11,21 +11,20 @@
 package org.mule.routing;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
+import org.mule.util.SerializationUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.SerializationException;
-import org.apache.commons.lang.SerializationUtils;
 
 public class MessageChunkAggregator extends AbstractAggregator
 {
@@ -36,13 +35,13 @@ public class MessageChunkAggregator extends AbstractAggregator
     public MessageChunkAggregator()
     {
         super();
-        eventComparator= new CorrelationSequenceComparator();
+        eventComparator = new CorrelationSequenceComparator();
     }
 
     @Override
-    protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new CollectionCorrelatorCallback(event.getMuleContext())
+        return new CollectionCorrelatorCallback(muleContext)
         {
             /**
              * This method is invoked if the shouldAggregate method is called and returns
@@ -65,9 +64,8 @@ public class MessageChunkAggregator extends AbstractAggregator
 
                 try
                 {
-                    for (Iterator iterator = IteratorUtils.arrayIterator(collectedEvents); iterator.hasNext();)
+                    for (MuleEvent event : collectedEvents)
                     {
-                        MuleEvent event = (MuleEvent) iterator.next();
                         baos.write(event.getMessageAsBytes());
                     }
 
@@ -77,8 +75,9 @@ public class MessageChunkAggregator extends AbstractAggregator
                     // the object...
                     try
                     {
-                        message = new DefaultMuleMessage(SerializationUtils.deserialize(baos.toByteArray()),
-                                firstEvent.getMessage(), muleContext);
+                        // must deserialize in correct classloader
+                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(), muleContext.getExecutionClassLoader());
+                        message = new DefaultMuleMessage(deserialized, firstEvent.getMessage(), muleContext);
 
                     }
                     catch (SerializationException e)

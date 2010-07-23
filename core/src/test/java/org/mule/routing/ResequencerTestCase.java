@@ -13,6 +13,7 @@ package org.mule.routing;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -95,7 +96,7 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
+        protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
         {
             return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext)
             {

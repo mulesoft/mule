@@ -11,7 +11,6 @@
 package org.mule.routing;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -25,9 +24,9 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator
 {
 
     @Override
-    protected EventCorrelatorCallback getCorrelatorCallback(MuleEvent event)
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
-        return new DelegateCorrelatorCallback(event.getMuleContext());
+        return new DelegateCorrelatorCallback(muleContext);
     }
 
     protected abstract MuleMessage aggregateEvents(EventGroup events) throws AggregationException;

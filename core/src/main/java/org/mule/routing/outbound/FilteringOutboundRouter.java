@@ -63,7 +63,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
-        MuleEvent result = null;
+        MuleEvent result;
 
         MuleMessage message = event.getMessage();
 

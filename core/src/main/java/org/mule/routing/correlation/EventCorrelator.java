@@ -100,6 +100,7 @@ public class EventCorrelator
     private MessageProcessor timeoutMessageProcessor;
 
 
+
     public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext context)
     {
         if (callback == null)
@@ -222,8 +223,7 @@ public class EventCorrelator
             }
 
             // ensure that only one thread at a time evaluates this EventGroup
-            // TODO this sync is useless (local var), need to lock on a field, possibly use lock striping
-            synchronized (group)
+            synchronized (groupsLock)
             {
                 // make sure no other thread removed the group in the meantime
                 if (group != this.getEventGroup(groupId))
