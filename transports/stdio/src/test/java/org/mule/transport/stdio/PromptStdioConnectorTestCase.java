@@ -14,21 +14,18 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
 {
-
-    private CountDownLatch latch;
-
+    @Override
     public String getTestEndpointURI()
     {
         return "stdio://System.out";
     }
 
+    @Override
     public Connector createConnector() throws Exception
     {
         Connector cnn = new PromptStdioConnector(muleContext);
@@ -36,6 +33,7 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
         return cnn;
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "Test Message";
@@ -64,13 +62,16 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
 
     private class ContextClassLoaderTestClassLoader extends ClassLoader
     {
-
+        public ContextClassLoaderTestClassLoader()
+        {
+            super();
+        }
+        
         @Override
         public InputStream getResourceAsStream(String name)
         {
-            return new StringBufferInputStream(
-                "1=Test ContextClassLoader Prompt Message\n2=Test ContextClassLoader Output Message");
+            String messages = "1=Test ContextClassLoader Prompt Message\n2=Test ContextClassLoader Output Message";
+            return new ByteArrayInputStream(messages.getBytes());
         }
     }
-
 }
