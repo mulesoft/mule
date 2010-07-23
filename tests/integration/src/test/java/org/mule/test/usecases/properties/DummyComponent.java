@@ -24,8 +24,8 @@ public class DummyComponent
         List recipients = new ArrayList();
         recipients.add("ross.mason@symphonysoft.com");
         recipients.add("ross@rossmason.com");
-        RequestContext.getEventContext().getMessage().setProperty(StaticRecipientList.RECIPIENTS_PROPERTY,
-            recipients);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(StaticRecipientList.RECIPIENTS_PROPERTY,
+                                                                          recipients);
     }
 
 }

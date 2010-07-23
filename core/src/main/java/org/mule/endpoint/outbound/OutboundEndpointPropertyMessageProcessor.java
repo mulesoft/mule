@@ -24,8 +24,8 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
 {
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-            event.getEndpoint().getEndpointURI().toString());
+        event.getMessage().setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
+                                               event.getEndpoint().getEndpointURI().toString());
         event = OptimizedRequestContext.unsafeSetEvent(event);
         return event;
     }

@@ -178,7 +178,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
 
         MuleMessage result = new DefaultMuleMessage(msg, eventContext.getMuleContext());
-        result.setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        result.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
 
         return result;
     }
@@ -322,7 +322,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
                 {
                     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(new Exception(""));
                     ctx.getMessage().setExceptionPayload(exceptionPayload);
-                    muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
+                    muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
                 }
             }
             

@@ -31,8 +31,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
     {
         //Default scope
         MessagePropertiesContext mpc = new MessagePropertiesContext();
-        mpc.setProperty("FOO", "BAR");
-        mpc.setProperty("ABC", "abc");
+        mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
+        mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
         mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
         doTest(mpc);
     }
@@ -78,8 +78,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
     {
         //Default scope
         MessagePropertiesContext mpc = new MessagePropertiesContext();
-        mpc.setProperty("FOO", "BAR");
-        mpc.setProperty("ABC", "abc");
+        mpc.setProperty("FOO", "BAR", PropertyScope.OUTBOUND);
+        mpc.setProperty("ABC", "abc", PropertyScope.OUTBOUND);
         mpc.setProperty("DOO", "DAR", PropertyScope.INVOCATION);
         doTest(mpc);
 

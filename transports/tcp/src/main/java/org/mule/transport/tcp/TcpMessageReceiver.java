@@ -439,7 +439,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             final SocketAddress clientAddress = socket.getRemoteSocketAddress();
             if (clientAddress != null)
             {
-                message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress.toString());
+                message.setOutboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress.toString());
             }
         }
     }

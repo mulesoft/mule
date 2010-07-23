@@ -327,7 +327,7 @@ public class RemoteDispatcher implements Disposable
                                     int timeout) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        message.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
+        message.setOutboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
         setCredentials(message);
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, (synchronous
                         ? RemoteDispatcherNotification.ACTION_SEND : RemoteDispatcherNotification.ACTION_DISPATCH), endpoint);
@@ -439,8 +439,8 @@ public class RemoteDispatcher implements Disposable
     {
         if (credentials != null)
         {
-            message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
-                credentials.getUsername(), credentials.getPassword()));
+            message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
+                    credentials.getUsername(), credentials.getPassword()));
         }
     }
 

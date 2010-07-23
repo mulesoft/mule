@@ -33,7 +33,7 @@ public abstract class AbstractEventTransformer extends AbstractTransformer
     public MuleMessage transform(Object src, Method method) throws TransformerException
     {
         MuleMessage message = (MuleMessage)transform(src);
-        message.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName());
+        message.setOutboundProperty(MuleProperties.MULE_METHOD_PROPERTY, method.getName());
         return message;
     }
 }

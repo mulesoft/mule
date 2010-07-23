@@ -30,7 +30,7 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
         assertNotNull(trans);
         MuleMessage message = new DefaultMuleMessage("<testing/>", muleContext);
-        message.setProperty("Welcome", "hello");
+        message.setOutboundProperty("Welcome", "hello");
         Object result = trans.transform(message);
         assertNotNull(result);
         XMLUnit.setIgnoreWhitespace(true);

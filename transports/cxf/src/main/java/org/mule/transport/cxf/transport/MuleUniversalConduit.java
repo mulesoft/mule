@@ -10,9 +10,6 @@
 
 package org.mule.transport.cxf.transport;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
@@ -70,6 +67,9 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
+
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 /**
  * A Conduit is primarily responsible for sending messages from CXF to somewhere
@@ -233,7 +233,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
             MuleMessage req = (MuleMessage) m.getExchange().get(CxfConstants.MULE_MESSAGE);
             req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
-            req.setProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+            req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
             
             MuleMessage result = sendStream(req, protocolEndpoint, m.getExchange());
 

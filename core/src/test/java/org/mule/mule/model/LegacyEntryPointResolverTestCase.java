@@ -182,7 +182,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         // those are usually set on the endpoint and copied over to the message
         final String methodName = "nosuchmethod";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-        RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(propertyName, methodName);
 
         resolverSet.invoke(new FruitBowl(), RequestContext.getEventContext());
         // fail("Should have failed to find an entrypoint.");
@@ -200,8 +200,8 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
         // those are usually set on the endpoint and copied over to the message
-        RequestContext.getEventContext().getMessage().setProperty(METHOD_PROPERTY_NAME,
-                INVALID_METHOD_NAME);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(METHOD_PROPERTY_NAME,
+                                                                          INVALID_METHOD_NAME);
 
         Apple apple = new Apple();
         apple.setAppleCleaner(new FruitCleaner()
@@ -233,7 +233,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         // those are usually set on the endpoint and copied over to the message
         final String methodName = "nosuchmethod";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-        RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(propertyName, methodName);
 
         try
         {
@@ -292,7 +292,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
 
         final String methodName = "setFruit";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-        RequestContext.getEventContext().getMessage().setProperty(propertyName, methodName);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(propertyName, methodName);
 
         FruitBowl bowl = new FruitBowl();
         assertFalse(bowl.hasApple());

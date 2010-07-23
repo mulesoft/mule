@@ -461,7 +461,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             if (value != null)
             {
-                properties.setProperty(key, value);
+                properties.setProperty(key, value, PropertyScope.OUTBOUND);
             }
             else
             {

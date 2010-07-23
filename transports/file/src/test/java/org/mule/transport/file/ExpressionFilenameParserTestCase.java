@@ -33,9 +33,9 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         parser.setMuleContext(muleContext);
 
         message = new DefaultMuleMessage("hello", muleContext);
-        message.setProperty("foo", "bar");
-        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
-        message.setProperty(FileConnector.PROPERTY_FILENAME, "newName");
+        message.setOutboundProperty("foo", "bar");
+        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
+        message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, "newName");
     }
 
     public void testWigglyMuleStyleParsing()

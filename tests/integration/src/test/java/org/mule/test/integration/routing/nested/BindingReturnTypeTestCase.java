@@ -44,7 +44,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
         public Object invoke(String s)
         {
             MuleMessage result = binding.process(s, new Integer(MAGIC_NUMBER));
-            result.setProperty(PROCESSED, Boolean.TRUE);
+            result.setOutboundProperty(PROCESSED, Boolean.TRUE);
             return result;
         }
         

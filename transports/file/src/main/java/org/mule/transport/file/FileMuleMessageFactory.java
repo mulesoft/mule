@@ -69,7 +69,7 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
 
     protected void setPropertiesFromFile(MuleMessage message, File file)
     {
-        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
-        message.setProperty(FileConnector.PROPERTY_DIRECTORY, file.getParent());
+        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+        message.setOutboundProperty(FileConnector.PROPERTY_DIRECTORY, file.getParent());
     }
 }

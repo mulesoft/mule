@@ -122,8 +122,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload(NullPayload.getInstance());
         message.setCorrelationId("1234");
-        message.setProperty("fruit1", "apple");
-        message.setProperty("fruit2", "orange");
+        message.setOutboundProperty("fruit1", "apple");
+        message.setOutboundProperty("fruit2", "orange");
         
         ObjectToHttpClientMethodRequest transformer = createTransformer();
         Object response = transformer.transform(message);

@@ -46,7 +46,7 @@ public class VMRequestorTestCase extends FunctionalTestCase
         assertEquals(10, results.size());
 
         //This would fail if the owner thread info was not updated
-        result.setProperty("foo", "bar");
+        result.setOutboundProperty("foo", "bar");
     }
 
     protected void makeClientRequest(final String message) throws MuleException

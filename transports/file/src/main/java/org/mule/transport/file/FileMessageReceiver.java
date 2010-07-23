@@ -205,7 +205,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         DefaultMuleMessage fileParserMsgAdaptor = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMsgAdaptor.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+        fileParserMsgAdaptor.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         
         File workFile = null;
         if (workDir != null && (moveDir == null || (moveDir != null && fileConnector.isStreaming())))
@@ -258,7 +258,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             return;
         }
 
-        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         if (!fileConnector.isStreaming())
         {
@@ -268,7 +268,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             // If we are streaming no need to move/delete now, that will be done when
             // stream is closed
-            message.setProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
             this.routeMessage(message);
         }
     }
@@ -300,8 +300,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
                 // create new Message for destinationFile
                 message = createMuleMessage(destinationFile, endpoint.getEncoding());
-                message.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-                message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
+                message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
 
             // finally deliver the file message

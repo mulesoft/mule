@@ -101,7 +101,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         if (etag != null && checkEtag)
         {
             Map<String, String> customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
-            request.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
+            request.setOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
         request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
 

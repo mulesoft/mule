@@ -66,11 +66,11 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
 
         if (peerCertificateChain != null)
         {
-            message.setProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
+            message.setOutboundProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
         }
         if (localCertificateChain != null)
         {
-            message.setProperty(SslConnector.LOCAL_CERTIFICATES, localCertificateChain);
+            message.setOutboundProperty(SslConnector.LOCAL_CERTIFICATES, localCertificateChain);
         }
     }
 

@@ -267,7 +267,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 final SocketAddress clientAddress = socket.getRemoteSocketAddress();
                 if (clientAddress != null)
                 {
-                    message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
+                    message.setOutboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
                 }
                 returnMessage = routeMessage(message);
 

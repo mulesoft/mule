@@ -42,7 +42,7 @@ public class XmppPacketToObject extends AbstractMessageAwareTransformer
         String subject = xmppMessage.getSubject();
         if (StringUtils.isNotEmpty(subject))
         {
-            muleMessage.setProperty(XmppConnector.XMPP_SUBJECT, subject);
+            muleMessage.setOutboundProperty(XmppConnector.XMPP_SUBJECT, subject);
         }
     }
 
@@ -51,7 +51,7 @@ public class XmppPacketToObject extends AbstractMessageAwareTransformer
         String thread = xmppMessage.getThread();
         if (StringUtils.isNotEmpty(thread))
         {
-            muleMessage.setProperty(XmppConnector.XMPP_THREAD, thread);
+            muleMessage.setOutboundProperty(XmppConnector.XMPP_THREAD, thread);
         }
     }
 
@@ -59,7 +59,7 @@ public class XmppPacketToObject extends AbstractMessageAwareTransformer
     {
         for (String propertyName : xmppMessage.getPropertyNames())
         {
-            muleMessage.setProperty(propertyName, xmppMessage.getProperty(propertyName));
+            muleMessage.setOutboundProperty(propertyName, xmppMessage.getProperty(propertyName));
         }
     }
 }

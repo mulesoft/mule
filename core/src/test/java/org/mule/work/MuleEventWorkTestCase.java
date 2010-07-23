@@ -35,8 +35,8 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
         super.doSetUp();
         // Create a dummy event and give it some properties
         originalEvent = getTestEvent("test");
-        originalEvent.getMessage().setProperty("test", "val");
-        originalEvent.getMessage().setProperty("test2", "val2");
+        originalEvent.getMessage().setOutboundProperty("test", "val");
+        originalEvent.getMessage().setOutboundProperty("test2", "val2");
         OptimizedRequestContext.unsafeSetEvent(originalEvent);
     }
 

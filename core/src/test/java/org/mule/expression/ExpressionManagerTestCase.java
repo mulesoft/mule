@@ -72,10 +72,10 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
     public void testParsing()
     {
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
-        msg.setProperty("user", "vasya");
-        msg.setProperty("password", "pupkin");
-        msg.setProperty("host", "example.com");
-        msg.setProperty("port", "12345");
+        msg.setOutboundProperty("user", "vasya");
+        msg.setOutboundProperty("password", "pupkin");
+        msg.setOutboundProperty("host", "example.com");
+        msg.setOutboundProperty("port", "12345");
 
         String result = muleContext.getExpressionManager().parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
         assertNotNull(result);

@@ -42,8 +42,8 @@ public class OrderToEmailTransformer extends AbstractTransformer
                        order.getAddress() + " by the next business day.";
         
         String email = order.getEmail();
-        RequestContext.getEventContext().getMessage().setProperty(
-                      MailProperties.TO_ADDRESSES_PROPERTY, email);
+        RequestContext.getEventContext().getMessage().setOutboundProperty(MailProperties.TO_ADDRESSES_PROPERTY,
+                                                                          email);
         logger.info("Sending e-mail notification to " + email);
         return body;
     }

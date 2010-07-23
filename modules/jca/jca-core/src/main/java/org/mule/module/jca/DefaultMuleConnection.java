@@ -183,7 +183,7 @@ public class DefaultMuleConnection implements MuleConnection
 
             if (credentials != null)
             {
-                message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
+                message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
 
             return new DefaultMuleEvent(message, endpoint, session);

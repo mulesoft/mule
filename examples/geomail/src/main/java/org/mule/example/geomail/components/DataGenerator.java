@@ -26,7 +26,7 @@ public class DataGenerator implements Callable
     
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        eventContext.getMessage().setProperty("from.email.address", "testdatagenerator@geomail.com");
+        eventContext.getMessage().setOutboundProperty("from.email.address", "testdatagenerator@geomail.com");
 
         // Create 3 for each run since many addresses will not be valid
         List<String> ipAddresses = new ArrayList<String>(batchSize);

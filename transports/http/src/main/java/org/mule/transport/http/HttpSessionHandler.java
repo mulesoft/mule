@@ -80,9 +80,9 @@ public class HttpSessionHandler implements SessionHandler
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
 
-        message.setProperty(HttpConnector.HTTP_COOKIES_PROPERTY, new Cookie[] {
-            // TODO handle domain, path, secure (https) and expiry
-            new Cookie(null, MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession)});
+        message.setOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY, new Cookie[] {
+                // TODO handle domain, path, secure (https) and expiry
+                new Cookie(null, MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession)});
     }
 
     /**

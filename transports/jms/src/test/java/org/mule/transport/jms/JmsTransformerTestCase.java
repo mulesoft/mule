@@ -71,7 +71,7 @@ public class JmsTransformerTestCase extends AbstractMuleTestCase
         MuleMessage msg = new DefaultMuleMessage(mockTextMessage, muleContext);
 
         // Now we set a custom "JMS-like" property on the MuleMessage
-        msg.setProperty("JMS_CUSTOM_PROPERTY", "customValue");
+        msg.setOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue");
 
         // The AbstractJMSTransformer will only apply JMS properties to the
         // underlying message when a "current event" is available, so we need to set

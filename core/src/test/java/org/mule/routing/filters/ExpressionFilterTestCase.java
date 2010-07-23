@@ -29,7 +29,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         filter.setMuleContext(muleContext);
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
-        message.setProperty("foo", "bar");
+        message.setOutboundProperty("foo", "bar");
         assertTrue(filter.accept(message));
     }
 
@@ -41,9 +41,9 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(filter.accept(message));
-        message.setProperty("foo", "bar");
+        message.setOutboundProperty("foo", "bar");
         assertTrue(!filter.accept(message));
-        message.setProperty("foo", "car");
+        message.setOutboundProperty("foo", "car");
         assertTrue(filter.accept(message));
     }
 
@@ -57,7 +57,7 @@ public class ExpressionFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(message));
         message.removeProperty("foo");
         assertTrue(!filter.accept(message));
-        message.setProperty("foo", "car");
+        message.setOutboundProperty("foo", "car");
         assertTrue(filter.accept(message));
     }
 

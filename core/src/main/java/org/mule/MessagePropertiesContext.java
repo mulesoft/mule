@@ -285,6 +285,7 @@ public class MessagePropertiesContext implements Serializable
      *
      * @param key   the key on which to associate the value
      * @param value the property value
+     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
      */
     public void setProperty(String key, Object value)
     {
@@ -302,12 +303,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public void setProperty(String key, Object value, PropertyScope scope)
     {
-        if (scope == null)
-        {
-            setProperty(key, value);
-            return;
-        }
-
         //checkScopeForWriteAccess(scope);
         if (PropertyScope.SESSION.equals(scope))
         {

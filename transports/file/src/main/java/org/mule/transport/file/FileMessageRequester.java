@@ -139,7 +139,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                         // resolve the destination file name
                         DefaultMuleMessage parserMesssage = new DefaultMuleMessage(null, 
                             connector.getMuleContext());
-                        parserMesssage.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                        parserMesssage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
                         destinationFileName = 
                             connector.getFilenameParser().getFilename(parserMesssage, moveToPattern);
@@ -170,7 +170,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     logger.error("File being read disappeared!", e);
                     return null;
                 }
-                returnMessage.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                returnMessage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
                 if (!connector.isStreaming())
                 {

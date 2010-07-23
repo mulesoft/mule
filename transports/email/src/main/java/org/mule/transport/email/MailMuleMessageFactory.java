@@ -62,17 +62,17 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         super.addProperties(muleMessage, transportMessage);
 
         Message mailMessage = (Message) transportMessage;
-        
-        muleMessage.setProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.TO)));
-        muleMessage.setProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.CC)));
-        muleMessage.setProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.BCC)));
+
+        muleMessage.setOutboundProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
+                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.TO)));
+        muleMessage.setOutboundProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY,
+                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.CC)));
+        muleMessage.setOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
+                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.BCC)));
         try
         {
-            muleMessage.setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-                MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
+            muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
+                                            MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
         }
         catch (MessagingException me)
         {
@@ -81,25 +81,25 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 
         try
         {
-            muleMessage.setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-                MailUtils.mailAddressesToString(mailMessage.getFrom()));
+            muleMessage.setOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
+                                            MailUtils.mailAddressesToString(mailMessage.getFrom()));
         }
         catch (javax.mail.MessagingException me)
         {
             log.warn("Invalid address found in From header:", me);
         }
 
-        muleMessage.setProperty(MailProperties.INBOUND_SUBJECT_PROPERTY, 
-            StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
-        muleMessage.setProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY, 
-            StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
+        muleMessage.setOutboundProperty(MailProperties.INBOUND_SUBJECT_PROPERTY,
+                                        StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
+        muleMessage.setOutboundProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY,
+                                        StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
 
         Date sentDate = mailMessage.getSentDate();
         if (sentDate == null)
         {
             sentDate = new Date();
         }
-        muleMessage.setProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
+        muleMessage.setOutboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
 
         for (Enumeration<?> e = mailMessage.getAllHeaders(); e.hasMoreElements();)
         {

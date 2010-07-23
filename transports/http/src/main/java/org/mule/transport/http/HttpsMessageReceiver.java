@@ -80,11 +80,11 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             
             if (peerCertificateChain != null)
             {
-                message.setProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
+                message.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
             }
             if (localCertificateChain != null)
             {
-                message.setProperty(HttpsConnector.LOCAL_CERTIFICATES, localCertificateChain);
+                message.setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, localCertificateChain);
             }
         }
 

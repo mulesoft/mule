@@ -232,7 +232,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformer.initialise();
 
         MuleMessage message = new DefaultMuleMessage(xml, muleContext);
-        message.setProperty("myproperty", param);
+        message.setOutboundProperty("myproperty", param);
         // do transformation
         String transformerResult = (String) transformer.transform(message);
 

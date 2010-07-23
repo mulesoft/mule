@@ -201,7 +201,7 @@ public class RestServiceWrapper extends AbstractComponent
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        event.getMessage().setProperty(HTTP_METHOD, httpMethod);
+        event.getMessage().setOutboundProperty(HTTP_METHOD, httpMethod);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
         endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);

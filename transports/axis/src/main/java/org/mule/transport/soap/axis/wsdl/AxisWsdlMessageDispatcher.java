@@ -79,8 +79,8 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
         service.setEngine(new AxisClient(clientConfig));
 
         // Really the Axis Client service should set this stuff
-        event.getMessage().setProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY,
-            parser.getCurrentDefinition().getTargetNamespace());
+        event.getMessage().setOutboundProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY,
+                                               parser.getCurrentDefinition().getTargetNamespace());
         // Todo how can we autogenerate the named params from the WSDL?
         return service;
     }

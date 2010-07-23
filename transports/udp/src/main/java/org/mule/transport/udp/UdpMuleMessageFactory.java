@@ -52,9 +52,9 @@ public class UdpMuleMessageFactory extends AbstractMuleMessageFactory
         InetAddress address = packet.getAddress();
         if (address != null)
         {
-            message.setProperty(UdpConnector.ADDRESS_PROPERTY, address);
+            message.setOutboundProperty(UdpConnector.ADDRESS_PROPERTY, address);
         }
 
-        message.setProperty(UdpConnector.PORT_PROPERTY, Integer.valueOf(packet.getPort()));
+        message.setOutboundProperty(UdpConnector.PORT_PROPERTY, Integer.valueOf(packet.getPort()));
     }
 }

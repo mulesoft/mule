@@ -40,7 +40,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
                 MessageReceiver receiver = getReceiverForURI(request);
 
                 MuleMessage requestMessage = receiver.createMuleMessage(request);
-                requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
+                requestMessage.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
                 //Need to remove this if set, we'll be returning a result but we need to make the request async
                 requestMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
                 //This will allow Mule to continue the response once the service has do its processing
