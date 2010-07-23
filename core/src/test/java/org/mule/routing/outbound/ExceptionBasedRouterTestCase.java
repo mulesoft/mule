@@ -25,7 +25,6 @@ import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
-import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
@@ -316,20 +315,5 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         mockendpoint2.verify();
 
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResult.getMessage());
-    }
-
-    private static class IsPayloadEqual implements Constraint
-    {            
-        private MuleMessage _message;
-        
-        public IsPayloadEqual(MuleMessage message) 
-        {
-            _message = message;
-        }
-        
-        public boolean eval(Object o)
-        {
-            return o instanceof MuleMessage && ((MuleMessage) o).getPayload().equals(_message.getPayload());
-        }
     }
 }
