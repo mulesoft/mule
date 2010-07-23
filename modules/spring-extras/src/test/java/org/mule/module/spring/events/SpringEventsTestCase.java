@@ -25,6 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -35,8 +36,8 @@ public class SpringEventsTestCase extends FunctionalTestCase
     protected static final int DEFAULT_LATCH_TIMEOUT = 5000;
 
     private static final int NUMBER_OF_MESSAGES = 10;
-    private volatile AtomicInteger eventCounter1;
-    private volatile AtomicInteger eventCounter2;
+    volatile AtomicInteger eventCounter1;
+    volatile AtomicInteger eventCounter2;
 
     @Override
     protected void doSetUp() throws Exception
@@ -47,11 +48,6 @@ public class SpringEventsTestCase extends FunctionalTestCase
     }
 
     @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-    }
-
     protected String getConfigResources()
     {
         return "mule-events-app-context.xml";
@@ -266,9 +262,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(1, eventCounter1.get());
     }
 
-    // asynchronously publish the given event to the ApplicationContext for
-    // 'count'
-    // number of times
+    // asynchronously publish the given event to the ApplicationContext for 'count' number of times
     protected void doPublish(final ApplicationEvent event, final int count)
     {
         Runnable publisher = new Runnable()
@@ -282,7 +276,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
                     {
                         context = ((MuleEventMulticaster) muleContext.getRegistry().lookupObject(
                             "applicationEventMulticaster")).applicationContext;
-
+                        context.publishEvent(event);
                     }
                     catch (IllegalArgumentException e)
                     {
@@ -294,7 +288,6 @@ public class SpringEventsTestCase extends FunctionalTestCase
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    context.publishEvent(event);
                 }
             }
         };
@@ -302,9 +295,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         Executors.newSingleThreadExecutor().execute(publisher);
     }
 
-    // asynchronously send the payload to the given Mule URL for 'count' number
-    // of
-    // times
+    // asynchronously send the payload to the given Mule URL for 'count' number of times
     protected void doSend(final String url, final Object payload, final int count)
     {
         Runnable sender = new Runnable()
@@ -399,6 +390,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             this.latch = latch;
         }
 
+        @Override
         public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
         {
             assertNotNull(message);
