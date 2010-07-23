@@ -52,6 +52,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
      *             {@link #TransactedPollingMessageReceiver(Connector, FlowConstruct, InboundEndpoint)}
      *             instead
      */
+    @Deprecated
     public TransactedPollingMessageReceiver(Connector connector,
                                             FlowConstruct flowConstruct,
                                             final InboundEndpoint endpoint,
@@ -102,6 +103,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
     }
 
+    @Override
     public void poll() throws Exception
     {
         TransactionTemplate<Object> tt = new TransactionTemplate<Object>(endpoint.getTransactionConfig(),
