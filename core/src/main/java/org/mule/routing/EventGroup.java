@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.IteratorUtils;
 
@@ -39,6 +41,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     private final Object groupId;
     // @GuardedBy("this")
     private final List<MuleEvent> events;
+    private final ReadWriteLock eventsLock = new ReentrantReadWriteLock();
     private final long created;
     private final int expectedSize;
 
@@ -143,8 +146,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     @SuppressWarnings("unchecked")
     public Iterator<MuleEvent> iterator()
     {
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             if (events.isEmpty())
             {
                 return IteratorUtils.emptyIterator();
@@ -153,6 +157,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
             {
                 return IteratorUtils.arrayIterator(this.toArray());
             }
+        }
+        finally
+        {
+            eventsLock.readLock().unlock();
         }
     }
 
@@ -163,14 +171,19 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public MuleEvent[] toArray()
     {
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             if (events.isEmpty())
             {
                 return EMPTY_EVENTS_ARRAY;
             }
 
             return events.toArray(EMPTY_EVENTS_ARRAY);
+        }
+        finally
+        {
+            eventsLock.readLock().unlock();
         }
     }
 
@@ -181,9 +194,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void addEvent(MuleEvent event)
     {
-        synchronized (events)
+        try
         {
+            eventsLock.writeLock().lock();
             events.add(event);
+        }
+        finally
+        {
+            eventsLock.writeLock().unlock();
         }
     }
 
@@ -194,9 +212,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void removeEvent(MuleEvent event)
     {
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             events.remove(event);
+        }
+        finally
+        {
+            eventsLock.writeLock().unlock();
         }
     }
 
@@ -217,9 +240,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public int size()
     {
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             return events.size();
+        }
+        finally
+        {
+            eventsLock.readLock().lock();
         }
     }
 
@@ -239,9 +267,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
      */
     public void clear()
     {
-        synchronized (events)
+        try
         {
+            eventsLock.writeLock().lock();
             events.clear();
+        }
+        finally
+        {
+            eventsLock.writeLock().unlock();
         }
     }
 
@@ -254,8 +287,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
         buf.append("id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
 
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             int currentSize = events.size();
             buf.append(", current events=").append(currentSize);
 
@@ -275,6 +309,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
                 buf.append(']');
             }
         }
+        finally
+        {
+            eventsLock.readLock().unlock();
+        }
 
         buf.append('}');
 
@@ -284,17 +322,22 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
     public MuleMessageCollection toMessageCollection()
     {
         MuleMessageCollection col;
-        synchronized (events)
+        try
         {
+            eventsLock.readLock().lock();
             if (events.isEmpty())
-            {
-                col = new DefaultMessageCollection(null);
-            }
+                    {
+                        col = new DefaultMessageCollection(null);
+                    }
             col = new DefaultMessageCollection(events.get(0).getMuleContext());
             for (MuleEvent event : events)
-            {
-                col.addMessage(event.getMessage());
-            }
+                    {
+                        col.addMessage(event.getMessage());
+                    }
+        }
+        finally
+        {
+            eventsLock.readLock().unlock();
         }
         return col;
     }
