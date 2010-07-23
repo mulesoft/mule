@@ -18,28 +18,19 @@ import java.io.File;
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
     @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
+    }    
+
+    @Override
     public void testBasic() throws Exception
     {
-        String myDirName = "myout";
-        String myFileName = "out.txt";
-
-        // make sure there is no directory and file
-        File myDir = FileUtils.newFile(myDirName);
-        if (myDir.isDirectory())
-        {
-            // Delete Any Existing Files
-            File[] files = myDir.listFiles();
-            for (int i = 0; i < files.length; i++)
-            {
-                assertTrue(files[i].delete());
-            }
-            // This may fail if this directory contains other directories.
-            assertTrue(myDir.delete());
-        }
+        File myDir = FileUtils.newFile(OUTPUT_DIR);
 
         // output directory may not exist before dispatching to the endpoint with invalid
         // configuration
-        File outputFile = FileUtils.newFile(myDir, myFileName);
+        File outputFile = FileUtils.newFile(myDir, OUTPUT_FILE);
         assertFalse(outputFile.exists());
         
         // this should throw java.lang.IllegalArgumentException: Configuring 'outputAppend' on a 
@@ -48,11 +39,5 @@ public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
         client.dispatch("vm://fileappend", "Hello1", null);
 
         assertFalse(outputFile.exists());
-    }
-    
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
     }
 }

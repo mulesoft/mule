@@ -10,60 +10,78 @@
 
 package org.mule.test.integration.transport.file;
 
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.commons.io.IOUtils;
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class FileAppendConnectorTestCase extends FunctionalTestCase
+public class FileAppendConnectorTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {
+    protected static final String OUTPUT_DIR = "myout";
+    protected static final String OUTPUT_FILE = "out.txt";
+    
+    protected CountDownLatch fileReceiveLatch = new CountDownLatch(2);
+    
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        muleContext.registerListener(this);
+    }
+    
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/providers/file/mule-fileappend-connector-config.xml";
+    }
+    
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        File outputDir = FileUtils.newFile(OUTPUT_DIR);
+        FileUtils.deleteTree(outputDir);
+        
+        super.doTearDown();
+    }
 
     public void testBasic() throws Exception
     {
-        String myDirName = "myout";
-        String myFileName = "out.txt";
         FileInputStream myFileStream = null;
-
-        // make sure there is no directory and file
-        File myDir = FileUtils.newFile(myDirName);
-        if (myDir.isDirectory())
-        {
-            // Delete Any Existing Files
-            File[] files = myDir.listFiles();
-            for (int i = 0; i < files.length; i++)
-            {
-                assertTrue(files[i].delete());
-            }
-            // This may fail if this directory contains other directories.
-            assertTrue(myDir.delete());
-        }
-
         try
         {
-            assertFalse(FileUtils.newFile(myDir, myFileName).exists());
+            File myDir = FileUtils.newFile(OUTPUT_DIR);
+            File myFile = FileUtils.newFile(myDir, OUTPUT_FILE);
+            assertFalse(myFile.exists());
 
             MuleClient client = new MuleClient(muleContext);
             client.send("vm://fileappend", "Hello1", null);
             client.send("vm://fileappend", "Hello2", null);
 
+            assertTrue(fileReceiveLatch.await(30, TimeUnit.SECONDS));
+            
             // the output file should exist now
-            myFileStream = new FileInputStream(FileUtils.newFile(myDir, myFileName));
+            myFileStream = new FileInputStream(myFile);
             assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
         }
         finally
         {
             IOUtils.closeQuietly(myFileStream);
-            assertTrue(FileUtils.newFile(myDir, myFileName).delete());
-            assertTrue(myDir.delete());
         }
     }
 
-    protected String getConfigResources()
+    public void onNotification(EndpointMessageNotification notification)
     {
-        return "org/mule/test/integration/providers/file/mule-fileappend-connector-config.xml";
+        if (notification.getEndpoint().contains("myout"))
+        {
+            fileReceiveLatch.countDown();
+        }
     }
 }
