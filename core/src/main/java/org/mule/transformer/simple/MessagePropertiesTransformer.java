@@ -24,7 +24,6 @@ import org.mule.transport.NullPayload;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -90,24 +89,23 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     {
         if (deleteProperties != null && deleteProperties.size() > 0)
         {
-            for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
+            for (String key : deleteProperties)
             {
-                message.removeProperty(iterator.next().toString(), scope);
+                message.removeProperty(key, scope);
             }
         }
 
         if (addProperties != null && addProperties.size() > 0)
         {
-            for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
+            for (Map.Entry<String, Object> entry : addProperties.entrySet())
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
                 if (entry.getKey() == null)
                 {
                     logger.error("Setting Null property keys is not supported, this entry is being ignored");
                 }
                 else
                 {
-                    final String key = entry.getKey().toString();
+                    final String key = entry.getKey();
 
                     Object value= entry.getValue();
                     Object realValue = value;
