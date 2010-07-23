@@ -18,6 +18,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -32,6 +33,7 @@ import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.notification.MuleContextNotification;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -55,12 +57,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import junit.framework.TestCase;
-import junit.framework.TestResult;
+import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -431,11 +432,33 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             }
 
             muleContext = createMuleContext();
+
+            // wait for Mule to fully start when requested (default)
+
+            // latch ref needs to be final for listener use, wrap in atomic ref
+            final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
             if (isStartContext() && null != muleContext && muleContext.isStarted() == false)
             {
+                contextStartedLatch.set(new Latch());
+                muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+                {
+                    public void onNotification(MuleContextNotification notification)
+                    {
+                        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                        {
+                            contextStartedLatch.get().countDown();
+                        }
+                    }
+                });
                 muleContext.start();
             }
 
+            // if it's null, than
+            if (contextStartedLatch.get() != null)
+            {
+                // wait no more than 20 secs
+                contextStartedLatch.get().await(20, TimeUnit.SECONDS);
+            }
             doSetUp();
         }
         catch (Exception e)
