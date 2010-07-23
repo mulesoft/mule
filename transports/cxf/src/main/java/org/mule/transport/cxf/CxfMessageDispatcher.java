@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,12 +141,12 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         if (attachmentNames != null && !attachmentNames.isEmpty())
         {
             List<DataHandler> attachments = new ArrayList<DataHandler>();
-            for (Iterator<?> i = attachmentNames.iterator(); i.hasNext();)
+            for (Object attachmentName : attachmentNames)
             {
-                attachments.add(message.getAttachment((String)i.next()));
+                attachments.add(message.getAttachment((String) attachmentName));
             }
             List<Object> temp = new ArrayList<Object>(Arrays.asList(args));
-            temp.add(attachments.toArray(new DataHandler[0]));
+            temp.add(attachments.toArray(new DataHandler[attachments.size()]));
             args = temp.toArray();
         }
 
@@ -331,21 +330,15 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Map<String, String> properties = new HashMap<String, String>();
         MuleMessage msg = event.getMessage();
         // propagate only invocation- and outbound-scoped properties
-        for (String name : event.getMessage().getPropertyNames(PropertyScope.INVOCATION))
+        for (String name : msg.getInvocationPropertyNames())
         {
             final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
             properties.put(name, value);
         }
-        for (String name : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))
+        for (String name : msg.getOutboundPropertyNames())
         {
             final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
             properties.put(name, value);
-        }
-
-        for (Iterator<?> iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-        {
-            String propertyKey = (String)iterator.next();
-            properties.put(propertyKey, msg.getProperty(propertyKey).toString());
         }
         properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
         properties.put("methodNamespace", method.getNamespaceURI());
