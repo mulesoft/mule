@@ -13,6 +13,7 @@ package org.mule.transformers.xml;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
@@ -73,14 +74,16 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertEquals("1234", msg.getCorrelationId());
         assertEquals("UTF-8", msg.getEncoding());
 
-        Set<String> keys = msg.getPropertyNames();
-        assertEquals(5, keys.size());
+
+        assertEquals(1, msg.getPropertyNames(PropertyScope.INVOCATION).size());
+        Set<String> outboundProps = msg.getPropertyNames(PropertyScope.OUTBOUND);
+        assertEquals(4, outboundProps.size());
 
         //Remove Mule properties
-        keys.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        keys.remove(MuleProperties.MULE_ENCODING_PROPERTY);
+        outboundProps.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        outboundProps.remove(MuleProperties.MULE_ENCODING_PROPERTY);
 
-        for (String key : keys)
+        for (String key : outboundProps)
         {
             assertTrue(key.equals("number") || key.equals("string") || key.equals("object"));
             assertFalse(key.equals("NUMBER") || key.equals("STRING") || key.equals("OBJECT"));
