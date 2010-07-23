@@ -452,7 +452,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.removeProperty(key, scope);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
+     * {@inheritDoc}
+     */
     @Deprecated
     public void setProperty(String key, Object value)
     {
