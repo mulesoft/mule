@@ -13,7 +13,6 @@ package org.mule.construct.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.AbstractMessageObserver;
 
 public class FlowConstructStatisticsMessageObserver extends AbstractMessageObserver
@@ -24,21 +23,15 @@ public class FlowConstructStatisticsMessageObserver extends AbstractMessageObser
     @Override
     public void observe(MuleEvent event)
     {
-        if ((flowConstruct.getStatistics().isEnabled())
-            && (flowConstruct.getStatistics() instanceof ServiceStatistics))
+        if (flowConstruct.getStatistics().isEnabled())
         {
-            // TODO (DDO) consider adding incReceivedEventSync and
-            // incReceivedEventASync to org.mule.api.management.stats.Statistics in
-            // order to avoid this horrendous cast.
-            ServiceStatistics serviceStatistics = (ServiceStatistics) flowConstruct.getStatistics();
-
             if (event.getEndpoint().getExchangePattern().hasResponse())
             {
-                serviceStatistics.incReceivedEventSync();
+                flowConstruct.getStatistics().incReceivedEventSync();
             }
             else
             {
-                serviceStatistics.incReceivedEventASync();
+                flowConstruct.getStatistics().incReceivedEventASync();
             }
         }
     }

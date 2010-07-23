@@ -10,6 +10,10 @@
 
 package org.mule.construct;
 
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -24,18 +28,12 @@ import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.management.stats.Statistics;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.source.MessageSource;
-import org.mule.management.stats.ServiceStatistics;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
-
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -64,14 +62,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     protected ExceptionListener exceptionListener;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
-    protected final Statistics statistics;
+    protected final FlowConstructStatistics statistics;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this);
-        this.statistics = new ServiceStatistics(name);
+        this.statistics = new FlowConstructStatistics(name);
     }
 
     public final void initialise() throws InitialisationException
@@ -243,7 +241,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         this.messageSource = messageSource;
     }
 
-    public Statistics getStatistics()
+    public FlowConstructStatistics getStatistics()
     {
         return statistics;
     }

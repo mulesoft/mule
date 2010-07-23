@@ -10,20 +10,16 @@
 
 package org.mule.management.stats;
 
-import org.mule.api.management.stats.Statistics;
-import org.mule.management.stats.printers.SimplePrinter;
-
 import java.io.PrintWriter;
+
+import org.mule.management.stats.printers.SimplePrinter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-public class ServiceStatistics implements Statistics, QueueStatistics
+public class ServiceStatistics extends FlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = -2086999226732861675L;
 
-    private String name;
-    private final AtomicLong receivedEventSync = new AtomicLong(0);
-    private final AtomicLong receivedEventASync = new AtomicLong(0);
     private final AtomicLong sentEventSync = new AtomicLong(0);
     private final AtomicLong sentReplyToEvent = new AtomicLong(0);
     private final AtomicLong sentEventASync = new AtomicLong(0);
@@ -39,8 +35,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
 
     private int threadPoolSize = 0;
     private long samplePeriod = 0;
-    private boolean enabled = false;
-    
+
     private RouterStatistics inboundRouterStat = null;
     private ComponentStatistics componentStat = null;
     private RouterStatistics outboundRouterStat = null;
@@ -52,27 +47,19 @@ public class ServiceStatistics implements Statistics, QueueStatistics
 
     public ServiceStatistics(String name, int threadPoolSize)
     {
-        super();
-        this.name = name;
+        super(name);
 
         this.threadPoolSize = threadPoolSize;
         clear();
     }
 
     /**
-     * Are statistics logged
-     */
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    /**
      * Enable statistics logs (this is a dynamic parameter)
      */
+    @Override
     public synchronized void setEnabled(boolean b)
     {
-        enabled = b;
+        super.setEnabled(b);
 
         if (inboundRouterStat != null)
         {
@@ -86,16 +73,6 @@ public class ServiceStatistics implements Statistics, QueueStatistics
         {
             outboundRouterStat.setEnabled(b);
         }
-    }
-
-    public void incReceivedEventSync()
-    {
-        receivedEventSync.addAndGet(1);
-    }
-
-    public void incReceivedEventASync()
-    {
-        receivedEventASync.addAndGet(1);
     }
 
     public void incExecutionError()
@@ -131,7 +108,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
         {
             maxQueuedEvent = queuedEvent;
         }
-        averageQueueSize = Math.round(receivedEventASync.get() / totalQueuedEvent);
+        averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
     }
 
     public synchronized void decQueuedEvent()
@@ -157,6 +134,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
     /**
      * @deprecated
      */
+    @Deprecated
     public long getMaxExecutionTime()
     {
         return componentStat.getMaxExecutionTime();
@@ -170,6 +148,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
     /**
      * @deprecated
      */
+    @Deprecated
     public long getMinExecutionTime()
     {
         return componentStat.getMinExecutionTime();
@@ -178,6 +157,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
     /**
      * @deprecated
      */
+    @Deprecated
     public long getTotalExecutionTime()
     {
         return componentStat.getTotalExecutionTime();
@@ -186,16 +166,6 @@ public class ServiceStatistics implements Statistics, QueueStatistics
     public synchronized long getQueuedEvents()
     {
         return queuedEvent;
-    }
-
-    public long getAsyncEventsReceived()
-    {
-        return receivedEventASync.get();
-    }
-
-    public long getSyncEventsReceived()
-    {
-        return receivedEventSync.get();
     }
 
     public long getReplyToEventsSent()
@@ -233,16 +203,6 @@ public class ServiceStatistics implements Statistics, QueueStatistics
         return executionError.get();
     }
 
-    public synchronized String getName()
-    {
-        return name;
-    }
-
-    public synchronized void setName(String name)
-    {
-        this.name = name;
-    }
-
     public void logSummary()
     {
         logSummary(new SimplePrinter(System.out));
@@ -253,10 +213,10 @@ public class ServiceStatistics implements Statistics, QueueStatistics
         printer.print(this);
     }
 
+    @Override
     public synchronized void clear()
     {
-        receivedEventSync.set(0);
-        receivedEventASync.set(0);
+        super.clear();
         queuedEvent = 0;
         maxQueuedEvent = 0;
         totalQueuedEvent = 0;
@@ -302,7 +262,7 @@ public class ServiceStatistics implements Statistics, QueueStatistics
         this.outboundRouterStat = outboundRouterStat;
         this.outboundRouterStat.setEnabled(enabled);
     }
-    
+
     public ComponentStatistics getComponentStat()
     {
         return componentStat;
