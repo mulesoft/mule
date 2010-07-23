@@ -77,7 +77,7 @@ public class Resequencer extends AbstractAggregator
         {
             last = processNext(muleEvent);
         }
-        // Respect existing bahaviour by returning last event
+        // Respect existing behaviour by returning last event
         return last;
     }
 

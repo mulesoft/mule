@@ -46,9 +46,10 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
-        message1.setCorrelationId(message1.getUniqueId());
-        message2.setCorrelationId(message1.getUniqueId());
-        message3.setCorrelationId(message1.getUniqueId());
+        final String correlationId = message1.getUniqueId();
+        message1.setCorrelationId(correlationId);
+        message2.setCorrelationId(correlationId);
+        message3.setCorrelationId(correlationId);
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
@@ -63,7 +64,7 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         MuleMessage resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
 
-        assertEquals("test event A", resultMessage.getPayload().toString());
+        assertEquals("test event A", resultMessage.getPayloadAsString());
 
         // set a resequencing comparator. We need to reset the router since it will not process the same event group
         //twice
@@ -77,8 +78,8 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         assertNotNull(resultEvent);
         resultMessage = resultEvent.getMessage();
         assertNotNull(resultMessage);
-;
-        assertEquals("test event C", resultMessage.getPayload().toString());
+
+        assertEquals("test event C", resultMessage.getPayloadAsString());
     }
 
     public static class TestEventResequencer extends Resequencer
