@@ -12,13 +12,11 @@ package org.mule.example.loanbroker.issues;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-
-import java.util.Iterator;
-import java.util.Set;
 
 public class TransformersMule2669TestCase extends FunctionalTestCase
 {
@@ -35,15 +33,9 @@ public class TransformersMule2669TestCase extends FunctionalTestCase
         request.setLenders(new Bank[0]);
         MuleMessage response = client.send("jms://in?connector=default", request, null);
         assertNotNull(response);
+        logger.debug(response);
         assertNull(response.getExceptionPayload());
-        Set propertyNames = response.getPropertyNames();
-        assertTrue(propertyNames.size() > 0);
-        Iterator names = propertyNames.iterator();
-        while (names.hasNext())
-        {
-            logger.debug(names.next());
-        }
-        assertTrue(propertyNames.contains("recipients"));
+        assertTrue(response.getPropertyNames(PropertyScope.INBOUND).contains("recipients"));
     }
 
 }
