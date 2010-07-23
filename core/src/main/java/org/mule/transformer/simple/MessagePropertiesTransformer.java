@@ -46,7 +46,8 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     private Map<String, String> renameProperties;
     private String getProperty;
     private boolean overwrite = true;
-    private PropertyScope scope;
+    // outbound it the default scope
+    private PropertyScope scope = PropertyScope.OUTBOUND;
 
     private MuleContext muleContext;
 
@@ -117,7 +118,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                         realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
 
-                    if(realValue!=null)
+                    if (realValue!=null)
                     {
                         if (message.getProperty(key, scope) != null)
                         {
@@ -190,7 +191,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                          * store current value of the property. then remove key and
                          * store value under new key
                          */
-                        if(scope==null)
+                        if (scope == null)
                         {
                             //If scope is not specified, rename the property in the same scope
                             //Cannot rename in Inbound Scope
