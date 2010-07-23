@@ -17,7 +17,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
@@ -66,15 +65,14 @@ public class SerializeOnlySessionHandler implements SessionHandler
     
     protected MuleSession removeNonSerializableProperties(MuleSession session)
     {
-        Object prop;
-        for (Iterator iterator = session.getPropertyNamesAsSet().iterator(); iterator.hasNext();)
+        for (String key : session.getPropertyNamesAsSet())
         {
-            prop = iterator.next();
-            final Object value = session.getProperty(prop);
+            final Object value = session.getProperty(key);
             if (!(value instanceof Serializable))
             {
-                logger.warn("Property " + prop + " is not serializable, it will not be preserved as part of the MuleSession");
-                session.removeProperty(prop);
+                logger.warn(String.format("Property %s is not serializable, it will not be preserved " +
+                                          "as part of the MuleSession", key));
+                session.removeProperty(key);
             }
         }
         return session;

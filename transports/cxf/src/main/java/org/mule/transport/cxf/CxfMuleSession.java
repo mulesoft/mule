@@ -36,7 +36,7 @@ public class CxfMuleSession implements Session
      * @param key
      * @return Value
      */
-    public Object get(Object key)
+    public String get(Object key)
     {
         return session.getProperty(key);
     }
