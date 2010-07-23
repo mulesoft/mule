@@ -148,9 +148,19 @@ public interface MuleMessage extends Serializable
     /**
      * Gets all property names in a given scope
      * @param scope the scope of property names
-     * @return all property keys on this message
+     * @return all property keys on this message in the given scope
+     * @see #getInvocationPropertyNames()
+     * @see #getInboundPropertyNames()
+     * @see #getOutboundPropertyNames()
+     * @see #getSessionPropertyNames()    
      */
     Set<String> getPropertyNames(PropertyScope scope);
+
+    Set<String> getInvocationPropertyNames();
+    Set<String> getInboundPropertyNames();
+    Set<String> getOutboundPropertyNames();
+    Set<String> getSessionPropertyNames();
+
 
     /**
      * @return the current message

@@ -558,6 +558,26 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
+    public Set<String> getInvocationPropertyNames()
+    {
+        return getPropertyNames(PropertyScope.INVOCATION);
+    }
+
+    public Set<String> getInboundPropertyNames()
+    {
+        return getPropertyNames(PropertyScope.INBOUND);
+    }
+
+    public Set<String> getOutboundPropertyNames()
+    {
+        return getPropertyNames(PropertyScope.OUTBOUND);
+    }
+
+    public Set<String> getSessionPropertyNames()
+    {
+        return getPropertyNames(PropertyScope.SESSION);
+    }
+
     //** {@inheritDoc} */
 
     /**
