@@ -22,7 +22,6 @@ import org.mule.transformer.codec.Base64Decoder;
 import org.mule.transformer.codec.Base64Encoder;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
@@ -109,14 +108,13 @@ public class LegacySessionHandler implements SessionHandler
     {
         StringBuffer buf = new StringBuffer();
         buf.append(getSessionIDKey()).append("=").append(session.getId());
-        for (Iterator iterator = session.getPropertyNames(); iterator.hasNext();)
+        for (String key : session.getPropertyNamesAsSet())
         {
-            Object o = iterator.next();
             buf.append(";");
-            buf.append(o).append("=").append(session.getProperty(o));
+            buf.append(key).append("=").append(session.getProperty(key));
             if (logger.isDebugEnabled())
             {
-                logger.debug("Adding property to session header: " + o + "=" + session.getProperty(o));
+                logger.debug(String.format("Adding property to session header: %s=%s", key, session.getProperty(key)));
             }
         }
         String sessionString = buf.toString();
