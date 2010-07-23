@@ -318,8 +318,8 @@ public class MessagePropertiesContext implements Serializable
             else
             {
                 logger.warn(String.format("Detected an attempt to set a session property, " +
-                                          "but MuleEvent isn't available in this thread. Key/value: %s=%s",
-                                          key, value));
+                                          "but MuleEvent isn't available in this thread. Key/value: %s=%s %s",
+                                          key, value, Thread.currentThread()));
             }
         }
         else
