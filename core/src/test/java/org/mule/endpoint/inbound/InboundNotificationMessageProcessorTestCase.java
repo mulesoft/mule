@@ -23,7 +23,7 @@ public class InboundNotificationMessageProcessorTestCase extends AbstractInbound
 
     public void testProcess() throws Exception
     {
-        TestEndpointMessageNotificationListener<EndpointMessageNotification> listener = new TestEndpointMessageNotificationListener<EndpointMessageNotification>();
+        TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
         InboundEndpoint endpoint = createTestInboundEndpoint(null, null);

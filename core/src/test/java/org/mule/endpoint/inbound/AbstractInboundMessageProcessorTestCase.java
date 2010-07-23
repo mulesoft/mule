@@ -122,13 +122,12 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         }
     }
 
-    static class TestSecurityNotificationListener<SecurityNotification>
-        implements SecurityNotificationListener<org.mule.context.notification.SecurityNotification>
+    static class TestSecurityNotificationListener implements SecurityNotificationListener<SecurityNotification>
     {
-        org.mule.context.notification.SecurityNotification securityNotification;
+        SecurityNotification securityNotification;
         Latch latch = new Latch();
 
-        public void onNotification(org.mule.context.notification.SecurityNotification notification)
+        public void onNotification(SecurityNotification notification)
         {
             securityNotification = notification;
             latch.countDown();
@@ -146,14 +145,12 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         }
     }
 
-    static class TestEndpointMessageNotificationListener<EndpointMessageNotification>
-        implements
-        EndpointMessageNotificationListener<org.mule.context.notification.EndpointMessageNotification>
+    static class TestEndpointMessageNotificationListener implements EndpointMessageNotificationListener<EndpointMessageNotification>
     {
-        org.mule.context.notification.EndpointMessageNotification messageNotification;
+        EndpointMessageNotification messageNotification;
         Latch latch = new Latch();
 
-        public void onNotification(org.mule.context.notification.EndpointMessageNotification notification)
+        public void onNotification(EndpointMessageNotification notification)
         {
             messageNotification = notification;
             latch.countDown();
