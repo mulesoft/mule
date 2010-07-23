@@ -526,7 +526,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
+     * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
+    @Deprecated
     public Set<String> getPropertyNames()
     {
         assertAccess(READ);
@@ -539,7 +541,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public Set<String> getPropertyNames(PropertyScope scope)
     {
         assertAccess(READ);
-        return properties.getScopedProperties(scope).keySet();
+        if (PropertyScope.SESSION.equals(scope))
+        {
+            if (RequestContext.getEvent() != null)
+            {
+                return RequestContext.getEvent().getSession().getPropertyNamesAsSet();
+            }
+            else
+            {
+                return Collections.emptySet();
+            }
+        }
+        else
+        {
+            return properties.getScopedProperties(scope).keySet();
+        }
     }
 
     //** {@inheritDoc} */

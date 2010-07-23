@@ -48,8 +48,10 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        // property values will be different
-        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames());
+        assertEquals(msg.getPropertyNames(PropertyScope.INVOCATION), transformed.getPropertyNames(PropertyScope.INVOCATION));
+        assertEquals(msg.getPropertyNames(PropertyScope.INBOUND), transformed.getPropertyNames(PropertyScope.INBOUND));
+        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames(PropertyScope.OUTBOUND));
+        assertEquals(msg.getPropertyNames(PropertyScope.SESSION), transformed.getPropertyNames(PropertyScope.SESSION));
 
         assertEquals("overwrittenValue", transformed.getOutboundProperty("addedProperty"));
     }
@@ -70,7 +72,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+        compareProperties(msg, transformed);
 
         assertEquals("originalValue", transformed.getInvocationProperty("addedProperty"));
     }
@@ -90,7 +92,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+        compareProperties(msg, transformed);
 
         assertEquals("Bar", transformed.getOutboundProperty("Foo"));
     }
@@ -110,7 +112,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+        compareProperties(msg, transformed);
 
         assertEquals("Bar", transformed.getInvocationProperty("Baz"));
     }
@@ -124,12 +126,17 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
         msg.setOutboundProperty("badProperty", "badValue");
+        assertEquals("badValue", msg.<Object>getOutboundProperty("badProperty"));
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
-        assertFalse(transformed.getPropertyNames().contains("badValue"));
+        compareProperties(msg, transformed);
+
+        assertFalse(transformed.getPropertyNames(PropertyScope.INVOCATION).contains("badValue"));
+        assertFalse(transformed.getPropertyNames(PropertyScope.INBOUND).contains("badValue"));
+        assertFalse(transformed.getPropertyNames(PropertyScope.OUTBOUND).contains("badValue"));
+        assertFalse(transformed.getPropertyNames(PropertyScope.SESSION).contains("badValue"));
     }
 
     @Test
@@ -151,4 +158,13 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
         assertEquals(null, transformer.getScope());
     }
+
+    private void compareProperties(DefaultMuleMessage msg, DefaultMuleMessage transformed)
+    {
+        assertEquals(msg.getPropertyNames(PropertyScope.INVOCATION), transformed.getPropertyNames(PropertyScope.INVOCATION));
+        assertEquals(msg.getPropertyNames(PropertyScope.INBOUND), transformed.getPropertyNames(PropertyScope.INBOUND));
+        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames(PropertyScope.OUTBOUND));
+        assertEquals(msg.getPropertyNames(PropertyScope.SESSION), transformed.getPropertyNames(PropertyScope.SESSION));
+    }
+
 }
