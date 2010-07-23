@@ -30,7 +30,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
-    private final SimpleServiceBuilder newSimpleService = ConstructBuilders.buildSimpleService();
+    private final SimpleServiceBuilder newSimpleService = ConstructBuilders.newSimpleService();
 
     private SpringBeanLookup springBeanLookup;
 
@@ -53,54 +53,54 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     @Override
     protected AbstractFlowConstruct createFlowConstruct() throws MuleException
     {
-        return newSimpleService.in(muleContext);
+        return newSimpleService.build(muleContext);
     }
 
     public void setName(String name)
     {
-        newSimpleService.named(name);
+        newSimpleService.name(name);
     }
 
     public void setExceptionListener(ExceptionListener exceptionListener)
     {
-        newSimpleService.withExceptionListener(exceptionListener);
+        newSimpleService.exceptionStrategy(exceptionListener);
     }
 
     public void setEndpoint(EndpointBuilder endpointBuilder)
     {
-        newSimpleService.receivingOn(endpointBuilder);
+        newSimpleService.inboundEndpoint(endpointBuilder);
     }
 
     public void setAddress(String address)
     {
-        newSimpleService.receivingOn(address);
+        newSimpleService.inboundAddress(address);
     }
 
     public void setTransformers(Collection<? extends Transformer> transformers)
     {
-        newSimpleService.transformingInboundRequestsWith(transformers);
+        newSimpleService.inboundTransformers(transformers);
     }
 
     public void setResponseTransformers(Collection<? extends Transformer> responseTransformers)
     {
-        newSimpleService.transformingInboundResponsesWith(responseTransformers);
+        newSimpleService.inboundResponseTransformers(responseTransformers);
     }
 
     public void setComponentClass(Class<?> componentClass)
     {
-        newSimpleService.serving(componentClass);
+        newSimpleService.component(componentClass);
     }
 
     public void setComponentBeanName(String componentBeanName)
     {
         springBeanLookup = new SpringBeanLookup();
         springBeanLookup.setBean(componentBeanName);
-        newSimpleService.serving(springBeanLookup);
+        newSimpleService.component(springBeanLookup);
     }
 
     public void setComponent(Component component)
     {
-        newSimpleService.serving(component);
+        newSimpleService.component(component);
     }
 
 }

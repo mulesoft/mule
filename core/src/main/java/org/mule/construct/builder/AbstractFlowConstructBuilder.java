@@ -36,49 +36,49 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
     protected Collection<? extends Transformer> inboundTransformers;
     protected Collection<? extends Transformer> inboundResponseTransformers;
 
-    public T named(String name)
+    public T name(String name)
     {
         this.name = name;
         return (T) this;
     }
 
-    public T withExceptionListener(ExceptionListener exceptionListener)
+    public T exceptionStrategy(ExceptionListener exceptionListener)
     {
         this.exceptionListener = exceptionListener;
         return (T) this;
     }
 
-    public T receivingOn(InboundEndpoint inboundEndpoint)
+    public T inboundEndpoint(InboundEndpoint inboundEndpoint)
     {
         this.inboundEndpoint = inboundEndpoint;
         return (T) this;
     }
 
-    public T receivingOn(EndpointBuilder endpointBuilder)
+    public T inboundEndpoint(EndpointBuilder endpointBuilder)
     {
         this.endpointBuilder = endpointBuilder;
         return (T) this;
     }
 
-    public T receivingOn(String address)
+    public T inboundAddress(String address)
     {
         this.address = address;
         return (T) this;
     }
 
-    public T transformingInboundRequestsWith(Collection<? extends Transformer> transformers)
+    public T inboundTransformers(Collection<? extends Transformer> transformers)
     {
         this.inboundTransformers = transformers;
         return (T) this;
     }
 
-    public T transformingInboundResponsesWith(Collection<? extends Transformer> responseTransformers)
+    public T inboundResponseTransformers(Collection<? extends Transformer> responseTransformers)
     {
         this.inboundResponseTransformers = responseTransformers;
         return (T) this;
     }
 
-    public F in(MuleContext muleContext) throws MuleException
+    public F build(MuleContext muleContext) throws MuleException
     {
         F flowConstruct = buildFlowConstruct(muleContext);
         addExceptionListener(flowConstruct);

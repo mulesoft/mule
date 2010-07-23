@@ -36,17 +36,17 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
         return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    public SimpleServiceBuilder serving(Class<?> componentClass)
+    public SimpleServiceBuilder component(Class<?> componentClass)
     {
-        return serving(new PrototypeObjectFactory(componentClass));
+        return component(new PrototypeObjectFactory(componentClass));
     }
 
-    public SimpleServiceBuilder serving(ObjectFactory objectFactory)
+    public SimpleServiceBuilder component(ObjectFactory objectFactory)
     {
-        return serving(new DefaultJavaComponent(objectFactory));
+        return component(new DefaultJavaComponent(objectFactory));
     }
 
-    public SimpleServiceBuilder serving(Component component)
+    public SimpleServiceBuilder component(Component component)
     {
         // TODO (DDO) support REST/WS annotated components
 

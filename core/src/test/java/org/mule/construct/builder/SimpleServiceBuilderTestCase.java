@@ -13,12 +13,12 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
 {
     public void testFullConfiguration() throws Exception
     {
-        SimpleService simpleService = ConstructBuilders.buildSimpleService()
-            .named("test-simple-service")
-            .receivingOn("test://foo")
-            .transformingInboundRequestsWith(Collections.singleton(new StringAppendTransformer("bar")))
-            .serving(EchoComponent.class)
-            .in(muleContext);
+        SimpleService simpleService = ConstructBuilders.newSimpleService()
+            .name("test-simple-service")
+            .inboundAddress("test://foo")
+            .inboundTransformers(Collections.singleton(new StringAppendTransformer("bar")))
+            .component(EchoComponent.class)
+            .build(muleContext);
 
         assertEquals("test-simple-service", simpleService.getName());
         assertEquals(EchoComponent.class,

@@ -20,9 +20,8 @@ public abstract class ConstructBuilders
         throw new UnsupportedOperationException("do not instantiate");
     }
 
-    public static SimpleServiceBuilder buildSimpleService()
+    public static SimpleServiceBuilder newSimpleService()
     {
         return new SimpleServiceBuilder();
     }
-
 }
