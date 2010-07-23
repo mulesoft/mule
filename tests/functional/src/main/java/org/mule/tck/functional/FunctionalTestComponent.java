@@ -58,7 +58,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private boolean enableNotifications = true;
     private boolean doInboundTransform = true;
     private String appendString;
-    private Class exceptionToThrow;
+    private Class<? extends Throwable> exceptionToThrow;
     private long waitTime = 0;
     private boolean logMessageDetails = false;
     private MuleContext muleContext;
@@ -68,8 +68,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * to the messages (objects) are stored, so any subsequent changes to the objects
      * will change the history.
      */
-    private List messageHistory;
+    private List<Object> messageHistory;
 
+    @SuppressWarnings("unchecked")
     public void initialise()
     {
         if (enableMessageHistory)
@@ -426,12 +427,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         this.enableNotifications = enableNotifications;
     }
 
-    public Class getExceptionToThrow()
+    public Class<? extends Throwable> getExceptionToThrow()
     {
         return exceptionToThrow;
     }
 
-    public void setExceptionToThrow(Class exceptionToThrow)
+    public void setExceptionToThrow(Class<? extends Throwable> exceptionToThrow)
     {
         this.exceptionToThrow = exceptionToThrow;
     }
