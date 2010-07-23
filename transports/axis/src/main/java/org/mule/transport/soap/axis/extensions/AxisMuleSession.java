@@ -22,7 +22,7 @@ public class AxisMuleSession implements org.apache.axis.session.Session
 {
 
     private MuleSession session;
-    private Object lock=new Object();
+    private Object lock = new Object();
 
     public AxisMuleSession(MuleSession session)
     {

@@ -99,7 +99,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         }
         catch (IllegalArgumentException iae)
         {
-            // this exception was expectd
+            // this exception was expected
         }
     }*/
         

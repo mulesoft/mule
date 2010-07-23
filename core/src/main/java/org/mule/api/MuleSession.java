@@ -90,7 +90,7 @@ public interface MuleSession extends Serializable
      * @param key the key for the object data being stored on the session
      * @param value the value of the session data
      */
-    void setProperty(Object key, Object value);
+    void setProperty(String key, Object value);
 
     /**
      * Will retrieve a session level property.
@@ -121,5 +121,5 @@ public interface MuleSession extends Serializable
     /**
      * @return property keys for all session properties
      */
-    Set getPropertyNamesAsSet();
+    Set<String> getPropertyNamesAsSet();
 }

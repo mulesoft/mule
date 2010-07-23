@@ -73,7 +73,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      */
     private SecurityContext securityContext;
 
-    private Map properties = null;
+    private Map<String, Object> properties = null;
 
     /**
      * The Mule context
@@ -136,7 +136,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
 
         properties = new CaseInsensitiveMap/*<String, Object>*/();
         requestSessionHandler.retrieveSessionInfoFromMessage(message, this);
-        id = (String) getProperty(requestSessionHandler.getSessionIDKey());
+        id = getProperty(requestSessionHandler.getSessionIDKey());
         if (id == null)
         {
             id = UUID.getUUID();
@@ -161,7 +161,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this.valid = session.isValid();
 
         this.properties = new HashMap<String, Object>();
-        for (Object key : session.getPropertyNamesAsSet())
+        for (String key : session.getPropertyNamesAsSet())
         {
             this.properties.put(key, session.getProperty(key));
         }
@@ -225,7 +225,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param key   the key for the object data being stored on the session
      * @param value the value of the session data
      */
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Object value)
     {
         properties.put(key, value);
     }

@@ -49,6 +49,6 @@ public class CxfMuleSession implements Session
      */
     public void put(Object key, Object value)
     {
-        session.setProperty(key, value);
+        session.setProperty(key.toString(), value);
     }
 }
