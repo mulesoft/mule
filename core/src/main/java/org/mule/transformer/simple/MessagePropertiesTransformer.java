@@ -196,15 +196,15 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                             //Cannot rename in Inbound Scope
                             //TODO Do Session and Application Scope still exist
 
-                            if(message.getPropertyNames(PropertyScope.INVOCATION).contains(key))
+                            if (message.getInvocationPropertyNames().contains(key))
                             {
                                 renameInScope(key, value, PropertyScope.INVOCATION, message);
                             }
-                            else if(message.getPropertyNames(PropertyScope.OUTBOUND).contains(key))
+                            else if(message.getOutboundPropertyNames().contains(key))
                             {
                                 renameInScope(key, value, PropertyScope.OUTBOUND, message);
                             }
-                            else if(message.getPropertyNames(PropertyScope.INBOUND).contains(key))
+                            else if(message.getInboundPropertyNames().contains(key))
                             {
                                 throw new TransformerException(CoreMessages.cannotRenameInboundScopeProperty(key, value));
                             }

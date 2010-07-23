@@ -26,7 +26,6 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -181,7 +180,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             // Also add the endpoint properties so that users can set fallback values
             // when the property is not set on the event
             props.putAll(ep.getProperties());
-            for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
+            for (String propertyKey : message.getOutboundPropertyNames())
             {
                 Object value = message.getOutboundProperty(propertyKey);
                 props.put(propertyKey, value);

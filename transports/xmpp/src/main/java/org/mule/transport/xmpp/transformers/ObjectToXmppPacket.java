@@ -12,7 +12,6 @@ package org.mule.transport.xmpp.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
@@ -53,7 +52,7 @@ public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
                     muleMessage.getExceptionPayload().getMessage()));
         }
 
-        for (String propertyName : muleMessage.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String propertyName : muleMessage.getOutboundPropertyNames())
         {
             if (propertyName.equals(XmppConnector.XMPP_THREAD))
             {

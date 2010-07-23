@@ -48,10 +48,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
-        assertEquals(msg.getPropertyNames(PropertyScope.INVOCATION), transformed.getPropertyNames(PropertyScope.INVOCATION));
-        assertEquals(msg.getPropertyNames(PropertyScope.INBOUND), transformed.getPropertyNames(PropertyScope.INBOUND));
-        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames(PropertyScope.OUTBOUND));
-        assertEquals(msg.getPropertyNames(PropertyScope.SESSION), transformed.getPropertyNames(PropertyScope.SESSION));
+        compareProperties(msg, transformed);
 
         assertEquals("overwrittenValue", transformed.getOutboundProperty("addedProperty"));
     }
@@ -133,10 +130,10 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(msg.getPayload(), transformed.getPayload());
         compareProperties(msg, transformed);
 
-        assertFalse(transformed.getPropertyNames(PropertyScope.INVOCATION).contains("badValue"));
-        assertFalse(transformed.getPropertyNames(PropertyScope.INBOUND).contains("badValue"));
-        assertFalse(transformed.getPropertyNames(PropertyScope.OUTBOUND).contains("badValue"));
-        assertFalse(transformed.getPropertyNames(PropertyScope.SESSION).contains("badValue"));
+        assertFalse(transformed.getInvocationPropertyNames().contains("badValue"));
+        assertFalse(transformed.getInboundPropertyNames().contains("badValue"));
+        assertFalse(transformed.getOutboundPropertyNames().contains("badValue"));
+        assertFalse(transformed.getSessionPropertyNames().contains("badValue"));
     }
 
     @Test
@@ -159,12 +156,12 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(null, transformer.getScope());
     }
 
-    private void compareProperties(DefaultMuleMessage msg, DefaultMuleMessage transformed)
+    private void compareProperties(MuleMessage msg, MuleMessage transformed)
     {
-        assertEquals(msg.getPropertyNames(PropertyScope.INVOCATION), transformed.getPropertyNames(PropertyScope.INVOCATION));
-        assertEquals(msg.getPropertyNames(PropertyScope.INBOUND), transformed.getPropertyNames(PropertyScope.INBOUND));
-        assertEquals(msg.getPropertyNames(PropertyScope.OUTBOUND), transformed.getPropertyNames(PropertyScope.OUTBOUND));
-        assertEquals(msg.getPropertyNames(PropertyScope.SESSION), transformed.getPropertyNames(PropertyScope.SESSION));
+        assertEquals(msg.getInvocationPropertyNames(), transformed.getInvocationPropertyNames());
+        assertEquals(msg.getInboundPropertyNames(), transformed.getInboundPropertyNames());
+        assertEquals(msg.getOutboundPropertyNames(), transformed.getOutboundPropertyNames());
+        assertEquals(msg.getSessionPropertyNames(), transformed.getSessionPropertyNames());
     }
 
 }

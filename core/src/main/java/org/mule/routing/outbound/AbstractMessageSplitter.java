@@ -17,7 +17,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transport.PropertyScope;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
         // Cache the properties here because for some message types getting the
         // properties can be expensive
         Map props = new HashMap();
-        for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String propertyKey : message.getOutboundPropertyNames())
         {
             Object value = message.getOutboundProperty(propertyKey);
             if (value != null)

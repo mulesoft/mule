@@ -146,7 +146,8 @@ public interface MuleMessage extends Serializable
     Set<String> getPropertyNames();
 
     /**
-     * Gets all property names in a given scope
+     * Gets all property names in a given scope. Prefer using one of the convenience
+     * scope-aware methods instead, this one is meant for internal access mostly.
      * @param scope the scope of property names
      * @return all property keys on this message in the given scope
      * @see #getInvocationPropertyNames()

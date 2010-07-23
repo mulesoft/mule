@@ -20,7 +20,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -291,7 +290,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected void setCustomProperties(MuleEvent event, Call call)
     {
-        for (String key : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND))
+        for (String key : event.getMessage().getOutboundPropertyNames())
         {
             if (!(key.startsWith(MuleProperties.PROPERTY_PREFIX)))
             {
@@ -486,7 +485,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap();
         MuleMessage msg = event.getMessage();
-        for (String propertyKey : msg.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String propertyKey : msg.getOutboundPropertyNames())
         {
             Object value = msg.getOutboundProperty(propertyKey);
             properties.put(propertyKey, value);

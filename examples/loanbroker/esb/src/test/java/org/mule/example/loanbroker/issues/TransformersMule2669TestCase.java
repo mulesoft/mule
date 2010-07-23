@@ -12,7 +12,6 @@ package org.mule.example.loanbroker.issues;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.example.loanbroker.bank.Bank;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.module.client.MuleClient;
@@ -35,7 +34,7 @@ public class TransformersMule2669TestCase extends FunctionalTestCase
         assertNotNull(response);
         logger.debug(response);
         assertNull(response.getExceptionPayload());
-        assertTrue(response.getPropertyNames(PropertyScope.INBOUND).contains("recipients"));
+        assertTrue(response.getInboundPropertyNames().contains("recipients"));
     }
 
 }

@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
@@ -70,11 +69,11 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         JobDataMap jobDataMap = new JobDataMap();
         MuleMessage msg = event.getMessage();
         // populate from invocation and outbound scopes only
-        for (String key : msg.getPropertyNames(PropertyScope.INVOCATION))
+        for (String key : msg.getInvocationPropertyNames())
         {
             jobDataMap.put(key, msg.getInvocationProperty(key));
         }
-        for (String key : msg.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String key : msg.getOutboundPropertyNames())
         {
             jobDataMap.put(key, msg.getOutboundProperty(key));
         }

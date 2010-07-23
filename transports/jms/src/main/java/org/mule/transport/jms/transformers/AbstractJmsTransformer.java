@@ -17,7 +17,6 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transport.ConnectException;
@@ -156,7 +155,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
 
     protected void setJmsProperties(MuleMessage message, Message msg) throws JMSException
     {
-        for (String key : message.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String key : message.getOutboundPropertyNames())
         {
             if (JmsConstants.JMS_PROPERTY_NAMES.contains(key))
             {
@@ -189,8 +188,8 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Unable to set property '" + key + "' of type "
-                                + ClassUtils.getSimpleName(value.getClass())
-                                + "': " + e.getMessage());
+                                     + ClassUtils.getSimpleName(value.getClass())
+                                     + "': " + e.getMessage());
                     }
                 }
             }

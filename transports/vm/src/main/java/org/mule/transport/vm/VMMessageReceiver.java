@@ -131,7 +131,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // TODO hackish way, needs to be reworked into an api - move outbound props (from dispatcher) to inbound (for receiver)
 
         // clone to avoid CMEs
-        final Set<String> props = new HashSet<String>(newMessage.getPropertyNames(PropertyScope.OUTBOUND));
+        final Set<String> props = new HashSet<String>(newMessage.getOutboundPropertyNames());
         for (String name : props)
         {
             final Object value = newMessage.removeProperty(name, PropertyScope.OUTBOUND);

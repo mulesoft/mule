@@ -72,17 +72,17 @@ public class OutboundHeadersExpressionEvaluator implements ExpressionEvaluator
 
         public int size()
         {
-            return message.getPropertyNames(PropertyScope.OUTBOUND).size();
+            return message.getOutboundPropertyNames().size();
         }
 
         public boolean isEmpty()
         {
-            return message.getPropertyNames(PropertyScope.OUTBOUND).size() == 0;
+            return message.getOutboundPropertyNames().size() == 0;
         }
 
         public boolean containsKey(Object key)
         {
-            return message.getPropertyNames(PropertyScope.OUTBOUND).contains(key.toString());
+            return message.getOutboundPropertyNames().contains(key.toString());
         }
 
         public boolean containsValue(Object value)
@@ -123,7 +123,7 @@ public class OutboundHeadersExpressionEvaluator implements ExpressionEvaluator
 
         public Set<String> keySet()
         {
-            return message.getPropertyNames(PropertyScope.OUTBOUND);
+            return message.getOutboundPropertyNames();
         }
 
         public Collection<Object> values()

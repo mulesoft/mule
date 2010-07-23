@@ -19,7 +19,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -45,7 +44,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
 
             if (ep instanceof OutboundEndpoint)
             {
-                for (String propertyKey : message.getPropertyNames(PropertyScope.OUTBOUND))
+                for (String propertyKey : message.getOutboundPropertyNames())
                 {
                     Object propertyValue = message.getOutboundProperty(propertyKey);
                     if (propertyKey.equalsIgnoreCase("packet.port"))
@@ -56,7 +55,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
                         {
                             logger.info("Uri after parsing is: " + newUri.getAddress());
                         }
-                        ep = new DynamicURIOutboundEndpoint((OutboundEndpoint)ep, newUri);
+                        ep = new DynamicURIOutboundEndpoint((OutboundEndpoint) ep, newUri);
                         break;
                     }
                 }

@@ -161,15 +161,15 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         payload.setOutboundProperty("foo", "fooValue");
         payload.setInvocationProperty("bar", "barValue");
 
-        assertEquals(1, payload.getPropertyNames(PropertyScope.INVOCATION).size());
-        assertEquals(2, payload.getPropertyNames(PropertyScope.OUTBOUND).size());
-        assertEquals(0, payload.getPropertyNames(PropertyScope.INBOUND).size());
+        assertEquals(1, payload.getInvocationPropertyNames().size());
+        assertEquals(2, payload.getOutboundPropertyNames().size());
+        assertEquals(0, payload.getInboundPropertyNames().size());
 
         payload.clearProperties(PropertyScope.INVOCATION);
-        assertEquals(0, payload.getPropertyNames(PropertyScope.INVOCATION).size());
+        assertEquals(0, payload.getInvocationPropertyNames().size());
 
         payload.clearProperties(PropertyScope.OUTBOUND);
-        assertEquals(0, payload.getPropertyNames(PropertyScope.OUTBOUND).size());
+        assertEquals(0, payload.getOutboundPropertyNames().size());
 
        //See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here
     }

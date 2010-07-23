@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -259,7 +258,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
 
         //attach the outbound properties to the message
-        for (String headerName : msg.getPropertyNames(PropertyScope.OUTBOUND))
+        for (String headerName : msg.getOutboundPropertyNames())
         {
             Object v = msg.getOutboundProperty(headerName);
             if (v != null)

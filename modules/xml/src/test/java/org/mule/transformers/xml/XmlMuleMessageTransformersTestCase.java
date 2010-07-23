@@ -13,7 +13,6 @@ package org.mule.transformers.xml;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.AbstractMuleTestCase;
@@ -75,8 +74,8 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleTestCase
         assertEquals("UTF-8", msg.getEncoding());
 
 
-        assertEquals(1, msg.getPropertyNames(PropertyScope.INVOCATION).size());
-        Set<String> outboundProps = msg.getPropertyNames(PropertyScope.OUTBOUND);
+        assertEquals(1, msg.getInvocationPropertyNames().size());
+        Set<String> outboundProps = msg.getOutboundPropertyNames();
         assertEquals(4, outboundProps.size());
 
         //Remove Mule properties
