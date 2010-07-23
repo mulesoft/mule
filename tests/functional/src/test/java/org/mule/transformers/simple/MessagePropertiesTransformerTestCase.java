@@ -101,10 +101,11 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         Map<String, String> add = new HashMap<String, String>();
         add.put("Foo", "Baz");
         t.setRenameProperties(add);
+        t.setScope(PropertyScope.INVOCATION);
         t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
-        msg.setProperty("Foo", "Bar", PropertyScope.INVOCATION);
+        msg.setInvocationProperty("Foo", "Bar");
         DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
@@ -153,7 +154,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals("test-property1", transformer.getDeleteProperties().get(0));
         assertEquals("test-property2", transformer.getDeleteProperties().get(1));
         assertEquals("Faz", transformer.getRenameProperties().get("Foo"));
-        assertEquals(null, transformer.getScope());
+        assertEquals(PropertyScope.OUTBOUND, transformer.getScope());
     }
 
     private void compareProperties(MuleMessage msg, MuleMessage transformed)
