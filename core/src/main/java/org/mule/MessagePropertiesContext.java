@@ -330,8 +330,9 @@ public class MessagePropertiesContext implements Serializable
     }
 
     /**
-     * @return all property keys on this message
+     * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
+    @Deprecated
     public Set<String> getPropertyNames()
     {
         Set<String> allProps = new HashSet<String>();
@@ -348,11 +349,6 @@ public class MessagePropertiesContext implements Serializable
      */
     public Set<String> getPropertyNames(PropertyScope scope)
     {
-        if (scope == null)
-        {
-            return getPropertyNames();
-        }
-
         if (PropertyScope.SESSION.equals(scope))
         {
             if (RequestContext.getEvent() != null)
