@@ -132,7 +132,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
         }
         try
         {
-            Object payload = event.transformMessage();// getTransformedMessage();
+            Object payload = event.getMessage().getPayload();// getTransformedMessage();
             // following line was added set the payload in the threadlocal
             // so that a protocol class can use the thread local and pick the
             // transformed

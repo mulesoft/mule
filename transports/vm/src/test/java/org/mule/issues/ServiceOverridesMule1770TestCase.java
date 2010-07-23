@@ -34,7 +34,7 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
         String temp =  (String)c.getServiceOverrides().get(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         assertNotNull("DispatcherFactory override should not be null", temp);
         assertEquals(TestMessageDispatcherFactory.class.getName(), temp);
-        Transformer transformer = TransformerUtils.firstOrNull(c.getDefaultInboundTransformers());
+        Transformer transformer = TransformerUtils.firstOrNull(c.getDefaultInboundTransformers(null));
         assertNotNull("InboundTransformer should not be null", transformer);
         assertEquals(NoActionTransformer.class, transformer.getClass());
     }
@@ -45,13 +45,13 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
     {
         AbstractConnector c1 = (AbstractConnector)muleContext.getRegistry().lookupConnector("test");
         assertNotNull("Connector should not be null", c1);
-        Transformer t1 = TransformerUtils.firstOrNull(c1.getDefaultInboundTransformers());
+        Transformer t1 = TransformerUtils.firstOrNull(c1.getDefaultInboundTransformers(null));
         assertNotNull("InboundTransformer should not be null", t1);
         assertEquals(NoActionTransformer.class, t1.getClass());
 
         AbstractConnector c2 = (AbstractConnector)muleContext.getRegistry().lookupConnector("second");
         assertNotNull("Connector should not be null", c2);
-        Transformer t2 = TransformerUtils.firstOrNull(c2.getDefaultInboundTransformers());
+        Transformer t2 = TransformerUtils.firstOrNull(c2.getDefaultInboundTransformers(null));
         assertNull("InboundTransformer should be null", t2);
     }
 

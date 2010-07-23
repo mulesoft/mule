@@ -126,7 +126,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         }
         else 
         {
-            payload = event.transformMessage();
+            payload = event.getMessage().getPayload();
         }
         
         if (wrapper.isProxy())

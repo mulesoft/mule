@@ -63,7 +63,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();
-        List<Transformer> ts = connector.getDefaultOutboundTransformers();
+        List<Transformer> ts = connector.getDefaultOutboundTransformers(null);
         if (ts.size() == 1)
         {
             this.sendTransformer = ts.get(0);
@@ -234,7 +234,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
 
         HttpMethod httpMethod;
-        Object body = event.transformMessage();
+        Object body = event.getMessage().getPayload();
 
         if (body instanceof HttpMethod)
         {

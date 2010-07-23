@@ -173,7 +173,6 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
         if (result instanceof VoidResult)
         {
             // This will rewire the current message
-            event.transformMessage();
             return event.getMessage();
         }
         else if (result != null)

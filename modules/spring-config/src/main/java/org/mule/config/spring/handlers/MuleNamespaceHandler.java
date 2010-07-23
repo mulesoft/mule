@@ -48,6 +48,7 @@ import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
@@ -64,7 +65,6 @@ import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -202,10 +202,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
 
         //Transformer elements
-        registerBeanDefinitionParser("transformers", new ParentDefinitionParser());
 
-        registerMuleBeanDefinitionParser("response-transformers", new ParentDefinitionParser());
-        registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
+        registerBeanDefinitionParser("transformer", new MessageProcessorRefDefinitionParser());
 
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new TransformerDefinitionParser(AutoTransformer.class));
@@ -259,6 +257,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
         // Message Processors
+        registerBeanDefinitionParser("message-processor", new MessageProcessorRefDefinitionParser());
         registerBeanDefinitionParser("custom-message-processor", new MessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ParentDefinitionParser());
 

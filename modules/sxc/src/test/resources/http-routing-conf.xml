@@ -26,9 +26,7 @@
                 </sxc:filtering-router>
                 <sxc:filtering-router>
                     <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
-                        <transformers>
-                            <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
-                        </transformers>
+                        <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                     </outbound-endpoint>
                     <sxc:filter pattern="//test:purchaseOrder[@country]"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
@@ -36,9 +34,7 @@
                 
                 <sxc:filtering-router>
                     <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
-                        <transformers>
-                            <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
-                        </transformers>
+                        <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                     </outbound-endpoint>
                     <sxc:filter pattern="//purchaseOrder[@country]"/>
                 </sxc:filtering-router>

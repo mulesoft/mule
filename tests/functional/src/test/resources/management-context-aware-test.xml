@@ -12,7 +12,9 @@
 
         <service name="service">
             <inbound>
-                <inbound-endpoint address="test://foo" transformer-refs="bean"/>
+                <inbound-endpoint address="test://foo">
+                	<transformer ref="bean"/>
+                </inbound-endpoint>
             </inbound>
             <component>
                 <singleton-object class="org.mule.config.spring.DummyComponent">

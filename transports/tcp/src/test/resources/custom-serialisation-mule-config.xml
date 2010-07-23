@@ -34,8 +34,9 @@
 
         <service name="BridgeOut">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="9994" transformer-refs="NoAction" 
-                    exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="9994" exchange-pattern="one-way">
+                	<transformer ref="NoAction"/>
+                </tcp:inbound-endpoint>
                 <forwarding-router/>
             </inbound>
             <outbound>

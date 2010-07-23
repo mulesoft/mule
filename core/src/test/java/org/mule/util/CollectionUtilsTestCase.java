@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 public class CollectionUtilsTestCase extends AbstractMuleTestCase
 {
@@ -111,6 +112,31 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         String result = CollectionUtils.toString(test, 10);
         assertTrue(result.endsWith("[..]]"));
         assertEquals(9, StringUtils.countMatches(result, ","));
+    }
+    
+    public void testContainsTypeTrue()
+    {
+        Collection c = new ArrayList();
+        c.add(new String());
+        c.add(new Date());
+        assertTrue(CollectionUtils.containsType(c, Date.class));
+    }
+
+    public void testContainsTypeFalse()
+    {
+        Collection c = new ArrayList();
+        c.add(new String());
+        c.add(new Integer(1));
+        assertFalse(CollectionUtils.containsType(c, Date.class));
+    }
+
+    public void testContainsTypeNullChecks()
+    {
+        Collection c = new ArrayList();
+        c.add(new String());
+        c.add(new Integer(1));
+        assertFalse(CollectionUtils.containsType(c, null));
+        assertFalse(CollectionUtils.containsType(null, Date.class));
     }
 
 }

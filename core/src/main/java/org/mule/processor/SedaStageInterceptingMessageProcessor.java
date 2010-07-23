@@ -143,6 +143,10 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
     protected MuleEvent dequeue() throws Exception
     {
+        if (queue == null)
+        {
+            return null;
+        }
         if (logger.isTraceEnabled())
         {
             logger.trace(MessageFormat.format("{0}: Polling queue {1}, timeout = {2}", getStageName(),

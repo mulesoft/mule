@@ -12,11 +12,16 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.NamedObject;
 import org.mule.api.processor.MessageProcessor;
 
-public class TestMessageProcessor implements MessageProcessor
+public class TestMessageProcessor implements MessageProcessor, NamedObject
 {
+    /** Simple label string to be appended to the payload. */
     private String label;
+    
+    /** Bean name used by Spring */
+    private String name;
     
     public TestMessageProcessor()
     {
@@ -45,6 +50,16 @@ public class TestMessageProcessor implements MessageProcessor
     public void setLabel(String label)
     {
         this.label = label;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 }
 

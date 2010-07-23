@@ -25,26 +25,38 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="middle" transformer-refs="Compress ObjectToJms"/>
+                    <outbound-endpoint ref="middle">
+                    	<transformer ref="Compress" />
+                    	<transformer ref="ObjectToJms" />
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="MiddlePart">
             <inbound>
-                <inbound-endpoint ref="middle" transformer-refs="JmsToObject Uncompress"/>
+                <inbound-endpoint ref="middle">
+                	<transformer ref="JmsToObject" />
+                	<transformer ref="Uncompress" />
+                </inbound-endpoint>
             </inbound>
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="middle2" transformer-refs="Compress ObjectToJms"/>
+                    <outbound-endpoint ref="middle2">
+	                	<transformer ref="Compress" />
+	                	<transformer ref="ObjectToJms" />
+	                </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="OutputPart">
             <inbound>
-                <inbound-endpoint ref="middle2" transformer-refs="JmsToObject Uncompress"/>
+                <inbound-endpoint ref="middle2">
+                	<transformer ref="JmsToObject" />
+                	<transformer ref="Uncompress" />
+                </inbound-endpoint>
             </inbound>
             <test:component>
                 <test:return-data>OUTPUT MESSAGE</test:return-data>

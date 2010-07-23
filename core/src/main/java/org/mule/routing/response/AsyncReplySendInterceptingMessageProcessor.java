@@ -53,7 +53,7 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
         ReplyToHandler replyToHandler = null;
         if (replyTo != null)
         {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
+            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
             // Use the response transformer for the event if one is set
             if (endpoint.getResponseTransformers() != null)
             {

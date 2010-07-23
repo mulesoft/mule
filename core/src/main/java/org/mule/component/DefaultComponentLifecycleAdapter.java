@@ -30,6 +30,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
@@ -367,6 +368,10 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         Object result;
         try
         {
+            if (componentObject.get() == null)
+            {
+                throw new ComponentException(MessageFactory.createStaticMessage("componentObject SoftReference is null"), RequestContext.getEventContext().getMessage(), component);
+            }
             // Use the overriding entrypoint resolver if one is set
             if (component.getEntryPointResolverSet() != null)
             {

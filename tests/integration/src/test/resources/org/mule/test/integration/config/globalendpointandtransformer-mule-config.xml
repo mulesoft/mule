@@ -13,7 +13,9 @@
     <model name="test">
         <service name="Bridge">
             <inbound>
-                <inbound-endpoint ref="in" transformer-refs="StringtoByteArray"/>
+                <inbound-endpoint ref="in">
+                	<transformer ref="StringtoByteArray"/>
+                </inbound-endpoint>
                 <forwarding-router/>
             </inbound>
         </service>

@@ -86,7 +86,9 @@
         <callable-entry-point-resolver/>
         <service name="ignoredService1">
             <inbound>
-                <http:inbound-endpoint ref="ignored" transformer-refs="appendString"/>
+                <http:inbound-endpoint ref="ignored">
+                	<transformer ref="appendString"/>
+                </http:inbound-endpoint>
             </inbound>
             <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
             <outbound>
@@ -98,7 +100,9 @@
 
         <service name="ignoredService2">
             <inbound>
-                <inbound-endpoint address="vm://echo3" exchange-pattern="request-response" transformer-refs="appendString2"/>
+                <inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
+                	<transformer ref="appendString2"/>
+                </inbound-endpoint>
             </inbound>
             <test:component doInboundTransform="false" appendString=" Received"/>
         </service>

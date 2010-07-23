@@ -279,18 +279,6 @@ public class CxfConnector extends AbstractConnector implements ServiceNotificati
             transformerEndpoint = receiverEndpointBuilder;
         }
 
-        // Ensure that the transformers aren't empty before setting them. Otherwise Mule will get confused
-        // and won't add the default transformers.
-        if (originalEndpoint.getTransformers() != null && !originalEndpoint.getTransformers().isEmpty())
-        {
-            transformerEndpoint.setTransformers(originalEndpoint.getTransformers());
-        }
-
-        if (originalEndpoint.getResponseTransformers() != null && !originalEndpoint.getResponseTransformers().isEmpty())
-        {
-            transformerEndpoint.setResponseTransformers(originalEndpoint.getResponseTransformers());
-        }
-
         // apply the filters to the correct endpoint
         EndpointBuilder filterEndpoint;
         if (cxfReceiver.isApplyFiltersToProtocol())

@@ -19,8 +19,9 @@
     <model name="test">
         <service name="with-router">
             <inbound>
-                <vm:inbound-endpoint path="with-router-in" exchange-pattern="one-way" 
-                    transformer-refs="fail"/>
+                <vm:inbound-endpoint path="with-router-in" exchange-pattern="one-way">
+                	<transformer ref="fail"/>
+                </vm:inbound-endpoint>
                 <forwarding-router/>
             </inbound>
             <outbound>
@@ -32,8 +33,9 @@
 
         <service name="without-router">
             <inbound>
-                <vm:inbound-endpoint path="without-router-in" exchange-pattern="one-way" 
-                    transformer-refs="fail"/>
+                <vm:inbound-endpoint path="without-router-in" exchange-pattern="one-way">
+                	<transformer ref="fail"/>
+                </vm:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>

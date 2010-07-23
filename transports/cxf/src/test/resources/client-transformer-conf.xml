@@ -17,9 +17,7 @@
         proxy="true"
         applyTransformersToProtocol="false"
         exchange-pattern="one-way">
-        <transformers>
-            <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
-        </transformers>
+        <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
     </cxf:endpoint>
     
     <cxf:endpoint 
@@ -28,9 +26,7 @@
         proxy="true"
         applyTransformersToProtocol="true"
         exchange-pattern="one-way">
-        <transformers>
-            <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
-        </transformers>
+        <mule-xml:xslt-transformer xsl-file="proxy.xsl" />
     </cxf:endpoint>
 
 	<model name="TestCxfModel">
@@ -38,7 +34,7 @@
             <inbound>
                 <inbound-endpoint address="cxf:vm://service" exchange-pattern="request-response"/>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent" />
+            <echo-component />
         </service>
     </model>
 </mule>

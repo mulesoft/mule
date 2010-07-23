@@ -401,7 +401,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private Object[] getArgs(MuleEvent event) throws TransformerException
     {
-        Object payload = event.transformMessage();
+        Object payload = event.getMessage().getPayload();
         Object[] args;
         if (payload instanceof Object[])
         {

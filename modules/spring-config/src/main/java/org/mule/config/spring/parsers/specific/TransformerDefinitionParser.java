@@ -10,26 +10,16 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
-/**
- * This allows a transformer to be defined globally, or embedded within an endpoint
- * (as either a normal or response transformer).
- */
-public class TransformerDefinitionParser extends ParentContextDefinitionParser
+public class TransformerDefinitionParser extends MessageProcessorDefinitionParser
 {
-
     public static final String TRANSFORMER = "transformer";
     public static final String RESPONSE_TRANSFORMER = "responseTransformer";
     public static final String RESPONSE_TRANSFORMERS = "response-transformers";
 
-    public TransformerDefinitionParser(Class transformer)
+    public TransformerDefinitionParser(Class clazz)
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(transformer, false));
-        and(RESPONSE_TRANSFORMERS, new ChildDefinitionParser(RESPONSE_TRANSFORMER, transformer));
-        otherwise(new ChildDefinitionParser(TRANSFORMER, transformer));
+        super(clazz);
     }
 
     /**
@@ -37,9 +27,7 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
      */
     public TransformerDefinitionParser()
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(false));
-        and(RESPONSE_TRANSFORMERS, new ChildDefinitionParser(RESPONSE_TRANSFORMER));
-        otherwise(new ChildDefinitionParser(TRANSFORMER));
+        super();
     }
 
 }

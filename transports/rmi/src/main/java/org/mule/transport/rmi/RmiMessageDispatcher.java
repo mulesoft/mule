@@ -63,7 +63,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
     private Object[] getArgs(MuleEvent event) throws TransformerException
     {
-        Object payload = event.transformMessage();
+        Object payload = event.getMessage().getPayload();
         if (payload instanceof Object[])
         {
             return (Object[])payload;

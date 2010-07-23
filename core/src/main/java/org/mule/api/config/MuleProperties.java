@@ -64,6 +64,7 @@ public class MuleProperties
     public static final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
     public static final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
     public static final String MULE_CREDENTIALS_PROPERTY = PROPERTY_PREFIX + "CREDENTIALS";
+    public static final String MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY = PROPERTY_PREFIX + "DISABLE_TRANSPORT_TRANSFORMER";
     // End MuleEvent Level properties
 
     /**

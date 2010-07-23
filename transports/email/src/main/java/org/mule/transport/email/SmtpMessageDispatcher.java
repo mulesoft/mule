@@ -93,7 +93,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        Object data = event.transformMessage();
+        Object data = event.getMessage().getPayload();
 
         if (!(data instanceof Message))
         {

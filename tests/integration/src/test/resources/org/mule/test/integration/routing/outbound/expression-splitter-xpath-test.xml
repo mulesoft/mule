@@ -37,9 +37,9 @@
         <service name="ServiceOne">
             <inbound>
                 <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response">
-                    <response-transformers>
+                    <response>
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>                        
-                    </response-transformers>
+                    </response>
                 </vm:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.routing.outbound.AddReceivedNodeService"/>
@@ -48,9 +48,9 @@
         <service name="ServiceTwo">
             <inbound>
                 <vm:inbound-endpoint path="service2.queue" exchange-pattern="request-response">
-                    <response-transformers>
+                    <response>
                         <mulexml:dom-to-xml-transformer returnClass="java.lang.String"/>
-                    </response-transformers>
+                    </response>
                 </vm:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.routing.outbound.AddReceivedNodeService"/>

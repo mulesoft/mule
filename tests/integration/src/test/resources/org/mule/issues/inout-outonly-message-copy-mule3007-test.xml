@@ -13,9 +13,6 @@
 
     <jms:activemq-connector name="activemqConnector" />
 
-<!--    <jms:object-to-jmsmessage-transformer name="ObjectToJmsMessage" />-->
-    <jms:jmsmessage-to-object-transformer name="JmsMessageToObject" />
-
     <model name="StreamTest">
         <service name="StreamTestService">
             <inbound>

@@ -42,7 +42,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        Object data = event.transformMessage();
+        Object data = event.getMessage().getPayload();
         OutputStream out = connector.getOutputStream(event.getEndpoint(), event.getMessage());
 
         try

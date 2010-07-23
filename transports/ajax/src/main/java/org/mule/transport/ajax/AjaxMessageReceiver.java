@@ -66,7 +66,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
             if ((message != null && message.getExceptionPayload() == null) && replyTo != null)
             {
-                connector.getReplyToHandler().processReplyTo(RequestContext.getEvent(), message, replyTo);
+                connector.getReplyToHandler((InboundEndpoint) endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
             return null;
         }

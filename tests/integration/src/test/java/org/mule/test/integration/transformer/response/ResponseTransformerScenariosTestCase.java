@@ -11,13 +11,16 @@
 package org.mule.test.integration.transformer.response;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 {
@@ -79,9 +82,12 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     public void testVmSyncResponseTransformer() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://syncResponseTransformer", "request", null);
+        Map props = new HashMap();
+        // This will disable the transformers configured in the VM connector's service-overrides.
+        props.put(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
+        MuleMessage message = client.send("vm://syncResponseTransformer", "request", props);
         assertNotNull(message);
-        assertEquals("request" + VM_OUTBOUND + VM_INBOUND + CUSTOM_RESPONSE, message.getPayloadAsString());
+        assertEquals("request" + CUSTOM_RESPONSE, message.getPayloadAsString());
     }
 
     public void testHttpSync() throws Exception

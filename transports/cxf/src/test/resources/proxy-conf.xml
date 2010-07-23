@@ -45,12 +45,10 @@
                 <cxf:inbound-endpoint address="http://localhost:63081/services/transform-proxy" 
                     proxy="true" exchange-pattern="request-response">
                     <!-- we're just ensuring that cxf proxies can handle non XMLStreamReader types here -->
-                    <transformers>
+                    <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    <response>
                         <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
-                    </transformers>
-                    <response-transformers>
-                        <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
-                    </response-transformers>
+                    </response>
                 </cxf:inbound-endpoint>
             </inbound>
             <outbound>
@@ -197,9 +195,9 @@
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo"
                         proxy="true"
                         exchange-pattern="request-response">
-                         <response-transformers>
+                         <response>
                              <transformer ref="TestXslt"/>
-                         </response-transformers>
+                         </response>
                     </cxf:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -231,9 +229,9 @@
                     <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" 
                                            proxy="true"
                                            exchange-pattern="request-response">
-                         <response-transformers>
+                         <response>
                              <transformer ref="TestXslt"/>
-                         </response-transformers>
+                         </response>
                     </cxf:outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/transform" scope="inbound"/>
                 </filtering-router>

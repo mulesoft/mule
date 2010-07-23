@@ -29,14 +29,12 @@
         <service name="HttpService">
             <inbound>
                 <inbound-endpoint ref="httpEndpoint">
-                    <transformers>
-                        <transformer ref="ByteArrayToString"/>
-                    </transformers>
-                    <response-transformers>
+                    <transformer ref="ByteArrayToString"/>
+                    <response>
                         <transformer ref="ObjectToXml"/>
                         <transformer ref="Compress"/>
                         <transformer ref="ToHttpResponse"/>
-                    </response-transformers>
+                    </response>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>

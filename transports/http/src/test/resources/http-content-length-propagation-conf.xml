@@ -17,7 +17,9 @@
         <service name="PSMaxMsg1">
             <inbound>
                 <http:inbound-endpoint name="httpEndpoint" host="localhost" port="8085"
-                                       transformer-refs="Xslt" contentType="text/xml"/>
+                                       contentType="text/xml">
+                	<transformer ref="Xslt" />
+                </http:inbound-endpoint>
                 <forwarding-router/>
             </inbound>
             <outbound>

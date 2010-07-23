@@ -50,7 +50,7 @@
         <service name="VmSyncResponseTransformer">
             <inbound>
                 <inbound-endpoint address="vm://syncResponseTransformer" exchange-pattern="request-response"
-                    responseTransformer-refs="customResponse" />
+                    responseTransformer-refs="customResponse" disableTransportTransformer="true" />
             </inbound>
             <echo-component />
         </service>

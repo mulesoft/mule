@@ -65,9 +65,6 @@
         <return-argument evaluator="bean" expression="ssn"/>
     </expression-transformer>
 
-    <!-- Example of a built-in, transport specific transformer -->
-    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
-
     <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" 
         exchange-pattern="one-way"/>
     <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="request-response"/>
@@ -168,7 +165,7 @@
             <outbound>
                 <chaining-router>
                     <outbound-endpoint ref="LenderService" exchange-pattern="request-response" />
-                    <outbound-endpoint ref="BankingGateway" transformer-refs="ObjectToJMSMessage" />
+                    <outbound-endpoint ref="BankingGateway"/>
                 </chaining-router>
             </outbound>
         </service>

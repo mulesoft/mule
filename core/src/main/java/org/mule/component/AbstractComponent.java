@@ -164,7 +164,6 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         }
         else if (result instanceof VoidResult)
         {
-            event.transformMessage();
             return event;
         }
         else if (result != null)

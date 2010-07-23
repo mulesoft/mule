@@ -61,7 +61,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         ImmutableEndpoint ep = event.getEndpoint();
         JdbcConnector jdbcConnector = (JdbcConnector) ep.getConnector();
         String statement = jdbcConnector.getStatement(ep);
-        Object payload = event.transformMessage();
+        Object payload = event.getMessage().getPayload();
         
         SqlStatementStrategy strategy = 
             jdbcConnector.getSqlStatementStrategyFactory().create(statement, payload);

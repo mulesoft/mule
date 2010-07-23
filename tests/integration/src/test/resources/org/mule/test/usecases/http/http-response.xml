@@ -37,11 +37,11 @@
         <service name="HttpWithChunking">
             <inbound>
                 <inbound-endpoint address="http://localhost:8988" exchange-pattern="request-response">
-                    <response-transformers>
+                    <response>
                         <message-properties-transformer>
                             <add-message-property key="Transfer-Encoding" value="chunked"/>
                         </message-properties-transformer>
-                    </response-transformers>
+                    </response>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>

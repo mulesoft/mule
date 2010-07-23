@@ -25,7 +25,11 @@
     <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer"
                  connector-ref="queue" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default"
-                 responseTransformer-refs="response" exchange-pattern="request-response"/>
+                  exchange-pattern="request-response">
+    	<response>
+    		<transformer ref="response" />
+    	</response>
+    </vm:endpoint>
 
     <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" 
         connector-ref="default" exchange-pattern="one-way"/>
@@ -99,7 +103,11 @@
             <echo-component/>
             <outbound>
                 <chaining-router>
-                    <outbound-endpoint ref="global-name-local-transformer" responseTransformer-refs="response"/>
+                    <outbound-endpoint ref="global-name-local-transformer">
+                    	<response>
+                    		<transformer ref="response"/>
+                    	</response>
+                    </outbound-endpoint>
                     <outbound-endpoint ref="out-global-name-local-transformer"/>
                 </chaining-router>
             </outbound>
@@ -119,8 +127,12 @@
             <echo-component/>
             <outbound>
                 <chaining-router>
-                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-refs="response"
-                                          exchange-pattern="request-response" connector-ref="default"/>
+                    <vm:outbound-endpoint path="local-name-local-transformer"
+                                          exchange-pattern="request-response" connector-ref="default">
+                    	<response>
+                    		<transformer ref="response" />
+                    	</response>
+                    </vm:outbound-endpoint>
                     <outbound-endpoint ref="out-local-name-local-transformer"/>
                 </chaining-router>
             </outbound>

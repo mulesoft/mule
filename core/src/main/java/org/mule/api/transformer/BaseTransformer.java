@@ -13,13 +13,14 @@ import org.mule.api.NamedObject;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.processor.MessageProcessor;
 
 /**
  * <code>Transformer</code> can be chained together to covert message payloads from one
  * object type to another.
 
  */
-public interface BaseTransformer extends Initialisable, Disposable, NamedObject
+public interface BaseTransformer extends MessageProcessor, Initialisable, Disposable, NamedObject
 {
     /**
      * The endpoint that this transformer is attached to

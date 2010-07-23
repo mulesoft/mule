@@ -106,7 +106,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     // Socket management (get and release) is handled outside this method
     private void dispatchToSocket(Socket socket, MuleEvent event) throws Exception
     {
-        Object payload = event.transformMessage();
+        Object payload = event.getMessage().getPayload();
         write(socket, payload);
     }
 

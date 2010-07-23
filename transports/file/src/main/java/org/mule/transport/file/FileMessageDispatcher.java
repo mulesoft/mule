@@ -51,7 +51,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        Object data = event.transformMessage();
+        Object data = event.getMessage().getPayload();
         // Wrap the transformed message before passing it to the filename parser
         MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
 

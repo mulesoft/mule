@@ -14,6 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
+
+import java.util.Collections;
 
 public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
 {
@@ -37,8 +40,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         // getters)
         uriBuilder = global.uriBuilder;
         connector = global.connector;
-        transformers = global.transformers;
-        responseTransformers = global.responseTransformers;
         name = global.name; // this seems a bit odd, but is tested for in the big
                             // spring config test case
         properties = global.properties;
@@ -53,6 +54,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         retryPolicyTemplate = global.retryPolicyTemplate;
         messageProcessors = global.messageProcessors;
         responseMessageProcessors = global.responseMessageProcessors;
+        disableTransportTransformer = global.disableTransportTransformer;
     }
 
     public EndpointURIEndpointBuilder(URIBuilder builder)
@@ -78,8 +80,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setName(source.getName());
         setEncoding(source.getEncoding());
         setConnector(source.getConnector());
-        setTransformers(source.getTransformers().isEmpty() ? null : source.getTransformers());
-        setResponseTransformers(source.getResponseTransformers().isEmpty() ? null : source.getResponseTransformers());
         setProperties(source.getProperties());
         setTransactionConfig(source.getTransactionConfig());
         setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());
@@ -90,8 +90,8 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setRetryPolicyTemplate(source.getRetryPolicyTemplate());
         setExchangePattern(source.getExchangePattern());
         setMuleContext(source.getMuleContext());
-        setMessageProcessors(source.getMessageProcessors().isEmpty() ? null : source.getMessageProcessors());
-        setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? null : source.getResponseMessageProcessors());
+        setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors());
+        setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
+        setDisableTransportTransformer(source.isDisableTransportTransformer());
     }
-
 }

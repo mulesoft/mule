@@ -20,7 +20,6 @@
     <!--        </properties>-->
     <!--    </connector>-->
 
-    <!--    <transformers>-->
     <!--        <transformer name="W10LaszloToW10Report" className="org.mule.transformer.xml.XsltTransformer"-->
     <!--            returnClass="java.lang.String">-->
     <!--            <properties>-->
@@ -41,7 +40,6 @@
     <!--            returnClass="org.w3c.dom.Document"/>-->
     <!--        <transformer name="DOMToXML" className="org.mule.transformer.xml.DomDocumentToXml"-->
     <!--            returnClass="java.lang.String"/>-->
-    <!--    </transformers>-->
 
     <model name="fo">
         <service name="getLaszloW10">

@@ -9,6 +9,8 @@
  */
 package org.mule.transport.ajax.container;
 
+import org.cometd.DataFilter;
+import org.mortbay.cometd.AbstractBayeux;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -19,9 +21,6 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxReplyToHandler;
 import org.mule.transport.servlet.ServletConnector;
-
-import org.cometd.DataFilter;
-import org.mortbay.cometd.AbstractBayeux;
 
 /**
  * A servlet connector that binds to the container and makes a configured 
@@ -230,9 +229,9 @@ public class AjaxServletConnector extends ServletConnector
     }
 
     @Override
-    public ReplyToHandler getReplyToHandler()
+    public ReplyToHandler getReplyToHandler(InboundEndpoint endpoint)
     {
-        return new AjaxReplyToHandler(getDefaultResponseTransformers(), this);
+        return new AjaxReplyToHandler(getDefaultResponseTransformers(endpoint), this);
     }
 
     @Override

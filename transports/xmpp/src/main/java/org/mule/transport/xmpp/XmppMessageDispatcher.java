@@ -85,15 +85,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getMessage().getPayload();
         
-        Message jabberMessage = null;
-        if (payload instanceof Message)
-        {
-            jabberMessage = (Message) payload;
-        }
-        else
-        {
-            jabberMessage = (Message) event.transformMessage();
-        }
+        Message jabberMessage = event.getMessage().getPayload(Message.class);
 
         conversation.dispatch(jabberMessage);
         

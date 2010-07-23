@@ -13,14 +13,12 @@
         <service name="service">
             <inbound>
                 <inbound-endpoint name="endpoint" address="test://foo" exchange-pattern="one-way">
-                    <transformers>
-                        <transformer ref="normal1"/>
-                        <string-to-byte-array-transformer name="normal2"/>
-                    </transformers>
-                    <response-transformers>
+                    <transformer ref="normal1"/>
+                    <string-to-byte-array-transformer name="normal2"/>
+                    <response>
                         <transformer ref="response1"/>
                         <string-to-byte-array-transformer name="response2"/>
-                    </response-transformers>
+                    </response>
                 </inbound-endpoint>
             </inbound>
         </service>

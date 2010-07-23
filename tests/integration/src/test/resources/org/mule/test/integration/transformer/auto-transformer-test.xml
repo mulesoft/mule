@@ -16,9 +16,7 @@
         <service name="foo">
             <inbound>
                 <vm:inbound-endpoint path="in" exchange-pattern="one-way">
-                    <transformers>
-                        <auto-transformer returnClass="org.mule.tck.testmodels.fruit.FruitBasket"/>
-                    </transformers>
+                    <auto-transformer returnClass="org.mule.tck.testmodels.fruit.FruitBasket"/>
                 </vm:inbound-endpoint>
             </inbound>
             <component class="org.mule.test.transformers.AutoTransformerTestCase$FruitBasketComponent"/>

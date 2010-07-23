@@ -34,6 +34,7 @@ import javax.mail.internet.MimeMessage;
 
 public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
+    public static final long DELIVERY_DELAY_MS = 10000;
 
     protected static final String CONFIG_BASE = "-functional-test.xml";
     protected static final boolean MIME_MESSAGE = true;
@@ -129,7 +130,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         } 
         client.dispatch("vm://send", msg, props);
 
-        server.waitForIncomingEmail(RECEIVE_TIMEOUT, 1);
+        server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
 
         MimeMessage[] messages = server.getReceivedMessages();
         assertNotNull("did not receive any messages", messages);
@@ -167,7 +168,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         Object payload = reply.getPayload();
         if (isMimeMessage)
         {
-            assertTrue(payload instanceof MimeMessage);
+            assertTrue("payload is " + payload.getClass().getName(), payload instanceof MimeMessage);
             verifyMessage((MimeMessage) payload);
         }
         else

@@ -27,6 +27,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpConnector;
+import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -37,8 +38,6 @@ import javax.mail.internet.MimeMessage;
  */
 public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {    
-    public static final long DELIVERY_DELAY_MS = 5000;
-
     public SmtpConnectorTestCase()
     {
         this(ServerSetup.PROTOCOL_SMTP, 50007);
@@ -110,7 +109,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, new ResponseOutputStream(System.out));
         endpoint.process(event);
 
-        getServers().waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
+        getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);
         MimeMessage[] messages = getServers().getReceivedMessages();
         assertNotNull("did not receive any messages", messages);
         assertEquals("did not receive 1 mail", 1, messages.length);

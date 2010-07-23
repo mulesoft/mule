@@ -106,7 +106,7 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            Object data = event.transformMessage();
+            Object data = event.getMessage().getPayload();
             //deliver(getClient(), channel, data);
             for (Client client : chan.getSubscribers())
             {
@@ -115,7 +115,7 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher
         }
         else if (cacheMessages)
         {
-            Object data = event.transformMessage();
+            Object data = event.getMessage().getPayload();
             if (logger.isTraceEnabled())
             {
                 logger.trace("There are no clients waiting, adding message to cache: " + data);

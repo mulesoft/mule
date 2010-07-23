@@ -64,8 +64,9 @@
         <service name="GreeterUMO">
 
             <inbound>
-                <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"
-                    exchange-pattern="one-way"/>
+                <stdio:inbound-endpoint system="IN" exchange-pattern="one-way">
+                	<transformer ref ="StdinToNameString"/>
+                </stdio:inbound-endpoint>
             </inbound>
 
             <component class="org.mule.example.hello.Greeter"/>
@@ -91,16 +92,18 @@
         <service name="ChitChatUMO">
 
             <inbound>
-                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"
-                    exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="chitchatter" exchange-pattern="one-way">
+                	<transformer ref="NameStringToChatString"/>
+                </vm:inbound-endpoint>
             </inbound>
 
             <component class="org.mule.example.hello.ChitChatter"/>
 
             <outbound>
                 <pass-through-router>
-                    <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString"
-                        exchange-pattern="one-way"/>
+                    <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
+                    	<transformer ref="ChatStringToString" />
+                    </stdio:outbound-endpoint>
                 </pass-through-router>
             </outbound>
 
@@ -110,8 +113,9 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound>
-                <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"
-                    exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="userErrorHandler" exchange-pattern="one-way">
+                	<transformer ref="ExceptionToString"/>
+                </vm:inbound-endpoint>
             </inbound>
 
             <outbound>

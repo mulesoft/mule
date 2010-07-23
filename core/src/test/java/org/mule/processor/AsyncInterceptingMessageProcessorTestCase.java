@@ -61,7 +61,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
 
         MuleEvent result = messageProcessor.process(event);
 
-        latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        latch.await(10000, TimeUnit.MILLISECONDS);
         assertNotNull(target.sensedEvent);
         // Event is not the same because it gets copied in
         // AbstractMuleEventWork#run()

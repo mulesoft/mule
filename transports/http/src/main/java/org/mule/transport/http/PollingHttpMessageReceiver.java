@@ -25,7 +25,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -113,9 +112,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // We need to create an outbound endpoint to do the polled request using
             // send() as thats the only way we can customize headers and use eTags
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
-            // Must not use transformers
-            endpointBuilder.setTransformers(Collections.<Transformer>emptyList());
-            endpointBuilder.setResponseTransformers(Collections.<Transformer>emptyList());
+            // Must not use inbound endpoint processors
+            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>emptyList());
+            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);

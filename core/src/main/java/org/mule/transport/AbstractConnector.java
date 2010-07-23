@@ -1481,31 +1481,31 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      */
     protected abstract void doStop() throws MuleException;
 
-    public List<Transformer> getDefaultInboundTransformers()
+    public List<Transformer> getDefaultInboundTransformers(InboundEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
             throw new RuntimeException("serviceDescriptor not initialized");
         }
-        return TransformerUtils.getDefaultInboundTransformers(serviceDescriptor);
+        return TransformerUtils.getDefaultInboundTransformers(serviceDescriptor, endpoint);
     }
 
-    public List<Transformer> getDefaultResponseTransformers()
+    public List<Transformer> getDefaultResponseTransformers(InboundEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
             throw new RuntimeException("serviceDescriptor not initialized");
         }
-        return TransformerUtils.getDefaultResponseTransformers(serviceDescriptor);
+        return TransformerUtils.getDefaultResponseTransformers(serviceDescriptor, endpoint);
     }
 
-    public List<Transformer> getDefaultOutboundTransformers()
+    public List<Transformer> getDefaultOutboundTransformers(OutboundEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
             throw new RuntimeException("serviceDescriptor not initialized");
         }
-        return TransformerUtils.getDefaultOutboundTransformers(serviceDescriptor);
+        return TransformerUtils.getDefaultOutboundTransformers(serviceDescriptor, endpoint);
     }
 
     /**
@@ -1513,9 +1513,9 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      *
      * @return Value for property 'replyToHandler'.
      */
-    public ReplyToHandler getReplyToHandler()
+    public ReplyToHandler getReplyToHandler(InboundEndpoint endpoint)
     {
-        return new DefaultReplyToHandler(getDefaultResponseTransformers(), muleContext);
+        return new DefaultReplyToHandler(getDefaultResponseTransformers(endpoint), muleContext);
     }
 
     /**

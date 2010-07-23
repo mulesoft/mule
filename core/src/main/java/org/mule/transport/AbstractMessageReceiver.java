@@ -28,6 +28,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
@@ -37,6 +39,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import org.apache.commons.lang.SerializationException;
 
@@ -72,6 +75,9 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      * endpointUri such as jms.*
      */
     private EndpointURI endpointUri;
+    
+    private List<Transformer> defaultInboundTransformers;
+    private List<Transformer> defaultResponseTransformers;
 
     /**
      * Creates the Message Receiver
@@ -123,6 +129,10 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     public final void initialise() throws InitialisationException
     {
         endpointUri = endpoint.getEndpointURI();
+        
+        defaultInboundTransformers = connector.getDefaultInboundTransformers((InboundEndpoint) endpoint);       
+        defaultResponseTransformers = connector.getDefaultResponseTransformers((InboundEndpoint) endpoint);
+        
         super.initialise();
     }
 
@@ -171,6 +181,10 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
         muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
 
+        if (!endpoint.isDisableTransportTransformer())
+        {
+            applyInboundTransformers(muleEvent);            
+        }
         MuleEvent resultEvent = null;
         try
         {
@@ -181,7 +195,21 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             return handleUnacceptedFilter(muleEvent.getMessage());
         }
 
-        return resultEvent != null ? resultEvent.getMessage() : null;
+        if (resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
+        {
+            applyResponseTransformers(resultEvent);
+        }
+        return (resultEvent != null ? resultEvent.getMessage() : null);
+    }
+    
+    protected void applyInboundTransformers(MuleEvent event) throws TransformerException
+    {
+        event.getMessage().applyTransformers(defaultInboundTransformers);
+    }
+
+    protected void applyResponseTransformers(MuleEvent event) throws TransformerException
+    {
+        event.getMessage().applyTransformers(defaultResponseTransformers);
     }
 
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)

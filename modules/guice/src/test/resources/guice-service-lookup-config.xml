@@ -15,7 +15,9 @@
     <model name="main">
         <service name="MyService2">
             <inbound>
-                <vm:inbound-endpoint path="myservice2" transformer-refs="auto-transform" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="myservice2" exchange-pattern="one-way">
+                    <transformer ref="auto-transform"/>
+                </vm:inbound-endpoint>
             </inbound>
             <component>
                 <guice:object classBinding="org.mule.module.guice.AutoTransformServiceInterface"/>

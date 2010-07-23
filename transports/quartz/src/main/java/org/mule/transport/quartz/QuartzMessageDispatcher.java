@@ -91,7 +91,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         Job job = null;
         // work out what we're actually calling
-        Object payload = event.transformMessage();
+        Object payload = event.getMessage().getPayload();
 
         if(jobConfig instanceof CustomJobConfig)
         {

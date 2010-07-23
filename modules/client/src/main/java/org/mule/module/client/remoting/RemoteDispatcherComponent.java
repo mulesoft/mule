@@ -246,7 +246,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             if (result != null)
             {
                 // See if there is a default transformer on the connector
-                List transformers = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformers();
+                List transformers = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformers((InboundEndpoint) endpoint);
                 if (transformers != null)
                 {
                     result.applyTransformers(transformers);

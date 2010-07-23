@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import javax.mail.internet.MimeMessage;
 
@@ -69,7 +70,7 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
         assertTrue(message.getPayload() instanceof byte[]);
 
         // next, check that the email is received in the server
-        greenMailSupport.getServers().waitForIncomingEmail(RECEIVE_TIMEOUT, 1);
+        greenMailSupport.getServers().waitForIncomingEmail(AbstractEmailFunctionalTestCase.DELIVERY_DELAY_MS, 1);
         MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
         assertNotNull("did not receive any messages", messages);
         assertEquals("did not receive 1 mail", 1, messages.length);

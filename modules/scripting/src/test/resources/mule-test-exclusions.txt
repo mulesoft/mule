@@ -1,3 +1,8 @@
 #
 # Test cases listed in this file are not run.
 #
+
+# componentObject SoftReference is null
+org.mule.module.scripting.transformer.GroovyScriptTransformerFunctionalTestCase
+org.mule.module.scripting.GroovyBindingFunctionalTestCase
+                

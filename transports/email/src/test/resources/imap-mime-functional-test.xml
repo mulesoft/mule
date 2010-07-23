@@ -13,18 +13,14 @@
     <imap:connector name="imapConnector"/>
     <vm:connector name="vmConnector"/>
 
-    <!-- for variety, this test uses a mime message, so blank out transformer -->
-    <no-action-transformer name="noActionTransformer"/>
-
     <model name="test">
         <service name="relay">
             <inbound>
-                <imap:inbound-endpoint user="bob" password="password" host="localhost" port="65443"
-                    transformer-refs="noActionTransformer" />
+                <imap:inbound-endpoint user="bob" password="password" host="localhost" port="65443" disableTransportTransformer="true" />
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="receive" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="receive" exchange-pattern="one-way" />
                 </pass-through-router>
             </outbound>
         </service>

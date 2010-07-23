@@ -80,6 +80,8 @@ public class EndpointUtils
     public static void addProperties(MuleDefinitionParser parser)
     {
         parser.addAlias(ADDRESS_ATTRIBUTE, URI_BUILDER_ATTRIBUTE);
+        parser.addAlias("transformer", "transformers");
+        parser.addAlias("responseTransformer", "responseTransformers");
         parser.addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
     }
 

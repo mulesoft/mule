@@ -19,9 +19,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestInboundTransformer;
-import org.mule.tck.testmodels.mule.TestOutboundTransformer;
-import org.mule.tck.testmodels.mule.TestResponseTransformer;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.util.ObjectNameHelper;
 
@@ -35,11 +32,11 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof InboundEndpoint);
         assertFalse(ep instanceof OutboundEndpoint);
         assertNotNull(ep.getTransformers());
-        assertEquals(1, ep.getTransformers().size());
-        assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
+        // We no longer apply default transport transformers as part of endpoint processing
+        assertEquals(0, ep.getTransformers().size());
         assertNotNull(ep.getResponseTransformers());
-        assertEquals(1, ep.getResponseTransformers().size());
-        assertTrue(ep.getResponseTransformers().get(0) instanceof TestResponseTransformer);
+        // We no longer apply default transport transformers as part of endpoint processing
+        assertEquals(0, ep.getResponseTransformers().size());
         testDefaultCommonEndpointAttributes(ep);
     }
 
@@ -50,9 +47,11 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
         assertFalse(ep instanceof InboundEndpoint);
         assertTrue(ep instanceof OutboundEndpoint);
-        assertTrue(ep.getTransformers() != null);
-        assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
-        assertTrue(ep.getResponseTransformers().isEmpty());
+        // We no longer apply default transport transformers as part of endpoint processing
+        assertEquals(0, ep.getTransformers().size());
+        assertNotNull(ep.getResponseTransformers());
+        // We no longer apply default transport transformers as part of endpoint processing
+        assertEquals(0, ep.getResponseTransformers().size());
         testDefaultCommonEndpointAttributes(ep);
     }
 

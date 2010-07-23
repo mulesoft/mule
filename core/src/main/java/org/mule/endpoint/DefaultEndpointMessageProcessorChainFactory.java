@@ -35,7 +35,6 @@ import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.ExceptionThrowingMessageFilter;
-import org.mule.transformer.TransformerMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
 import java.util.ArrayList;
@@ -54,7 +53,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundLoggingMessageProcessor(endpoint),
             new ExceptionThrowingMessageFilter(endpoint.getFilter()),
             new InboundSecurityFilterMessageProcessor(endpoint),
-            new TransformerMessageProcessor(endpoint.getTransformers()) 
         });
         
     }
@@ -65,7 +63,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         return Arrays.asList(new MessageProcessor[] 
         { 
             new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()),
-            new TransformerMessageProcessor(endpoint.getResponseTransformers()) 
         });
     }
     
@@ -107,7 +104,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         throws MuleException
     {
         return Arrays.asList(new MessageProcessor[]{
-            new TransformerMessageProcessor(endpoint.getResponseTransformers()),
             new OutboundRewriteResponseEventMessageProcessor()
         });
     }

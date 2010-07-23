@@ -183,6 +183,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getEndpointBuilderName();
     }
 
+    public boolean isDisableTransportTransformer()
+    {
+        return endpoint.isDisableTransportTransformer();
+    }
+    
     @Override
     public int hashCode()
     {

@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections.Predicate;
+
 
 // @ThreadSafe
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
@@ -193,6 +195,21 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         List list = new LinkedList();
         list.add(value);
         return list;
+    }
+    
+    public static boolean containsType(Collection<?> collection, final Class<?> type)
+    {
+        if (type == null)
+        {
+            return false;
+        }
+        return exists(collection, new Predicate()
+        {
+            public boolean evaluate(Object object)
+            {
+                return object != null && type.isAssignableFrom(object.getClass());
+            }
+        });
     }
 
 }

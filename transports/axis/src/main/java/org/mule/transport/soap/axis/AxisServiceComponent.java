@@ -252,7 +252,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 msgContext.setProperty("securityProvider", securityProvider);
             }
 
-            Object request = context.transformMessage();
+            Object request = context.getMessage().getPayload();
             if (request instanceof File)
             {
                 request = new FileInputStream((File)request);

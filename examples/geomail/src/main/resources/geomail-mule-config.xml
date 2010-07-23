@@ -63,7 +63,9 @@
     <vm:endpoint name="Storage" path="channels/storage" exchange-pattern="one-way"/>
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator" exchange-pattern="one-way"/>
     
-    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" transformer-refs="SenderToJson" exchange-pattern="one-way"/>
+    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" exchange-pattern="one-way">
+    	<transformer ref="SenderToJson"/>
+    </ajax:servlet-endpoint>
 
     <model>
 
@@ -121,7 +123,9 @@
                 </filtering-router>
 
                 <filtering-router>
-                    <outbound-endpoint ref="Positions" transformer-refs="IP2Sender"/>
+                    <outbound-endpoint ref="Positions">
+                    	<transformer ref="IP2Sender"/>
+                    </outbound-endpoint>
                     <filter ref="inCacheFilter"/>
                 </filtering-router>
             </outbound>
@@ -143,7 +147,10 @@
 
              <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="Storage" transformer-refs="HostIpXSLT XmlToSender"/>
+                    <outbound-endpoint ref="Storage">
+                    	<transformer ref="HostIpXSLT" />
+                    	<transformer ref="XmlToSender" />
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
 
@@ -169,7 +176,10 @@
 
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="Storage" transformer-refs="FraudlabsXSLT XmlToSender"/>
+                    <outbound-endpoint ref="Storage">
+                    	<transformer ref="FraudlabsXSLT" />
+                    	<transformer ref="XmlToSender"/>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
 

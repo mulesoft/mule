@@ -10,6 +10,10 @@
 
 package org.mule.endpoint;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -32,10 +36,6 @@ import java.util.Map;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 
 public class EndpointTestCase extends AbstractMuleTestCase
 {
@@ -75,6 +75,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final EndpointMessageProcessorChainFactory messageProcessorsFactory = mock(EndpointMessageProcessorChainFactory.class);
         final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
         final List<MessageProcessor> responseMessageProcessors = new ArrayList<MessageProcessor>();
+        final boolean disableTransportTransformer = true;
 
         // Creates a mock Transformer that will check that the endpoint is completely
         // configured when setEndpoint method is called.
@@ -99,6 +100,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(endpointBuilderName, endpoint.getEndpointBuilderName());
                 assertEquals(muleContext, endpoint.getMuleContext());
                 assertEquals(retryPolicyTemplate, endpoint.getRetryPolicyTemplate());
+                assertEquals(disableTransportTransformer, endpoint.isDisableTransportTransformer());
 
                 return null;
             }
@@ -109,11 +111,11 @@ public class EndpointTestCase extends AbstractMuleTestCase
 
         // Creates the endpoint using the transformers which will validate the
         // configuration
-        new AbstractEndpoint(mockConnector, uri, inputTransformers, outputTransformers, name, properties,
+        new AbstractEndpoint(mockConnector, uri, name, properties,
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
-            messageProcessors, responseMessageProcessors)
+            messageProcessors, responseMessageProcessors, disableTransportTransformer)
         {
             @Override
             protected MessageProcessor createMessageProcessorChain() throws MuleException

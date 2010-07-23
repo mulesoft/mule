@@ -21,7 +21,11 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <http:inbound-endpoint ref="clientEndpoint" responseTransformer-refs="setResponseType"/>
+                <http:inbound-endpoint ref="clientEndpoint">
+                	<response>
+                		<transformer ref="setResponseType"/>
+                	</response>
+                </http:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

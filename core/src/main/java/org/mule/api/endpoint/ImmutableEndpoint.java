@@ -89,6 +89,7 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
      * If an endpoint has no transformers an empty list is returned.
      *
      * @return the transformers to use when receiving or sending data
+     * @deprecated use getMessageProcessors() instead
      */
     List<Transformer> getTransformers();
 
@@ -97,6 +98,7 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
      * If an endpoint has no response transformers an empty list is returned.
      *
      * @return the transformer to use when receiving the response data
+     * @deprecated use getResponseMessageProcessors() instead
      */
     List<Transformer> getResponseTransformers();
 
@@ -209,4 +211,6 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
     String getEndpointBuilderName();
 
     boolean isProtocolSupported(String protocol);
+    
+    boolean isDisableTransportTransformer();
 }

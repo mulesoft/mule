@@ -665,9 +665,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     @Override
-    public ReplyToHandler getReplyToHandler()
+    public ReplyToHandler getReplyToHandler(InboundEndpoint endpoint)
     {
-        return new JmsReplyToHandler(this, getDefaultResponseTransformers());
+        return new JmsReplyToHandler(this, getDefaultResponseTransformers(endpoint));
     }
 
     /**

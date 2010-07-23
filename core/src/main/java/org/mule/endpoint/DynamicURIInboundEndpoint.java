@@ -197,6 +197,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return getConnector().supportsProtocol(protocol);
     }
 
+    public boolean isDisableTransportTransformer()
+    {
+        return endpoint.isDisableTransportTransformer();
+    }
+    
     @Override
     public int hashCode()
     {

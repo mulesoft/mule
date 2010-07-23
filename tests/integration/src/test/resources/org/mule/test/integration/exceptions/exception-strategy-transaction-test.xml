@@ -18,7 +18,6 @@
         numberOfConcurrentTransactedReceivers="1" createMultipleTransactedReceivers="true"
         eagerConsumer="false"/>
     
-    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
     <object-to-string-transformer name="ObjectToString"/>
     
     <jms:endpoint name="InputQueueClient" queue="InputQueue" exchange-pattern="request-response"/>
@@ -56,8 +55,9 @@
             </outbound>
             <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase$AssertRollbackServiceExceptionStrategy">
                 <rollback-transaction exception-pattern="*"/>
-                <jms:outbound-endpoint ref="ExceptionQueue"
-                    transformer-refs="ObjectToString ObjectToJMSMessage"/>
+                <jms:outbound-endpoint ref="ExceptionQueue">
+                	<transformer ref="ObjectToString" />
+                </jms:outbound-endpoint>
             </custom-exception-strategy>
         </service>
         

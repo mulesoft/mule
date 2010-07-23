@@ -65,17 +65,6 @@ org.mule.test.integration.messaging.meps.SynchronousResponseExceptionTestCase
 # MULE-4638
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 
-##########################################################################
-# The following tests will fail if run off-line
-##########################################################################
-#org.mule.config.spring.RootSchemaValidationTestCase
-
-##########################################################################
-# The following tests will fail if 0.0.0.0 is not configured properly
-##########################################################################
-#org.mule.test.integration.management.ManagementSimpleStartupTestCase
-#org.mule.test.integration.management.ManagementStartupTestCase
-
 #No Jira, temporary exclusion because it passes locally but not on the build server
 org.mule.test.transformers.XQueryFunctionalTestCase
 
@@ -94,3 +83,19 @@ org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
 
 #TODO
 org.mule.context.notification.ServerNotificationManagerTestCase
+
+###########################
+# Broken by BL-137
+###########################
+
+# CXF - same cause as org.mule.transport.cxf.ProtocolTestCase
+org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
+
+# abstract-transformer and abstract-message-processor violate "Unique Particle Attribution"
+org.mule.config.spring.RootSchemaValidationTestCase
+
+# These tests have a property propagation / MEPs issue
+org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
+org.mule.test.integration.messaging.meps.InOutAsyncTestCase
+org.mule.test.integration.messaging.meps.InOptionalOutOutOptionalInTestCase
+org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase

@@ -12,8 +12,10 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -66,12 +68,11 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         });
 
         Service service = MuleTestUtils.getTestService(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
-        InboundEndpoint ep = 
-            muleContext.getRegistry().lookupEndpointFactory()
-                .getInboundEndpoint(getTestEndpointURI());
+        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(getTestEndpointURI());
+        eb.setDisableTransportTransformer(true);
+        InboundEndpoint ep = eb.buildInboundEndpoint();
         service.getMessageSource().addSource(ep);
         muleContext.getRegistry().registerService(service);
-        //muleContext.applyLifecycle(service);
         if (!muleContext.isStarted())
         {
             muleContext.start();
@@ -79,7 +80,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
 
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
-    }
+    }    
 
     protected static Map newEmailToStringServiceOverrides()
     {

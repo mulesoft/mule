@@ -677,12 +677,7 @@ public class MuleClient implements Disposable
         InboundEndpoint endpoint = getInboundEndpoint(url);
         try
         {
-            MuleMessage message = endpoint.request(timeout);
-            if (message != null && endpoint.getTransformers() != null)
-            {
-                message.applyTransformers(endpoint.getTransformers());
-            }
-            return message;
+            return endpoint.request(timeout);
         }
         catch (Exception e)
         {
@@ -722,12 +717,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage request(String url, List transformers, long timeout) throws MuleException
     {
-        MuleMessage message = request(url, timeout);
-        if (message != null && transformers != null)
-        {
-            message.applyTransformers(transformers);
-        }
-        return message;
+        return request(url, timeout);
     }
 
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException

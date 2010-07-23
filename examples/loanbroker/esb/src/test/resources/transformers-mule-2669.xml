@@ -14,8 +14,6 @@
     </message-properties-transformer>
     <custom-transformer name="ObjectToJMSMessage"
                         class="org.mule.transport.jms.transformers.ObjectToJMSMessage"/>
-    <custom-transformer name="JMSMessageToObject"
-                        class="org.mule.transport.jms.transformers.JMSMessageToObject"/>
 
     <jms:activemq-connector name="default"/>
     
@@ -27,7 +25,7 @@
         <service name="test service">
             <inbound>
                 <jms:inbound-endpoint queue="in" exchange-pattern="request-response" connector-ref="noOutbound"
-                                  transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
+                                  transformer-refs="SetLendersAsRecipients ObjectToJMSMessage"/>
             </inbound>
             <component class="org.mule.example.loanbroker.issues.SimpleEchoComponent"/>
         </service>

@@ -90,21 +90,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected format. The
-     * transformer used is the one configured on the endpoint through which this
-     * event was received.
-     * 
-     * @return the message transformed into it's recognised or expected format.
-     * @throws org.mule.api.transformer.TransformerException if a failure occurs in
-     *             the transformer
-     * @see org.mule.api.transformer.Transformer
-     */
-    public Object transformMessage() throws TransformerException
-    {
-        return event.transformMessage();
-    }
-
-    /**
      * Returns the message transformed into its recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.

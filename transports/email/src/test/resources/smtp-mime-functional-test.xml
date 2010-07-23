@@ -10,10 +10,6 @@
        http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.0/mule-smtp.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <smtp:connector name="smtpConnector">
-        <service-overrides outboundTransformer="org.mule.transformer.NoActionTransformer"/>
-    </smtp:connector>
-
     <model name="test">
         <service name="relay">
             <inbound>
@@ -21,7 +17,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="smtp://localhost:65438" exchange-pattern="one-way"/>
+                    <outbound-endpoint address="smtp://localhost:65438" exchange-pattern="one-way" disableTransportTransformer="true" />
                 </pass-through-router>
             </outbound>
         </service>

@@ -40,9 +40,12 @@
             <inbound>
                 <inbound-endpoint
                     address="http://localhost:8003/springService"
-                    transformer-refs="springInputXform"
-                    responseTransformer-refs="springOutputXform"
-                    exchange-pattern="request-response" />
+                    exchange-pattern="request-response">
+                    <transformer ref="springInputXform" />
+                    <response>
+                        <transformer ref="springOutputXform" />
+                    </response>
+                </inbound-endpoint>
             </inbound>
 
             <pooled-component>

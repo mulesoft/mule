@@ -10,7 +10,10 @@
 
 package org.mule.transformer;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -91,6 +94,15 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         super();
     }
 
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        if (event != null && event.getMessage() != null)
+        {
+            event.getMessage().applyTransformers(this);
+        }
+        return event;
+    }
+    
     protected Object checkReturnClass(Object object) throws TransformerException
     {
         if (returnType != null)

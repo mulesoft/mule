@@ -3,13 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd">
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <vm:connector name="vmConnector" />
 
@@ -19,24 +17,17 @@
         <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
     </jms:activemq-connector>
 
-    <script:script name="SetProperty" engine="groovy">
-         eventContext.session.setProperty("foo", "bar")
-         return eventContext.transformMessage()
-    </script:script>
-
-    <script:script name="GetProperty" engine="groovy">
-        if (!("bar" == eventContext.session.getProperty("foo")))
-            throw new IllegalStateException("Property 'foo' not propagated in session")
-         return eventContext.transformMessage()
-    </script:script>
+	<custom-transformer name="GetProperty" class="org.mule.test.integration.message.GetProperty" />
+	<custom-transformer name="SetProperty" class="org.mule.test.integration.message.SetProperty" />
 
     <model>
         <!-- Send old format, receive old format -->
         <service name="s1">
             <inbound>
-                <vm:inbound-endpoint path="in1" exchange-pattern="one-way" />
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
+                	<transformer ref="SetProperty" />
+                </vm:inbound-endpoint>
             </inbound>
-            <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
                     <jms:outbound-endpoint queue="q1" exchange-pattern="one-way" 
@@ -49,10 +40,11 @@
                 <jms:inbound-endpoint queue="q1" exchange-pattern="one-way" 
                     connector-ref="jmsLegacyConnector" />
             </inbound>
-            <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out1" exchange-pattern="one-way" />
+                    <vm:outbound-endpoint path="out1" exchange-pattern="one-way">
+                    	<transformer ref="GetProperty" />
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -60,9 +52,10 @@
         <!-- Send old format, receive new format -->
         <service name="s2">
             <inbound>
-                <vm:inbound-endpoint path="in2" exchange-pattern="one-way" />
+                <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
+                	<transformer ref="SetProperty" />
+                </vm:inbound-endpoint>
             </inbound>
-            <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
                     <jms:outbound-endpoint queue="q2" exchange-pattern="one-way" 
@@ -75,10 +68,11 @@
                 <jms:inbound-endpoint queue="q2" exchange-pattern="one-way" 
                     connector-ref="jmsConnector"  />
             </inbound>
-            <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out2" exchange-pattern="one-way" />
+                    <vm:outbound-endpoint path="out2" exchange-pattern="one-way">
+                    	<transformer ref="GetProperty" />
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -86,9 +80,10 @@
         <!-- Send new format, receive old format -->
         <service name="s3">
             <inbound>
-                <vm:inbound-endpoint path="in3" exchange-pattern="one-way" />
+                <vm:inbound-endpoint path="in3" exchange-pattern="one-way">
+                	<transformer ref="SetProperty" />
+                </vm:inbound-endpoint>
             </inbound>
-            <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
                     <jms:outbound-endpoint queue="q3" exchange-pattern="one-way" 
@@ -101,10 +96,11 @@
                 <jms:inbound-endpoint queue="q3" exchange-pattern="one-way" 
                     connector-ref="jmsLegacyConnector" />
             </inbound>
-            <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out3" exchange-pattern="one-way" />
+                    <vm:outbound-endpoint path="out3" exchange-pattern="one-way">
+                    	<transformer ref="GetProperty" />
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -112,9 +108,10 @@
         <!-- Send new format, receive new format -->
         <service name="s4">
             <inbound>
-                <vm:inbound-endpoint path="in4" exchange-pattern="one-way" />
+                <vm:inbound-endpoint path="in4" exchange-pattern="one-way">
+                	<transformer ref="SetProperty" />
+                </vm:inbound-endpoint>
             </inbound>
-            <script:component script-ref="SetProperty" />
             <outbound>
                 <pass-through-router>
                     <jms:outbound-endpoint queue="q4" exchange-pattern="one-way" 
@@ -127,10 +124,11 @@
                 <jms:inbound-endpoint queue="q4" exchange-pattern="one-way" 
                     connector-ref="jmsConnector" />
             </inbound>
-            <script:component script-ref="GetProperty" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way" />
+                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
+                    	<transformer ref="GetProperty" />
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

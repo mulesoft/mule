@@ -98,7 +98,7 @@ public class CxfMessageDispatcherTestCase extends AbstractMuleTestCase
         ClientWrapper clientWrapper = mock(ClientWrapper.class);
         MuleMessage muleMessage = mock(MuleMessage.class);
 
-        when(muleEvent.transformMessage()).thenReturn(payload);
+        when(muleEvent.getMessage().getPayload()).thenReturn(payload);
         when(muleEvent.getMessage()).thenReturn(muleMessage);
 
         cxfMessageDispatcher.wrapper = clientWrapper;

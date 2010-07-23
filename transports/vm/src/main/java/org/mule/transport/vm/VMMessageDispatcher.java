@@ -42,8 +42,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(final MuleEvent event) throws Exception
     {
         EndpointURI endpointUri = endpoint.getEndpointURI();
-        // Apply any outbound transformers on this event before we dispatch
-        event.transformMessage();
 
         if (endpointUri == null)
         {
@@ -78,8 +76,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
                                                                                       event.getEndpoint().getEndpointURI()));
         }
-
-        event.transformMessage();
 
         MuleMessage message = event.getMessage();
         connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);

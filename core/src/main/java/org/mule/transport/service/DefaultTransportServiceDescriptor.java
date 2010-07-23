@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
@@ -41,8 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 /** @inheritDocs */
 public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
@@ -60,10 +59,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String defaultOutboundTransformer;
     private String defaultResponseTransformer;
     private String endpointBuilder;
-
-    private final AtomicReference inboundTransformer = new AtomicReference();
-    private final AtomicReference outboundTransformer = new AtomicReference();
-    private final AtomicReference responseTransformer = new AtomicReference();
 
     private Properties exceptionMappings = new Properties();
     private MuleContext muleContext;
@@ -124,21 +119,18 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if (temp != null)
         {
             defaultInboundTransformer = temp;
-            inboundTransformer.set(null);
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
         if (temp != null)
         {
             defaultOutboundTransformer = temp;
-            outboundTransformer.set(null);
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
         if (temp != null)
         {
             defaultResponseTransformer = temp;
-            responseTransformer.set(null);
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
@@ -370,29 +362,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createInboundTransformers() throws TransportFactoryException
+    public List<Transformer> createInboundTransformers(InboundEndpoint endpoint) throws TransportFactoryException
     {
-        if (inboundTransformer.get() != null)
-        {
-            return CollectionUtils.singletonList(inboundTransformer.get());
-        }
         if (defaultInboundTransformer != null)
         {
             logger.info("Loading default inbound transformer: " + defaultInboundTransformer);
             try
             {
-                synchronized (inboundTransformer)
-                {
-                    if (inboundTransformer.get() == null)
-                    {
-                        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                            defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                        newTransformer.setName(newTransformer.getName() + "#" + hashCode());
-                        muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
-                        inboundTransformer.compareAndSet(null, newTransformer);
-                    }
-                }
-                return CollectionUtils.singletonList(inboundTransformer.get());
+                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
+                    defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
+                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setEndpoint(endpoint);
+                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
+                return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
             {
@@ -404,29 +386,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createOutboundTransformers() throws TransportFactoryException
+    public List<Transformer> createOutboundTransformers(OutboundEndpoint endpoint) throws TransportFactoryException
     {
-        if (outboundTransformer.get() != null)
-        {
-            return CollectionUtils.singletonList(outboundTransformer.get());
-        }
         if (defaultOutboundTransformer != null)
         {
             logger.info("Loading default outbound transformer: " + defaultOutboundTransformer);
             try
             {
-                synchronized (outboundTransformer)
-                {
-                    if (outboundTransformer.get() == null)
-                    {
-                        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                            defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                        newTransformer.setName(newTransformer.getName() + "#" + hashCode());
-                        muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
-                        outboundTransformer.compareAndSet(null, newTransformer);
-                    }
-                }
-                return CollectionUtils.singletonList(outboundTransformer.get());
+                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
+                    defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
+                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setEndpoint(endpoint);
+                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
+                return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
             {
@@ -438,29 +410,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createResponseTransformers() throws TransportFactoryException
+    public List<Transformer> createResponseTransformers(InboundEndpoint endpoint) throws TransportFactoryException
     {
-        if (responseTransformer.get() != null)
-        {
-            return CollectionUtils.singletonList(responseTransformer.get());
-        }
         if (defaultResponseTransformer != null)
         {
             logger.info("Loading default response transformer: " + defaultResponseTransformer);
             try
             {
-                synchronized (responseTransformer)
-                {
-                    if (responseTransformer.get() == null)
-                    {
-                        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                            defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
-                        newTransformer.setName(newTransformer.getName() + "#" + hashCode());
-                        muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
-                        responseTransformer.compareAndSet(null, newTransformer);
-                    }
-                }
-                return CollectionUtils.singletonList(responseTransformer.get());
+                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
+                    defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
+                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setEndpoint(endpoint);
+                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
+                return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
             {

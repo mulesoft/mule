@@ -28,7 +28,6 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
@@ -44,8 +43,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 
     public DefaultInboundEndpoint(Connector connector,
                                   EndpointURI endpointUri,
-                                  List<Transformer> transformers,
-                                  List<Transformer> responseTransformers,
                                   String name,
                                   Map properties,
                                   TransactionConfig transactionConfig,
@@ -61,13 +58,14 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   RetryPolicyTemplate retryPolicyTemplate,
                                   EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                   List <MessageProcessor> messageProcessors,
-                                  List <MessageProcessor> responseMessageProcessors)
+                                  List <MessageProcessor> responseMessageProcessors,
+                                  boolean disableTransportTransformer)
     {
-        super(connector, endpointUri, transformers, responseTransformers, name, properties, 
+        super(connector, endpointUri, name, properties, 
             transactionConfig, filter, deleteUnacceptedMessage, securityFilter, 
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate,  messageProcessorsFactory, 
-            messageProcessors, responseMessageProcessors);
+            messageProcessors, responseMessageProcessors, disableTransportTransformer);
     }
 
     public MuleMessage request(long timeout) throws Exception

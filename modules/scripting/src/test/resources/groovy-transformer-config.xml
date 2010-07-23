@@ -70,7 +70,9 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out3" exchange-pattern="one-way" transformer-refs="stringReplace"/>
+                    <outbound-endpoint address="vm://out3" exchange-pattern="one-way">
+                        <transformer ref="stringReplace"/>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
@@ -82,7 +84,9 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="vm://out4" exchange-pattern="one-way" transformer-refs="stringReplaceWithParams"/>
+                    <outbound-endpoint address="vm://out4" exchange-pattern="one-way">
+                        <transformer ref="stringReplaceWithParams"/>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

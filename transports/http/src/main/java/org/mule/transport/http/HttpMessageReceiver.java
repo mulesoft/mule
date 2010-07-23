@@ -465,7 +465,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
-        message.applyTransformers(connector.getDefaultResponseTransformers(), HttpResponse.class);
+        message.applyTransformers(connector.getDefaultResponseTransformers((InboundEndpoint) endpoint), HttpResponse.class);
         return (HttpResponse) message.getPayload();
     }
 

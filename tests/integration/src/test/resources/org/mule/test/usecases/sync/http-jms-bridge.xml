@@ -20,21 +20,17 @@
         <service name="bridge">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="4444" path="in" exchange-pattern="request-response">
-                    <transformers>
-                        <transformer ref="toString"/>
-                    </transformers>
+                    <transformer ref="toString"/>
                 </http:inbound-endpoint>
             </inbound>
             <test:component logMessageDetails="true"/>
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out" exchange-pattern="one-way">
-                        <transformers>
-                            <message-properties-transformer>
-                                <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
-                                <add-message-property key="X-Custom-Header" value="#[header:INBOUND:X-Custom-Header]"/>
-                            </message-properties-transformer>
-                        </transformers>
+                        <message-properties-transformer>
+                            <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
+                            <add-message-property key="X-Custom-Header" value="#[header:INBOUND:X-Custom-Header]"/>
+                        </message-properties-transformer>
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>

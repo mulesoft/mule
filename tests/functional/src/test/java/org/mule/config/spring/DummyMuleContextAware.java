@@ -11,6 +11,8 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -114,6 +116,11 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
     }
 
     public List<DataType<?>> getSourceDataTypes()
+    {
+        return null;
+    }
+
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         return null;
     }

@@ -52,12 +52,16 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setConnector(Connector connector);
 
+    /** @deprecated Use addMessageProcessor() */
     void addTransformer(Transformer transformer);
 
+    /** @deprecated Use addResponseMessageProcessor() */
     void addResponseTransformer(Transformer transformer);
 
+    /** @deprecated Use setMessageProcessors() */
     void setTransformers(List<Transformer> transformers);
 
+    /** @deprecated Use setResponseMessageProcessors() */
     void setResponseTransformers(List<Transformer> responseTransformer);
 
     void setName(String name);
@@ -96,6 +100,8 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
 
+    void setDisableTransportTransformer(boolean disableTransportTransformer);
+    
     void setURIBuilder(URIBuilder URIBuilder);
 
     Object clone() throws CloneNotSupportedException;

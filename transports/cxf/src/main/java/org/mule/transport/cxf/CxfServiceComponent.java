@@ -223,7 +223,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             
             if (!"GET".equals(method)) 
             {
-                Object payload = ctx.transformMessage();
+                Object payload = ctx.getMessage().getPayload();
 
                 setPayload(ctx, m, payload);
             }
@@ -397,7 +397,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     protected InputStream getMessageStream(MuleEventContext context) throws MuleException
     {
         InputStream is;
-        Object eventMsgPayload = context.transformMessage();
+        Object eventMsgPayload = context.getMessage().getPayload();
 
         if (eventMsgPayload instanceof InputStream)
         {

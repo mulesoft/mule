@@ -18,7 +18,9 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -162,9 +164,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
-            preTransformMessage(event.getMessage());
-
-            Object message = event.transformMessage();
+            Object message = event.getMessage().getPayload();
             if (!(message instanceof Message))
             {
                 throw new DispatchException(
@@ -540,6 +540,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // ignored
             }
         }
+    }
+    
+    @Override
+    protected void applyOutboundTransformers(MuleEvent event) throws TransformerException
+    {
+        try
+        {
+            preTransformMessage(event.getMessage());
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), e);
+        }
+        super.applyOutboundTransformers(event);
     }
 
 }

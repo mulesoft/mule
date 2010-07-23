@@ -11,7 +11,6 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:jmsmessage-to-object-transformer name="jmsmessagetoobject"/>
     <byte-array-to-string-transformer name="inboundtransformer"/>
     <string-to-byte-array-transformer name="responsetransformer"/>
     
@@ -32,7 +31,7 @@
         <service name="JMSReplyProvider">
             <inbound>
                 <inbound-endpoint address="jms://queue_in" exchange-pattern="request-response"
-                    transformer-refs="jmsmessagetoobject inboundtransformer" />
+                    transformer-refs="inboundtransformer" />
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>

@@ -290,12 +290,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
-    public Object transformMessage() throws TransformerException
-    {
-        message.applyTransformers(endpoint.getTransformers());
-        return message.getPayload();
-    }
-
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return (T)transformMessage(DataTypeFactory.create(outputType));
@@ -307,7 +301,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         {
             throw new TransformerException(CoreMessages.objectIsNull("outputType"));
         }
-        message.applyTransformers(endpoint.getTransformers());
         return message.getPayload(outputType);
     }
 

@@ -239,20 +239,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint.getTransformers());
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
-        // check the global endpoint
-        try
-        {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("appleInEndpoint");
-        }
-        catch (MuleException e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        assertNotNull(endpoint);
-        assertEquals(1, endpoint.getTransformers().size());
-        assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
-
         assertEquals(2, service.getMessageSource().getEndpoints().size());
         assertNotNull(service.getMessageSource().getCatchAllStrategy());
         assertTrue(service.getMessageSource().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
@@ -265,20 +251,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
         assertNotNull(endpoint.getTransformers());
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
-
-        // check the global endpoint
-        try
-        {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("orangeEndpoint");
-        }
-        catch (MuleException e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        assertNotNull(endpoint);
-        assertFalse(endpoint.getTransformers().isEmpty());
-        assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
     }
 
     public void testInboundRouterConfig()

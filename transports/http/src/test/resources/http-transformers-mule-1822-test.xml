@@ -58,7 +58,11 @@
 
         <service name="responseService1">
             <inbound>
-                <inbound-endpoint ref="response" responseTransformer-refs="appendResponse"/>
+                <inbound-endpoint ref="response">
+                	<response>
+                		<transformer ref="appendResponse"/>
+                	</response>
+                </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
@@ -69,8 +73,11 @@
 
         <service name="responseService2">
             <inbound>
-                <vm:inbound-endpoint path="echo2" exchange-pattern="request-response" responseTransformer-refs="appendResponse2">
+                <vm:inbound-endpoint path="echo2" exchange-pattern="request-response">
                     <object-to-string-transformer />
+                    <response>
+                    	<transformer ref="appendResponse2" />
+                    </response>
                 </vm:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>
@@ -84,9 +91,12 @@
 
         <service name="bothService1">
             <inbound>
-                <http:inbound-endpoint ref="both" responseTransformer-refs="appendResponse">
+                <http:inbound-endpoint ref="both">
                    <object-to-string-transformer/>
                    <transformer ref="appendString" />
+                   <response>
+                   		<transformer ref="appendResponse" />
+                   </response>
                 </http:inbound-endpoint>
             </inbound>
             <outbound>
@@ -98,10 +108,12 @@
 
         <service name="bothService2">
             <inbound>
-                <vm:inbound-endpoint address="vm://echo3" exchange-pattern="request-response"
-                                  responseTransformer-refs="appendResponse2">
+                <vm:inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
                   <object-to-string-transformer />
                   <transformer ref="appendString2" />
+                  <response>
+                  	<transformer ref="appendResponse2" />
+                  </response>
                 </vm:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>

@@ -14,9 +14,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;
+
+import java.util.List;
 
 /**
  * The Message Requester is used to explicitly request messages from a message channel or
@@ -26,6 +31,8 @@ import org.mule.context.notification.EndpointMessageNotification;
  */
 public abstract class AbstractMessageRequester extends AbstractConnectable implements MessageRequester
 {
+    private List<Transformer> defaultInboundTransformers;
+
     public AbstractMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
@@ -35,6 +42,26 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
     protected ConnectableLifecycleManager createLifecycleManager()
     {
         return new ConnectableLifecycleManager<MessageRequester>(getRequesterName(), this);
+    }
+
+    /**
+     * Method used to perform any initialisation work. If a fatal error occurs during
+     * initialisation an <code>InitialisationException</code> should be thrown,
+     * causing the Mule instance to shutdown. If the error is recoverable, say by
+     * retrying to connect, a <code>RecoverableException</code> should be thrown.
+     * There is no guarantee that by throwing a Recoverable exception that the Mule
+     * instance will not shut down.
+     * 
+     * @throws org.mule.api.lifecycle.InitialisationException if a fatal error occurs
+     *             causing the Mule instance to shutdown
+     * @throws org.mule.api.lifecycle.RecoverableException if an error occurs that
+     *             can be recovered from
+     */
+    @Override
+    public final void initialise() throws InitialisationException
+    {
+        defaultInboundTransformers = connector.getDefaultInboundTransformers((InboundEndpoint) endpoint);               
+        super.initialise();
     }
 
     protected String getRequesterName()
@@ -61,6 +88,10 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
             connect();
             MuleMessage result = null;
             result = doRequest(timeout);
+            if (result != null && !endpoint.isDisableTransportTransformer())
+            {
+            	applyInboundTransformers(result);
+            }
 
             if (result != null && connector.isEnableMessageEvents())
             {
@@ -79,6 +110,11 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
             disposeAndLogException();
             throw new ReceiveException(endpoint, timeout, e);
         }
+    }
+
+    protected void applyInboundTransformers(MuleMessage message) throws TransformerException
+    {
+        message.applyTransformers(defaultInboundTransformers);
     }
 
     @Override

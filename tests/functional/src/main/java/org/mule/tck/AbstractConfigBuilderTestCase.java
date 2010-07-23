@@ -148,9 +148,11 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // check first Router
         OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
-        assertNotNull(((FilteringOutboundRouter) route1).getTransformers());
-        assertTrue(TransformerUtils.firstOrNull(((FilteringOutboundRouter) route1).getTransformers())
-                instanceof TestCompressionTransformer);
+        assertEquals(1, route1.getRoutes().size());
+        ImmutableEndpoint ep = (ImmutableEndpoint) route1.getRoutes().get(0);
+        
+        assertNotNull(ep.getTransformers());
+        assertTrue(TransformerUtils.firstOrNull(ep.getTransformers()) instanceof TestCompressionTransformer);
 
         Filter filter = ((FilteringOutboundRouter) route1).getFilter();
         assertNotNull(filter);

@@ -19,8 +19,12 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
+
+import java.util.List;
 
 /**
  * Abstract implementation of an outbound channel adaptors. Outbound channel adaptors
@@ -30,6 +34,8 @@ import org.mule.api.transport.MessageDispatcher;
 public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
 {
 
+    protected List<Transformer> defaultOutboundTransformers;;       
+    
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -38,6 +44,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     @Override
     protected ConnectableLifecycleManager createLifecycleManager()
     {
+        defaultOutboundTransformers = connector.getDefaultOutboundTransformers((OutboundEndpoint) endpoint);       
         return new ConnectableLifecycleManager<MessageDispatcher>(getDispatcherName(), this);
     }
 
@@ -55,6 +62,13 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             connect();
 
+            String prop = (String) event.getMessage().getProperty(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
+            boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop)) || endpoint.isDisableTransportTransformer();
+                        
+            if (!disableTransportTransformer)
+            {
+                applyOutboundTransformers(event);            
+            }
             if (endpoint.getExchangePattern().hasResponse())
             {
                 MuleMessage resultMessage = doSend(event);
@@ -162,6 +176,11 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     public OutboundEndpoint getEndpoint()
     {
         return (OutboundEndpoint) super.getEndpoint();
+    }
+    
+    protected void applyOutboundTransformers(MuleEvent event) throws TransformerException
+    {
+        event.getMessage().applyTransformers(defaultOutboundTransformers);
     }
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;

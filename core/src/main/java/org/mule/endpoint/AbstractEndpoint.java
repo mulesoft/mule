@@ -27,7 +27,7 @@ import org.mule.util.ClassUtils;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -61,16 +61,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * The endpointUri on which to send or receive information
      */
     private final EndpointURI endpointUri;
-
-    /**
-     * The transformers used to transform the incoming or outgoing data
-     */
-    private final List<Transformer> transformers;
-
-    /**
-     * The transformers used to transform the incoming or outgoing data
-     */
-    private final List<Transformer> responseTransformers;
 
     private final EndpointMessageProcessorChainFactory messageProcessorsFactory;
 
@@ -136,10 +126,10 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     private String endpointBuilderName;
 
+    private boolean disableTransportTransformer = false;
+    
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
-                            List<Transformer> transformers,
-                            List<Transformer> responseTransformers,
                             String name,
                             Map properties,
                             TransactionConfig transactionConfig,
@@ -155,7 +145,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             RetryPolicyTemplate retryPolicyTemplate,
                             EndpointMessageProcessorChainFactory messageProcessorsFactory,
                             List <MessageProcessor> messageProcessors,
-                            List <MessageProcessor> responseMessageProcessors)
+                            List <MessageProcessor> responseMessageProcessors,
+                            boolean disableTransportTransformer)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -178,6 +169,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
+        this.disableTransportTransformer = disableTransportTransformer;
 
         if (transactionConfig != null && transactionConfig.getFactory() != null &&
             transactionConfig.getAction() != TransactionConfig.ACTION_NONE &&
@@ -211,25 +203,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         {
             this.responseMessageProcessors = Collections.unmodifiableList(responseMessageProcessors);
         }
-
-        if (transformers == null)
-        {
-            this.transformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
-        }
-        else
-        {
-            updateTransformerEndpoints(transformers);
-            this.transformers = Collections.unmodifiableList(transformers);
-        }
-        if (responseTransformers == null)
-        {
-            this.responseTransformers = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
-        }
-        else
-        {
-            updateTransformerEndpoints(responseTransformers);
-            this.responseTransformers = Collections.unmodifiableList(responseTransformers);
-        }   
     }
 
     public EndpointURI getEndpointURI()
@@ -267,8 +240,17 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return responseMessageProcessors;
     }
 
+    /** @deprecated use getMessageProcessors() */
     public List<Transformer> getTransformers()
     {
+        List transformers = new LinkedList();
+        for (MessageProcessor processor : messageProcessors)
+        {
+            if (processor instanceof Transformer)
+            {
+                transformers.add(processor);
+            }
+        }
         return transformers;
     }
 
@@ -320,12 +302,13 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
         }
 
-        return getClass().getSimpleName() + "{endpointUri=" + sanitizedEndPointUri + ", name='" + name +
-                "', mep=" + messageExchangePattern  + ", properties=" + properties +
-                ", transactionConfig=" + (transactionConfig.getFactory()==null ? "none" : transactionConfig) +
-                ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages +
-                ", securityFilter=" + securityFilter + ", initialState=" + initialState + ", responseTimeout=" + responseTimeout + 
-                ", endpointEncoding=" + endpointEncoding + ", connector=" + connector + ", transformer=" + transformers + "}";
+        return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
+                + connector + ",  name='" + name + "', mep=" + messageExchangePattern + ", properties=" + properties
+                + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
+                + deleteUnacceptedMessages + ", securityFilter=" + securityFilter 
+                + ", initialState=" + initialState + ", responseTimeout="
+                + responseTimeout + ", endpointEncoding=" + endpointEncoding + ", disableTransportTransformer="
+                + disableTransportTransformer + "}";
     }
 
     public String getProtocol()
@@ -369,10 +352,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && equal(name, other.name) 
                 && equal(properties, other.properties)
                 && responseTimeout == other.responseTimeout
-                && equal(responseTransformers, other.responseTransformers)
-                && equal(securityFilter, other.securityFilter)
-                && equal(transactionConfig, other.transactionConfig) 
-                && equal(transformers, other.transformers);
+                && equal(messageProcessors, other.messageProcessors)
+                && equal(responseMessageProcessors, other.responseMessageProcessors)
+                && equal(securityFilter, other.securityFilter) 
+                && equal(transactionConfig, other.transactionConfig)
+                && disableTransportTransformer == other.disableTransportTransformer;
     }
 
     @Override
@@ -390,10 +374,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 name,
                 properties, 
                 Integer.valueOf(responseTimeout),
-                responseTransformers, 
+                responseMessageProcessors, 
                 securityFilter, 
                 transactionConfig,
-                transformers});
+                messageProcessors,
+                disableTransportTransformer ? Boolean.TRUE : Boolean.FALSE});
     }
 
     public Filter getFilter()
@@ -404,16 +389,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public boolean isDeleteUnacceptedMessages()
     {
         return deleteUnacceptedMessages;
-    }
-
-    // TODO - remove (or fix)
-    protected void updateTransformerEndpoints(List transformers)
-    {
-        Iterator transformer = transformers.iterator();
-        while (transformer.hasNext())
-        {
-            ((Transformer) transformer.next()).setEndpoint(this);
-        }
     }
 
     /**
@@ -455,9 +430,18 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return initialState;
     }
 
+    /** @deprecated use getResponseMessageProcessors() */
     public List<Transformer> getResponseTransformers()
     {
-        return responseTransformers;
+        List transformers = new LinkedList();
+        for (MessageProcessor processor : responseMessageProcessors)
+        {
+            if (processor instanceof Transformer)
+            {
+                transformers.add(processor);
+            }
+        }
+        return transformers;
     }
 
     public Object getProperty(Object key)
@@ -483,6 +467,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public boolean isProtocolSupported(String protocol)
     {
         return connector.supportsProtocol(protocol);
+    }
+    
+    public boolean isDisableTransportTransformer() 
+    {
+        return disableTransportTransformer;
     }
     
     public MessageProcessor getMessageProcessorChain() throws MuleException
