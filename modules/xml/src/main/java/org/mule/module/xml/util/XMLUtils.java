@@ -25,7 +25,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -39,6 +43,10 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +54,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
@@ -69,6 +79,8 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     /**
      * Converts a DOM to an XML string.
+     * @param dom the dome object to convert
+     * @return A string representation of the document
      */
     public static String toXml(Document dom)
     {
@@ -441,7 +453,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         // We need this check because namespace writing works
         // different on Woodstox and the RI.
         if (writeElementNS) {
-            if (prefix == null || prefix.length() == 0) {
+            if (prefix.length() == 0) {
                 writer.writeDefaultNamespace(uri);
             } else {
                 writer.writeNamespace(prefix, uri);
@@ -462,6 +474,106 @@ public class XMLUtils extends org.mule.util.XMLUtils
                     .getAttributeLocalName(i), reader.getAttributeValue(i));
             }
 
+        }
+    }
+
+    /**
+     * Creates an XPath object with a custom NamespaceContext given the Node to operate on
+     * @param node the Node or document to operate on.  Note that namespace handling will not work if a Node fragment is passed in
+     * @return a new XPath object
+     */
+    private static XPath createXPath(Node node)
+    {
+        XPath xp = XPathFactory.newInstance().newXPath();
+        if (node instanceof Document)
+        {
+            xp.setNamespaceContext(new XPathNamespaceContext((Document) node));
+        }
+        return xp;
+    }
+
+    /**
+     * Select a single XML node using an Xpath
+     * @param xpath the XPath expression to evaluate
+     * @param node the node (or document) to exaluate on
+     * @return the result of the evaluation.
+     * @throws XPathExpressionException if the XPath expression is malformed and cannot be parsed
+     */
+    public static Node selectOne(String xpath, Node node) throws XPathExpressionException
+    {
+            XPath xp = createXPath(node);
+            return (Node) xp.evaluate(xpath, node, XPathConstants.NODE);
+    }
+
+    /**
+     * Select a single XML String value using an Xpath
+     * @param xpath the XPath expression to evaluate
+     * @param node the node (or document) to evaluate on
+     * @return the result of the evaluation.
+     * @throws XPathExpressionException if the XPath expression is malformed and cannot be parsed
+     */
+    public static String selectValue(String xpath, Node node) throws XPathExpressionException
+    {
+            XPath xp = createXPath(node);
+            return (String) xp.evaluate(xpath, node, XPathConstants.STRING);
+    }
+
+    /**
+     * Select a set of Node objects using the Xpath expression
+     * @param xpath the XPath expression to evaluate
+     * @param node the node (or document) to evaluate on
+     * @return the result of the evaluation. 
+     * @throws XPathExpressionException if the XPath expression is malformed and cannot be parsed
+     */
+    public static List<Node> select(String xpath, Node node) throws XPathExpressionException
+    {
+            XPath xp = createXPath(node);
+            NodeList nl = (NodeList) xp.evaluate(xpath, node, XPathConstants.NODESET);
+            List<Node> nodeList = new ArrayList<Node>(nl.getLength());
+            for (int i = 0; i < nl.getLength(); i++)
+            {
+                nodeList.add(nl.item(i));
+            }
+            return nodeList;
+    }
+
+
+
+    /**
+     * The default namespace context that will read namespaces from the current document if the
+     * Node being processed is a Document
+     */
+    private static class XPathNamespaceContext implements NamespaceContext
+    {
+        private Document document;
+
+        public XPathNamespaceContext(Document document)
+        {
+            this.document = document;
+        }
+
+        public String getNamespaceURI(String prefix)
+        {
+            if (prefix == null || prefix.equals(""))
+            {
+                return document.getDocumentElement().getNamespaceURI();
+            }
+            else
+            {
+                return document.lookupNamespaceURI(prefix);
+            }
+        }
+
+        public String getPrefix(String namespaceURI)
+        {
+            return document.lookupPrefix(namespaceURI);
+        }
+
+        public Iterator<String> getPrefixes(String namespaceURI)
+        {
+            List<String> list = new ArrayList<String>();
+            list.add(getPrefix(namespaceURI));
+            return list.iterator();
         }
     }
 }
