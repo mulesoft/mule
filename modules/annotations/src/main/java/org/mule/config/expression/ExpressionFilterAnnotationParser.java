@@ -9,19 +9,15 @@
  */
 package org.mule.config.expression;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.routing.ExpressionFilter;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.MessageFilter;
-import org.mule.routing.filters.logic.AndFilter;
-import org.mule.routing.filters.logic.OrFilter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.StringTokenizer;
 
 /**
  * Responsible for converting a {@link org.mule.api.annotations.routing.ExpressionFilter} annotation to a
@@ -32,38 +28,7 @@ public class ExpressionFilterAnnotationParser implements RouterAnnotationParser
     public MessageProcessor parseRouter(Annotation annotation) throws MuleException
     {
         MessageFilter router = new MessageFilter();
-        StringTokenizer st = new StringTokenizer(((ExpressionFilter)annotation).value(), "AND,OR", true);
         Filter f = new ExpressionFilterParser().parseFilterString(((ExpressionFilter)annotation).value());
-        while ( st.hasMoreTokens())
-        {
-            String s = st.nextToken();
-            if(s.equals("AND"))
-            {
-                f = new AndFilter(f);
-            }
-            else if(s.equals("OR"))
-            {
-                f = new OrFilter(f);
-            }
-            else if(f instanceof AndFilter)
-            {
-                ((AndFilter)f).getFilters().add(new org.mule.routing.filters.ExpressionFilter(s));
-            }
-            else if(f instanceof OrFilter)
-            {
-                ((OrFilter)f).getFilters().add(new org.mule.routing.filters.ExpressionFilter(s));
-            }
-            else if(f==null)
-            {
-                f = new org.mule.routing.filters.ExpressionFilter(s);
-            }
-            else
-            {
-                throw new DefaultMuleException("Expression Filter is malformed. IF this is a nested filter make sure each expression is separated by either 'AND' or 'OR'");
-            }
-
-        }
-
         router.setFilter(f);
         return null;//   router;
     }
