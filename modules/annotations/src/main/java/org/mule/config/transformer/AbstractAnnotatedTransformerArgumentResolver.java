@@ -54,28 +54,28 @@ public abstract class AbstractAnnotatedTransformerArgumentResolver implements Tr
         Class annotatedType = (result instanceof CollectionDataType ? ((CollectionDataType)result).getItemType() : result.getType());
 
         //Check the cache first
-        boolean isJson = matchingClasses.contains(annotatedType);
-        if(!isJson)
+        boolean isAnnotated = matchingClasses.contains(annotatedType);
+        if(!isAnnotated)
         {
             //then scan the class for annotations
-            isJson = findAnnotation(annotatedType);
+            isAnnotated = findAnnotation(annotatedType);
         }
 
-        if (!isJson)
+        if (!isAnnotated)
         {
             annotatedType = source.getType();
             //Check the cache first
-            isJson = matchingClasses.contains(annotatedType);
-            if(!isJson)
+            isAnnotated = matchingClasses.contains(annotatedType);
+            if(!isAnnotated)
             {
                 //then scan the class for annotations
-                isJson = AnnotationUtils.hasAnnotationWithPackage(getAnnotationsPackageName(), annotatedType);
+                isAnnotated = AnnotationUtils.hasAnnotationWithPackage(getAnnotationsPackageName(), annotatedType);
             }
         }
 
         Object argument = context.getRegistry().lookupObject(getArgumentClass());
 
-        if (!isJson)
+        if (!isAnnotated)
         {
             //We didn't find Json annotations anywhere, lets cache the classes so we don't need to scan again
             nonMatchingClasses.add(source.getType());
