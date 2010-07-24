@@ -121,6 +121,29 @@
             <version>${saxonVersion}</version>
         </dependency>
 
+        <!-- JAXB support (JDK 5 only) -->
+        <dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.xml.stream</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.1.5</version>
+			<scope>runtime</scope>
+		</dependency>
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
