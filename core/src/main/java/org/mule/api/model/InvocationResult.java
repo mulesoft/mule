@@ -13,66 +13,80 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.lang.reflect.Method;
 
-/** TODO */
+/**
+ * Tracks the state of an invocation on a component using an {@link EntryPointResolver}
+ */
 public class InvocationResult
 {
-    /** the resover performing the invocation knows that it cannot attempt to make the invocation */
-    public static final int STATE_INVOKE_NOT_SUPPORTED = 0;
+    public static enum State {
+        /** the resolver performing the invocation knows that it cannot attempt to make the invocation */
+        NOT_SUPPORTED,
+        /** the invocation was successful */
+        SUCCESSFUL,
+        /** The invocation was attempted but failed */
+        FAILED
+    }
+    @Deprecated
+    public static final State STATE_INVOKE_NOT_SUPPORTED = State.NOT_SUPPORTED;
 
-    /** the invocation was successful */
-    public static final int STATE_INVOKED_SUCESSFUL = 1;
+    @Deprecated
+    public static final State STATE_INVOKED_SUCESSFUL = State.SUCCESSFUL;
 
-    /** The invocation was attempted but failed */
-    public static final int STATE_INVOKED_FAILED = 2;
+    @Deprecated
+    public static final State STATE_INVOKED_FAILED = State.FAILED;
 
     private String errorMessage;
 
     /** the name of the method called for this invocation */
     private String methodCalled;
 
+    /** the result of calling the invocation method */
     private Object result;
 
-    private int state;
+    /** the state of this invocation */
+    private State state;
 
+    /** The entry-point resolver that created this InvocationResult */
     private EntryPointResolver resolver;
 
     /**
      * Will construct an InvocationResult with a given state. The state must be either
-     * {@link #STATE_INVOKE_NOT_SUPPORTED} if the resover performing the invocation knows that it cannot
+     * {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
      * attempt to make the invocation
-     * {@link #STATE_INVOKED_FAILED} If an invocation attempt is made but fails
-     * {@link #STATE_INVOKED_SUCESSFUL} If the invocation was successful
+     * {@link org.mule.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
+     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
      *
+     * Typically, this constructor is used when the state is {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.api.model.InvocationResult.State#FAILED}
+     *
+     * @param resolver the resolver being used to make the invocation
      * @param state the state of the result
      */
-    public InvocationResult(EntryPointResolver resolver, int state)
+    public InvocationResult(EntryPointResolver resolver, State state)
     {
-        if (state < 0 || state > 2)
-        {
-            throw new IllegalArgumentException("state");
-        }
         this.state = state;
         this.resolver = resolver;
     }
 
     /**
-     * Creates a result with the result payload set. The state of this result will be {@link #STATE_INVOKED_SUCESSFUL}
+     * Creates a result with the result payload set. The state of this result will be {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
      * since only in this state will a result be set.
      *
+     * @param resolver the resolver being used to make the invocation
      * @param result the result of a successful invocation
+     * @param method the method invoke by this invocation
      */
     public InvocationResult(EntryPointResolver resolver, Object result, Method method)
     {
 
         this.result = result;
-        this.state = STATE_INVOKED_SUCESSFUL;
+        this.state = State.SUCCESSFUL;
         this.methodCalled = method.getName();
         this.resolver = resolver;
     }
 
     /**
      * Returns the name of the method invoked, this property is only set if the state of the invocation is
-     * {@link #STATE_INVOKED_SUCESSFUL}
+     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
      *
      * @return the name of the method invoked
      */
@@ -84,8 +98,8 @@ public class InvocationResult
     /**
      * The result of this invocation
      *
-     * @return an object or null if the result did not yeild a result or because the state of this invocation result
-     *         is either {@link #STATE_INVOKE_NOT_SUPPORTED} or {@link #STATE_INVOKED_FAILED}.
+     * @return an object or null if the result did not yield a result or because the state of this invocation result
+     *         is either {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} or {@link org.mule.api.model.InvocationResult.State#FAILED}.
      */
     public Object getResult()
     {
@@ -93,25 +107,25 @@ public class InvocationResult
     }
 
     /**
-     * Returns the state of this invocation. Possible values are:
-     * {@link #STATE_INVOKE_NOT_SUPPORTED} if the resover performing the invocation knows that it cannot
+     * @return the state of this invocation. Possible values are:
+     * {@link org.mule.api.model.InvocationResult.State#NOT_SUPPORTED} if the resolver performing the invocation knows that it cannot
      * attempt to make the invocation
-     * {@link #STATE_INVOKED_FAILED} If an invocation attempt is made but fails
-     * {@link #STATE_INVOKED_SUCESSFUL} If the invocation was successful
+     * {@link org.mule.api.model.InvocationResult.State#FAILED} If an invocation attempt is made but fails
+     * {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL} If the invocation was successful
      */
-    public int getState()
+    public State getState()
     {
         return state;
     }
 
     /**
-     * An optional error message can be set if the invocation state is not {@link #STATE_INVOKED_SUCESSFUL}
+     * An optional error message can be set if the invocation state is not {@link org.mule.api.model.InvocationResult.State#SUCCESSFUL}
      *
-     * @param message
+     * @param message the error message
      */
     public void setErrorMessage(String message)
     {
-        if (state == STATE_INVOKED_SUCESSFUL)
+        if (state == State.SUCCESSFUL)
         {
             throw new IllegalStateException(CoreMessages.invocationSuccessfulCantSetError().toString());
         }
@@ -135,7 +149,7 @@ public class InvocationResult
      */
     public String getErrorMessage()
     {
-        return resolver.getClass().getSimpleName() + ": " + errorMessage;
+        return (errorMessage==null ? null : resolver.getClass().getSimpleName() + ": " + errorMessage);
     }
 
     public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes, String methods)
@@ -143,12 +157,6 @@ public class InvocationResult
         setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
                 component.getClass().getName(), argTypes, methods).toString());
     }
-
-//    public void setErrorTooManyMatchingMethods(Object component, Class<?>[] argTypes)
-//    {
-//        setErrorMessage(CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes(
-//                component.getClass().getName(), argTypes).toString());
-//    }
 
     public void setErrorNoMatchingMethods(Object component, Class<?>[] args)
     {
