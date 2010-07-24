@@ -542,7 +542,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if (inboundExchangePatterns == null)
         {
             throw new TransportServiceException(CoreMessages.objectNotSetInService(
-                "Inbound exchange patterns", getService()));
+                MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, getService()));
         }
         return inboundExchangePatterns;
     }
@@ -552,7 +552,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if (outboundExchangePatterns == null)
         {
             throw new TransportServiceException(CoreMessages.objectNotSetInService(
-                "Outbound exchange patterns", getService()));
+                MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, getService()));
         }
         return outboundExchangePatterns;
     }
@@ -562,7 +562,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if (defaultExchangePattern == null)
         {
             throw new TransportServiceException(CoreMessages.objectNotSetInService(
-                "Default exchange pattern", getService()));
+                MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, getService()));
         }
         
         return MessageExchangePattern.fromString(defaultExchangePattern);
