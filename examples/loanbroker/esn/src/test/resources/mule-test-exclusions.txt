@@ -1,4 +1,7 @@
 #
 # Test cases listed in this file are not run.
 #
+# Intermittent failures. See: MULE-4972
+org.mule.example.loanbroker.esn.VMLoanBrokerSynchronousFunctionalTestCase
+org.mule.example.loanbroker.esn.VMLoanBrokerAsynchronousFunctionalTestCase
 
