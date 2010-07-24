@@ -52,10 +52,10 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     {
         Transformer trans = this.getTransformer();
         Object result = trans.transform(getTestData());
-        assertNotNull(result);
+        assertNotNull("The result of the transform shouldn't be null", result);
 
         Object expectedResult = this.getResultData();
-        assertNotNull(expectedResult);
+        assertNotNull("The expected result data must not be null", expectedResult);
 
         assertTrue("Transformation result does not match expected result", this.compareResults(
             expectedResult, result));
@@ -64,12 +64,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     public void testRoundtripTransform() throws Exception
     {
         Transformer roundTripTransformer = this.getRoundTripTransformer();
+        //If null this is just a one way test
         if (roundTripTransformer != null)
         {
             Object result = roundTripTransformer.transform(this.getResultData());
-            assertNotNull(result);
+            assertNotNull("The result of the roundtrip transform shouldn't be null", result);
 
-            assertTrue(this.compareRoundtripResults(this.getTestData(), result));
+            assertTrue("The result of the roundtrip transform does not match the expected result", this.compareRoundtripResults(this.getTestData(), result));
         }
     }
 
@@ -93,7 +94,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             Transformer trans = this.getTransformer();
             Transformer trans2 = this.getRoundTripTransformer();
             MuleMessage message = new DefaultMuleMessage(getTestData(), muleContext);
-            message.applyTransformers(Arrays.asList( new Transformer[]{trans, trans2}));
+            message.applyTransformers(Arrays.asList(trans, trans2));
             Object result = message.getPayload();
             this.compareRoundtripResults(this.getTestData(), result);
         }
