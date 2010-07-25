@@ -9,53 +9,26 @@
  */
 package org.mule.api.annotations.param;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
-import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.IOUtils;
-import org.mule.util.StringDataSource;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
+public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
-    private InboundAttachmentsAnnotationComponent component;
-    private MuleEventContext eventContext;
-
     @Override
-    public void doSetUp() throws Exception
+    protected Object getComponent()
     {
-        super.doSetUp();
-
-        eventContext = getTestEventContext("test");
-
-        try
-        {
-            eventContext.getMessage().addAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
-            eventContext.getMessage().addAttachment("bar", new DataHandler(new StringDataSource("barValue")));
-            eventContext.getMessage().addAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        component = new InboundAttachmentsAnnotationComponent();
+        return new InboundAttachmentsAnnotationComponent();
     }
 
     public void testSingleAttachment() throws Exception
     {
-        InvocationResult response = doTest("processAttachment", eventContext);
+        InvocationResult response = invokeResolver("processAttachment", eventContext);
         assertTrue(response.getResult() instanceof DataHandler);
         assertEquals("fooValue", readAttachment((DataHandler) response.getResult()));
     }
@@ -66,14 +39,14 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
         //These should really be in core, but the @Transformer annotation is not in core
         muleContext.getRegistry().registerObject("dataHandlerTransformers", new DataHandlerTransformer());
 
-        InvocationResult response = doTest("processAttachmentWithType", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentWithType", eventContext);
         assertTrue(response.getResult() instanceof String);
         assertEquals("fooValue", response.getResult());
     }
 
     public void testSingleAttachmentOptional() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentOptional", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentOptional", eventContext);
         assertTrue(response.getResult() instanceof String);
         assertEquals("faz not set", response.getResult());
     }
@@ -81,14 +54,14 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
     public void testSingleAttachmentWithTypeNoMatchingTransform() throws Exception
     {
         //TODO this test still works because DataHandler.toString() gets called by the ObjectToString transformer
-        InvocationResult response = doTest("processAttachmentWithType", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentWithType", eventContext);
         assertTrue(response.getResult() instanceof String);
         //assertEquals("fooValue", response.getResult());
     }
 
     public void testMapAttachments() throws Exception
     {
-        InvocationResult response = doTest("processAttachments", eventContext);
+        InvocationResult response = invokeResolver("processAttachments", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         assertEquals(2, result.size());
@@ -102,7 +75,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeAttachment("foo");
         try
         {
-            doTest("processAttachments", eventContext);
+            invokeResolver("processAttachments", eventContext);
             fail("Required attachment value is missing");
         }
         catch (RequiredValueException e)
@@ -113,7 +86,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapSingleAttachment() throws Exception
     {
-        InvocationResult response = doTest("processSingleMapAttachment", eventContext);
+        InvocationResult response = invokeResolver("processSingleMapAttachment", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         assertEquals(1, result.size());
@@ -126,7 +99,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
     {
         eventContext.getMessage().removeAttachment("baz");
 
-        InvocationResult response = doTest("processAttachmentsOptional", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         assertEquals(2, result.size());
@@ -141,7 +114,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeAttachment("bar");
         eventContext.getMessage().removeAttachment("baz");
 
-        InvocationResult response = doTest("processAttachmentsAllOptional", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsAllOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         assertEquals(0, result.size());
@@ -151,7 +124,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
     {
         try
         {
-            doTest("processUnmodifiableAttachments", eventContext);
+            invokeResolver("processUnmodifiableAttachments", eventContext);
             fail("Required attachment value is missing");
         }
         catch (InvocationTargetException e)
@@ -163,7 +136,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapAttachmentsAll() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsAll", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsAll", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         //Will include all Mule attachments too
@@ -175,7 +148,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapAttachmentsWildcard() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsWildcard", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         //Will match on ba*
@@ -187,7 +160,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapAttachmentsMultiWildcard() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsMultiWildcard", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsMultiWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<String, DataHandler> result = (Map<String, DataHandler>) response.getResult();
         //Will match on ba*, f*
@@ -200,7 +173,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListAttachments() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsList", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsList", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         assertEquals(3, result.size());
@@ -209,7 +182,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
     public void testListAttachmentsWithOptional() throws Exception
     {
         eventContext.getMessage().removeAttachment("baz");
-        InvocationResult response = doTest("processAttachmentsListOptional", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsListOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         assertEquals(2, result.size());
@@ -221,7 +194,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeAttachment("bar");
         eventContext.getMessage().removeAttachment("baz");
 
-        InvocationResult response = doTest("processAttachmentsListAllOptional", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsListAllOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         assertEquals(0, result.size());
@@ -232,7 +205,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeAttachment("bar");
         try
         {
-            doTest("processAttachmentsList", eventContext);
+            invokeResolver("processAttachmentsList", eventContext);
             fail("Required attachment value is missing");
         }
         catch (RequiredValueException e)
@@ -243,7 +216,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testSingleListAttachment() throws Exception
     {
-        InvocationResult response = doTest("processSingleAttachmentList", eventContext);
+        InvocationResult response = invokeResolver("processSingleAttachmentList", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         assertEquals(1, result.size());
@@ -253,7 +226,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
     {
         try
         {
-            doTest("processUnmodifiableAttachmentsList", eventContext);
+            invokeResolver("processUnmodifiableAttachmentsList", eventContext);
             fail("Required attachment value is missing");
         }
         catch (InvocationTargetException e)
@@ -265,7 +238,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListAttachmentsAll() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsListAll", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsListAll", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         assertEquals(3, result.size());
@@ -273,7 +246,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListAttachmentsWilcard() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsListWildcard", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsListWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         //Will match all attachments with ba*
@@ -283,35 +256,10 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListAttachmentsMultiWilcard() throws Exception
     {
-        InvocationResult response = doTest("processAttachmentsListMultiWildcard", eventContext);
+        InvocationResult response = invokeResolver("processAttachmentsListMultiWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
         //Will match all attachments with ba* and f*
         assertEquals(3, result.size());
-    }
-
-    private String readAttachment(DataHandler handler) throws IOException
-    {
-        return IOUtils.toString((InputStream) handler.getContent());
-    }
-
-    protected InvocationResult doTest(String methodName, MuleEventContext eventContext) throws Exception
-    {
-        EntryPointResolver resolver = getResolver();
-        eventContext.getMessage().setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, methodName);
-        InvocationResult result = resolver.invoke(component, eventContext);
-        if (InvocationResult.State.SUCCESSFUL == result.getState())
-        {
-            assertNotNull("The result of invoking the component should not be null", result.getResult());
-            assertNull(result.getErrorMessage());
-            assertFalse(result.hasError());
-            assertEquals(methodName, result.getMethodCalled());
-        }
-        return result;
-    }
-
-    protected EntryPointResolver getResolver() throws Exception
-    {
-        return createObject(AnnotatedEntryPointResolver.class);
     }
 }

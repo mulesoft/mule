@@ -9,14 +9,10 @@
  */
 package org.mule.api.annotations.param;
 
-import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transport.PropertyScope;
-import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -25,33 +21,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
-public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
+public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
-    private InboundHeadersAnnotationComponent component;
-    private MuleEventContext eventContext;
-
     @Override
-    public void doSetUp() throws Exception
+    protected Object getComponent()
     {
-        super.doSetUp();
-
-        component = new InboundHeadersAnnotationComponent();
-        eventContext = getTestEventContext("test");
-        eventContext.getMessage().setInboundProperty("foo", "fooValue");
-        eventContext.getMessage().setInboundProperty("bar", "barValue");
-        eventContext.getMessage().setInboundProperty("baz", "bazValue");
+        return new InboundHeadersAnnotationComponent();
     }
-
 
     public void testSingleHeader() throws Exception
     {
-        InvocationResult response = doTest("processHeader", eventContext);
+        InvocationResult response = invokeResolver("processHeader", eventContext);
         assertEquals("fooValue", response.getResult());
     }
 
     public void testSingleHeaderOptional() throws Exception
     {
-        InvocationResult response = doTest("processHeaderOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeaderOptional", eventContext);
         assertEquals("faz not set", response.getResult());
     }
 
@@ -59,7 +45,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         Apple apple = new Apple();
         eventContext.getMessage().setInboundProperty("apple", apple);
-        InvocationResult response = doTest("processHeaderWithType", eventContext);
+        InvocationResult response = invokeResolver("processHeaderWithType", eventContext);
         assertEquals(apple, response.getResult());
     }
 
@@ -67,13 +53,13 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         Apple apple = new Apple();
         eventContext.getMessage().setInboundProperty("apple", apple);
-        InvocationResult response = doTest("processHeaderWithBaseType", eventContext);
+        InvocationResult response = invokeResolver("processHeaderWithBaseType", eventContext);
         assertEquals(apple, response.getResult());
     }
 
     public void testMapHeaders() throws Exception
     {
-        InvocationResult response = doTest("processHeaders", eventContext);
+        InvocationResult response = invokeResolver("processHeaders", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         assertEquals(2, result.size());
@@ -87,7 +73,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeProperty("foo", PropertyScope.INBOUND);
         try
         {
-            doTest("processHeaders", eventContext);
+            invokeResolver("processHeaders", eventContext);
             fail("Foo header is missing but required");
         }
         catch (RequiredValueException e)
@@ -98,7 +84,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapSingleHeader() throws Exception
     {
-        InvocationResult response = doTest("processSingleMapHeader", eventContext);
+        InvocationResult response = invokeResolver("processSingleMapHeader", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         assertEquals(1, result.size());
@@ -111,7 +97,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         eventContext.getMessage().removeProperty("baz", PropertyScope.INBOUND);
 
-        InvocationResult response = doTest("processHeadersOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeadersOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         assertEquals(2, result.size());
@@ -124,7 +110,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         eventContext.getMessage().clearProperties(PropertyScope.INBOUND);
 
-        InvocationResult response = doTest("processHeadersAllOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeadersAllOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //We just want ot make sure we don't return null collections
@@ -135,7 +121,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         try
         {
-            doTest("processUnmodifiableHeaders", eventContext);
+            invokeResolver("processUnmodifiableHeaders", eventContext);
             fail("Foo header is missing but required");
         }
         catch (InvocationTargetException e)
@@ -147,7 +133,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
 
     public void testMapHeadersAll() throws Exception
     {
-        InvocationResult response = doTest("processHeadersOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeadersOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //Will include all Mule headers too
@@ -160,7 +146,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     public void testMapHeadersWildcard() throws Exception
     {
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersWildcard", eventContext);
+        InvocationResult response = invokeResolver("processHeadersWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //Will match all Mule headers
@@ -171,7 +157,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     public void testMapHeadersMultiWildcard() throws Exception
     {
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersMultiWildcard", eventContext);
+        InvocationResult response = invokeResolver("processHeadersMultiWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //Will match all Mule headers
@@ -193,7 +179,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().setInboundProperty("orange", new Orange());
 
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersWithGenerics", eventContext);
+        InvocationResult response = invokeResolver("processHeadersWithGenerics", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //Will match all Mule headers
@@ -206,7 +192,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListHeaders() throws Exception
     {
-        InvocationResult response = doTest("processHeadersList", eventContext);
+        InvocationResult response = invokeResolver("processHeadersList", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         assertEquals(3, result.size());
@@ -218,7 +204,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     public void testListHeadersWithOptional() throws Exception
     {
         eventContext.getMessage().removeProperty("baz", PropertyScope.INBOUND);
-        InvocationResult response = doTest("processHeadersListOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         assertEquals(2, result.size());
@@ -231,7 +217,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().removeProperty("bar", PropertyScope.INBOUND);
         try
         {
-            doTest("processHeadersList", eventContext);
+            invokeResolver("processHeadersList", eventContext);
             fail("Bar header is missing but required");
         }
         catch (RequiredValueException e)
@@ -242,7 +228,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
 
     public void testSingleListHeader() throws Exception
     {
-        InvocationResult response = doTest("processSingleHeaderList", eventContext);
+        InvocationResult response = invokeResolver("processSingleHeaderList", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         assertEquals(1, result.size());
@@ -253,7 +239,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
        try
         {
-            doTest("processUnmodifiableHeadersList", eventContext);
+            invokeResolver("processUnmodifiableHeadersList", eventContext);
             fail("Foo header is missing but required");
         }
         catch (InvocationTargetException e)
@@ -265,7 +251,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
 
     public void testListHeadersAll() throws Exception
     {
-        InvocationResult response = doTest("processHeadersListAll", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListAll", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         //Will include all Mule headers too
@@ -279,7 +265,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     {
         eventContext.getMessage().clearProperties(PropertyScope.INBOUND);
 
-        InvocationResult response = doTest("processHeadersListAllOptional", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListAllOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         //We just want ot make sure we don't return null collections
@@ -289,7 +275,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     public void testListHeadersWilcard() throws Exception
     {
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersListWildcard", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         //Will match all Mule headers
@@ -301,7 +287,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
     public void testListHeadersMultiWilcard() throws Exception
     {
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersListMultiWildcard", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListMultiWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         //Will match on MULE_* and ba*
@@ -329,7 +315,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
         eventContext.getMessage().setInboundProperty("orange", orange);
 
         eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
-        InvocationResult response = doTest("processHeadersListWithGenerics", eventContext);
+        InvocationResult response = invokeResolver("processHeadersListWithGenerics", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
         //Will match all Mule headers
@@ -339,25 +325,4 @@ public class InboundHeadersAnnotationTestCase extends AbstractMuleTestCase
         assertTrue(result.contains(orange));
         assertFalse(result.contains(banana));
     }
-
-    protected InvocationResult doTest(String methodName, MuleEventContext eventContext) throws Exception
-    {
-        EntryPointResolver resolver = getResolver();
-        eventContext.getMessage().setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, methodName);
-        InvocationResult result = resolver.invoke(component, eventContext);
-        if (InvocationResult.State.SUCCESSFUL == result.getState())
-        {
-            assertNotNull("The result of invoking the component should not be null", result.getResult());
-            assertNull(result.getErrorMessage());
-            assertFalse(result.hasError());
-            assertEquals(methodName, result.getMethodCalled());
-        }
-        return result;
-    }
-
-    protected EntryPointResolver getResolver() throws Exception
-    {
-        return createObject(AnnotatedEntryPointResolver.class);
-    }
-
 }
