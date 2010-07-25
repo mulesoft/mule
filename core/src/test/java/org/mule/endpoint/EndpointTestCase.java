@@ -75,6 +75,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final EndpointMessageProcessorChainFactory messageProcessorsFactory = mock(EndpointMessageProcessorChainFactory.class);
         final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
         final List<MessageProcessor> responseMessageProcessors = new ArrayList<MessageProcessor>();
+        final String mimeType = "text/plain";
         final boolean disableTransportTransformer = true;
 
         // Creates a mock Transformer that will check that the endpoint is completely
@@ -100,6 +101,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(endpointBuilderName, endpoint.getEndpointBuilderName());
                 assertEquals(muleContext, endpoint.getMuleContext());
                 assertEquals(retryPolicyTemplate, endpoint.getRetryPolicyTemplate());
+                assertEquals(mimeType, endpoint.getMimeType());
                 assertEquals(disableTransportTransformer, endpoint.isDisableTransportTransformer());
 
                 return null;
@@ -115,7 +117,8 @@ public class EndpointTestCase extends AbstractMuleTestCase
             mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
-            messageProcessors, responseMessageProcessors, disableTransportTransformer)
+            messageProcessors, responseMessageProcessors, disableTransportTransformer,
+            mimeType)
         {
             @Override
             protected MessageProcessor createMessageProcessorChain() throws MuleException

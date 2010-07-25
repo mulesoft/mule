@@ -44,7 +44,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
             new String[]{MuleProperties.EXCHANGE_PATTERN, 
                     AbstractEndpointBuilder.PROPERTY_RESPONSE_TIMEOUT, "encoding",
-                    "connector", "createConnector", "transformer", "responseTransformer", "disableTransportTransformer"};
+                    "connector", "createConnector", "transformer", "responseTransformer", "disableTransportTransformer", "mimeType"};
 
     // this is an example of parsing a single element with several parsers.  in this case
     // (because we extend AbstractSingleParentFamilyDefinitionParser) the first parser is expected to

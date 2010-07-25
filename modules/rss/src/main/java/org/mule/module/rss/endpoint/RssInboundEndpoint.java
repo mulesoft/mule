@@ -43,7 +43,7 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint
                 ie.getProperties(), ie.getTransactionConfig(), ie.getFilter(), ie.isDeleteUnacceptedMessages(),
                 ie.getSecurityFilter(), ie.getExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
                 ie.getEncoding(), ie.getEndpointBuilderName(), ie.getMuleContext(), ie.getRetryPolicyTemplate(), 
-                ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors(), ie.isDisableTransportTransformer());
+                ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors(), ie.isDisableTransportTransformer(), ie.getMimeType());
         this.splitFeed = splitFeed;
         this.lastUpdate = lastUpdate;
         this.acceptedMimeTypes = acceptedContentTypes;

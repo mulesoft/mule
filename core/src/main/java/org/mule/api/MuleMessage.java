@@ -513,6 +513,11 @@ public interface MuleMessage extends Serializable
 
     MuleContext getMuleContext();
 
+    /**
+     * Returns the data type (if any) associated with the message's payload.
+     */
+    DataType<?> getDataType();
+
     <T> T getSessionProperty(String name, T defaultValue);
 
     <T> T getSessionProperty(String name);

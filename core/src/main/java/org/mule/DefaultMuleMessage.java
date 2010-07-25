@@ -25,6 +25,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -66,6 +67,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private static final long serialVersionUID = 1541720810851984844L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
     private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
+    private final String CONTENT_TYPE_PROPERTY = "Content-Type";
 
     /** 
      * The default UUID for the message. If the underlying transport has the notion of a 
@@ -77,7 +79,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private transient Object originalPayload;
 
     /** 
-     * If an excpetion occurs while processing this message an exception payload 
+     * If an exception occurs while processing this message an exception payload
      * will be attached here 
      */
     private ExceptionPayload exceptionPayload;
@@ -101,6 +103,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     // so we allow mutation again (and we can't serialize threads anyway)
     private transient AtomicReference ownerThread = null;
     private transient AtomicBoolean mutable = null;
+
+    private DataType<?> dataType;
 
     static
     {
@@ -190,7 +194,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 for (String name : muleMessage.getPropertyNames(scope))
                 {
                     Object value = muleMessage.getProperty(name, scope);
-                    setProperty(name, value, scope);
+                    if (value != null)
+                        setProperty(name, value, scope);
                 }
             }
             catch (IllegalArgumentException iae)
@@ -937,8 +942,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public String getEncoding()
     {
         assertAccess(READ);
-        
-        String encoding =  getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY);
+        String encoding = null;
+        if (dataType != null)
+        {
+            encoding = dataType.getEncoding();
+        }
+        if (encoding != null)
+        {
+            return encoding;
+        }
+        encoding = getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY);
         if (encoding != null)
         {
             return encoding;
@@ -955,9 +968,25 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
-        setOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
+        if (encoding != null)
+        {
+            setOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, encoding);
+        }
     }
 
+    public void setMimeType(String mimeType)
+    {
+        assertAccess(WRITE);
+        if (mimeType != null && !mimeType.equals(MimeTypes.ANY))
+        {
+            String encoding = getEncoding();
+            if (encoding != null)
+            {
+                mimeType = mimeType + ";charset=" + encoding;
+            }
+            setOutboundProperty(CONTENT_TYPE_PROPERTY, mimeType);
+        }
+    }
     /**
      * {@inheritDoc}
      */
@@ -1084,6 +1113,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     if (transformer.isAcceptNull())
                     {
                         setPayload(NullPayload.getInstance());
+                        setDataType(null);
                     }
                     else
                     {
@@ -1123,6 +1153,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     {
                         setPayload(result);
                     }
+                    setDataType(transformer.getReturnDataType());
                 }
                 else
                 {
@@ -1141,6 +1172,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 }
             }
         }
+    }
+
+    protected void setDataType(DataType<?> dt)
+    {
+        dataType = dt;
+        setEncoding(dt == null ? null : dt.getEncoding());
+        setMimeType(dt == null ? null : dt.getMimeType());
     }
 
     //////////////////////////////// ThreadSafeAccess Impl ///////////////////////////////
@@ -1333,4 +1371,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this.muleContext = muleContext;
     }
 
+    public DataType<?> getDataType()
+    {
+        return dataType;
+    }
 }

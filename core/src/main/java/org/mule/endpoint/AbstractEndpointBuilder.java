@@ -57,6 +57,9 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of
  * endpoints out of the endpoint instance itself. <br/>
@@ -90,6 +93,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected List<MessageProcessor> messageProcessors = new LinkedList<MessageProcessor>();
     protected List<MessageProcessor> responseMessageProcessors = new LinkedList<MessageProcessor>();
     protected Boolean disableTransportTransformer;
+    protected String mimeType;
 
     // not included in equality/hash
     protected String registryId = null;
@@ -184,7 +188,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
                 getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors, 
-                isDisableTransportTransformer());
+                isDisableTransportTransformer(), mimeType);
 
         for (MessageProcessor mp : messageProcessors)
         {
@@ -229,7 +233,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors, 
-                responseMessageProcessors, isDisableTransportTransformer());
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType);
 
         for (MessageProcessor mp : messageProcessors)
         {
@@ -492,6 +496,32 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                             + endpointURI.toString()
                             + "' has response transformer(s) configured, response transformers configured as uri paramaters will be ignored.");
             }
+        }
+    }
+
+    protected String getMimeType()
+    {
+        return mimeType;
+    }
+    
+    public void setMimeType(String mimeType)
+    {
+        if (mimeType == null)
+        {
+            this.mimeType = null;
+        }
+        else
+        {
+            MimeType mt = null;
+            try
+            {
+                mt = new MimeType(mimeType);
+            }
+            catch (MimeTypeParseException e)
+            {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+            this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
         }
     }
 
@@ -761,13 +791,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.uriBuilder = URIBuilder;
     }
 
+
     @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
             deleteUnacceptedMessages, encoding, uriBuilder, filter, initialState, name, properties, 
             responseTimeout, responseMessageProcessors, securityFilter, synchronous, 
-            messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer});
+            messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
 
     @Override
@@ -795,7 +826,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 && equal(messageExchangePattern, other.messageExchangePattern)
                 && equal(transactionConfig, other.transactionConfig)
                 && equal(responseMessageProcessors, other.responseMessageProcessors) 
-                && equal(disableTransportTransformer, other.disableTransportTransformer);
+                && equal(disableTransportTransformer, other.disableTransportTransformer)
+                && equal(mimeType, other.mimeType);
     }
 
     protected static boolean equal(Object a, Object b)

@@ -635,13 +635,6 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
     <xsd:complexType name="xmlPrettyPrinterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="encoding" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The encoding format to use, such as UTF-8.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="expandEmptyElements" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>

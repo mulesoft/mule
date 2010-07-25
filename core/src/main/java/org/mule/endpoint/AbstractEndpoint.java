@@ -126,6 +126,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     private String endpointBuilderName;
 
+    private final String endpointMimeType;
+
     private boolean disableTransportTransformer = false;
     
     public AbstractEndpoint(Connector connector,
@@ -146,7 +148,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             EndpointMessageProcessorChainFactory messageProcessorsFactory,
                             List <MessageProcessor> messageProcessors,
                             List <MessageProcessor> responseMessageProcessors,
-                            boolean disableTransportTransformer)
+                            boolean disableTransportTransformer,
+                            String endpointMimeType)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -169,6 +172,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.endpointBuilderName = endpointBuilderName;
         this.muleContext = muleContext;
         this.retryPolicyTemplate = retryPolicyTemplate;
+        this.endpointMimeType = endpointMimeType;
         this.disableTransportTransformer = disableTransportTransformer;
 
         if (transactionConfig != null && transactionConfig.getFactory() != null &&
@@ -213,6 +217,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     public String getEncoding()
     {
         return endpointEncoding;
+    }
+
+    public String getMimeType()
+    {
+        return endpointMimeType;
     }
 
     public Connector getConnector()

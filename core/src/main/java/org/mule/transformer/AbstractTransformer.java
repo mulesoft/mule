@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -85,6 +87,12 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      * passed is is not supported or the return tye is incorrect
      */
     private boolean ignoreBadInput = false;
+
+    /*
+     *  Mime type and encoding for transformer output
+     */
+    protected String mimeType;
+    protected String encoding;
 
     /**
      * default constructor required for discovery
@@ -209,6 +217,8 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     public void setReturnDataType(DataType<?> type)
     {
         this.returnType = type;
+        this.encoding = type.getEncoding();
+        this.mimeType = type.getMimeType();
     }
 
     public DataType<?> getReturnDataType()
@@ -219,6 +229,44 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     public void setReturnClass(Class<?> newClass)
     {
         returnType = new SimpleDataType<Object>(newClass);
+        returnType.setMimeType(mimeType);
+        returnType.setEncoding(encoding);
+    }
+
+    public void setMimeType(String mimeType) throws MimeTypeParseException
+    {
+        if (mimeType == null)
+        {
+            this.mimeType = null;
+        }
+        else
+        {
+            MimeType mt = new MimeType(mimeType);
+            this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
+        }
+        if (returnType != null)
+        {
+            returnType.setMimeType(mimeType);
+        }
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
+    }
+
+    public String getEncoding()
+    {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
+        if (returnType != null)
+        {
+            returnType.setEncoding(encoding);
+        }
     }
 
     public boolean isSourceTypeSupported(Class<?> aClass)

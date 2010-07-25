@@ -1,0 +1,82 @@
+package org.mule.transport.vm.functional;
+
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.transport.PropertyScope;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transaction.TransactionCoordination;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/*
+* $Id
+* --------------------------------------------------------------------------------------
+* Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+*
+* The software in this package is published under the terms of the CPAL v1.0
+* license, a copy of which has been included with this distribution in the
+* LICENSE.txt file.
+*/
+public class EndpointContentTypeTestCase extends FunctionalTestCase
+{
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/config/content-type-setting-endpoint-configs.xml";
+    }
+
+    public void testContentTypes() throws Exception
+    {
+        MuleMessage response;
+        Map messageProperties = new HashMap();
+        messageProperties.put("content-type", "text/xml");
+        MuleClient client = new MuleClient(muleContext);
+        try
+        {
+            response = client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
+            fail("Invalid mime type was not rejected");
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Saw " + ex.getClass() + " as expected.");
+        }
+        messageProperties.put("content-type", "text/plain");
+        EchoComponent.setExpectedContentType("text/plain");
+        response = client.send("vm://in1?connector=vm-in1", "OK", messageProperties);
+        assertNotNull(response);
+        assertEquals("OK", response.getPayload());
+
+        messageProperties.remove("content-type");
+        EchoComponent.setExpectedContentType("text/plain");
+        response = client.send("vm://in1?connector=vm-in1", "OK", messageProperties);
+        assertNotNull(response);
+        assertEquals("OK", response.getPayload());
+
+        messageProperties.put("content-type", "text/plain");
+        EchoComponent.setExpectedContentType("text/xml");
+        response = client.send("vm://in2?connector=vm-in2", "OK", messageProperties);
+        assertNotNull(response);
+        assertEquals("OK", response.getPayload());
+    }
+
+    public static class EchoComponent implements Callable
+    {
+        static String expectedContentType;
+
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            MuleMessage message = eventContext.getMessage();
+            assertEquals(expectedContentType, message.getProperty("content-type", PropertyScope.INBOUND));
+            return message;
+        }
+
+        public static void setExpectedContentType(String expectedContentType)
+        {
+            EchoComponent.expectedContentType = expectedContentType;
+        }
+    }
+}

@@ -148,4 +148,14 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      */
     DataType<?> getReturnDataType();
 
+    /**
+     * Return the mime type returned by the transformer (if any).
+     */
+    String getMimeType();
+
+    /**
+     * Return the encoding returned by the transformer (if any).
+     */
+    String getEncoding();
+
 }

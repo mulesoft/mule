@@ -59,13 +59,15 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                   List <MessageProcessor> messageProcessors,
                                   List <MessageProcessor> responseMessageProcessors,
-                                  boolean disableTransportTransformer)
+                                  boolean disableTransportTransformer,
+                                  String mimeType)
     {
         super(connector, endpointUri, name, properties, 
             transactionConfig, filter, deleteUnacceptedMessage, securityFilter, 
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate,  messageProcessorsFactory, 
-            messageProcessors, responseMessageProcessors, disableTransportTransformer);
+            messageProcessors, responseMessageProcessors, disableTransportTransformer,
+            mimeType);
     }
 
     public MuleMessage request(long timeout) throws Exception

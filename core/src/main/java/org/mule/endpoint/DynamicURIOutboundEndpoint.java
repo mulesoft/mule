@@ -83,6 +83,11 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
         return endpoint.getEncoding();
     }
 
+    public String getMimeType()
+    {
+        return endpoint.getMimeType();
+    }
+
     public Filter getFilter()
     {
         return endpoint.getFilter();

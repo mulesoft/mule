@@ -305,6 +305,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the transformer's output
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            String encoding used for transformer outputpwd.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1910,6 +1924,7 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
+        <xsd:attributeGroup ref="mimeTypeAttributes"/>
         <xsd:attribute name="responseTimeout" type="substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
@@ -4901,6 +4916,16 @@
         <!--I don't like this flag, may be we could use content-type mappings... -->
         <xsd:attribute name="binary" type="substitutableBoolean"/>
     </xsd:complexType>
+
+    <xsd:attributeGroup name="mimeTypeAttributes">
+        <xsd:attribute name="mimeType" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The mime type, e.g. text/plain or application/json
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
     <!-- these cannot be references (unless we use qualified attribute names, which are ugly),
          but serve as templates to cut+paste in individual transports

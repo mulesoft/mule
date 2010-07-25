@@ -57,12 +57,13 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    EndpointMessageProcessorChainFactory messageProcessorsFactory,
                                    List <MessageProcessor> messageProcessors,
                                    List <MessageProcessor> responseMessageProcessors,
-                                   boolean disableTransportTransformer)
+                                   boolean disableTransportTransformer,
+                                   String endpointMimeType)
     {
         super(connector, endpointUri, name, properties, transactionConfig, filter,
                 deleteUnacceptedMessage, securityFilter, messageExchangePattern, responseTimeout, initialState,
                 endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
-                messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer);
+                messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 
         responseProperties = new ArrayList<String>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).

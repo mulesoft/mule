@@ -21,6 +21,7 @@ public class SimpleDataType<T> implements DataType<T>
 {
     protected Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
+    protected String encoding;
 
     public SimpleDataType(Class<?> type, String mimeType)
     {
@@ -46,6 +47,16 @@ public class SimpleDataType<T> implements DataType<T>
     public void setMimeType(String mimeType)
     {
         this.mimeType = (mimeType==null?ANY_MIME_TYPE:mimeType);
+    }
+
+    public String getEncoding()
+    {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
     }
 
     public boolean isCompatibleWith(DataType dataType)

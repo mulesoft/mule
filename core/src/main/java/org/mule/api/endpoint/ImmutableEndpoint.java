@@ -211,6 +211,11 @@ public interface ImmutableEndpoint extends Serializable, RoutingTarget
     String getEndpointBuilderName();
 
     boolean isProtocolSupported(String protocol);
+
+    /**
+     * Return the mime type defined for the endpoint, if any
+     */
+    String getMimeType();
     
     boolean isDisableTransportTransformer();
 }

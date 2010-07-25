@@ -1306,4 +1306,14 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 323, mep.name(), direction, endpointURI);
     }
+
+    public static Message illegalMIMEType(String badMIMIEType)
+    {
+        return  factory.createMessage(BUNDLE_PATH, 324, badMIMIEType);
+    }
+
+        public static Message unexpectedMIMEType(String badMIMIEType, String goodMIMEType)
+    {
+        return  factory.createMessage(BUNDLE_PATH, 325, badMIMIEType, goodMIMEType);
+    }
 }

@@ -54,6 +54,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         retryPolicyTemplate = global.retryPolicyTemplate;
         messageProcessors = global.messageProcessors;
         responseMessageProcessors = global.responseMessageProcessors;
+        mimeType = global.mimeType;
         disableTransportTransformer = global.disableTransportTransformer;
     }
 
@@ -93,5 +94,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors());
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
         setDisableTransportTransformer(source.isDisableTransportTransformer());
+        setMimeType(source.getMimeType());
     }
 }

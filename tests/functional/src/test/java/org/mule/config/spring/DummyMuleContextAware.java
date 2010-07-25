@@ -120,6 +120,16 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
         return null;
     }
 
+    public String getMimeType()
+    {
+        return null;
+    }
+
+    public String getEncoding()
+    {
+        return null;  
+    }
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return null;

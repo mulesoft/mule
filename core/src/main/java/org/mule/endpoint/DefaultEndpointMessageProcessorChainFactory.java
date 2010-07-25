@@ -17,11 +17,13 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.endpoint.inbound.InboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
+import org.mule.endpoint.outbound.OutboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
@@ -48,6 +50,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     {
         return Arrays.asList(new MessageProcessor[] 
         { 
+            new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint),
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
@@ -95,7 +98,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         list.add(new OutboundSecurityFilterMessageProcessor(endpoint));
         list.add(new OutboundTryCatchMessageProcessor(endpoint));
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
-
+        list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
         return list;
     }
     

@@ -9,6 +9,8 @@
  */
 package org.mule.api.transformer;
 
+import java.io.Serializable;
+
 /**
  * Defines a Java type associated with additional information about the data.  This may be a mime 
  * type for the type or for collections, the collection item type can be stored with the collection 
@@ -16,7 +18,7 @@ package org.mule.api.transformer;
  *
  * @since 3.0.0
  */
-public interface DataType<T>
+public interface DataType<T> extends Serializable
 {
     public static final String ANY_MIME_TYPE = "*/*";
 
@@ -34,6 +36,16 @@ public interface DataType<T>
      *         not needed
      */
     String getMimeType();
+
+    /**
+     * The encoding for the object to transform
+     */
+    String getEncoding();
+
+    /**
+     * The encoding for the object to transform
+     */
+    void setEncoding(String encoding);
 
     /**
      * The mime type of the the source object to transform.

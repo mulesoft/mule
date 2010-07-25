@@ -92,6 +92,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         return endpoint.getEncoding();
     }
 
+    public String getMimeType()
+    {
+        return endpoint.getMimeType();
+    }
+
     public Filter getFilter()
     {
         return endpoint.getFilter();

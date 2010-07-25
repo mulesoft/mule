@@ -12,8 +12,7 @@
 
     <http:connector name="httpConnector" reuseAddress="true"/>
 
-    <message-properties-transformer name="setResponseType">
-        <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+    <message-properties-transformer name="setResponseType" mimeType="text/baz" encoding="UTF-16BE">
     </message-properties-transformer>
 
     <http:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
