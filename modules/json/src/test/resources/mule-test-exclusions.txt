@@ -2,3 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
+#MULE-4973. No support for Mixin resolution yet
+org.mule.module.json.transformers.JsonAutoTransformerWithMixinsTestCase
