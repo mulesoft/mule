@@ -2,7 +2,9 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
@@ -25,4 +27,13 @@
     <mulexml:jxpath-extractor-transformer name="jxpath-extractor">
         <mulexml:namespace prefix="bar" uri="http://bar.com"/>
     </mulexml:jxpath-extractor-transformer>
+
+    <mulexml:jaxb-object-to-xml-transformer name="ObjectToXml" sourceClass="org.mule.jaxb.model.Person"/>
+
+    <mulexml:jaxb-xml-to-object-transformer name="XmlToObject" jaxbContext-ref="myJaxb" returnClass="org.mule.jaxb.model.Person"/>
+
+     <spring:bean name="myJaxb" class="javax.xml.bind.JAXBContext" factory-method="newInstance">
+        <spring:constructor-arg value="org.mule.jaxb.model"/>
+    </spring:bean>
+
 </mule>

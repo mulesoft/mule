@@ -19,7 +19,6 @@ import org.mule.transformer.AbstractTransformer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -32,15 +31,21 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
 /**
- * TODO
+ * Allows marshaling of Java objects to XML using JAXB 2.  A specific sourceClass can be set on this transformer, this
+ * is the expected source object type.  If no external {@link javax.xml.bind.JAXBContext} is set on the transformer, but
+ * the 'sourceClass' is set, a {@link javax.xml.bind.JAXBContext} will be created using the sourceClass.
+ *
+ * @since 3.0
  */
 public class JAXBMarshallerTransformer extends AbstractTransformer
 {
     protected JAXBContext jaxbContext;
 
+    protected Class<?> sourceClass;
+
     public JAXBMarshallerTransformer()
     {
-        setReturnClass(InputStream.class);
+        setReturnClass(OutputStream.class);
         registerSourceType(Object.class);
     }
 
@@ -57,7 +62,28 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
         super.initialise();
         if (jaxbContext == null)
         {
-            throw new InitialisationException(CoreMessages.objectIsNull("jaxbContext"), this);
+            if(getSourceClass()!=null)
+            {
+                try
+                {
+                    jaxbContext = JAXBContext.newInstance(getSourceClass());
+                }
+                catch (JAXBException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
+            }
+            else
+            {
+                throw new InitialisationException(CoreMessages.objectIsNull("jaxbContext"), this);
+            }
+        }
+
+        //restrict the handled types
+        if (getSourceClass() != null)
+        {
+            sourceTypes.clear();
+            registerSourceType(getSourceClass());
         }
     }
 
@@ -110,22 +136,35 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
                     }
                 };
             }
+            else
+            {
+                throw new TransformerException(CoreMessages.transformerInvalidReturnType(getReturnClass(), getName()));
+            }
 
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
-        return null;
     }
 
-    public JAXBContext getJAXBContext()
+    public JAXBContext getJaxbContext()
     {
         return jaxbContext;
     }
 
-    public void setJAXBContext(JAXBContext context)
+    public void setJaxbContext(JAXBContext jaxbContext)
     {
-        this.jaxbContext = context;
+        this.jaxbContext = jaxbContext;
+    }
+
+    public Class<?> getSourceClass()
+    {
+        return sourceClass;
+    }
+
+    public void setSourceClass(Class<?> sourceClass)
+    {
+        this.sourceClass = sourceClass;
     }
 }

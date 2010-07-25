@@ -11,9 +11,12 @@ package org.mule.module.xml.config;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.jaxb.model.Person;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
 import org.mule.module.xml.transformer.JXPathExtractor;
+import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.FunctionalTestCase;
 
@@ -29,7 +32,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         NamespaceManager manager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
         assertNotNull(manager);
         assertTrue(manager.isIncludeConfigNamespaces());
-        assertEquals(4, manager.getNamespaces().size());
+        assertEquals(5, manager.getNamespaces().size());
     }
 
     public void testJXPathFilterConfig() throws Exception
@@ -41,7 +44,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertTrue(ep.getFilter() instanceof JXPathFilter);
         JXPathFilter filter = (JXPathFilter)ep.getFilter();
         assertEquals("/bar:foo/bar:bar", filter.getPattern());
-        assertEquals(5, filter.getNamespaces().size());
+        assertEquals(6, filter.getNamespaces().size());
         assertEquals("http://bar.com", filter.getNamespaces().get("bar"));
     }
 
@@ -54,7 +57,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertTrue(ep.getFilter() instanceof JaxenFilter);
         JaxenFilter filter = (JaxenFilter)ep.getFilter();
         assertEquals("/car:foo/car:bar", filter.getPattern());
-        assertEquals(5, filter.getNamespaces().size());
+        assertEquals(6, filter.getNamespaces().size());
         assertEquals("http://car.com", filter.getNamespaces().get("car"));
     }
 
@@ -63,8 +66,23 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         JXPathExtractor transformer = (JXPathExtractor)muleContext.getRegistry().lookupTransformer("jxpath-extractor");
         assertNotNull(transformer);
         assertNotNull(transformer.getNamespaces());
-        assertEquals(5, transformer.getNamespaces().size());
+        assertEquals(6, transformer.getNamespaces().size());
         assertNotNull(transformer.getNamespaces().get("foo"));
         assertNotNull(transformer.getNamespaces().get("bar"));
+    }
+
+    public void testJaxbConfig() throws Exception
+    {
+        JAXBMarshallerTransformer t = (JAXBMarshallerTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
+        assertNotNull(t);
+        assertEquals(Person.class, t.getSourceClass());
+        assertTrue(t.isSourceTypeSupported(Person.class));
+        assertFalse(t.isSourceTypeSupported(Object.class));
+        assertNotNull(t.getJaxbContext());
+
+        JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer)muleContext.getRegistry().lookupTransformer("XmlToObject");
+        assertNotNull(t2);
+        assertEquals(Person.class, t2.getReturnDataType().getType());
+        assertNotNull(t2.getJaxbContext());
     }
 }

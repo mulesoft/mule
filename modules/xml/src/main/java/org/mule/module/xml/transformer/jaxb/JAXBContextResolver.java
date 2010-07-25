@@ -24,6 +24,8 @@ import javax.xml.bind.JAXBException;
  * the package of the the annotated class, for this to work either a jaxb.index file must be present or an {@link javax.naming.spi.ObjectFactory}
  * must be in the package.  This allows for JAXB generated classes to be used easily.  If this method fails a context will
  * be created using just the annotated class to initialise the context.
+ *
+ * @since 3.0
  */
 public class JAXBContextResolver extends AbstractAnnotatedTransformerArgumentResolver
 {

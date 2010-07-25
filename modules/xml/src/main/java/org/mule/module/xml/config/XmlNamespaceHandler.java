@@ -11,8 +11,8 @@
 package org.mule.module.xml.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -29,11 +29,13 @@ import org.mule.module.xml.transformer.DomDocumentToXml;
 import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XPathExtractor;
+import org.mule.module.xml.transformer.XQueryTransformer;
 import org.mule.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.XmlToOutputHandler;
-import org.mule.module.xml.transformer.XQueryTransformer;
+import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 
 public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -59,6 +61,10 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xml-prettyprinter-transformer", new TransformerDefinitionParser(XmlPrettyPrinter.class));
         registerBeanDefinitionParser("xpath-extractor-transformer", new TransformerDefinitionParser(XPathExtractor.class));
 
+        //JAXB
+        registerBeanDefinitionParser("jaxb-object-to-xml-transformer", new TransformerDefinitionParser(JAXBMarshallerTransformer.class));
+        registerBeanDefinitionParser("jaxb-xml-to-object-transformer", new TransformerDefinitionParser(JAXBUnmarshallerTransformer.class));
+        
         //XStream
         registerBeanDefinitionParser("object-to-xml-transformer", new TransformerDefinitionParser(ObjectToXml.class));
         registerBeanDefinitionParser("xml-to-object-transformer", new TransformerDefinitionParser(XmlToObject.class));

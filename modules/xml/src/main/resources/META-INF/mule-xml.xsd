@@ -154,7 +154,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="expectedValue" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true. 
+                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -190,7 +190,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="returnResult" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether the filter should cache the result of the XML. If this is false, the filter will be more efficient, but it won't allow you to read the XML again. 
+                            Whether the filter should cache the result of the XML. If this is false, the filter will be more efficient, but it won't allow you to read the XML again.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -378,14 +378,14 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                The XPathExtractor is a simple transformer that evaluates an XPath expression 
-                using the JAXP libraries against the given bean and returns the result. 
+                The XPathExtractor is a simple transformer that evaluates an XPath expression
+                using the JAXP libraries against the given bean and returns the result.
                 By default, a String of the result will be returned. To return a Node, NodeSet,
                 Boolean or Number result, the {{resultType}} attribute can be set.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="xpathExtractorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
@@ -408,7 +408,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="resultType" type="xpathResultType" >
                     <xsd:annotation>
                         <xsd:documentation>
-                            The XPath result type (e.g. STRING or NODE). 
+                            The XPath result type (e.g. STRING or NODE).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -472,7 +472,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                     <xsd:element name="alias" type="aliasType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
-                                
+
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -498,6 +498,57 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <!-- JAXB Transformers -->
+    <xsd:element name="jaxb-object-to-xml-transformer" type="jaxbMarshalerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts a Java object to an XML representation using XStream.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="jaxb-xml-to-object-transformer" type="jaxbTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Converts XML to Java bean graphs using XStream.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="jaxbMarshalerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:attribute name="sourceClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Restrict the accepted source class object to a specific type. If not set the transformer
+                            will handle all source types. Note that if you need to specify an array type you need to
+                            postfix the class name with '[]'. For example, if you want to ensure the transformer only
+                            accepts an Orange[], you set the sourceClass to 'org.mule.tck.testmodels.fruit.Orange[]'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="jaxbTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:attribute name="jaxbContext-ref" type="xsd:string" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A reference to a JaxbContext created as a Spring bean
+                            </xsd:documentation>
+                        </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- End JAXB -->
 
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
@@ -574,7 +625,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    
+
                     <xsd:element name="xquery-text" type="xsd:string" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>The inline XQuery script definition. This is not required if the &lt;xquery-file&gt; attribute is set.

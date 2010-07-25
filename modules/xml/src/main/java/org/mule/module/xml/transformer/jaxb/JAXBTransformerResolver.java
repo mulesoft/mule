@@ -32,11 +32,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * A {@link org.mule.api.registry.TransformerResolver} implementation used to discover whether the current transform
+ * requests requires JAXB. The resolver will scan the source and return type for JAXB 2 annotations and will configure
+ * a JAXB transformer accordingly.  The transformer is cached and will be used for any subsequent requests.
+ *
+ * The {@link javax.xml.bind.JAXBContext} instance needed for the transform can be discovered from the registry, this means one can be
+ * pre-configured in Spring or Guice.  If there is no pre-configured {@link javax.xml.bind.JAXBContext} one will be created with the
+ * annotated JAXB class.  This context will cached with the transformer.
+ *
+ * @since 3.0
  */
 public class JAXBTransformerResolver implements TransformerResolver, MuleContextAware, Disposable
 {
-    public static final String[] ignorredPackages = {"java.,javax.,org.w3c.,org.mule.transport."};
+    public static final String[] ignoredPackages = {"java.,javax.,org.w3c.,org.mule.transport., org.mule.module."};
 
     /**
      * logger used by this class
@@ -156,9 +164,9 @@ public class JAXBTransformerResolver implements TransformerResolver, MuleContext
     protected boolean hasJaxbAnnotations(Class annotatedType)
     {
         String p = annotatedType.getPackage().getName();
-        for (int i = 0; i < ignorredPackages.length; i++)
+        for (int i = 0; i < ignoredPackages.length; i++)
         {
-            if(p.startsWith(ignorredPackages[i])) return false;
+            if(p.startsWith(ignoredPackages[i])) return false;
         }
 
         try
