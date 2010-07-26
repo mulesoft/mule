@@ -45,6 +45,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         message.setCorrelationId(id);
         message.setCorrelationGroupSize(1);
         aggregator.setMuleContext(muleContext);
+        aggregator.setFlowConstruct(getTestService());
         aggregator.initialise();
         aggregator.process(event);
 
