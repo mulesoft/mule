@@ -25,14 +25,8 @@ public class MessageProcessorRefDefinitionParser extends ParentContextDefinition
     {
         super("response", 
             addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "responseMessageProcessor"));
-        and("endpoint", 
-            addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor"));
-        and("inbound-endpoint", 
-            addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor"));
-        and("outbound-endpoint", 
-            addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor"));
         otherwise(
-            addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "transformer"));
+            addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor"));
     }
 
     private static MuleDefinitionParser addAlias(MuleDefinitionParser parser, String alias, String name)
