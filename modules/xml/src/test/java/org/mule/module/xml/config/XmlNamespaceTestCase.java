@@ -22,6 +22,11 @@ import org.mule.tck.FunctionalTestCase;
 
 public class XmlNamespaceTestCase extends FunctionalTestCase
 {
+    public XmlNamespaceTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
+
     protected String getConfigResources()
     {
         return "xml-namespace-config.xml";
@@ -75,9 +80,6 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
     {
         JAXBMarshallerTransformer t = (JAXBMarshallerTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
         assertNotNull(t);
-        assertEquals(Person.class, t.getSourceClass());
-        assertTrue(t.isSourceTypeSupported(Person.class));
-        assertFalse(t.isSourceTypeSupported(Object.class));
         assertNotNull(t.getJaxbContext());
 
         JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer)muleContext.getRegistry().lookupTransformer("XmlToObject");

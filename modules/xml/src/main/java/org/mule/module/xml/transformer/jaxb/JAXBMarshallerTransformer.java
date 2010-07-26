@@ -62,28 +62,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
         super.initialise();
         if (jaxbContext == null)
         {
-            if(getSourceClass()!=null)
-            {
-                try
-                {
-                    jaxbContext = JAXBContext.newInstance(getSourceClass());
-                }
-                catch (JAXBException e)
-                {
-                    throw new InitialisationException(e, this);
-                }
-            }
-            else
-            {
-                throw new InitialisationException(CoreMessages.objectIsNull("jaxbContext"), this);
-            }
-        }
-
-        //restrict the handled types
-        if (getSourceClass() != null)
-        {
-            sourceTypes.clear();
-            registerSourceType(getSourceClass());
+            throw new InitialisationException(CoreMessages.objectIsNull("jaxbContext"), this);
         }
     }
 

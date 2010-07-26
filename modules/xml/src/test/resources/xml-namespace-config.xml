@@ -28,12 +28,16 @@
         <mulexml:namespace prefix="bar" uri="http://bar.com"/>
     </mulexml:jxpath-extractor-transformer>
 
-    <mulexml:jaxb-object-to-xml-transformer name="ObjectToXml" sourceClass="org.mule.jaxb.model.Person"/>
+    <mulexml:jaxb-object-to-xml-transformer name="ObjectToXml" jaxbContext-ref="myJaxb"/>
 
     <mulexml:jaxb-xml-to-object-transformer name="XmlToObject" jaxbContext-ref="myJaxb" returnClass="org.mule.jaxb.model.Person"/>
 
-     <spring:bean name="myJaxb" class="javax.xml.bind.JAXBContext" factory-method="newInstance">
+    <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.jaxb.model"/>
+
+    <!-- The above is equivalent to the following Spting config
+    <spring:bean name="myJaxb" class="javax.xml.bind.JAXBContext" factory-method="newInstance">
+         <!- comma-separated list of package names where JAXB classes exist ->
         <spring:constructor-arg value="org.mule.jaxb.model"/>
     </spring:bean>
-
+    -->
 </mule>

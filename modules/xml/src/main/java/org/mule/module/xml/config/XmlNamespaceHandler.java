@@ -14,6 +14,7 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
@@ -64,7 +65,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         //JAXB
         registerBeanDefinitionParser("jaxb-object-to-xml-transformer", new MessageProcessorDefinitionParser(JAXBMarshallerTransformer.class));
         registerBeanDefinitionParser("jaxb-xml-to-object-transformer", new MessageProcessorDefinitionParser(JAXBUnmarshallerTransformer.class));
-        
+        registerBeanDefinitionParser("jaxb-context", new OrphanDefinitionParser(JaxbContextFactoryBean.class, true));
+
         //XStream
         registerBeanDefinitionParser("object-to-xml-transformer", new MessageProcessorDefinitionParser(ObjectToXml.class));
         registerBeanDefinitionParser("xml-to-object-transformer", new MessageProcessorDefinitionParser(XmlToObject.class));

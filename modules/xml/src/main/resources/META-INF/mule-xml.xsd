@@ -500,7 +500,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
     </xsd:complexType>
 
     <!-- JAXB Transformers -->
-    <xsd:element name="jaxb-object-to-xml-transformer" type="jaxbMarshalerType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="jaxb-object-to-xml-transformer" type="jaxbTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 Converts a Java object to an XML representation using XStream.
@@ -517,27 +517,10 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="jaxbMarshalerType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="sourceClass" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Restrict the accepted source class object to a specific type. If not set the transformer
-                            will handle all source types. Note that if you need to specify an array type you need to
-                            postfix the class name with '[]'. For example, if you want to ensure the transformer only
-                            accepts an Orange[], you set the sourceClass to 'org.mule.tck.testmodels.fruit.Orange[]'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="jaxbTransformerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
-                <xsd:attribute name="jaxbContext-ref" type="xsd:string" use="optional">
+                <xsd:attribute name="jaxbContext-ref" type="xsd:string" use="required">
                         <xsd:annotation>
                             <xsd:documentation>
                                 A reference to a JaxbContext created as a Spring bean
@@ -545,6 +528,29 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="jaxb-context" type="jaxbContextType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="jaxbContextType">
+         <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+        <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The reference name of this context.  Usually this will be referenced by a JAXB transformer
+                    </xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="packageNames" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A comma-separated list of packages where JAXB classes live
+                    </xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
