@@ -22,8 +22,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
 {
     public void testFullConfiguration() throws Exception
     {
-        SimpleService simpleService = ConstructBuilders.newSimpleService()
-            .name("test-simple-service")
+        SimpleService simpleService = new SimpleServiceBuilder().name("test-simple-service")
             .inboundAddress("test://foo")
             .inboundTransformers(Collections.singleton(new StringAppendTransformer("bar")))
             .component(EchoComponent.class)
