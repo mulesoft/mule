@@ -40,13 +40,6 @@ import java.util.List;
 public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable
 {
 
-    public static List instances = new ArrayList();
-    
-    public static List getInstances()
-    {
-        return instances;
-    }
-
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
     protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
