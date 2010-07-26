@@ -11,9 +11,9 @@
 package org.mule.module.xml.config;
 
 import org.mule.api.service.Service;
-import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.module.xml.routing.XmlMessageSplitter;
+import org.mule.routing.CorrelationMode;
+import org.mule.tck.FunctionalTestCase;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
         XmlMessageSplitter splitter =
                 (XmlMessageSplitter) getRouter("fancy config splitter", XmlMessageSplitter.class);
 
-        assertEquals(AbstractOutboundRouter.ENABLE_CORRELATION_ALWAYS, splitter.getEnableCorrelation());
+        assertEquals(CorrelationMode.ALWAYS, splitter.getEnableCorrelation());
         assertEquals("external", splitter.getExternalSchemaLocation());
         assertEquals("/expression", splitter.getSplitExpression());
         assertTrue(splitter.isDeterministic());
