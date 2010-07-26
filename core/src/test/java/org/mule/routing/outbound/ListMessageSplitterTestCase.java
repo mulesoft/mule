@@ -66,7 +66,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", null);
+        session.matchAndReturn("getFlowConstruct", getTestService());
         session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
 
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);

@@ -44,6 +44,7 @@ public class ResequencerTestCase extends AbstractMuleTestCase
 
         TestEventResequencer router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
+        router.setFlowConstruct(testService);
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
@@ -74,6 +75,7 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         router = new TestEventResequencer(3);
         router.setMuleContext(muleContext);
         router.setEventComparator(new EventPayloadComparator());
+        router.setFlowConstruct(testService);
         router.initialise();
 
 

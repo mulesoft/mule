@@ -10,10 +10,6 @@
 
 package org.mule.construct;
 
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -30,10 +26,17 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
+
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -63,6 +66,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected final FlowConstructStatistics statistics;
+    protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
@@ -244,6 +248,16 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     public FlowConstructStatistics getStatistics()
     {
         return statistics;
+    }
+
+    public MessageInfoMapping getMessageInfoMapping()
+    {
+        return messageInfoMapping;
+    }
+
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
+    {
+        this.messageInfoMapping = messageInfoMapping;
     }
 
     protected void doInitialise() throws InitialisationException

@@ -13,6 +13,8 @@ package org.mule.routing.response;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -29,10 +31,11 @@ import java.util.Iterator;
  * usecase is to aggregate a set of asynchonous events into a single response
  */
 public class DefaultResponseRouterCollection extends DefaultInboundRouterCollection
-    implements ResponseRouterCollection
+    implements ResponseRouterCollection, FlowConstructAware
 {
     private volatile int timeout = -1; // undefined
     private volatile boolean failOnTimeout = true;
+    protected FlowConstruct flowConstruct;
 
     public DefaultResponseRouterCollection()
     {
@@ -45,6 +48,13 @@ public class DefaultResponseRouterCollection extends DefaultInboundRouterCollect
         if (timeout == -1) // undefined
         {
             setTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
+        }
+        for (Router router : routers)
+        {
+            if (router instanceof FlowConstructAware)
+            {
+                ((FlowConstructAware) router).setFlowConstruct(flowConstruct);
+            }
         }
         super.initialise();
     }
@@ -134,6 +144,11 @@ public class DefaultResponseRouterCollection extends DefaultInboundRouterCollect
     public boolean hasEndpoints()
     {
         return !getEndpoints().isEmpty();
+    }
+    
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 
 }

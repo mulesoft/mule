@@ -39,6 +39,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleTestCase
 
         SimpleCollectionAggregator router = new SimpleCollectionAggregator();
         router.setMuleContext(muleContext);
+        router.setFlowConstruct(testService);
         router.initialise();
         
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);

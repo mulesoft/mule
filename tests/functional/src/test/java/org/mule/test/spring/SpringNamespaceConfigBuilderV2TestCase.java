@@ -16,14 +16,10 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.ExpressionMessageInfoMapping;
-import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -69,14 +65,8 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     {
         Service d = muleContext.getRegistry().lookupService("msgInfoMappingTestComponent");
         assertNotNull(d);
-        OutboundRouterCollection router = d.getOutboundRouter();
-        assertNotNull(router);
-        List routers = router.getRouters();
-        assertNotNull(routers);
-        assertEquals(1, routers.size());
-        AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
-        // the one we put in the config
-        final MessageInfoMapping mapping = theRouter.getMessageInfoMapping();
+
+        final MessageInfoMapping mapping = d.getMessageInfoMapping();
         assertTrue(mapping instanceof ExpressionMessageInfoMapping);
 
         Map props = new HashMap();
@@ -85,20 +75,6 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         MuleMessage msg = new DefaultMuleMessage("foo", props, muleContext);
         assertEquals("myID123",mapping.getMessageId(msg));
         assertEquals("myCorrelationID456",mapping.getCorrelationId(msg));
-    }
-
-    public void testMessageInfoMappingResponseRouterConfig() throws Exception
-    {
-        Service d = muleContext.getRegistry().lookupService("msgInfoMappingResponseRouterTestComponent");
-        assertNotNull(d);
-        ResponseRouterCollection router = d.getResponseRouter();
-        assertNotNull(router);
-        List routers = router.getRouters();
-        assertNotNull(routers);
-        assertEquals(1, routers.size());
-        AbstractResponseRouter theRouter = (AbstractResponseRouter)routers.get(0);
-        // the one we put in the config
-        assertTrue(theRouter.getMessageInfoMapping() instanceof ExpressionMessageInfoMapping);
     }
 
     public void testPropertyTypesConfig() throws Exception

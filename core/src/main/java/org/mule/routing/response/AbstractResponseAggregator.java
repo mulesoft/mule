@@ -14,6 +14,8 @@ import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
@@ -27,16 +29,18 @@ import org.mule.routing.correlation.EventCorrelatorCallback;
  * allows developers to customise how and when events are grouped and collated.
  * Response Agrregators are used to collect responses that are usually sent to
  * replyTo endpoints set on outbound routers. When an event is sent out via an
- * outbound router, the response router will block the response flow on an
- * Service until the Response Router resolves a reply or times out.
+ * outbound router, the response router will block the response flow on an Service
+ * until the Response Router resolves a reply or times out.
  */
-public abstract class AbstractResponseAggregator extends AbstractResponseRouter
+public abstract class AbstractResponseAggregator extends AbstractResponseRouter implements FlowConstructAware
 {
     private int timeout = -1; // undefined
 
     private boolean failOnTimeout = true;
 
     private EventCorrelator eventCorrelator;
+
+    protected FlowConstruct flowConstruct;
 
     @Override
     public void initialise() throws InitialisationException
@@ -45,7 +49,8 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             setTimeout(muleContext.getConfiguration().getDefaultResponseTimeout());
         }
-        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), null, getMessageInfoMapping(), muleContext);
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(), null, flowConstruct.getMessageInfoMapping(),
+            muleContext);
         eventCorrelator.setTimeout(getTimeout());
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
         super.initialise();
@@ -62,14 +67,14 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             throw new UnsupportedOperationException("EventAggregator is only supported with Service");
         }
-        
+
         eventCorrelator.addEvent(event);
     }
 
     /**
      * This method is called by the responding callee thread and should return the
      * aggregated response message
-     *
+     * 
      * @param message
      * @throws RoutingException
      */
@@ -106,4 +111,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         return null;
     }
+
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
+
 }

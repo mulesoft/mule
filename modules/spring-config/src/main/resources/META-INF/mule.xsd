@@ -1005,7 +1005,18 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0" />
+                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message info mapper used to extract key bits of the message
+                                information, such as Message ID or Correlation ID. these
+                                properties
+                                are used by some routers and this mapping information tells Mule
+                                where to get the information from in the current message.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="initialState" default="started">
                     <xsd:annotation>
@@ -3360,7 +3371,6 @@
             <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    <!-- TODO this does not make sense here, need to re-visit <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>-->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -3484,11 +3494,7 @@
 
     <xsd:complexType name="messageChunkingAggregatorRouterType">
         <xsd:complexContent>
-            <xsd:extension base="baseAggregatorRouterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
-                </xsd:sequence>
-            </xsd:extension>
+            <xsd:extension base="baseAggregatorRouterType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -3616,13 +3622,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID.  these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -3671,13 +3670,6 @@
                 <xsd:annotation>
                     <xsd:documentation>
                         Defines an overall transaction that will be used for all endpoints on this router.  This is only useful when you want to define an outbound only transaction that will commit all of the transactions defined on the outbound endpoints for this router.  Note that you must still define a transaction on each of the endpoints that should take part in the transaction.  These transactions should always be configured to JOIN the existing transaction.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="abstract-message-info-mapping" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The message info mapper used to extract key bits of the message information, such as Message ID or Correlation ID.  these properties are used by some routers and this mapping information tells Mule where to get the information from in the current message.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>

@@ -37,6 +37,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
 
         MessageChunkAggregator router = new MessageChunkAggregator();
         router.setMuleContext(muleContext);
+        router.setFlowConstruct(testService);    
         router.initialise();
 
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);

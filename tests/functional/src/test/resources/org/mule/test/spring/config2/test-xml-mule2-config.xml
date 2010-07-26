@@ -240,22 +240,10 @@
                     <mule:filtering-router>
                         <mule:outbound-endpoint address="test://msgInfoMappingTestComponent" 
                             exchange-pattern="one-way" name="msgInfoMappingTestComponent-Out"/>
-                        <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
-                                                              correlationIdExpression="#[header:correlation]"/>
                     </mule:filtering-router>
                 </mule:outbound>
-            </mule:service>
-
-            <mule:service name="msgInfoMappingResponseRouterTestComponent">
-                <mule:inbound/>
-                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <mule:async-reply>
-                     <mule:inbound-endpoint address="test://async-reply" exchange-pattern="one-way"/>
-                    <mule:single-async-reply-router>
-                        <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
-                                                              correlationIdExpression="#[header:correlation]"/>
-                    </mule:single-async-reply-router>
-                </mule:async-reply>
+                <mule:expression-message-info-mapping messageIdExpression="#[header:id]"
+                    correlationIdExpression="#[header:correlation]" />
             </mule:service>
 
         </mule:model>

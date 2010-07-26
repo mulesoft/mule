@@ -36,7 +36,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
     {
         MuleMessage message = event.getMessage();
 
-        String correlationId = messageInfoMapping.getCorrelationId(message);
+        String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(message);
 
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         int correlationSequence = 1;

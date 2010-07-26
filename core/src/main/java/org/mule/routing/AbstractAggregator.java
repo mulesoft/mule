@@ -15,10 +15,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.MessageInfoMapping;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -26,22 +27,25 @@ import org.mule.routing.correlation.EventCorrelatorCallback;
 import javax.resource.spi.work.WorkException;
 
 /**
- * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message.
+ * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
+ * single message.
  */
 
-public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor implements Initialisable, MuleContextAware
+public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
+    implements Initialisable, MuleContextAware, FlowConstructAware
 {
 
     protected EventCorrelator eventCorrelator;
     protected MuleContext muleContext;
-    private MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
+    protected FlowConstruct flowConstruct;
 
     private int timeout = 0;
     private boolean failOnTimeout = true;
 
     public void initialise() throws InitialisationException
     {
-        eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, getMessageInfoMapping(), muleContext);
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next,
+            flowConstruct.getMessageInfoMapping(), muleContext);
         if (timeout != 0)
         {
             eventCorrelator.setTimeout(timeout);
@@ -94,13 +98,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         this.failOnTimeout = failOnTimeout;
     }
 
-    public MessageInfoMapping getMessageInfoMapping()
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        return messageInfoMapping;
-    }
-
-    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
-    {
-        this.messageInfoMapping = messageInfoMapping;
+        this.flowConstruct = flowConstruct;
     }
 }

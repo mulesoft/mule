@@ -69,16 +69,16 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
 
         for (MessageProcessor processor : processors)
         {
-            if (processor instanceof Initialisable)
+            if (processor instanceof FlowConstructAware)
             {
-                ((Initialisable) processor).initialise();
+                ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
             }
         }
         for (MessageProcessor processor : processors)
         {
-            if (processor instanceof FlowConstructAware)
+            if (processor instanceof Initialisable)
             {
-                ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+                ((Initialisable) processor).initialise();
             }
         }
 

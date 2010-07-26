@@ -42,6 +42,7 @@ public class AggregatorTestCase extends AbstractMuleTestCase
 
         TestEventAggregator router = new TestEventAggregator(3);
         router.setMuleContext(muleContext);
+        router.setFlowConstruct(testService);
         router.initialise();
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);

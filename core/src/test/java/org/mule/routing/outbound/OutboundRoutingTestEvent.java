@@ -21,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.UUID;
 
@@ -194,6 +195,15 @@ public class OutboundRoutingTestEvent implements MuleEvent
 
     public FlowConstruct getFlowConstruct()
     {
-        return session == null ? null : session.getFlowConstruct();
+        try
+        {
+            return session == null
+                                  ? MuleTestUtils.getTestService(message.getMuleContext())
+                                  : session.getFlowConstruct();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

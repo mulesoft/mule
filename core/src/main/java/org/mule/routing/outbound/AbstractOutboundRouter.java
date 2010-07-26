@@ -20,7 +20,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
@@ -28,7 +27,6 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
-import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -36,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,8 +73,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      * Determines if Mule stamps outgoing message with a correlation ID or not.
      */
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
-
-    protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     protected TransactionConfig transactionConfig;
 
@@ -218,7 +215,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
 
             String correlation;
-            correlation = messageInfoMapping.getCorrelationId(message);
+            correlation = service.getMessageInfoMapping().getCorrelationId(message);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Extracted correlation Id as: " + correlation);
@@ -318,16 +315,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                         + enableCorrelation);
             }
         }
-    }
-
-    public MessageInfoMapping getMessageInfoMapping()
-    {
-        return messageInfoMapping;
-    }
-
-    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
-    {
-        this.messageInfoMapping = messageInfoMapping;
     }
 
     public TransactionConfig getTransactionConfig()

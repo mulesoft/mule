@@ -29,6 +29,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
@@ -40,6 +41,7 @@ import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.AbstractRouterCollection;
+import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.response.DefaultResponseRouterCollection;
@@ -96,7 +98,9 @@ public abstract class AbstractService implements Service
     protected MessageSource asyncReplyMessageSource;
 
     protected MessageProcessor messageProcessorChain;
+    protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
+    
     /**
      * Determines the initial state of this service when the model starts. Can be
      * 'stopped' or 'started' (default)
@@ -158,6 +162,10 @@ public abstract class AbstractService implements Service
                         exceptionListener = getModel().getExceptionListener();
                     }
 
+                    if (responseRouter instanceof FlowConstructAware)
+                    {
+                        ((FlowConstructAware) responseRouter).setFlowConstruct(object);
+                    }
                     asyncReplyMessageSource = (((DefaultInboundRouterCollection) responseRouter).getMessageSource());
                     if (messageSource instanceof FlowConstructAware)
                     {
@@ -616,6 +624,16 @@ public abstract class AbstractService implements Service
     public LifecycleManager getLifecycleManager()
     {
         return lifecycleManager;
+    }
+    
+    public MessageInfoMapping getMessageInfoMapping()
+    {
+        return messageInfoMapping;
+    }
+
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
+    {
+        this.messageInfoMapping = messageInfoMapping;
     }
 
 }

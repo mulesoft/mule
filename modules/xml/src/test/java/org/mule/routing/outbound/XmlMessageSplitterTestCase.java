@@ -155,7 +155,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.matchAndReturn("getFlowConstruct", null);
+        session.matchAndReturn("getFlowConstruct", getTestService());
         session.matchAndReturn("setFlowConstruct", RouterTestUtils.getArgListCheckerFlowConstruct(), null);
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
@@ -185,6 +185,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
         splitter.setValidateSchema(true);
@@ -212,6 +213,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     public void testInvalidPayloadTypeThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
 
@@ -233,6 +235,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     public void testInvalidXmlPayloadThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
+        session.matchAndReturn("getFlowConstruct", getTestService());
 
         XmlMessageSplitter splitter = new XmlMessageSplitter();
 

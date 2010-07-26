@@ -10,11 +10,12 @@
 
 package org.mule.api.construct;
 
-import java.beans.ExceptionListener;
-
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.management.stats.FlowConstructStatistics;
+
+import java.beans.ExceptionListener;
 
 /**
  * <p>
@@ -46,4 +47,10 @@ public interface FlowConstruct extends LifecycleStateEnabled
     FlowConstructStatistics getStatistics();
 
     MuleContext getMuleContext();
+
+    /**
+     * @return This implementation of {@link MessageInfoMapping} used to control how
+     *         Important message information is pulled from the current message.
+     */
+    MessageInfoMapping getMessageInfoMapping();
 }
