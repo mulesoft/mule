@@ -11,7 +11,7 @@
 package org.mule.config.spring.factories;
 
 import java.beans.ExceptionListener;
-import java.util.Collection;
+import java.util.List;
 
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
@@ -75,14 +75,14 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         newSimpleService.inboundAddress(address);
     }
 
-    public void setTransformers(Collection<? extends Transformer> transformers)
+    public void setTransformers(List<? extends Transformer> transformers)
     {
-        newSimpleService.inboundTransformers(transformers);
+        newSimpleService.inboundTransformers(transformers.toArray(new Transformer[0]));
     }
 
-    public void setResponseTransformers(Collection<? extends Transformer> responseTransformers)
+    public void setResponseTransformers(List<? extends Transformer> responseTransformers)
     {
-        newSimpleService.inboundResponseTransformers(responseTransformers);
+        newSimpleService.inboundResponseTransformers(responseTransformers.toArray(new Transformer[0]));
     }
 
     public void setComponentClass(Class<?> componentClass)

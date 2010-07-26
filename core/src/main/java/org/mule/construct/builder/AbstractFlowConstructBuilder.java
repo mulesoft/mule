@@ -11,18 +11,20 @@
 package org.mule.construct.builder;
 
 import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.service.DefaultServiceExceptionStrategy;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
@@ -33,8 +35,8 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
     protected String address;
     protected EndpointBuilder endpointBuilder;
     protected InboundEndpoint inboundEndpoint;
-    protected Collection<? extends Transformer> inboundTransformers;
-    protected Collection<? extends Transformer> inboundResponseTransformers;
+    protected List<MessageProcessor> inboundTransformers;
+    protected List<MessageProcessor> inboundResponseTransformers;
 
     public T name(String name)
     {
@@ -66,15 +68,15 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         return (T) this;
     }
 
-    public T inboundTransformers(Collection<? extends Transformer> transformers)
+    public T inboundTransformers(Transformer... transformers)
     {
-        this.inboundTransformers = transformers;
+        this.inboundTransformers = Arrays.asList(transformers);
         return (T) this;
     }
 
-    public T inboundResponseTransformers(Collection<? extends Transformer> responseTransformers)
+    public T inboundResponseTransformers(Transformer... responseTransformers)
     {
-        this.inboundResponseTransformers = responseTransformers;
+        this.inboundResponseTransformers = Arrays.asList(responseTransformers);
         return (T) this;
     }
 
@@ -115,12 +117,12 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
 
         if (inboundTransformers != null)
         {
-            endpointBuilder.setTransformers(new ArrayList<Transformer>(inboundTransformers));
+            endpointBuilder.setMessageProcessors(inboundTransformers);
         }
 
         if (inboundResponseTransformers != null)
         {
-            endpointBuilder.setResponseTransformers(new ArrayList<Transformer>(inboundResponseTransformers));
+            endpointBuilder.setResponseMessageProcessors(inboundResponseTransformers);
         }
 
         return endpointBuilder.buildInboundEndpoint();

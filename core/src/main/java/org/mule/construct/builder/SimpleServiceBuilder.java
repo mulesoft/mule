@@ -15,11 +15,14 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.object.ObjectFactory;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
+import org.mule.object.SingletonObjectFactory;
 
 /**
  * Fluent API for the creation of a SimpleService.
@@ -44,6 +47,16 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     public SimpleServiceBuilder component(ObjectFactory objectFactory)
     {
         return component(new DefaultJavaComponent(objectFactory));
+    }
+
+    public SimpleServiceBuilder component(Callable callable)
+    {
+        return component(new SimpleCallableJavaComponent(callable));
+    }
+
+    public SimpleServiceBuilder component(Object o)
+    {
+        return component(new SingletonObjectFactory(o));
     }
 
     public SimpleServiceBuilder component(Component component)
