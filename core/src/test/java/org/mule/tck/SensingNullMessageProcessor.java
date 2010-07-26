@@ -13,26 +13,68 @@ package org.mule.tck;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
 
 public class SensingNullMessageProcessor implements MessageProcessor
 {
     public MuleEvent event;
+    protected InternalMessageSource source = new InternalMessageSource();
+    private long waitTime = 0;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        this.event = event;
-        if (event.getEndpoint().getExchangePattern().hasResponse())
+        if (waitTime > 0)
         {
-            return event;
+            try
+            {
+                Thread.sleep(waitTime);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        this.event = event;
+        if (source.listener != null)
+        {
+            return source.listener.process(event);
         }
         else
         {
-            return null;
+            if (event.getEndpoint().getExchangePattern().hasResponse())
+            {
+                return event;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
     public void clear()
     {
         event = null;
+    }
+
+    public MessageSource getMessageSource()
+    {
+        return source;
+    }
+
+    public void setWaitTime(long waitTime)
+    {
+        this.waitTime = waitTime;
+    }
+
+    class InternalMessageSource implements MessageSource
+    {
+        MessageProcessor listener;
+
+        public void setListener(MessageProcessor listener)
+        {
+            this.listener = listener;
+
+        }
     }
 }
