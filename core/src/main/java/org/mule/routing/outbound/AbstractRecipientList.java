@@ -20,6 +20,7 @@ import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,10 +58,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         List recipients = this.getRecipients(message);
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        if (enableCorrelation != CorrelationMode.NEVER)
         {
             boolean correlationSet = message.getCorrelationGroupSize() != -1;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
             {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
             }

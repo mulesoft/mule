@@ -27,6 +27,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
+import org.mule.routing.CorrelationMode;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -44,10 +45,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractOutboundRouter extends AbstractRouter implements OutboundRouter
 {
-    public static final int ENABLE_CORRELATION_IF_NOT_SET = 0;
-    public static final int ENABLE_CORRELATION_ALWAYS = 1;
-    public static final int ENABLE_CORRELATION_NEVER = 2;
-
     /**
      * These properties are automatically propagated by Mule from inbound to outbound
      */
@@ -72,7 +69,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     /**
      * Determines if Mule stamps outgoing message with a correlation ID or not.
      */
-    protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
+    protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
 
     protected TransactionConfig transactionConfig;
 
@@ -186,10 +183,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                         + ((OutboundEndpoint)route).getEndpointURI());
             }
         }
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        if (enableCorrelation != CorrelationMode.NEVER)
         {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
             {
                 if (logger.isDebugEnabled())
                 {
@@ -283,12 +280,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         this.replyTo = replyTo;
     }
 
-    public int getEnableCorrelation()
+    public CorrelationMode getEnableCorrelation()
     {
         return enableCorrelation;
     }
 
-    public void setEnableCorrelation(int enableCorrelation)
+    public void setEnableCorrelation(CorrelationMode enableCorrelation)
     {
         this.enableCorrelation = enableCorrelation;
     }
@@ -299,15 +296,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             if (enableCorrelation.equals("ALWAYS"))
             {
-                this.enableCorrelation = ENABLE_CORRELATION_ALWAYS;
+                this.enableCorrelation = CorrelationMode.ALWAYS;
             }
             else if (enableCorrelation.equals("NEVER"))
             {
-                this.enableCorrelation = ENABLE_CORRELATION_NEVER;
+                this.enableCorrelation = CorrelationMode.NEVER;
             }
             else if (enableCorrelation.equals("IF_NOT_SET"))
             {
-                this.enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
+                this.enableCorrelation = CorrelationMode.IF_NOT_SET;
             }
             else
             {

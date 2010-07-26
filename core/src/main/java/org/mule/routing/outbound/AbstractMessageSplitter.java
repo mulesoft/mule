@@ -17,6 +17,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RoutingMessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,10 +71,10 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
 
             try
             {
-                if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+                if (enableCorrelation != CorrelationMode.NEVER)
                 {
                     boolean correlationSet = message.getCorrelationId() != null;
-                    if (!correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+                    if (!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
                     {
                         sendMessage.setCorrelationId(correlationId);
                     }

@@ -22,6 +22,7 @@ import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -65,10 +66,10 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+        if (enableCorrelation != CorrelationMode.NEVER)
         {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET))
+            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
             {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
             }

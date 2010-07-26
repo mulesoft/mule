@@ -20,6 +20,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
+import org.mule.routing.CorrelationMode;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -147,8 +148,8 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     public void testByteArrayPayloadCorrelateNever() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
-        syncXmlSplitter.setEnableCorrelation(AbstractOutboundRouter.ENABLE_CORRELATION_NEVER);
-        asyncXmlSplitter.setEnableCorrelation(AbstractOutboundRouter.ENABLE_CORRELATION_NEVER);
+        syncXmlSplitter.setEnableCorrelation(CorrelationMode.NEVER);
+        asyncXmlSplitter.setEnableCorrelation(CorrelationMode.NEVER);
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
@@ -290,8 +291,8 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
             assertTrue("Wrong class type for node.", payload instanceof Document);
 
             // MULE-2963
-            if (syncXmlSplitter.enableCorrelation == AbstractOutboundRouter.ENABLE_CORRELATION_NEVER ||
-                    asyncXmlSplitter.enableCorrelation == AbstractOutboundRouter.ENABLE_CORRELATION_NEVER)
+            if (syncXmlSplitter.enableCorrelation == CorrelationMode.NEVER
+                || asyncXmlSplitter.enableCorrelation == CorrelationMode.NEVER)
             {
                 assertEquals(-1, message.getCorrelationGroupSize());
             }

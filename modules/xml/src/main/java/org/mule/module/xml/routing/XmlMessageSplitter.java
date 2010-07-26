@@ -15,6 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.routing.CorrelationMode;
 import org.mule.routing.outbound.AbstractRoundRobinMessageSplitter;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
@@ -211,7 +212,7 @@ public class XmlMessageSplitter extends AbstractRoundRobinMessageSplitter
             }
 
             List foundNodes = xpath.selectNodes(dom4jDoc);
-            if (enableCorrelation != ENABLE_CORRELATION_NEVER)
+            if (enableCorrelation != CorrelationMode.NEVER)
             {
                 message.setCorrelationGroupSize(foundNodes.size());
             }

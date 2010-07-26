@@ -23,19 +23,12 @@ public class RouterDefinitionParser extends ChildDefinitionParser
     public RouterDefinitionParser(Class clazz)
     {
         super(ROUTER, clazz);
-        standardOptions();
     }
 
     // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
     public RouterDefinitionParser()
     {
         super(ROUTER, null, AbstractAggregator.class, true);
-        standardOptions();
-    }
-
-    protected void standardOptions()
-    {
-        addMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
     }
 
 }
