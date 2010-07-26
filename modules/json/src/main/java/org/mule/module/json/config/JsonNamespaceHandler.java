@@ -12,7 +12,7 @@ package org.mule.module.json.config;
 
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.module.json.transformers.JsonToObject;
 import org.mule.module.json.transformers.ObjectToJson;
@@ -29,8 +29,8 @@ public class JsonNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("is-json-filter", new FilterDefinitionParser(IsJsonFilter.class));
-        registerBeanDefinitionParser("object-to-json-transformer", new TransformerDefinitionParser(ObjectToJson.class));
-        registerBeanDefinitionParser("json-to-object-transformer", new TransformerDefinitionParser(JsonToObject.class));
+        registerBeanDefinitionParser("object-to-json-transformer", new MessageProcessorDefinitionParser(ObjectToJson.class));
+        registerBeanDefinitionParser("json-to-object-transformer", new MessageProcessorDefinitionParser(JsonToObject.class));
         registerBeanDefinitionParser("serialization-mixin", new ChildMapEntryDefinitionParser("serializationMixins", "targetClass", "mixinClass"));
         registerBeanDefinitionParser("deserialization-mixin", new ChildMapEntryDefinitionParser("deserializationMixins", "targetClass", "mixinClass"));
         registerBeanDefinitionParser("mixin-map", new MixinMapDefinitionParser(HashMap.class, "name", true));

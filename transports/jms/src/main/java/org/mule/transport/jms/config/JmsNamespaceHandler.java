@@ -17,8 +17,8 @@ import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
@@ -71,9 +71,9 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JmsTransactionFactory.class));
         registerBeanDefinitionParser("client-ack-transaction", new TransactionDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
         
-        registerBeanDefinitionParser("jmsmessage-to-object-transformer", new TransformerDefinitionParser(JMSMessageToObject.class));
+        registerBeanDefinitionParser("jmsmessage-to-object-transformer", new MessageProcessorDefinitionParser(JMSMessageToObject.class));
 
-        registerBeanDefinitionParser("object-to-jmsmessage-transformer", new TransformerDefinitionParser(ObjectToJMSMessage.class));
+        registerBeanDefinitionParser("object-to-jmsmessage-transformer", new MessageProcessorDefinitionParser(ObjectToJMSMessage.class));
         registerBeanDefinitionParser("property-filter", new FilterDefinitionParser(JmsPropertyFilter.class));
         registerBeanDefinitionParser("selector", new ChildDefinitionParser(FilterDefinitionParser.FILTER, JmsSelectorFilter.class));
     }

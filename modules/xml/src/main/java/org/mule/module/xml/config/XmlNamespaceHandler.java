@@ -16,8 +16,8 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
@@ -54,20 +54,20 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("filter-based-splitter", new RouterDefinitionParser(FilterBasedXmlMessageSplitter.class));
 
         //Simple Xml transformers
-        registerBeanDefinitionParser("dom-to-xml-transformer", new TransformerDefinitionParser(DomDocumentToXml.class));
-        registerBeanDefinitionParser("dom-to-output-handler-transformer", new TransformerDefinitionParser(XmlToOutputHandler.class));
-        registerBeanDefinitionParser("jxpath-extractor-transformer", new TransformerDefinitionParser(JXPathExtractor.class));
-        registerBeanDefinitionParser("xml-to-dom-transformer", new TransformerDefinitionParser(XmlToDomDocument.class));
-        registerBeanDefinitionParser("xml-prettyprinter-transformer", new TransformerDefinitionParser(XmlPrettyPrinter.class));
-        registerBeanDefinitionParser("xpath-extractor-transformer", new TransformerDefinitionParser(XPathExtractor.class));
+        registerBeanDefinitionParser("dom-to-xml-transformer", new MessageProcessorDefinitionParser(DomDocumentToXml.class));
+        registerBeanDefinitionParser("dom-to-output-handler-transformer", new MessageProcessorDefinitionParser(XmlToOutputHandler.class));
+        registerBeanDefinitionParser("jxpath-extractor-transformer", new MessageProcessorDefinitionParser(JXPathExtractor.class));
+        registerBeanDefinitionParser("xml-to-dom-transformer", new MessageProcessorDefinitionParser(XmlToDomDocument.class));
+        registerBeanDefinitionParser("xml-prettyprinter-transformer", new MessageProcessorDefinitionParser(XmlPrettyPrinter.class));
+        registerBeanDefinitionParser("xpath-extractor-transformer", new MessageProcessorDefinitionParser(XPathExtractor.class));
 
         //JAXB
-        registerBeanDefinitionParser("jaxb-object-to-xml-transformer", new TransformerDefinitionParser(JAXBMarshallerTransformer.class));
-        registerBeanDefinitionParser("jaxb-xml-to-object-transformer", new TransformerDefinitionParser(JAXBUnmarshallerTransformer.class));
+        registerBeanDefinitionParser("jaxb-object-to-xml-transformer", new MessageProcessorDefinitionParser(JAXBMarshallerTransformer.class));
+        registerBeanDefinitionParser("jaxb-xml-to-object-transformer", new MessageProcessorDefinitionParser(JAXBUnmarshallerTransformer.class));
         
         //XStream
-        registerBeanDefinitionParser("object-to-xml-transformer", new TransformerDefinitionParser(ObjectToXml.class));
-        registerBeanDefinitionParser("xml-to-object-transformer", new TransformerDefinitionParser(XmlToObject.class));
+        registerBeanDefinitionParser("object-to-xml-transformer", new MessageProcessorDefinitionParser(ObjectToXml.class));
+        registerBeanDefinitionParser("xml-to-object-transformer", new MessageProcessorDefinitionParser(XmlToObject.class));
         registerBeanDefinitionParser("alias", new ChildMapEntryDefinitionParser("aliases", "name", "class"));
         registerBeanDefinitionParser("converter", new ChildListEntryDefinitionParser("converters", "class"));
 
@@ -80,7 +80,7 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));
 
         //XQuery
-        registerBeanDefinitionParser("xquery-transformer", new TransformerDefinitionParser(XQueryTransformer.class));
+        registerBeanDefinitionParser("xquery-transformer", new MessageProcessorDefinitionParser(XQueryTransformer.class));
         registerBeanDefinitionParser("xquery-text", new TextDefinitionParser("xquery", true));
 
         //Used by XQuery and XSLT

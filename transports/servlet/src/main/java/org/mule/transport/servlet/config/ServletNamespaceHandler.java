@@ -10,7 +10,7 @@
 package org.mule.transport.servlet.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.servlet.ServletConnector;
 import org.mule.transport.servlet.transformers.HttpRequestToByteArray;
@@ -26,8 +26,8 @@ public class ServletNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(ServletConnector.SERVLET, URIBuilder.PATH_ATTRIBUTES);
         registerConnectorDefinitionParser(ServletConnector.class);
-        registerBeanDefinitionParser("http-request-to-parameter-map", new TransformerDefinitionParser(HttpRequestToParameterMap.class));
-        registerBeanDefinitionParser("http-request-to-input-stream", new TransformerDefinitionParser(HttpRequestToInputStream.class));
-        registerBeanDefinitionParser("http-request-to-byte-array", new TransformerDefinitionParser(HttpRequestToByteArray.class));        
+        registerBeanDefinitionParser("http-request-to-parameter-map", new MessageProcessorDefinitionParser(HttpRequestToParameterMap.class));
+        registerBeanDefinitionParser("http-request-to-input-stream", new MessageProcessorDefinitionParser(HttpRequestToInputStream.class));
+        registerBeanDefinitionParser("http-request-to-byte-array", new MessageProcessorDefinitionParser(HttpRequestToByteArray.class));        
     }
 }

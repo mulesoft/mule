@@ -11,7 +11,7 @@ package org.mule.module.atom;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.module.atom.endpoint.AtomInboundEndpointFactoryBean;
@@ -28,7 +28,7 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
 
         registerBeanDefinitionParser("route-filter", new ChildDefinitionParser("filter", URIRouteFilter.class));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(AbderaServiceComponent.class));
-        registerBeanDefinitionParser("entry-builder-transformer", new TransformerDefinitionParser(AtomEntryBuilderTransformer.class));
+        registerBeanDefinitionParser("entry-builder-transformer", new MessageProcessorDefinitionParser(AtomEntryBuilderTransformer.class));
         registerBeanDefinitionParser("entry-property", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
     }

@@ -9,8 +9,8 @@
  */
 package org.mule.transport.soap.config;
 
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.transport.soap.transformers.HttpRequestToSoapRequest;
 
 /**
@@ -21,7 +21,7 @@ public class SoapNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("http-to-soap-request-transformer", new TransformerDefinitionParser(HttpRequestToSoapRequest.class));
+        registerBeanDefinitionParser("http-to-soap-request-transformer", new MessageProcessorDefinitionParser(HttpRequestToSoapRequest.class));
     }
 
 }

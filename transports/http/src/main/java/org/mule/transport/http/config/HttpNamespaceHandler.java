@@ -17,7 +17,7 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -48,10 +48,10 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("requiredParameter", new ChildMapEntryDefinitionParser("requiredParams"));
         registerBeanDefinitionParser("optionalParameter", new ChildMapEntryDefinitionParser("optionalParams"));
         
-        registerBeanDefinitionParser("http-response-to-object-transformer", new TransformerDefinitionParser(HttpClientMethodResponseToObject.class));
-        registerBeanDefinitionParser("http-response-to-string-transformer", new TransformerDefinitionParser(HttpResponseToString.class));
-        registerBeanDefinitionParser("object-to-http-request-transformer", new TransformerDefinitionParser(ObjectToHttpClientMethodRequest.class));
-        registerBeanDefinitionParser("message-to-http-response-transformer", new TransformerDefinitionParser(MuleMessageToHttpResponse.class));
+        registerBeanDefinitionParser("http-response-to-object-transformer", new MessageProcessorDefinitionParser(HttpClientMethodResponseToObject.class));
+        registerBeanDefinitionParser("http-response-to-string-transformer", new MessageProcessorDefinitionParser(HttpResponseToString.class));
+        registerBeanDefinitionParser("object-to-http-request-transformer", new MessageProcessorDefinitionParser(ObjectToHttpClientMethodRequest.class));
+        registerBeanDefinitionParser("message-to-http-response-transformer", new MessageProcessorDefinitionParser(MuleMessageToHttpResponse.class));
         registerBeanDefinitionParser("error-filter", new ChildDefinitionParser("filter", ErrorFilterFactoryBean.class));
         registerBeanDefinitionParser("request-wildcard-filter", new ChildDefinitionParser("filter", HttpRequestWildcardFilter.class));
     }

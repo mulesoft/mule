@@ -13,7 +13,7 @@ package org.mule.transport.xmpp.config;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.endpoint.URIBuilder;
@@ -58,8 +58,8 @@ public class XmppNamespaceHandler extends AbstractMuleNamespaceHandler
         registerOutboundEndpintParser();
         
         registerConnectorDefinitionParser(XmppConnector.class);
-        registerBeanDefinitionParser("xmpp-to-object-transformer", new TransformerDefinitionParser(XmppPacketToObject.class));
-        registerBeanDefinitionParser("object-to-xmpp-transformer", new TransformerDefinitionParser(ObjectToXmppPacket.class));
+        registerBeanDefinitionParser("xmpp-to-object-transformer", new MessageProcessorDefinitionParser(XmppPacketToObject.class));
+        registerBeanDefinitionParser("object-to-xmpp-transformer", new MessageProcessorDefinitionParser(ObjectToXmppPacket.class));
     }
 
     private void registerGlobalEndpointParser()

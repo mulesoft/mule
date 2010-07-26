@@ -13,7 +13,7 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
 
-public class MessagePropertiesTransformerDefinitionParser extends TransformerDefinitionParser
+public class MessagePropertiesTransformerDefinitionParser extends MessageProcessorDefinitionParser
 {
     public MessagePropertiesTransformerDefinitionParser()
     {

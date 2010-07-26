@@ -10,7 +10,7 @@
 package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.transport.email.transformers.EmailMessageToString;
 import org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray;
 import org.mule.transport.email.transformers.ObjectToMimeMessage;
@@ -22,11 +22,11 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("email-to-string-transformer", new TransformerDefinitionParser(EmailMessageToString.class));
-        registerBeanDefinitionParser("string-to-email-transformer", new TransformerDefinitionParser(StringToEmailMessage.class));
-        registerBeanDefinitionParser("object-to-mime-transformer", new TransformerDefinitionParser(ObjectToMimeMessage.class));
-        registerBeanDefinitionParser("mime-to-bytes-transformer", new TransformerDefinitionParser(MimeMessageToRfc822ByteArray.class));
-        registerBeanDefinitionParser("bytes-to-mime-transformer", new TransformerDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
+        registerBeanDefinitionParser("email-to-string-transformer", new MessageProcessorDefinitionParser(EmailMessageToString.class));
+        registerBeanDefinitionParser("string-to-email-transformer", new MessageProcessorDefinitionParser(StringToEmailMessage.class));
+        registerBeanDefinitionParser("object-to-mime-transformer", new MessageProcessorDefinitionParser(ObjectToMimeMessage.class));
+        registerBeanDefinitionParser("mime-to-bytes-transformer", new MessageProcessorDefinitionParser(MimeMessageToRfc822ByteArray.class));
+        registerBeanDefinitionParser("bytes-to-mime-transformer", new MessageProcessorDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
     }
 
 }
