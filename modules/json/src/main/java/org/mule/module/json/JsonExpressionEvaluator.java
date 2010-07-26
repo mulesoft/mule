@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  * #[json:person/registered]
  * </code>
  * <p/>
- * Where 'registered' is a boolean value.  It is also possible to filter on the existance of a value i.e.
+ * Where 'registered' is a boolean value.  It is also possible to filter on the existence of a value i.e.
  * <p/>
  * <code>
  * #[json:person/favouriteColour]
@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * to create more sophisticated boolean expressions; equals and not equals -
  * <p/>
  * <code>
- * #[json:person/favouriteColour == red]
+ * #[json:person/favouriteColour = red]
  * </code>
  * <p/>
  * or
@@ -70,19 +70,19 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
         {
             start = 0;
         }
-        int i = expression.indexOf("==", start);
-
-        if (i > -1)
-        {
-            compareTo = expression.substring(i + 2, expression.length()).trim();
-            expression = expression.substring(0, i).trim();
-        }
-        else if ((i = expression.indexOf("!=", start)) > -1)
+        int i=0;
+        if ((i = expression.indexOf("!=", start)) > -1)
         {
             compareTo = expression.substring(i + 2, expression.length()).trim();
             expression = expression.substring(0, i).trim();
             not = true;
         }
+        else if ((i = expression.indexOf("=", start)) > -1)
+        {
+            compareTo = expression.substring(i + 1, expression.length()).trim();
+            expression = expression.substring(0, i).trim();
+        }
+        
         try
         {
             String json = message.getPayloadAsString();

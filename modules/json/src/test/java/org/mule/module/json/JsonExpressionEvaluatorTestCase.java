@@ -84,13 +84,13 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
 
-        filter.setExpression("[0]/favorited==false");
+        filter.setExpression("[0]/favorited=false");
         assertTrue(filter.accept(message));
 
         filter.setExpression("[0]/truncated != true");
         assertFalse(filter.accept(message));
 
-        filter.setExpression("[0]/source==null");
+        filter.setExpression("[0]/source=null");
         assertFalse(filter.accept(message));
 
         filter.setExpression("[0]/source!= null");
@@ -105,7 +105,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         String json = IOUtils.getResourceAsString("test-data.json", getClass());
         MuleMessage message = new DefaultMuleMessage(json, muleContext);
 
-        ExpressionFilter filter = new ExpressionFilter("#[json:[0]/xyz == null]");
+        ExpressionFilter filter = new ExpressionFilter("#[json:[0]/xyz = null]");
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
 
