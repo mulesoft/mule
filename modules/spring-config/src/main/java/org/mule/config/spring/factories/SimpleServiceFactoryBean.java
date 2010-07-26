@@ -10,15 +10,12 @@
 
 package org.mule.config.spring.factories;
 
-import java.beans.ExceptionListener;
-
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.SimpleService;
+import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.SimpleServiceBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -28,13 +25,19 @@ import org.springframework.context.ApplicationContext;
  */
 public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 {
-    private final SimpleServiceBuilder newSimpleService = new SimpleServiceBuilder();
+    final SimpleServiceBuilder simpleServiceBuilder = new SimpleServiceBuilder();
 
     private SpringBeanLookup springBeanLookup;
 
     public Class<?> getObjectType()
     {
         return SimpleService.class;
+    }
+
+    @Override
+    protected AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService> getFlowConstructBuilder()
+    {
+        return simpleServiceBuilder;
     }
 
     @Override
@@ -51,54 +54,24 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     @Override
     protected AbstractFlowConstruct createFlowConstruct() throws MuleException
     {
-        return newSimpleService.build(muleContext);
-    }
-
-    public void setName(String name)
-    {
-        newSimpleService.name(name);
-    }
-
-    public void setExceptionListener(ExceptionListener exceptionListener)
-    {
-        newSimpleService.exceptionStrategy(exceptionListener);
-    }
-
-    public void setEndpoint(EndpointBuilder endpointBuilder)
-    {
-        newSimpleService.inboundEndpoint(endpointBuilder);
-    }
-
-    public void setAddress(String address)
-    {
-        newSimpleService.inboundAddress(address);
-    }
-
-    public void setTransformers(Transformer... transformers)
-    {
-        newSimpleService.inboundTransformers(transformers);
-    }
-
-    public void setResponseTransformers(Transformer... responseTransformers)
-    {
-        newSimpleService.inboundResponseTransformers(responseTransformers);
+        return simpleServiceBuilder.build(muleContext);
     }
 
     public void setComponentClass(Class<?> componentClass)
     {
-        newSimpleService.component(componentClass);
+        simpleServiceBuilder.component(componentClass);
     }
 
     public void setComponentBeanName(String componentBeanName)
     {
         springBeanLookup = new SpringBeanLookup();
         springBeanLookup.setBean(componentBeanName);
-        newSimpleService.component(springBeanLookup);
+        simpleServiceBuilder.component(springBeanLookup);
     }
 
     public void setComponent(Component component)
     {
-        newSimpleService.component(component);
+        simpleServiceBuilder.component(component);
     }
 
 }

@@ -10,12 +10,17 @@
 
 package org.mule.config.spring.factories;
 
+import java.beans.ExceptionListener;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Transformer;
 import org.mule.construct.AbstractFlowConstruct;
+import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -65,6 +70,38 @@ public abstract class AbstractFlowConstructFactoryBean
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+    }
+
+    protected abstract AbstractFlowConstructBuilder<? extends AbstractFlowConstructBuilder<?, ?>, ? extends AbstractFlowConstruct> getFlowConstructBuilder();
+
+    public void setName(String name)
+    {
+        getFlowConstructBuilder().name(name);
+    }
+
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        getFlowConstructBuilder().exceptionStrategy(exceptionListener);
+    }
+
+    public void setEndpoint(EndpointBuilder endpointBuilder)
+    {
+        getFlowConstructBuilder().inboundEndpoint(endpointBuilder);
+    }
+
+    public void setAddress(String address)
+    {
+        getFlowConstructBuilder().inboundAddress(address);
+    }
+
+    public void setTransformers(Transformer... transformers)
+    {
+        getFlowConstructBuilder().inboundTransformers(transformers);
+    }
+
+    public void setResponseTransformers(Transformer... responseTransformers)
+    {
+        getFlowConstructBuilder().inboundResponseTransformers(responseTransformers);
     }
 
     public void afterPropertiesSet() throws Exception
