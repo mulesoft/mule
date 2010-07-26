@@ -84,8 +84,13 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="mixin-map" type="mixinMapType" substitutionGroup="mule:abstract-extension"/>
-
+    <xsd:element name="mapper" type="mapperType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Jackson mapper to use with a JSON transformer. This isn't required but can be used to configure mixins on the mapper.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="jsonTransformerType">
         <xsd:complexContent>
@@ -95,14 +100,7 @@
                         <xsd:documentation>
                             The JSON engine can be configured using this attribute. This is an object
                             reference to an instance of:
-                            {{org.codehaus.jackson.ObjectCodec}}. This can be created as a bean and injected.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="mixins-ref" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to a &lt;mixin-map&gt; containing one or more mixin definitions
+                            {{org.codehaus.jackson.map.ObjectMapperpper}}. This can be created as a bean and injected.  This can be created using the &lt;mapper/&gt; element.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -160,16 +158,16 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="mixinMapType" mixed="true">
+    <xsd:complexType name="mapperType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
-                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element type="mixin" name="mixin"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string" use="required">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The name of the map that is used to make a reference to it by the transformer elements.
+                        The name of the mapper that is used to make a reference to it by the transformer elements.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>

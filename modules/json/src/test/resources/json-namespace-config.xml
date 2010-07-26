@@ -10,19 +10,15 @@
 
     <json:is-json-filter name="jsonFilter" validateParsing="true"/>
 
-    <!-- often you'll want to use the same mixins for serialization and deserialization, so using a map means you only define
-         them once -->
-    <json:mixin-map name="myMixins">
+    <json:mapper name="myMapper">
         <json:mixin mixinClass="org.mule.module.json.transformers.FruitCollectionMixin"
-                targetClass="org.mule.module.json.transformers.FruitCollection"/>
-        <json:mixin
-                mixinClass="org.mule.module.json.transformers.AppleMixin"
-                targetClass="org.mule.tck.testmodels.fruit.Apple"/>
-
-    </json:mixin-map>
+                        targetClass="org.mule.module.json.transformers.FruitCollection"/>
+        <json:mixin mixinClass="org.mule.module.json.transformers.AppleMixin"
+                        targetClass="org.mule.tck.testmodels.fruit.Apple"/>
+    </json:mapper>
 
     <json:json-to-object-transformer name="jsonToFruitCollection" returnClass="org.mule.module.json.transformers.FruitCollection"
-                                     mixins-ref="myMixins">
+                                     mapper-ref="myMapper">
         <!-- test augmenting the mixin map with local mixins -->
         <json:deserialization-mixin
                 mixinClass="org.mule.module.json.transformers.OrangeMixin"

@@ -15,7 +15,7 @@ import org.mule.util.IOUtils;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
-public class JsonDataTestCase extends AbstractMuleTestCase
+public class  JsonDataTestCase extends AbstractMuleTestCase
 {
     public void testReadingArrayData() throws Exception
     {
