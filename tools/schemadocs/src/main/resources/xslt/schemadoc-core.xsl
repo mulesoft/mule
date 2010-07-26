@@ -39,7 +39,7 @@
             <xsl:apply-templates select="." mode="attributes"/>
         </table>
 
-        <xsl:apply-templates select="*[1]" mode="child-elements"/>
+        <xsl:apply-templates select="./*[1]" mode="child-elements"/>
 
     </xsl:template>
 
