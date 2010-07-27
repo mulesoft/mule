@@ -449,9 +449,9 @@ public class MuleUniversalConduit extends AbstractConduit
 
         // This is a little "trick" to apply transformers from the CXF endpoint
         // to the raw message instead of the pojos
-        if (applyTransformersToProtocol)
+        if (prev != null && applyTransformersToProtocol)
         {
-            message.applyTransformers(((OutboundEndpoint) prev.getEndpoint()).getTransformers());
+            message.applyTransformers(prev.getEndpoint().getTransformers());
         }
 
         MuleMessage msg = null;
