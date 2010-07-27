@@ -11,9 +11,6 @@
 package org.mule.construct;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
 import org.mule.component.AbstractComponent;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
@@ -22,15 +19,14 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
     private static final StringReverserComponent COMPONENT = new StringReverserComponent();
     private SimpleService simpleService;
-    private DirectInboundMessageSource dims;
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
 
-        dims = new DirectInboundMessageSource();
-        simpleService = new SimpleService(muleContext, "test-simple-service", dims, COMPONENT);
+        simpleService = new SimpleService(muleContext, "test-simple-service", directInboundMessageSource,
+            COMPONENT);
     }
 
     @Override
@@ -43,25 +39,10 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
     {
         simpleService.initialise();
         simpleService.start();
-        MuleEvent response = dims.process(MuleTestUtils.getTestInboundEvent("hello", muleContext));
+        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
+            muleContext));
 
         assertEquals("olleh", response.getMessageAsString());
-    }
-
-    private static class DirectInboundMessageSource implements MessageSource
-    {
-        private MessageProcessor listener;
-
-        public void setListener(MessageProcessor listener)
-        {
-            this.listener = listener;
-        }
-
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            return listener.process(event);
-        }
-
     }
 
     private static class StringReverserComponent extends AbstractComponent

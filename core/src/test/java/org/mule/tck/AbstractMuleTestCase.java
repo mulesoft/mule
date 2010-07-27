@@ -650,11 +650,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(MessageExchangePattern mep) throws Exception
-    {
-        return MuleTestUtils.getTestOutboundEndpoint(mep, muleContext);
-    }
-
     public static InboundEndpoint getTestInboundEndpoint(MessageExchangePattern mep) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(mep, muleContext);

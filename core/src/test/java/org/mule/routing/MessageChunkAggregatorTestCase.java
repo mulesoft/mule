@@ -19,6 +19,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 
 public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
@@ -48,7 +49,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
         message3.setCorrelationId(message1.getUniqueId());
         message1.setCorrelationGroupSize(3);
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY);
+        ImmutableEndpoint endpoint = MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);

@@ -10,21 +10,50 @@
 
 package org.mule.construct;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 {
-    protected abstract AbstractFlowConstruct getFlowConstruct();
+    public static class DirectInboundMessageSource implements MessageSource
+    {
+        private MessageProcessor listener;
 
-    public void testStart() throws MuleException
+        public void setListener(MessageProcessor listener)
+        {
+            this.listener = listener;
+        }
+
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return listener.process(event);
+        }
+
+    }
+
+    protected DirectInboundMessageSource directInboundMessageSource;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
+        directInboundMessageSource = new DirectInboundMessageSource();
+    }
+
+    protected abstract AbstractFlowConstruct getFlowConstruct() throws Exception;
+
+    public void testStart() throws Exception
     {
         try
         {
             getFlowConstruct().start();
             fail("Exception expected: Cannot start an uninitialised service");
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             // expected
         }
@@ -37,7 +66,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().initialise();
             fail("Exception expected: Cannot initialise an already initialised service");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
@@ -45,7 +74,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 
     }
 
-    public void testStop() throws MuleException
+    public void testStop() throws Exception
     {
         assertFalse(getFlowConstruct().isStarted());
 
@@ -54,7 +83,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().stop();
             fail("Exception expected: Cannot stop an uninitialised service");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
@@ -67,7 +96,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().stop();
             fail("Exception expected: Cannot stop a service that is not started");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
@@ -81,7 +110,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().stop();
             fail("Exception expected: Cannot stop a service that is not started");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
@@ -90,7 +119,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 
     }
 
-    public void testDispose() throws MuleException
+    public void testDispose() throws Exception
     {
         assertFalse(getFlowConstruct().isStarted());
         getFlowConstruct().dispose();
@@ -100,7 +129,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().dispose();
             fail("Exception expected: Cannot dispose a service that is already disposed");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
@@ -110,7 +139,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             getFlowConstruct().initialise();
             fail("Exception expected: Cannot invoke initialise (or any lifecycle) on an object once it is disposed");
         }
-        catch (IllegalStateException e)
+        catch (final IllegalStateException e)
         {
             // expected
         }
