@@ -176,6 +176,15 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    public void testDeletePropertiesCaseInsensitiveRegex() throws Exception
+    {
+        final String expression = "(?i)^BAD.*";
+        final String[] validProperties = new String[] {"somethingnotsobad"};
+        final String[] invalidProperties = new String[] {"badProperty", "badThing"};
+
+        doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
+    }
+
     public void testDeletePropertiesEndingWithExpression() throws Exception
     {
         final String expression = ".*bad$";
