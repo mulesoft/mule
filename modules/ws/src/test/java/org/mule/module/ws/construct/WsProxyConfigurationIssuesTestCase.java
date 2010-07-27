@@ -10,7 +10,7 @@
 
 package org.mule.module.ws.construct;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.Callable;
 
 import org.mule.MessageExchangePattern;
@@ -71,7 +71,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
-    public void testNullWsdlUrl()
+    public void testNullWsdlUri()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
         {
@@ -80,7 +80,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
                 return new WSProxy(muleContext, "testNullWsdlUrl",
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                        muleContext), (URL) null);
+                        muleContext), (URI) null);
             }
         });
     }

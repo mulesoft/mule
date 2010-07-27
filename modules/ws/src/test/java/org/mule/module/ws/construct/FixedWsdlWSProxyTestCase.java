@@ -10,14 +10,16 @@
 
 package org.mule.module.ws.construct;
 
+import java.net.InetAddress;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 
-public class NoWsdlWSProxyTestCase extends AbstractWSProxyTestCase
+public class FixedWsdlWSProxyTestCase extends AbstractWSProxyTestCase
 {
     @Override
     protected WSProxy newWSProxy(OutboundEndpoint testOutboundEndpoint) throws Exception
     {
-        return new WSProxy(muleContext, "no-wsdl-ws-proxy", directInboundMessageSource, testOutboundEndpoint);
+        return new WSProxy(muleContext, "fixed-wsdl-ws-proxy", directInboundMessageSource,
+            testOutboundEndpoint, "fake_wsdl " + InetAddress.getLocalHost().getHostName());
     }
 }

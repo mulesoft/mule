@@ -11,7 +11,7 @@
 package org.mule.module.ws.construct;
 
 import java.net.InetAddress;
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,10 +77,10 @@ public class WSProxy extends AbstractFlowConstruct
                    String name,
                    MessageSource messageSource,
                    OutboundEndpoint outboundEndpoint,
-                   URL wsdlUrl) throws MuleException
+                   URI wsdlUri) throws MuleException
     {
         this(muleContext, name, messageSource, outboundEndpoint,
-            new DynamicWsdlProxyRequestProcessor(wsdlUrl));
+            new DynamicWsdlProxyRequestProcessor(wsdlUri));
     }
 
     private WSProxy(MuleContext muleContext,
@@ -240,15 +240,15 @@ public class WSProxy extends AbstractFlowConstruct
         private static final String LOCALHOST = "localhost";
         private final String wsdlAddress;
 
-        DynamicWsdlProxyRequestProcessor(URL wsdlUrl) throws FlowConstructInvalidException
+        DynamicWsdlProxyRequestProcessor(URI wsdlUri) throws FlowConstructInvalidException
         {
-            if (wsdlUrl == null)
+            if (wsdlUri == null)
             {
                 throw new FlowConstructInvalidException(
-                    MessageFactory.createStaticMessage("wsdlUrl can't be null"));
+                    MessageFactory.createStaticMessage("wsdlUri can't be null"));
             }
 
-            wsdlAddress = wsdlUrl.toExternalForm();
+            wsdlAddress = wsdlUri.toString();
             logger.info("Using url " + wsdlAddress + " as WSDL");
         }
 
