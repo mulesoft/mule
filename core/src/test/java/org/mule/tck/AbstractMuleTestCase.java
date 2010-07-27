@@ -636,7 +636,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     protected void doTearDown() throws Exception
     {
-		// Breaks org.mule.transport.cxf.CxfConnectorHttpFunctionalTestCase (and probably others)
+        // Breaks org.mule.transport.cxf.CxfConnectorHttpFunctionalTestCase (and probably others)
         //RequestContext.clear();
     }
 
