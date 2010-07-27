@@ -58,7 +58,6 @@ import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -220,6 +219,32 @@ public class MuleEventMulticaster
         listeners.add(listenerToAdd);
     }
 
+    public void addApplicationListenerBean(String s)
+    {
+        Object listener = applicationContext.getBean(s);
+        if(listener instanceof ApplicationListener)
+        {
+            addApplicationListener((ApplicationListener)listener);
+        }
+        else
+        {
+            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
+        }
+    }
+
+    public void removeApplicationListenerBean(String s)
+    {
+        Object listener = applicationContext.getBean(s);
+        if(listener instanceof ApplicationListener)
+        {
+            removeApplicationListener((ApplicationListener)listener);
+        }
+        else
+        {
+            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
+        }
+    }
+
     /**
      * Removes a listener from the multicaster
      * 
@@ -338,7 +363,7 @@ public class MuleEventMulticaster
                     }
                     else if (!(asyncListener.getListener() instanceof MuleEventListener))
                     {
-                        asyncListener.onApplicationEvent(e);
+                        asyncListener.onApplicationEvent(muleEvent);
                     }
                     // Synchronous MuleEvent listener Checks
                 }
