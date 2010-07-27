@@ -99,6 +99,3 @@ org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.messaging.meps.InOutAsyncTestCase
 org.mule.test.integration.messaging.meps.InOptionalOutOutOptionalInTestCase
 org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
-
-#MULE-4976. Since upgrade to Spring 3.0.3.  There seems to be an updated API we should be using
-org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase

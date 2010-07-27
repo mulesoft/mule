@@ -219,32 +219,6 @@ public class MuleEventMulticaster
         listeners.add(listenerToAdd);
     }
 
-    public void addApplicationListenerBean(String s)
-    {
-        Object listener = applicationContext.getBean(s);
-        if(listener instanceof ApplicationListener)
-        {
-            addApplicationListener((ApplicationListener)listener);
-        }
-        else
-        {
-            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
-        }
-    }
-
-    public void removeApplicationListenerBean(String s)
-    {
-        Object listener = applicationContext.getBean(s);
-        if(listener instanceof ApplicationListener)
-        {
-            removeApplicationListener((ApplicationListener)listener);
-        }
-        else
-        {
-            throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
-        }
-    }
-
     /**
      * Removes a listener from the multicaster
      * 
@@ -363,7 +337,7 @@ public class MuleEventMulticaster
                     }
                     else if (!(asyncListener.getListener() instanceof MuleEventListener))
                     {
-                        asyncListener.onApplicationEvent(muleEvent);
+                        asyncListener.onApplicationEvent(e);
                     }
                     // Synchronous MuleEvent listener Checks
                 }

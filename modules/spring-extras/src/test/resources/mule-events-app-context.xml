@@ -8,15 +8,15 @@
         This context initialises the MuleEventMulticaster and two Test beans used for sending and recieving
         MuleEvents.  The testBeans have a callback which is used in the tests to control the behaviour of the components.
         Both beans are MuleSubscriptionEventListeners which means they hae methods for getting and setting
-        subscriptions.  You can specify that a bean receices all events either by setting the subscription property to
+        subscriptions.  You can specify that a bean receices all events either by setting the subscription proprty to
         '*' or by implementing MuleEventListener.
         
         The irregular part of this test configuration is that the Mule VM provider is used.  This provider uses
         in-memory queues to store events and is useful for testing as no additional connections need to be made.
         In a real configuration the VM provider would not be used as it passes events around in the same vm which
-        isn't necessary in Spring as you can use Spring's event mechanism for that.  Also if you do use the VM transport
+        isn't necessary in Spring as you can use Spring's event mechanism for that.  Also if you do use the VM provider
         do not set subscriptions to '*' for beans that publish events as the bean will keep receiving the event it publishes.
-        This does not happen when using the other Mule transports.
+        This does not happen when using the other Mule providers.
     -->
 
     <!-- The Mule implementation of ApplicationEventMulticaster.  On startup the application

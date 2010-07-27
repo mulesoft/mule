@@ -17,9 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
-import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -44,7 +42,6 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 
     public void testReceivingASubscriptionEvent() throws Exception
     {
-        final Latch latch = new Latch();
         OrderManagerBean subscriptionBean = (OrderManagerBean) muleContext.getRegistry().lookupObject(
             "orderManagerBean");
         assertNotNull(subscriptionBean);
@@ -55,8 +52,6 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
             public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();
-                latch.release();
-
             }
         };
         subscriptionBean.setEventCallback(callback);
@@ -64,11 +59,11 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);
-
-        assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(1000);
+        assertTrue(eventCount.get() == 1);
 
         MuleMessage result = client.request("jms://processed.queue", 10000);
-        assertEquals(1, eventCount.get());
+        assertEquals(1, eventCount.intValue());
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayloadAsString());
     }
