@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transport.MessageReceiver;
@@ -273,7 +273,7 @@ public class JettyHttpConnector extends AbstractConnector
     }
 
     @Override
-    public ReplyToHandler getReplyToHandler(InboundEndpoint endpoint)
+    public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
         if (isUseContinuations())
         {

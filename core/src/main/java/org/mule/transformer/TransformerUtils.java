@@ -13,8 +13,7 @@ package org.mule.transformer;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
@@ -102,7 +101,7 @@ public class TransformerUtils
         }
     }
 
-    public static List<Transformer> getDefaultInboundTransformers(final TransportServiceDescriptor serviceDescriptor, final InboundEndpoint endpoint)
+    public static List<Transformer> getDefaultInboundTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
     {
         return getTransformersFromSource(new TransformerSource()
         {
@@ -113,7 +112,7 @@ public class TransformerUtils
         });
     }
 
-    public static List<Transformer> getDefaultResponseTransformers(final TransportServiceDescriptor serviceDescriptor, final InboundEndpoint endpoint)
+    public static List<Transformer> getDefaultResponseTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
     {
         return getTransformersFromSource(new TransformerSource()
         {
@@ -124,7 +123,7 @@ public class TransformerUtils
         });
     }
 
-    public static List<Transformer> getDefaultOutboundTransformers(final TransportServiceDescriptor serviceDescriptor, final OutboundEndpoint endpoint)
+    public static List<Transformer> getDefaultOutboundTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
     {
         return getTransformersFromSource(new TransformerSource()
         {

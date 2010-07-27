@@ -130,8 +130,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     {
         endpointUri = endpoint.getEndpointURI();
         
-        defaultInboundTransformers = connector.getDefaultInboundTransformers((InboundEndpoint) endpoint);       
-        defaultResponseTransformers = connector.getDefaultResponseTransformers((InboundEndpoint) endpoint);
+        defaultInboundTransformers = connector.getDefaultInboundTransformers(endpoint);       
+        defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);
         
         super.initialise();
     }

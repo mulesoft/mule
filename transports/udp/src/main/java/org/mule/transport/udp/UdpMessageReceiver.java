@@ -126,7 +126,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         List transformers = endpoint.getResponseTransformers();
         if (transformers == null)
         {
-            return connector.getDefaultResponseTransformers((InboundEndpoint) endpoint);
+            return connector.getDefaultResponseTransformers(endpoint);
         }
         return transformers;
     }

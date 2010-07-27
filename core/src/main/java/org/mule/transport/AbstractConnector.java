@@ -1481,7 +1481,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      */
     protected abstract void doStop() throws MuleException;
 
-    public List<Transformer> getDefaultInboundTransformers(InboundEndpoint endpoint)
+    public List<Transformer> getDefaultInboundTransformers(ImmutableEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
@@ -1490,7 +1490,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         return TransformerUtils.getDefaultInboundTransformers(serviceDescriptor, endpoint);
     }
 
-    public List<Transformer> getDefaultResponseTransformers(InboundEndpoint endpoint)
+    public List<Transformer> getDefaultResponseTransformers(ImmutableEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
@@ -1499,7 +1499,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         return TransformerUtils.getDefaultResponseTransformers(serviceDescriptor, endpoint);
     }
 
-    public List<Transformer> getDefaultOutboundTransformers(OutboundEndpoint endpoint)
+    public List<Transformer> getDefaultOutboundTransformers(ImmutableEndpoint endpoint)
     {
         if (serviceDescriptor == null)
         {
@@ -1513,7 +1513,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      *
      * @return Value for property 'replyToHandler'.
      */
-    public ReplyToHandler getReplyToHandler(InboundEndpoint endpoint)
+    public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
         return new DefaultReplyToHandler(getDefaultResponseTransformers(endpoint), muleContext);
     }

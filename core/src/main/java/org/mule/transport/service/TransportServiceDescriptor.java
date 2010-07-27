@@ -10,17 +10,14 @@
 
 package org.mule.transport.service;
 
-import java.util.List;
-import java.util.Properties;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
@@ -30,6 +27,9 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.api.transport.SessionHandler;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * <code>TransportServiceDescriptor</code> describes the necessary information for
@@ -64,11 +64,11 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
 
     Connector createConnector() throws TransportServiceException;
 
-    List<Transformer> createInboundTransformers(InboundEndpoint endpoint) throws TransportFactoryException;
+    List<Transformer> createInboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
-    List<Transformer> createOutboundTransformers(OutboundEndpoint endpoint) throws TransportFactoryException;
+    List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
-    List<Transformer> createResponseTransformers(InboundEndpoint endpoint) throws TransportFactoryException;
+    List<Transformer> createResponseTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
     EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 

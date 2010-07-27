@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
@@ -30,8 +30,7 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         Object replyTo = event.getMessage().getReplyTo();
-        ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
-            (InboundEndpoint) event.getEndpoint());
+        ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
         // Do not propagate REPLY_TO beyond the inbound endpoint
         event.getMessage().setReplyTo(null);
 
@@ -47,7 +46,7 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
         return resultEvent;
     }
 
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
+    protected ReplyToHandler getReplyToHandler(MuleMessage message, ImmutableEndpoint endpoint)
     {
         Object replyTo = message.getReplyTo();
         ReplyToHandler replyToHandler = null;

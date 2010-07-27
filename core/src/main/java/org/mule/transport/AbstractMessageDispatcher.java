@@ -35,7 +35,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 {
 
     protected List<Transformer> defaultOutboundTransformers;;       
-    
+    protected List<Transformer> defaultResponseTransformers;;       
+
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
@@ -44,7 +45,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     @Override
     protected ConnectableLifecycleManager createLifecycleManager()
     {
-        defaultOutboundTransformers = connector.getDefaultOutboundTransformers((OutboundEndpoint) endpoint);       
+        defaultOutboundTransformers = connector.getDefaultOutboundTransformers(endpoint);       
+        defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);       
         return new ConnectableLifecycleManager<MessageDispatcher>(getDispatcherName(), this);
     }
 
@@ -57,7 +59,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent result = null;
+        MuleEvent resultEvent = null;
         try
         {
             connect();
@@ -74,7 +76,12 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 MuleMessage resultMessage = doSend(event);
                 if (resultMessage != null)
                 {
-                    result = new DefaultMuleEvent(resultMessage, event);
+                    resultEvent = new DefaultMuleEvent(resultMessage, event);
+                    // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.
+                    //if (!disableTransportTransformer)
+                    //{
+                    //    applyResponseTransformers(resultEvent);            
+                    //}
                 }
             }
             else
@@ -90,7 +97,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             throw new DispatchException(event.getMessage(), endpoint, e);
         }
-        return result;
+        return resultEvent;
     }
 
     /**
@@ -181,6 +188,11 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
     protected void applyOutboundTransformers(MuleEvent event) throws TransformerException
     {
         event.getMessage().applyTransformers(defaultOutboundTransformers);
+    }
+
+    protected void applyResponseTransformers(MuleEvent event) throws TransformerException
+    {
+        event.getMessage().applyTransformers(defaultResponseTransformers);
     }
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;

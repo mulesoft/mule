@@ -60,7 +60,7 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
     @Override
     public final void initialise() throws InitialisationException
     {
-        defaultInboundTransformers = connector.getDefaultInboundTransformers((InboundEndpoint) endpoint);               
+        defaultInboundTransformers = connector.getDefaultInboundTransformers(endpoint);               
         super.initialise();
     }
 

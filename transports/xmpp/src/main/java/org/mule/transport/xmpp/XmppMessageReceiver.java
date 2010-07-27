@@ -145,7 +145,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
                 if (returnMessage != null && packet instanceof Message)
                 {
-                    returnMessage.applyTransformers(connector.getDefaultResponseTransformers((InboundEndpoint) endpoint));
+                    returnMessage.applyTransformers(connector.getDefaultResponseTransformers(endpoint));
                     Packet result = (Packet) returnMessage.getPayload();
 //                    xmppConnection.sendPacket(result);
                 }

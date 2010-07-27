@@ -17,8 +17,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURIBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
@@ -362,7 +362,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createInboundTransformers(InboundEndpoint endpoint) throws TransportFactoryException
+    public List<Transformer> createInboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException
     {
         if (defaultInboundTransformer != null)
         {
@@ -386,7 +386,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createOutboundTransformers(OutboundEndpoint endpoint) throws TransportFactoryException
+    public List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException
     {
         if (defaultOutboundTransformer != null)
         {
@@ -410,7 +410,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transformer> createResponseTransformers(InboundEndpoint endpoint) throws TransportFactoryException
+    public List<Transformer> createResponseTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException
     {
         if (defaultResponseTransformer != null)
         {
