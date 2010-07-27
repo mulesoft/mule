@@ -636,7 +636,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     protected void doTearDown() throws Exception
     {
-        RequestContext.clear();
+		// Breaks org.mule.transport.cxf.CxfConnectorHttpFunctionalTestCase (and probably others)
+        //RequestContext.clear();
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name) throws Exception
