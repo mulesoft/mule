@@ -137,7 +137,6 @@ import org.mule.transaction.lookup.JRunTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.Resin3TransactionManagerLookupFactory;
 import org.mule.transaction.lookup.WeblogicTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.WebsphereTransactionManagerLookupFactory;
-import org.mule.transformer.NoActionTransformer;
 import org.mule.transformer.codec.Base64Decoder;
 import org.mule.transformer.codec.Base64Encoder;
 import org.mule.transformer.codec.XmlEntityDecoder;
@@ -206,7 +205,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("custom-transformer", new MessageProcessorDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new MessageProcessorDefinitionParser(AutoTransformer.class));
-        registerBeanDefinitionParser("no-action-transformer", new MessageProcessorDefinitionParser(NoActionTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
 
         registerBeanDefinitionParser("expression-transformer", new MessageProcessorDefinitionParser(ExpressionTransformer.class));

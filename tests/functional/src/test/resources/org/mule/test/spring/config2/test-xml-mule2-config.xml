@@ -46,7 +46,7 @@
             <property name="beanProperty2" value="12"/>
             <property name="containerProperty" value="a string"/>
         </mule:custom-transformer>
-        <mule:no-action-transformer name="TestTransformer" returnClass="[B"/>
+        <test:no-action-transformer name="TestTransformer" returnClass="[B"/>
 
         <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ" exchange-pattern="one-way">
             <mule:message-property-filter pattern="foo=bar"/>

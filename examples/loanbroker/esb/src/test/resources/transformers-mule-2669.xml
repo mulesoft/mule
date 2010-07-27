@@ -18,7 +18,7 @@
     <jms:activemq-connector name="default"/>
     
     <jms:activemq-connector name="noOutbound">
-        <service-overrides responseTransformer="org.mule.transformer.NoActionTransformer"/>
+        <service-overrides responseTransformer="org.mule.tck.transformer.NoActionTransformer"/>
     </jms:activemq-connector>
 
     <model name="test">

@@ -3,10 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+      http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
 
     <vm:connector name="vm-in1" />
@@ -19,7 +21,7 @@
     <vm:endpoint name="inbound2" path="in2" connector-ref="vm-in2" exchange-pattern="request-response"/>
     <vm:endpoint name="outbound2" path="out2" connector-ref="vm-out2" exchange-pattern="request-response"/>
 
-    <no-action-transformer name="plain" mimeType="text/plain"/>
+    <test:no-action-transformer name="plain" mimeType="text/plain"/>
 
     <model name="model">
 
@@ -30,7 +32,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="outbound1" >
-                        <no-action-transformer mimeType="text/xml"/>   
+                        <test:no-action-transformer mimeType="text/xml"/>   
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

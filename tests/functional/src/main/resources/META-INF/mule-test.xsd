@@ -126,4 +126,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="no-action-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that has no effect.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
 </xsd:schema>

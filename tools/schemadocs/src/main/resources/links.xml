@@ -83,7 +83,6 @@
     <link><item>mule:transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:custom-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:message-properties-transformer</item><page>Additional+Configuration</page></link>
-    <link><item>mule:no-action-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:base64-encoder-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:base64-decoder-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:xml-entity-encoder-transformer</item><page>Additional+Configuration</page></link>

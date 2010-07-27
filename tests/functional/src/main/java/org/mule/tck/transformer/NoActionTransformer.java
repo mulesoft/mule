@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transformer;
+package org.mule.tck.transformer;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 /**

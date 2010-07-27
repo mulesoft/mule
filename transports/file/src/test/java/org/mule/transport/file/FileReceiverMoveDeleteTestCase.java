@@ -23,8 +23,8 @@ import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.transformer.NoActionTransformer;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.transformer.NoActionTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;

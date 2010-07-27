@@ -15,17 +15,17 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformer.NoActionTransformer;
+import org.mule.transformer.AbstractTransformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -322,7 +322,14 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         {
             this.expectCopy = expectCopy;
             List<Transformer> transformers = new ArrayList<Transformer>();
-            transformers.add(new NoActionTransformer());
+            transformers.add(new AbstractTransformer() 
+            {
+                @Override
+                public Object doTransform(Object src, String encoding) throws TransformerException
+                {
+                    return src;
+                }
+            });
             setTransformers(transformers);
         }
 

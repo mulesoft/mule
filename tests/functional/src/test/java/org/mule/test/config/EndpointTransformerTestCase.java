@@ -13,7 +13,7 @@ package org.mule.test.config;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformer.NoActionTransformer;
+import org.mule.tck.transformer.NoActionTransformer;
 import org.mule.transformer.TransformerUtils;
 
 public class EndpointTransformerTestCase extends AbstractMuleTestCase

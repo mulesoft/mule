@@ -10,7 +10,7 @@
 
 package org.mule.transport.email.connectors;
 
-import org.mule.transformer.NoActionTransformer;
+import org.mule.tck.transformer.NoActionTransformer;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 

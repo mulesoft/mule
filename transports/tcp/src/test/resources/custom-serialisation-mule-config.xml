@@ -16,7 +16,7 @@
         <tcp:custom-protocol class="org.mule.transport.tcp.integration.CustomSerializationProtocol"/>
     </tcp:connector>
 
-    <custom-transformer name="NoAction" class="org.mule.transformer.NoActionTransformer"/>
+    <custom-transformer name="NoAction" class="org.mule.tck.transformer.NoActionTransformer"/>
 
     <model name="model">
         <service name="BridgeIn">
@@ -26,7 +26,7 @@
             <outbound>
                 <pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="9994" exchange-pattern="one-way">
-                        <custom-transformer class="org.mule.transformer.NoActionTransformer"/>
+                        <custom-transformer class="org.mule.tck.transformer.NoActionTransformer"/>
                     </tcp:outbound-endpoint>
                 </pass-through-router>
             </outbound>
