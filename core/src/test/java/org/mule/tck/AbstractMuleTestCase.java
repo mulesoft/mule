@@ -11,6 +11,7 @@
 package org.mule.tck;
 
 import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -635,7 +636,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     protected void doTearDown() throws Exception
     {
-        // template method
+        RequestContext.clear();
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name) throws Exception

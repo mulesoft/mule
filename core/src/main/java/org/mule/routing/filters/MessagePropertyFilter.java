@@ -81,7 +81,7 @@ public class MessagePropertyFilter implements Filter
         }
         if (!match && logger.isDebugEnabled())
         {
-            logger.debug(String.format("Property: '%s' not found on message with Id: %s", propertyName, message.getUniqueId()));
+            logger.debug(String.format("Property: '%s' not found in scope '%s'. Message %n%s", propertyName, scope, message));
         }
         return match;
     }
