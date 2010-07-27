@@ -13,12 +13,13 @@ package org.mule.routing.filters;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 /**
  * <code>WildcardFilter</code> is used to match Strings against wildcards. It
@@ -67,7 +68,7 @@ public class WildcardFilter implements Filter, ObjectFilter
             return false;
         }
 
-        if(this.pattern.equals(object))
+        if (this.pattern.equals(object))
         {
             return true;
         }
@@ -75,10 +76,9 @@ public class WildcardFilter implements Filter, ObjectFilter
         String[] currentPatterns = this.patterns;
         if (currentPatterns != null)
         {
-            for (int x = 0; x < currentPatterns.length; x++)
+            for (String pattern : currentPatterns)
             {
                 boolean foundMatch;
-                String pattern = currentPatterns[x];
 
                 if ("*".equals(pattern) || "**".equals(pattern))
                 {
