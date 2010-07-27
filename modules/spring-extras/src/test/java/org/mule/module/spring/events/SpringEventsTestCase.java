@@ -25,7 +25,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -33,7 +32,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 public class SpringEventsTestCase extends FunctionalTestCase
 {
-    protected static final int DEFAULT_LATCH_TIMEOUT = 5000;
+    protected static final int DEFAULT_LATCH_TIMEOUT = 10000;
 
     private static final int NUMBER_OF_MESSAGES = 10;
     volatile AtomicInteger eventCounter1;
