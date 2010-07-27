@@ -425,23 +425,6 @@ public class MessagePropertiesContext implements Serializable
         return ObjectUtils.getString(getProperty(name, scope), defaultValue);
     }
 
-    protected MessagePropertiesContext copy()
-    {
-        Set<String> keys = new TreeSet<String>(getPropertyNames());
-
-        Map<PropertyScope, Map<String, Object>> map = new TreeMap<PropertyScope,
-                Map<String, Object>>(new PropertyScope.ScopeComparator());
-
-        map.put(PropertyScope.INVOCATION,
-                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.INVOCATION)));
-        map.put(PropertyScope.INBOUND,
-                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.INBOUND)));
-        map.put(PropertyScope.OUTBOUND,
-                new CaseInsensitiveHashMap/*<String, Object>*/(getScopedProperties(PropertyScope.OUTBOUND)));
-
-        return new MessagePropertiesContext(getDefaultScope(), keys, map);
-    }
-
     @Override
     public String toString()
     {
