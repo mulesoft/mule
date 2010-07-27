@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.retry.RetryContext;
+import org.mule.api.transformer.DataType;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 
@@ -97,7 +98,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         DatagramSocket socket = connector.getSocket(ep);
         try
         {
-            byte[] payload = event.transformMessageToBytes();
+            byte[] payload = event.transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
 
             int port = ep.getEndpointURI().getPort();
             InetAddress inetAddress = null;

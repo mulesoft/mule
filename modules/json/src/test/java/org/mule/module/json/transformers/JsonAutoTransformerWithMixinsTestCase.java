@@ -11,11 +11,13 @@ package org.mule.module.json.transformers;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.module.json.JsonData;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.mule.transformer.types.DataTypeFactory;
 
 //TODO: IBEANS-141. No support for Mixin resolution yet
 public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleTestCase
@@ -40,13 +42,13 @@ public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleTestCase
         //1) Mixins are recognised by the Transformer resolver
         //2) that we successfully marshal and marshal an object that is not annotated directly
         MuleMessage message = new DefaultMuleMessage(APPLE_JSON, muleContext);
-        Apple apple = message.getPayload(Apple.class);
+        Apple apple = (Apple) message.getPayload(DataTypeFactory.create(Apple.class));
         assertNotNull(apple);
         assertFalse(apple.isWashed());
         assertTrue(apple.isBitten());
 
         message = new DefaultMuleMessage(apple, muleContext);
-        String json = message.getPayload(String.class);
+        String json = message.getPayload(DataType.STRING_DATA_TYPE);
         assertNotNull(json);
         JsonData data = new JsonData(json);
         assertEquals("true", data.get("bitten"));

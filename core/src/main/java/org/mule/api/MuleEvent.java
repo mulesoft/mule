@@ -59,7 +59,9 @@ public interface MuleEvent
      * @return the message transformed into it's recognised or expected format.
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.api.transformer.Transformer if the transform fails or the outputtype is null
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     <T> T transformMessage(Class<T> outputType) throws TransformerException;
 
      /**
@@ -82,7 +84,9 @@ public interface MuleEvent
      *         array of bytes.
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.api.transformer.Transformer
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     byte[] transformMessageToBytes() throws TransformerException;
 
     /**

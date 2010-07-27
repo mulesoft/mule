@@ -10,6 +10,7 @@
 package org.mule.transformer.types;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
@@ -49,6 +50,18 @@ public class DataTypeFactory
     public static DataType<?> create(Class<?> type)
     {
         return create(type, MimeTypes.ANY);
+    }
+
+    public static DataType<?> createImmutable(Class<?> type)
+    {
+        return new ImmutableDataType(create(type, MimeTypes.ANY));
+    }
+
+    public static DataType<?> createWithEncoding(Class<?> type, String encoding)
+    {
+        DataType dataType = create(type);
+        dataType.setEncoding(encoding);
+        return dataType;
     }
 
     public static DataType<?> create(Class<?> type, String mimeType)
@@ -105,7 +118,7 @@ public class DataTypeFactory
             type = mm.getPayload().getClass();
             //TODO better mime handling, see MULE-4639
             //case insensitive
-            mime = mm.getInboundProperty("Content-Type");
+            mime = mm.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
             if (mime == null)
             {
                 //case insensitive

@@ -12,6 +12,7 @@ package org.mule.transport.servlet.jetty;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.SystemUtils;
@@ -69,7 +70,7 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(endpoint, message, null).getPayload(byte[].class));
+            results.add(client.send(endpoint, message, null).getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
         }
         assertEquals(noOfMessages, results.size());
         for (int i = 0; i < noOfMessages; i++)

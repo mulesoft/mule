@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringDataSource;
 
 import java.util.List;
@@ -191,7 +192,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         MuleMessage message = client.send("vm://attachmentsWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<?, ?> result = message.getPayload(Map.class);
+        Map<?, ?> result = (Map<?, ?>) message.getPayload(DataTypeFactory.create(Map.class));
         //Will match on ba*
         assertEquals(2, result.size());
         assertNull(result.get("foo"));

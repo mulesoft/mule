@@ -111,9 +111,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public byte[] transformMessageToBytes() throws TransformerException
     {
-        return transformMessage(byte[].class);
+        return transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
     }
 
     public String transformMessageToString() throws TransformerException

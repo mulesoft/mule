@@ -117,11 +117,13 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return null;  
         }
 
+        @Deprecated
         public Object transformMessage(Class outputType) throws TransformerException
         {
             return null;  
         }
 
+        @Deprecated
         public byte[] transformMessageToBytes() throws TransformerException
         {
             return new byte[0];  

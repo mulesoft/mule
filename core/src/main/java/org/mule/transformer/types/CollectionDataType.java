@@ -117,6 +117,10 @@ public class CollectionDataType<T> extends SimpleDataType<T>
     @Override
     public boolean isCompatibleWith(DataType dataType)
     {
+        if (dataType instanceof ImmutableDataType)
+        {
+            dataType = ((ImmutableDataType)dataType).getWrappedDataType();
+        }
         if (!(dataType instanceof CollectionDataType))
         {
             return false;

@@ -67,7 +67,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private static final long serialVersionUID = 1541720810851984844L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
     private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
-    private final String CONTENT_TYPE_PROPERTY = "Content-Type";
 
     /** 
      * The default UUID for the message. If the underlying transport has the notion of a 
@@ -245,10 +244,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
+     * @deprecated use {@link #getPayload(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     public <T> T getPayload(Class<T> outputType) throws TransformerException
     {
-        return getPayload(outputType, getEncoding());
+        return (T) getPayload(DataTypeFactory.create(outputType), getEncoding());
     }
 
 
@@ -323,24 +324,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
 
         return (T) result;
-    }
-
-    /**
-     * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a trnsformr that can do this transformation. If a transformer cannot be found
-     * an exception is thrown.  Any transfromers added to the reqgistry will be checked for compatability
-     *
-     * @param outputType the desired return type
-     * @param encoding   the encoding to use if required
-     * @return The converted payload of this message. Note that this method will not alter the payload of this
-     *         message *unless* the payload is an inputstream in which case the stream will be read and the payload will become
-     *         the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
-     *                              payload
-     */
-    protected <T> T getPayload(Class<T> outputType, String encoding) throws TransformerException
-    {
-        return (T) getPayload(new SimpleDataType(outputType), encoding);
     }
 
     /**
@@ -514,7 +497,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             return cache;
         }
-        byte[] result = getPayload(byte[].class);
+        byte[] result = getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
         if (muleContext.getConfiguration().isCacheMessageAsBytes())
         {
             cache = result;
@@ -532,7 +515,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             return new String(cache, encoding);
         }
-        String result = getPayload(String.class, encoding);
+        String result = getPayload(DataType.STRING_DATA_TYPE, encoding);
         if (muleContext.getConfiguration().isCacheMessageAsBytes())
         {
             cache = result.getBytes(encoding);
@@ -984,7 +967,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 mimeType = mimeType + ";charset=" + encoding;
             }
-            setOutboundProperty(CONTENT_TYPE_PROPERTY, mimeType);
+            setOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY, mimeType);
         }
     }
     /**
@@ -1098,7 +1081,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
         if (null != outputType && !getPayload().getClass().isAssignableFrom(outputType))
         {
-            setPayload(getPayload(outputType));
+            setPayload(getPayload(DataTypeFactory.create(outputType)));
         }
     }
 

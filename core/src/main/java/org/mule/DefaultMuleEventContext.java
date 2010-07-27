@@ -30,6 +30,7 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -41,6 +42,7 @@ import java.io.OutputStream;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>DefaultMuleEventContext</code> is the context object for the current
@@ -93,6 +95,25 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Returns the message transformed into its recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.
+     *
+     * @param dataType The dataType  required for the return object. This param
+     *            just provides a convienient way to manage type casting of
+     *            transformed objects
+     * @return the message transformed into it's recognised or expected format.
+     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     *             if the return type is not the same as the expected type in the
+     *             transformer
+     * @see org.mule.api.transformer.Transformer
+     */
+    public Object transformMessage(DataType dataType) throws TransformerException
+    {
+        return event.transformMessage(dataType);
+    }
+
+    /**
+     * Returns the message transformed into its recognised or expected format. The
+     * transformer used is the one configured on the endpoint through which this
+     * event was received.
      * 
      * @param expectedType The class type required for the return object. This param
      *            just provides a convienient way to manage type casting of
@@ -102,10 +123,12 @@ public class DefaultMuleEventContext implements MuleEventContext
      *             if the return type is not the same as the expected type in the
      *             transformer
      * @see org.mule.api.transformer.Transformer
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     public Object transformMessage(Class expectedType) throws TransformerException
     {
-        return event.transformMessage(expectedType);
+        return event.transformMessage(DataTypeFactory.create(expectedType));
     }
 
     /**
@@ -118,10 +141,12 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @throws org.mule.api.transformer.TransformerException if a failure occurs in
      *             the transformer
      * @see org.mule.api.transformer.Transformer
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     public byte[] transformMessageToBytes() throws TransformerException
     {
-        return event.transformMessageToBytes();
+        return event.transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
     }
 
     /**

@@ -28,6 +28,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.CxfConnector;
 import org.mule.transport.cxf.CxfConstants;
@@ -328,7 +329,7 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = result.getPayload(InputStream.class);
+            InputStream is = (InputStream) result.getPayload(DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
             result.setPayload(pb);
             

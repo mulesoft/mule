@@ -9,6 +9,8 @@
  */
 package org.mule.api.transformer;
 
+import org.mule.transformer.types.DataTypeFactory;
+
 import java.io.Serializable;
 
 /**
@@ -18,7 +20,7 @@ import java.io.Serializable;
  *
  * @since 3.0.0
  */
-public interface DataType<T> extends Serializable
+public interface DataType<T> extends Serializable, Cloneable
 {
     public static final String ANY_MIME_TYPE = "*/*";
 
@@ -63,4 +65,13 @@ public interface DataType<T> extends Serializable
      * @return true if the mime types are the same and this type can be assigned to the dataType.type.
      */
     boolean isCompatibleWith(DataType dataType);
+
+    /**
+     * Create an exact copy of this datatype
+     */
+    DataType cloneDataType();
+
+    DataType<byte[]> BYTE_ARRAY_DATA_TYPE = (DataType<byte[]>) DataTypeFactory.createImmutable(byte[].class);
+
+    DataType<String> STRING_DATA_TYPE = (DataType<String>) DataTypeFactory.createImmutable(String.class);
 }

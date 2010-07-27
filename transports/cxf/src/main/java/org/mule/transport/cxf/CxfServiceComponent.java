@@ -31,6 +31,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.xml.stax.StaxSource;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -381,7 +382,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         else
         {
-            InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
+            InputStream is = (InputStream) ctx.transformMessage(DataTypeFactory.create(InputStream.class));
             m.put(Message.ENCODING, ctx.getEncoding());
             m.setContent(InputStream.class, is);
         }
@@ -405,7 +406,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         else
         {
-            is = (InputStream) context.transformMessage(InputStream.class);
+            is = (InputStream) context.transformMessage(DataTypeFactory.create(InputStream.class));
         }
         return is;
     }

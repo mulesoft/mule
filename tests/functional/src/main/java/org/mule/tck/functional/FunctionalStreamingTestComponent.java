@@ -12,6 +12,7 @@ package org.mule.tck.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -72,7 +73,7 @@ public class FunctionalStreamingTestComponent implements Callable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-        InputStream in = context.getMessage().getPayload(InputStream.class);
+        InputStream in = (InputStream) context.getMessage().getPayload(DataTypeFactory.create(InputStream.class));
         try
         {
             logger.debug("arrived at " + toString());

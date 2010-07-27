@@ -11,13 +11,15 @@ package org.mule.transformer.types;
 
 import org.mule.api.transformer.DataType;
 
+import java.io.IOException;
+
 /**
  * A data type that simply wraps a Java type.  This type also allows a mime type to be associated
  * with the Java type.
  *
  * @since 3.0
  */
-public class SimpleDataType<T> implements DataType<T>
+public class SimpleDataType<T> implements DataType<T>, Cloneable
 {
     protected Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
@@ -61,6 +63,10 @@ public class SimpleDataType<T> implements DataType<T>
 
     public boolean isCompatibleWith(DataType dataType)
     {
+        if (dataType instanceof ImmutableDataType)
+        {
+            dataType = ((ImmutableDataType)dataType).getWrappedDataType();
+        }
         if (this == dataType)
         {
             return true;
@@ -139,5 +145,18 @@ public class SimpleDataType<T> implements DataType<T>
                 "type=" + type.getName() +
                 ", mimeType='" + mimeType + '\'' +
                 '}';
+    }
+
+    public DataType cloneDataType()
+    {
+        try
+        {
+            return (DataType) clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // This cannot happen, because we implement Cloneable
+            throw new IllegalStateException(e);
+        }
     }
 }

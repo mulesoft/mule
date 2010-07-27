@@ -13,6 +13,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 
 import org.apache.abdera.model.Feed;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class EventReceiver implements Callable
 {
@@ -21,7 +22,7 @@ public class EventReceiver implements Callable
 
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        Feed feed = eventContext.getMessage().getPayload(Feed.class);
+        Feed feed = (Feed) eventContext.getMessage().getPayload(DataTypeFactory.create(Feed.class));
         System.out.println("Received " + feed.getEntries().size() + " events");
 
         receivedEntries = feed.getEntries().size();

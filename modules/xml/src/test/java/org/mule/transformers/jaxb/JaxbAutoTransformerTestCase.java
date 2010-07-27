@@ -15,6 +15,7 @@ import org.mule.jaxb.model.Item;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractMuleTestCase;
 
+import org.mule.transformer.types.DataTypeFactory;
 import org.w3c.dom.Document;
 
 public class JaxbAutoTransformerTestCase extends AbstractMuleTestCase
@@ -24,7 +25,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_XML, muleContext);
-        Item item = message.getPayload(Item.class);
+        Item item = (Item) message.getPayload(DataTypeFactory.create(Item.class));
 
         assertNotNull(item);
         assertEquals("1234", item.getCode());
@@ -32,7 +33,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleTestCase
         assertTrue(item.isInStock());
 
         //and back again
-        Document doc = message.getPayload(Document.class);
+        Document doc = (Document) message.getPayload(DataTypeFactory.create(Document.class));
         
         assertNotNull(doc);
         assertEquals("1234", XMLUtils.selectValue("/item/code", doc));

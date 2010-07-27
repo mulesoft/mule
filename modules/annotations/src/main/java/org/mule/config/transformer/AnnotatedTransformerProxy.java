@@ -161,7 +161,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         else if (!sourceAnnotated)
         {
             //This will perform any additional transformation from the source type to the method parameter type
-            firstArg = message.getPayload(transformMethod.getParameterTypes()[0]);
+            firstArg = message.getPayload(DataTypeFactory.create(transformMethod.getParameterTypes()[0]));
         }
 
         //if the source is annotated, the paramTransformer will figure out the first parameter

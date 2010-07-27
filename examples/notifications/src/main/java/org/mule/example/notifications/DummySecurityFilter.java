@@ -19,6 +19,7 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class DummySecurityFilter extends AbstractEndpointSecurityFilter
     {
         try
         {
-            Map<?, ?> payload = event.getMessage().getPayload(Map.class);
+            Map<?, ?> payload = (Map<?, ?>) event.getMessage().getPayload(DataTypeFactory.create(Map.class));
             String user = (String) payload.get("user");
             if (user == null)
             {

@@ -15,8 +15,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -73,11 +75,11 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator, M
             {
                 if (expression.equals(BYTE_ARRAY))
                 {
-                    return message.getPayload(byte[].class);
+                    return message.getPayload(DataType.BYTE_ARRAY_DATA_TYPE);
                 }
                 else
                 {
-                    return message.getPayload(ClassUtils.loadClass(expression, getClass()));
+                    return message.getPayload(DataTypeFactory.create(ClassUtils.loadClass(expression, getClass())));
                 }
             }
             catch (TransformerException e)

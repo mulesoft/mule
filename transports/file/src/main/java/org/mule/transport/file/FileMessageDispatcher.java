@@ -16,7 +16,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.OutputHandler;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 import org.mule.transport.file.i18n.FileMessages;
@@ -79,7 +81,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                InputStream is = (InputStream) event.transformMessage(InputStream.class);
+                InputStream is = (InputStream) event.transformMessage(DataTypeFactory.create(InputStream.class));
                 IOUtils.copyLarge(is, fos);
                 is.close();
             }

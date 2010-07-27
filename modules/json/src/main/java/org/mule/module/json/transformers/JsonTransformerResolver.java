@@ -85,6 +85,7 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
             {
                 annotatedType = result.getType();
                 //Set the correct mime type on the raw type
+                source = source.cloneDataType();
                 source.setMimeType(JSON_MIME_TYPE);
                 marshal = false;
             }
@@ -92,6 +93,7 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
             {
                 annotatedType = source.getType();
                 //Set the correct mime type on the raw type
+                result = result.cloneDataType();
                 result.setMimeType(JSON_MIME_TYPE);
                 marshal = true;
             }

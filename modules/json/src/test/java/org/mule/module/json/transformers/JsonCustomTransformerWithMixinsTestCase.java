@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.json.JsonData;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class JsonCustomTransformerWithMixinsTestCase extends AbstractMuleTestCase
 {
@@ -33,13 +34,13 @@ public class JsonCustomTransformerWithMixinsTestCase extends AbstractMuleTestCas
         //2) that we successfully marshal and marshal an object that is not annotated directly
         MuleMessage message=  new DefaultMuleMessage(APPLE_JSON, muleContext);
 
-        Apple apple = message.getPayload(Apple.class);
+        Apple apple = (Apple) message.getPayload(DataTypeFactory.create(Apple.class));
         assertNotNull(apple);
         assertFalse(apple.isWashed());
         assertTrue(apple.isBitten());
 
         message=  new DefaultMuleMessage(apple, muleContext);
-        String json = message.getPayload(String.class);
+        String json = (String) message.getPayload(DataTypeFactory.create(String.class));
         assertNotNull(json);
         JsonData data = new JsonData(json);
         assertEquals("true", data.get("bitten"));

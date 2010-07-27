@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
 
@@ -85,7 +86,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getMessage().getPayload();
         
-        Message jabberMessage = event.getMessage().getPayload(Message.class);
+        Message jabberMessage = (Message) event.getMessage().getPayload(DataTypeFactory.create(Message.class));
 
         conversation.dispatch(jabberMessage);
         

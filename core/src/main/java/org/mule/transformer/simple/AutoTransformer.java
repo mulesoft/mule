@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * A transformer that uses the transform discovery mechanism to convert the message payload. This transformer
@@ -42,6 +43,6 @@ public class AutoTransformer extends AbstractMessageAwareTransformer
 
     public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        return message.getPayload(getReturnClass());
+        return message.getPayload(DataTypeFactory.create(getReturnClass()));
     }
 }

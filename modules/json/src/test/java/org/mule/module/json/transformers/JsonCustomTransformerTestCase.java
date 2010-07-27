@@ -16,6 +16,7 @@ import org.mule.json.model.Item;
 import org.mule.json.model.Person;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.types.CollectionDataType;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.ListDataType;
 import org.mule.transformer.types.SimpleDataType;
 
@@ -38,7 +39,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_JSON, muleContext);
 
-        Person person = message.getPayload(Person.class);
+        Person person = (Person) message.getPayload(DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());

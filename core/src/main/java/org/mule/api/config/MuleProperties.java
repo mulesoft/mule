@@ -154,4 +154,6 @@ public class MuleProperties
     public static final String MULE_CONTEXT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "context";
     public static final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
 
+    public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
+
 }

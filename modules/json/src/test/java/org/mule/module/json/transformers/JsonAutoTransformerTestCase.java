@@ -11,9 +11,11 @@ package org.mule.module.json.transformers;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.json.model.Item;
 import org.mule.module.json.JsonData;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class JsonAutoTransformerTestCase extends AbstractMuleTestCase
 {
@@ -23,7 +25,7 @@ public class JsonAutoTransformerTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_JSON, muleContext);
 
-        Item item = message.getPayload(Item.class);
+        Item item = (Item) message.getPayload(DataTypeFactory.create(Item.class));
         assertNotNull(item);
         assertEquals("1234", item.getCode());
         assertEquals("Vacuum Cleaner", item.getDescription());
@@ -31,7 +33,7 @@ public class JsonAutoTransformerTestCase extends AbstractMuleTestCase
 
         //and back again
         message = new DefaultMuleMessage(item, muleContext);
-        String json = message.getPayload(String.class);
+        String json = message.getPayload(DataType.STRING_DATA_TYPE);
         assertNotNull(json);
         assertEquals(ITEM_JSON, json);
         JsonData data = new JsonData(json);

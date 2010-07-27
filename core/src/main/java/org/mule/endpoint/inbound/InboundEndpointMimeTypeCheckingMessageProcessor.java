@@ -13,6 +13,7 @@ package org.mule.endpoint.inbound;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
@@ -26,8 +27,6 @@ import javax.activation.MimeTypeParseException;
  */
 public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageProcessor
 {
-    private final String CONTENT_TYPE_PROPERTY = "Content-Type";
-
     private InboundEndpoint endpoint;
 
     public InboundEndpointMimeTypeCheckingMessageProcessor(InboundEndpoint endpoint)
@@ -41,14 +40,14 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
         if (endpointMimeType != null)
         {
             MuleMessage message = event.getMessage();
-            String contentType = message.getProperty(CONTENT_TYPE_PROPERTY, PropertyScope.INBOUND);
+            String contentType = message.getProperty(MuleProperties.CONTENT_TYPE_PROPERTY, PropertyScope.INBOUND);
             if (contentType == null)
             {
-                contentType = message.getProperty(CONTENT_TYPE_PROPERTY, PropertyScope.OUTBOUND);
+                contentType = message.getProperty(MuleProperties.CONTENT_TYPE_PROPERTY, PropertyScope.OUTBOUND);
             }
             if (contentType == null)
             {
-                message.setProperty(CONTENT_TYPE_PROPERTY, endpointMimeType, PropertyScope.INBOUND);
+                message.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, endpointMimeType, PropertyScope.INBOUND);
             }
             else
             {

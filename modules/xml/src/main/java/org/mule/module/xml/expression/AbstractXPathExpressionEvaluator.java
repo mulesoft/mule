@@ -34,6 +34,7 @@ import java.util.WeakHashMap;
 import org.dom4j.Document;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
@@ -110,7 +111,7 @@ public abstract class AbstractXPathExpressionEvaluator implements ExpressionEval
             //we need to convert to a Dom if its an XML string
             if(payload instanceof String)
             {
-                payload = message.getPayload(Document.class);
+                payload = message.getPayload(DataTypeFactory.create(Document.class));
             }
 
             XPath xpath = getXPath(expression, payload);

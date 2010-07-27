@@ -290,6 +290,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    /**
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
+     */
+    @Deprecated
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return (T)transformMessage(DataTypeFactory.create(outputType));
@@ -314,10 +318,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @return a byte[] representation of the message
      * @throws TransformerException if an unsupported encoding is being used or if
      *                              the result message is not a String byte[] or Seializable object
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     public byte[] transformMessageToBytes() throws TransformerException
     {
-        return (byte[]) transformMessage(byte[].class);
+        return transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
     }
 
     /**
@@ -334,29 +340,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public String transformMessageToString() throws TransformerException
     {
-        try
-        {
-            return new String(transformMessageToBytes(), getEncoding());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new TransformerException(endpoint.getTransformers(), e);
-        }
-
-        /* TODO MULE-2691 Note that the above code actually transforms the message 
-         * to byte[] instead of String.  The following code would transform the 
-         * message to a String but breaks some tests in transports/http:
-         * 
-        transformMessageToBytes();
-        
-        ByteArrayToObject t = new ByteArrayToObject();
-        t.setEncoding(getEncoding());
-        List list = new ArrayList();
-        list.add(t);
-        message.applyTransformers(list);
-
-        return (String) message.getPayload();
-        */
+        return (String) transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding())); 
     }
 
     public String getMessageAsString() throws MuleException

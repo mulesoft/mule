@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * A {@link org.mule.api.MuleMessage} type that manages a collection of MuleMessage Objects.
@@ -139,15 +141,18 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
      * {@link java.util.List} of results.
      *
      * {@inheritDoc}
+     * @deprecated use {@link #getPayload(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     @Override
     public Object getPayload(Class outputType) throws TransformerException
     {
+        DataType outputDataType = DataTypeFactory.create(outputType);
         List results = new ArrayList(getMessageList().size());
         for (Iterator iterator = getMessageList().iterator(); iterator.hasNext();)
         {
             MuleMessage message = (MuleMessage) iterator.next();
-            results.add(message.getPayload(outputType));
+            results.add(message.getPayload(outputDataType));
         }
         return results;
     }

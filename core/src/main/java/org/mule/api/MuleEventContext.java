@@ -17,6 +17,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -44,6 +45,22 @@ public interface MuleEventContext
     byte[] getMessageAsBytes() throws MuleException;
 
     /**
+     * Returns the message transformed into its recognised or expected format. The
+     * transformer used is the one configured on the endpoint through which this
+     * event was received.
+     *
+     * @param dataType The dataType  required for the return object. This param
+     *            just provides a convienient way to manage type casting of
+     *            transformed objects
+     * @return the message transformed into it's recognised or expected format.
+     * @throws org.mule.api.transformer.TransformerException if a failure occurs or
+     *             if the return type is not the same as the expected type in the
+     *             transformer
+     * @see org.mule.api.transformer.Transformer
+     */
+    Object transformMessage(DataType dataType) throws TransformerException;
+
+    /**
      * Returns the message transformed into it's recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.
@@ -56,7 +73,9 @@ public interface MuleEventContext
      *             if the return type is not the same as the expected type in the
      *             transformer
      * @see org.mule.api.transformer.Transformer
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     Object transformMessage(Class expectedType) throws TransformerException;
 
     /**
@@ -68,7 +87,9 @@ public interface MuleEventContext
      *         array of bytes.
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.api.transformer.Transformer
+     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Deprecated
     byte[] transformMessageToBytes() throws TransformerException;
 
     /**

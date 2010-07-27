@@ -39,6 +39,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.dom.DOMXPath;
 import org.jaxen.dom4j.Dom4jXPath;
 import org.jaxen.javabean.JavaBeanXPath;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>JaxenFilter</code> evaluates an XPath expression against an XML document
@@ -115,7 +116,7 @@ public class JaxenFilter implements Filter, MuleContextAware
             {
                 try
                 {
-                    return accept(obj.getPayload(org.w3c.dom.Document.class));
+                    return accept(obj.getPayload(DataTypeFactory.create(org.w3c.dom.Document.class)));
                 }
                 catch (Exception e)
                 {

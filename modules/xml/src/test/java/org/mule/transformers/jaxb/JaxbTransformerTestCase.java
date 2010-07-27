@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.jaxb.model.EmailAddress;
 import org.mule.jaxb.model.Person;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.ListDataType;
 
 import java.io.ByteArrayInputStream;
@@ -32,7 +33,7 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_XML, muleContext);
-        Person person = message.getPayload(Person.class);
+        Person person = (Person) message.getPayload(DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());

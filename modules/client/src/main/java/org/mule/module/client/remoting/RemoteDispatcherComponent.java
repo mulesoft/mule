@@ -32,6 +32,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -101,7 +102,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
         Object result;
         logger.debug("Message received by RemoteDispatcherComponent");
-        ByteArrayInputStream in = new ByteArrayInputStream(context.transformMessageToBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream((byte[]) context.transformMessage(DataType.BYTE_ARRAY_DATA_TYPE));
         RemoteDispatcherNotification action = (RemoteDispatcherNotification) ((MuleMessage)wireFormat.read(in)).getPayload();
 
         // because we serialized a message inside a message, we need to inject the the muleContext ourselves

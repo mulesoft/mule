@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.io.ByteArrayOutputStream;
@@ -285,7 +286,7 @@ public class HttpResponse
         }
         else 
         {
-            setBody(msg.getPayload(OutputHandler.class));
+            setBody((OutputHandler)msg.getPayload(DataTypeFactory.create(OutputHandler.class)));
         }
     }
     

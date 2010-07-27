@@ -216,7 +216,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     public void setReturnDataType(DataType<?> type)
     {
-        this.returnType = type;
+        this.returnType = type.cloneDataType();
         this.encoding = type.getEncoding();
         this.mimeType = type.getMimeType();
     }

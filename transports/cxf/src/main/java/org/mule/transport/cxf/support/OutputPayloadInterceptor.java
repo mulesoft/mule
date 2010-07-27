@@ -13,6 +13,7 @@ package org.mule.transport.cxf.support;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.DelayedResult;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.util.List;
@@ -86,7 +87,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     }
                     else
                     {
-                        o = muleMsg.getPayload(XMLStreamReader.class);
+                        o = muleMsg.getPayload(DataTypeFactory.create(XMLStreamReader.class));
                     }
     
                     objs.add(o);

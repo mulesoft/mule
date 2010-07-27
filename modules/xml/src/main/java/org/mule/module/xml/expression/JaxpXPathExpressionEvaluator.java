@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.mule.transformer.types.DataTypeFactory;
 import org.w3c.dom.Node;
 
 /**
@@ -154,7 +155,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
         }
         try
         {
-            Node payload = message.getPayload(Node.class);
+            Node payload = (Node) message.getPayload(DataTypeFactory.create(Node.class));
 
             XPathExpression xpath = getXPath(expression);
 
