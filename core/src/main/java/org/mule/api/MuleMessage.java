@@ -458,9 +458,7 @@ public interface MuleMessage extends Serializable
      * the fully read stream.
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
-     * @deprecated use {@link #getPayload(org.mule.api.transformer.DataType)} instead
      */
-    @Deprecated
     <T> T getPayload(Class<T> outputType) throws TransformerException;
 
     /**

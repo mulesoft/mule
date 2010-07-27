@@ -123,9 +123,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      *             if the return type is not the same as the expected type in the
      *             transformer
      * @see org.mule.api.transformer.Transformer
-     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
-    @Deprecated
     public Object transformMessage(Class expectedType) throws TransformerException
     {
         return event.transformMessage(DataTypeFactory.create(expectedType));

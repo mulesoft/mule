@@ -244,9 +244,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
-     * @deprecated use {@link #getPayload(org.mule.api.transformer.DataType)} instead
      */
-    @Deprecated
     public <T> T getPayload(Class<T> outputType) throws TransformerException
     {
         return (T) getPayload(DataTypeFactory.create(outputType), getEncoding());

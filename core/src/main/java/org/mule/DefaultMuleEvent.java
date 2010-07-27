@@ -290,10 +290,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
-    /**
-     * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
-     */
-    @Deprecated
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return (T)transformMessage(DataTypeFactory.create(outputType));

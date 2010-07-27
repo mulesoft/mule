@@ -141,9 +141,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
      * {@link java.util.List} of results.
      *
      * {@inheritDoc}
-     * @deprecated use {@link #getPayload(org.mule.api.transformer.DataType)} instead
      */
-    @Deprecated
     @Override
     public Object getPayload(Class outputType) throws TransformerException
     {
@@ -168,7 +166,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public byte[] getPayloadAsBytes() throws Exception
     {
-        throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(byte[].class)");
+        throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
     }
 
     /**
@@ -177,7 +175,7 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     @Override
     public String getPayloadAsString(String encoding) throws Exception
     {
-        throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(String[].class)");
+        throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
 
     }
 
