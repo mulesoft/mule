@@ -18,7 +18,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,7 +119,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     public void testDelete() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        t.setDeleteProperties(Collections.singletonList("badProperty"));
+        t.setDeleteProperties("badProperty");
         t.setMuleContext(muleContext);
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
@@ -244,7 +243,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
     private MessagePropertiesTransformer createTransformerWithExpression(String expression)
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
-        t.setDeleteProperties(Collections.singletonList(expression));
+        t.setDeleteProperties(expression);
         t.setMuleContext(muleContext);
         return t;
     }

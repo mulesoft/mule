@@ -47,7 +47,7 @@ public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTest
         
         MessagePropertiesTransformer deleteWrongScope = new MessagePropertiesTransformer();
         deleteWrongScope.setScope(PropertyScope.OUTBOUND);
-        deleteWrongScope.setDeleteProperties(Collections.singletonList("foo"));
+        deleteWrongScope.setDeleteProperties("foo");
         deleteWrongScope.setMuleContext(muleContext);
         deleteWrongScope.initialise();
 

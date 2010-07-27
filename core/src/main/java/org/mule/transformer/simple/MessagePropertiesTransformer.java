@@ -23,6 +23,7 @@ import org.mule.transport.NullPayload;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -183,9 +184,17 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
         return deleteProperties;
     }
 
+    /**
+     * @see #setDeleteProperties(String...)
+     */
     public void setDeleteProperties(List<String> deleteProperties)
     {
         this.deleteProperties = deleteProperties;
+    }
+
+    public void setDeleteProperties(String... deleteProperties)
+    {
+        this.deleteProperties = Arrays.asList(deleteProperties);
     }
 
     public Map getAddProperties()
