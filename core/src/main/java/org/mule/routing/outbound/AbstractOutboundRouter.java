@@ -19,6 +19,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
@@ -26,10 +27,10 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.outbound.OutboundCorrelationPropertyMessageProcessor;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationMode;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,12 +70,21 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     /**
      * Determines if Mule stamps outgoing message with a correlation ID or not.
      */
-    protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
+    protected CorrelationMode enableCorrelation;
 
     protected TransactionConfig transactionConfig;
 
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
+    
+    protected OutboundCorrelationPropertyMessageProcessor correlationPropertyMessageProcessor = new OutboundCorrelationPropertyMessageProcessor(
+        CorrelationMode.NEVER);
 
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+    }
+    
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return route(event);
@@ -183,59 +193,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
                         + ((OutboundEndpoint)route).getEndpointURI());
             }
         }
-        if (enableCorrelation != CorrelationMode.NEVER)
-        {
-            boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                            + "' , not setting it again");
-                }
-                return;
-            }
-            else if (correlationSet)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                            + "', but router is configured to overwrite it");
-                }
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("No CorrelationId is set on the message, will set a new Id");
-                }
-            }
-
-            String correlation;
-            correlation = service.getMessageInfoMapping().getCorrelationId(message);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Extracted correlation Id as: " + correlation);
-            }
-
-            if (logger.isDebugEnabled())
-            {
-                StringBuffer buf = new StringBuffer();
-                buf.append("Setting Correlation info on Outbound router");
-                if (route instanceof OutboundEndpoint)
-                {
-                    buf.append(" for endpoint: ").append(
-                        ((OutboundEndpoint)route).getEndpointURI());
-                }
-                buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
-                // buf.append(", ").append("Seq=").append(seq);
-                // buf.append(", ").append("Group Size=").append(group);
-                logger.debug(buf.toString());
-            }
-            message.setCorrelationId(correlation);
-            // message.setCorrelationGroupSize(group);
-            // message.setCorrelationSequence(seq);
-        }
     }
 
     public List<MessageProcessor> getRoutes()
@@ -296,15 +253,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         {
             if (enableCorrelation.equals("ALWAYS"))
             {
-                this.enableCorrelation = CorrelationMode.ALWAYS;
+                setEnableCorrelation(CorrelationMode.ALWAYS);
             }
             else if (enableCorrelation.equals("NEVER"))
             {
-                this.enableCorrelation = CorrelationMode.NEVER;
+                setEnableCorrelation(CorrelationMode.NEVER);
             }
             else if (enableCorrelation.equals("IF_NOT_SET"))
             {
-                this.enableCorrelation = CorrelationMode.IF_NOT_SET;
+                setEnableCorrelation(CorrelationMode.IF_NOT_SET);
             }
             else
             {
@@ -380,6 +337,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint) ? (ImmutableEndpoint)route : routedEvent.getEndpoint();
         MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession());
 
+        // Add correlation ID if required
+        event = correlationPropertyMessageProcessor.process(event);
+        
         if (awaitResponse)
         {
             int timeout = message.getOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
