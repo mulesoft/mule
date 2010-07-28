@@ -13,7 +13,6 @@ package org.mule.routing;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
@@ -67,13 +66,13 @@ public class Resequencer extends AbstractAggregator
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleMessage msg = eventCorrelator.process(event);
-        if (msg == null)
+        MuleEvent result = eventCorrelator.process(event);
+        if (result == null)
         {
             return null;
         }
         MuleEvent last = null;
-        for (MuleEvent muleEvent : (MuleEvent[]) msg.getPayload())
+        for (MuleEvent muleEvent : (MuleEvent[]) result.getMessage().getPayload())
         {
             last = processNext(muleEvent);
         }

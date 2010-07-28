@@ -9,11 +9,10 @@
  */
 package org.mule.routing.correlation;
 
-import org.mule.routing.AggregationException;
-import org.mule.routing.EventGroup;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.RoutingException;
+import org.mule.routing.AggregationException;
+import org.mule.routing.EventGroup;
 
 /**
  * A callback used to allow pluggable behaviour when correlating events
@@ -42,7 +41,7 @@ public interface EventCorrelatorCallback
      *                              whole event group is removed and passed to the exception handler
      *                              for this component
      */
-    public MuleMessage aggregateEvents(EventGroup events) throws RoutingException;
+    public MuleEvent aggregateEvents(EventGroup events) throws RoutingException;
 
 
     /**

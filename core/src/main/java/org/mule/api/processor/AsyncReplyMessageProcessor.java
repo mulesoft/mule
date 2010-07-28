@@ -23,11 +23,11 @@ import org.mule.api.source.MessageSource;
  * 
  * @since 3.0
  */
-public interface AsyncReplyInterceptingMessageProcessor extends InterceptingMessageProcessor
+public interface AsyncReplyMessageProcessor extends InterceptingMessageProcessor
 {
 
     /**
      * @param messageSource the message source that will be used to receive the reply message
      */
-    void setReplySource(MessageSource messageSource);
+    void setReplySource(MessageSource replyMessageSource);
 }

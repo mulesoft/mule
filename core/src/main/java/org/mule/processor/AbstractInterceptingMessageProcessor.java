@@ -27,12 +27,12 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
 {
     protected Log logger = LogFactory.getLog(getClass());
 
-    protected MessageProcessor next;
-
     public void setListener(MessageProcessor next)
     {
         this.next = next;
     }
+
+    protected MessageProcessor next;
 
     protected MuleEvent processNext(MuleEvent event) throws MuleException
     {

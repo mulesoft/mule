@@ -179,11 +179,11 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         connector.registerListener(endpoint, getSensingNullMessageProcessor(), service);
 
         // this should work
-        connector.unregisterListener(endpoint);
+        connector.unregisterListener(endpoint, service);
         // so should this
         try
         {
-            connector.unregisterListener(null);
+            connector.unregisterListener(null, service);
             fail("cannot unregister null");
         }
         catch (Exception e)
@@ -192,7 +192,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         }
         try
         {
-            connector.unregisterListener(null);
+            connector.unregisterListener(null, service);
             fail("cannot unregister null");
         }
         catch (Exception e)
@@ -202,14 +202,14 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            connector.unregisterListener(null);
+            connector.unregisterListener(null, service);
             fail("cannot unregister null");
         }
         catch (Exception e)
         {
             // expected
         }
-        connector.unregisterListener(endpoint);
+        connector.unregisterListener(endpoint, service);
         muleContext.getRegistry().unregisterService(service.getName());
     }
 

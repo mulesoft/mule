@@ -10,9 +10,9 @@
 
 package org.mule.example.loanbroker.routers;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.routing.EventGroup;
@@ -29,7 +29,7 @@ public class BankQuotesAggregationLogic
      */
     protected static final Log logger = LogFactory.getLog(BankQuotesAggregationLogic.class);
     
-    public static MuleMessage aggregateEvents(EventGroup events) throws Exception
+    public static MuleEvent aggregateEvents(EventGroup events) throws Exception
     {
         LoanQuote lowestQuote = null;
         LoanQuote quote = null;
@@ -64,6 +64,7 @@ public class BankQuotesAggregationLogic
         }
 
         logger.info(LocaleMessage.lowestQuote(lowestQuote));
-        return new DefaultMuleMessage(lowestQuote, event.getMessage(), event.getMuleContext());
+        return new DefaultMuleEvent(new DefaultMuleMessage(lowestQuote, event.getMessage(),
+            event.getMuleContext()), event);
     }
 }

@@ -42,13 +42,19 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
 {
 
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
-    protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
+    protected RouterStatistics statistics;
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
     protected MessageProcessor catchAllStrategy;
     private final InterceptingMessageProcessor internalCatchAllStrategy = new InternalCatchAllMessageProcessor();;
 
+    public ServiceCompositeMessageSource()
+    {
+        statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
+    }
+    
     public void initialise() throws InitialisationException
     {
+        statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
         if (catchAllStrategy != null)
         {
             for (MessageProcessor processor : processors)
@@ -60,6 +66,8 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
                 }
             }
         }
+
+        createMessageProcessorChain();
 
         for (MessageProcessor processor : processors)
         {
@@ -76,6 +84,10 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             }
         }
 
+    }
+
+    protected void createMessageProcessorChain()
+    {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(processors);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());

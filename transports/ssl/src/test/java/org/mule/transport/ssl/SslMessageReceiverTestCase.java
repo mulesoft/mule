@@ -13,7 +13,7 @@ package org.mule.transport.ssl;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -24,7 +24,7 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         Mock mockComponent = new Mock(Service.class);
         mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new DefaultInboundRouterCollection());
+        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
         return new SslMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 

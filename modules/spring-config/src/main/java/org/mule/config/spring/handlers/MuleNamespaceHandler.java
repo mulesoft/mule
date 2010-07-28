@@ -88,6 +88,7 @@ import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.processor.NullMessageProcessor;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.IdempotentMessageFilter;
@@ -122,13 +123,11 @@ import org.mule.routing.outbound.MessageChunkingRouter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
-import org.mule.routing.response.DefaultResponseRouterCollection;
-import org.mule.routing.response.SimpleCollectionResponseAggregator;
-import org.mule.routing.response.SingleResponseRouter;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
@@ -316,7 +315,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("messageSource", ServiceCompositeMessageSource.class, true));
         registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundRouter", DefaultOutboundRouterCollection.class, true));
-        registerBeanDefinitionParser("async-reply", new ChildDefinitionParser("responseRouter", DefaultResponseRouterCollection.class, true));
+        registerBeanDefinitionParser("async-reply", new ChildDefinitionParser("asyncReplyMessageSource", ServiceAsyncReplyCompositeMessageSource.class, true));
 
         //Inbound Routers
         registerBeanDefinitionParser("forwarding-router", new InboundRouterDefinitionParser(ForwardingConsumer.class));
@@ -347,9 +346,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("reply-to", new EndpointRefParser("replyTo"));
 
         //Response Routers
-        registerBeanDefinitionParser("custom-async-reply-router", new RouterDefinitionParser(null));
-        registerBeanDefinitionParser("single-async-reply-router", new RouterDefinitionParser(SingleResponseRouter.class));
-        registerBeanDefinitionParser("collection-async-reply-router", new RouterDefinitionParser(SimpleCollectionResponseAggregator.class));
+        registerBeanDefinitionParser("custom-async-reply-router", new InboundRouterDefinitionParser(null));
+        registerBeanDefinitionParser("single-async-reply-router", new InboundRouterDefinitionParser(NullMessageProcessor.class));
+        registerBeanDefinitionParser("collection-async-reply-router", new InboundRouterDefinitionParser(SimpleCollectionAggregator.class));
 
         //Message Info Mappings
         registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));

@@ -91,6 +91,10 @@ public class SedaService extends AbstractService
             }, getThreadingProfile().isDoThreading(), lifecycleManager.getState(), exceptionListener, stats,
             muleContext));
         builder.chain(new ServiceInternalMessageProcessor(this));
+        if (asyncReplyMessageSource.getEndpoints().size() > 0)
+        {
+            builder.chain(createAsyncReplyProcessor());
+        }
         builder.chain(new ServiceOutboundMessageProcessor(this));
         builder.chain(new ServiceOutboundStatisticsObserver(this));
         builder.chain(outboundRouter);

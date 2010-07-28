@@ -11,6 +11,7 @@
 package org.mule.routing;
 
 import org.mule.DefaultMessageCollection;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessageCollection;
 import org.mule.util.ClassUtils;
@@ -297,5 +298,18 @@ public class EventGroup implements Comparable<EventGroup>, Serializable
             }
         }
         return col;
+    }
+    
+    public MuleEvent getMessageCollectionEvent()
+    {
+        if (events.size() > 0)
+        {
+
+            return new DefaultMuleEvent(toMessageCollection(), events.get(0));
+        }
+        else
+        {
+            return null;
+        }
     }
 }

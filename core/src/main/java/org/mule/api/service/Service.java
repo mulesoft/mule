@@ -22,8 +22,8 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;
 
 import java.io.Serializable;
@@ -98,18 +98,6 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
     OutboundRouterCollection getOutboundRouter();
 
     /**
-     * Response Routers control how events are returned in a request/response call.
-     * It can be use to aggregate response events before returning, thus acting as a
-     * Join in a forked process. This can be used to make request/response calls a
-     * lot more efficient as independent tasks can be forked, execute concurrently
-     * and then join before the request completes
-     *
-     * @return the response router for this service
-     * @see ResponseRouterCollection
-     */
-    ResponseRouterCollection getResponseRouter();
-
-    /**
      * Returns the initial state of this service
      *
      * @return the initial state of this service
@@ -134,18 +122,6 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      * @see OutboundRouterCollection
      */
     void setOutboundRouter(OutboundRouterCollection router);
-
-    /**
-     * Response Routers control how events are returned in a request/response call.
-     * It can be use to aggregate response events before returning, thus acting as a
-     * Join in a forked process. This can be used to make request/response calls a
-     * lot more efficient as independent tasks can be forked, execute concurrently
-     * and then join before the request completes
-     *
-     * @param router the response router for this service
-     * @see org.mule.api.routing.ResponseRouterCollection
-     */
-    void setResponseRouter(ResponseRouterCollection router);
 
     /**
      * Sets the initial state of this service
@@ -178,5 +154,9 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
     MuleContext getMuleContext();
 
     LifecycleManager getLifecycleManager();
+    
+    void setAsyncReplyMessageSource(ServiceAsyncReplyCompositeMessageSource asyncReplyMessageSource);
+
+    ServiceAsyncReplyCompositeMessageSource getAsyncReplyMessageSource();
 
 }

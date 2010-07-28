@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -55,7 +56,7 @@ public class MessageChunkAggregator extends AbstractAggregator
              *             exception handler for this componenet
              */
             @Override
-            public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+            public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
             {
                 MuleEvent[] collectedEvents = events.toArray();
                 MuleEvent firstEvent = collectedEvents[0];
@@ -88,7 +89,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                     message.setCorrelationGroupSize(-1);
                     message.setCorrelationSequence(-1);
 
-                    return message;
+                    return new DefaultMuleEvent(message, firstEvent);
                 }
                 catch (Exception e)
                 {

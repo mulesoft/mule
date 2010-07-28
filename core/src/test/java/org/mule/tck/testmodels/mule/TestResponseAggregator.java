@@ -10,13 +10,14 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.routing.response.ResponseCorrelationAggregator;
+import org.mule.routing.SimpleCollectionAggregator;
+
 
 /**
  * <code>TestResponseAggregator</code> is a mock response Agrregator object used for
  * testing configuration
  */
-public class TestResponseAggregator extends ResponseCorrelationAggregator
+public class TestResponseAggregator extends SimpleCollectionAggregator
 {
     private String testProperty;
 

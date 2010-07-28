@@ -21,21 +21,19 @@ import org.mule.api.routing.BindingCollection;
 import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.ResponseRouter;
-import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
 
@@ -267,14 +265,14 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testResponseRouterConfig()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertNotNull(service.getResponseRouter());
+        assertNotNull(service.getAsyncReplyMessageSource());
         
-        ResponseRouterCollection messageRouter = service.getResponseRouter();
+        ServiceAsyncReplyCompositeMessageSource messageRouter = service.getAsyncReplyMessageSource();
         assertNull(messageRouter.getCatchAllStrategy());
-        assertEquals(10001, messageRouter.getTimeout());
-        assertEquals(1, messageRouter.getRouters().size());
+        assertEquals(10001, messageRouter.getTimeout().longValue());
+        assertEquals(1, messageRouter.getMessageProcessors().size());
         
-        ResponseRouter router = (ResponseRouter) messageRouter.getRouters().get(0);
+        MessageProcessor router = (MessageProcessor) messageRouter.getMessageProcessors().get(0);
         assertTrue(router instanceof TestResponseAggregator);
         assertNotNull(messageRouter.getEndpoints());
         assertEquals(2, messageRouter.getEndpoints().size());

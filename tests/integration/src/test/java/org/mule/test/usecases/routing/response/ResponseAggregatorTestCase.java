@@ -13,8 +13,9 @@ package org.mule.test.usecases.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.routing.response.SingleResponseRouter;
+import org.mule.routing.asyncreply.DefaultAsyncReplyMessageProcessor;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.SensingNullMessageProcessor;
 
 import java.util.Map;
 
@@ -36,38 +37,32 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
 
     public void testResponseEventsCleanedUp() throws Exception
     {
-        // relax access to get to the responseEvents
-        RelaxedResponseAggregator aggregator = new RelaxedResponseAggregator();
-
+        RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
+        
         MuleEvent event = getTestEvent("message1");
         final MuleMessage message = event.getMessage();
         final String id = message.getUniqueId();
         message.setCorrelationId(id);
         message.setCorrelationGroupSize(1);
-        aggregator.setMuleContext(muleContext);
-        aggregator.setFlowConstruct(getTestService());
-        aggregator.initialise();
-        aggregator.process(event);
+        
+        SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
+        mp.setListener(listener);
+        mp.setReplySource(listener.getMessageSource());
+        
+        mp.process(event);
 
-        aggregator.getResponse(event);
-
-        Map responseEvents = aggregator.getResponseEvents();
+        Map responseEvents = mp.getResponseEvents();
         assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
     }
 
     /**
      * This class opens up the access to responseEvents map for testing
      */
-    private static final class RelaxedResponseAggregator extends SingleResponseRouter
+    private static final class RelaxedAsyncReplyMP extends DefaultAsyncReplyMessageProcessor
     {
-        public RelaxedResponseAggregator()
-        {
-            super();
-        }
-        
         public Map getResponseEvents()
         {
-            return getEventCorrelator().getResponseMessages();
+            return responseEvents;
         }
     }
 }

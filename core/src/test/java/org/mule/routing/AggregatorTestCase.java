@@ -26,7 +26,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Iterator;
-import java.util.Map;
 
 public class AggregatorTestCase extends AbstractMuleTestCase
 {
@@ -96,7 +95,7 @@ public class AggregatorTestCase extends AbstractMuleTestCase
                     return new EventGroup(groupId, eventThreshold);
                 }
 
-                public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+                public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
                 {
                     if (events.size() != eventThreshold)
                     {
@@ -118,7 +117,8 @@ public class AggregatorTestCase extends AbstractMuleTestCase
                         }
                     }
 
-                    return new DefaultMuleMessage(newPayload.toString(), (Map) null, muleContext);
+                    return new DefaultMuleEvent(new DefaultMuleMessage(newPayload.toString(), muleContext),
+                        events.getMessageCollectionEvent());
                 }
             };
         }

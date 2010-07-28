@@ -332,7 +332,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
                     new AnnotationMetaData(componentFactoryClass, null, ElementType.TYPE, annotation), ChannelType.Reply);
             if (inboundEndpoint != null)
             {
-                service.getResponseRouter().addEndpoint(inboundEndpoint);
+                service.getAsyncReplyMessageSource().addSource(inboundEndpoint);
             }
         }
 

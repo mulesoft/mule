@@ -51,7 +51,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      *            for use as context for logging, notifications and error handling.
      * @throws Exception
      */
-    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct pattern)
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct)
         throws Exception;
 
     /**
@@ -62,7 +62,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * @param endpoint
      * @throws Exception
      */
-    public void unregisterListener(InboundEndpoint endpoint) throws Exception;
+    public void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception;
 
     /**
      * @return true if the endpoint is started

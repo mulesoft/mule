@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.AbstractMuleTestCase;
 
 import com.mockobjects.dynamic.Mock;
@@ -71,7 +71,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
         
         Mock mockService = new Mock(Service.class);
         mockService.expect("getResponseRouter");
-        mockService.expectAndReturn("getInboundRouter", new DefaultInboundRouterCollection());
+        mockService.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
         Service service = (Service) mockService.proxy();
         
         Map<String, Object> properties = Collections.emptyMap();

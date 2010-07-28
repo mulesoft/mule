@@ -11,7 +11,6 @@ package org.mule.config.routing.reply;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
@@ -74,7 +73,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
      *          exception handler for this component.
      * @see {@link org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(EventGroup)}
      */
-    public MuleMessage aggregateEvents(EventGroup events) throws RoutingException
+    public MuleEvent aggregateEvents(EventGroup events) throws RoutingException
     {
         MuleEvent event = events.iterator().next();
         
@@ -90,7 +89,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
             event.getMessage().setInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY, callback);
             try
             {
-                return ((Service) event.getFlowConstruct()).getComponent().process(event).getMessage();
+                return ((Service) event.getFlowConstruct()).getComponent().process(event);
             }
             catch (MuleException e)
             {
@@ -100,7 +99,7 @@ public class SingleResponseWithCallbackCorrelator implements EventCorrelatorCall
         }
         else
         {
-            return event.getMessage();
+            return event;
         }
     }
 

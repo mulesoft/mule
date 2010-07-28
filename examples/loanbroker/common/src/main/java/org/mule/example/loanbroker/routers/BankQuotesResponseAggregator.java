@@ -10,26 +10,27 @@
 
 package org.mule.example.loanbroker.routers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.routing.AbstractAggregator;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.routing.response.ResponseCorrelationAggregator;
 
 /**
  * <code>BankQuotesInboundAggregator</code> receives a number of quotes and selects the
  * lowest
  */
-public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
+public class BankQuotesResponseAggregator extends AbstractAggregator
 {
     @Override
-    protected EventCorrelatorCallback getCorrelatorCallback()
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
         return new CollectionCorrelatorCallback(muleContext)
         {
             @Override
-            public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+            public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
             {
                 try
                 {

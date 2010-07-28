@@ -78,5 +78,4 @@ public class JcaService extends AbstractService
     {
         builder.chain(component);
     }
-
 }

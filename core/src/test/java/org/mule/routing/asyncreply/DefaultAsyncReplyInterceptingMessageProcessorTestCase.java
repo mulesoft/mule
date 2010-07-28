@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.response;
+package org.mule.routing.asyncreply;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -16,7 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.AsyncReplyInterceptingMessageProcessor;
+import org.mule.api.processor.AsyncReplyMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
@@ -33,24 +33,24 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
 
     public void testSingleEventNoTimeout() throws Exception
     {
-        AsyncReplyInterceptingMessageProcessor asyncReplyMP = new DefaultAsyncReplyInterceptingMessageProcessor(
-            RECEIVE_TIMEOUT);
+        AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
 
         asyncReplyMP.setListener(target);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, (Service) null);
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService());
 
         MuleEvent resultEvent = asyncReplyMP.process(event);
 
-        assertSame(event, resultEvent);
+        // Can't assert same because we copy event when we receive async reply
+        assertEquals(event.getMessageAsString(), resultEvent.getMessageAsString());
+        assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
     }
 
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
-        AsyncReplyInterceptingMessageProcessor asyncReplyMP = new DefaultAsyncReplyInterceptingMessageProcessor(
-            RECEIVE_TIMEOUT);
+        AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
             new WorkManagerSource()
@@ -66,20 +66,20 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
         asyncReplyMP.setListener(asyncMP);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, (Service) null,
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
 
         MuleEvent resultEvent = asyncReplyMP.process(event);
 
-        // Can't assert same because we copy event for async currently
+        // Can't assert same because we copy event for async and also on async reply currently
         assertEquals(event.getMessageAsString(), resultEvent.getMessageAsString());
         assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
     }
 
     public void testSingleEventTimeout() throws Exception
     {
-        AsyncReplyInterceptingMessageProcessor asyncReplyMP = new DefaultAsyncReplyInterceptingMessageProcessor(
-            1);
+        DefaultAsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
+        asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
@@ -96,7 +96,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
         asyncReplyMP.setListener(asyncMP);
         asyncReplyMP.setReplySource(target.getMessageSource());
 
-        MuleEvent event = getTestEvent(TEST_MESSAGE, (Service) null,
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
 
         try
@@ -112,8 +112,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
 
     public void testMultiple() throws Exception
     {
-        final AsyncReplyInterceptingMessageProcessor asyncReplyMP = new DefaultAsyncReplyInterceptingMessageProcessor(
-            RECEIVE_TIMEOUT);
+        final AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
@@ -131,6 +130,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
         asyncReplyMP.setReplySource(target.getMessageSource());
 
         final InboundEndpoint inboundEndpoint = getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
+        final Service service = getTestService();
 
         for (int i = 0; i < 500; i++)
         {
@@ -141,7 +141,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
                     MuleEvent event;
                     try
                     {
-                        event = getTestEvent(TEST_MESSAGE, (Service) null, inboundEndpoint);
+                        event = getTestEvent(TEST_MESSAGE, service, inboundEndpoint);
                         MuleEvent resultEvent = asyncReplyMP.process(event);
 
                         // Can't assert same because we copy event for async currently

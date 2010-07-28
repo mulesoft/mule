@@ -26,7 +26,6 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.routing.response.AsyncReplyReceiveMessageProcessor;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 
@@ -43,7 +42,6 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
     public ServiceInternalMessageProcessor(Service service)
     {
         this.service = service;
-        receiveAsyncReplyMessageProcessor = new AsyncReplyReceiveMessageProcessor(service.getResponseRouter());
     }
 
     /**
@@ -59,11 +57,10 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
             Object replyTo = event.getMessage().getReplyTo();
             ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
             // Do not propagate REPLY_TO beyond the inbound endpoint
-            //event.getMessage().setReplyTo(null);
+            event.getMessage().setReplyTo(null);
 
             resultEvent = service.getComponent().process(event);
             resultEvent = processNext(resultEvent);
-            resultEvent = receiveAsyncReplyMessageProcessor.process(resultEvent);
 
             // Allow components to stop processing of the ReplyTo property (e.g.
             // CXF)

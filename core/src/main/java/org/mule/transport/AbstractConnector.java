@@ -186,8 +186,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     @SuppressWarnings("unchecked")
     protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
 
-    protected final Map<String, FlowConstruct> flowConstructByEndpoint = new HashMap<String, FlowConstruct>();
-
     /**
      * Defines the dispatcher threading profile
      */
@@ -1308,7 +1306,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         // Since we're managing the creation we also need to initialise
         receiver.initialise();
         receivers.put(receiverKey, receiver);
-        flowConstructByEndpoint.put(endpoint.getName(), flowConstruct);
 
         if (isConnected())
         {
@@ -1334,14 +1331,12 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 endpoint.getEndpointURI().getAddress());
     }
 
-    public final void unregisterListener(InboundEndpoint endpoint) throws Exception
+    public final void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception
     {
         if (endpoint == null)
         {
             throw new IllegalArgumentException("The endpoint must not be null when you unregister a listener");
         }
-
-        FlowConstruct flowConstruct = (FlowConstruct) flowConstructByEndpoint.remove(endpoint.getName());
 
         EndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)

@@ -22,7 +22,6 @@ import org.mule.routing.binding.DefaultInterfaceBinding
 import org.mule.routing.filters.MessagePropertyFilter
 import org.mule.routing.filters.PayloadTypeFilter
 import org.mule.routing.outbound.OutboundPassThroughRouter
-import org.mule.routing.response.DefaultResponseRouterCollection
 import org.mule.security.MuleSecurityManager
 import org.mule.service.DefaultServiceExceptionStrategy
 import org.mule.tck.testmodels.fruit.FruitCleaner
@@ -202,14 +201,12 @@ outboundRouter.addRoute(epFactory.getOutboundEndpoint(epBuilder))
 service.outboundRouter.addRouter(outboundRouter)
 
 //Response Router
-responseRouter = new DefaultResponseRouterCollection();
-responseRouter.addEndpoint(createInboundEndpoint("test://response1", null));
-responseRouter.addEndpoint(appleResponseEndpoint);
-ResponseRouter responseAggregator = new TestResponseAggregator()
+service.asyncReplyMessageSource.addSource(createInboundEndpoint("test://response1", null));
+service.asyncReplyMessageSource.addSource(appleResponseEndpoint);
+TestResponseAggregator responseAggregator = new TestResponseAggregator()
 responseAggregator.muleContext=muleContext
-responseRouter.addRouter(responseAggregator);
-responseRouter.timeout = 10001
-service.responseRouter = responseRouter
+service.asyncReplyMessageSource.addMessageProcessor(responseAggregator);
+service.asyncReplyMessageSource.timeout = 10001
 
 //Exception Strategy
 dces = new DefaultServiceExceptionStrategy();

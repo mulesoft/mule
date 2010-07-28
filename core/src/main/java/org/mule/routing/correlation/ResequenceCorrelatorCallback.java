@@ -9,10 +9,10 @@
  */
 package org.mule.routing.correlation;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 
@@ -49,7 +49,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
      *          for this componenet
      */
     @Override
-    public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         MuleEvent results[];
         if (events == null || events.size() == 0)
@@ -62,7 +62,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
             Arrays.sort(results, eventComparator);
         }
         //This is a bit of a hack since we wrap the the collection of events in a Mule Message to pass back
-        return new DefaultMuleMessage(results, muleContext);
+        return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
     }
 
 }

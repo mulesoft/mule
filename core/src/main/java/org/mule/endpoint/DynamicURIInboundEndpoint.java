@@ -274,7 +274,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         try
         {
-            getConnector().unregisterListener(this);
+            getConnector().unregisterListener(this, flowConstruct);
         }
         catch (Exception e)
         {

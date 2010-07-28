@@ -9,30 +9,23 @@
  */
 package org.mule.routing.correlation;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.EventGroup;
-import org.mule.util.MapUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.concurrent.Latch;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +36,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +55,10 @@ public class EventCorrelator
     public static final int MAX_PROCESSED_GROUPS = 50000;
 
     protected static final long MILLI_TO_NANO_MULTIPLIER = 1000000L;
+    
+    private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
+
+    protected long groupTimeToLive = ONE_DAY_IN_MILLI;
 
     /**
      * A map of EventGroup objects. These represent one or more messages to be
@@ -69,23 +67,12 @@ public class EventCorrelator
      */
     protected final ConcurrentMap eventGroups = new ConcurrentHashMap();
 
-    /**
-     * A map of locks used to wait for response messages for a given message id
-     */
-    protected final ConcurrentMap locks = new ConcurrentHashMap();
-
-    /**
-     * The collection of messages that are ready to be returned to the callee. Keyed
-     * by Message ID
-     */
-    protected final ConcurrentMap responseMessages = new ConcurrentHashMap();
-
     protected final Object groupsLock = new Object();
 
     // @GuardedBy groupsLock
     protected final BoundedFifoBuffer processedGroups = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
-    private int timeout = -1; // undefined
+    private long timeout = -1; // undefined
 
     private boolean failOnTimeout = true;
 
@@ -98,8 +85,11 @@ public class EventCorrelator
     private AtomicBoolean timerStarted = new AtomicBoolean(false);
     
     private MessageProcessor timeoutMessageProcessor;
-
-
+    
+    /**
+     * A map with keys = group id and values = group creation time
+     */
+    private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
 
     public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext context)
     {
@@ -131,33 +121,22 @@ public class EventCorrelator
         this.context.getWorkManager().scheduleWork(new ExpiringGroupWork());
     }
 
-    /**
-     * @deprecated this is used by a test, but I would like to remove this method
-     */
-    public Map getResponseMessages()
+    public void forceGroupExpiry(String groupId)
     {
-        return Collections.unmodifiableMap(responseMessages);
-    }
-
-    public MuleMessage process(MuleEvent event) throws RoutingException
-    {
-        addEvent(event);
-        Object correlationId = messageInfoMapping.getCorrelationId(event.getMessage());
-        if (locks.get(correlationId) != null)
+        if (eventGroups.get(groupId) != null)
         {
-            locks.remove(correlationId);
-            return (MuleMessage) responseMessages.remove(correlationId);
+            handleGroupExpiry((EventGroup) eventGroups.get(groupId));
         }
         else
         {
-            return null;
+            addProcessedGroup(groupId);
         }
     }
-
-    public void addEvent(MuleEvent event) throws RoutingException
+    
+    public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
-        final Object groupId = messageInfoMapping.getCorrelationId(event.getMessage());
+        final String groupId = messageInfoMapping.getCorrelationId(event.getMessage());
 
         if (logger.isTraceEnabled())
         {
@@ -209,9 +188,10 @@ public class EventCorrelator
                 //Fire a notification to say we received this message
                 context.fireNotification(new RoutingNotification(event.getMessage(),
                         event.getEndpoint().getEndpointURI().toString(),
-                        RoutingNotification.MISSED_ASYNC_REPLY));
-                return;
+                        RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
+                return null;
             }
+            
             // check for an existing group first
             EventGroup group = this.getEventGroup(groupId);
 
@@ -244,55 +224,26 @@ public class EventCorrelator
                 // check to see if the event group is ready to be aggregated
                 if (callback.shouldAggregateEvents(group))
                 {
-                    // create the response message
-                    MuleMessage returnMessage = callback.aggregateEvents(group);
+                    // create the response event
+                    MuleEvent returnEvent = callback.aggregateEvents(group);
+                    returnEvent.getMessage().setCorrelationId(groupId);
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
                     this.removeEventGroup(group);
 
-                    // add the new response message so that it can be collected by
-                    // the response Thread
-                    MuleMessage previousResult = (MuleMessage) responseMessages.putIfAbsent(groupId,
-                            returnMessage);
-                    if (previousResult != null)
-                    {
-                        // this would indicate that we need a better way to prevent
-                        // continued aggregation for a group that is currently being
-                        // processed. Can this actually happen?
-                        throw new IllegalStateException(
-                                "Detected duplicate aggregation result message with id: " + groupId);
-                    }
-
-                    // will get/create a latch for the response Message ID and
-                    // release it, notifying other threads that the response message
-                    // is available
-                    Latch l = (Latch) locks.get(groupId);
-                    if (l == null)
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Creating latch for " + groupId + " in " + this);
-                        }
-
-                        l = new Latch();
-                        Latch previous = (Latch) locks.putIfAbsent(groupId, l);
-                        if (previous != null)
-                        {
-                            l = previous;
-                        }
-                    }
-
-                    l.countDown();
+                    return returnEvent;
                 }
-
-                // result or not: exit spinloop
-                break;
+                else
+                {
+                    return null;
+                }
             }
         }
     }
+    
 
-    protected EventGroup getEventGroup(Object groupId)
+    protected EventGroup getEventGroup(String groupId)
     {
         return (EventGroup) eventGroups.get(groupId);
     }
@@ -332,163 +283,6 @@ public class EventCorrelator
         }
     }
 
-    /**
-     * This method is called by the responding callee thread and should return the
-     * aggregated response message
-     *
-     * @param message
-     * @throws RoutingException
-     */
-    public MuleMessage getResponse(MuleMessage message) throws RoutingException
-    {
-        return getResponse(message, getTimeout());
-    }
-
-    /**
-     * This method is called by the responding callee thread and should return the
-     * aggregated response message
-     *
-     * @param message
-     * @throws RoutingException
-     */
-    public MuleMessage getResponse(MuleMessage message, int timeout) throws RoutingException
-    {
-        final String messageId = messageInfoMapping.getMessageId(message);
-        if (logger.isTraceEnabled())
-        {
-            try
-            {
-                logger.trace(String.format("Waiting for response(s) for message with id: %s%n%s%n%s",
-                                           messageId,
-                                           StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false),
-                                           StringMessageUtils.headersToString(message)));
-            }
-            catch (Exception e)
-            {
-                // ignore
-            }
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Waiting for response for message id: " + messageId + " in " + this);
-        }
-
-        Latch l = (Latch) locks.get(messageId);
-        if (l == null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Got response but no one is waiting for it yet. Creating latch for message id "
-                        + messageId + " in " + this);
-            }
-
-            l = new Latch();
-            Latch previous = (Latch) locks.putIfAbsent(messageId, l);
-            if (previous != null)
-            {
-                l = previous;
-            }
-        }
-
-        // the final result message
-        MuleMessage result;
-
-        // indicates whether the result message could be obtained in the required
-        // timeout interval
-        boolean resultAvailable = false;
-
-        // flag for catching the interrupted status of the Thread waiting for a
-        // result
-        boolean interruptedWhileWaiting = false;
-
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Waiting for response to message: " + messageId);
-            }
-
-            // how long should we wait for the lock?
-            if (this.getTimeout() <= 0)
-            {
-                l.await();
-                resultAvailable = true;
-            }
-            else
-            {
-                resultAvailable = l.await(timeout, TimeUnit.MILLISECONDS);
-            }
-        }
-        catch (InterruptedException e)
-        {
-            interruptedWhileWaiting = true;
-        }
-        finally
-        {
-            locks.remove(messageId);
-            result = (MuleMessage) responseMessages.remove(messageId);
-
-            if (interruptedWhileWaiting)
-            {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        if (!resultAvailable)
-        {
-            if (isFailOnTimeout())
-            {
-                if (logger.isTraceEnabled())
-                {
-                    logger.trace(String.format("Current responses are: %n%s", MapUtils.toString(responseMessages, true)));
-                }
-                context.fireNotification(new RoutingNotification(message, null,
-                        RoutingNotification.ASYNC_REPLY_TIMEOUT));
-
-                throw new ResponseTimeoutException(
-                        CoreMessages.responseTimedOutWaitingForId(
-                                this.getTimeout(), messageId), message, null);
-            }
-            else
-            {
-                EventGroup group = this.getEventGroup(messageId);
-                if (group == null)
-                {
-                    //Unlikely this will ever happen
-                    if (logger.isTraceEnabled())
-                    {
-                        logger.trace(String.format("There is no current event Group. Current responses are: %n%s",
-                                                   MapUtils.toString(responseMessages, true)));
-                    }
-                    return null;
-                }
-                else
-                {
-                    this.removeEventGroup(group);
-                    // create the response message
-                    MuleMessage msg = callback.aggregateEvents(group);
-                    return msg;
-                }
-            }
-        }
-
-        if (result == null)
-        {
-            // this should never happen, just using it as a safe guard for now
-            throw new IllegalStateException("Response Message is null");
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("remaining locks  : " + locks.keySet());
-            logger.debug("remaining results: " + responseMessages.keySet());
-        }
-
-        return result;
-    }
-
-
     public boolean isFailOnTimeout()
     {
         return failOnTimeout;
@@ -499,27 +293,86 @@ public class EventCorrelator
         this.failOnTimeout = failOnTimeout;
     }
 
-    public int getTimeout()
+    public long getTimeout()
     {
         return timeout;
     }
 
-    public void setTimeout(int timeout)
+    public void setTimeout(long timeout)
     {
         this.timeout = timeout;
     }
     
+    protected void handleGroupExpiry(EventGroup group)
+    {
+        removeEventGroup(group);
+
+        final FlowConstruct service = group.toArray()[0].getFlowConstruct();
+
+        if (isFailOnTimeout())
+        {
+            final MuleMessageCollection messageCollection = group.toMessageCollection();
+            context.fireNotification(new RoutingNotification(messageCollection, null,
+                                                             RoutingNotification.CORRELATION_TIMEOUT));
+            service.getExceptionListener().exceptionThrown(
+                    new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
+                                                    messageCollection));
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(MessageFormat.format(
+                        "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} " +
+                        "total for group ID: {2}", group.size(), group.expectedSize(), group.getGroupId()
+                ));
+            }
+
+            try
+            {
+                if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis()))
+                {
+                    MuleEvent newEvent = callback.aggregateEvents(group);
+                    newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
+
+
+                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
+                    {
+                        // TODO which use cases would need a sync reply event returned?
+                        if (timeoutMessageProcessor != null)
+                        {
+                            timeoutMessageProcessor.process(newEvent);
+                        }
+                        else
+                        {
+                            if (!(service instanceof Service))
+                            {
+                                throw new UnsupportedOperationException("EventAggregator is only supported with Service");
+                            }
+
+                            ((Service) service).dispatchEvent(newEvent);
+                        }
+                        expiredAndDispatchedGroups.put(group.getGroupId(),
+                            group.getCreated());
+                    }
+                    else
+                    {
+                        logger.warn(MessageFormat.format("Discarding group {0}", group.getGroupId()));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                service.getExceptionListener().exceptionThrown(e);
+            }
+        }
+    }
+
+    
     private final class ExpiringGroupWork implements Work, Expirable
     {
-        private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
-        protected long groupTimeToLive = ONE_DAY_IN_MILLI;
         private ExpiryMonitor expiryMonitor;
         
-        /**
-         * A map with keys = group id and values = group creation time
-         */
-        private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
-
         public ExpiringGroupWork()
         {
             this.expiryMonitor = new ExpiryMonitor("EventCorrelator", 1000 * 60);
@@ -566,68 +419,7 @@ public class EventCorrelator
                     for (Object anExpired : expired)
                     {
                         EventGroup group = (EventGroup) anExpired;
-                        eventGroups.remove(group.getGroupId());
-                        locks.remove(group.getGroupId());
-
-                        final FlowConstruct service = group.toArray()[0].getFlowConstruct();
-
-                        if (isFailOnTimeout())
-                        {
-                            final MuleMessageCollection messageCollection = group.toMessageCollection();
-                            context.fireNotification(new RoutingNotification(messageCollection, null,
-                                                                             RoutingNotification.CORRELATION_TIMEOUT));
-                            service.getExceptionListener().exceptionThrown(
-                                    new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                                    messageCollection));
-                        }
-                        else
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(MessageFormat.format(
-                                        "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} " +
-                                        "total for group ID: {2}", group.size(), group.expectedSize(), group.getGroupId()
-                                ));
-                            }
-
-                            try
-                            {
-                                if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis()))
-                                {
-                                    MuleMessage msg = callback.aggregateEvents(group);
-                                    MuleEvent newEvent = new DefaultMuleEvent(msg, group.toArray()[0].getEndpoint(),
-                                                                              new DefaultMuleSession((Service) service, context));
-
-                                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
-                                    {
-                                        // TODO which use cases would need a sync reply event returned?
-                                        if (timeoutMessageProcessor != null)
-                                        {
-                                            timeoutMessageProcessor.process(newEvent);
-                                        }
-                                        else
-                                        {
-                                            if (!(service instanceof Service))
-                                            {
-                                                throw new UnsupportedOperationException("EventAggregator is only supported with Service");
-                                            }
-
-                                            ((Service) service).dispatchEvent(newEvent);
-                                        }
-                                        expiredAndDispatchedGroups.put(group.getGroupId(),
-                                            group.getCreated());
-                                    }
-                                    else
-                                    {
-                                        logger.warn(MessageFormat.format("Discarding group {0}", group.getGroupId()));
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                service.getExceptionListener().exceptionThrown(e);
-                            }
-                        }
+                        handleGroupExpiry(group);
                     }
                 }
                 try
@@ -640,5 +432,6 @@ public class EventCorrelator
                 }
             }
         }
+
     }
 }

@@ -26,11 +26,14 @@ public class RoutingNotification extends ServerNotification
     public static final int MISSED_ASYNC_REPLY = ROUTING_EVENT_ACTION_START_RANGE + 1;
     public static final int ASYNC_REPLY_TIMEOUT = ROUTING_EVENT_ACTION_START_RANGE + 2;
     public static final int CORRELATION_TIMEOUT = ROUTING_EVENT_ACTION_START_RANGE + 3;
+    public static final int MISSED_AGGREGATION_GROUP_EVENT = ROUTING_EVENT_ACTION_START_RANGE + 4;
 
+    
     static {
         registerAction("missed async reply", MISSED_ASYNC_REPLY);
         registerAction("async reply timeout", ASYNC_REPLY_TIMEOUT);
         registerAction("correlation timeout", CORRELATION_TIMEOUT);
+        registerAction("missed aggregation group event", MISSED_AGGREGATION_GROUP_EVENT);
     }
 
     public RoutingNotification(MuleMessage resource, String identifier, int action)
@@ -60,6 +63,10 @@ public class RoutingNotification extends ServerNotification
             return TYPE_WARNING;
         }
         else if (action == ASYNC_REPLY_TIMEOUT)
+        {
+            return TYPE_WARNING;
+        }
+        else if (action == MISSED_AGGREGATION_GROUP_EVENT)
         {
             return TYPE_WARNING;
         }

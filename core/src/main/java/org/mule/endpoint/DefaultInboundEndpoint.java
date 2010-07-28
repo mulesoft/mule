@@ -110,7 +110,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         try
         {
-            getConnector().unregisterListener(this);
+            getConnector().unregisterListener(this, flowConstruct);
             if (getMessageProcessorChain() instanceof Stoppable)
             {
                 ((Stoppable) getMessageProcessorChain()).stop();

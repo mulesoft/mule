@@ -11,7 +11,7 @@
 package org.mule.routing;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 
@@ -29,7 +29,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator
         return new DelegateCorrelatorCallback(muleContext);
     }
 
-    protected abstract MuleMessage aggregateEvents(EventGroup events) throws AggregationException;
+    protected abstract MuleEvent aggregateEvents(EventGroup events) throws AggregationException;
 
     private class DelegateCorrelatorCallback extends CollectionCorrelatorCallback
     {
@@ -39,7 +39,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator
         }
 
         @Override
-        public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+        public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
         {
             return AbstractCorrelationAggregator.this.aggregateEvents(events);
         }

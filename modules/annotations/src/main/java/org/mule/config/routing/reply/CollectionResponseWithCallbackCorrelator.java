@@ -9,11 +9,9 @@
  */
 package org.mule.config.routing.reply;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.routing.AggregationException;
@@ -48,11 +46,9 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
      *          exception handler for this componenet.
      * @see {@link org.mule.routing.response.AbstractResponseAggregator#aggregateEvents(org.mule.routing.EventGroup)}
      */
-    public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
-        MuleEvent receivedEvent = events.iterator().next();
-        MuleMessage result = super.aggregateEvents(events);
-        MuleEvent event = new DefaultMuleEvent(result, receivedEvent.getEndpoint(), receivedEvent.getFlowConstruct(), receivedEvent);
+        MuleEvent event = super.aggregateEvents(events);
 
         if (!(event.getFlowConstruct() instanceof Service))
         {
@@ -62,7 +58,7 @@ public class CollectionResponseWithCallbackCorrelator extends CollectionCorrelat
         
         try
         {
-            return ((Service) event.getFlowConstruct()).getComponent().process(event).getMessage();
+            return ((Service) event.getFlowConstruct()).getComponent().process(event);
         }
         catch (MuleException e)
         {

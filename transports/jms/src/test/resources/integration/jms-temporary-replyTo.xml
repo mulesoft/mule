@@ -98,10 +98,9 @@
                     <reply-to ref="replyTo"/>
                 </pass-through-router>
             </outbound>
-            <async-reply timeout="5001" failOnTimeout="true">
+            <async-reply timeout="5001">
                 <inbound-endpoint address="${inbound.destination}" connector-ref="jmsConnector2"
                     exchange-pattern="one-way"/>
-                <single-async-reply-router/>
             </async-reply>
         </service>
 

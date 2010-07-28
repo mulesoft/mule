@@ -9,6 +9,7 @@
  */
 package org.mule.config.routing.reply;
 
+import org.mule.api.MuleContext;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 
 /**
@@ -19,7 +20,7 @@ import org.mule.routing.correlation.EventCorrelatorCallback;
 public class SingleResponseWithCallbackRouter extends AbstractResponseCallbackAggregator
 {
     @Override
-    protected EventCorrelatorCallback getCorrelatorCallback()
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
         return new SingleResponseWithCallbackCorrelator(getCallbackMethod());
     }

@@ -10,7 +10,7 @@
 
 package org.mule.example.loanbroker.routers;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.routing.AbstractCorrelationAggregator;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
@@ -33,7 +33,7 @@ public class BankQuotesInboundAggregator extends AbstractCorrelationAggregator
      *             for this componenet
      */
     @Override
-    protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+    protected MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         try
         {

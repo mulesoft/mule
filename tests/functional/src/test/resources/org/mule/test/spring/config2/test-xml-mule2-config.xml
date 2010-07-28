@@ -205,7 +205,6 @@
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:selective-consumer-router>
                     <mule:idempotent-receiver-router/>
-
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 </mule:inbound>
 

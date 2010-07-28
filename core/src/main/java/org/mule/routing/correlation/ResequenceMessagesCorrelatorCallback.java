@@ -9,17 +9,18 @@
  */
 package org.mule.routing.correlation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 
 import java.util.Arrays;
 import java.util.Comparator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
@@ -56,12 +57,12 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
      *          whole event group is removed and passed to the exception handler
      *          for this componenet
      */
-    public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         MuleEvent[] results = (events == null) ? new MuleEvent[0] : events.toArray();
         Arrays.sort(results, eventComparator);
         //This is a bit of a hack since we return a collection of events on one message
-        return new DefaultMuleMessage(results, muleContext);
+        return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
     }
 
 }

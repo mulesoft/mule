@@ -13,7 +13,7 @@ package org.mule.transport.multicast;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.routing.inbound.DefaultInboundRouterCollection;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
@@ -25,7 +25,7 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
     {
         Mock mockComponent = new Mock(Service.class);
         mockComponent.expect("getResponseRouter");
-        mockComponent.expectAndReturn("getInboundRouter", new DefaultInboundRouterCollection());
+        mockComponent.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
 
         return new MulticastMessageReceiver((AbstractConnector)endpoint.getConnector(),
             (Service)mockComponent.proxy(), endpoint);

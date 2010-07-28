@@ -345,6 +345,7 @@
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
@@ -1101,7 +1102,11 @@
     <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="1"/>
+            <xsd:choice minOccurs="1" maxOccurs="1">
+                <!-- Deprecated -->
+	            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="1"/>
+	            <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:choice>
             <!-- TODO leaving this commented here, but I do not think there should be a transformer here -->
             <!--<xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:sequence>
@@ -1115,7 +1120,7 @@
         <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If the router times out before all expected events have been received, specifies whether an exception should be thrown (true) or the current events should be returned for processing (false). The default is false.
+                    If the router times out before all expected events have been received, specifies whether an exception should be thrown (true) or the current events should be returned for processing (false). The default is true.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -3584,7 +3589,7 @@
     </xsd:complexType>
 
     <!-- ResponseRouters -->
-
+    <!--  Deprecated -->
     <xsd:element name="single-async-reply-router" type="asyncReplyRouterType"
                  substitutionGroup="abstract-async-reply-router">
         <xsd:annotation>
@@ -3594,6 +3599,7 @@
         </xsd:annotation>
     </xsd:element>
 
+    <!--  Deprecated -->
     <xsd:element name="collection-async-reply-router" type="asyncReplyRouterType"
                  substitutionGroup="abstract-async-reply-router">
         <xsd:annotation>
@@ -3603,6 +3609,7 @@
         </xsd:annotation>
     </xsd:element>
 
+    <!--  Deprecated -->
     <xsd:complexType name="asyncReplyRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractAsyncReplyRouterType">
@@ -3619,6 +3626,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--  Deprecated -->
     <xsd:element name="custom-async-reply-router" type="customAsyncReplyRouterType"
                  substitutionGroup="abstract-async-reply-router"/>
     <xsd:complexType name="customAsyncReplyRouterType">

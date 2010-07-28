@@ -37,7 +37,7 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
         {
             public void onNotification(RoutingNotification notification)
             {
-                if (notification.getAction() == RoutingNotification.MISSED_ASYNC_REPLY)
+                if (notification.getAction() == RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT)
                 {
                     latch.countDown();
                     assertEquals("test Received Late!", ((MuleMessage)((RoutingNotification)notification).getSource()).getPayload());

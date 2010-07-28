@@ -9,12 +9,12 @@
  */
 package org.mule.config.routing.reply;
 
-import org.mule.routing.response.AbstractResponseAggregator;
+import org.mule.routing.AbstractAggregator;
 
 /**
  * TODO
  */
-public abstract class AbstractResponseCallbackAggregator extends AbstractResponseAggregator
+public abstract class AbstractResponseCallbackAggregator extends AbstractAggregator
 {
     private String callbackMethod;
 

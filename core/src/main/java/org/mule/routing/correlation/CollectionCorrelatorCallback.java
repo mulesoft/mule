@@ -9,11 +9,9 @@
  */
 package org.mule.routing.correlation;
 
-import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 
@@ -51,11 +49,9 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
      *          whole event group is removed and passed to the exception handler
      *          for this componenet
      */
-    public MuleMessage aggregateEvents(EventGroup events) throws AggregationException
+    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
-        MuleMessageCollection message = new DefaultMessageCollection(muleContext);
-        message.addMessages(events.toArray());
-        return message;
+        return events.getMessageCollectionEvent();
     }
 
     /**

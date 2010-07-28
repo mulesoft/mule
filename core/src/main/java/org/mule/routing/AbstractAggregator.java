@@ -10,16 +10,16 @@
 
 package org.mule.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.Aggregator;
+import org.mule.api.service.Service;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
@@ -32,24 +32,35 @@ import javax.resource.spi.work.WorkException;
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
-    implements Initialisable, MuleContextAware, FlowConstructAware
+    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator
 {
 
     protected EventCorrelator eventCorrelator;
     protected MuleContext muleContext;
     protected FlowConstruct flowConstruct;
 
-    private int timeout = 0;
+    private long timeout = 0;
     private boolean failOnTimeout = true;
 
     public void initialise() throws InitialisationException
     {
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next,
             flowConstruct.getMessageInfoMapping(), muleContext);
+
+        // Inherit failOnTimeout from async-reply if this aggregator is being used for async-reply
+        if (flowConstruct instanceof Service)
+        {
+            Service service = (Service) flowConstruct;
+            if (service.getAsyncReplyMessageSource().getMessageProcessors().contains(this))
+            {
+                failOnTimeout = service.getAsyncReplyMessageSource().isFailOnTimeout();
+            }
+        }
+        
+        eventCorrelator.setTimeout(timeout);
+        eventCorrelator.setFailOnTimeout(isFailOnTimeout());
         if (timeout != 0)
         {
-            eventCorrelator.setTimeout(timeout);
-            eventCorrelator.setFailOnTimeout(isFailOnTimeout());
             try
             {
                 eventCorrelator.enableTimeoutMonitor();
@@ -70,20 +81,25 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleMessage msg = eventCorrelator.process(event);
-        if (msg == null)
+        MuleEvent result = eventCorrelator.process(event);
+        if (result == null)
         {
             return null;
         }
-        return processNext(new DefaultMuleEvent(msg, event));
+        return processNext(result);
     }
 
-    public int getTimeout()
+    public void expireAggregation(String groupId)
+    {
+        eventCorrelator.forceGroupExpiry(groupId);
+    }
+
+    public long getTimeout()
     {
         return timeout;
     }
 
-    public void setTimeout(int timeout)
+    public void setTimeout(long timeout)
     {
         this.timeout = timeout;
     }
