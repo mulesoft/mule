@@ -30,8 +30,11 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
+import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.transformer.TransformerTemplate;
+import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.util.StringUtils;
 
 /**
@@ -116,6 +119,8 @@ public class WSProxy extends AbstractFlowConstruct
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
         builder.chain(proxyMessageProcessor);
+        builder.chain(new StopFurtherMessageProcessingMessageProcessor());
+        builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
 
         final OutboundPassThroughRouter outboundRouter = new OutboundPassThroughRouter();
         outboundRouter.setMuleContext(muleContext);
@@ -143,13 +148,28 @@ public class WSProxy extends AbstractFlowConstruct
         }
     }
 
+    private static final class CopyInboundToOutboundPropertiesTransformerCallback
+        implements TransformerCallback
+    {
+        public Object doTransform(MuleMessage message) throws Exception
+        {
+            for (final String inboundPropertyName : message.getInboundPropertyNames())
+            {
+                message.setOutboundProperty(inboundPropertyName,
+                    message.getInboundProperty(inboundPropertyName));
+            }
+
+            return message;
+        }
+    }
+
     private static abstract class AbstractProxyRequestProcessor implements MessageProcessor
     {
         private static final String HTTP_REQUEST = "http.request";
         private static final String WSDL_PARAM_1 = "?wsdl";
         private static final String WSDL_PARAM_2 = "&wsdl";
 
-        protected final Log logger = LogFactory.getLog(getClass());
+        protected final Log logger = LogFactory.getLog(WSProxy.class);
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -168,14 +188,14 @@ public class WSProxy extends AbstractFlowConstruct
 
         private MuleEvent buildWsdlResult(MuleEvent event) throws MuleException
         {
-            // the processing is stopped so that the result is not passed through
-            // the outbound router but will be passed back as a result
-            event.setStopFurtherProcessing(true);
-
             try
             {
                 final String wsdlContents = getWsdlContents(event);
                 event.getMessage().setPayload(wsdlContents);
+
+                // the processing is stopped so that the result is not passed through
+                // the outbound router but will be passed back as a result
+                event.setStopFurtherProcessing(true);
                 return event;
             }
             catch (final Exception e)
@@ -271,23 +291,23 @@ public class WSProxy extends AbstractFlowConstruct
             }
 
             wsdlAddress = urlWebservice.concat("?wsdl");
-            logger.info("Defaulting to: " + wsdlAddress);
+            logger.info("Setting WSDL address to: " + wsdlAddress);
         }
 
         @Override
         protected String getWsdlContents(MuleEvent event) throws Exception
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Retrieving WSDL from web service");
-            }
-
             String wsdlString;
 
             final MuleContext muleContext = event.getMuleContext();
             final InboundEndpoint webServiceEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getInboundEndpoint(wsdlAddress);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Retrieving WSDL from web service with: " + webServiceEndpoint);
+            }
 
             final MuleMessage replyWSDL = webServiceEndpoint.request(event.getTimeout());
             wsdlString = replyWSDL.getPayloadAsString();

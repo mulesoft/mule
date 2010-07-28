@@ -23,6 +23,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.MessageFilter;
@@ -258,21 +259,6 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
                     }
                 }
                 return null;
-            }
-        }
-    }
-
-    class StopFurtherMessageProcessingMessageProcessor extends AbstractInterceptingMessageProcessor
-    {
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            if (!event.isStopFurtherProcessing())
-            {
-                return processNext(event);
-            }
-            else
-            {
-                return event;
             }
         }
     }
