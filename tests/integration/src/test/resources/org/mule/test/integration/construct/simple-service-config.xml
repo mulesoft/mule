@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+  <simple-service name="maths-service-1"
+                  address="vm://maths1.in"
+                  component-class="org.mule.tck.services.SimpleMathsComponent" />
+
+  <simple-service name="abstract-maths-service-2"
+                  abstract="true"
+                  component-class="org.mule.tck.services.SimpleMathsComponent" />
+
+  <simple-service name="maths-service-2"
+                  address="vm://maths2.in"
+                  parent="abstract-maths-service-2" />
+                  
+  <vm:endpoint name="maths-service-3-endpoint" path="maths3.in" />
+
+  <simple-service name="maths-service-3"
+                  endpoint-ref="maths-service-3-endpoint"
+                  component-class="org.mule.tck.services.SimpleMathsComponent" />
+                  
+  <spring:bean name="math-component"
+               class="org.mule.tck.services.SimpleMathsComponent" />
+
+  <simple-service name="maths-service-4"
+                  address="vm://maths4.in"
+                  component-ref="math-component" />
+                  
+  <byte-array-to-string-transformer name="byte-array-to-string" />
+  <append-string-transformer name="append-bar" message="bar"/>
+  <append-string-transformer name="append-baz" message="baz"/>
+  <string-to-byte-array-transformer name="string-to-byte-array" />
+  
+  <simple-service name="byte-array-massager-1"
+                  address="vm://bam1.in"
+                  transformer-refs="byte-array-to-string append-bar"
+                  responseTransformer-refs="append-baz string-to-byte-array"
+                  component-class="org.mule.component.simple.EchoComponent" />
+  
+  <simple-service name="byte-array-massager-2"
+                  address="vm://bam2.in"
+                  parent="byte-array-massager-1" />
+                    
+  <simple-service name="maths-service-5"
+                  address="vm://maths5.in">
+    <component class="org.mule.tck.services.SimpleMathsComponent" />
+  </simple-service>
+                    
+  <simple-service name="maths-service-6"
+                  address="vm://maths6.in">
+    <component class="org.mule.tck.services.SimpleMathsComponent">
+      <method-entry-point-resolver>
+        <include-entry-point method="add"/>
+      </method-entry-point-resolver>
+    </component>
+  </simple-service>
+
+  <simple-service name="exception-strategy"
+                  address="vm://exst.in"
+                  component-class="org.mule.tck.services.SimpleMathsComponent">
+    <default-service-exception-strategy />
+  </simple-service>
+</mule>
