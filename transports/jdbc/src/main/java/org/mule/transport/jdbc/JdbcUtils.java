@@ -16,10 +16,10 @@ import java.sql.SQLException;
 /**
  * Utility methods for working with various parts of JDBC.
  */
-public abstract class JdbcUtils
+public final class JdbcUtils
 {
 
-    protected JdbcUtils()
+    private JdbcUtils()
     {
         // empty, just to restrict instanciation
     }
