@@ -6,29 +6,29 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
 
-    <composite-message-processor name="composite1">
+    <composite-processor name="composite1">
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <append-string-transformer message="3" />
-    </composite-message-processor>
+    </composite-processor>
 
-    <composite-message-processor name="composite2">
+    <composite-processor name="composite2">
         <append-string-transformer message="1" />
-        <composite-message-processor>
+        <composite-processor>
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />
             <append-string-transformer message="c" />
-        </composite-message-processor>
+        </composite-processor>
         <append-string-transformer message="2" />
-    </composite-message-processor>
+    </composite-processor>
 
     <endpoint name="endpoint" address="test://test">
-        <composite-message-processor>
+        <composite-processor>
             <append-string-transformer message="1" />
             <append-string-transformer message="2" />
             <append-string-transformer message="3" />
-        </composite-message-processor>
-        <message-processor ref="composite2" />
+        </composite-processor>
+        <processor ref="composite2" />
     </endpoint>
 
 </mule>

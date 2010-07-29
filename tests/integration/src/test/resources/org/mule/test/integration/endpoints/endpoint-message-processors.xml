@@ -14,19 +14,19 @@
         <service name="synchronousOutbound">
             <inbound>
                 <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
-                    <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
-                    </custom-message-processor>
-                    <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                    </custom-processor>
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="B" />
-                    </custom-message-processor>
+                    </custom-processor>
                     <response>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="C" />
-                        </custom-message-processor>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        </custom-processor>
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="D" />
-                        </custom-message-processor>
+                        </custom-processor>
                     </response>
                 </vm:inbound-endpoint>
             </inbound>
@@ -34,19 +34,19 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="service2" exchange-pattern="request-response">
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="E" />
-                        </custom-message-processor>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        </custom-processor>
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
-                        </custom-message-processor>
+                        </custom-processor>
                         <response>
-                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="G" />
-                            </custom-message-processor>
-                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            </custom-processor>
+                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
-                            </custom-message-processor>
+                            </custom-processor>
                         </response>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -56,19 +56,19 @@
         <service name="asynchronousOutbound">
             <inbound>
                 <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
-                    <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
-                    </custom-message-processor>
-                    <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                    </custom-processor>
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="B" />
-                    </custom-message-processor>
+                    </custom-processor>
                     <response>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="C" />
-                        </custom-message-processor>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        </custom-processor>
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="D" />
-                        </custom-message-processor>
+                        </custom-processor>
                     </response>
                 </vm:inbound-endpoint>
             </inbound>
@@ -76,20 +76,20 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out" exchange-pattern="one-way">
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="E" />
-                        </custom-message-processor>
-                        <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        </custom-processor>
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
-                        </custom-message-processor>
+                        </custom-processor>
                         <!-- These processors should get ignored because the endpoint is asynchronous -->
                         <response>
-                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="G" />
-                            </custom-message-processor>
-                            <custom-message-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            </custom-processor>
+                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
-                            </custom-message-processor>
+                            </custom-processor>
                         </response>
                     </vm:outbound-endpoint>
                 </pass-through-router>

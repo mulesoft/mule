@@ -20,6 +20,7 @@ import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
@@ -52,6 +53,7 @@ import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageSourceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
@@ -256,10 +258,14 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
         
         // Message Processors
-        registerBeanDefinitionParser("message-processor", new MessageProcessorRefDefinitionParser());
-        registerBeanDefinitionParser("custom-message-processor", new MessageProcessorDefinitionParser());        
-        registerBeanDefinitionParser("composite-message-processor", new CompositeMessageProcessorDefinitionParser());        
+        registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
+        registerBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser());        
+        registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ParentDefinitionParser());
+        
+        // Message Sources
+        registerBeanDefinitionParser("custom-source", new MessageSourceDefinitionParser());        
+        registerBeanDefinitionParser("composite-source", new MessageSourceDefinitionParser(CompositeMessageSourceFactoryBean.class));        
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

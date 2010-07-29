@@ -17,7 +17,7 @@ import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 /**
  * Handles a reference to a globla Message Processor.
- * e.g., <message-processor ref="doSomething" />
+ * e.g., <processor ref="doSomething" />
  */
 public class MessageProcessorRefDefinitionParser extends ParentContextDefinitionParser
 {

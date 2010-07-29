@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+
+    <composite-processor name="composite1">
+        <description>Composite thats appands 'ayz'</description>
+        <append-string-transformer message="x" />
+        <append-string-transformer message="y" />
+        <append-string-transformer message="z" />
+    </composite-processor>
+    
+    <flow name="flow">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <append-string-transformer message="1" />
+        <append-string-transformer message="2" />
+        <processor ref="composite1"/>
+        <composite-processor>
+            <append-string-transformer message="a" />
+            <append-string-transformer message="b" />
+            <append-string-transformer message="c" />
+        </composite-processor>
+        <append-string-transformer message="3" />
+        <default-service-exception-strategy />
+    </flow>
+    
+    <flow name="flow2">
+        <composite-source>
+            <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+        </composite-source>
+        <append-string-transformer message="1" />
+        <processor ref="composite1"/>
+<!--    <vm:outbound-endpoint path="echo" exchange-pattern="request-response"/> -->
+    </flow>
+    <!-- 
+    <flow name="echo">
+        <vm:inbound-endpoint path="echo" exchange-pattern="request-response"/>
+        <append-string-transformer message="a" />
+    </flow>
+    -->
+    
+
+</mule>

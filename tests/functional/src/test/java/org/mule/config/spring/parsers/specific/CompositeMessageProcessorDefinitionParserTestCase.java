@@ -23,7 +23,7 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
+        return "org/mule/config/spring/parsers/specific/composite-processor.xml";
     }
 
     public void testInterceptingComposite() throws MuleException, Exception
