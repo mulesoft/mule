@@ -38,6 +38,11 @@ public class TestCaseWatchdog extends Thread
 
     public void run()
     {
+        if (this.delay < 0)
+        {
+            return;
+        }
+        
         long millisToWait = this.unit.toMillis(this.delay);
         if (log.isDebugEnabled())
         {
