@@ -407,15 +407,7 @@ public abstract class AbstractService implements Service
         stats.setInboundRouterStat(messageSource.getStatistics());
         stats.setComponentStat(component.getStatistics());
 
-        try
-        {
-            buildServiceMessageProcessorChain();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        
+        buildServiceMessageProcessorChain();
         messageSource.setListener(messageProcessorChain);
 
         // Component is not in chain
@@ -464,7 +456,7 @@ public abstract class AbstractService implements Service
         exceptionListener.exceptionThrown(e);
     }
 
-    protected void buildServiceMessageProcessorChain() throws MuleException
+    protected void buildServiceMessageProcessorChain()
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.setName("Service '" + name + "' Processor Chain");

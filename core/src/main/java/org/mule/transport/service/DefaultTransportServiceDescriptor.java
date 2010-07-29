@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -466,48 +465,18 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            return createEndpointBuilder(new Object[] { uri, muleContext });
-        }
-    }
-
-    public EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException
-    {
-        EndpointBuilder wrappingBuilder;
-        if (endpointBuilder == null)
-        {
-            logger.debug("Endpoint builder not set, Loading default builder: "
-                    + EndpointURIEndpointBuilder.class.getName());
+            logger.debug("Loading endpoint builder: " + endpointBuilder);
             try
             {
-                wrappingBuilder = new EndpointURIEndpointBuilder(builder);
+                return (EndpointBuilder) ClassUtils.instanciateClass(endpointBuilder, new Object[]{uri, muleContext}, classLoader);
             }
-            catch (EndpointException e)
+            catch (Exception e)
             {
                 throw new TransportFactoryException(CoreMessages.failedToLoad("Endpoint Builder: " + endpointBuilder), e);
             }
         }
-        else
-        {
-            wrappingBuilder = createEndpointBuilder(new Object[] { builder });
-        }
+    }
 
-        wrappingBuilder.setMuleContext(muleContext);
-        return wrappingBuilder;
-    }
-    
-    protected EndpointBuilder createEndpointBuilder(Object[] constructorParams) throws TransportFactoryException
-    {
-        logger.debug("Loading endpoint builder: " + endpointBuilder);
-        try
-        {
-            return (EndpointBuilder) ClassUtils.instanciateClass(endpointBuilder, constructorParams, classLoader);
-        }
-        catch (Exception e)
-        {
-            throw new TransportFactoryException(CoreMessages.failedToLoad("Endpoint Builder: " + endpointBuilder), e);
-        }
-    }
-    
     public void setExceptionMappings(Properties props)
     {
         this.exceptionMappings = props;

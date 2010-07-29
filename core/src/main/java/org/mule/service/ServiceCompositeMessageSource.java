@@ -67,15 +67,8 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             }
         }
 
-        try
-        {
-            createMessageProcessorChain();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        
+        createMessageProcessorChain();
+
         for (MessageProcessor processor : processors)
         {
             if (processor instanceof FlowConstructAware)
@@ -93,7 +86,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
 
     }
 
-    protected void createMessageProcessorChain() throws MuleException
+    protected void createMessageProcessorChain()
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(processors);

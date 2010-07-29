@@ -11,7 +11,6 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -62,6 +61,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         {
             logger.debug("sending reply to: " + replyTo);
         }
+
         String replyToEndpoint = replyTo.toString();
 
         // get the endpoint for this url
@@ -74,9 +74,6 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property
         // anyway as it should never be true from a replyTo dispatch
         returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
-
-        // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
-        returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage, muleContext);
 
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession());

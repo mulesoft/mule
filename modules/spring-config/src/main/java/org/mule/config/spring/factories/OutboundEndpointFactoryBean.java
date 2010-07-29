@@ -10,12 +10,9 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.transport.service.TransportServiceDescriptor;
 
 /**
  * Spring FactoryBean used to create concrete instances of outbound endpoints
@@ -40,12 +37,7 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
 
     public Object doGetObject() throws Exception
     {
-        // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
-        String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
-        TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
-        EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this);
-        
-        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(this);
     }
 
 }

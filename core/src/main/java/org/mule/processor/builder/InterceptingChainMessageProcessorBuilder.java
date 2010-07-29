@@ -55,7 +55,7 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
     protected List processors = new ArrayList();
     protected String name;
 
-    public MessageProcessor build() throws MuleException
+    public MessageProcessor build()
     {
         if (processors.isEmpty())
         {
@@ -75,7 +75,7 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
         return composite;
     }
 
-    private MessageProcessor getMessageProcessor(Object processor) throws MuleException
+    private MessageProcessor getMessageProcessor(Object processor)
     {
         if (processor instanceof MessageProcessor)
         {

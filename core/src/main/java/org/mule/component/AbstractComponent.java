@@ -250,20 +250,11 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                 return invokeInternal(event);
             }
         });
-        
-        try
+        interceptorChain = chainBuilder.build();
+        if (interceptorChain instanceof Initialisable)
         {
-            interceptorChain = chainBuilder.build();
-            if (interceptorChain instanceof Initialisable)
-            {
-                ((Initialisable) interceptorChain).initialise();
-            }
+            ((Initialisable) interceptorChain).initialise();
         }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        
         doInitialise();
     }
 

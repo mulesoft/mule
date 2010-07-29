@@ -190,9 +190,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
      * method but if you wish to use another {@link MessageProcessorBuilder} or just
      * a single {@link MessageProcessor} then this method can be overridden and
      * return a single {@link MessageProcessor} instead.
-     * @throws MuleException 
      */
-    protected void createMessageProcessor() throws MuleException
+    protected void createMessageProcessor()
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         configureMessageProcessors(builder);

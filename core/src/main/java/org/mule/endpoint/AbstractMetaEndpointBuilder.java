@@ -71,20 +71,4 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
         super.setProperties(properties);
     }
 
-    @Override
-    protected String getScheme()
-    {
-        return uriBuilder.getEndpoint().getScheme();
-    }
-
-    public static String getEndpointAddressWithoutMetaScheme(String string)
-    {
-        int idx = string.indexOf(':');
-        if (idx != -1)
-        {
-            string = string.substring(idx+1);
-        }
-        return string;
-    }
-    
 }
