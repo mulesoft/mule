@@ -231,7 +231,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="abstractMessageProcessorType" />
 
     <xsd:element name="message-processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
@@ -270,6 +269,40 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="composite-message-processor" type="compositeMessageProcessorType" substitutionGroup="abstract-message-processor"/>
+    <xsd:complexType name="compositeMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-message-processor" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <!-- TODO
+                <xsd:attribute name="type" use="optional" default="intercepting">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines how the child messge processors should used to construct the composite message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="iterating"/>
+                            <xsd:enumeration value="intercepting"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="builderClass" type="xsd:NMTOKEN" use="optional"/>
+                -->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+
+    <composite-message-processor name="composite1">
+        <append-string-transformer message="1" />
+        <append-string-transformer message="2" />
+        <append-string-transformer message="3" />
+    </composite-message-processor>
+
+    <composite-message-processor name="composite2">
+        <append-string-transformer message="1" />
+        <composite-message-processor>
+            <append-string-transformer message="a" />
+            <append-string-transformer message="b" />
+            <append-string-transformer message="c" />
+        </composite-message-processor>
+        <append-string-transformer message="2" />
+    </composite-message-processor>
+
+    <endpoint name="endpoint" address="test://test">
+        <composite-message-processor>
+            <append-string-transformer message="1" />
+            <append-string-transformer message="2" />
+            <append-string-transformer message="3" />
+        </composite-message-processor>
+        <message-processor ref="composite2" />
+    </endpoint>
+
+</mule>

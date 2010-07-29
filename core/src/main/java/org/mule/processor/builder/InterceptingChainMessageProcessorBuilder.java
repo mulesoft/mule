@@ -148,26 +148,6 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
         return this;
     }
     
-    public void setMessageProcessors(List processors)
-    {
-        for (Object object : processors)
-        {
-            if (object instanceof MessageProcessor)
-            {
-                chain((MessageProcessor[]) object);
-            }
-            else if (object instanceof MessageProcessorBuilder)
-            {
-                chain((MessageProcessorBuilder[]) object);
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-            }
-        }
-    }
-
     @Override
     public String toString()
     {

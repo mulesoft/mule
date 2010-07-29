@@ -37,6 +37,7 @@ import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
+import org.mule.config.spring.parsers.specific.CompositeMessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
@@ -252,9 +253,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
+        
         // Message Processors
         registerBeanDefinitionParser("message-processor", new MessageProcessorRefDefinitionParser());
         registerBeanDefinitionParser("custom-message-processor", new MessageProcessorDefinitionParser());        
+        registerBeanDefinitionParser("composite-message-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ParentDefinitionParser());
 
         // Models
