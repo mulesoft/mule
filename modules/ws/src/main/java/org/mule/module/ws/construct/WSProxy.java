@@ -232,6 +232,13 @@ public class WSProxy extends AbstractFlowConstruct
     {
         private final String wsdlContents;
 
+        /**
+         * Instantiates a request processor that returns a static WSDL contents when
+         * the proxy receives a WSDL request.
+         * 
+         * @param wsdlContents the WSDL contents to use.
+         * @throws FlowConstructInvalidException
+         */
         StaticWsdlProxyRequestProcessor(String wsdlContents) throws FlowConstructInvalidException
         {
             if (StringUtils.isBlank(wsdlContents))
@@ -260,6 +267,13 @@ public class WSProxy extends AbstractFlowConstruct
         private static final String LOCALHOST = "localhost";
         private final String wsdlAddress;
 
+        /**
+         * Instantiates a request processor that fetches and rewrites addresses of a
+         * remote WSDL when the proxy receives a WSDL request.
+         * 
+         * @param wsdlUri the URI to fetch the WSDL from.
+         * @throws FlowConstructInvalidException
+         */
         DynamicWsdlProxyRequestProcessor(URI wsdlUri) throws FlowConstructInvalidException
         {
             if (wsdlUri == null)
@@ -272,6 +286,13 @@ public class WSProxy extends AbstractFlowConstruct
             logger.info("Using url " + wsdlAddress + " as WSDL");
         }
 
+        /**
+         * Instantiates a request processor that fetches and rewrites addresses of a
+         * remote WSDL when the proxy receives a WSDL request.
+         * 
+         * @param outboundEndpoint the endpoint to fetch the WSDL from.
+         * @throws FlowConstructInvalidException
+         */
         DynamicWsdlProxyRequestProcessor(OutboundEndpoint outboundEndpoint)
             throws FlowConstructInvalidException
         {
