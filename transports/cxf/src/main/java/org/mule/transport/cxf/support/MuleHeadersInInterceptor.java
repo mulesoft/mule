@@ -27,7 +27,7 @@ import org.w3c.dom.Text;
 /**
  * Reads the Mule Soap Header and sets the various header properties on the message.
  */
-public class MuleHeadersInInterceptor extends BaseMuleHeaderInterceptor
+public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor
 {
 
     public MuleHeadersInInterceptor()

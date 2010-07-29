@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
  * and after the event processing.
  */
-public class LoggingInterceptor extends EnvelopeInterceptor
+public class LoggingInterceptor extends AbstractEnvelopeInterceptor
 {
     /**
      * logger used by this class

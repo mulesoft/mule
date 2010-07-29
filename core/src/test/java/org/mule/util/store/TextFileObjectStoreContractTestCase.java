@@ -14,7 +14,7 @@ import org.mule.api.store.ObjectStore;
 
 import java.io.Serializable;
 
-public class TextFileObjectStoreContractTestCase extends ObjectStoreContractTestCase
+public class TextFileObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase
 {
     private TextFileObjectStore objectStore;
 

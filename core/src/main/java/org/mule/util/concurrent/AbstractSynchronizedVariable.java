@@ -13,18 +13,18 @@ package org.mule.util.concurrent;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 // @ThreadSafe
-public abstract class SynchronizedVariable implements Executor
+public abstract class AbstractSynchronizedVariable implements Executor
 {
     // @GuardedBy(itself)
     protected final Object lock;
 
-    public SynchronizedVariable()
+    public AbstractSynchronizedVariable()
     {
         super();
         lock = this;
     }
 
-    public SynchronizedVariable(Object lock)
+    public AbstractSynchronizedVariable(Object lock)
     {
         super();
         this.lock = lock;

@@ -10,14 +10,6 @@
 
 package org.mule.transport.cxf.support;
 
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-import static org.mule.transport.soap.MuleSoapHeaders.MULE_10_ACTOR;
-import static org.mule.transport.soap.MuleSoapHeaders.MULE_HEADER;
-import static org.mule.transport.soap.MuleSoapHeaders.MULE_NAMESPACE;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,10 +18,18 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+import static org.mule.transport.soap.MuleSoapHeaders.MULE_10_ACTOR;
+import static org.mule.transport.soap.MuleSoapHeaders.MULE_HEADER;
+import static org.mule.transport.soap.MuleSoapHeaders.MULE_NAMESPACE;
+
 /**
  *
  */
-abstract class BaseMuleHeaderInterceptor extends AbstractPhaseInterceptor<Message>
+abstract class AbstractMuleHeaderInterceptor extends AbstractPhaseInterceptor<Message>
 {
     protected final static String MULE_NS_URI = MULE_10_ACTOR;
     protected final static String MULE_NS_PREFIX = MULE_NAMESPACE;
@@ -54,7 +54,7 @@ abstract class BaseMuleHeaderInterceptor extends AbstractPhaseInterceptor<Messag
         SUPPORTED_HEADERS.add(MULE_REPLY_TO_PROPERTY);
     }
 
-    public BaseMuleHeaderInterceptor(String p)
+    public AbstractMuleHeaderInterceptor(String p)
     {
         super(p);
     }

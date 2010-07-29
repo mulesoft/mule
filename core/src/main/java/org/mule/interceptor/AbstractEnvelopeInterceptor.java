@@ -19,19 +19,15 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after
  * an event is received.
  */
-public abstract class EnvelopeInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
+public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
 {
     /**
      * This method is invoked before the event is processed
-     * 
-     * @param invocation the message invocation being processed
      */
     public abstract MuleEvent before(MuleEvent event) throws MuleException;
 
     /**
      * This method is invoked after the event has been processed
-     * 
-     * @param invocation the message invocation being processed
      */
     public abstract MuleEvent after(MuleEvent event) throws MuleException;
 

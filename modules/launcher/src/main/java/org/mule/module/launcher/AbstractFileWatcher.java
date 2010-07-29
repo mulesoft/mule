@@ -12,13 +12,13 @@ package org.mule.module.launcher;
 
 import java.io.File;
 
-public abstract class FileWatcher implements Runnable
+public abstract class AbstractFileWatcher implements Runnable
 {
 
     private long timeStamp;
     private File file;
 
-    public FileWatcher(File file)
+    public AbstractFileWatcher(File file)
     {
         this.file = file;
         this.timeStamp = file.lastModified();

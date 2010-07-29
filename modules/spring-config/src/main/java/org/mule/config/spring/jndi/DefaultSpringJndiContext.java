@@ -369,7 +369,7 @@ public class DefaultSpringJndiContext implements Context, Serializable
         internalBind(name, null, true);
     }
 
-    private abstract class LocalNamingEnumeration implements NamingEnumeration
+    private abstract class AbstractLocalNamingEnumeration implements NamingEnumeration
     {
 
         private Iterator i = bindings.entrySet().iterator();
@@ -394,7 +394,7 @@ public class DefaultSpringJndiContext implements Context, Serializable
         }
     }
 
-    private class ListEnumeration extends DefaultSpringJndiContext.LocalNamingEnumeration
+    private class ListEnumeration extends AbstractLocalNamingEnumeration
     {
 
         public Object next() throws NamingException
@@ -409,7 +409,7 @@ public class DefaultSpringJndiContext implements Context, Serializable
         }
     }
 
-    private class ListBindingEnumeration extends DefaultSpringJndiContext.LocalNamingEnumeration
+    private class ListBindingEnumeration extends AbstractLocalNamingEnumeration
     {
 
         public Object next() throws NamingException

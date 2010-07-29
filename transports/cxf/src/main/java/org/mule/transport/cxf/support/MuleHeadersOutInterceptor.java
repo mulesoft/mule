@@ -10,13 +10,6 @@
 
 package org.mule.transport.cxf.support;
 
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-import static org.mule.transport.soap.MuleSoapHeaders.MULE_HEADER;
-
 import org.mule.api.MuleEvent;
 import org.mule.transport.soap.MuleSoapHeaders;
 
@@ -32,10 +25,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+import static org.mule.transport.soap.MuleSoapHeaders.MULE_HEADER;
+
 /**
  * Writes the Mule Soap Header to the outgoing request.
  */
-public class MuleHeadersOutInterceptor extends BaseMuleHeaderInterceptor
+public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor
 {
 
     public MuleHeadersOutInterceptor()

@@ -15,7 +15,7 @@ import org.mule.transport.NullPayload;
 
 import java.io.Serializable;
 
-public class InMemoryStoreContractTestCase extends ObjectStoreContractTestCase
+public class InMemoryStoreContractTestCase extends AbstractObjectStoreContractTestCase
 {
     @Override
     public ObjectStore<Serializable> getObjectStore()

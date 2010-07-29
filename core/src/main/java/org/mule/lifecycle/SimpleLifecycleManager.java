@@ -28,7 +28,7 @@ import org.mule.lifecycle.phases.NotInLifecyclePhase;
  * {@link Agent}, all of which can be controlled externally via JMX
  * @param <O> the object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
  */
-public abstract class SimpleLifecycleManager<O> extends LifecycleManagerSupport<O>
+public abstract class SimpleLifecycleManager<O> extends AbstractLifecycleManager<O>
 {
     public SimpleLifecycleManager(String id, O object)
     {

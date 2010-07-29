@@ -300,7 +300,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
             logger.info("Monitoring for hot-deployment: " + new File(absoluteResourcePaths [0]));
         }
 
-        final FileWatcher watcher = new ConfigFileWatcher(new File(absoluteResourcePaths [0]));
+        final AbstractFileWatcher watcher = new ConfigFileWatcher(new File(absoluteResourcePaths [0]));
 
         // register a config monitor only after context has started, as it may take some time
         muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
@@ -323,7 +323,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         });
     }
 
-    protected void scheduleConfigMonitor(FileWatcher watcher)
+    protected void scheduleConfigMonitor(AbstractFileWatcher watcher)
     {
         final int reloadIntervalMs = DEFAULT_RELOAD_CHECK_INTERVAL_MS;
         watchTimer = Executors.newSingleThreadScheduledExecutor(new ConfigChangeMonitorThreadFactory(appName));
@@ -349,7 +349,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
     }
 
 
-    protected class ConfigFileWatcher extends FileWatcher
+    protected class ConfigFileWatcher extends AbstractFileWatcher
     {
 
         public ConfigFileWatcher(File watchedResource)

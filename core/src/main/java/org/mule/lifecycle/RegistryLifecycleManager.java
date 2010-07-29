@@ -41,7 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class RegistryLifecycleManager extends LifecycleManagerSupport<Registry> implements RegistryLifecycleHelpers
+public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> implements RegistryLifecycleHelpers
 {
     protected Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>();
     private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();

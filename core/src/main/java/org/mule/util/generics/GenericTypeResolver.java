@@ -39,6 +39,11 @@ public abstract class GenericTypeResolver
             Collections.synchronizedMap(new WeakHashMap<Class, Reference<Map<TypeVariable, Type>>>());
 
 
+    private GenericTypeResolver()
+    {
+        // do not isntantiate
+    }
+
     /**
      * Determine the target type for the given parameter specification.
      *

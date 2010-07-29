@@ -35,12 +35,12 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 3.0
  */
-public abstract class LifecycleManagerSupport<O> implements LifecycleManager
+public abstract class AbstractLifecycleManager<O> implements LifecycleManager
 {
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(LifecycleManagerSupport.class);
+    protected transient final Log logger = LogFactory.getLog(AbstractLifecycleManager.class);
 
     protected String lifecycleManagerId;
     protected String currentPhase = NotInLifecyclePhase.PHASE_NAME;
@@ -54,7 +54,7 @@ public abstract class LifecycleManagerSupport<O> implements LifecycleManager
     private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
 
 
-    public LifecycleManagerSupport(String id, O object)
+    public AbstractLifecycleManager(String id, O object)
     {
         lifecycleManagerId = id;
         this.object = object;

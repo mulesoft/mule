@@ -24,7 +24,7 @@ import org.mule.lifecycle.phases.NotInLifecyclePhase;
  * This is a specialized class that extends {@link RegistryLifecycleManager} and will
  * invoke lifecycle on the registry instance for the MuleContext.  This class must only be used by the MuleContext.
  */
-public class MuleContextLifecycleManager extends LifecycleManagerSupport<MuleContext> implements MuleContextAware
+public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleContext> implements MuleContextAware
 {
 
     private MuleContext muleContext;

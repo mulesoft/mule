@@ -135,7 +135,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
             result.getMessageAsString());
     }
 
-    class TestInterceptor extends EnvelopeInterceptor
+    class TestInterceptor extends AbstractEnvelopeInterceptor
     {
 
         private String name;

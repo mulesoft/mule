@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * This test verifies the contract described in {@link ObjectStore}
  */
-public abstract class ObjectStoreContractTestCase extends AbstractMuleTestCase
+public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTestCase
 {
     public void testContainsWithNullKey()
     {

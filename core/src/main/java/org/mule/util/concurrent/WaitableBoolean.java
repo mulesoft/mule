@@ -11,7 +11,7 @@
 package org.mule.util.concurrent;
 
 // @ThreadSafe
-public class WaitableBoolean extends SynchronizedVariable
+public class WaitableBoolean extends AbstractSynchronizedVariable
 {
     // @GuardedBy(lock)
     private boolean value;
