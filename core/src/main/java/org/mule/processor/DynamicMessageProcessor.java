@@ -33,6 +33,6 @@ public abstract class DynamicMessageProcessor implements MessageProcessor
      * @param event
      * @return
      */
-    protected abstract MessageProcessor resolveMessageProcessor(MuleEvent event);
+    protected abstract MessageProcessor resolveMessageProcessor(MuleEvent event) throws MuleException;
 
 }
