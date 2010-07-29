@@ -26,7 +26,6 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
-import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.ObjectUtils;
@@ -107,12 +106,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     static
     {
-        addToConsuableClasses("javax.xml.stream.XMLStreamReader");
-        addToConsuableClasses("javax.xml.transform.stream.StreamSource");
+        addToConsumableClasses("javax.xml.stream.XMLStreamReader");
+        addToConsumableClasses("javax.xml.transform.stream.StreamSource");
         consumableClasses.add(OutputHandler.class);
     }
     
-    private static void addToConsuableClasses(String className)
+    private static void addToConsumableClasses(String className)
     {
         try
         {
