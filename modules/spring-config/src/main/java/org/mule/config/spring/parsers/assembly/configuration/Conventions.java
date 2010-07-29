@@ -14,8 +14,14 @@ package org.mule.config.spring.parsers.assembly.configuration;
  * Method to evaluate the first character of the attribute name and ignore if it is upper case since this is not valid Bean notation
  * and Mule uses upper case to signify a non-bean attribute name.
  */
-public abstract class Conventions
+public final class Conventions
 {
+
+    private Conventions()
+    {
+        // do not instantiate
+    }
+
     /**
      * Overloads the Spring version of this method to tak into account the first character in the attribute name
      * An upper case char as the first letter of a bean name is not allowed. In Mule this also signifies a non bean property
