@@ -215,20 +215,6 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
         assertEquals(testTimeout, dispacher.sensedSendEvent.getTimeout());
     }
 
-    public void testCorrelationId() throws Exception
-    {
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
-        
-        assertNull(testOutboundEvent.getMessage().getCorrelationId());
-        
-        endpoint.process(testOutboundEvent);
-        
-        assertEquals(testOutboundEvent.getMessage().getUniqueId(), dispacher.sensedSendEvent.getMessage()
-            .getCorrelationId());
-    }
-    
     public void testTransaction()
     {
         // TODO

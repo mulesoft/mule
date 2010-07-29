@@ -79,7 +79,6 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         list.add(router1);
         list.add(router2);
         messageRouter.setRouters(list);
-        initialiseObject(messageRouter);
 
         MuleEvent event = getTestInboundEvent("test event", (MuleSession) session.proxy());
 
@@ -190,7 +189,6 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(new StringBuffer(), muleContext);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
         filterRouter.setMessageProperties(session.getFlowConstruct(), message, endpoint);
-        // Filter router no longer sets correlation id
-        assertNull(message.getCorrelationId());
+        assertNotNull(message.getCorrelationId());
     }
 }

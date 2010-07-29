@@ -23,7 +23,6 @@ import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
-import org.mule.endpoint.outbound.OutboundCorrelationPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
@@ -37,7 +36,6 @@ import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.routing.CorrelationMode;
 import org.mule.routing.ExceptionThrowingMessageFilter;
 import org.mule.transport.AbstractConnector;
 
@@ -84,9 +82,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         // Log but don't proceed if connector is not started
         list.add(new OutboundLoggingMessageProcessor());
         list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleState()));
-        
-        // TODO Add configuration to endpoint and use this
-        list.add(new OutboundCorrelationPropertyMessageProcessor(CorrelationMode.IF_NOT_SET));
 
         // Everything is processed within TransactionTemplate
         list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(),
