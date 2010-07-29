@@ -10,6 +10,8 @@
 
 package org.mule.api.processor;
 
+import org.mule.api.MuleException;
+
 /**
  * Builds {@link MessageProcessor} instances.
  * 
@@ -17,5 +19,5 @@ package org.mule.api.processor;
  */
 public interface MessageProcessorBuilder
 {
-    MessageProcessor build();
+    MessageProcessor build() throws MuleException;
 }

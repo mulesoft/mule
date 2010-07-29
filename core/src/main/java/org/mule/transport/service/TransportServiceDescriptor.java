@@ -27,6 +27,7 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.api.transport.SessionHandler;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import java.util.List;
 import java.util.Properties;
@@ -73,6 +74,8 @@ public interface TransportServiceDescriptor extends ServiceDescriptor, MuleConte
     EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 
     EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
+
+    EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException;
 
     void setExceptionMappings(Properties props);
 
