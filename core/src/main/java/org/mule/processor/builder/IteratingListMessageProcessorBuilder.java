@@ -10,10 +10,12 @@
 
 package org.mule.processor.builder;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -49,16 +51,16 @@ import org.apache.commons.logging.LogFactory;
 public class IteratingListMessageProcessorBuilder implements MessageProcessorBuilder
 {
 
-    protected List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    protected List processors = new ArrayList();
     protected String name;
 
     public MessageProcessor build()
     {
-        if (list.isEmpty())
+        if (processors.isEmpty())
         {
             return new NullMessageProcessor();
         }
-        return new IteratingListCompositeMessageProcessor(list, name);
+        return new IteratingListCompositeMessageProcessor(processors, name);
     }
 
     public void setName(String name)
@@ -70,7 +72,16 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
     {
         for (MessageProcessor messageProcessor : processors)
         {
-            list.add(messageProcessor);
+            this.processors.add(messageProcessor);
+        }
+        return this;
+    }
+
+    public IteratingListMessageProcessorBuilder add(MessageProcessorBuilder... builders)
+    {
+        for (MessageProcessorBuilder builder : builders)
+        {
+            this.processors.add(builder);
         }
         return this;
     }
@@ -79,14 +90,20 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
     {
         if (processors != null)
         {
-            list.addAll(processors);
+            this.processors.addAll(processors);
         }
         return this;
     }
 
     public IteratingListMessageProcessorBuilder addBefore(MessageProcessor processor)
     {
-        list.add(0, processor);
+        this.processors.add(0, processor);
+        return this;
+    }
+
+    public IteratingListMessageProcessorBuilder addBefore(MessageProcessorBuilder builder)
+    {
+        this.processors.add(0, builder);
         return this;
     }
 
@@ -110,17 +127,37 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
      * nested chain.
      */
     static class IteratingListCompositeMessageProcessor
-        implements MessageProcessor, Lifecycle, FlowConstructAware
+        implements MessageProcessor, Lifecycle, FlowConstructAware, MuleContextAware
     {
         private Log log;
         private String name;
-        private List<MessageProcessor> list;
+        private List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
-        public IteratingListCompositeMessageProcessor(List<MessageProcessor> list, String name)
+        public IteratingListCompositeMessageProcessor(List processors, String name)
         {
             this.name = name;
-            this.list = list;
+            for (Object object : list)
+            {
+                list.add(getMessageProcessor(object));
+            }
             log = LogFactory.getLog(IteratingListCompositeMessageProcessor.class);
+        }
+
+        private MessageProcessor getMessageProcessor(Object processor)
+        {
+            if (processor instanceof MessageProcessor)
+            {
+                return (MessageProcessor) processor;
+            }
+            else if (processor instanceof MessageProcessorBuilder)
+            {
+                return ((MessageProcessorBuilder) processor).build();
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
         }
 
         public MuleEvent process(MuleEvent event) throws MuleException
@@ -188,6 +225,17 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
                 if (processor instanceof FlowConstructAware)
                 {
                     ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+                }
+            }
+        }
+
+        public void setMuleContext(MuleContext muleContext)
+        {
+            for (MessageProcessor processor : list)
+            {
+                if (processor instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) processor).setMuleContext(muleContext);
                 }
             }
         }

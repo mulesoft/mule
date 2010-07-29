@@ -45,7 +45,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
     {
         if (messageProcessors != null)
         {
-            builder.chain(messageProcessors);
+            builder.chain((MessageProcessor[]) messageProcessors.toArray());
         }
         else
         {

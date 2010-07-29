@@ -10,10 +10,12 @@
 
 package org.mule.processor.builder;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -27,7 +29,6 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,27 +52,44 @@ import org.apache.commons.logging.LogFactory;
 public class InterceptingChainMessageProcessorBuilder implements MessageProcessorBuilder
 {
 
-    protected List<MessageProcessor> chain = new ArrayList<MessageProcessor>();
+    protected List processors = new ArrayList();
     protected String name;
 
     public MessageProcessor build()
     {
-        if (chain.isEmpty())
+        if (processors.isEmpty())
         {
             return new NullMessageProcessor();
         }
 
-        InterceptingMessageProcessor first = createInterceptingMessageProcessor(chain.get(0));
-        MessageProcessor composite = new InterceptingChainCompositeMessageProcessor(first, chain, name);
+        InterceptingMessageProcessor first = createInterceptingMessageProcessor(getMessageProcessor(processors.get(0)));
+        MessageProcessor composite = new InterceptingChainCompositeMessageProcessor(first, processors, name);
         InterceptingMessageProcessor current = first;
 
-        for (int i = 1; i < chain.size(); i++)
+        for (int i = 1; i < processors.size(); i++)
         {
-            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(chain.get(i));
+            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(getMessageProcessor(processors.get(i)));
             current.setListener(mp);
             current = mp;
         }
         return composite;
+    }
+
+    private MessageProcessor getMessageProcessor(Object processor)
+    {
+        if (processor instanceof MessageProcessor)
+        {
+            return (MessageProcessor) processor;
+        }
+        else if (processor instanceof MessageProcessorBuilder)
+        {
+            return ((MessageProcessorBuilder) processor).build();
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+        }
     }
 
     public void setName(String name)
@@ -95,24 +113,59 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
     {
         for (MessageProcessor messageProcessor : processors)
         {
-            chain.add(messageProcessor);
+            this.processors.add(messageProcessor);
         }
         return this;
     }
 
-    public InterceptingChainMessageProcessorBuilder chain(Collection<MessageProcessor> processors)
+    public InterceptingChainMessageProcessorBuilder chain(List<MessageProcessor> processors)
     {
         if (processors != null)
         {
-            chain.addAll(processors);
+            this.processors.addAll(processors);
+        }
+        return this;
+    }
+
+    public InterceptingChainMessageProcessorBuilder chain(MessageProcessorBuilder... builders)
+    {
+        for (MessageProcessorBuilder messageProcessorBuilder : builders)
+        {
+            this.processors.add(messageProcessorBuilder);
         }
         return this;
     }
 
     public InterceptingChainMessageProcessorBuilder chainBefore(MessageProcessor processor)
     {
-        chain.add(0, processor);
+        this.processors.add(0, processor);
         return this;
+    }
+
+    public InterceptingChainMessageProcessorBuilder chainBefore(MessageProcessorBuilder builder)
+    {
+        this.processors.add(0, builder);
+        return this;
+    }
+    
+    public void setMessageProcessors(List processors)
+    {
+        for (Object object : processors)
+        {
+            if (object instanceof MessageProcessor)
+            {
+                chain((MessageProcessor[]) object);
+            }
+            else if (object instanceof MessageProcessorBuilder)
+            {
+                chain((MessageProcessorBuilder[]) object);
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
+        }
     }
 
     @Override
@@ -164,7 +217,8 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
      * MessageProcessor in the parent chain is not injected into the first in the
      * nested chain.
      */
-    static class InterceptingChainCompositeMessageProcessor implements MessageProcessor, Lifecycle, FlowConstructAware
+    static class InterceptingChainCompositeMessageProcessor
+        implements MessageProcessor, Lifecycle, FlowConstructAware, MuleContextAware
     {
         private Log log;
         private String name;
@@ -172,8 +226,8 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
         private List<MessageProcessor> allProcessors;
 
         public InterceptingChainCompositeMessageProcessor(InterceptingMessageProcessor firstInChain,
-                                                List<MessageProcessor> allProcessors,
-                                                String name)
+                                                          List<MessageProcessor> allProcessors,
+                                                          String name)
         {
             this.name = name;
             this.firstInChain = firstInChain;
@@ -246,6 +300,17 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
             }
         }
 
+        public void setMuleContext(MuleContext context)
+        {
+            for (MessageProcessor processor : allProcessors)
+            {
+                if (processor instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) processor).setMuleContext(context);
+                }
+            }
+        }
+
         @Override
         public String toString()
         {
@@ -272,6 +337,7 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
             }
             return string.toString();
         }
+
     }
 
 }

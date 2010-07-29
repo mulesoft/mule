@@ -18,6 +18,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -31,6 +32,21 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new AppendingMP("1"), new AppendingMP("2"), new AppendingMP("3"));
+        assertEquals("0123", builder.build().process(getTestEvent("0")).getMessageAsString());
+    }
+
+    public void testMPChainWithBuilder() throws MuleException, Exception
+    {
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new AppendingMP("1"));
+        builder.chain(new MessageProcessorBuilder()
+        {
+            public MessageProcessor build()
+            {
+                return new AppendingMP("2");
+            }
+        });
+        builder.chain(new AppendingMP("3"));
         assertEquals("0123", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
@@ -60,8 +76,8 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
     public void testNestedMPChain() throws MuleException, Exception
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
-        builder.chain(new AppendingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(new AppendingMP("a"),
-            new AppendingMP("b")).build(), new AppendingMP("2"));
+        builder.chain(new AppendingMP("1"), new InterceptingChainMessageProcessorBuilder().chain(
+            new AppendingMP("a"), new AppendingMP("b")).build(), new AppendingMP("2"));
         assertEquals("01ab2", builder.build().process(getTestEvent("0")).getMessageAsString());
     }
 
