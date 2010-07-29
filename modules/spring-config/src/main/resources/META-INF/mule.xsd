@@ -1291,7 +1291,7 @@
                 <xsd:attribute name="endpoint-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The component that is invoked when incoming messages are received.
+                            The endpoint on which this simple service is listening.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
