@@ -193,7 +193,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 {
                     Object value = muleMessage.getProperty(name, scope);
                     if (value != null)
+                    {
                         setProperty(name, value, scope);
+                    }
                 }
             }
             catch (IllegalArgumentException iae)
