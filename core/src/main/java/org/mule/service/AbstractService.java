@@ -373,13 +373,10 @@ public abstract class AbstractService implements Service
             ((Startable) messageProcessorChain).start();
         }
 
-        if (messageSource instanceof Startable)
+        messageSource.start();
+        if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
-            ((Startable) messageSource).start();
-        }
-        if (asyncReplyMessageSource instanceof Startable)
-        {
-            ((Startable) asyncReplyMessageSource).start();
+            asyncReplyMessageSource.start();
         }
     }
 
@@ -423,7 +420,11 @@ public abstract class AbstractService implements Service
             ((Initialisable) messageProcessorChain).initialise();
         }
         messageSource.initialise();
-        asyncReplyMessageSource.initialise();
+        if (asyncReplyMessageSource.getEndpoints().size() > 0)
+        {
+            asyncReplyMessageSource.initialise();
+        }
+
     }
 
     public void forceStop() throws MuleException
