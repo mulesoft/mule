@@ -13,7 +13,7 @@ package org.mule.test.usecases.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.routing.asyncreply.DefaultAsyncReplyMessageProcessor;
+import org.mule.processor.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
@@ -58,7 +58,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     /**
      * This class opens up the access to responseEvents map for testing
      */
-    private static final class RelaxedAsyncReplyMP extends DefaultAsyncReplyMessageProcessor
+    private static final class RelaxedAsyncReplyMP extends SimpleAsyncRequestReplyRequester
     {
         public Map getResponseEvents()
         {

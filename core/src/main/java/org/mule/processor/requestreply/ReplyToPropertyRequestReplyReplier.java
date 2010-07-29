@@ -8,23 +8,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.asyncreply;
+package org.mule.processor.requestreply;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
 import org.apache.commons.lang.BooleanUtils;
 
-/**
- * Need to be configured at the beginning of the chain
- */
-public class AsyncReplySendInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
+public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
+    implements RequestReplyReplierMessageProcessor
 {
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -32,13 +32,14 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
         Object replyTo = event.getMessage().getReplyTo();
         ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
             (InboundEndpoint) event.getEndpoint());
-        // Do not propagate REPLY_TO beyond the inbound endpoint
+        // Do not propagate REPLY_TO
         event.getMessage().setReplyTo(null);
 
         MuleEvent resultEvent = processNext(event);
 
         // Allow components to stop processing of the ReplyTo property (e.g. CXF)
-        final String replyToStop = resultEvent.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+        final String replyToStop = resultEvent.getMessage().getInvocationProperty(
+            MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
         if (resultEvent != null && !BooleanUtils.toBoolean(replyToStop))
         {
             processReplyTo(event, resultEvent, replyToHandler, replyTo);
@@ -70,12 +71,19 @@ public class AsyncReplySendInterceptingMessageProcessor extends AbstractIntercep
     {
         if (result != null && replyToHandler != null)
         {
-            String requestor = result.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-            if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName())) || requestor == null)
+            String requestor = result.getMessage().getOutboundProperty(
+                MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+            if ((requestor != null && !requestor.equals(event.getFlowConstruct().getName()))
+                || requestor == null)
             {
                 replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
             }
         }
+    }
+
+    public void setReplyProcessor(MessageProcessor replyMessageProcessor)
+    {
+        // Not used
     }
 
 }

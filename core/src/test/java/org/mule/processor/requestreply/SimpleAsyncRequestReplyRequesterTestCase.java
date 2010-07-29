@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.asyncreply;
+package org.mule.processor.requestreply;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -16,10 +16,11 @@ import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.AsyncReplyMessageProcessor;
+import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
@@ -27,13 +28,13 @@ import java.beans.ExceptionListener;
 
 import javax.resource.spi.work.Work;
 
-public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends AbstractMuleTestCase
+public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
     implements ExceptionListener
 {
 
     public void testSingleEventNoTimeout() throws Exception
     {
-        AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
+        RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
 
         asyncReplyMP.setListener(target);
@@ -50,7 +51,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
 
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
-        AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
+        RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
             new WorkManagerSource()
@@ -60,7 +61,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, DefaultAsyncReplyInterceptingMessageProcessorTestCase.this);
+            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -78,7 +79,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
 
     public void testSingleEventTimeout() throws Exception
     {
-        DefaultAsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
+        SimpleAsyncRequestReplyRequester asyncReplyMP = new SimpleAsyncRequestReplyRequester();
         asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
@@ -90,7 +91,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, DefaultAsyncReplyInterceptingMessageProcessorTestCase.this);
+            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -112,7 +113,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
 
     public void testMultiple() throws Exception
     {
-        final AsyncReplyMessageProcessor asyncReplyMP = new DefaultAsyncReplyMessageProcessor();
+        final RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
@@ -123,7 +124,7 @@ public class DefaultAsyncReplyInterceptingMessageProcessorTestCase extends Abstr
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, DefaultAsyncReplyInterceptingMessageProcessorTestCase.this);
+            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);

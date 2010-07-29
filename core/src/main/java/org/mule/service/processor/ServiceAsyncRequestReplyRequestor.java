@@ -10,10 +10,11 @@
 
 package org.mule.service.processor;
 
-import org.mule.routing.asyncreply.DefaultAsyncReplyMessageProcessor;
+import org.mule.api.source.MessageSource;
+import org.mule.processor.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
-public class ServiceAsyncReplyMessageProcessor extends DefaultAsyncReplyMessageProcessor
+public class ServiceAsyncRequestReplyRequestor extends AbstractAsyncRequestReplyRequester
 {
 
     protected void postLatchAwait(String asyncReplyCorrelationId)
@@ -24,4 +25,13 @@ public class ServiceAsyncReplyMessageProcessor extends DefaultAsyncReplyMessageP
         }
     }
 
+    @Override
+    protected void verifyReplyMessageSource(MessageSource messageSource)
+    {
+        if (!(messageSource instanceof ServiceAsyncReplyCompositeMessageSource))
+        {
+            throw new IllegalArgumentException(
+                "ServiceAsyncReplyCompositeMessageSource async reply MessageSource must be used with ServiceAsyncRequestReplyRequestor");
+        }
+    }
 }

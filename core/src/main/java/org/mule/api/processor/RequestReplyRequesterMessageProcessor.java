@@ -23,7 +23,7 @@ import org.mule.api.source.MessageSource;
  * 
  * @since 3.0
  */
-public interface AsyncReplyMessageProcessor extends InterceptingMessageProcessor
+public interface RequestReplyRequesterMessageProcessor extends InterceptingMessageProcessor
 {
 
     /**

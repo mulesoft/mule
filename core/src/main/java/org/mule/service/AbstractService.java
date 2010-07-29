@@ -28,7 +28,6 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
-import org.mule.api.processor.AsyncReplyMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -41,7 +40,7 @@ import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
-import org.mule.service.processor.ServiceAsyncReplyMessageProcessor;
+import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -634,9 +633,9 @@ public abstract class AbstractService implements Service
         }
     }
 
-    protected AsyncReplyMessageProcessor createAsyncReplyProcessor()
+    protected ServiceAsyncRequestReplyRequestor createAsyncReplyProcessor()
     {
-        ServiceAsyncReplyMessageProcessor asyncReplyMessageProcessor = new ServiceAsyncReplyMessageProcessor();
+        ServiceAsyncRequestReplyRequestor asyncReplyMessageProcessor = new ServiceAsyncRequestReplyRequestor();
         asyncReplyMessageProcessor.setTimeout(getAsyncReplyTimeout());
         asyncReplyMessageProcessor.setFailOnTimeout(asyncReplyMessageSource.isFailOnTimeout());
         asyncReplyMessageProcessor.setReplySource(asyncReplyMessageSource);

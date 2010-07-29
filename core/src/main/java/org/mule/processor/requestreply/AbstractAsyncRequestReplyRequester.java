@@ -8,17 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.asyncreply;
+package org.mule.processor.requestreply;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.AsyncReplyMessageProcessor;
+import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.source.MessageSource;
@@ -33,25 +30,22 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
-public class DefaultAsyncReplyMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements AsyncReplyMessageProcessor, FlowConstructAware, Initialisable
+public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessor
+    implements RequestReplyRequesterMessageProcessor
 {
+
+    public static final int MAX_PROCESSED_GROUPS = 50000;
 
     protected volatile long timeout = -1;
     protected volatile boolean failOnTimeout = true;
     protected MessageSource replyMessageSource;
     protected FlowConstruct flowConstruct;
-
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
 
     protected final ConcurrentMap locks = new ConcurrentHashMap();
     protected final ConcurrentMap responseEvents = new ConcurrentHashMap();
-
-    public static final int MAX_PROCESSED_GROUPS = 50000;
-
     protected final Object processedLock = new Object();
-
-    // @GuardedBy groupsLock
+    // @GuardedBy processedLock
     protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -68,15 +62,7 @@ public class DefaultAsyncReplyMessageProcessor extends AbstractInterceptingMessa
             processNext(event);
 
             // Receive one-way async-reply response
-            return processAsyncReply(event);
-        }
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        if (timeout < 0)
-        {
-            timeout = flowConstruct.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+            return receiveAsyncReply(event);
         }
     }
 
@@ -92,8 +78,13 @@ public class DefaultAsyncReplyMessageProcessor extends AbstractInterceptingMessa
 
     public void setReplySource(MessageSource messageSource)
     {
+        verifyReplyMessageSource(messageSource);
         replyMessageSource = messageSource;
         messageSource.setListener(internalAsyncReplyMessageProcessor);
+    }
+
+    protected void verifyReplyMessageSource(MessageSource messageSource)
+    {
     }
 
     protected String getAsyncReplyCorrelationId(MuleEvent event)
@@ -108,7 +99,7 @@ public class DefaultAsyncReplyMessageProcessor extends AbstractInterceptingMessa
         }
     }
 
-    protected MuleEvent processAsyncReply(MuleEvent event) throws ResponseTimeoutException
+    protected MuleEvent receiveAsyncReply(MuleEvent event) throws ResponseTimeoutException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
         Latch asyncReplyLatch = (Latch) locks.get(asyncReplyCorrelationId);
@@ -261,11 +252,6 @@ public class DefaultAsyncReplyMessageProcessor extends AbstractInterceptingMessa
             }
             return null;
         }
-    }
-
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 
 }
