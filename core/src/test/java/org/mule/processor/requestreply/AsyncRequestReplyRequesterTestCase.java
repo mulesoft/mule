@@ -20,7 +20,6 @@ import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
@@ -28,13 +27,13 @@ import java.beans.ExceptionListener;
 
 import javax.resource.spi.work.Work;
 
-public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
+public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
     implements ExceptionListener
 {
 
     public void testSingleEventNoTimeout() throws Exception
     {
-        RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
+        RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
 
         asyncReplyMP.setListener(target);
@@ -51,7 +50,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
 
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
-        RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
+        RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
             new WorkManagerSource()
@@ -61,7 +60,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
+            }, true, AsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -79,7 +78,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
 
     public void testSingleEventTimeout() throws Exception
     {
-        SimpleAsyncRequestReplyRequester asyncReplyMP = new SimpleAsyncRequestReplyRequester();
+        TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
         asyncReplyMP.setTimeout(1);
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
@@ -91,7 +90,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
+            }, true, AsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -113,7 +112,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
 
     public void testMultiple() throws Exception
     {
-        final RequestReplyRequesterMessageProcessor asyncReplyMP = new SimpleAsyncRequestReplyRequester();
+        final RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
         SensingNullMessageProcessor target = getSensingNullMessageProcessor();
         target.setWaitTime(50);
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
@@ -124,7 +123,7 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, SimpleAsyncRequestReplyRequesterTestCase.this);
+            }, true, AsyncRequestReplyRequesterTestCase.this);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -168,5 +167,9 @@ public class SimpleAsyncRequestReplyRequesterTestCase extends AbstractMuleTestCa
         e.printStackTrace();
         fail(e.getMessage());
     }
+    
+    class TestAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
+    {
 
+    }
 }
