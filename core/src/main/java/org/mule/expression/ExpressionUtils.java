@@ -43,7 +43,7 @@ public final class ExpressionUtils
     }
 
     /**
-     * Handlers scope-aware expressions like "#[header:INBOUND:foo]
+     * Handler scope-aware expressions like "#[header:INBOUND:foo]
      */
     public static <T> T getPropertyWithScope(String expression, MuleMessage msg, Class<T> type)
     {
