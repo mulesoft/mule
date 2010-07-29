@@ -17,12 +17,15 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.object.ObjectFactory;
+import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Fluent API for the creation of a SimpleService.
@@ -37,6 +40,20 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     protected MessageExchangePattern getInboundMessageExchangePattern()
     {
         return MessageExchangePattern.REQUEST_RESPONSE;
+    }
+
+    @SuppressWarnings("unchecked")
+    public SimpleServiceBuilder inboundTransformers(Transformer... transformers)
+    {
+        this.inboundTransformers = Arrays.asList(transformers);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public SimpleServiceBuilder inboundResponseTransformers(Transformer... responseTransformers)
+    {
+        this.inboundResponseTransformers = Arrays.asList(responseTransformers);
+        return this;
     }
 
     public SimpleServiceBuilder component(Class<?> componentClass)

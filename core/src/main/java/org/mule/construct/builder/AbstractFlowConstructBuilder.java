@@ -20,11 +20,8 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
-import org.mule.api.transformer.Transformer;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.service.DefaultServiceExceptionStrategy;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
@@ -32,9 +29,11 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
 
     protected String name;
     protected ExceptionListener exceptionListener;
-    protected String address;
-    protected EndpointBuilder endpointBuilder;
     protected InboundEndpoint inboundEndpoint;
+    protected EndpointBuilder inboundEndpointBuilder;
+    protected String inboundAddress;
+
+    // getters should be exposed only for builders where it makes sense
     protected List<MessageProcessor> inboundTransformers;
     protected List<MessageProcessor> inboundResponseTransformers;
 
@@ -56,27 +55,15 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         return (T) this;
     }
 
-    public T inboundEndpoint(EndpointBuilder endpointBuilder)
+    public T inboundEndpoint(EndpointBuilder inboundEndpointBuilder)
     {
-        this.endpointBuilder = endpointBuilder;
+        this.inboundEndpointBuilder = inboundEndpointBuilder;
         return (T) this;
     }
 
-    public T inboundAddress(String address)
+    public T inboundAddress(String inboundAddress)
     {
-        this.address = address;
-        return (T) this;
-    }
-
-    public T inboundTransformers(Transformer... transformers)
-    {
-        this.inboundTransformers = Arrays.asList(transformers);
-        return (T) this;
-    }
-
-    public T inboundResponseTransformers(Transformer... responseTransformers)
-    {
-        this.inboundResponseTransformers = Arrays.asList(responseTransformers);
+        this.inboundAddress = inboundAddress;
         return (T) this;
     }
 
@@ -108,24 +95,25 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
             return inboundEndpoint;
         }
 
-        if (endpointBuilder == null)
+        if (inboundEndpointBuilder == null)
         {
-            endpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(address);
+            inboundEndpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(
+                inboundAddress);
         }
 
-        endpointBuilder.setExchangePattern(getInboundMessageExchangePattern());
+        inboundEndpointBuilder.setExchangePattern(getInboundMessageExchangePattern());
 
         if (inboundTransformers != null)
         {
-            endpointBuilder.setMessageProcessors(inboundTransformers);
+            inboundEndpointBuilder.setMessageProcessors(inboundTransformers);
         }
 
         if (inboundResponseTransformers != null)
         {
-            endpointBuilder.setResponseMessageProcessors(inboundResponseTransformers);
+            inboundEndpointBuilder.setResponseMessageProcessors(inboundResponseTransformers);
         }
 
-        return endpointBuilder.buildInboundEndpoint();
+        return inboundEndpointBuilder.buildInboundEndpoint();
     }
 
     protected abstract MessageExchangePattern getInboundMessageExchangePattern();

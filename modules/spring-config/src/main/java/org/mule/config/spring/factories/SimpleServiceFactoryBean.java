@@ -10,10 +10,10 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.api.MuleException;
 import org.mule.api.component.Component;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
-import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.SimpleService;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.SimpleServiceBuilder;
@@ -51,10 +51,24 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         }
     }
 
-    @Override
-    protected AbstractFlowConstruct createFlowConstruct() throws MuleException
+    public void setEndpoint(EndpointBuilder endpointBuilder)
     {
-        return simpleServiceBuilder.build(muleContext);
+        simpleServiceBuilder.inboundEndpoint(endpointBuilder);
+    }
+
+    public void setAddress(String address)
+    {
+        simpleServiceBuilder.inboundAddress(address);
+    }
+
+    public void setTransformers(Transformer... transformers)
+    {
+        simpleServiceBuilder.inboundTransformers(transformers);
+    }
+
+    public void setResponseTransformers(Transformer... responseTransformers)
+    {
+        simpleServiceBuilder.inboundResponseTransformers(responseTransformers);
     }
 
     public void setComponentClass(Class<?> componentClass)
@@ -73,5 +87,4 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
     {
         simpleServiceBuilder.component(component);
     }
-
 }
