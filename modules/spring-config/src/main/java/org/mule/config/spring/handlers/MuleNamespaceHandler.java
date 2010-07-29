@@ -43,6 +43,7 @@ import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionPa
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
 import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
@@ -285,6 +286,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-service", new ServiceDefinitionParser());
         
         // Flow Constructs
+        registerBeanDefinitionParser("flow", new FlowDefinitionParser());
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
 
         // Components

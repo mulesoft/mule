@@ -306,6 +306,27 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <!-- Message Sources -->
+    <xsd:element name="abstract-message-source" abstract="true" type="abstractMessageSourceType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for message source elements. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractMessageSourceType" />
+    
+    <xsd:element name="source" type="compositeMessageSourceType" substitutionGroup="abstract-message-source"/>
+    <xsd:complexType name="compositeMessageSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageSourceType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-message-source" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -1284,11 +1305,59 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="flow" type="flowType" substitutionGroup="abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A flexible flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="flowType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A flexible flow..
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="baseFlowConstructType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="abstract-message-source" minOccurs="1"
+                            maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The source of new messages for this flow
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
+                            maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The inbound endpoint for this flow
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:choice> 
+                    <xsd:element ref="abstract-message-processor" minOccurs="1"
+                        maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message processors that process incoming messages that are received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>    
+    
     
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
@@ -1313,6 +1382,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="address" type="xsd:string">
                     <xsd:annotation>

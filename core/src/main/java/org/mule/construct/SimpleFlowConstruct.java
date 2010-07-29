@@ -11,11 +11,12 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.NullMessageProcessor;
+import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Simple implementation of {@link AbstractFlowConstruct} that allows a list of
@@ -28,11 +29,16 @@ import java.util.Collection;
  */
 public class SimpleFlowConstruct extends AbstractFlowConstruct
 {
-    protected Collection<MessageProcessor> messageProcessors;
+    protected List messageProcessors;
 
-    public void setMessageProcessors(Collection<MessageProcessor> messageProcessors)
+    public void setMessageProcessors(List messageProcessors)
     {
         this.messageProcessors = messageProcessors;
+    }
+
+    public List getMessageProcessors()
+    {
+        return messageProcessors;
     }
 
     public SimpleFlowConstruct(String name, MuleContext muleContext)
@@ -43,13 +49,27 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
     @Override
     protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
-        if (messageProcessors != null)
+        for (Object processor : messageProcessors)
         {
-            builder.chain((MessageProcessor[]) messageProcessors.toArray());
+            if (processor instanceof MessageProcessor)
+            {
+                builder.chain((MessageProcessor) processor);
+            }
+            else if (processor instanceof MessageProcessorBuilder)
+            {
+                builder.chain((MessageProcessorBuilder) processor);
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
         }
-        else
-        {
-            builder.chain(new NullMessageProcessor());
-        }
+    }
+
+    @Deprecated
+    public void setEndpoint(InboundEndpoint endpoint)
+    {
+        this.messageSource = endpoint;
     }
 }
