@@ -18,7 +18,7 @@ import org.mule.api.processor.MessageProcessor;
  * Implementation of {@link MessageProcessor} that dynamically chooses and uses
  * another {@link MessageProcessor}
  */
-public abstract class DynamicMessageProcessor implements MessageProcessor
+public abstract class AbstractDynamicMessageProcessor implements MessageProcessor
 {
 
     public MuleEvent process(MuleEvent event) throws MuleException
