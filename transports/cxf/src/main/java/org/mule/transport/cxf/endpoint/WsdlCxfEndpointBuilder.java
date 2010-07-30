@@ -34,7 +34,7 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
     public WsdlCxfEndpointBuilder(String address, MuleContext muleContext)
     {
         super(getAddressWithoutQuery(getEndpointAddressWithoutMetaScheme(address)), muleContext);
-        this.wsdlAddress = address.substring(9);
+        this.wsdlAddress = getEndpointAddressWithoutMetaScheme(address);
     }
     
     @Override
