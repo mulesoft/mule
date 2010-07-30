@@ -9,6 +9,7 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -36,15 +37,11 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
         assertEquals(NullPayload.getInstance(), result.getPayload());
         assertNull(result.getExceptionPayload());
 
-        Map props = new HashMap();
-        props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        DefaultMuleMessage msg = new DefaultMuleMessage("some data", muleContext);
+        msg.setOutboundProperty("foo", "bar");
+        result = client.send("inboundEndpoint", msg);
         assertNotNull(result);
         assertEquals("got it!", result.getPayloadAsString());
-
-        final Object foo = result.getInboundProperty("foo");
-        assertNotNull(foo);
-        assertEquals("bar", foo);
     }
 }
 // END SNIPPET: full-class
