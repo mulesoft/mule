@@ -102,3 +102,4 @@ org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 
 # BL-38 Need to port for CXF changes
 org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
+org.mule.test.integration.message.SessionPropertyChainingRouterTestCase

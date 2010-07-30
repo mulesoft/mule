@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.resolvers;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.model.resolvers.EntryPointNotFoundException;
@@ -47,7 +48,9 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     public void testValidCallToReverse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service?method=reverseString", "hello", null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        msg.setOutboundProperty("method", "reverseString");
+        MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
     }
@@ -55,7 +58,9 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     public void testValidCallToUpperCase() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service?method=upperCaseString", "hello", null);
+        DefaultMuleMessage msg = new DefaultMuleMessage("hello", muleContext);
+        msg.setOutboundProperty("method", "upperCaseString");
+        MuleMessage message = client.send("vm://service", msg);
         assertNotNull(message);
         assertEquals("HELLO", message.getPayloadAsString());
     }

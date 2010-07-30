@@ -20,7 +20,6 @@
             </component>
             
             <!-- This test will report errors, don't clutter the log -->
-            <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
         </service>
 
         <service name="Service2">

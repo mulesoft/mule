@@ -16,10 +16,6 @@
         <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
     </vm:connector>
 
-    <cxf:connector name="cxfConnector">
-        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
-    </cxf:connector>
-
     <http:connector name="httpConnector">
         <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
     </http:connector>
@@ -37,8 +33,10 @@
             </inbound>
             <outbound>
                 <chaining-router>
-                    <cxf:outbound-endpoint exchange-pattern="request-response" 
-                        address="http://localhost:65082/services/EchoUMO" operation="echo" />
+                    <outbound-endpoint exchange-pattern="request-response" 
+                        address="http://localhost:65082/services/EchoUMO">
+                        <cxf:simple-client serviceClass="org.mule.test.integration.tck.Echo" operation="echo" />
+                    </outbound-endpoint>
                     <vm:outbound-endpoint path="service3" exchange-pattern="request-response">
                         <custom-transformer class="org.mule.transformer.simple.MessagePropertiesTransformer">
                             <spring:property name="getProperty" value="foo" />
@@ -51,9 +49,10 @@
 
         <service name="Service2">
             <inbound>
-                <cxf:inbound-endpoint exchange-pattern="request-response"
-                    address="http://localhost:65082/services/EchoUMO"
-                    serviceClass="org.mule.test.integration.tck.Echo" />
+                <inbound-endpoint exchange-pattern="request-response"
+                    address="http://localhost:65082/services/EchoUMO">
+                        <cxf:simple-service serviceClass="org.mule.test.integration.tck.Echo" />
+                </inbound-endpoint>
             </inbound>
             <echo-component />
         </service>
