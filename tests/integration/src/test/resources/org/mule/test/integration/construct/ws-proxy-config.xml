@@ -60,7 +60,16 @@
   <ws:proxy name="weather-forecast-ws-proxy-concrete-child"
             parent="weather-forecast-ws-proxy-abstract-parent"
             inboundAddress="http://localhost:8090/weather-forecast/6" />
-  
+            
+  <ws:proxy name="weather-forecast-ws-proxy-child-endpoints">
+    <http:inbound-endpoint address="http://localhost:8090/weather-forecast/7" />
+    <http:outbound-endpoint address="http://localhost:6090/weather-forecast" />
+  </ws:proxy>
+            
+  <ws:proxy name="weather-forecast-ws-proxy-concrete-child-endpoints"
+            parent="weather-forecast-ws-proxy-abstract-parent">
+    <http:inbound-endpoint address="http://localhost:8090/weather-forecast/8" />
+  </ws:proxy>
 
   <!--
         Test support

@@ -14,6 +14,9 @@ import java.io.File;
 import java.net.URI;
 
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
@@ -35,24 +38,24 @@ public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
         return wsProxyBuilder;
     }
 
-    public void setInboundEndpoint(EndpointBuilder inboundEndpointBuilder)
-    {
-        wsProxyBuilder.inboundEndpoint(inboundEndpointBuilder);
-    }
-
     public void setInboundAddress(String inboundAddress)
     {
         wsProxyBuilder.inboundAddress(inboundAddress);
     }
 
-    public void setOutboundEndpoint(EndpointBuilder outboundEndpointBuilder)
+    public void setInboundEndpoint(EndpointBuilder inboundEndpointBuilder)
     {
-        wsProxyBuilder.outboundEndpoint(outboundEndpointBuilder);
+        wsProxyBuilder.inboundEndpoint(inboundEndpointBuilder);
     }
 
     public void setOutboundAddress(String outboundAddress)
     {
         wsProxyBuilder.outboundAddress(outboundAddress);
+    }
+
+    public void setOutboundEndpoint(EndpointBuilder outboundEndpointBuilder)
+    {
+        wsProxyBuilder.outboundEndpoint(outboundEndpointBuilder);
     }
 
     public void setTransformers(Transformer... transformers)
@@ -73,5 +76,24 @@ public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
     public void setWsdlFile(File wsdlFile)
     {
         wsProxyBuilder.wsdlFile(wsdlFile);
+    }
+
+    public void setEndpoints(ImmutableEndpoint... endpoints)
+    {
+        for (final ImmutableEndpoint endpoint : endpoints)
+        {
+            if (endpoint instanceof InboundEndpoint)
+            {
+                wsProxyBuilder.inboundEndpoint((InboundEndpoint) endpoint);
+            }
+            else if (endpoint instanceof OutboundEndpoint)
+            {
+                wsProxyBuilder.outboundEndpoint((OutboundEndpoint) endpoint);
+            }
+            else
+            {
+                throw new IllegalArgumentException("unsupported type of endpoint: " + endpoint);
+            }
+        }
     }
 }

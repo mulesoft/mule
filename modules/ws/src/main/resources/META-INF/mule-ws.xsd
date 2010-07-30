@@ -43,6 +43,20 @@
         <xsd:complexContent>
             <xsd:extension base="mule:baseFlowConstructType">
                 <xsd:sequence>
+                  <xsd:element ref="mule:abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
+                      <xsd:annotation>
+                          <xsd:documentation>
+                              The endpoint on which this proxy is listening.
+                          </xsd:documentation>
+                      </xsd:annotation>
+                  </xsd:element>
+                  <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1">
+                      <xsd:annotation>
+                          <xsd:documentation>
+                              The endpoint of the proxied web service.
+                          </xsd:documentation>
+                      </xsd:annotation>
+                  </xsd:element>
                   <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">

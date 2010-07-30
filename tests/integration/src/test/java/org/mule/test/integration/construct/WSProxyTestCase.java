@@ -67,6 +67,16 @@ public class WSProxyTestCase extends FunctionalTestCase
         testWsdlAndWebServiceRequests(6);
     }
 
+    public void testEndpointChildren() throws Exception
+    {
+        testWsdlAndWebServiceRequests(7);
+    }
+
+    public void testInheritanceAndEndpointChildren() throws Exception
+    {
+        testWsdlAndWebServiceRequests(8);
+    }
+
     private void testWsdlAndWebServiceRequests(int proxyId) throws Exception
     {
         testWsdlRequest(proxyId);
@@ -84,7 +94,8 @@ public class WSProxyTestCase extends FunctionalTestCase
     {
         final String weatherForecast = muleClient.send(
             "wsdl-cxf:http://localhost:8090/weather-forecast/" + proxyId + "?wsdl&method=GetWeatherByZipCode",
-            "95050", null, getTestTimeoutSecs() * 1000).getPayloadAsString();
+            "95050", null, getTestTimeoutSecs() * 1000)
+            .getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
