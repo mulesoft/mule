@@ -18,24 +18,22 @@
                   http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
                   http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd">
 
-    <cxf:connector name="cxfConnector">
-        <service-overrides dispatcherFactory="org.mule.test.integration.transport.cxf.TestCxfMessageDispatcherFactory"/>
-    </cxf:connector>
-
-    <cxf:endpoint
-            name="clientEndpoint"
-            address="http://localhost:63081/services/greeter"
-            exchange-pattern="request-response"
+    <endpoint name="clientEndpoint"
+              exchange-pattern="request-response"
+              address="http://localhost:63081/services/greeter">
+        <cxf:jaxws-client
             clientClass="org.apache.hello_world_soap_http.SOAPService"
-            wsdlPort="SoapPort"
-            wsdlLocation="classpath:/wsdl/hello_world.wsdl">
-    </cxf:endpoint>
+            port="SoapPort"
+            wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+    </endpoint>
 
     <model>
         <service name="greeterService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/greeter"
-                    exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:63081/services/greeter"
+                    exchange-pattern="request-response">
+                     <cxf:jaxws-service />
+                 </inbound-endpoint>
             </inbound>
             <component>
                 <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
@@ -62,13 +60,15 @@
             </scripting:component>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint
+                    <outbound-endpoint
                             address="http://localhost:63081/services/greeter"
-                            exchange-pattern="request-response"
+                            exchange-pattern="request-response">
+                        <cxf:jaxws-client
                             clientClass="org.apache.hello_world_soap_http.SOAPService"
-                            wsdlPort="SoapPort"
+                            port="SoapPort"
                             wsdlLocation="classpath:/wsdl/hello_world.wsdl"
                             operation="greetMe"/>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

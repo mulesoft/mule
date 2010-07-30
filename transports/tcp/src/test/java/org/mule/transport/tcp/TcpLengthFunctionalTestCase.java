@@ -18,7 +18,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
-    private int timeout = getTestTimeoutSecs() * 1000 / 20;
+    private int timeout = 60 * 1000 / 20;
 
     public TcpLengthFunctionalTestCase()
     {

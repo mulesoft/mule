@@ -14,12 +14,13 @@
   <model name="TestCxfModel">
     <service name="echoService">
       <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/employee" mtomEnabled="false"
-            exchange-pattern="request-response">
-            <cxf:features>
-              <wsa:addressing />
-            </cxf:features>
-          </cxf:inbound-endpoint>
+          <inbound-endpoint address="http://localhost:63081/services/employee" exchange-pattern="request-response">
+              <cxf:jaxws-service mtomEnabled="false">
+                <cxf:features>
+                  <wsa:addressing />
+                </cxf:features>
+              </cxf:jaxws-service>
+          </inbound-endpoint>
       </inbound>
       <component class="org.mule.transport.cxf.employee.EmployeeDirectoryImpl"/>
     </service>

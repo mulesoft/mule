@@ -10,10 +10,8 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.transport.Connector;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.cxf.Bus;
@@ -24,27 +22,17 @@ public class ConfigurationTestCase extends FunctionalTestCase
 {
     public void testBusConfiguration() throws Exception
     {
+        CxfConfiguration config = muleContext.getRegistry().get("cxf");
+
+        Bus cxfBus = ((CxfConfiguration) config).getCxfBus();
         boolean found = false;
-        Collection connectors = muleContext.getRegistry().lookupObjects(Connector.class);
-        for (Iterator itr = connectors.iterator(); itr.hasNext();)
+        for (Iterator itr2 = cxfBus.getInInterceptors().iterator(); itr2.hasNext();)
         {
-            Connector c = (Connector) itr.next();
-
-            if (c instanceof CxfConnector)
+            Interceptor i = (Interceptor) itr2.next();
+            if (i instanceof LoggingInInterceptor)
             {
-                System.out.println("Found connector");
-
-                Bus cxfBus = ((CxfConnector) c).getCxfBus();
-
-                for (Iterator itr2 = cxfBus.getInInterceptors().iterator(); itr2.hasNext();)
-                {
-                    Interceptor i = (Interceptor) itr2.next();
-                    if (i instanceof LoggingInInterceptor)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
+                found = true;
+                break;
             }
         }
 

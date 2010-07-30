@@ -12,8 +12,6 @@
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-     <cxf:connector name="cxf" defaultFrontend="simple" />
-
      <model name="Sample">
           <service name="WebServiceSample">
                <inbound>
@@ -31,9 +29,10 @@
 
           <service name="TestUMO">
                <inbound>
-                    <cxf:inbound-endpoint address="http://localhost:65081/services/TestUMO" 
-                        serviceClass="org.mule.tck.functional.Receiveable"
-                        exchange-pattern="request-response"/>
+                    <inbound-endpoint address="http://localhost:65081/services/TestUMO" 
+                                      exchange-pattern="request-response">
+                        <cxf:simple-service serviceClass="org.mule.tck.functional.Receiveable"/>
+                    </inbound-endpoint>
                </inbound>
                <test:web-service-component/>
           </service>

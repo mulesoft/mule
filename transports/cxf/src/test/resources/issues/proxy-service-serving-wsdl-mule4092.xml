@@ -10,11 +10,10 @@
      <model name="NileIntegrationGateway">
           <service name="OnlineStoreGateway">
                <inbound>
-                    <cxf:inbound-endpoint address="http://localhost:8777/services/onlinestore"
-                         proxy="true" exchange-pattern="request-response"
-                         wsdlLocation="issues/test.wsdl"
-                         serviceName="OnlineStoreService">
-                    </cxf:inbound-endpoint>
+                    <inbound-endpoint address="http://localhost:8777/services/onlinestore"
+                         exchange-pattern="request-response">
+                         <cxf:proxy-service wsdlLocation="issues/test.wsdl" service="OnlineStoreService"/>
+                    </inbound-endpoint>
                </inbound>
           </service>
      </model>

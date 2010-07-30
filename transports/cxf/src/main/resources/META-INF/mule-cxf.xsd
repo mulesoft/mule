@@ -36,17 +36,10 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="cxfConnectorType" substitutionGroup="mule:abstract-connector"/>
-    <xsd:complexType name="cxfConnectorType">
+    <xsd:element name="configuration" type="cxfConfigurationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="cxfConfigurationType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws">
-                   <xsd:annotation>
-                        <xsd:documentation>
-                            The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" frontend is also supported.  
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+            <xsd:extension base="mule:abstractExtensionType">
                 <xsd:attribute name="configurationLocation" type="xsd:string">
                     <xsd:annotation>
                          <xsd:documentation>
@@ -61,55 +54,127 @@
                          </xsd:documentation>
                      </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="name" type="xsd:string" default="_cxfConfiguration">
+                    <xsd:annotation>
+                         <xsd:documentation>
+                             
+                         </xsd:documentation>
+                     </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
-    <xsd:complexType name="inboundEndpointType">
+    
+    <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:complexType name="simpleServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
-                <xsd:group ref="endpointElements"/>
-                <xsd:attributeGroup ref="inboundEndpointAttributes"/>
-                <xsd:attributeGroup ref="commonEndpointAttributes"/>
+            <xsd:extension base="webServiceType">
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType"
-                 substitutionGroup="mule:abstract-outbound-endpoint"/>
-
-    <xsd:complexType name="outboundEndpointType">
+    
+    <xsd:element name="jaxws-service" type="jaxWsServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:complexType name="jaxWsServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
-                <xsd:group ref="endpointElements"/>
-                <xsd:attributeGroup ref="outboundEndpointAttributes"/>
-                <xsd:attributeGroup ref="commonEndpointAttributes"/>
+            <xsd:extension base="webServiceType">
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
-
-    <xsd:complexType name="globalEndpointType">
+    
+    
+    <xsd:element name="proxy-service" type="proxyServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:complexType name="proxyServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
-                <xsd:group ref="endpointElements"/>
-                <xsd:attributeGroup ref="inboundEndpointAttributes"/>
-                <xsd:attributeGroup ref="outboundEndpointAttributes"/>
-                <xsd:attributeGroup ref="commonEndpointAttributes"/>
+            <xsd:extension base="webServiceType">
+                <xsd:attributeGroup ref="proxyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="webServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:group ref="commonConfiguration"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:attributeGroup name="commonEndpointAttributes">
-        <xsd:attribute name="proxy" type="mule:substitutableBoolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Whether or not this outbound endpoint is acting as a web service proxy. If so, it will expect raw xml as the input parameter and return an XML stream as the output.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+    <xsd:element name="simple-client" type="simpleClientType" substitutionGroup="mule:abstract-message-processor"/>
+
+    <xsd:complexType name="simpleClientType">
+        <xsd:complexContent>
+            <xsd:extension base="clientType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="jaxws-client" type="jaxwsClientType" substitutionGroup="mule:abstract-message-processor"/>
+
+    <xsd:complexType name="jaxwsClientType">
+        <xsd:complexContent>
+            <xsd:extension base="clientType">
+                <xsd:attribute name="clientClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the client class that CXF generated using CXF's wsdl2java tool. You must use wsdl2java if you do not have both the client and the server in the same JVM. Otherwise, this can be optional if the endpoint address is the same in both cases.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The WSDL port you want to use to communicate with the service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="proxy-client" type="proxyClientType" substitutionGroup="mule:abstract-message-processor"/>
+
+    <xsd:complexType name="proxyClientType">
+        <xsd:complexContent>
+            <xsd:extension base="clientType">
+                <xsd:attributeGroup ref="proxyAttributes"/>
+                <xsd:attribute name="port" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The WSDL port you want to use to communicate with the service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="clientType">
+        <xsd:complexContent>
+            <xsd:extension base="outboundType">
+                <xsd:attributeGroup ref="clientAttributes"/>
+                <xsd:attribute name="serviceClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class CXF should use to construct its service model for the client. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="outboundType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:group ref="commonConfiguration"/>
+                <xsd:attributeGroup ref="commonAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="proxyAttributes">
         <xsd:attribute name="payload">
             <xsd:annotation>
                 <xsd:documentation>
@@ -123,6 +188,9 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+    </xsd:attributeGroup>
+    
+    <xsd:attributeGroup name="commonAttributes">
         <xsd:attribute name="mtomEnabled" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
@@ -137,20 +205,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="protocolConnector" type="xsd:string" >
-            <xsd:annotation>
-                <xsd:documentation>
-                            The name of the connector that you wish to use to send/receive messages on with CXF. (As of 2.1)
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="applyTransformersToProtocol" type="mule:substitutableBoolean" default="true">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Whether to apply the transformers to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="enableMuleSoapHeaders" type="mule:substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
@@ -158,41 +212,27 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="serviceClass" type="xsd:string">
+        <xsd:attribute name="configuration-ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The class CXF should use to construct its service model. This is optional, and by default it will use the implementation class of your component, on inbound cxf endpoint. But it is mandatory for outbound endpoint when using "aegis" frontend. 
+                    The CXF configuration that should be used. 
                 </xsd:documentation>
             </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="frontend">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The CXF frontend that is used to build an internal service representation from your Java classes. The default is "jaxws". The "simple" and "aegis" frontend are also supported.  
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-               <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="jaxws"/>
-                    <xsd:enumeration value="simple"/>
-                    <xsd:enumeration value="aegis"/>
-                </xsd:restriction>
-            </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:attributeGroup name="inboundEndpointAttributes">
-        <xsd:attribute name="bindingUri" type="xsd:string">
+    <xsd:attributeGroup name="inboundAttributes">
+        <xsd:attribute name="bindingId" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The binding that should be used for this service. It defaults to the SOAP binding by default.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="endpointName" type="xsd:string">
+        <xsd:attribute name="port" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The WSDL endpoint name of your service.
+                    The WSDL port name of your service.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -203,37 +243,34 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="serviceName" type="xsd:string">
+        <xsd:attribute name="service" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     The WSDL service name of your service.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="applyFiltersToProtocol" type="mule:substitutableBoolean" default="true">
+        <xsd:attribute name="serviceClass" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to apply the filters to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="applySecurityToProtocol" type="mule:substitutableBoolean" default="true">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Whether to apply the security filter to the protocol endpoint. Defaults to true for Mule 2.2+ and false for 2.1 and previous versions.
+                    The class CXF should use to construct its service model. This is optional, and by default it will use the implementation class of your component, on inbound cxf endpoint. But it is mandatory for outbound endpoint when using "aegis" frontend. 
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:group name="endpointElements">
+    <xsd:group name="commonConfiguration">
         <xsd:sequence>
-            <xsd:element ref="mule:abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="response" minOccurs="0">
+            <xsd:element name="configuration-ref" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        
+                    </xsd:documentation>
+                </xsd:annotation>
                 <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element ref="mule:abstract-message-processor" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:sequence>
+                	<xsd:sequence>
+                		<xsd:element ref="configuration" minOccurs="0" maxOccurs="1"/>
+                	</xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
             <xsd:element name="databinding" type="databindingType" minOccurs="0">
@@ -281,21 +318,7 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:attributeGroup name="outboundEndpointAttributes">
-        <xsd:attribute name="wsdlPort" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The WSDL port you want to use to communicate with the service.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="clientClass" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name of the client class that CXF generated using CXF's wsdl2java tool. You must use wsdl2java if you do not have both the client and the server in the same JVM. Otherwise, this can be optional if the endpoint address is the same in both cases.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+    <xsd:attributeGroup name="clientAttributes">
         <xsd:attribute name="operation" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
@@ -303,6 +326,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <!-- 
         <xsd:attribute name="payloadToArguments" default="nullPayloadAsParameter">
             <xsd:annotation>
                 <xsd:documentation>
@@ -320,6 +344,7 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+         -->
     </xsd:attributeGroup>
 
     <xsd:complexType name="databindingType">

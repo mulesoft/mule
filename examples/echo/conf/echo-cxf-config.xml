@@ -28,11 +28,14 @@
     <model name="echoSample">
         <service name="EchoUMO">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
-                                      serviceClass="org.mule.example.echo.Echo"
-                                      exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:65082/services/EchoUMO"
+                                  exchange-pattern="request-response">
+                    <cxf:jaxws-service />                  
+                </inbound-endpoint>
             </inbound>
-            <echo-component/>
+            <component>
+                <singleton-object class="org.mule.example.echo.Echo"/>
+            </component>
         </service>
     </model>
     

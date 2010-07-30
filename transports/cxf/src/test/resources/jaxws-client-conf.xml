@@ -15,33 +15,36 @@
            <quartz:job-endpoint address="vm://quartz.in"/>
        </quartz:scheduled-dispatch-job>
   </quartz:endpoint>
-    
-  <cxf:endpoint 
-      name="clientEndpoint" 
+  
+  <endpoint name="clientEndpoint" 
       address="http://localhost:63081/services/greeter"
-      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-      wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
       exchange-pattern="request-response">
-      <cxf:inInterceptors>
-          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
-      </cxf:inInterceptors>
-      <cxf:outInterceptors>
-          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
-      </cxf:outInterceptors>
-  </cxf:endpoint>
+	  <cxf:jaxws-client
+	      clientClass="org.apache.hello_world_soap_http.SOAPService" 
+	      port="SoapPort" 
+	      wsdlLocation="classpath:/wsdl/hello_world.wsdl">
+	      <cxf:inInterceptors>
+	          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
+	      </cxf:inInterceptors>
+	      <cxf:outInterceptors>
+	          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
+	      </cxf:outInterceptors>
+	  </cxf:jaxws-client>
+  </endpoint>
     
   <model name="TestCxfModel">
-  
-    <service name="greeterService">
-      <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" 
-            exchange-pattern="request-response"/>
-      </inbound>
-      <component>
-        <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
-      </component>
-    </service>
+
+	<service name="greeterService">
+		<inbound>
+			<inbound-endpoint address="http://localhost:63081/services/greeter"
+				exchange-pattern="request-response">
+				<cxf:jaxws-service />
+			</inbound-endpoint>
+		</inbound>
+		<component>
+			<singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+		</component>
+	</service>
     
     <service name="cxfClient">
       <inbound>
@@ -52,13 +55,15 @@
       </component>
       <outbound>
         <pass-through-router>
-           <cxf:outbound-endpoint
-             address="http://localhost:63081/services/greeter"
-             clientClass="org.apache.hello_world_soap_http.SOAPService"
-             wsdlPort="SoapPort"
-             wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-             operation="greetMe"
-             exchange-pattern="request-response"/>
+           <outbound-endpoint address="http://localhost:63081/services/greeter"
+              exchange-pattern="request-response">
+	           <cxf:jaxws-client
+	             clientClass="org.apache.hello_world_soap_http.SOAPService"
+	             port="SoapPort"
+	             wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+	             operation="greetMe"
+	             />
+           </outbound-endpoint>
         </pass-through-router>
       </outbound>
     </service>

@@ -43,7 +43,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     /** Milliseconds to wait after sending each message in order for the thread to "catch up" with the test. */
     protected int getDelay()
     {
-        return 10000;
+        return 30000;
     }
 
     protected int getWarmUpMessages()
@@ -56,7 +56,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     {
         MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
-        CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
+        CustomerQuoteRequest request = new CustomerQuoteRequest(c, 10000, 48);
         // Send asynchronous request
         client.dispatch("CustomerRequests", request, null);
 

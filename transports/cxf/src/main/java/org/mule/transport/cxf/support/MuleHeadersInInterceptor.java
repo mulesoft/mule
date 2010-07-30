@@ -10,6 +10,11 @@
 
 package org.mule.transport.cxf.support;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.transport.cxf.CxfConstants;
+
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -79,6 +84,34 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor
             {
                 message.put(child_el.getLocalName(), collectTextFrom(child_el));
             }
+        }
+        
+
+        MuleMessage reqMsg = ((MuleEvent) message.get(CxfConstants.MULE_EVENT)).getMessage();
+        
+        // Copy correlation headers nto message
+        String replyTo = (String) message.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        if (replyTo != null)
+        {
+            reqMsg.setReplyTo(replyTo);
+        }
+        
+        String corId = (String) message.get(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        if (corId != null)
+        {
+            reqMsg.setCorrelationId(corId);
+        }
+
+        String corGroupSize = (String) message.get(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+        if (corGroupSize != null)
+        {
+            reqMsg.setCorrelationGroupSize(Integer.valueOf(corGroupSize));
+        }
+
+        String corSeq = (String) message.get(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+        if (corSeq != null)
+        {
+            reqMsg.setCorrelationSequence(Integer.valueOf(corSeq));
         }
     }
 

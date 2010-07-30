@@ -10,16 +10,14 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.NullPayload;
-import org.mule.transport.cxf.i18n.CxfMessages;
 
 /**
  * This enum defines the strategies to convert a Payload to an array of arguments
  * that will be used to call the webservice in
- * {@link CxfMessageDispatcher#doSendWithClient(org.mule.api.MuleEvent)} and in
- * {@link CxfMessageDispatcher#doSendWithProxy(org.mule.api.MuleEvent)}.
+ * {@link CxfOutboundMessageProcessor#doSendWithClient(org.mule.api.MuleEvent)} and in
+ * {@link CxfOutboundMessageProcessor#doSendWithProxy(org.mule.api.MuleEvent)}.
  */
 public enum CxfPayloadToArguments
 {
@@ -93,35 +91,5 @@ public enum CxfPayloadToArguments
     public String getPayloadToArgumentsParameterValue()
     {
         return payloadToArgumentsParameterValue;
-    }
-
-    /**
-     * This returns the proper {@link CxfPayloadToArguments} for the provided
-     * endpoint. The proper {@link CxfPayloadToArguments} is indicated by the
-     * property {@link CxfConstants#PAYLOAD_TO_ARGUMENTS} in the endoint. The valid
-     * values are <code>null</code> and any of the possible values returned by
-     * {@link #getPayloadToArgumentsParameterValue()}.
-     * 
-     * @param endpoint
-     * @return
-     * @throws MalformedEndpointException
-     */
-    public static CxfPayloadToArguments getPayloadToArgumentsForEndpoint(OutboundEndpoint endpoint)
-        throws MalformedEndpointException
-    {
-        String nullPayloadParameterValue = (String) endpoint.getProperty(CxfConstants.PAYLOAD_TO_ARGUMENTS);
-        if (nullPayloadParameterValue == null)
-        {
-            nullPayloadParameterValue = CxfConstants.PAYLOAD_TO_ARGUMENTS_BY_DEFAULT;
-        }
-        for (CxfPayloadToArguments transformer : values())
-        {
-            if (transformer.getPayloadToArgumentsParameterValue().equals(nullPayloadParameterValue))
-            {
-                return transformer;
-            }
-        }
-        throw new MalformedEndpointException(
-            CxfMessages.invalidPayloadToArgumentsParameter(nullPayloadParameterValue), endpoint.getName());
     }
 }

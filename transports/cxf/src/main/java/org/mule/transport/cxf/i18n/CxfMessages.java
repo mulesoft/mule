@@ -116,6 +116,11 @@ public class CxfMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 25, String.valueOf(serviceQName),
             String.valueOf(probableServices), String.valueOf(allServices));
     }
+
+    public static Message onlyServiceOrClientClassIsValid()
+    {
+        return factory.createMessage(BUNDLE_PATH, 26);
+    }
 }
 
 

@@ -40,20 +40,23 @@
     <model name="http secured test model">
         <service name="SecureUMO">
             <inbound>
-                <cxf:inbound-endpoint 
-                    address="http://localhost:60443/services/Echo"
-                    frontend="simple"
-                    applySecurityToProtocol="true"
-                    exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
-                </cxf:inbound-endpoint>
-                <cxf:inbound-endpoint 
+                <inbound-endpoint 
                     address="https://localhost:60444/services/Echo"
-                    frontend="simple"
-                    applySecurityToProtocol="true"
                     exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
-                </cxf:inbound-endpoint>
+                    <cxf:simple-service/>
+                </inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+        <service name="AnotherSecureUMO">
+            <inbound>
+                <inbound-endpoint 
+                    address="http://localhost:60443/services/Echo"
+                    exchange-pattern="request-response">
+                    <acegi:http-security-filter realm="mule-realm"/>
+                    <cxf:simple-service/>
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>

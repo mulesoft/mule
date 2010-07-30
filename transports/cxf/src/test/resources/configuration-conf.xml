@@ -7,8 +7,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
-    <cxf:connector name="cxf" defaultFrontend="simple" 
-      configurationLocation="cxf-config.xml"/>
+    <cxf:configuration name="cxf" configurationLocation="cxf-config.xml"/>
     
     <model name="test">
 

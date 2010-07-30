@@ -54,13 +54,15 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint
+                    <outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx"
-                            exchange-pattern="request-response"
+                            exchange-pattern="request-response">
+                        <cxf:jaxws-client
                             clientClass="net.webservicex.StockQuote"
                             operation="GetQuote" 
-                            wsdlPort="StockQuoteSoap" 
+                            port="StockQuoteSoap" 
                             wsdlLocation="classpath:stockquote.wsdl" />
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

@@ -15,10 +15,13 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 
 @WebService
-public interface Echo
+public class Echo
 {
     @WebResult(name="text")
-    public String echo(@WebParam(name="text") String string);
+    public String echo(@WebParam(name="text") String string)
+    {
+        return string;
+    }
 }
 
 

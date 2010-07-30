@@ -13,48 +13,50 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
-
-  <cxf:endpoint 
+  <endpoint 
       name="cxfOutbound" 
       address="http://localhost:63081/services/greeter"
-      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-      wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-      operation="greetMe"
-      exchange-pattern="request-response"
-      applyTransformersToProtocol="false">
+	  exchange-pattern="request-response">
+	  <cxf:jaxws-client
+	      clientClass="org.apache.hello_world_soap_http.SOAPService" 
+	      port="SoapPort" 
+	      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+	      operation="greetMe">
+	      <cxf:inInterceptors>
+	          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
+	      </cxf:inInterceptors>
+	      <cxf:outInterceptors>
+	          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
+	      </cxf:outInterceptors>
+	  </cxf:jaxws-client>
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
       </message-properties-transformer> 
-      
-      <cxf:inInterceptors>
-          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
-      </cxf:inInterceptors>
-      <cxf:outInterceptors>
-          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
-      </cxf:outInterceptors>
-  </cxf:endpoint>
-    
-  <cxf:endpoint 
+  </endpoint>
+  
+  <endpoint 
       name="cxfOutbound2" 
       address="http://localhost:63081/services/greeter"
-      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-      wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-      operation="greetMe"
-      exchange-pattern="request-response"
-      applyTransformersToProtocol="true">
+	  exchange-pattern="request-response">
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
       </message-properties-transformer>
-  </cxf:endpoint>
+	  <cxf:jaxws-client 
+	      clientClass="org.apache.hello_world_soap_http.SOAPService" 
+	      port="SoapPort" 
+	      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+	      operation="greetMe">
+	  </cxf:jaxws-client>
+  </endpoint>
   
   <model name="TestCxfModel">
   
     <service name="greeterService">
       <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" 
-                                exchange-pattern="request-response"/>
+          <inbound-endpoint address="http://localhost:63081/services/greeter" 
+                            exchange-pattern="request-response">
+              <cxf:jaxws-service />
+          </inbound-endpoint>
       </inbound>
       <component>
         <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>

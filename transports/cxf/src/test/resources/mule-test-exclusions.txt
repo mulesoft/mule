@@ -17,24 +17,16 @@ org.mule.transport.cxf.client.GeneratedClientTestCase
 # MULE-3054
 org.mule.transport.cxf.jaxws.ClientTestCase
 
-# MULE-3475
-org.mule.transport.cxf.WSProxyTestCase
-
-# Broken by r12671, CI build MULE-MULE2JDK5-429
-# MULE-3694
-org.mule.transport.cxf.CxfConnectorVMFunctionalTestCase
-
 ###########################
 # Broken by BL-137
 ###########################
-
-# Uses Mokito and gets an NPE
-org.mule.transport.cxf.CxfMessageDispatcherTestCase
-
 # Problem with arguments in doSendWithProxy() 
-org.mule.transport.cxf.messagedispatcher.CxfMessageDispatcherTreatNullPayloadAsParameterByDefaultTestCase
-org.mule.transport.cxf.messagedispatcher.CxfMessageDispatcherTreatNullPayloadAsParameterTestCase
-org.mule.transport.cxf.messagedispatcher.CxfMessageDispatcherTreatNullPayloadAsVoidTestCase
+org.mule.transport.cxf.payload.TreatNullPayloadAsParameterByDefaultTestCase
+org.mule.transport.cxf.payload.TreatNullPayloadAsParameterTestCase
+org.mule.transport.cxf.payload.TreatNullPayloadAsVoidTestCase
 
-# Content is not allowed in prolog. (net.sf.saxon.trans.DynamicError)
-org.mule.transport.cxf.ProtocolTestCase
+# Need to make work post refactoring
+org.mule.transport.cxf.DatabindingTestCase
+org.mule.transport.cxf.wsa.WSATest
+org.mule.transport.cxf.WSProxyTestCase
+org.mule.transport.cxf.ClientSimpleFrontendTestCase

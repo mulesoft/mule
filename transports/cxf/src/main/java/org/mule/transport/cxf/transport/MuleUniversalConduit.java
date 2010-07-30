@@ -10,28 +10,26 @@
 
 package org.mule.transport.cxf.transport;
 
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
-import org.mule.transport.cxf.CxfConnector;
+import org.mule.transport.cxf.CxfConfiguration;
 import org.mule.transport.cxf.CxfConstants;
+import org.mule.transport.cxf.CxfOutboundMessageProcessor;
 import org.mule.transport.cxf.support.DelegatingOutputStream;
 import org.mule.transport.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.transport.http.HttpConnector;
@@ -45,7 +43,6 @@ import java.io.PushbackInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -69,9 +66,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 /**
  * A Conduit is primarily responsible for sending messages from CXF to somewhere
  * else. This conduit takes messages which are being written and sends them to the
@@ -84,7 +78,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private EndpointInfo endpoint;
 
-    private CxfConnector connector;
+    private CxfConfiguration configuration;
 
     private Destination decoupledDestination;
 
@@ -96,25 +90,21 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private boolean closeInput = true;
 
-    private boolean applyTransformersToProtocol;
-    
-    private ImmutableEndpoint muleEndpoint;
-
-    private Map<String,OutboundEndpoint> protocolEndpoints = new HashMap<String, OutboundEndpoint>();
+    private Map<String,OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
     
     /**
      * @param ei The Endpoint being invoked by this destination.
      * @param t The EPR associated with this Conduit - i.e. the reply destination.
      */
     public MuleUniversalConduit(MuleUniversalTransport transport,
-                                CxfConnector connector,
+                                CxfConfiguration configuration,
                                 EndpointInfo ei,
                                 EndpointReferenceType t)
     {
         super(getTargetReference(ei, t));
         this.transport = transport;
         this.endpoint = ei;
-        this.connector = connector;
+        this.configuration = configuration;
     }
     
     @Override
@@ -210,41 +200,92 @@ public class MuleUniversalConduit extends AbstractConduit
         };
 
         MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
-        
-        MuleMessage req;
         if (event == null) 
         {
-            req = new DefaultMuleMessage(handler, connector.getMuleContext());
+            MuleContext muleContext = configuration.getMuleContext();
+            MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
+            MuleSession session = new DefaultMuleSession(muleContext);
+            
+            String url = setupURL(message);
+            
+            try
+            {
+                OutboundEndpoint ep = getEndpoint(muleContext, url);
+                event = new DefaultMuleEvent(muleMsg, ep, session);
+            }
+            catch (Exception e)
+            {
+                throw new Fault(e);
+            }
+            event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
+            RequestContext.setEvent(event);
         }
-        else 
+        else
         {
-            req = new DefaultMuleMessage(handler, event.getMessage(), connector.getMuleContext());
+            event.getMessage().setPayload(handler);
         }
-        
-        message.getExchange().put(CxfConstants.MULE_MESSAGE, req);
+        message.getExchange().put(CxfConstants.MULE_EVENT, event);
+    }
+    
+    protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
+    {
+        if (endpoints.get(uri) != null)
+        {
+            return endpoints.get(uri);
+        }
+
+        OutboundEndpoint ndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+        endpoints.put(uri, ndpoint);
+        return ndpoint;
+    }
+    
+    protected String setupURL(Message message) throws MalformedURLException
+    {
+        String value = (String) message.get(Message.ENDPOINT_ADDRESS);
+        String pathInfo = (String) message.get(Message.PATH_INFO);
+        String queryString = (String) message.get(Message.QUERY_STRING);
+        String username = (String) message.get(BindingProvider.USERNAME_PROPERTY);
+        String password = (String) message.get(BindingProvider.PASSWORD_PROPERTY);
+
+        String result = value != null ? value : getTargetOrEndpoint();
+
+        if (username != null) {
+             int slashIdx = result.indexOf("//");
+             if (slashIdx != -1) {
+                 result = result.substring(0, slashIdx + 2) + username + ":" + password + "@" + result.substring(slashIdx+2);
+             }
+        }
+
+        // REVISIT: is this really correct?
+        if (null != pathInfo && !result.endsWith(pathInfo))
+        {
+            result = result + pathInfo;
+        }
+        if (queryString != null)
+        {
+            result = result + "?" + queryString;
+        }
+        return result;
     }
     
     protected void dispatchMuleMessage(Message m) throws IOException {
-        String uri = setupURL(m);
-
-        LOGGER.info("Sending message to " + uri);
         try
         {
-            OutboundEndpoint protocolEndpoint = getProtocolEndpoint(uri);
-
-            MuleMessage req = (MuleMessage) m.getExchange().get(CxfConstants.MULE_MESSAGE);
-            req.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, uri, PropertyScope.INVOCATION);
-            req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+            MuleEvent reqEvent = (MuleEvent) m.getExchange().get(CxfConstants.MULE_EVENT);
             
-            MuleMessage result = sendStream(req, protocolEndpoint, m.getExchange());
+            MuleMessage req = reqEvent.getMessage();
+            req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
 
-            if (result == null)
+            MuleEvent resEvent = processNext(reqEvent, m.getExchange());
+
+            if (resEvent == null)
             {
                 m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
                 return;
             }
             
             // If we have a result, send it back to CXF
+            MuleMessage result = resEvent.getMessage();
             InputStream is = getResponseBody(m, result);
             if (is != null)
             {
@@ -253,7 +294,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 String contentType = result.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 inMessage.put(Message.CONTENT_TYPE, contentType);
                 inMessage.put(Message.ENCODING, result.getEncoding());
-                inMessage.put(CxfConstants.MULE_MESSAGE, result);
+                inMessage.put(CxfConstants.MULE_EVENT, resEvent);
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
@@ -270,53 +311,6 @@ public class MuleUniversalConduit extends AbstractConduit
             ex.initCause(e);
             throw ex;
         }
-    }
-
-    protected OutboundEndpoint getProtocolEndpoint(String uri) throws MuleException
-    {
-        OutboundEndpoint ep = protocolEndpoints.get(uri);
-        if (ep == null)
-        {
-            ep = initializeProtocolEndpoint(uri);
-        }
-        return ep;
-    }
-
-    protected synchronized OutboundEndpoint initializeProtocolEndpoint(String uri) throws MuleException
-    {
-
-        if (protocolEndpoints.get(uri) != null)
-        {
-            return protocolEndpoints.get(uri);
-        }
-
-        MuleRegistry registry = connector.getMuleContext().getRegistry();
-        OutboundEndpoint protocolEndpoint;
-
-
-        EndpointURIEndpointBuilder builder = new EndpointURIEndpointBuilder(uri, connector.getMuleContext());
-        builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-
-        if (muleEndpoint == null)
-        {
-            // Someone is using a JAX-WS client directly and not going through
-            // MuleClient
-            protocolEndpoint = registry.lookupEndpointFactory().getOutboundEndpoint(uri);
-        }
-        else
-        {
-            // MuleClient/Dispatcher case
-            String connectorName = (String) muleEndpoint.getProperty("protocolConnector");
-            if (connectorName != null)
-            {
-                builder.setConnector(registry.lookupConnector(connectorName));
-            }
-            // Propagate responseTimeout to http endpoint.
-            builder.setResponseTimeout(muleEndpoint.getResponseTimeout());
-        }
-        protocolEndpoint = registry.lookupEndpointFactory().getOutboundEndpoint(builder);
-        protocolEndpoints.put(uri, protocolEndpoint);
-        return protocolEndpoint;
     }
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
@@ -349,35 +343,6 @@ public class MuleUniversalConduit extends AbstractConduit
         return exchange != null && exchange.isOneWay();
     }
     
-    protected String setupURL(Message message) throws MalformedURLException
-    {
-        String value = (String) message.get(Message.ENDPOINT_ADDRESS);
-        String pathInfo = (String) message.get(Message.PATH_INFO);
-        String queryString = (String) message.get(Message.QUERY_STRING);
-        String username = (String) message.get(BindingProvider.USERNAME_PROPERTY);
-        String password = (String) message.get(BindingProvider.PASSWORD_PROPERTY);
-
-        String result = value != null ? value : getTargetOrEndpoint();
-
-        if (username != null) {
-             int slashIdx = result.indexOf("//");
-             if (slashIdx != -1) {
-                 result = result.substring(0, slashIdx + 2) + username + ":" + password + "@" + result.substring(slashIdx+2);
-             }
-        }
-        
-        // REVISIT: is this really correct?
-        if (null != pathInfo && !result.endsWith(pathInfo))
-        {
-            result = result + pathInfo;
-        }
-        if (queryString != null)
-        {
-            result = result + "?" + queryString;
-        }
-        return result;
-    }
-
     protected String getTargetOrEndpoint()
     {
         if (target != null)
@@ -393,82 +358,26 @@ public class MuleUniversalConduit extends AbstractConduit
         // template method
     }
     
-    protected MuleMessage sendStream(MuleMessage sendMessage, 
-                                     OutboundEndpoint protocolEndpoint,
-                                     Exchange exchange) throws MuleException
+    protected MuleEvent processNext(MuleEvent event,
+                                    Exchange exchange) throws MuleException
     {
-        MuleEventContext eventContext = RequestContext.getEventContext();
-        MuleSession session = null;
-        if (eventContext != null)
+        CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
+        MuleEvent response;
+        if (processor == null)
         {
-            session = eventContext.getSession();
+            // we're sending from a CXF client, not from mule
+            OutboundEndpoint ep = (OutboundEndpoint) event.getEndpoint();
+            response = ep.process(event);
         }
-
-        MuleMessage message = new DefaultMuleMessage(sendMessage, connector.getMuleContext());
-        if (session == null)
+        else
         {
-            session = new DefaultMuleSession(message, connector.getSessionHandler(), connector.getMuleContext());
-        }
-        
-        // Filter out CXF client properties like wsdlLocation, inInterceptors, etc
-        MuleEvent prev = RequestContext.getEvent();
-        // If you're invoking from a CXF generated client, the event can be null
-        if (prev != null) 
-        {
-            for (Iterator itr = prev.getEndpoint().getProperties().keySet().iterator(); itr.hasNext();)
-            {
-                String key = (String) itr.next();
-                
-                message.removeProperty(key);
-            }
+           response = processor.processNext(event);
+           
+           Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+           holder.value = response;
         }
         
-        // part workaround for some of MULE-4533. Needs a cleaner solution
-        message.removeProperty(CxfConstants.OPERATION);
-        message.removeProperty(CxfConstants.INBOUND_OPERATION);
-        message.removeProperty(CxfConstants.INBOUND_SERVICE);
-        message.removeProperty(CxfConstants.IN_INTERCEPTORS);
-        message.removeProperty(CxfConstants.IN_FAULT_INTERCEPTORS);
-        message.removeProperty(CxfConstants.OUT_INTERCEPTORS);
-        message.removeProperty(CxfConstants.OUT_FAULT_INTERCEPTORS);
-        message.removeProperty(CxfConstants.APPLY_FILTERS_TO_PROTOCOL);
-        message.removeProperty(CxfConstants.APPLY_SECURITY_TO_PROTOCOL);
-        message.removeProperty(CxfConstants.APPLY_TRANSFORMERS_TO_PROTOCOL);
-        message.removeProperty(CxfConstants.WSDL_LOCATION);
-        message.removeProperty(CxfConstants.DATA_BINDING);
-        message.removeProperty(CxfConstants.ENABLE_MULE_SOAP_HEADERS);
-        message.removeProperty(CxfConstants.FEATURES);
-        message.removeProperty(CxfConstants.FRONTEND);
-        message.removeProperty(CxfConstants.PROXY);
-        message.removeProperty(CxfConstants.SERVICE_NAME);
-        message.removeProperty(CxfConstants.PROTOCOL_CONNECTOR);
-        
-        MuleEvent event = new DefaultMuleEvent(message, protocolEndpoint, session);
-        event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
-        RequestContext.setEvent(event);
-
-        // This is a little "trick" to apply transformers from the CXF endpoint
-        // to the raw message instead of the pojos
-        if (prev != null && applyTransformersToProtocol)
-        {
-            message.applyTransformers(prev.getEndpoint().getTransformers());
-        }
-
-        MuleMessage msg = null;
-        MuleEvent result = protocolEndpoint.process(event);
-        if (result != null)
-        {
-            msg = result.getMessage();
-        }
-        // We need to grab this back in the CxfMessageDispatcher again.
-        Holder<MuleMessage> holder = (Holder<MuleMessage>) exchange.get("holder");
-        // it's null if there is no dispatcher and the Client is being used directly over Mule
-        if (holder != null)
-        {
-            holder.value = msg;
-        }
-        
-        return msg;
+        return response;
     }
 
     @Override
@@ -559,19 +468,15 @@ public class MuleUniversalConduit extends AbstractConduit
             incomingObserver.onMessage(inMessage);
         }
     }
+    
     public void setCloseInput(boolean closeInput)
     {
         this.closeInput = closeInput;
     }
 
-    public void setApplyTransformersToProtocol(boolean applyTransformersToProtocol)
+    protected CxfConfiguration getConnector()
     {
-        this.applyTransformersToProtocol = applyTransformersToProtocol;
-    }
-
-    protected CxfConnector getConnector()
-    {
-        return connector;
+        return configuration;
     }
 
     protected EndpointInfo getEndpoint()
@@ -583,11 +488,4 @@ public class MuleUniversalConduit extends AbstractConduit
     {
         return transport;
     }
-    
-    public void setMuleEndpoint(ImmutableEndpoint muleEndpoint)
-    {
-        this.muleEndpoint = muleEndpoint;
-        
-    }
-    
 }

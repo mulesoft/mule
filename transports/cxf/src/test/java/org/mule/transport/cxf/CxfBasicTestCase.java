@@ -16,6 +16,10 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
@@ -43,17 +47,11 @@ public class CxfBasicTestCase extends FunctionalTestCase
     public void testEchoService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
-            null);
-        assertEquals("Hello!", result.getPayload());
-    }
-
-    public void testEchoServiceSynchronous() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("cxf:http://localhost:63083/services/Echo3?method=echo", "Hello!",
-            null);
-        assertEquals("Hello!", result.getPayload());
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("Content-Type", "application/soap+xml");
+        InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
+        MuleMessage result = client.send("http://localhost:63081/services/Echo", xml, props);
+        assertTrue(result.getPayloadAsString().contains("Hello!"));
     }
 
     public void testEchoWsdl() throws Exception

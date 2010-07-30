@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule:mule xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:cxf="http://cxf.apache.org/core"
-  xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-  xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
-  xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+  xmlns:cxf-core="http://cxf.apache.org/core"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
   xsi:schemaLocation="
-               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-               http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+  <model name="CXFSoapRequest">
 
-  <mule:model name="CXFSoapRequest">
-
-    <mule:service name="TestComponent">
-      <mule:inbound>
-        <mule:inbound-endpoint
-          address="cxf:http://localhost:63381/services/TestComponent" exchange-pattern="request-response">
-          <mule:properties>
-            <entry key="frontend" value="simple" />
-          </mule:properties>
-        </mule:inbound-endpoint>
-        </mule:inbound>
-      <mule:component class="org.mule.tck.testmodels.services.TestComponent" />
-    </mule:service>
-  </mule:model>
-</mule:mule>
+    <service name="TestComponent">
+      <inbound>
+        <inbound-endpoint
+          address="http://localhost:63381/services/TestComponent" exchange-pattern="request-response">
+          <cxf:simple-service />
+        </inbound-endpoint>
+      </inbound>
+      <component class="org.mule.tck.testmodels.services.TestComponent" />
+    </service>
+  </model>
+</mule>

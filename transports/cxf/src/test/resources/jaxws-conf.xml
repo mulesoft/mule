@@ -12,19 +12,23 @@
   <model name="TestCxfModel">
     <service name="echoService">
       <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
+          <inbound-endpoint address="http://localhost:63081/services/Echo"
             exchange-pattern="request-response">
-            <cxf:features>
-              <cxf-core:logging/>
-            </cxf:features>
-          </cxf:inbound-endpoint>
+            <cxf:jaxws-service>
+	            <cxf:features>
+	              <cxf-core:logging/>
+	            </cxf:features>
+            </cxf:jaxws-service>
+          </inbound-endpoint>
       </inbound>
       <component class="org.mule.transport.cxf.testmodels.Echo"/>
     </service>
     <service name="asyncService">
       <inbound>
-          <cxf:inbound-endpoint address="http://localhost:63081/services/async"
-            exchange-pattern="request-response"/>
+          <inbound-endpoint address="http://localhost:63081/services/async"
+            exchange-pattern="request-response">
+              <cxf:jaxws-service />
+          </inbound-endpoint>
       </inbound>
       <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
     </service>

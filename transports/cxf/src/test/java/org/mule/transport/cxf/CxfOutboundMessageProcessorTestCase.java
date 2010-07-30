@@ -1,0 +1,67 @@
+package org.mule.transport.cxf;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.component.simple.EchoService;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transport.cxf.builder.SimpleClientMessageProcessorBuilder;
+
+public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
+{
+    String msg = 
+        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
+    		"<ns1:echo xmlns:ns1=\"http://simple.component.api.mule.org/\">" +
+    		    "<ns1:return>hello</ns1:return>" +
+    		"</ns1:echo>" + 
+        "</soap:Body></soap:Envelope>";
+
+    boolean gotEvent = false;
+    Object payload;
+    
+    public void testOutbound() throws Exception
+    {
+        CxfConfiguration config = new CxfConfiguration();
+        config.setMuleContext(muleContext);
+        config.initialise();
+        
+        // Build a CXF MessageProcessor
+        SimpleClientMessageProcessorBuilder builder = new SimpleClientMessageProcessorBuilder();
+        builder.setConfiguration(config);
+        builder.setServiceClass(EchoService.class);
+        builder.setOperation("echo");
+        builder.setMuleContext(muleContext);
+        
+        CxfOutboundMessageProcessor processor = builder.build();
+        
+        MessageProcessor messageProcessor = new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                payload = event.getMessage().getPayload();
+                try
+                {
+                    System.out.println(event.getMessage().getPayloadAsString());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                
+                event.getMessage().setPayload(msg);
+                gotEvent = true;
+                return event;
+            }
+        };
+        processor.setListener(messageProcessor);
+        
+        MuleEvent event = getTestEvent("hello", getTestInboundEndpoint("test"));
+        MuleEvent response = processor.process(event);
+        
+        Object payload = response.getMessage().getPayload();
+        assertTrue(payload instanceof String);
+        assertEquals("hello", payload);
+        assertTrue(gotEvent);
+    }
+
+}

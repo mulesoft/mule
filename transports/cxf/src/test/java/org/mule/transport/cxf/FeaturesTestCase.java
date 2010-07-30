@@ -11,11 +11,14 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder;
+import org.mule.transport.cxf.config.FlowConfiguringMessageProcessor;
 
 import java.util.List;
-import java.util.Map;
 
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.LoggingFeature;
 
 public class FeaturesTestCase extends FunctionalTestCase
@@ -31,14 +34,25 @@ public class FeaturesTestCase extends FunctionalTestCase
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildInboundEndpoint();
         assertNotNull(endpoint);
-        Map properties = endpoint.getProperties();
-        assertNotNull(properties);
-        assertEquals(6, properties.size());
-        assertNotNull(properties.get("features"));
-        assertTrue(properties.get("features") instanceof List);
-        List features = (List) properties.get("features");
-        assertEquals(2, features.size());
-        assertTrue(features.get(0) instanceof LoggingFeature);
+        
+        List<MessageProcessor> mps = endpoint.getMessageProcessors();
+        assertTrue(mps.get(0) instanceof FlowConfiguringMessageProcessor);
+        
+        FlowConfiguringMessageProcessor mp = (FlowConfiguringMessageProcessor) mps.get(0);
+        WebServiceMessageProcessorBuilder builder = (WebServiceMessageProcessorBuilder) mp.getMessageProcessorBuilder();
+        
+        List<AbstractFeature> features = builder.getFeatures();
+        assertNotNull(features);
+        boolean found = false;
+        for (AbstractFeature f : features) 
+        {
+            if (f instanceof LoggingFeature)
+            {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
 }

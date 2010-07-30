@@ -31,7 +31,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException e)
         {
-            assertTrue(e.getCause() instanceof CxfEnabledFaultMessage);
+            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
         }
     }
 
@@ -52,7 +52,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException ex)
         {
-            final Throwable t = ex.getCause();
+            final Throwable t = ex.getCause().getCause();
             t.printStackTrace();
             assertNotNull("Cause should've been filled in.", t);
             assertTrue(t instanceof CxfEnabledFaultMessage);
@@ -75,7 +75,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException e)
         {
-            assertTrue(e.getCause() instanceof Fault);
+            assertTrue(e.getCause().getCause() instanceof Fault);
         }
     }
 

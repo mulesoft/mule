@@ -117,7 +117,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
 
         // retrieve the original http request. This will be used to check if the user
         // asked for the WSDL or just for the service
-        String httpRequest = message.<String>getOutboundProperty(HTTP_REQUEST).toLowerCase();
+        String httpRequest = message.<String>getInboundProperty(HTTP_REQUEST).toLowerCase();
 
         // check if the inbound endpoint contains the WSDL parameter
         if ((httpRequest.indexOf(WSDL_PARAM_1) != -1) || (httpRequest.indexOf(WSDL_PARAM_2) != -1))

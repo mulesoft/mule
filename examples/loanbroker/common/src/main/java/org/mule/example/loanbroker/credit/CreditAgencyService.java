@@ -13,11 +13,14 @@ package org.mule.example.loanbroker.credit;
 import org.mule.example.loanbroker.messages.CreditProfile;
 import org.mule.example.loanbroker.messages.Customer;
 
+import javax.jws.WebService;
+
 
 /**
  * <code>CreditAgencyService</code> the service that provides a credit score for a
  * customer.
  */
+@WebService
 public interface CreditAgencyService
 {
     CreditProfile getCreditProfile(Customer customer);

@@ -12,6 +12,7 @@ package org.mule.transport.soap;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.PropertyScope;
 
 import java.util.Iterator;
 
@@ -54,7 +55,13 @@ public class MuleSoapHeaders
         setCorrelationId(event.getMessage().getCorrelationId());
         setCorrelationGroup(String.valueOf(event.getMessage().getCorrelationGroupSize()));
         setCorrelationSequence(String.valueOf(event.getMessage().getCorrelationSequence()));
-        setReplyTo((String)event.getMessage().getReplyTo());
+
+        // only propogate the reply to header if it's in the outbound scope
+        Object replyTo = event.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
+        if (replyTo != null)
+        {
+            setReplyTo(replyTo.toString());
+        }
     }
 
     /**

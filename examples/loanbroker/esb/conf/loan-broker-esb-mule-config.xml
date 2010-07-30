@@ -69,7 +69,11 @@
         exchange-pattern="one-way"/>
     <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="request-response"/>
     <jms:endpoint name="CustomerResponses" queue="esb.loan.quotes" exchange-pattern="one-way"/>
-    <jms:endpoint name="LoanQuotes" queue="esb.loan.quotes" exchange-pattern="one-way"/>
+    <endpoint name="LoanQuotes" address="jms://esb.loan.quotes" exchange-pattern="one-way">
+        <response>
+            <object-to-string-transformer/>
+        </response>
+    </endpoint>
     <jms:endpoint name="CreditAgencyGateway" queue="esb.credit.agency" exchange-pattern="one-way"/>
     <!-- Here we're telling Mule to invoke a remote Ejb directly 
     (not host a proxy service for the remote object as with the other example in loan-broker-esb-mule-config-with-ejb-container.xml) -->
@@ -78,27 +82,52 @@
     <jms:endpoint name="LenderGateway" queue="esb.lender.service" exchange-pattern="one-way"/>
     <vm:endpoint name="LenderService" path="lender.service" exchange-pattern="request-response"/>
     <jms:endpoint name="BankingGateway" queue="esb.banks" exchange-pattern="one-way"/>
-    <cxf:endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1" 
-        exchange-pattern="request-response" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2" 
-        exchange-pattern="request-response" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3"
-        exchange-pattern="request-response" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4" 
-        exchange-pattern="request-response" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5" 
-        exchange-pattern="request-response" operation="getLoanQuote" />
-    <cxf:endpoint name="Bank1In" address="http://localhost:10080/mule/TheBank1" 
-        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank2In" address="http://localhost:20080/mule/TheBank2" 
-        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank3In" address="http://localhost:30080/mule/TheBank3" 
-        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank4In" address="http://localhost:40080/mule/TheBank4" 
-        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
-    <cxf:endpoint name="Bank5In" address="http://localhost:50080/mule/TheBank5" 
-        exchange-pattern="request-response" serviceClass="org.mule.example.loanbroker.bank.BankService" />
 
+    <endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" />
+    </endpoint>
+    <endpoint name="Bank1In" address="http://localhost:10080/mule/TheBank1" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService" />    
+    </endpoint>
+    
+    <endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" />
+    </endpoint>
+    <endpoint name="Bank2In" address="http://localhost:20080/mule/TheBank2" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService" />    
+    </endpoint>
+    
+    <endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" />
+    </endpoint>
+    <endpoint name="Bank3In" address="http://localhost:30080/mule/TheBank3" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService" />    
+    </endpoint>
+
+    <endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" />
+    </endpoint>
+    <endpoint name="Bank4In" address="http://localhost:40080/mule/TheBank4" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService" />    
+    </endpoint>
+
+    <endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" operation="getLoanQuote" />
+    </endpoint>
+    <endpoint name="Bank5In" address="http://localhost:50080/mule/TheBank5" 
+        exchange-pattern="request-response">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService" />    
+    </endpoint>
+    
     <model name="loan-broker">
         <service name="LoanBroker">
             <description>
@@ -117,7 +146,7 @@
                 </pass-through-router>
             </outbound>
 
-            <async-reply timeout="10000">
+            <async-reply timeout="30000">
                 <inbound-endpoint ref="LoanQuotes" />
                 <custom-async-reply-router class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator" />
             </async-reply>

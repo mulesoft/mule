@@ -54,7 +54,7 @@ public class Mule4412TestCase extends FunctionalTestCase
     public void testFilterOnce() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        msg.setInboundProperty("pass", "true");
+        msg.setOutboundProperty("pass", "true");
         MuleClient client = new MuleClient(muleContext);
         client.send("vm://async", msg);
         MuleMessage reply = client.request("vm://asyncResponse", RECEIVE_TIMEOUT_MS);

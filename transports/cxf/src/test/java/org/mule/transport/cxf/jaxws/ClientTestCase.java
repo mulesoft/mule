@@ -25,7 +25,7 @@ public class ClientTestCase extends FunctionalTestCase
     {
         GreeterImpl impl = getGreeter();
         
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         
         assertEquals(1, impl.getInvocationCount());
     }
@@ -47,7 +47,7 @@ public class ClientTestCase extends FunctionalTestCase
         
         GreeterImpl impl = getGreeter();
         
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         
         assertEquals(2, impl.getInvocationCount());
     }

@@ -23,8 +23,10 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/Echo"
-                                      frontend="simple" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:63081/services/Echo"
+                                  exchange-pattern="request-response">
+                    <cxf:simple-service />                  
+                </inbound-endpoint>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent" />
         </service>

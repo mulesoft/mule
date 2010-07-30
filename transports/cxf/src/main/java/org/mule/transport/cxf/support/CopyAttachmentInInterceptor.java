@@ -38,13 +38,10 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
         MuleMessage muleMsg;
         if (event == null) 
         {
-            muleMsg = (MuleMessage) message.get(CxfConstants.MULE_MESSAGE);
+            event = (MuleEvent) message.get(CxfConstants.MULE_EVENT);
         } 
-        else
-        {
-            muleMsg = event.getMessage();
-        }
         
+        muleMsg = event.getMessage();
         Collection<Attachment> atts = message.getAttachments();
         if (atts != null)
         {

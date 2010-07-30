@@ -43,7 +43,6 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
             {
                 MuleMessage msg = context.getMessage();
                 assertEquals("BAR", msg.getInboundProperty("FOO"));
-                assertNull(msg.getInvocationProperty("clientClass"));
             }
         };
         testComponent.setEventCallback(callback);

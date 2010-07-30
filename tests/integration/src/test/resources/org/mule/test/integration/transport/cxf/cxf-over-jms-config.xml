@@ -12,9 +12,6 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <cxf:endpoint name="clientEndpoint" address="jms://TestComponent2?method=echo"
-        exchange-pattern="one-way"/>
-    
     <model name="Test-Case">
         <service name="JmsService">
             <inbound>
@@ -30,16 +27,18 @@
         
         <service name="TestComponent">
             <inbound>
-                <cxf:inbound-endpoint address="vm://test" exchange-pattern="request-response" 
-                    frontend="simple" />
+                <inbound-endpoint address="vm://test" exchange-pattern="request-response">
+                    <cxf:simple-service />    
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>
         
         <service name="TestComponent2">
             <inbound>
-                <cxf:inbound-endpoint address="jms://TestComponent2" exchange-pattern="one-way"
-                    frontend="simple"/>
+                <inbound-endpoint address="jms://TestComponent2" exchange-pattern="one-way">
+                    <cxf:simple-service />
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
             <outbound>
@@ -51,21 +50,26 @@
         
         <service name="TestCxfJmsProxy">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63081/services/testBridge" 
-                    exchange-pattern="request-response" proxy="true" />
+                <inbound-endpoint address="http://localhost:63081/services/testBridge" 
+                    exchange-pattern="request-response">
+                    <cxf:proxy-service />
+                </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="jms://testEcho" 
-                        exchange-pattern="request-response" proxy="true" />
+                    <outbound-endpoint address="jms://testEcho" 
+                        exchange-pattern="request-response">
+                        <cxf:proxy-client />
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="TestEcho">
             <inbound>
-                <cxf:inbound-endpoint address="jms://testEcho" exchange-pattern="request-response"
-                    frontend="simple" proxy="true"/>
+                <inbound-endpoint address="jms://testEcho" exchange-pattern="request-response">
+                    <cxf:proxy-service />
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>

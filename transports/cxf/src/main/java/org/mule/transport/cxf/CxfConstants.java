@@ -12,33 +12,14 @@ package org.mule.transport.cxf;
 
 public class CxfConstants 
 {
-    public static final String DATA_BINDING = "databinding";
-    public static final String BINDING_ID = "bindingId";
-    public static final String FRONTEND = "frontend";
     public static final String JAX_WS_FRONTEND = "jaxws";
     public static final String SIMPLE_FRONTEND = "simple";
-    public static final String AEGIS_FRONTEND = "aegis";
-    public static final String WSDL_LOCATION = "wsdlLocation";
-    public static final String NAMESPACE = "namespace";
-    public static final String SERVICE_NAME = "serviceName";
-    public static final String CLIENT_CLASS = "clientClass";
-    public static final String SERVICE_INTERFACE = "serviceInterface";
-    public static final String CLIENT_PORT = "wsdlPort";
     public static final String OPERATION = "operation";
-    public static final String PROXY = "proxy";
-    public static final String SERVICE_CLASS = "serviceClass";
-    public static final String FEATURES = "features";
-    public static final String IN_INTERCEPTORS = "inInterceptors";
-    public static final String IN_FAULT_INTERCEPTORS = "inFaultInterceptors";
-    public static final String OUT_INTERCEPTORS = "outInterceptors";
-    public static final String OUT_FAULT_INTERCEPTORS = "outFaultInterceptors";
     public static final String MTOM_ENABLED = "mtomEnabled";
-    public static final String MULE_MESSAGE = "mule.message";
     
-    public static final String APPLY_FILTERS_TO_PROTOCOL = "applyFiltersToProtocol";
-    public static final String APPLY_TRANSFORMERS_TO_PROTOCOL = "applyTransformersToProtocol";
-    public static final String APPLY_SECURITY_TO_PROTOCOL = "applySecurityToProtocol";
-    public static final String PROTOCOL_CONNECTOR = "protocolConnector";
+    public static final String CXF_OUTBOUND_MESSAGE_PROCESSOR = "cxf_outbound_message_processor";
+    public static final String MULE_EVENT = "mule.event";
+    
     public static final String ATTACHMENTS = "cxf_attachments";
     public static final String INBOUND_SERVICE= "cxf_service";
     public static final String INBOUND_OPERATION= "cxf_operation";
@@ -52,4 +33,12 @@ public class CxfConstants
     public static final String PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER = "nullPayloadAsParameter";
     public static final String PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_VOID = "nullPayloadAsVoid";
     public static final String PAYLOAD_TO_ARGUMENTS_BY_DEFAULT = PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER;
+    public static final String DEFAULT_CXF_CONFIGURATION = "_cxfConfiguration";
+    
+    public static final String DATA_BINDING = "databinding";
+    public static final String FEATURES = "features";
+    public static final String IN_INTERCEPTORS = "inInterceptors";
+    public static final String IN_FAULT_INTERCEPTORS = "inFaultInterceptors";
+    public static final String OUT_INTERCEPTORS = "outInterceptors";
+    public static final String OUT_FAULT_INTERCEPTORS = "outFaultInterceptors";
 }

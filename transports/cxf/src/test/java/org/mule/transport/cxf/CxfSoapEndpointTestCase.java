@@ -58,17 +58,4 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals("pwd", endpointUri.getPassword());
     }
 
-    public void testEndpointFinder() throws Exception
-    {
-        String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
-        EndpointURI endpointUri = new MuleEndpointURI(url, muleContext);
-        endpointUri.initialise();
-
-        assertEquals("soap", endpointUri.getSchemeMetaInfo());
-        // it's up to the client to actually strip off the method name if necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
-            endpointUri.getAddress());
-        assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
-        assertEquals(3, endpointUri.getParams().size());
-    }
 }

@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf.transport;
 
-import org.mule.transport.cxf.CxfConnector;
+import org.mule.transport.cxf.CxfConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,9 +63,9 @@ public class MuleUniversalTransport extends AbstractTransportFactory
 
     private Bus bus;
 
-    private CxfConnector connector;
+    private CxfConfiguration connector;
 
-    public MuleUniversalTransport(CxfConnector connector)
+    public MuleUniversalTransport(CxfConfiguration connector)
     {
         super();
 
@@ -147,7 +147,7 @@ public class MuleUniversalTransport extends AbstractTransportFactory
         destinations.remove(destination.getAddress().getAddress().getValue());
     }
 
-    public CxfConnector getConnector()
+    public CxfConfiguration getConnector()
     {
         return connector;
     }

@@ -16,25 +16,29 @@
 
         <service name="Gateway">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:8088/TestProxy" 
-                                      exchange-pattern="request-response" 
-                                      proxy="true" 
-                                      endpointName="TestPOJOComponentPort"
-                                      serviceName="TestPOJOComponent" 
-                                      namespace="http://someOtherPackage.support.cxf.transport.mule/"
-                                      wsdlLocation="./org/mule/transport/cxf/support/TestProxyImpl.wsdl"
-                />
+                <inbound-endpoint address="http://localhost:8088/TestProxy" 
+                                          exchange-pattern="request-response">
+                    <cxf:proxy-service port="TestPOJOComponentPort"
+                                       service="TestPOJOComponent" 
+                                       namespace="http://someOtherPackage.support.cxf.transport.mule/"
+                                       wsdlLocation="./org/mule/transport/cxf/support/TestProxyImpl.wsdl"
+                    />
+                </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response" proxy="true"/>
+                    <outbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
+                        <cxf:proxy-client />
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="Component">
             <inbound>
-                <cxf:inbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response" frontend="simple"/>                
+                <inbound-endpoint address="vm://TestProxyImpl" exchange-pattern="request-response">
+                    <cxf:proxy-service />
+                </inbound-endpoint>             
             </inbound>
             <component class="org.mule.transport.cxf.support.someOtherPackage.TestPOJOComponent"/>
         </service>

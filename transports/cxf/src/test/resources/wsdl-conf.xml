@@ -12,21 +12,21 @@
        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
 
-    <cxf:connector name="cxf" defaultFrontend="simple"/>
-    
     <model name="WsdlTest">
         <service name="mycomponent">
             <inbound>
-                <cxf:inbound-endpoint address="servlet://mycomponent" 
-                    serviceClass="org.mule.api.lifecycle.Callable" exchange-pattern="request-response"/>
+                <inbound-endpoint address="servlet://mycomponent" exchange-pattern="request-response">
+                	<cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
+                </inbound-endpoint>
             </inbound>
             <test:component/>
         </service>
         
         <service name="cxfService">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:63082/cxfService" 
-                    serviceClass="org.mule.api.lifecycle.Callable" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:63082/cxfService" exchange-pattern="request-response">
+                	<cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
+                </inbound-endpoint>
             </inbound>
             <test:component/>
         </service>

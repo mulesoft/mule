@@ -6,25 +6,27 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd">
-  
-  <cxf:endpoint 
-      name="clientEndpoint" 
-      address="http://localhost:63081/services/greeter"
-      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-      wsdlPort="SoapPort" 
-      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-      exchange-pattern="request-response"/>
-      
-  <model name="TestCxfModel">
-  
-    <service name="greeterService">
-      <inbound>
-          <cxf:inbound-endpoint address="jetty://localhost:63081/services/greeter" exchange-pattern="request-response" />
-      </inbound>
-      <component>
-        <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl"/>
-      </component>
-    </service>
 
-  </model>
+    <endpoint name="clientEndpoint" address="http://localhost:63081/services/greeter"
+        exchange-pattern="request-response">
+        <cxf:jaxws-client 
+            clientClass="org.apache.hello_world_soap_http.SOAPService"
+            port="SoapPort" 
+            wsdlLocation="classpath:/wsdl/hello_world.wsdl" />
+    </endpoint>
+    
+    <model name="TestCxfModel">
+
+        <service name="greeterService">
+            <inbound>
+                <inbound-endpoint address="jetty://localhost:63081/services/greeter"
+                    exchange-pattern="request-response">
+                    <cxf:jaxws-service />    
+                </inbound-endpoint>
+            </inbound>
+            <component>
+                <singleton-object class="org.apache.hello_world_soap_http.GreeterImpl" />
+            </component>
+        </service>
+    </model>
 </mule>

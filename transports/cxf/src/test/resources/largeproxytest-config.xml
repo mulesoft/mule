@@ -25,24 +25,28 @@
 
         <service name="echoProxy">
             <inbound>
-                <cxf:inbound-endpoint address="jetty://localhost:63082/services/EchoProxy" proxy="true"
-                                      exchange-pattern="request-response" protocolConnector="jettyConnector">
-
-                </cxf:inbound-endpoint>
+                <inbound-endpoint address="jetty://localhost:63082/services/EchoProxy"
+                                  exchange-pattern="request-response" connector-ref="jettyConnector">
+				    <cxf:proxy-service />
+                </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <cxf:outbound-endpoint address="http://localhost:63081/services/Echo" proxy="true"
-                                           exchange-pattern="request-response" protocolConnector="HttpConnector"/>
+                    <outbound-endpoint address="http://localhost:63081/services/Echo"
+                                       exchange-pattern="request-response" connector-ref="HttpConnector">
+                        <cxf:proxy-client />   
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="echoService">
             <inbound>
-                <cxf:inbound-endpoint
-                        address="jetty://localhost:63081/services/Echo" frontend="simple" exchange-pattern="request-response"
-                        protocolConnector="jettyConnector"/>
+                <inbound-endpoint
+                        address="jetty://localhost:63081/services/Echo" exchange-pattern="request-response"
+                        connector-ref="jettyConnector">
+                	<cxf:simple-service />        
+                </inbound-endpoint>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>

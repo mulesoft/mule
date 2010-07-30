@@ -12,8 +12,6 @@
        http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.0/mule-https.xsd">
 
-    <cxf:connector name="cxf" defaultFrontend="simple"/>
-   
     <https:connector name="httpConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
         <https:tls-key-store path="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"/>
@@ -34,28 +32,32 @@
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
     
-    <cxf:endpoint name="cxfOutbound" 
-        address="http://admin:admin@localhost:61080/services/Echo?method=echo"
+    <endpoint name="cxfOutbound" 
+        address="cxf:http://admin:admin@localhost:61080/services/Echo?method=echo"
         exchange-pattern="request-response"/>
     
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <cxf:inbound-endpoint 
-                   address="https://localhost:60443/services/Echo"
-                   frontend="simple"
-                   protocolConnector="httpConnector"
-                   applySecurityToProtocol="true"
-                   exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
-                </cxf:inbound-endpoint>
-                <cxf:inbound-endpoint 
+                <inbound-endpoint 
                    address="http://localhost:61080/services/Echo"
-                   frontend="simple"
-                   applySecurityToProtocol="true"
                    exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
-                </cxf:inbound-endpoint>
+                   <acegi:http-security-filter realm="mule-realm"/>
+                   <cxf:simple-service />
+                </inbound-endpoint>
+            </inbound>
+            <echo-component/>
+        </service>
+        
+        <service name="secure">
+            <inbound>
+                <inbound-endpoint 
+                   address="https://localhost:60443/services/Echo"
+                   connector-ref="httpConnector"
+                   exchange-pattern="request-response">
+                   <acegi:http-security-filter realm="mule-realm"/>
+                   <cxf:simple-service />
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>

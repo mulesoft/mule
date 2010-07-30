@@ -14,7 +14,9 @@
     <model name="Proxy_Test">
         <service name="WebService">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:6065" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:6065" exchange-pattern="request-response">
+                	<cxf:simple-service />
+                </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>

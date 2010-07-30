@@ -10,22 +10,24 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.ComponentException;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 import org.apache.cxf.frontend.MethodDispatcher;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
@@ -36,37 +38,28 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public class MuleInvoker implements Invoker
 {
-    private final CxfMessageReceiver receiver;
-    private final boolean synchronous;
+    private final CxfInboundMessageProcessor cxfMmessageProcessor;
     private Class<?> targetClass;
     
-    public MuleInvoker(CxfMessageReceiver receiver, Class<?> targetClass, boolean synchronous)
+    public MuleInvoker(CxfInboundMessageProcessor cxfMmessageProcessor, Class<?> targetClass)
     {
-        this.receiver = receiver;
+        this.cxfMmessageProcessor = cxfMmessageProcessor;
         this.targetClass = targetClass;
-        this.synchronous = synchronous;
     }
 
     public Object invoke(Exchange exchange, Object o)
     {
-        MuleMessage message = null;
+        // this is the original request. Keep it to copy all the message properties from it
+        MuleEvent event = (MuleEvent) exchange.getInMessage().get(CxfConstants.MULE_EVENT);
+        MuleEvent responseEvent = null;
         try
         {
-            // this is the original request. Keep it to copy all the message properties from it
-            MuleMessage reqMsg = (MuleMessage) exchange.getInMessage().get(CxfConstants.MULE_MESSAGE);
-            
-            // create a temporary MuleMessage using the MuleMessageFactory to make sure that
-            // the payload is properly handled
-            MuleMessage cxfMessage = receiver.createMuleMessage(exchange.getInMessage());
-            
-            // create the request message from the properly converted payload in cxfMessage and
-            // all the message properties in the original request
-            MuleMessage muleReq = new DefaultMuleMessage(cxfMessage.getPayload(), reqMsg, 
-                receiver.getConnector().getMuleContext());
+            MuleMessage reqMsg = event.getMessage();
+            reqMsg.setPayload(extractPayload(exchange.getInMessage()));
             
             BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
             Service svc = exchange.get(Service.class);
-            if (!receiver.isProxy())
+            if (!cxfMmessageProcessor.isProxy())
             {
                 MethodDispatcher md = (MethodDispatcher) svc.get(MethodDispatcher.class.getName());
                 Method m = md.getMethod(bop);
@@ -75,51 +68,42 @@ public class MuleInvoker implements Invoker
                     m = matchMethod(m, targetClass);
                 }
             
-                muleReq.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
+                reqMsg.setProperty(MuleProperties.MULE_METHOD_PROPERTY, m, PropertyScope.INVOCATION);
             }
 
             if (bop != null)
             {
-                muleReq.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
-                muleReq.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
+                reqMsg.setProperty(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName(), PropertyScope.INVOCATION);
+                reqMsg.setProperty(CxfConstants.INBOUND_SERVICE, svc.getName(), PropertyScope.INVOCATION);
             }
             
-            String replyTo = (String) exchange.getInMessage().get(MuleProperties.MULE_REPLY_TO_PROPERTY);
-            if (replyTo != null)
-            {
-                muleReq.setReplyTo(replyTo);
-            }
-            
-            String corId = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-            if (corId != null)
-            {
-                muleReq.setCorrelationId(corId);
-            }
-
-            String corGroupSize = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-            if (corGroupSize != null)
-            {
-                muleReq.setCorrelationGroupSize(Integer.valueOf(corGroupSize));
-            }
-
-            String corSeq = (String) exchange.getInMessage().get(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-            if (corSeq != null)
-            {
-                muleReq.setCorrelationSequence(Integer.valueOf(corSeq));
-            }
-            
-            message = receiver.routeMessage(muleReq);
+            responseEvent = cxfMmessageProcessor.processNext(event);
         }
         catch (MuleException e)
         {
+            exchange.put(CxfConstants.MULE_EVENT, event);
+            throw new Fault(e);
+        }
+        catch (RuntimeException e)
+        {
+            exchange.put(CxfConstants.MULE_EVENT, event);
             throw new Fault(e);
         }
 
-        if (message != null)
+        if (!event.getEndpoint().getExchangePattern().hasResponse())
         {
-            if (message.getExceptionPayload() != null)
+            // weird response from AbstractInterceptingMessageProcessor
+            responseEvent = null;
+        }
+        
+        if (responseEvent != null)
+        {
+            exchange.put(CxfConstants.MULE_EVENT, responseEvent);
+            MuleMessage resMessage = responseEvent.getMessage();
+            
+            if (resMessage.getExceptionPayload() != null)
             {
-                Throwable cause = message.getExceptionPayload().getException();
+                Throwable cause = resMessage.getExceptionPayload().getException();
                 if (cause instanceof ComponentException)
                 {
                     cause = cause.getCause();
@@ -133,29 +117,54 @@ public class MuleInvoker implements Invoker
 
                 throw new Fault(cause);
             }
-            else if (message.getPayload() instanceof NullPayload)
+            else if (resMessage.getPayload() instanceof NullPayload)
             {
                 return new MessageContentsList((Object)null);
             }
-            else if (receiver.isProxy())
+            else if (cxfMmessageProcessor.isProxy())
             {
-                message.getPayload();
-                return new Object[] { message };
+                resMessage.getPayload();
+                return new Object[] { resMessage };
             }
             else
             {
-                return new Object[]{message.getPayload()};
+                return new Object[]{resMessage.getPayload()};
             }
         }
         else
         {
-            return new MessageContentsList((Object)null);
+            exchange.getInMessage().getInterceptorChain().abort();
+            exchange.getOutMessage().getInterceptorChain().abort();
+            exchange.put(CxfConstants.MULE_EVENT, null);
+            return null;
         }
     }
-
-    public InboundEndpoint getEndpoint()
-    {
-        return receiver.getEndpoint();
+    
+    protected Object extractPayload(Message cxfMessage)
+    {   
+        List<Object> list = CastUtils.cast(cxfMessage.getContent(List.class));
+        if (list == null)
+        {
+            // Seems Providers get objects stored this way
+            Object object = cxfMessage.getContent(Object.class);
+            if (object != null)
+            {
+                return object;
+            }
+            else
+            {
+                return new Object[0];
+            }
+        }
+        
+        if ((list.size() == 1) && (list.get(0) != null))
+        {
+            return list.get(0);
+        }
+        else
+        {
+            return list.toArray();
+        }
     }
 
     /**

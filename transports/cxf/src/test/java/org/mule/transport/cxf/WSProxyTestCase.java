@@ -47,6 +47,7 @@ public class WSProxyTestCase extends FunctionalTestCase
         
         String wsdl = replyMessage.getPayloadAsString();
         assertNotNull(wsdl);
+        System.out.println(wsdl);
         assertTrue(wsdl.indexOf("<wsdl:definitions") != -1);
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echoResponse\">") != -1);
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echoRequest\">") != -1);

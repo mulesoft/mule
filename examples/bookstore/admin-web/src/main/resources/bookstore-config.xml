@@ -39,8 +39,10 @@
           <service name="CatalogService">
                <inbound>
                     <!-- Public interface -->
-                    <inbound-endpoint address="cxf:http://0.0.0.0:8777/services/catalog"
-                        exchange-pattern="request-response"/>
+                    <inbound-endpoint address="http://0.0.0.0:8777/services/catalog"
+                        exchange-pattern="request-response">
+                        <cxf:jaxws-service />
+                    </inbound-endpoint>
 
                     <!-- Administration interface -->
                     <inbound-endpoint address="servlet://catalog" exchange-pattern="request-response">
@@ -62,8 +64,10 @@
           <service name="OrderService">
                <inbound>
                     <!-- Public interface -->
-                    <inbound-endpoint address="cxf:http://0.0.0.0:8777/services/order" 
-                        exchange-pattern="request-response"/>
+                    <inbound-endpoint address="http://0.0.0.0:8777/services/order" 
+                        exchange-pattern="request-response">
+                        <cxf:jaxws-service />
+                    </inbound-endpoint>
                </inbound>
                <component>
                     <singleton-object class="org.mule.example.bookstore.OrderServiceImpl" />

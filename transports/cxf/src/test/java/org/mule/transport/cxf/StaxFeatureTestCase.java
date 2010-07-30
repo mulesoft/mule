@@ -18,7 +18,7 @@ public class StaxFeatureTestCase extends FunctionalTestCase
 {
     public void testEchoService() throws Exception
     {
-        CxfConnector cxfCon = (CxfConnector)muleContext.getRegistry().lookupConnector("connector.cxf.0");
+        CxfConfiguration cxfCon = (CxfConfiguration)muleContext.getRegistry().lookupObject(CxfConstants.DEFAULT_CXF_CONFIGURATION);
         assertNotNull(cxfCon);
 
         Bus cxfBus = cxfCon.getCxfBus();

@@ -15,9 +15,10 @@
     <model>
         <service name="Echo">
             <inbound>
-                <cxf:inbound-endpoint address="http://localhost:65082/services/EchoUMO"
-                    serviceClass="org.mule.transport.cxf.testmodels.Echo" 
-                    exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:65082/services/EchoUMO"
+                    exchange-pattern="request-response">
+                    <cxf:simple-service serviceClass="org.mule.transport.cxf.testmodels.Echo" /> 
+                </inbound-endpoint>
                 <wire-tap-router>
                     <vm:outbound-endpoint path="ToTapper" exchange-pattern="one-way"/>
                 </wire-tap-router>

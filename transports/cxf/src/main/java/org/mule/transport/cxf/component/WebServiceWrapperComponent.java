@@ -18,7 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.transport.cxf.endpoint.CxfEndpointBuilder;
 import org.mule.transport.soap.component.AbstractWebServiceWrapperComponent;
 
 public class WebServiceWrapperComponent extends AbstractWebServiceWrapperComponent
@@ -45,10 +45,10 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
             tempUrl = address;
         }
 
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("cxf:" + tempUrl, muleContext);
+        EndpointBuilder endpointBuilder = new CxfEndpointBuilder("cxf:" + tempUrl, muleContext);
         if (wsdlPort != null)
         {
-            endpointBuilder.setProperty("wsdlPort", wsdlPort);
+            endpointBuilder.setProperty("port", wsdlPort);
         }
         if (operation != null)
         {
