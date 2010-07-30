@@ -129,9 +129,20 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     protected void movePropertiesToInbound(MuleMessage newMessage)
     {
         // TODO hackish way, needs to be reworked into an api - move outbound props (from dispatcher) to inbound (for receiver)
-
+        Set<String> props = new HashSet<String>(newMessage.getInboundPropertyNames());
+        for (String name : props)
+        {
+            newMessage.removeProperty(name, PropertyScope.INBOUND);
+        }
+        
+        props = new HashSet<String>(newMessage.getInvocationPropertyNames());
+        for (String name : props)
+        {
+            newMessage.removeProperty(name, PropertyScope.INVOCATION);
+        }
+        
         // clone to avoid CMEs
-        final Set<String> props = new HashSet<String>(newMessage.getOutboundPropertyNames());
+        props = new HashSet<String>(newMessage.getOutboundPropertyNames());
         for (String name : props)
         {
             final Object value = newMessage.removeProperty(name, PropertyScope.OUTBOUND);
