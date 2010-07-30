@@ -19,7 +19,13 @@ import org.w3c.dom.Element;
 public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefinitionParser
 {
     private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
-    private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
+
+    public SimpleServiceDefinitionParser()
+    {
+        super();
+        super.addAlias("endpoint", "endpointBuilder");
+        super.addAlias("component-class", "componentClass");
+    }
 
     @Override
     protected Class<?> getBeanClass(Element element)
@@ -30,21 +36,13 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        String componentRefAttribute = element.getAttribute(COMPONENT_REF_ATTRIBUTE);
+        final String componentRefAttribute = element.getAttribute(COMPONENT_REF_ATTRIBUTE);
         if (StringUtils.isNotBlank(componentRefAttribute))
         {
             builder.addPropertyValue("componentBeanName", componentRefAttribute);
         }
         element.removeAttribute(COMPONENT_REF_ATTRIBUTE);
 
-        String componentClassAttribute = element.getAttribute(COMPONENT_CLASS_ATTRIBUTE);
-        if (StringUtils.isNotBlank(componentClassAttribute))
-        {
-            builder.addPropertyValue("componentClass", componentClassAttribute);
-        }
-        element.removeAttribute(COMPONENT_CLASS_ATTRIBUTE);
-
         super.doParse(element, parserContext, builder);
     }
-
 }

@@ -12,6 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.SimpleService;
@@ -51,7 +52,12 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         }
     }
 
-    public void setEndpoint(EndpointBuilder endpointBuilder)
+    public void setEndpoint(InboundEndpoint inboundEndpoint)
+    {
+        simpleServiceBuilder.inboundEndpoint(inboundEndpoint);
+    }
+
+    public void setEndpointBuilder(EndpointBuilder endpointBuilder)
     {
         simpleServiceBuilder.inboundEndpoint(endpointBuilder);
     }

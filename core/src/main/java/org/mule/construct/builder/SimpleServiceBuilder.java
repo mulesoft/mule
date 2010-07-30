@@ -78,8 +78,6 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
 
     public SimpleServiceBuilder component(Component component)
     {
-        // TODO (DDO) support REST/WS annotated components
-
         if (component instanceof JavaComponent)
         {
             JavaComponent javaComponent = (JavaComponent) component;
@@ -99,5 +97,4 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     {
         return new SimpleService(muleContext, name, buildMessageSource(muleContext), component);
     }
-
 }

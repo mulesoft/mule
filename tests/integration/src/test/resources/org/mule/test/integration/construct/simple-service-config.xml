@@ -20,7 +20,8 @@
                   address="vm://maths2.in"
                   parent="abstract-maths-service-2" />
                   
-  <vm:endpoint name="maths-service-3-endpoint" path="maths3.in" />
+  <vm:endpoint name="maths-service-3-endpoint"
+               path="maths3.in" />
 
   <simple-service name="maths-service-3"
                   endpoint-ref="maths-service-3-endpoint"
@@ -52,7 +53,7 @@
                   address="vm://maths5.in">
     <component class="org.mule.tck.services.SimpleMathsComponent" />
   </simple-service>
-                    
+
   <simple-service name="maths-service-6"
                   address="vm://maths6.in">
     <component class="org.mule.tck.services.SimpleMathsComponent">
@@ -60,6 +61,12 @@
         <include-entry-point method="add"/>
       </method-entry-point-resolver>
     </component>
+  </simple-service>
+  
+  <simple-service name="maths-service-7"
+                  component-class="org.mule.tck.services.SimpleMathsComponent">
+    <vm:inbound-endpoint path="maths7.in"
+                         exchange-pattern="request-response" />
   </simple-service>
 
   <simple-service name="exception-strategy"

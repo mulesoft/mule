@@ -1411,6 +1411,13 @@
         <xsd:complexContent>
             <xsd:extension base="baseFlowConstructType">
                 <xsd:sequence>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint on which messages are received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element ref="abstract-component" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>

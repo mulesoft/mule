@@ -64,6 +64,11 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestMathsService("vm://maths6.in");
     }
 
+    public void testChildEndpoint() throws Exception
+    {
+        doTestMathsService("vm://maths7.in");
+    }
+
     public void testTransformerReferences() throws Exception
     {
         doTestStringMassager("vm://bam1.in");
