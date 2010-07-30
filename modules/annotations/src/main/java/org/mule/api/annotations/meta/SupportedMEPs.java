@@ -9,7 +9,7 @@
  */
 package org.mule.api.annotations.meta;
 
-import org.mule.config.endpoint.MEP;
+import org.mule.MessageExchangePattern;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,5 +20,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.ANNOTATION_TYPE })
 public @interface SupportedMEPs
 {
-    public MEP[] value();
+    public MessageExchangePattern[] value();
 }

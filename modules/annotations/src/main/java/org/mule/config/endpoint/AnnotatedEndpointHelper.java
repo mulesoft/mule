@@ -9,7 +9,6 @@
  */
 package org.mule.config.endpoint;
 
-import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.meta.ChannelType;
@@ -135,7 +134,7 @@ public class AnnotatedEndpointHelper
             endpointBuilder.setName(parsePlaceholderValues(epData.getName()));
         }
 
-        endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(epData.isSynchronous()));
+        endpointBuilder.setExchangePattern(epData.getMep());
 
         if (epData.getType() == ChannelType.Inbound)
         {

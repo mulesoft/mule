@@ -9,9 +9,11 @@
  */
 package org.mule.config.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.meta.Channel;
+import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.routing.Reply;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.routing.reply.AbstractResponseCallbackAggregator;
@@ -29,7 +31,7 @@ public class ReplyAnnotationParser extends AbstractEndpointAnnotationParser impl
     protected AnnotatedEndpointData createEndpointData(Annotation annotation) throws MuleException
     {
         Reply reply = (Reply) annotation;
-        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly, reply);
+        AnnotatedEndpointData epd = new AnnotatedEndpointData(MessageExchangePattern.ONE_WAY, ChannelType.Reply, reply);
         epd.setConnectorName(reply.connector());
         epd.setAddress(reply.uri());
         epd.setFilter(reply.filter());

@@ -9,9 +9,11 @@
  */
 package org.mule.config.routing;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.RouterAnnotationParser;
+import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.routing.WireTap;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -19,7 +21,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.converters.PropertiesConverter;
 import org.mule.config.endpoint.AnnotatedEndpointData;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
-import org.mule.config.endpoint.MEP;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -51,7 +52,7 @@ public class WireTapRouterParser implements RouterAnnotationParser, MuleContextA
     {
         WireTap wireTap = (WireTap) annotation;
 
-        AnnotatedEndpointData epd = new AnnotatedEndpointData(MEP.InOnly, wireTap);
+        AnnotatedEndpointData epd = new AnnotatedEndpointData(MessageExchangePattern.ONE_WAY, ChannelType.Outbound, wireTap);
         epd.setEncoding(wireTap.encoding());
         epd.setProperties((Map) new PropertiesConverter().convert(wireTap.properties(), muleContext));
         epd.setConnectorName(wireTap.connectorName());

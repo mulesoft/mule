@@ -9,13 +9,14 @@
  */
 package org.mule.transport.quartz.config;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Schedule;
 import org.mule.api.annotations.meta.Channel;
+import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.endpoint.AbstractEndpointAnnotationParser;
 import org.mule.config.endpoint.AnnotatedEndpointData;
-import org.mule.config.endpoint.MEP;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.EventGeneratorJobConfig;
 import org.mule.util.CollectionUtils;
@@ -59,7 +60,7 @@ public class ScheduleAnnotationParser extends AbstractEndpointAnnotationParser
         Schedule schedule = (Schedule) annotation;
 
         String uri = "quartz://schedule" + UUID.getUUID();
-        AnnotatedEndpointData epData = new AnnotatedEndpointData(MEP.InOnly, annotation);
+        AnnotatedEndpointData epData = new AnnotatedEndpointData(MessageExchangePattern.ONE_WAY, ChannelType.Inbound, annotation);
 
         epData.setProperties(convertProperties(getProperties(schedule)));
         //By default the scheduler should only use a single thread

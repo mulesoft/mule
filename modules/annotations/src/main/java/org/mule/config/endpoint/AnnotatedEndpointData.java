@@ -9,6 +9,7 @@
  */
 package org.mule.config.endpoint;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.transport.Connector;
 import org.mule.util.StringUtils;
@@ -25,7 +26,6 @@ import java.util.Properties;
  */
 public class AnnotatedEndpointData
 {
-    private boolean synchronous = false;
     private String encoding;
     private Map properties = new HashMap();
     private String connectorName;
@@ -35,23 +35,15 @@ public class AnnotatedEndpointData
     private String filter;
     private String correlationExpression;
     private Connector connector;
-    private MEP mep;
+    private MessageExchangePattern mep;
     private ChannelType type;
     private Annotation annotation;
 
-    public AnnotatedEndpointData(MEP mep, Annotation annotation)
+    public AnnotatedEndpointData(MessageExchangePattern mep, ChannelType type, Annotation annotation)
     {
         this.mep = mep;
         this.annotation = annotation;
-        this.type = (mep == MEP.InOnly || mep == MEP.InOptionalOut || mep == MEP.InOut ? ChannelType.Inbound : ChannelType.Outbound);
-        if (this.type == ChannelType.Inbound)
-        {
-            synchronous = !mep.equals(MEP.InOnly);
-        }
-        else
-        {
-            synchronous = !mep.equals(MEP.OutOnly);
-        }
+        this.type = type;
     }
 
     protected String emptyToNull(String value)
@@ -78,12 +70,6 @@ public class AnnotatedEndpointData
     public Map getProperties()
     {
         return properties;
-    }
-
-
-    public boolean isSynchronous()
-    {
-        return synchronous;
     }
 
     public ChannelType getType()
@@ -179,22 +165,22 @@ public class AnnotatedEndpointData
         this.correlationExpression = emptyToNull(correlationExpression);
     }
 
-    public MEP getMep()
+    public MessageExchangePattern getMep()
     {
         return mep;
     }
 
 
 
-    public void setMEPUsingMethod(Method method, boolean inbound)
+    public void setMEPUsingMethod(Method method)
     {
         if (method.getReturnType().equals(Void.TYPE))
         {
-            mep = (inbound ? MEP.InOnly : MEP.OutOnly);
+            mep = MessageExchangePattern.ONE_WAY;
         }
         else
         {
-            mep = (inbound ? MEP.InOut : MEP.OutIn);
+            mep = MessageExchangePattern.REQUEST_RESPONSE;
         }
 
     }
