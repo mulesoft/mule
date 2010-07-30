@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Allow's EndpointURI to be set and changed dynamically by wrapping up an immutable
+ * Allows EndpointURI to be set and changed dynamically by wrapping up an immutable
  * endpoint instance.
  */
 public class DynamicURIOutboundEndpoint implements OutboundEndpoint
@@ -37,7 +37,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
 
     private static final long serialVersionUID = -2814979100270307813L;
 
-    private OutboundEndpoint endpoint;
+    protected OutboundEndpoint endpoint;
     private EndpointURI dynamicEndpointURI;
 
     public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint)

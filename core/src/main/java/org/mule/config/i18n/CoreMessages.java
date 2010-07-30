@@ -1070,9 +1070,9 @@ public class CoreMessages extends MessageFactory
                                                       Transformer transformer1,
                                                       Transformer transformer2)
     {
-        return factory.createMessage(BUNDLE_PATH, 256, new Object[]{input, output,
-            transformer1.getName() + "(" + transformer1.getClass() + ")",
-            transformer2.getName() + "(" + transformer2.getClass() + ")"});
+        return factory.createMessage(BUNDLE_PATH, 256, input, output,
+                transformer1.getName() + "(" + transformer1.getClass() + ")",
+                transformer2.getName() + "(" + transformer2.getClass() + ")");
     }
 
     public static Message configurationBuilderSuccess(ConfigurationBuilder configurationBuilder,
@@ -1309,11 +1309,21 @@ public class CoreMessages extends MessageFactory
 
     public static Message illegalMIMEType(String badMIMIEType)
     {
-        return  factory.createMessage(BUNDLE_PATH, 324, badMIMIEType);
+        return factory.createMessage(BUNDLE_PATH, 324, badMIMIEType);
     }
 
-        public static Message unexpectedMIMEType(String badMIMIEType, String goodMIMEType)
+    public static Message unexpectedMIMEType(String badMIMIEType, String goodMIMEType)
     {
-        return  factory.createMessage(BUNDLE_PATH, 325, badMIMIEType, goodMIMEType);
+        return factory.createMessage(BUNDLE_PATH, 325, badMIMIEType, goodMIMEType);
+    }
+
+    public static Message dynamicEndpointURIsCannotBeUsedOnInbound()
+    {
+        return factory.createMessage(BUNDLE_PATH, 326);
+    }
+
+    public static Message dynamicEndpointsMustSpecifyAScheme()
+    {
+        return factory.createMessage(BUNDLE_PATH, 327);
     }
 }

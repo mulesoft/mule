@@ -21,6 +21,7 @@ import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -54,11 +55,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of
@@ -165,11 +166,18 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
     {
+        //It does not make sense to allow inbound dynamic endpoints
+        String uri = uriBuilder.getConstructor();
+        if(muleContext.getExpressionManager().isExpression(uri))
+        {
+            throw new MalformedEndpointException(CoreMessages.dynamicEndpointURIsCannotBeUsedOnInbound(), uri);
+        }
+
         prepareToBuildEndpoint();
 
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
-        
+
         addTransformersFromUri(endpointURI);
         addResponseTransformersFromUri(endpointURI);
 
@@ -184,15 +192,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), 
-                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
-                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
-                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors, 
+                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
+                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
+                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
+                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors,
                 isDisableTransportTransformer(), mimeType);
 
         for (MessageProcessor mp : messageProcessors)
         {
-        	// TODO There should ideally be an EndpointAware interface 
+        	// TODO There should ideally be an EndpointAware interface
         	if (mp instanceof Transformer)
         	{
         		((Transformer) mp).setEndpoint(endpoint);
@@ -210,6 +218,21 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
     {
+
+        String uri = uriBuilder.getConstructor();
+        if(muleContext.getExpressionManager().isExpression(uri))
+        {
+            if(muleContext.getExpressionManager().isValidExpression(uriBuilder.getConstructor()))
+            {
+                uriBuilder = new URIBuilder(DynamicOutboundEndpoint.DYNAMIC_URI_PLACEHOLDER, muleContext);
+                return new DynamicOutboundEndpoint(muleContext, this, uri);
+            }
+            else
+            {
+                throw new MalformedEndpointException(uri);
+            }
+        }
+
         prepareToBuildEndpoint();
 
         EndpointURI endpointURI = uriBuilder.getEndpoint();
@@ -217,7 +240,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         addTransformersFromUri(endpointURI);
         addResponseTransformersFromUri(endpointURI);
-        
+
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(getScheme()))
         {
@@ -229,15 +252,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         OutboundEndpoint endpoint = new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
-                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(), 
-                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector), 
-                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector), 
-                responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors, 
+                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
+                messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
+                getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
+                responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
                 responseMessageProcessors, isDisableTransportTransformer(), mimeType);
 
         for (MessageProcessor mp : messageProcessors)
         {
-        	// TODO There should ideally be an EndpointAware interface 
+        	// TODO There should ideally be an EndpointAware interface
         	if (mp instanceof Transformer)
         	{
         		((Transformer) mp).setEndpoint(endpoint);
@@ -272,7 +295,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         TransportServiceDescriptor serviceDescriptor = getConnectorServiceDescriptor();
         initExchangePatternFromConnectorDefault(serviceDescriptor);
 
-        if (serviceDescriptor.getInboundExchangePatterns().contains(messageExchangePattern) == false)
+        if (!serviceDescriptor.getInboundExchangePatterns().contains(messageExchangePattern))
         {
             throw new EndpointException(CoreMessages.exchangePatternForEndpointNotSupported(
                 messageExchangePattern, "inbound", uriBuilder.getEndpoint()));
@@ -284,13 +307,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         TransportServiceDescriptor serviceDescriptor = getConnectorServiceDescriptor();
         initExchangePatternFromConnectorDefault(serviceDescriptor);
 
-        if (serviceDescriptor.getOutboundExchangePatterns().contains(messageExchangePattern) == false)
+        if (!serviceDescriptor.getOutboundExchangePatterns().contains(messageExchangePattern))
         {
             throw new EndpointException(CoreMessages.exchangePatternForEndpointNotSupported(
                 messageExchangePattern, "outbound", uriBuilder.getEndpoint()));
         }
     }
-    
+
     private TransportServiceDescriptor getConnectorServiceDescriptor() throws EndpointException
     {
         try
@@ -304,7 +327,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected void initExchangePatternFromConnectorDefault(TransportServiceDescriptor serviceDescriptor) 
+    protected void initExchangePatternFromConnectorDefault(TransportServiceDescriptor serviceDescriptor)
         throws EndpointException
     {
         if (messageExchangePattern == null)
@@ -419,6 +442,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                                                : getDefaultDeleteUnacceptedMessages(connector);
     }
 
+    @SuppressWarnings("unused")
     protected boolean getDefaultDeleteUnacceptedMessages(Connector connector)
     {
         return false;
@@ -429,6 +453,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return encoding != null ? encoding : getDefaultEndpointEncoding(connector);
     }
 
+    @SuppressWarnings("unused")
     protected String getDefaultEndpointEncoding(Connector connector)
     {
         return muleContext.getConfiguration().getDefaultEncoding();
@@ -439,6 +464,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return filter != null ? filter : getDefaultFilter(connector);
     }
 
+    @SuppressWarnings("unused")
     protected Filter getDefaultFilter(Connector connector)
     {
         return null;
@@ -449,6 +475,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return initialState != null ? initialState : getDefaultInitialState(connector);
     }
 
+    @SuppressWarnings("unused")
     protected String getDefaultInitialState(Connector connector)
     {
         return ImmutableEndpoint.INITIAL_STATE_STARTED;
@@ -460,6 +487,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     }
 
+    @SuppressWarnings("unused")
     protected int getDefaultResponseTimeout(Connector connector)
     {
         return muleContext.getConfiguration().getDefaultResponseTimeout();
@@ -503,7 +531,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         return mimeType;
     }
-    
+
     public void setMimeType(String mimeType)
     {
         if (mimeType == null)
@@ -512,7 +540,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         else
         {
-            MimeType mt = null;
+            MimeType mt;
             try
             {
                 mt = new MimeType(mimeType);
@@ -593,7 +621,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     /**
      * Some endpoint may always require a new connector to be created for every
      * endpoint
-     * 
+     *
      * @return the default if false but cusotm endpoints can override
      * @since 3.0.0
      */
@@ -692,7 +720,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         return false;
     }
-    
+
     public void setName(String name)
     {
         this.name = name;
@@ -712,7 +740,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     /**
      * Sets a property on the endpoint
-     * 
+     *
      * @param key the property key
      * @param value the value of the property
      */
@@ -800,9 +828,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     @Override
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
-            deleteUnacceptedMessages, encoding, uriBuilder, filter, initialState, name, properties, 
-            responseTimeout, responseMessageProcessors, securityFilter, synchronous, 
+        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector,
+            deleteUnacceptedMessages, encoding, uriBuilder, filter, initialState, name, properties,
+            responseTimeout, responseMessageProcessors, securityFilter, synchronous,
             messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
 
@@ -830,7 +858,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
                 && equal(messageExchangePattern, other.messageExchangePattern)
                 && equal(transactionConfig, other.transactionConfig)
-                && equal(responseMessageProcessors, other.responseMessageProcessors) 
+                && equal(responseMessageProcessors, other.responseMessageProcessors)
                 && equal(disableTransportTransformer, other.disableTransportTransformer)
                 && equal(mimeType, other.mimeType);
     }
@@ -876,7 +904,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             builder.setDisableTransportTransformer(disableTransportTransformer.booleanValue());
         }
-        
+
         return builder;
     }
 }

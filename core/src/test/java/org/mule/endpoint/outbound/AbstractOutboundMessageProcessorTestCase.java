@@ -92,23 +92,32 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
                                                           TransactionConfig txConfig)
         throws EndpointException, InitialisationException
     {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test",
+        return createTestOutboundEndpoint("test://test", filter, securityFilter, transformer, responseTransformer, exchangePattern, txConfig);
+    }
+    protected OutboundEndpoint createTestOutboundEndpoint(String uri, Filter filter,
+                                                          EndpointSecurityFilter securityFilter,
+                                                          Transformer transformer,
+                                                          Transformer responseTransformer,
+                                                          MessageExchangePattern exchangePattern,
+                                                          TransactionConfig txConfig)
+        throws EndpointException, InitialisationException
+    {
+        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
             muleContext);
         endpointBuilder.setFilter(filter);
         endpointBuilder.setSecurityFilter(securityFilter);
         if (transformer != null)
         {
-            endpointBuilder.setTransformers(Collections.singletonList(transformer));
+            endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
         }
         if (responseTransformer != null)
         {
-            endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
+            endpointBuilder.setResponseMessageProcessors(Collections.singletonList(responseTransformer));
         }
         endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);
         customizeEndpointBuilder(endpointBuilder);
-        OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
-        return endpoint;
+        return endpointBuilder.buildOutboundEndpoint();
     }
 
     protected void customizeEndpointBuilder(EndpointBuilder endpointBuilder)
@@ -120,6 +129,8 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
+        props.put("port", new Integer(12345));
+
         return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
             getTestSession(getTestService(), muleContext));
     }
