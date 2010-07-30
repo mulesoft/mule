@@ -35,7 +35,7 @@
                 <chaining-router>
                     <outbound-endpoint exchange-pattern="request-response" 
                         address="http://localhost:65082/services/EchoUMO">
-                        <cxf:simple-client serviceClass="org.mule.test.integration.tck.Echo" operation="echo" />
+                        <cxf:simple-client serviceClass="org.mule.api.component.simple.EchoService" operation="echo" />
                     </outbound-endpoint>
                     <vm:outbound-endpoint path="service3" exchange-pattern="request-response">
                         <custom-transformer class="org.mule.transformer.simple.MessagePropertiesTransformer">
@@ -51,7 +51,7 @@
             <inbound>
                 <inbound-endpoint exchange-pattern="request-response"
                     address="http://localhost:65082/services/EchoUMO">
-                        <cxf:simple-service serviceClass="org.mule.test.integration.tck.Echo" />
+                        <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService" />
                 </inbound-endpoint>
             </inbound>
             <echo-component />
