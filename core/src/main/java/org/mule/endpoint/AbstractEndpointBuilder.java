@@ -219,7 +219,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         addResponseTransformersFromUri(endpointURI);
         
         Connector connector = getConnector();
-        if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
+        if (connector != null && !connector.supportsProtocol(getScheme()))
         {
             throw new IllegalArgumentException(CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(
                 connector.getProtocol(), endpointURI).getMessage());
@@ -539,7 +539,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     private Connector getConnector(EndpointURI endpointURI, MuleContext muleContext) throws EndpointException
     {
-        String scheme = uriBuilder.getEndpoint().getFullScheme();
+        String scheme = getScheme();
         TransportFactory factory = new TransportFactory(muleContext);
 
         Connector connector;
@@ -583,6 +583,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         }
         return connector;
+    }
+
+    protected String getScheme()
+    {
+        return uriBuilder.getEndpoint().getFullScheme();
     }
 
     /**

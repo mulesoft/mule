@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.Aggregator;
 import org.mule.management.stats.RouterStatistics;
@@ -31,7 +32,7 @@ public class ServiceAsyncReplyCompositeMessageSource extends ServiceCompositeMes
         statistics = new RouterStatistics(RouterStatistics.TYPE_RESPONSE);
     }
 
-    protected void createMessageProcessorChain()
+    protected void createMessageProcessorChain() throws MuleException
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(processors);

@@ -54,7 +54,7 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
     protected List processors = new ArrayList();
     protected String name;
 
-    public MessageProcessor build()
+    public MessageProcessor build() throws MuleException
     {
         if (processors.isEmpty())
         {
@@ -133,7 +133,7 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
         private String name;
         private List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
-        public IteratingListCompositeMessageProcessor(List processors, String name)
+        public IteratingListCompositeMessageProcessor(List processors, String name) throws MuleException
         {
             this.name = name;
             for (Object object : list)
@@ -143,7 +143,7 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
             log = LogFactory.getLog(IteratingListCompositeMessageProcessor.class);
         }
 
-        private MessageProcessor getMessageProcessor(Object processor)
+        private MessageProcessor getMessageProcessor(Object processor) throws MuleException
         {
             if (processor instanceof MessageProcessor)
             {

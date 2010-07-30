@@ -73,7 +73,14 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
         {
             chainBuilder.chain(next);
         }
-        chain = chainBuilder.build();
+        try
+        {
+            chain = chainBuilder.build();
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     public void dispose()
