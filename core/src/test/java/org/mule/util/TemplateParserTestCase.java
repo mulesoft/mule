@@ -23,6 +23,10 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     public void testStringParserSquareBraces()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+        assertNotNull(tp.getStyle());
+        assertEquals("[", tp.getStyle().getPrefix());
+        assertEquals("]", tp.getStyle().getSuffix());
+
         Map props = new HashMap();
         props.put("fromAddress", "ross.mason@symphonysoft.com");
         String string = "smtp://[fromAddress]";
@@ -34,9 +38,47 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("smtp://[toAddress]", result);
     }
 
+    public void testParserValidationSquareBraces()
+    {
+        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+        assertTrue(tp.isValid("[][]"));
+        assertFalse(tp.isValid("[[]]"));
+        assertFalse(tp.isValid("[[][]"));
+    }
+
+    public void testParserValidationAntStyle()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        assertTrue(tp.isValid("${}"));
+        assertTrue(tp.isValid("${}${}"));
+        assertFalse(tp.isValid("${}&{}"));
+        assertFalse(tp.isValid("{}${}"));
+        assertFalse(tp.isValid("${$}${}"));
+        assertFalse(tp.isValid("${${}}${}"));
+        assertFalse(tp.isValid("$ {}"));
+
+    }
+
+    public void testParserValidationMuleStyle()
+    {
+        TemplateParser tp = TemplateParser.createMuleStyleParser();
+        assertTrue(tp.isValid("#[]"));
+        assertTrue(tp.isValid("#[]   #[]"));
+        assertFalse(tp.isValid("#[]&[]"));
+        assertFalse(tp.isValid("[]$[]#"));
+        assertFalse(tp.isValid("#[#]#[]"));
+        assertFalse(tp.isValid("#[#[]]#[]"));
+        assertFalse(tp.isValid("# []"));
+
+    }
+
     public void testStringParserAntBraces()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
+        assertNotNull(tp.getStyle());
+        assertEquals("${", tp.getStyle().getPrefix());
+        assertEquals("}", tp.getStyle().getSuffix());
+
         Map props = new HashMap();
         props.put("prop1", "value1");
         props.put("prop2", "value2");
@@ -67,6 +109,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     public void testListParserAntBraces()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
+
         Map props = new HashMap();
         props.put("prop1", "value1");
         props.put("prop2", "value2");

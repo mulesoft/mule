@@ -64,6 +64,7 @@ public interface ExpressionManager
      * @param message The current message being processed
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
      *                   null. @return the result of the evaluation
+     * @return the parsered expression string
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
@@ -80,6 +81,7 @@ public interface ExpressionManager
      * @param message The current message bing processed
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
      *                   null. @return the result of the evaluation
+     * @return the parsered expression string
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
@@ -107,6 +109,7 @@ public interface ExpressionManager
      * @param message The current message being processed
      * @param failIfNull determines if an exception should be thrown if expression could not be evaluated or returns
      *                   null. @return the result of the evaluation
+     * @return the parsered expression string
      * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and
      *                                    'failIfNull is set to true.
      */
@@ -125,4 +128,27 @@ public interface ExpressionManager
      * @return true if the expression evaluator is recognised
      */
     public boolean isValidExpression(String expression);
+
+    /**
+     * Determines if the expression is valid or not.  This method will validate a single expression or
+     * expressions embedded in a string.  the expression must be well formed i.e. #[bean:user]
+     *
+     * @param expression the expression to validate
+     * @throws InvalidExpressionException if the expression is invalid, including information about the position and fault
+     *
+     * @since 3.0
+     */
+    public void validateExpression(String expression) throws InvalidExpressionException;
+
+    /**
+     * Determines if the string is an expression.  This method will validate that the string contains either the expression
+     * prefix (malformed) or a full expression.  This isn't full proof but catches most error cases
+     *
+     * @param string is this string an expression string
+     * @return true if the string contains an expression
+     *
+     * @since 3.0
+     */
+    public boolean isExpression(String string);
+
 }

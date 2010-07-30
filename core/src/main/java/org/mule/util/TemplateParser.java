@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,20 +35,31 @@ public final class TemplateParser
 
     private static final String DOLLAR_ESCAPE = "@@@";
 
+    private static final Map<String, PatternInfo> patterns = new HashMap<String, PatternInfo>();
+
+    static
+    {
+        patterns.put(ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\}]+\\}", "${", "}"));
+        patterns.put(SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\]]+\\]", "[", "]"));
+        patterns.put(CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\}]+\\}", "{", "}"));
+        patterns.put(WIGGLY_MULE_TEMPLATE_STYLE, new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE, "#\\[[^#]+\\]", "#[", "]"));
+    }
+
+
     /**
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(TemplateParser.class);
 
-    public static final Pattern ANT_TEMPLATE_PATTERN = Pattern.compile("\\$\\{[^\\}]+\\}", Pattern.CASE_INSENSITIVE);
-    public static final Pattern SQUARE_TEMPLATE_PATTERN = Pattern.compile("\\[[^\\]]+\\]", Pattern.CASE_INSENSITIVE);
-    public static final Pattern CURLY_TEMPLATE_PATTERN = Pattern.compile("\\{[^\\}]+\\}", Pattern.CASE_INSENSITIVE);
-    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = Pattern.compile("#\\[[^#]+\\]", Pattern.CASE_INSENSITIVE);
+    public static final Pattern ANT_TEMPLATE_PATTERN = patterns.get(ANT_TEMPLATE_STYLE).getPattern();
+    public static final Pattern SQUARE_TEMPLATE_PATTERN = patterns.get(SQUARE_TEMPLATE_STYLE).getPattern();
+    public static final Pattern CURLY_TEMPLATE_PATTERN = patterns.get(CURLY_TEMPLATE_STYLE).getPattern();
+    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = patterns.get(WIGGLY_MULE_TEMPLATE_STYLE).getPattern();
 
     private final Pattern pattern;
     private final int pre;
     private final int post;
-    private final String style;
+    private final PatternInfo style;
 
 
     public static TemplateParser createAntStyleParser()
@@ -70,37 +82,17 @@ public final class TemplateParser
         return new TemplateParser(WIGGLY_MULE_TEMPLATE_STYLE);
     }
 
-    private TemplateParser(String style)
+    private TemplateParser(String styleName)
     {
-        if (ANT_TEMPLATE_STYLE.equals(style))
+        this.style = patterns.get(styleName);
+        if (this.style == null)
         {
-            pattern = ANT_TEMPLATE_PATTERN;
-            pre = 2;
-            post = 1;
+            throw new IllegalArgumentException("Unknown template style: " + styleName);
+
         }
-        else if (WIGGLY_MULE_TEMPLATE_STYLE.equals(style))
-        {
-            pattern = WIGGLY_MULE_TEMPLATE_PATTERN;
-            pre = 2;
-            post = 1;
-        }
-        else if (SQUARE_TEMPLATE_STYLE.equals(style))
-        {
-            pattern = SQUARE_TEMPLATE_PATTERN;
-            pre = 1;
-            post = 1;
-        }
-        else if (CURLY_TEMPLATE_STYLE.equals(style))
-        {
-            pattern = CURLY_TEMPLATE_PATTERN;
-            pre = 1;
-            post = 1;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Unknown template style: " + style);
-        }
-        this.style = style;
+        pattern = style.getPattern();
+        pre = style.getPrefix().length();
+        post = style.getSuffix().length();
     }
 
     /**
@@ -288,7 +280,7 @@ public final class TemplateParser
         }
     }
 
-    public String getStyle()
+    public PatternInfo getStyle()
     {
         return style;
     }
@@ -304,9 +296,156 @@ public final class TemplateParser
         return m.find();
     }
 
+    public boolean isValid(String expression)
+    {
+        try
+        {
+            style.validate(expression);
+            return true;
+        }
+        catch (IllegalArgumentException e)
+        {
+            return false;
+        }
+    }
+
+    public void validate(String expression) throws IllegalArgumentException
+    {
+        style.validate(expression);
+    }
+
     public static interface TemplateCallback
     {
         Object match(String token);
     }
 
+
+    static class PatternInfo
+    {
+        String name;
+        String regEx;
+        String prefix;
+        String suffix;
+
+        PatternInfo(String name, String regEx, String prefix, String suffix)
+        {
+            this.name = name;
+            this.regEx = regEx;
+            if (prefix.length() < 1 || prefix.length() > 2)
+            {
+                throw new IllegalArgumentException("Prefix can only be one or two characters long: " + prefix);
+            }
+            this.prefix = prefix;
+            if (suffix.length() != 1)
+            {
+                throw new IllegalArgumentException("Suffic can only be one character long: " + suffix);
+            }
+            this.suffix = suffix;
+        }
+
+        public String getRegEx()
+        {
+            return regEx;
+        }
+
+        public String getPrefix()
+        {
+            return prefix;
+        }
+
+        public String getSuffix()
+        {
+            return suffix;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public Pattern getPattern()
+        {
+            return Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+        }
+
+        public void validate(String expression) throws IllegalArgumentException
+        {
+            Stack<Character> openDelimiterStack = new Stack<Character>();
+
+            int charCount = expression.length();
+            int index = 0;
+            char nextChar;
+            char preDelim = 0;
+            char open;
+            char close;
+            if (prefix.length() == 2)
+            {
+                preDelim = prefix.charAt(0);
+                open = prefix.charAt(1);
+            }
+            else
+            {
+                open = prefix.charAt(0);
+            }
+            close = suffix.charAt(0);
+
+            for (; index < charCount; index++)
+            {
+                nextChar = expression.charAt(index);
+                if (preDelim != 0 && nextChar == preDelim)
+                {
+                    if (openDelimiterStack.isEmpty())
+                    {
+                        openDelimiterStack.push(nextChar);
+                        nextChar = expression.charAt(++index);
+                        if (nextChar != open)
+                        {
+                            throw new IllegalArgumentException(String.format("Character %s at position %s must appear immediately after %s", open, index, preDelim));
+                        }
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence. Character cannot appear after %s", nextChar, index, openDelimiterStack.pop()));
+                    }
+                }
+
+                if (nextChar == open)
+                {
+                    if (preDelim == 0)
+                    {
+                        openDelimiterStack.push(nextChar);
+                    }
+                    //Check the stack size to avoid out of bounds
+                    else if (openDelimiterStack.size() == 1 && openDelimiterStack.peek().equals(preDelim))
+                    {
+                        openDelimiterStack.push(nextChar);
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence. Character cannot appear after %s", nextChar, index, preDelim));
+                    }
+                }
+                else if (nextChar == close)
+                {
+                    if (openDelimiterStack.isEmpty())
+                    {
+                        throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
+                    }
+                    else
+                    {
+                        openDelimiterStack.pop();
+                        if (preDelim != 0)
+                        {
+                            openDelimiterStack.pop();
+                        }
+                        if (!openDelimiterStack.isEmpty())
+                        {
+                            throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
