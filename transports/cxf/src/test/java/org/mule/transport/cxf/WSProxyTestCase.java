@@ -50,7 +50,7 @@ public class WSProxyTestCase extends FunctionalTestCase
         System.out.println(wsdl);
         assertTrue(wsdl.indexOf("<wsdl:definitions") != -1);
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echoResponse\">") != -1);
-        assertTrue(wsdl.indexOf("<wsdl:message name=\"echoRequest\">") != -1);
+        assertTrue(wsdl.indexOf("<wsdl:message name=\"echo\">") != -1);
     }
     
     public void testProxyRequest() throws Exception
@@ -74,7 +74,7 @@ public class WSProxyTestCase extends FunctionalTestCase
         assertNotNull(wsdl);
         assertTrue(wsdl.indexOf("<wsdl:definitions") != -1);
         assertTrue(wsdl.indexOf("<wsdl:message name=\"echoResponse\">") != -1);
-        assertTrue(wsdl.indexOf("<wsdl:message name=\"echoRequest\">") != -1);
+        assertTrue(wsdl.indexOf("<wsdl:message name=\"echo\">") != -1);
     }
     
     public void testWsdlFileProxyRequest() throws Exception

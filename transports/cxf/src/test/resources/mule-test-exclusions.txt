@@ -28,5 +28,4 @@ org.mule.transport.cxf.payload.TreatNullPayloadAsVoidTestCase
 # Need to make work post refactoring
 org.mule.transport.cxf.DatabindingTestCase
 org.mule.transport.cxf.wsa.WSATest
-org.mule.transport.cxf.WSProxyTestCase
 org.mule.transport.cxf.ClientSimpleFrontendTestCase

@@ -9,6 +9,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.cxf.builder.WsdlClientMessageProcessorBuilder;
+import org.mule.transport.cxf.config.FlowConfiguringMessageProcessor;
 
 import java.util.Arrays;
 
@@ -20,7 +21,14 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
     public WsdlCxfEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
     {
         super(global);
+        
+        this.uriBuilder = getEndpointBuilderWithoutMeta(global).getEndpointBuilder();
         this.wsdlAddress = getEndpointBuilder().toString().substring(9);
+    }
+
+    private EndpointURIEndpointBuilder getEndpointBuilderWithoutMeta(EndpointURIEndpointBuilder builder)
+    {
+        return new EndpointURIEndpointBuilder(getEndpointAddressWithoutMetaScheme(builder.getEndpointBuilder().toString()), muleContext);
     }
 
     public WsdlCxfEndpointBuilder(String address, MuleContext muleContext)
@@ -45,7 +53,7 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
         
         try
         {
-            messageProcessors = Arrays.asList((MessageProcessor)builder.build());
+            messageProcessors = Arrays.asList((MessageProcessor) new FlowConfiguringMessageProcessor(builder));
         }
         catch (Exception e)
         {
@@ -54,7 +62,7 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
 
         return super.buildOutboundEndpoint();
     }
-
+    
     private String getOperation()
     {
         String query = wsdlAddress;
