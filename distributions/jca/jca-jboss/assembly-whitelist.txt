@@ -102,6 +102,7 @@ mule-module-spring-config
 mule-module-spring-extras
 mule-module-spring-security
 mule-module-sxc
+mule-module-ws
 mule-module-xml
 mule-transport-bpm
 mule-transport-ajax
