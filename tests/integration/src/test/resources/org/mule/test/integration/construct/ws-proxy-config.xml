@@ -65,8 +65,6 @@
   <!--
         Test support
   -->
-  <cxf:connector name="cxf-connector" />
-  
   <object-to-string-transformer name="object-to-string-transformer" />
   <script:transformer name="zip-code-changer-1">
     <script:script engine="groovy">
@@ -82,8 +80,10 @@
   <model name="ws-proxy-test-targets">
     <service name="weather-forecaster">
       <inbound>
-        <inbound-endpoint address="cxf:http://localhost:6090/weather-forecast"
-          exchange-pattern="request-response" connector-ref="cxf-connector" />
+        <inbound-endpoint address="http://localhost:6090/weather-forecast"
+          exchange-pattern="request-response">
+            <cxf:jaxws-service />  
+        </inbound-endpoint>
       </inbound>
       <component class="org.mule.test.components.WeatherForecaster" />
     </service>
