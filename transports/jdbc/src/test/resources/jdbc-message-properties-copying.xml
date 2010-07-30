@@ -18,7 +18,12 @@
             <outbound>
                 <chaining-router>
                     <jdbc:outbound-endpoint queryKey="getTest" exchange-pattern="request-response" />
-                    <vm:outbound-endpoint path="resultInterpreter" exchange-pattern="request-response" />
+                    <vm:outbound-endpoint path="resultInterpreter" exchange-pattern="request-response">
+                        <message-properties-transformer>
+                            <!-- Propogate property -->
+                            <add-message-property key="custom-key" value="#[header:INBOUND:custom-key]"/>
+                        </message-properties-transformer>
+                    </vm:outbound-endpoint>
                 </chaining-router>
             </outbound>
         </service>
