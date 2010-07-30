@@ -128,7 +128,8 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             }
 
             MuleEvent resultEvent = createResultEvent(event, result);
-
+            // Components only have access to the original event, so propogate the stop further processing 
+            resultEvent.setStopFurtherProcessing(event.isStopFurtherProcessing());
             fireComponentNotification(resultEvent.getMessage(), ComponentMessageNotification.COMPONENT_POST_INVOKE);
 
             return resultEvent;
