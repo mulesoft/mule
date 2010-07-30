@@ -43,8 +43,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  */
 public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTestCase
 {
-    private FakeMessageDispatcher dispacher;
-    private MuleEvent testOutboundEvent;
+    protected FakeMessageDispatcher dispacher;
+    protected MuleEvent testOutboundEvent;
 
     public void testDefaultFlowSync() throws Exception
     {
@@ -114,11 +114,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
         assertMessageNotSent();
         assertNotNull(result);
-        // TODO We just return the request rather than any error message like we do
-        // with inbound?
         assertEquals(TEST_MESSAGE, result.getMessage().getPayloadAsString());
-        // TODO No exception payload either?
-        assertNull(result.getMessage().getExceptionPayload());
+        assertNotNull(result.getMessage().getExceptionPayload());
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
@@ -174,9 +171,8 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
         assertMessageSent(true);
 
-        // TODO BL-103
-        // assertEquals(TEST_MESSAGE + OutboundAppendTransformer.APPEND_STRING,
-        // dispacher.sensedSendEvent.getMessageAsString());
+        assertEquals(TEST_MESSAGE + OutboundAppendTransformer.APPEND_STRING,
+        dispacher.sensedSendEvent.getMessageAsString());
 
         assertNotNull(result);
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING, result.getMessageAsString());
@@ -276,14 +272,15 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
     }
 
-    protected OutboundEndpoint createOutboundEndpoint(Filter filter,
+    protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,
                                                       EndpointSecurityFilter securityFilter,
                                                       Transformer in,
                                                       Transformer response,
                                                       MessageExchangePattern exchangePattern,
                                                       TransactionConfig txConfig) throws Exception
     {
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(filter, securityFilter, in, response,
+
+        OutboundEndpoint endpoint = createTestOutboundEndpoint(uri, filter, securityFilter, in, response,
             exchangePattern, txConfig);
         dispacher = new FakeMessageDispatcher(endpoint);
         Connector connector = endpoint.getConnector();
@@ -296,8 +293,18 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
             }
 
         });
-        //connector.start();
         return endpoint;
+    }
+
+    protected OutboundEndpoint createOutboundEndpoint(Filter filter,
+                                                      EndpointSecurityFilter securityFilter,
+                                                      Transformer in,
+                                                      Transformer response,
+                                                      MessageExchangePattern exchangePattern,
+                                                      TransactionConfig txConfig) throws Exception
+    {
+        return createOutboundEndpoint("test://test", filter, securityFilter, in, response, exchangePattern, txConfig);
+
     }
 
     static class FakeMessageDispatcher extends TestMessageDispatcher

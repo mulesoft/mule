@@ -18,6 +18,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
@@ -60,6 +61,7 @@ public class InboundSecurityFilterMessageProcessor extends AbstractInterceptingM
                 connector.handleException(e, receiver);
                 resultEvent = RequestContext.getEvent();
                 resultEvent.getMessage().setPayload(e.getLocalizedMessage());
+                resultEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
             }
         }
         else

@@ -16,6 +16,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transport.DispatchException;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
 
@@ -53,6 +54,7 @@ public class OutboundSecurityFilterMessageProcessor extends AbstractIntercepting
                 connector.fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                 connector.handleException(e);
+                event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
                 return event;
             }
             catch (Exception e)
