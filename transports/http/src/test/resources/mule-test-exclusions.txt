@@ -18,3 +18,5 @@ org.mule.transport.http.issues.StreamingDownloadMule1389TestCase
 org.mule.transport.http.functional.HttpContentLengthPropagationTestCase
 
 #org.mule.transport.http.functional.HttpOutboundTestCase
+
+org.mule.transport.http.DispatchTestCase
