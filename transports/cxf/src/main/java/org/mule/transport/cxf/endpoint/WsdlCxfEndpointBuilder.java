@@ -22,13 +22,8 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
     {
         super(global);
         
-        this.uriBuilder = getEndpointBuilderWithoutMeta(global).getEndpointBuilder();
-        this.wsdlAddress = getEndpointBuilder().toString().substring(9);
-    }
-
-    private EndpointURIEndpointBuilder getEndpointBuilderWithoutMeta(EndpointURIEndpointBuilder builder)
-    {
-        return new EndpointURIEndpointBuilder(getEndpointAddressWithoutMetaScheme(builder.getEndpointBuilder().toString()), muleContext);
+        this.wsdlAddress = getEndpointAddressWithoutMetaScheme(global.getEndpointBuilder().toString());
+        this.uriBuilder = new EndpointURIEndpointBuilder(wsdlAddress, muleContext).getEndpointBuilder();
     }
 
     public WsdlCxfEndpointBuilder(String address, MuleContext muleContext)
