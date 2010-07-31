@@ -17,6 +17,7 @@ import org.mule.model.seda.SedaService
 import org.mule.object.SingletonObjectFactory
 import org.mule.retry.policies.NoRetryPolicyTemplate
 import org.mule.routing.ForwardingCatchAllStrategy
+import org.mule.routing.MessageFilter
 import org.mule.routing.binding.DefaultBindingCollection
 import org.mule.routing.binding.DefaultInterfaceBinding
 import org.mule.routing.filters.MessagePropertyFilter
@@ -105,7 +106,7 @@ filter.pattern = "foo=bar"
 
 // Global Endpoint
 epBuilder= new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)
-epBuilder.filter = filter
+epBuilder.addMessageProcessor(new MessageFilter(filter))
 muleContext.registry.registerEndpointBuilder("fruitBowlEndpoint", epBuilder);
 
 // Global Endpoint
@@ -168,7 +169,7 @@ service.component.interceptors = interceptorList
 epBuilder= new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("orangeEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.setProperty("testLocal", "value1")
-epBuilder.filter = new PayloadTypeFilter(String.class)
+epBuilder.addMessageProcessor(new MessageFilter(new PayloadTypeFilter(String.class)))
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
 service.messageSource.addSource(epFactory.getInboundEndpoint(epBuilder))
 service.messageSource.addSource(orangeEndpoint)
