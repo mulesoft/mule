@@ -336,7 +336,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
             muleContext);
         endpointBuilder.setTransformers(transformers);
         endpointBuilder.setName("epBuilderTest");
-        endpointBuilder.setMessageFilter(new MessageFilter(filter));
+        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
         muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
 
         getTestService();

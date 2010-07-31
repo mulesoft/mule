@@ -211,5 +211,20 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
             }
         });
     }
+    
+    public static void removeType(Collection<?> collection, final Class<?> type)
+    {
+        if (type == null)
+        {
+            return;
+        }
+        filter(collection, new Predicate()
+        {
+            public boolean evaluate(Object object)
+            {
+                return object != null && type.isAssignableFrom(object.getClass());
+            }
+        });
+    }
 
 }

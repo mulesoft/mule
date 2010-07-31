@@ -87,7 +87,7 @@ public class AnnotatedEndpointHelper
         if (epData.getFilter() != null)
         {
             Filter filter = (Filter) convertProperty(Filter.class, epData.getFilter());
-            endpointBuilder.setMessageFilter(new MessageFilter(filter));
+            endpointBuilder.addMessageProcessor(new MessageFilter(filter));
 
         }
 

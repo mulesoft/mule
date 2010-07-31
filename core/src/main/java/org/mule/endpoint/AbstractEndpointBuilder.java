@@ -80,7 +80,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String name;
     protected Map<Object, Object> properties = new HashMap<Object, Object>();
     protected TransactionConfig transactionConfig;
-    protected MessageFilter messageFilter;
     protected Boolean deleteUnacceptedMessages;
     protected EndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
@@ -460,11 +459,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return muleContext.getConfiguration().getDefaultEncoding();
     }
 
-    protected Filter getFilter()
-    {
-        return messageFilter != null ? messageFilter.getFilter() : null;
-    }
-
     protected String getInitialState(Connector connector)
     {
         return initialState != null ? initialState : getDefaultInitialState(connector);
@@ -749,24 +743,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.transactionConfig = transactionConfig;
     }
 
-    public void setMessageFilter(MessageFilter messageFilter)
-    {
-        if (this.messageFilter != null)
-        {
-            messageProcessors.remove(this.messageFilter);
-        }
-        this.messageFilter = messageFilter;
-        if (messageFilter != null)
-        {
-            messageProcessors.add(messageFilter);
-        }
-    }
-
-    public void setFilter(Filter filter)
-    {
-        setMessageFilter(new MessageFilter(filter));
-    }
-
     public void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
     {
         this.deleteUnacceptedMessages = Boolean.valueOf(deleteUnacceptedMessages);
@@ -831,13 +807,30 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         this.uriBuilder = URIBuilder;
     }
+    
+
+    public void setFilters(List<Filter> filters)
+    {
+        if (filters == null)
+        {
+            // Used by axis to clear out filter
+            CollectionUtils.removeType(messageProcessors, MessageFilter.class);
+        }
+        else
+        {
+            for (Filter filter : filters)
+            {
+                messageProcessors.add(0, new MessageFilter(filter));
+            }
+        }
+    }
 
 
     @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
-            deleteUnacceptedMessages, encoding, uriBuilder, messageFilter, initialState, name, properties,
+            deleteUnacceptedMessages, encoding, uriBuilder, initialState, name, properties,
             responseTimeout, responseMessageProcessors, securityFilter, synchronous, 
             messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
@@ -858,7 +851,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return equal(retryPolicyTemplate, other.retryPolicyTemplate) && equal(connector, other.connector)
                 && equal(createConnector, other.createConnector)
                 && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
-                && equal(uriBuilder, other.uriBuilder) && equal(messageFilter, other.messageFilter)
+                && equal(uriBuilder, other.uriBuilder)
                 && equal(initialState, other.initialState) && equal(name, other.name)
                 && equal(properties, other.properties)
                 && equal(responseTimeout, other.responseTimeout)
@@ -887,7 +880,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         builder.setName(name);
         builder.setProperties(properties);
         builder.setTransactionConfig(transactionConfig);
-        builder.setMessageFilter(messageFilter);
         builder.setSecurityFilter(securityFilter);
         builder.setInitialState(initialState);
         builder.setEncoding(encoding);

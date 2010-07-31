@@ -31,6 +31,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.routing.MessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
@@ -83,7 +84,7 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
         throws EndpointException, InitialisationException
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
-        endpointBuilder.setFilter(filter);
+        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
         endpointBuilder.setSecurityFilter(securityFilter);
         if (transformer != null)
         {

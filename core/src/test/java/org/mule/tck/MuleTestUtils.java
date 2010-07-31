@@ -254,7 +254,7 @@ public final class MuleTestUtils
         {
             endpointBuilder.setProperties(properties);
         }
-        endpointBuilder.setMessageFilter(new MessageFilter(filter));
+        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
         return source.getEndpoint(endpointBuilder);
     }
 

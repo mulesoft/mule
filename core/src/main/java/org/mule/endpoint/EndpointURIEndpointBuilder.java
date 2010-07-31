@@ -44,7 +44,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
                             // spring config test case
         properties = global.properties;
         transactionConfig = global.transactionConfig;
-        messageFilter = global.messageFilter;
         deleteUnacceptedMessages = global.deleteUnacceptedMessages;
         securityFilter = global.securityFilter;
         synchronous = global.synchronous;
@@ -86,7 +85,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());
         setInitialState(source.getInitialState());
         setResponseTimeout(source.getResponseTimeout());
-        setFilter(source.getFilter());
         setSecurityFilter(source.getSecurityFilter());
         setRetryPolicyTemplate(source.getRetryPolicyTemplate());
         setExchangePattern(source.getExchangePattern());

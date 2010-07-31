@@ -138,5 +138,16 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertFalse(CollectionUtils.containsType(c, null));
         assertFalse(CollectionUtils.containsType(null, Date.class));
     }
+    
+    public void testRemoveType()
+    {
+        Collection c = new ArrayList();
+        c.add(new String());
+        c.add(new Integer(1));
+        CollectionUtils.removeType(c, String.class);
+        assertEquals(1, c.size());
+        assertFalse(CollectionUtils.containsType(c, null));
+        assertFalse(CollectionUtils.containsType(null, Date.class));
+    }
 
 }

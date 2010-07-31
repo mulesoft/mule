@@ -43,6 +43,7 @@
                         <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
                     </message-filter>
                      -->
+                     <payload-type-filter expectedType="java.lang.String"/>
                 </vm:inbound-endpoint>
             </inbound>
             <test:component/>

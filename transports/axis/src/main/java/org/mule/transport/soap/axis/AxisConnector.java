@@ -25,6 +25,7 @@ import org.mule.component.DefaultJavaComponent;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
@@ -391,7 +392,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers().isEmpty() ? null
                                                                                                                  : receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
-        serviceEndpointbuilder.setMessageFilter(new MessageFilter(receiver.getEndpoint().getFilter()));
+        serviceEndpointbuilder.addMessageProcessor(new MessageFilter(receiver.getEndpoint().getFilter()));
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
         serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
@@ -400,7 +401,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // filters and transformers will get invoked twice?
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
-        receiverEndpointBuilder.setMessageFilter(null);
+        ((AbstractEndpointBuilder) receiverEndpointBuilder).setFilters(null);
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 

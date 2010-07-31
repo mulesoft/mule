@@ -16,13 +16,11 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.URIBuilder;
-import org.mule.routing.MessageFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -72,8 +70,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setProperties(Map<Object, Object> properties);
 
     void setTransactionConfig(TransactionConfig transactionConfig);
-
-    void setMessageFilter(MessageFilter messageFilter);
 
     void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
 
