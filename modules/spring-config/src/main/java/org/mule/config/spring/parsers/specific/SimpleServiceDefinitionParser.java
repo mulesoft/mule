@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.factories.SimpleServiceFactoryBean;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.util.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -21,6 +22,11 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
 {
     private static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
     private static final String ADDRESS_ATTRIBUTE = "address";
+    private static final String INBOUND_ENDPOINT_CHILD = "inbound-endpoint";
+
+    private static final String RESPONSE_TRANSFORMER_REFS_ATTRIBUTE = "responseTransformer-refs";
+    private static final String TRANSFORMER_REFS_ATTRIBUTE = "transformer-refs";
+
     private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
     private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
 
@@ -31,6 +37,9 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
             new String[]{ADDRESS_ATTRIBUTE}, new String[]{ENDPOINT_REF_ATTRIBUTE}}));
         super.registerPreProcessor(new CheckExclusiveAttributes(new String[][]{
             new String[]{COMPONENT_CLASS_ATTRIBUTE}, new String[]{COMPONENT_REF_ATTRIBUTE}}));
+        super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
+            ENDPOINT_REF_ATTRIBUTE, ADDRESS_ATTRIBUTE, TRANSFORMER_REFS_ATTRIBUTE,
+            RESPONSE_TRANSFORMER_REFS_ATTRIBUTE}, new String[]{INBOUND_ENDPOINT_CHILD}));
     }
 
     @Override
