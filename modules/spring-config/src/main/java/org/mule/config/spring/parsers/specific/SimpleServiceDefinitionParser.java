@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.factories.SimpleServiceFactoryBean;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.util.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -18,13 +19,18 @@ import org.w3c.dom.Element;
 
 public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefinitionParser
 {
+    private static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
+    private static final String ADDRESS_ATTRIBUTE = "address";
+    private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
     private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
 
     public SimpleServiceDefinitionParser()
     {
-        super();
         super.addAlias("endpoint", "endpointBuilder");
-        super.addAlias("component-class", "componentClass");
+        super.registerPreProcessor(new CheckExclusiveAttributes(new String[][]{
+            new String[]{ADDRESS_ATTRIBUTE}, new String[]{ENDPOINT_REF_ATTRIBUTE}}));
+        super.registerPreProcessor(new CheckExclusiveAttributes(new String[][]{
+            new String[]{COMPONENT_CLASS_ATTRIBUTE}, new String[]{COMPONENT_REF_ATTRIBUTE}}));
     }
 
     @Override
