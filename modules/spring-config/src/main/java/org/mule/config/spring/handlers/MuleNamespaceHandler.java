@@ -12,6 +12,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.source.MessageSource;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -53,7 +54,6 @@ import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageSourceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
@@ -265,8 +265,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("message-filter", new MessageProcessorDefinitionParser(MessageFilter.class, true)).addAlias("messageProcessor", "unacceptedMessageProcessor");
         
         // Message Sources
-        registerBeanDefinitionParser("custom-source", new MessageSourceDefinitionParser());        
-        registerBeanDefinitionParser("composite-source", new MessageSourceDefinitionParser(CompositeMessageSourceFactoryBean.class));        
+        registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));        
+        registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));        
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());

@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
@@ -21,14 +20,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-/**
- * Spring FactoryBean used to create concrete instances of outbound endpoints
- */
 public class CompositeMessageSourceFactoryBean implements FactoryBean
 {
 
     protected List<MessageSource> sources = Collections.<MessageSource> emptyList();
-    protected List<InboundEndpoint> endpoints = Collections.<InboundEndpoint> emptyList();
 
     public Class getObjectType()
     {
@@ -40,22 +35,12 @@ public class CompositeMessageSourceFactoryBean implements FactoryBean
         this.sources = sources;
     }
 
-    @Deprecated
-    public void setEndpoints(List<InboundEndpoint> endpoints)
-    {
-        this.endpoints = endpoints;
-    }
-
     public Object getObject() throws Exception
     {
         CompositeMessageSource composite = new StartableCompositeMessageSource();
         for (MessageSource source : sources)
         {
             composite.addSource(source);
-        }
-        for (MessageSource endpoint : endpoints)
-        {
-            composite.addSource(endpoint);
         }
         return composite;
     }
