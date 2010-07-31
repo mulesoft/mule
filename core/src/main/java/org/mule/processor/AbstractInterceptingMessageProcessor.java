@@ -10,8 +10,10 @@
 
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 
@@ -45,6 +47,11 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
             if (logger.isTraceEnabled())
             {
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
+            }
+            // If the next message processor is an outbound router then create outbound event
+            if (next instanceof OutboundEndpoint)
+            {
+                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) next, event.getSession());
             }
             return next.process(event);
         }

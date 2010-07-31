@@ -10,12 +10,14 @@
 
 package org.mule.processor.builder;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -175,6 +177,13 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
             if (logger.isTraceEnabled())
             {
                 logger.trace("Invoking adapted MessageProcessor '" + delegate.getClass().getName() + "'");
+            }
+            // If the next message processor is an outbound router then create
+            // outbound event
+            if (delegate instanceof OutboundEndpoint)
+            {
+                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) delegate,
+                    event.getSession());
             }
             return processNext(delegate.process(event));
         }
