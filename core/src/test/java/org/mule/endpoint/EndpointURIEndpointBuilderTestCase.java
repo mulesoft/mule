@@ -93,7 +93,6 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(endpoint.isDeleteUnacceptedMessages(), builder.getDeleteUnacceptedMessages(builder.getConnector()));
         assertEquals(endpoint.getInitialState(), builder.getInitialState(builder.getConnector()));
         assertEquals(endpoint.getResponseTimeout(), builder.getResponseTimeout(builder.getConnector()));
-        assertEquals(endpoint.getFilter(), builder.getFilter(builder.getConnector()));
         assertEquals(endpoint.getSecurityFilter(), builder.getSecurityFilter());
         assertEquals(endpoint.getRetryPolicyTemplate(), builder.getRetryPolicyTemplate(builder.getConnector()));
         assertEquals(MessageExchangePattern.ONE_WAY, builder.getExchangePattern());

@@ -19,6 +19,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.AbstractTransformer;
@@ -335,7 +336,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
             muleContext);
         endpointBuilder.setTransformers(transformers);
         endpointBuilder.setName("epBuilderTest");
-        endpointBuilder.setFilter(filter);
+        endpointBuilder.setMessageFilter(new MessageFilter(filter));
         muleContext.getRegistry().registerEndpointBuilder("epBuilderTest", endpointBuilder);
 
         getTestService();

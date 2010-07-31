@@ -42,6 +42,7 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.routing.MessageFilter;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
@@ -253,7 +254,7 @@ public final class MuleTestUtils
         {
             endpointBuilder.setProperties(properties);
         }
-        endpointBuilder.setFilter(filter);
+        endpointBuilder.setMessageFilter(new MessageFilter(filter));
         return source.getEndpoint(endpointBuilder);
     }
 

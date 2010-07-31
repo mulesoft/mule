@@ -35,6 +35,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.routing.MessageFilter;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -79,7 +80,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String name;
     protected Map<Object, Object> properties = new HashMap<Object, Object>();
     protected TransactionConfig transactionConfig;
-    protected Filter filter;
+    protected MessageFilter messageFilter;
     protected Boolean deleteUnacceptedMessages;
     protected EndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
@@ -191,7 +192,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         checkInboundExchangePattern();
 
         InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI,
-                getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+                getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
@@ -251,7 +252,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         checkOutboundExchangePattern();
 
         OutboundEndpoint endpoint = new DefaultOutboundEndpoint(connector, endpointURI,
-                getName(endpointURI), getProperties(), getTransactionConfig(), getFilter(connector),
+                getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
@@ -459,15 +460,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return muleContext.getConfiguration().getDefaultEncoding();
     }
 
-    protected Filter getFilter(Connector connector)
+    protected Filter getFilter()
     {
-        return filter != null ? filter : getDefaultFilter(connector);
-    }
-
-    @SuppressWarnings("unused")
-    protected Filter getDefaultFilter(Connector connector)
-    {
-        return null;
+        return messageFilter != null ? messageFilter.getFilter() : null;
     }
 
     protected String getInitialState(Connector connector)
@@ -754,9 +749,22 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         this.transactionConfig = transactionConfig;
     }
 
+    public void setMessageFilter(MessageFilter messageFilter)
+    {
+        if (this.messageFilter != null)
+        {
+            messageProcessors.remove(this.messageFilter);
+        }
+        this.messageFilter = messageFilter;
+        if (messageFilter != null)
+        {
+            messageProcessors.add(messageFilter);
+        }
+    }
+
     public void setFilter(Filter filter)
     {
-        this.filter = filter;
+        setMessageFilter(new MessageFilter(filter));
     }
 
     public void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
@@ -828,9 +836,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     @Override
     public int hashCode()
     {
-        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector,
-            deleteUnacceptedMessages, encoding, uriBuilder, filter, initialState, name, properties,
-            responseTimeout, responseMessageProcessors, securityFilter, synchronous,
+        return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
+            deleteUnacceptedMessages, encoding, uriBuilder, messageFilter, initialState, name, properties,
+            responseTimeout, responseMessageProcessors, securityFilter, synchronous, 
             messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
 
@@ -850,7 +858,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return equal(retryPolicyTemplate, other.retryPolicyTemplate) && equal(connector, other.connector)
                 && equal(createConnector, other.createConnector)
                 && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages) && equal(encoding, other.encoding)
-                && equal(uriBuilder, other.uriBuilder) && equal(filter, other.filter)
+                && equal(uriBuilder, other.uriBuilder) && equal(messageFilter, other.messageFilter)
                 && equal(initialState, other.initialState) && equal(name, other.name)
                 && equal(properties, other.properties)
                 && equal(responseTimeout, other.responseTimeout)
@@ -879,7 +887,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         builder.setName(name);
         builder.setProperties(properties);
         builder.setTransactionConfig(transactionConfig);
-        builder.setFilter(filter);
+        builder.setMessageFilter(messageFilter);
         builder.setSecurityFilter(securityFilter);
         builder.setInitialState(initialState);
         builder.setEncoding(encoding);

@@ -62,7 +62,6 @@ public class EndpointTestCase extends AbstractMuleTestCase
         properties.put(property1, value1);
         
         final TransactionConfig mockTransactionConfig = mock(TransactionConfig.class);
-        final Filter mockFilter = mock(Filter.class);
         final boolean deleteUnacceptedMessages = true;
         final EndpointSecurityFilter mockEndpointSecurityFilter = mock(EndpointSecurityFilter.class);
         final MessageExchangePattern messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
@@ -91,7 +90,6 @@ public class EndpointTestCase extends AbstractMuleTestCase
                 assertEquals(name, endpoint.getName());
                 assertEquals(value1, endpoint.getProperties().get(property1));
                 assertEquals(mockTransactionConfig, endpoint.getTransactionConfig());
-                assertEquals(mockFilter, endpoint.getFilter());
                 assertEquals(deleteUnacceptedMessages, endpoint.isDeleteUnacceptedMessages());
                 assertEquals(mockEndpointSecurityFilter, endpoint.getSecurityFilter());
                 assertEquals(messageExchangePattern, endpoint.getExchangePattern());
@@ -114,7 +112,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         // Creates the endpoint using the transformers which will validate the
         // configuration
         new AbstractEndpoint(mockConnector, uri, name, properties,
-            mockTransactionConfig, mockFilter, deleteUnacceptedMessages, mockEndpointSecurityFilter,
+            mockTransactionConfig, deleteUnacceptedMessages, mockEndpointSecurityFilter,
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
             messageProcessors, responseMessageProcessors, disableTransportTransformer,

@@ -44,7 +44,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
                             // spring config test case
         properties = global.properties;
         transactionConfig = global.transactionConfig;
-        filter = global.filter;
+        messageFilter = global.messageFilter;
         deleteUnacceptedMessages = global.deleteUnacceptedMessages;
         securityFilter = global.securityFilter;
         synchronous = global.synchronous;

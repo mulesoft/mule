@@ -254,6 +254,43 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A message processor that uses a filter to determine whether to process an event.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="messageFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-filter">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Used to filter events.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-message-processor" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Events that do not pass the filter are sent to this (optional) message processor.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
     <xsd:complexType name="customMessageProcessorType">
         <xsd:complexContent>
@@ -261,7 +298,7 @@
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>

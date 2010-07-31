@@ -22,6 +22,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.URIBuilder;
+import org.mule.routing.MessageFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setTransactionConfig(TransactionConfig transactionConfig);
 
-    void setFilter(Filter filter);
+    void setMessageFilter(MessageFilter messageFilter);
 
     void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
 

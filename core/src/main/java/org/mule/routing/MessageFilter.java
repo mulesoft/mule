@@ -78,11 +78,17 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         }
     }
 
+    @Deprecated
+    public void setMessageProcessor(MessageProcessor unacceptedMessageProcessor)
+    {
+        this.unacceptedMessageProcessor = unacceptedMessageProcessor;
+    }
+    
     /**
      * The <code>MessageProcessor</code> that should be used to handle messaged that are not accepted by the
      * filter.
      * 
-     * @param messageProcessor
+     * @param unacceptedMessageProcessor
      */
     public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor)
     {

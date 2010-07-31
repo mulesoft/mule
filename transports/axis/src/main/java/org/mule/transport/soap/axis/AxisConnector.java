@@ -28,6 +28,7 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.routing.MessageFilter;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.servlet.ServletConnector;
@@ -297,7 +298,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param component the component for which the endpoint is being registered
+     * @param flowConstruct the component for which the endpoint is being registered
      * @param endpoint  the endpoint being registered for the component
      * @return the key to store the newly created receiver against. In this case it
      *         is the component name, which is equivalent to the Axis service name.
@@ -390,7 +391,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers().isEmpty() ? null
                                                                                                                  : receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
-        serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
+        serviceEndpointbuilder.setMessageFilter(new MessageFilter(receiver.getEndpoint().getFilter()));
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
         serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
@@ -399,7 +400,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         // filters and transformers will get invoked twice?
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
-        receiverEndpointBuilder.setFilter(null);
+        receiverEndpointBuilder.setMessageFilter(null);
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 

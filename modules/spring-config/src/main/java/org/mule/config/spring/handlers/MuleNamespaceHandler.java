@@ -262,6 +262,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ParentDefinitionParser());
+        registerMuleBeanDefinitionParser("message-filter", new MessageProcessorDefinitionParser(MessageFilter.class, true)).addAlias("messageProcessor", "unacceptedMessageProcessor");
         
         // Message Sources
         registerBeanDefinitionParser("custom-source", new MessageSourceDefinitionParser());        
@@ -342,7 +343,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Outbound Routers
         registerBeanDefinitionParser("pass-through-router", new RouterDefinitionParser(OutboundPassThroughRouter.class));
-        registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
+        registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser(FilteringOutboundRouter.class));
+        registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser(ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser(EndpointSelector.class));
         registerBeanDefinitionParser("exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));
         registerBeanDefinitionParser("recipient-list-exception-based-router", new RouterDefinitionParser(ExceptionBasedRouter.class));

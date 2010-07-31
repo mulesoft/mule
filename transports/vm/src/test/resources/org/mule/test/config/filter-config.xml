@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+        xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+        xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
+
+    <regex-filter pattern=".*ABC.*" name="globalMf"/>
+
+    <message-filter name="acceptAll">
+        <regex-filter pattern="."/>
+    </message-filter>
+    <message-filter name="firstMf">
+        <filter ref="globalMf"/>
+        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+    </message-filter>
+
+    <message-filter name="secondMf">
+        <regex-filter pattern=".*DEF.*"/>
+        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject2"/>
+    </message-filter>
+
+    <model name="main">
+        <service name="Order Validation">
+            <inbound>
+                <vm:inbound-endpoint path="order.validation" exchange-pattern="request-response">
+                    <processor ref="acceptAll"/>
+                    <processor ref="firstMf"/>
+                    <processor ref="secondMf"/>
+                    <!-- uncomment this to see the bug: Spring will try to call setUnacceptedMessageProcessor
+                         on the endpoint
+                    <message-filter>
+                        <filter ref="globalMf"/>
+                        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+                    </message-filter>
+                     -->
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component/>
+        </service>
+    </model>
+</mule>

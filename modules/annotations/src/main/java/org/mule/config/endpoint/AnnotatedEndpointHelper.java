@@ -20,6 +20,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.registry.RegistryMap;
+import org.mule.routing.MessageFilter;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.util.TemplateParser;
@@ -86,7 +87,8 @@ public class AnnotatedEndpointHelper
         if (epData.getFilter() != null)
         {
             Filter filter = (Filter) convertProperty(Filter.class, epData.getFilter());
-            endpointBuilder.setFilter(filter);
+            endpointBuilder.setMessageFilter(new MessageFilter(filter));
+
         }
 
         if (epData.getEncoding() != null)

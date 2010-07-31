@@ -23,6 +23,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
@@ -65,7 +66,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     private final EndpointMessageProcessorChainFactory messageProcessorsFactory;
 
     private final List <MessageProcessor> messageProcessors;
-    
+
     private final List <MessageProcessor> responseMessageProcessors;
     
     private MessageProcessor messageProcessorChain;
@@ -86,11 +87,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      * The transaction configuration for this endpoint
      */
     private final TransactionConfig transactionConfig;
-
-    /**
-     * event filter for this endpoint
-     */
-    private final Filter filter;
 
     /**
      * determines whether unaccepted filtered events should be removed from the
@@ -135,7 +131,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             String name,
                             Map properties,
                             TransactionConfig transactionConfig,
-                            Filter filter,
                             boolean deleteUnacceptedMessages,
                             EndpointSecurityFilter securityFilter,
                             MessageExchangePattern messageExchangePattern,
@@ -158,7 +153,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         // this.properties = Collections.unmodifiableMap(properties);
         this.properties.putAll(properties);
         this.transactionConfig = transactionConfig;
-        this.filter = filter;
         this.deleteUnacceptedMessages = deleteUnacceptedMessages;
         this.securityFilter = securityFilter;
         if (this.securityFilter != null)
@@ -313,7 +307,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
                 + connector + ",  name='" + name + "', mep=" + messageExchangePattern + ", properties=" + properties
-                + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
+                + ", transactionConfig=" + transactionConfig + ", deleteUnacceptedMessages="
                 + deleteUnacceptedMessages + ", securityFilter=" + securityFilter 
                 + ", initialState=" + initialState + ", responseTimeout="
                 + responseTimeout + ", endpointEncoding=" + endpointEncoding + ", disableTransportTransformer="
@@ -353,7 +347,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && deleteUnacceptedMessages == other.deleteUnacceptedMessages
                 && equal(endpointEncoding, other.endpointEncoding)
                 && equal(endpointUri, other.endpointUri)
-                && equal(filter, other.filter)
                 && equal(initialState, other.initialState)
                 // don't include lifecycle state as lifecycle code includes hashing
                 // && equal(initialised, other.initialised)
@@ -375,7 +368,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE,
                 endpointEncoding,
                 endpointUri,
-                filter,
                 initialState,
                 // don't include lifecycle state as lifecycle code includes hashing
                 // initialised,
@@ -392,7 +384,15 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     public Filter getFilter()
     {
-        return filter;
+        // Call the first MessageFilter in the chain "the filter".
+        for (MessageProcessor mp : messageProcessors)
+        {
+            if (mp instanceof MessageFilter)
+            {
+                return ((MessageFilter) mp).getFilter();
+            }
+        }
+        return null;
     }
 
     public boolean isDeleteUnacceptedMessages()
