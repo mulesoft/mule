@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO
- */
-/**
  * Creates a Quartz inbound endpoint for a service
  */
 public class ScheduleAnnotationParser extends AbstractEndpointAnnotationParser
@@ -72,7 +69,7 @@ public class ScheduleAnnotationParser extends AbstractEndpointAnnotationParser
             epData.getProperties().put("threads", threads);
         }
         epData.setAddress(uri);
-        epData.setConnector(getConnector(schedule));
+        epData.setConnector(getConnector());
         //Create event generator job
         EventGeneratorJobConfig config = new EventGeneratorJobConfig();
         config.setStateful(threads.equals("1"));
@@ -110,7 +107,7 @@ public class ScheduleAnnotationParser extends AbstractEndpointAnnotationParser
         return Schedule.class.getAnnotation(Channel.class).identifer();
     }
 
-    protected QuartzConnector getConnector(Schedule schedule) throws MuleException
+    protected QuartzConnector getConnector() throws MuleException
     {
         QuartzConnector connector = new QuartzConnector(muleContext);
         connector.setName("scheduler." + connector.hashCode());
@@ -119,16 +116,15 @@ public class ScheduleAnnotationParser extends AbstractEndpointAnnotationParser
     }
 
     /**
-     * Features like the {@link org.mule.ibeans.api.client.IntegrationBean} annotation can be used to define an service proxy
-     * configuration where the annotations are configured on the interface methods.  However, it is illegal to configure
-     * the @Schedule annotation in this way.
+     * Validates that this parser can parse the supplied annotation.  Only returns true if the clazz is not an interface
+     * and the annotation is an instance of {@link org.mule.api.annotations.Schedule}
      *
      * @param annotation the annotation being processed
      * @param clazz      the class on which the annotation was found
      * @param member     the member on which the annotation was found inside the class.  this is only set when the annotation
      *                   was either set on a {@link java.lang.reflect.Method}, {@link java.lang.reflect.Field} or {@link java.lang.reflect.Constructor}
      *                   class members, otherwise this value is null.
-     * @return tue if this parser supports the current annotation and the clazz is not an interface
+     * @return true if this parser supports the current annotation and the clazz is not an interface
      * @throws IllegalArgumentException if the class parameter is an interface
      */
     @Override
