@@ -19,9 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -917,22 +915,10 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 230, name);
     }
 
-    public static Message inboundRouterMustUseInboundEndpoints(InboundRouterCollection router,
-                                                               ImmutableEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 232, endpoint, router);
-    }
-
     public static Message outboundRouterMustUseOutboudEndpoints(OutboundRouter router,
                                                                 ImmutableEndpoint endpoint)
     {
         return factory.createMessage(BUNDLE_PATH, 233, endpoint, router);
-    }
-
-    public static Message responseRouterMustUseInboundEndpoints(ResponseRouterCollection router,
-                                                                ImmutableEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 234, endpoint, router);
     }
 
     public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener,

@@ -11,14 +11,12 @@
 package org.mule.api.routing;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
 
 /**
  * <code>ResponseTimeoutException</code> is thrown when a response is not received
  * in a given timeout in the Response Router.
  * 
- * @see org.mule.api.routing.ResponseRouter
  */
 public class ResponseTimeoutException extends RoutingException
 {

@@ -20,7 +20,6 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
-import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
