@@ -1425,7 +1425,7 @@
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:choice> 
-                    <xsd:element ref="abstract-message-processor" minOccurs="1"
+                    <xsd:element ref="abstract-message-processor" minOccurs="0"
                         maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>
