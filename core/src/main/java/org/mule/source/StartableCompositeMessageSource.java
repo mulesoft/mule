@@ -86,6 +86,15 @@ public class StartableCompositeMessageSource
             sources.remove(source);
         }
     }
+    
+    public void setMessageSources(List<MessageSource> sources) throws MuleException
+    {
+        this.sources.clear();
+        for (MessageSource messageSource : sources)
+        {
+            addSource(messageSource);
+        }
+    }
 
     public void start() throws MuleException
     {

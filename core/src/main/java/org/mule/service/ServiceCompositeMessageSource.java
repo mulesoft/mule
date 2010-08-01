@@ -150,27 +150,6 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         this.processors.add(processor);
     }
 
-    public void setEndpoints(List<InboundEndpoint> endpoints) throws MuleException
-    {
-        if (endpoints != null)
-        {
-            for (MessageSource endpoint : sources)
-            {
-                removeSource(endpoint);
-            }
-            this.sources.clear();
-            this.endpoints.clear();
-            for (InboundEndpoint endpoint : endpoints)
-            {
-                addSource(endpoint);
-            }
-        }
-        else
-        {
-            throw new IllegalArgumentException("List of endpoints = null");
-        }
-    }
-
     @Override
     public void addSource(MessageSource source) throws MuleException
     {
@@ -189,6 +168,12 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         {
             endpoints.remove((InboundEndpoint) source);
         }
+    }
+    
+    public void setMessageSources(List<MessageSource> sources) throws MuleException
+    {
+        this.endpoints.clear();
+        super.setMessageSources(sources);
     }
 
     public List<InboundEndpoint> getEndpoints()
@@ -237,7 +222,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     {
         return catchAllStrategy;
     }
-
+    
     class InternalCatchAllMessageProcessor extends AbstractInterceptingMessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException

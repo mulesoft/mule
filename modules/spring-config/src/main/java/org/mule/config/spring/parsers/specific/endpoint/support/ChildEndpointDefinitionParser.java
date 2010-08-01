@@ -56,6 +56,24 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     }
 
     @Override
+    public String getPropertyName(Element e)
+    {
+        String parent = e.getParentNode().getLocalName().toLowerCase();
+        if ("inbound-endpoint".equals(e.getLocalName()))
+        {
+            return "messageSource";
+        }
+        else if ("composite-processor".equals(parent) || "flow".equals(parent))
+        {
+            return "messageProcessor";
+        }
+        else
+        {
+            return super.getPropertyName(e);
+        }
+    }
+
+    @Override
     public String getBeanName(Element element)
     {
         if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
