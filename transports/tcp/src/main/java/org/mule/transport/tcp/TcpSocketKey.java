@@ -39,11 +39,13 @@ public class TcpSocketKey
                 endpoint.getEndpointURI().getPort());
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         return obj instanceof TcpSocketKey && address.equals(((TcpSocketKey) obj).address);
     }
 
+    @Override
     public int hashCode()
     {
         return address.hashCode();
@@ -69,6 +71,7 @@ public class TcpSocketKey
         return address.getPort();
     }
 
+    @Override
     public String toString()
     {
         return getInetAddress() + ":" + getPort();

@@ -78,7 +78,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
         catch (Exception e)
         {
-            throw new org.mule.transport.ConnectException(TcpMessages.failedToBindToUri(uri), e, this);
+            throw new ConnectException(TcpMessages.failedToBindToUri(uri), e, this);
         }
 
         try
