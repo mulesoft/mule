@@ -2504,14 +2504,18 @@
     <xsd:element name="interceptor-stack" type="abstractInterceptorStackType" substitutionGroup="abstract-interceptor-stack"/>
 
 
-    <xsd:element name="abstract-interceptor" abstract="true" type="abstractInterceptorType">
+    <xsd:element name="abstract-interceptor" abstract="true" type="abstractInterceptorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an interceptor element.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractInterceptorType"/>
+	<xsd:complexType name="abstractInterceptorType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractMessageProcessorType" />
+		</xsd:complexContent>
+	</xsd:complexType>
 
     <xsd:group name="interceptorGroup">
         <xsd:sequence>

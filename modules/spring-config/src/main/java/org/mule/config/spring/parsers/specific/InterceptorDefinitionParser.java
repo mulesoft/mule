@@ -10,11 +10,13 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.interceptor.Interceptor;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
+import org.w3c.dom.Element;
+
 /**
- * This allows a interceptor to be defined on a global interceptor stack or on a
- * service.
+ * This allows a interceptor to be defined on a global interceptor stack or on a service.
  */
 public class InterceptorDefinitionParser extends ChildDefinitionParser
 {
@@ -23,7 +25,7 @@ public class InterceptorDefinitionParser extends ChildDefinitionParser
 
     public InterceptorDefinitionParser(Class interceptor)
     {
-        super(INTERCEPTOR, interceptor);
+        super(INTERCEPTOR, interceptor, Interceptor.class);
     }
 
     /**
@@ -31,6 +33,23 @@ public class InterceptorDefinitionParser extends ChildDefinitionParser
      */
     public InterceptorDefinitionParser()
     {
-        super(INTERCEPTOR);
+        super(INTERCEPTOR, null, Interceptor.class);
+    }
+
+    @Override
+    public String getPropertyName(Element e)
+    {
+        String parentName = e.getParentNode().getLocalName().toLowerCase();
+        if ("flow".equals(parentName) || "inbound".equals(parentName) || "endpoint".equals(parentName)
+            || "inbound-endpoint".equals(parentName) || "outbound-endpoint".equals(parentName)
+            || "async-reply".equals(parentName) || "composite-processor".equals(parentName))
+        {
+            return "messageProcessor";
+        }
+        else
+        {
+            return super.getPropertyName(e);
+
+        }
     }
 }

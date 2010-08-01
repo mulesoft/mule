@@ -10,6 +10,7 @@
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <append-string-transformer message="3" />
+        <custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
     </composite-processor>
 
     <composite-processor name="composite2">
