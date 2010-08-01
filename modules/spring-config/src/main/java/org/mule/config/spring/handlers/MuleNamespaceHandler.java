@@ -44,6 +44,7 @@ import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionPa
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
 import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
@@ -374,7 +375,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", null));
 
         //Common Filters
-        registerMuleBeanDefinitionParser("filter", new ParentDefinitionParser()).addAlias("ref", "filter");
+        registerMuleBeanDefinitionParser("filter", new FilterRefDefinitionParser());
         registerBeanDefinitionParser("and-filter", new FilterDefinitionParser(AndFilter.class));
         registerBeanDefinitionParser("or-filter", new FilterDefinitionParser(OrFilter.class));
         registerBeanDefinitionParser("not-filter", new FilterDefinitionParser(NotFilter.class));
