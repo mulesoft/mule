@@ -14,9 +14,10 @@ package org.mule.transport.http.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.http.HttpConnector;
@@ -52,7 +53,8 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("http-response-to-string-transformer", new MessageProcessorDefinitionParser(HttpResponseToString.class));
         registerBeanDefinitionParser("object-to-http-request-transformer", new MessageProcessorDefinitionParser(ObjectToHttpClientMethodRequest.class));
         registerBeanDefinitionParser("message-to-http-response-transformer", new MessageProcessorDefinitionParser(MuleMessageToHttpResponse.class));
-        registerBeanDefinitionParser("error-filter", new ChildDefinitionParser("filter", ErrorFilterFactoryBean.class));
-        registerBeanDefinitionParser("request-wildcard-filter", new ChildDefinitionParser("filter", HttpRequestWildcardFilter.class));
+
+        registerBeanDefinitionParser("error-filter", new ParentDefinitionParser());
+        registerBeanDefinitionParser("request-wildcard-filter", new FilterDefinitionParser(HttpRequestWildcardFilter.class));
     }
 }

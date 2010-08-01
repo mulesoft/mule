@@ -19,6 +19,8 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
@@ -39,6 +41,7 @@ import org.mule.transport.soap.axis.extensions.WSDDFileProvider;
 import org.mule.transport.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.transport.soap.axis.i18n.AxisMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 
 import java.util.ArrayList;
@@ -399,9 +402,13 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
         // TODO Do we really need to modify the existing receiver endpoint? What happens if we don't security,
         // filters and transformers will get invoked twice?
-        EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
+        AbstractEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
-        ((AbstractEndpointBuilder) receiverEndpointBuilder).setFilters(null);
+
+        List<MessageProcessor> procs = receiverEndpointBuilder.getMessageProcessors();
+        CollectionUtils.removeType(procs, MessageFilter.class);
+        CollectionUtils.removeType(procs, EndpointSecurityFilter.class);
+        receiverEndpointBuilder.setMessageProcessors(procs);
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 

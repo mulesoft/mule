@@ -495,7 +495,7 @@
     </xsd:element>
     <xsd:complexType name="abstractInboundRouterType"/>
 
-    <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType">
+    <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for filter elements, which control which messages are handled. 
@@ -503,13 +503,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractFilterType">
-        <xsd:attribute name="name" type="substitutableName">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+		        <xsd:attribute name="name" type="substitutableName">
+		            <xsd:annotation>
+		                <xsd:documentation>
+		                    Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
+		                </xsd:documentation>
+		            </xsd:annotation>
+		        </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="outboundCollectionType">

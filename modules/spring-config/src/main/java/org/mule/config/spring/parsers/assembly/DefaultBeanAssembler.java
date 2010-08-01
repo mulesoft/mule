@@ -45,9 +45,9 @@ public class DefaultBeanAssembler implements BeanAssembler
 
     private static Log logger = LogFactory.getLog(DefaultBeanAssembler.class);
     private PropertyConfiguration beanConfig;
-    private BeanDefinitionBuilder bean;
-    private PropertyConfiguration targetConfig;
-    private BeanDefinition target;
+    protected BeanDefinitionBuilder bean;
+    protected PropertyConfiguration targetConfig;
+    protected BeanDefinition target;
 
     public DefaultBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
                                 PropertyConfiguration targetConfig, BeanDefinition target)
@@ -244,7 +244,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
 
-    private static List retrieveList(Object value)
+    protected static List retrieveList(Object value)
     {
         if (value instanceof List)
         {

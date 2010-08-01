@@ -28,14 +28,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.routing.MessageFilter;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -807,24 +805,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         this.uriBuilder = URIBuilder;
     }
-    
-
-    public void setFilters(List<Filter> filters)
-    {
-        if (filters == null)
-        {
-            // Used by axis to clear out filter
-            CollectionUtils.removeType(messageProcessors, MessageFilter.class);
-        }
-        else
-        {
-            for (Filter filter : filters)
-            {
-                messageProcessors.add(0, new MessageFilter(filter));
-            }
-        }
-    }
-
 
     @Override
     public int hashCode()

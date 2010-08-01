@@ -13,7 +13,6 @@ package org.mule.module.xml.config;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.TextDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -44,9 +43,9 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         //Filters
-        registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
-        registerBeanDefinitionParser("jaxen-filter", new ChildDefinitionParser("filter", JaxenFilter.class));
-        registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
+        registerBeanDefinitionParser("jxpath-filter", new FilterDefinitionParser(JXPathFilter.class));
+        registerBeanDefinitionParser("jaxen-filter", new FilterDefinitionParser(JaxenFilter.class));
+        registerBeanDefinitionParser("is-xml-filter", new FilterDefinitionParser(IsXmlFilter.class));
         registerBeanDefinitionParser("xpath-filter", new FilterDefinitionParser(XPathFilter.class));
         registerBeanDefinitionParser("schema-validation-filter", new FilterDefinitionParser(SchemaValidationFilter.class));
 
