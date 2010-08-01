@@ -12,7 +12,6 @@ package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.source.MessageSource;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -265,7 +264,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("message-filter", new MessageProcessorDefinitionParser(MessageFilter.class, true)).addAlias("messageProcessor", "unacceptedMessageProcessor");
         
         // Message Sources
-        registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));        
+        // TODO MULE-4987
+        // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));        
         registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));        
 
         // Models
