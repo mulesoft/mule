@@ -19,6 +19,9 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.ajax.embedded.AjaxConnector;
+import org.mule.transport.ajax.i18n.AjaxMessages;
+import org.mule.util.StringUtils;
 
 import org.cometd.Bayeux;
 import org.cometd.Client;
@@ -26,21 +29,23 @@ import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.BayeuxService;
 
 /**
- * Registers a receiver service with Bayeux.  
- * The {@link AjaxMessageReceiver.ReceiverService#route(dojox.cometd.Client, Object)}
+ * Registers a receiver service with Bayeux.
+ * The {@link AjaxMessageReceiver.ReceiverService#route(org.cometd.Client, Object)}
  * is invoked when a message is received on the subscription channel
  */
 public class AjaxMessageReceiver extends AbstractMessageReceiver
 {
     private AbstractBayeux bayeux;
 
-    @SuppressWarnings("unused")
-    private ReceiverService service;
-
     public AjaxMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, flowConstruct, endpoint); 
+        super(connector, flowConstruct, endpoint);
+        String path = endpoint.getEndpointURI().getPath();
+        if(StringUtils.isEmpty(path) || path.equals("/"))
+        {
+            throw new CreateException(AjaxMessages.createStaticMessage("The subscription path cannotbe empty or equal '/'"), this);
+        }
     }
 
     public class ReceiverService extends BayeuxService
@@ -49,16 +54,17 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
 
         public ReceiverService(String channel, Bayeux bayeux, ImmutableEndpoint endpoint)
         {
-            super(bayeux, channel /*, connector.getReceiverThreadingProfile().getMaxThreadsActive(), endpoint.isSynchronous()*/);
+            super(bayeux, channel, connector.getReceiverThreadingProfile().getMaxThreadsActive());
             this.endpoint = endpoint;
-            //this.setSeeOwnPublishes(true);
             subscribe(channel, "route");
         }
+
 
         public Object route(Client client, Object data) throws Exception
         {
             AbstractConnector connector = (AbstractConnector) getConnector();
             MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
+            messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CIENT, client);
 
             Object replyTo = messageToRoute.getReplyTo();
             MuleMessage message = AjaxMessageReceiver.this.routeMessage(messageToRoute);
@@ -66,7 +72,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
             if ((message != null && message.getExceptionPayload() == null) && replyTo != null)
             {
-                connector.getReplyToHandler((InboundEndpoint) endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
+                connector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
             return null;
         }
@@ -86,7 +92,8 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
     protected void doStart() throws MuleException
     {
         //Register our listener service with Bayeux
-        service = new ReceiverService(endpoint.getEndpointURI().getPath(), getBayeux(), getEndpoint());
+        String channel = endpoint.getEndpointURI().getPath();
+        new ReceiverService(channel, getBayeux(), getEndpoint());
     }
 }
 

@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MuleJarResourcesServlet extends HttpServlet
 {
+    public static final String DEFAULT_PATH_SPEC = "/mule-resource/*";
+
     public static final String DEFAULT_BASE_PATH = "";
 
     public static final String DEFAULT_MIME_TYPE = "application/octet-stream";

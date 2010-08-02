@@ -15,8 +15,10 @@ var mule = {
     _init: function()
     {
         var loc = new String(document.location);
+        console.debug("location is: " + loc);
         loc = loc.replace("localhost", mule.localAdapter);
-        loc = loc.substring(0, loc.indexOf("/", 8)) + mule.uri;
+        console.debug("after local host replace: " + loc);
+        loc = loc.substring(0, loc.lastIndexOf("/")) + mule.uri;
         console.debug("initing now: " + loc);
         dojox.cometd.init(loc);
 

@@ -26,6 +26,7 @@ import org.mule.context.notification.NotificationException;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxMuleMessageFactory;
 import org.mule.transport.ajax.AjaxServletContextListener;
+import org.mule.transport.ajax.MuleJarResourcesServlet;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
 
@@ -45,10 +46,19 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events 
  * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and 
  * subscribe events.
+ *
+ * Note that a {@link @RESOURCE_BASE_PROPERTY} can be set on the ajax endpoint that provides the location of any web application resources such
+ * as html pages
  */
 public class AjaxConnector extends AjaxServletConnector implements MuleContextNotificationListener<MuleContextNotification>
 {
     public static final String PROTOCOL = "ajax";
+
+    public static final String RESOURCE_BASE_PROPERTY = "resourceBase";
+
+    public static final String SERVLET_PATH_SPEC = "/ajax/*";
+
+    public static final String COMETD_CIENT = "cometd.client";
 
     /**
      * This is the key that's used to retrieve the reply to destination from a {@link Map} that's
@@ -86,20 +96,6 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         }
 
         httpServer = new Server();
-//
-//        if (configFile != null)
-//        {
-//            try
-//            {
-//                InputStream is = IOUtils.getResourceAsStream(configFile, getClass());
-//                XmlConfiguration config = new XmlConfiguration(is);
-//                config.configure(httpServer);
-//            }
-//            catch (Exception e)
-//            {
-//                throw new InitialisationException(e, this);
-//            }
-//        }
     }
 
     public void onNotification(MuleContextNotification notification)
@@ -124,7 +120,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     {
          String connectorKey = endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
 
-        synchronized (connectors)
+        synchronized (this)
         {
             BayeuxHolder connectorRef = connectors.get(connectorKey);
             if(connectorRef!=null)
@@ -132,7 +128,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
                 return connectorRef.servlet.getBayeux();
             }
         }
-        throw new IllegalArgumentException("Endpoiont not registered: " + connectorKey);
+        throw new IllegalArgumentException("Endpoint not registered: " + connectorKey);
     }
 
     /**
@@ -221,7 +217,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 
         BayeuxHolder holder;
 
-        synchronized (connectors)
+        synchronized (this)
         {
             holder = connectors.get(connectorKey);
             if (holder == null)
@@ -239,17 +235,12 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 
                 ContinuationCometdServlet servlet = createServletForConnector(connector, endpoint);
                 holder = new BayeuxHolder(connector, servlet);
-                //if(getBayeux()==null) setBayeux(servlet.getBayeux());
-               // connector.start();
-
                 connectors.put(connectorKey, holder);
             }
             else
             {
                 holder.increment();
             }
-//            AbstractBayeux bayeux = holder.servlet.getBayeux();
-//            bayeux.setJSONCommented(isJsonCommented());
         }
         return holder;
     }
@@ -268,7 +259,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
 
         String connectorKey = endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
 
-        synchronized (connectors)
+        synchronized (this)
         {
             BayeuxHolder connectorRef = connectors.get(connectorKey);
             if (connectorRef != null)
@@ -287,7 +278,7 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     @Override
     public void setDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
     {
-        super.setDispatcherFactory(dispatcherFactory);    //To change body of overridden methods use File | Settings | File Templates.
+        super.setDispatcherFactory(dispatcherFactory);
     }
 
     protected org.mortbay.jetty.AbstractConnector createJettyConnector()
@@ -304,26 +295,27 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
     {
         ContinuationCometdServlet servlet = new MuleAjaxServlet();
 
-        Context context = new Context(this.getHttpServer(), "/", Context.NO_SESSIONS);
+//        String path = endpoint.getEndpointURI().getPath();
+//        if(StringUtils.isBlank(path))
+//        {
+//            path = "/";
+//        }
+        Context context = new Context(this.getHttpServer(), "/", Context.NO_SECURITY);
         context.setConnectorNames(new String[]{connector.getName()});
         context.addEventListener(new AjaxServletContextListener(muleContext, getName()));
 
         ServletHolder holder = new ServletHolder();
         holder.setServlet(servlet);
-        context.setResourceBase(endpoint.getEndpointURI().getPath());
-        context.addServlet(holder, "/ajax/*");
+        String resourceBase = (String)endpoint.getProperty(RESOURCE_BASE_PROPERTY);
+        if(resourceBase!=null)
+        {
+                context.setResourceBase(resourceBase);
+        }
+
+        context.addServlet(MuleJarResourcesServlet.class, MuleJarResourcesServlet.DEFAULT_PATH_SPEC);
+        context.addServlet(holder, SERVLET_PATH_SPEC);
         context.addServlet(DefaultServlet.class, "/");
 
-//        try
-//        {
-//            //we need start so that the Bayeux instance is created. (to register listeners we need an instance of Bayeux available)
-//            connector.start();
-//            context.start();
-//        }
-//        catch (Exception e)
-//        {
-//            throw new InitialisationException(AjaxMessages.failedToStartAjaxServlet(), e, this);
-//        }
 
         if(getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
         holder.setInitParameter("JSONCommented", Boolean.toString(isJsonCommented()));
