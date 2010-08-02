@@ -54,7 +54,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
 
         public ReceiverService(String channel, Bayeux bayeux, ImmutableEndpoint endpoint)
         {
-            super(bayeux, channel, connector.getReceiverThreadingProfile().getMaxThreadsActive());
+            super(bayeux, channel);
             this.endpoint = endpoint;
             subscribe(channel, "route");
         }
