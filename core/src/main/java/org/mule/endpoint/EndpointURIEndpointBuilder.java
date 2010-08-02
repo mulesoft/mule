@@ -17,6 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.Collections;
+import java.util.LinkedList;
 
 public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
 {
@@ -45,7 +46,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         properties = global.properties;
         transactionConfig = global.transactionConfig;
         deleteUnacceptedMessages = global.deleteUnacceptedMessages;
-        securityFilter = global.securityFilter;
         synchronous = global.synchronous;
         messageExchangePattern = global.messageExchangePattern;
         responseTimeout = global.responseTimeout;
@@ -85,13 +85,14 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());
         setInitialState(source.getInitialState());
         setResponseTimeout(source.getResponseTimeout());
-        setSecurityFilter(source.getSecurityFilter());
         setRetryPolicyTemplate(source.getRetryPolicyTemplate());
         setExchangePattern(source.getExchangePattern());
         setMuleContext(source.getMuleContext());
-        setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors());
+        setMessageProcessors(
+            new LinkedList(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors()));
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
         setDisableTransportTransformer(source.isDisableTransportTransformer());
         setMimeType(source.getMimeType());
+        setSecurityFilter(source.getSecurityFilter());
     }
 }

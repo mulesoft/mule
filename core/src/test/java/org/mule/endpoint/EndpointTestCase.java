@@ -112,7 +112,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
         // Creates the endpoint using the transformers which will validate the
         // configuration
         new AbstractEndpoint(mockConnector, uri, name, properties,
-            mockTransactionConfig, deleteUnacceptedMessages, mockEndpointSecurityFilter,
+            mockTransactionConfig, deleteUnacceptedMessages, 
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate, messageProcessorsFactory, 
             messageProcessors, responseMessageProcessors, disableTransportTransformer,

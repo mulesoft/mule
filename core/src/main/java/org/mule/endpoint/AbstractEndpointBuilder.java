@@ -13,6 +13,8 @@ package org.mule.endpoint;
 import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -34,6 +36,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
+import org.mule.endpoint.outbound.OutboundSecurityFilterMessageProcessor;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -49,6 +53,7 @@ import org.mule.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +84,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Map<Object, Object> properties = new HashMap<Object, Object>();
     protected TransactionConfig transactionConfig;
     protected Boolean deleteUnacceptedMessages;
-    protected EndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
     protected MessageExchangePattern messageExchangePattern;
     protected Integer responseTimeout;
@@ -93,6 +97,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected List<MessageProcessor> responseMessageProcessors = new LinkedList<MessageProcessor>();
     protected Boolean disableTransportTransformer;
     protected String mimeType;
+    protected MessageProcessor securityFilter;
 
     // not included in equality/hash
     protected String registryId = null;
@@ -190,7 +195,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
-                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
+                getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors,
@@ -250,7 +255,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         OutboundEndpoint endpoint = new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
-                getDefaultDeleteUnacceptedMessages(connector), getSecurityFilter(),
+                getDefaultDeleteUnacceptedMessages(connector), 
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
@@ -389,7 +394,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected EndpointSecurityFilter getSecurityFilter()
     {
-        return securityFilter != null ? securityFilter : getDefaultSecurityFilter();
+        for (MessageProcessor mp : messageProcessors)
+        {
+            if (mp instanceof SecurityFilterMessageProcessor)
+            {
+                return ((SecurityFilterMessageProcessor)mp).getFilter();
+            }
+        }
+
+        return null;
     }
 
     protected EndpointSecurityFilter getDefaultSecurityFilter()
@@ -674,6 +687,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
         this.messageProcessors = messageProcessors;
+        if (securityFilter != null)
+        {
+            messageProcessors.add(0, securityFilter);
+        }
     }
 
     public List<MessageProcessor> getMessageProcessors()
@@ -748,7 +765,21 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     public void setSecurityFilter(EndpointSecurityFilter securityFilter)
     {
-        this.securityFilter = securityFilter;
+        this.securityFilter = null;
+        for (Iterator<MessageProcessor> iter = messageProcessors.iterator(); iter.hasNext(); )
+        {
+            MessageProcessor mp = iter.next();
+            if (mp instanceof SecurityFilterMessageProcessor)
+            {
+                iter.remove();
+                break;
+            }
+        }
+        if (securityFilter != null)
+        {
+            this.securityFilter = new SecurityFilterMessageProcessor(securityFilter);
+            messageProcessors.add(0, this.securityFilter);
+        }
     }
 
     public void setExchangePattern(MessageExchangePattern mep)
@@ -811,7 +842,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         return ClassUtils.hash(new Object[]{retryPolicyTemplate, connector, createConnector, 
             deleteUnacceptedMessages, encoding, uriBuilder, initialState, name, properties,
-            responseTimeout, responseMessageProcessors, securityFilter, synchronous, 
+            responseTimeout, responseMessageProcessors, synchronous,
             messageExchangePattern, transactionConfig, messageProcessors, disableTransportTransformer, mimeType});
     }
 
@@ -836,7 +867,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 && equal(properties, other.properties)
                 && equal(responseTimeout, other.responseTimeout)
                 && equal(messageProcessors, other.messageProcessors)
-                && equal(securityFilter, other.securityFilter) && equal(synchronous, other.synchronous)
+                && equal(synchronous, other.synchronous)
                 && equal(messageExchangePattern, other.messageExchangePattern)
                 && equal(transactionConfig, other.transactionConfig)
                 && equal(responseMessageProcessors, other.responseMessageProcessors)
@@ -860,7 +891,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         builder.setName(name);
         builder.setProperties(properties);
         builder.setTransactionConfig(transactionConfig);
-        builder.setSecurityFilter(securityFilter);
         builder.setInitialState(initialState);
         builder.setEncoding(encoding);
         builder.setRegistryId(registryId);
@@ -887,4 +917,53 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         return builder;
     }
+
+    /**
+     * A temporary holder for security filters.  This will be replaced by the correct inbound or outbound
+     * SecurityFilterMessageProcessor when an endpoint is constructed.
+     */
+    protected class SecurityFilterMessageProcessor implements EndpointAwareMessageProcessor
+    {
+        private EndpointSecurityFilter filter;
+
+
+        public SecurityFilterMessageProcessor(EndpointSecurityFilter filter)
+        {
+            this.filter = filter;
+        }
+
+        public EndpointSecurityFilter getFilter()
+        {
+            return filter;
+        }
+
+        /**
+         * Should never be called
+         */
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * create the proper sort of message processor, injecting the endpoint into it
+         */
+        public MessageProcessor injectEndpoint(ImmutableEndpoint endpoint)
+        {
+            filter.setEndpoint(endpoint);
+            if (endpoint instanceof InboundEndpoint)
+            {
+                return new InboundSecurityFilterMessageProcessor((InboundEndpoint) endpoint, filter);
+            }
+            else if (endpoint instanceof OutboundEndpoint)
+            {
+                return new OutboundSecurityFilterMessageProcessor((OutboundEndpoint) endpoint, filter);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
 }

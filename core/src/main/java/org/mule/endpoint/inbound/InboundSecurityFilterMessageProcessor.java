@@ -18,6 +18,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.endpoint.SecurityFilterMessageProcessor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
@@ -28,29 +29,43 @@ import org.mule.transport.AbstractConnector;
  * securiy exception message as it's payload. A {@link SecurityNotification} is also
  * published.
  */
-public class InboundSecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor
+public class InboundSecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements SecurityFilterMessageProcessor
 {
     
     protected InboundEndpoint endpoint;
+    protected EndpointSecurityFilter filter;
 
     public InboundSecurityFilterMessageProcessor(InboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
+        this.filter = endpoint.getSecurityFilter();
     }
-    
+
+    public InboundSecurityFilterMessageProcessor(InboundEndpoint endpoint, EndpointSecurityFilter filter)
+    {
+        this.endpoint = endpoint;
+        this.filter = filter;
+    }
+
+    public EndpointSecurityFilter getFilter()
+    {
+        return filter;
+    }
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-        MessageReceiver receiver = connector.getReceiver(event.getFlowConstruct(), endpoint);
         MuleEvent resultEvent = null;
 
         // Apply Security filter if one is set
         boolean authorised = false;
-        if (endpoint.getSecurityFilter() != null)
+        if (filter != null)
         {
+            AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
+            MessageReceiver receiver = connector.getReceiver(event.getFlowConstruct(), endpoint);
+
             try
             {
-                endpoint.getSecurityFilter().authenticate(event);
+                filter.authenticate(event);
                 authorised = true;
             }
             catch (SecurityException e)

@@ -178,7 +178,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     {
         NullOutboundEndpoint(MuleContext muleContext)
         {
-            super(createDynamicConnector(muleContext), null, null, new HashMap(), null, true, null, MessageExchangePattern.ONE_WAY, 0, "started", null, null, muleContext, null, null, null, null, true, null);
+            super(createDynamicConnector(muleContext), null, null, new HashMap(), null, true, MessageExchangePattern.ONE_WAY, 0, "started", null, null, muleContext, null, null, null, null, true, null);
         }
 
         @Override

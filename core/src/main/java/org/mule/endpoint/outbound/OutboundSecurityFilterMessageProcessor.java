@@ -16,6 +16,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transport.DispatchException;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.endpoint.SecurityFilterMessageProcessor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
@@ -27,25 +28,37 @@ import org.mule.transport.AbstractConnector;
  * message is returned as the response.
  */
 
-public class OutboundSecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor
+public class OutboundSecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements SecurityFilterMessageProcessor
 {
 
     private OutboundEndpoint endpoint;
+    private EndpointSecurityFilter filter;
 
     public OutboundSecurityFilterMessageProcessor(OutboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
+        this.filter = endpoint.getSecurityFilter();
+    }
+
+    public OutboundSecurityFilterMessageProcessor(OutboundEndpoint endpoint, EndpointSecurityFilter filter)
+    {
+        this.endpoint = endpoint;
+        this.filter = filter;
+    }
+
+    public EndpointSecurityFilter getFilter()
+    {
+        return filter;
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
-
-        if (endpoint.getSecurityFilter() != null)
+        if (filter != null)
         {
+            AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
             try
             {
-                endpoint.getSecurityFilter().authenticate(event);
+                filter.authenticate(event);
             }
             catch (org.mule.api.security.SecurityException e)
             {

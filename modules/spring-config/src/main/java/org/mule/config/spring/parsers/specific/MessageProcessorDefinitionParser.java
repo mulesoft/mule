@@ -21,18 +21,12 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
  */
 public class MessageProcessorDefinitionParser extends ParentContextDefinitionParser
 {
-    public MessageProcessorDefinitionParser(Class messageProcessor)
-    {
-        this(messageProcessor, false);
-    }
 
-    public MessageProcessorDefinitionParser(Class messageProcessor, boolean ignoreName)
+    public MessageProcessorDefinitionParser(Class messageProcessor)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(messageProcessor, false));
         and("response", new ChildDefinitionParser("responseMessageProcessor", messageProcessor));
         otherwise(new ChildDefinitionParser("messageProcessor", messageProcessor));
-        if (ignoreName)
-            addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
     }
 
     /**

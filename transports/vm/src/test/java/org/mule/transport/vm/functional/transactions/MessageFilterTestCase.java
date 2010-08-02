@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 /** Test transaction behavior when "joinExternal" is set to disallow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
@@ -26,6 +27,8 @@ import org.mule.tck.FunctionalTestCase;
 public class MessageFilterTestCase extends FunctionalTestCase
 {
     protected static final Log logger = LogFactory.getLog(MessageFilterTestCase.class);
+
+    private static String rejectMesage;
 
     @Override
     protected String getConfigResources()
@@ -38,29 +41,38 @@ public class MessageFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://order.validation", "OK", null);
-        assertNotNull(response);
-        assertEquals("OK(rejected!-1)", response.getPayloadAsString());
+        assertTrue(response.getPayload() instanceof NullPayload);
+        assertEquals("OK(rejected!-1)", rejectMesage);
         response = client.send("vm://order.validation", "OK-ABC", null);
-        assertNotNull(response);
-        assertEquals("OK-ABC(rejected!-2)", response.getPayloadAsString());
+
+        // The current behavior is to echo the response when the filter doesn't accept it.  The Exception
+        // Handling work should replace tht with more intuitive behavior and thus break this assertion..
+        assertEquals("OK-ABC", response.getPayload());
+
+        assertEquals("OK-ABC(rejected!-2)", rejectMesage);
         response = client.send("vm://order.validation", "OK-DEF", null);
-        assertNotNull(response);
-        assertEquals("OK-DEF(rejected!-1)", response.getPayloadAsString());
+        assertTrue(response.getPayload() instanceof NullPayload);
+        assertEquals("OK-DEF(rejected!-1)", rejectMesage);
+        rejectMesage = null;
         response = client.send("vm://order.validation", "OK-ABC-DEF", null);
-        assertNotNull(response);
-        assertEquals("OK-ABC-DEF", response.getPayloadAsString());
+        assertEquals("OK-ABC-DEF(success)", response.getPayloadAsString());
+        assertNull(rejectMesage);
     }
 
     public static class Reject1 implements MessageProcessor
     {
+        public void setName(String name)
+        {
+        }
+
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             try
             {
                 MuleMessage msg = event.getMessage();
                 String payload = msg.getPayloadAsString();
-                msg.setPayload(payload + "(rejected!-1)");
-                return event;
+                rejectMesage = payload + "(rejected!-1)";
+                return null;
             }
             catch (Exception e)
             {
@@ -70,14 +82,18 @@ public class MessageFilterTestCase extends FunctionalTestCase
     }
 
      public static class Reject2 implements MessageProcessor
-    {
+     {
+         public void setName(String name)
+         {
+         }
+
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             try
             {
                 MuleMessage msg = event.getMessage();
                 String payload = msg.getPayloadAsString();
-                msg.setPayload(payload + "(rejected!-2)");
+                rejectMesage = payload + "(rejected!-2)";
                 return event;
             }
             catch (Exception e)

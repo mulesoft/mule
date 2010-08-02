@@ -45,7 +45,6 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    Map properties,
                                    TransactionConfig transactionConfig,
                                    boolean deleteUnacceptedMessage,
-                                   EndpointSecurityFilter securityFilter,
                                    MessageExchangePattern messageExchangePattern,
                                    int responseTimeout,
                                    String initialState,
@@ -61,7 +60,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    String endpointMimeType)
     {
         super(connector, endpointUri, name, properties, transactionConfig, 
-                deleteUnacceptedMessage, securityFilter, messageExchangePattern, responseTimeout, initialState,
+                deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
                 endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, 
                 messageProcessorsFactory, messageProcessors, responseMessageProcessors, disableTransportTransformer, endpointMimeType);
 

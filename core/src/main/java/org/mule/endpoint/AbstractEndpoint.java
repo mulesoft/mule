@@ -27,7 +27,9 @@ import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.util.CollectionUtils;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -95,11 +98,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     private final boolean deleteUnacceptedMessages;
 
-    /**
-     * The security filter to apply to this endpoint
-     */
-    private final EndpointSecurityFilter securityFilter;
-
     private final MessageExchangePattern messageExchangePattern;
     
     /**
@@ -132,7 +130,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                             Map properties,
                             TransactionConfig transactionConfig,
                             boolean deleteUnacceptedMessages,
-                            EndpointSecurityFilter securityFilter,
                             MessageExchangePattern messageExchangePattern,
                             int responseTimeout,
                             String initialState,
@@ -154,11 +151,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.properties.putAll(properties);
         this.transactionConfig = transactionConfig;
         this.deleteUnacceptedMessages = deleteUnacceptedMessages;
-        this.securityFilter = securityFilter;
-        if (this.securityFilter != null)
-        {
-            this.securityFilter.setEndpoint(this);
-        }
 
         this.responseTimeout = responseTimeout;
         this.initialState = initialState;
@@ -191,6 +183,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         }
         else
         {
+            messageProcessors = injectSelfIntoMessageProcessors(messageProcessors);
             this.messageProcessors = Collections.unmodifiableList(messageProcessors);
         }
         if (responseMessageProcessors == null)
@@ -307,8 +300,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
                 + connector + ",  name='" + name + "', mep=" + messageExchangePattern + ", properties=" + properties
-                + ", transactionConfig=" + transactionConfig + ", deleteUnacceptedMessages="
-                + deleteUnacceptedMessages + ", securityFilter=" + securityFilter 
+                + ", transactionConfig=" + transactionConfig + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages
                 + ", initialState=" + initialState + ", responseTimeout="
                 + responseTimeout + ", endpointEncoding=" + endpointEncoding + ", disableTransportTransformer="
                 + disableTransportTransformer + "}";
@@ -356,7 +348,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 && responseTimeout == other.responseTimeout
                 && equal(messageProcessors, other.messageProcessors)
                 && equal(responseMessageProcessors, other.responseMessageProcessors)
-                && equal(securityFilter, other.securityFilter) 
                 && equal(transactionConfig, other.transactionConfig)
                 && disableTransportTransformer == other.disableTransportTransformer;
     }
@@ -375,8 +366,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
                 name,
                 properties, 
                 Integer.valueOf(responseTimeout),
-                responseMessageProcessors, 
-                securityFilter, 
+                responseMessageProcessors,
                 transactionConfig,
                 messageProcessors,
                 disableTransportTransformer ? Boolean.TRUE : Boolean.FALSE});
@@ -410,7 +400,15 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
      */
     public EndpointSecurityFilter getSecurityFilter()
     {
-        return securityFilter;
+        for (MessageProcessor mp : messageProcessors)
+        {
+            if (mp instanceof SecurityFilterMessageProcessor)
+            {
+                return ((SecurityFilterMessageProcessor)mp).getFilter();
+            }
+        }
+
+        return null;
     }
 
     public MessageExchangePattern getExchangePattern()
@@ -493,4 +491,29 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     }
 
     abstract protected MessageProcessor createMessageProcessorChain() throws MuleException;
+
+    private List injectSelfIntoMessageProcessors(List<MessageProcessor> messageProcessors)
+    {
+        if (!CollectionUtils.containsType(messageProcessors, EndpointAwareMessageProcessor.class))
+        {
+            return messageProcessors;
+        }
+        List<MessageProcessor> newMessageProcessors = new ArrayList<MessageProcessor>(messageProcessors.size());
+        for (MessageProcessor mp : messageProcessors)
+        {
+            if (!(mp instanceof EndpointAwareMessageProcessor))
+            {
+                newMessageProcessors.add(mp);
+            }
+            else
+            {
+                MessageProcessor newMp = ((EndpointAwareMessageProcessor)mp).injectEndpoint(this);
+                if (newMp != null)
+                {
+                    newMessageProcessors.add(newMp);
+                }
+            }
+        }
+        return newMessageProcessors;
+    }
 }

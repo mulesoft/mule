@@ -47,7 +47,6 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   Map properties,
                                   TransactionConfig transactionConfig,
                                   boolean deleteUnacceptedMessage,
-                                  EndpointSecurityFilter securityFilter,
                                   MessageExchangePattern messageExchangePattern,
                                   int responseTimeout,
                                   String initialState,
@@ -62,7 +61,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   String mimeType)
     {
         super(connector, endpointUri, name, properties, 
-            transactionConfig, deleteUnacceptedMessage, securityFilter,
+            transactionConfig, deleteUnacceptedMessage,
             messageExchangePattern, responseTimeout, initialState, endpointEncoding, 
             endpointBuilderName, muleContext, retryPolicyTemplate,  messageProcessorsFactory, 
             messageProcessors, responseMessageProcessors, disableTransportTransformer,

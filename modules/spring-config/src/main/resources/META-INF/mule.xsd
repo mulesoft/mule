@@ -2056,14 +2056,18 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType">
+    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for security filter elements, which control access to the system.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractSecurityFilterType"/>
+    <xsd:complexType name="abstractSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="custom-security-filter" type="customSecurityFilterType" substitutionGroup="abstract-security-filter">
         <xsd:annotation>
@@ -3556,18 +3560,25 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-message-processor" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Events that do not pass the filter are sent to this (optional) message processor.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>
                             Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="onNotAccepted" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Events that are not accepted by the filter are sent to this (optional) named message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="throwOnNotAccepted" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to throw an exception if a message is not accepted
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

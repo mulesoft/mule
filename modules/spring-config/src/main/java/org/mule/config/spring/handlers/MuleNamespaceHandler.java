@@ -51,6 +51,7 @@ import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionPars
 import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
@@ -263,7 +264,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ParentDefinitionParser());
-        registerMuleBeanDefinitionParser("message-filter", new MessageProcessorDefinitionParser(MessageFilter.class, true)).addAlias("messageProcessor", "unacceptedMessageProcessor");
+        registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         
         // Message Sources
         // TODO MULE-4987

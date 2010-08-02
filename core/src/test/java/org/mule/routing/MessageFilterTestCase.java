@@ -86,7 +86,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
         MuleEvent resultEvent = mp.process(inEvent);
 
         assertNull(out.event);
-        assertEquals(inEvent, resultEvent);
+        assertNull(resultEvent);
         assertNotNull(unaccepted.event);
         assertSame(inEvent, unaccepted.event);
     }

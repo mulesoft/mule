@@ -15,6 +15,8 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.FilterUnacceptedException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractFilteringMessageProcessor;
 
 /**
@@ -29,6 +31,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
 {
     protected Filter filter;
     protected MessageProcessor unacceptedMessageProcessor;
+    protected boolean throwOnNotAccepted;
 
     public MessageFilter()
     {
@@ -70,12 +73,17 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     {
         if (unacceptedMessageProcessor == null)
         {
-            return super.handleUnaccepted(event);
+            super.handleUnaccepted(event);
         }
         else
         {
-            return unacceptedMessageProcessor.process(event);
+            unacceptedMessageProcessor.process(event);
         }
+        if (throwOnNotAccepted)
+        {
+            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);   
+        }
+        return null;
     }
 
     @Deprecated
@@ -110,4 +118,8 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         this.filter = filter;
     }
 
+    public void setThrowOnNotAccepted(boolean throwOnNotAccepted)
+    {
+        this.throwOnNotAccepted = throwOnNotAccepted;
+    }
 }

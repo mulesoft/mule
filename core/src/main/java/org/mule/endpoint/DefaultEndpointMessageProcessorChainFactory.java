@@ -55,7 +55,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
             new ExceptionThrowingMessageFilter(endpoint.getFilter()),
-            new InboundSecurityFilterMessageProcessor(endpoint),
         });
         
     }
@@ -95,7 +94,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
         list.add(new OutboundEndpointPropertyMessageProcessor());
-        list.add(new OutboundSecurityFilterMessageProcessor(endpoint));
         list.add(new OutboundTryCatchMessageProcessor(endpoint));
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
         list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));

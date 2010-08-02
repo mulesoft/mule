@@ -15,19 +15,19 @@
         http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.0/mule-jbossts.xsd">
 
     <regex-filter pattern=".*ABC.*" name="globalMf"/>
-
+    <custom-processor name="reject1" class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+    <custom-processor name="reject2" class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject2"/>
     <message-filter name="acceptAll">
         <regex-filter pattern="."/>
     </message-filter>
-    <message-filter name="firstMf">
+    <message-filter name="firstMf" onNotAccepted="reject1">
         <filter ref="globalMf"/>
-        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
     </message-filter>
 
-    <message-filter name="secondMf">
+    <message-filter name="secondMf" onNotAccepted="reject2" throwOnNotAccepted="true">
         <regex-filter pattern=".*DEF.*"/>
-        <custom-processor class="org.mule.transport.vm.functional.transactions.MessageFilterTestCase$Reject2"/>
     </message-filter>
+
 
     <model name="main">
         <service name="Order Validation">
@@ -46,7 +46,7 @@
                      <payload-type-filter expectedType="java.lang.String"/>
                 </vm:inbound-endpoint>
             </inbound>
-            <test:component/>
+            <test:component appendString="(success)"/>
         </service>
     </model>
 </mule>

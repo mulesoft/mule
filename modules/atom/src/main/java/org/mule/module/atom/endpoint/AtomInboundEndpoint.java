@@ -42,7 +42,7 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint
     {
         super(ie.getConnector(), ie.getEndpointURI(), ie.getName(),
                 ie.getProperties(), ie.getTransactionConfig(), ie.isDeleteUnacceptedMessages(),
-                ie.getSecurityFilter(), ie.getExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
+                ie.getExchangePattern(), ie.getResponseTimeout(), ie.getInitialState(),
                 ie.getEncoding(), ie.getEndpointBuilderName(), ie.getMuleContext(), ie.getRetryPolicyTemplate(), 
                 ie.getMessageProcessorsFactory(), ie.getMessageProcessors(), ie.getResponseMessageProcessors(), ie.isDisableTransportTransformer(), ie.getMimeType());
         this.splitFeed = splitFeed;
