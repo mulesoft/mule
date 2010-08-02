@@ -3533,7 +3533,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractInterceptingRouterType" />
+    <xsd:complexType name="abstractInterceptingRouterType">
+        <xsd:complexContent>
+        	<xsd:extension base="abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
     
     <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-router">
         <xsd:annotation>
