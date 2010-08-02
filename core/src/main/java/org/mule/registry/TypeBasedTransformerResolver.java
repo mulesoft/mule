@@ -27,7 +27,6 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.types.SimpleDataType;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +87,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
         //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
         //byte[]
-        Transformer secondPass = null;
+        Transformer secondPass;
 
         if (transformer == null)
         {
@@ -131,7 +130,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         return transformer;
     }
 
-    protected Transformer getNearestTransformerMatch(List trans, Class input, Class output) throws ResolverException
+    protected Transformer getNearestTransformerMatch(List<Transformer> trans, Class input, Class output) throws ResolverException
     {
         if (trans.size() > 1)
         {
@@ -140,9 +139,8 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
                 logger.debug("Comparing transformers for best match: input = " + input + " output = " + output + " Possible transformers = " + trans);
             }
             TransformerWeighting weighting = null;
-            for (Iterator iterator = trans.iterator(); iterator.hasNext();)
+            for (Transformer transformer : trans)
             {
-                Transformer transformer = (Transformer) iterator.next();
                 TransformerWeighting current = new TransformerWeighting(input, output, transformer);
                 if (weighting == null)
                 {
@@ -174,7 +172,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         }
         else
         {
-            return (Transformer) trans.get(0);
+            return trans.get(0);
         }
     }
 
