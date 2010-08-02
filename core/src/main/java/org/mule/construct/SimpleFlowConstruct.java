@@ -16,6 +16,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ import java.util.List;
  */
 public class SimpleFlowConstruct extends AbstractFlowConstruct
 {
-    protected List messageProcessors;
+    protected List messageProcessors = Collections.emptyList();
 
     public void setMessageProcessors(List messageProcessors)
     {

@@ -1425,14 +1425,24 @@
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:choice> 
-                    <xsd:element ref="abstract-message-processor" minOccurs="0"
-                        maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The message processors that process incoming messages that are received.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                        <xsd:element ref="abstract-message-processor" minOccurs="1"
+                            maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    A message processor
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="abstract-outbound-endpoint" minOccurs="1"
+                            maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    An outbound endpoint
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:choice>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:extension>

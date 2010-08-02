@@ -46,13 +46,36 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow2");
         assertEquals(StartableCompositeMessageSource.class, flow.getMessageSource().getClass());
-        assertEquals(2, flow.getMessageProcessors().size());
+        assertEquals(3, flow.getMessageProcessors().size());
 
         assertEquals("01xyz", muleContext.getClient().send("vm://in2",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
         assertEquals("01xyz", muleContext.getClient().send("vm://in3",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
 
+    }
+
+    public void testEchoFlow() throws MuleException, Exception
+    {
+        assertEquals("0", muleContext.getClient()
+            .send("vm://echo", new DefaultMuleMessage("0", muleContext))
+            .getPayloadAsString());
+    }
+
+    public void testInOutFlow() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://inout-in", new DefaultMuleMessage("0", muleContext));
+        assertEquals("0", muleContext.getClient()
+            .request("vm://inout-out", RECEIVE_TIMEOUT)
+            .getPayloadAsString());
+    }
+
+    public void testInOutAppendFlow() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://inout-append-in", new DefaultMuleMessage("0", muleContext));
+        assertEquals("0inout", muleContext.getClient()
+            .request("vm://inout-append-out", RECEIVE_TIMEOUT)
+            .getPayloadAsString());
     }
 
 }
