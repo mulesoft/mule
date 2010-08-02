@@ -30,15 +30,13 @@ import static org.mule.util.ClassUtils.hash;
  * more than one property you can use the logic filters for And, Or and Not
  * expressions. By default the comparison is case sensitive; you can set the
  * <i>caseSensitive</i> property to override this.
- *
+ * <p/>
  * Since 3.0.0 its possible to set the property value as a wildcard expression i.e.
- *
+ * <p/>
  * <pre>fooHeader = *foo*</pre>
  */
 public class MessagePropertyFilter implements Filter
 {
-    public static final String DEFAULT_PROPERTY_SCOPE = "outbound";
-
     /**
      * logger used by this class
      */
@@ -48,7 +46,7 @@ public class MessagePropertyFilter implements Filter
 
     private String propertyName;
     private String propertyValue;
-    private String scope = DEFAULT_PROPERTY_SCOPE;
+    private PropertyScope scope = PropertyScope.OUTBOUND;
 
     private WildcardFilter wildcardFilter;
 
@@ -68,8 +66,7 @@ public class MessagePropertyFilter implements Filter
         {
             return false;
         }
-        PropertyScope ps = PropertyScope.get(this.scope);
-        Object value = message.getProperty(propertyName, ps);
+        Object value = message.getProperty(propertyName, scope);
         boolean match;
         if (value == null)
         {
@@ -98,7 +95,6 @@ public class MessagePropertyFilter implements Filter
             value1 = "null";
         }
 
-      
 
         boolean result;
 
@@ -114,25 +110,34 @@ public class MessagePropertyFilter implements Filter
 
     public void setPattern(String expression)
     {
+        int x = expression.indexOf(":");
         int i = expression.indexOf('=');
+
         if (i == -1)
         {
             throw new IllegalArgumentException(
-                "Pattern is malformed - it should be a key value pair, i.e. property=value: " + expression);
+                    "Pattern is malformed - it should be a key value pair, i.e. property=value: " + expression);
+        }
+
+        if (x > -1 && x < i)
+        {
+            setScope(expression.substring(0, x));
+            expression = expression.substring(x + 1);
+            i = expression.indexOf('=');
+        }
+
+
+        if (expression.charAt(i - 1) == '!')
+        {
+            not = true;
+            propertyName = expression.substring(0, i - 1).trim();
         }
         else
         {
-            if (expression.charAt(i - 1) == '!')
-            {
-                not = true;
-                propertyName = expression.substring(0, i - 1).trim();
-            }
-            else
-            {
-                propertyName = expression.substring(0, i).trim();
-            }
-            propertyValue = expression.substring(i + 1).trim();
+            propertyName = expression.substring(0, i).trim();
         }
+        propertyValue = expression.substring(i + 1).trim();
+
         wildcardFilter = new WildcardFilter(propertyValue);
         wildcardFilter.setCaseSensitive(isCaseSensitive());
     }
@@ -153,7 +158,7 @@ public class MessagePropertyFilter implements Filter
 
     public String getScope()
     {
-        return scope;
+        return scope.getScopeName();
     }
 
     public void setScope(String scope)
@@ -164,24 +169,30 @@ public class MessagePropertyFilter implements Filter
             return;
         }
 
-        PropertyScope ps = PropertyScope.get(scope.toLowerCase());
+        PropertyScope ps = PropertyScope.get(scope.toLowerCase().trim());
         if (ps == null)
         {
             throw new IllegalArgumentException(String.format("'%s' is not a valid property scope.", scope));
         }
-        this.scope = scope;
+        this.scope = ps;
     }
 
     public boolean equals(Object obj)
     {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
 
         final MessagePropertyFilter other = (MessagePropertyFilter) obj;
         return equal(propertyName, other.propertyName)
-            && equal(propertyValue, other.propertyValue)
-            && equal(scope, other.scope)
-            && caseSensitive == other.caseSensitive;
+                && equal(propertyValue, other.propertyValue)
+                && equal(scope, other.scope)
+                && caseSensitive == other.caseSensitive;
     }
 
     public int hashCode()

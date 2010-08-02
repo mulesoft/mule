@@ -38,6 +38,39 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    public void testMessagePropertyFilterInboundScope() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        RequestContext.setEvent(getTestEvent(message));
+        MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
+        assertEquals("inbound", filter.getScope());
+
+        assertFalse(filter.accept(message));
+        message.setInboundProperty("foo", "bar");
+        assertTrue("Filter didn't accept the message", filter.accept(message));
+    }
+
+    public void testMessagePropertyFilterWithURL() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        RequestContext.setEvent(getTestEvent(message));
+        MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
+        assertEquals("inbound", filter.getScope());
+
+        assertFalse(filter.accept(message));
+        message.setInboundProperty("foo", "http://foo.com");
+        assertTrue("Filter didn't accept the message", filter.accept(message));
+
+        //Checking here that a ':' in the value doesn't throw things off
+        filter = new MessagePropertyFilter("bar=http://bar.com");
+        //default scope
+        assertEquals("outbound", filter.getScope());
+
+        assertFalse(filter.accept(message));
+        message.setOutboundProperty("bar", "http://bar.com");
+        assertTrue("Filter didn't accept the message", filter.accept(message));
+    }
+
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
