@@ -45,7 +45,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     protected RouterStatistics statistics;
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
     protected MessageProcessor catchAllStrategy;
-    private final InterceptingMessageProcessor internalCatchAllStrategy = new InternalCatchAllMessageProcessor();;
+    private final InterceptingMessageProcessor internalCatchAllStrategy = new InternalCatchAllMessageProcessor();
 
     public ServiceCompositeMessageSource()
     {
@@ -90,7 +90,6 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
                 ((Initialisable) processor).initialise();
             }
         }
-
     }
 
     protected void createMessageProcessorChain() throws MuleException
@@ -166,10 +165,11 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         super.removeSource(source);
         if (source instanceof InboundEndpoint)
         {
-            endpoints.remove((InboundEndpoint) source);
+            endpoints.remove(source);
         }
     }
     
+    @Override
     public void setMessageSources(List<MessageSource> sources) throws MuleException
     {
         this.endpoints.clear();

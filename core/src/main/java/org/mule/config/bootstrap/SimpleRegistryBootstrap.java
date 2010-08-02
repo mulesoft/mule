@@ -96,9 +96,8 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     /** {@inheritDoc} */
     public void initialise() throws InitialisationException
     {
-        Enumeration e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
+        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
         List<Properties> bootstraps = new LinkedList<Properties>();
-
 
         // load ALL of the bootstrap files first
         while (e.hasMoreElements())
@@ -182,7 +181,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         {
             transString = (String)entry.getValue();
             // reset
-            Class returnClass = null;
+            Class<?> returnClass = null;
             returnClassString = null;
             int x = transString.indexOf(",");
             if (x > -1)
@@ -307,81 +306,81 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     private void registerObject(String key, String value, Registry registry) throws Exception
     {
-            boolean optional = false;
-            String className = null;
+        boolean optional = false;
+        String className = null;
 
-            try
+        try
+        {
+            int x = value.indexOf(",");
+            if (x > -1)
             {
-                int x = value.indexOf(",");
-                if (x > -1)
-                {
-                    Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
-                    optional = p.containsKey("optional");
-                    className = value.substring(0, x);
-                }
-                else
-                {
-                    className = value;
-                }
-                Object o = ClassUtils.instanciateClass(className);
-                Class meta = Object.class;
+                Properties p = PropertiesUtils.getPropertiesFromString(value.substring(x + 1), ',');
+                optional = p.containsKey("optional");
+                className = value.substring(0, x);
+            }
+            else
+            {
+                className = value;
+            }
+            Object o = ClassUtils.instanciateClass(className);
+            Class<?> meta = Object.class;
 
-                if (o instanceof ObjectProcessor)
-                {
-                    meta = ObjectProcessor.class;
-                }
-                else if (o instanceof StreamCloser)
-                {
-                    meta = StreamCloser.class;
-                }
-                else if(o instanceof BootstrapObjectFactory)
-                {
-                    o = ((BootstrapObjectFactory)o).create();
-                }
-                registry.registerObject(key, o, meta);
-            }
-            catch (InvocationTargetException itex)
+            if (o instanceof ObjectProcessor)
             {
-                Throwable cause = ExceptionUtils.getCause(itex);
-                if (cause instanceof NoClassDefFoundError && optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw new Exception(cause);
-                }
+                meta = ObjectProcessor.class;
             }
-            catch (NoClassDefFoundError ncdfe)
+            else if (o instanceof StreamCloser)
             {
-                if (optional)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw ncdfe;
-                }
+                meta = StreamCloser.class;
             }
-            catch (ClassNotFoundException cnfe)
+            else if (o instanceof BootstrapObjectFactory)
             {
-                if (optional)
+                o = ((BootstrapObjectFactory)o).create();
+            }
+            registry.registerObject(key, o, meta);
+        }
+        catch (InvocationTargetException itex)
+        {
+            Throwable cause = ExceptionUtils.getCause(itex);
+            if (cause instanceof NoClassDefFoundError && optional)
+            {
+                if (logger.isDebugEnabled())
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Ignoring optional object: " + className);
-                    }
-                }
-                else
-                {
-                    throw cnfe;
+                    logger.debug("Ignoring optional object: " + className);
                 }
             }
+            else
+            {
+                throw new Exception(cause);
+            }
+        }
+        catch (NoClassDefFoundError ncdfe)
+        {
+            if (optional)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Ignoring optional object: " + className);
+                }
+            }
+            else
+            {
+                throw ncdfe;
+            }
+        }
+        catch (ClassNotFoundException cnfe)
+        {
+            if (optional)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Ignoring optional object: " + className);
+                }
+            }
+            else
+            {
+                throw cnfe;
+            }
+        }
     }
 }
