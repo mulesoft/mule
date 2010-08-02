@@ -63,4 +63,20 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertEquals("BLAH1", result);
     }
+
+    public void testStringExpressionDoParse() throws Exception
+    {
+        String result = muleContext.getExpressionManager().parse(
+            "#[xpath:/xml/*/tag1[@attr1='blahattr1']]", message);
+        assertNotNull(result);
+        assertEquals("BLAH1", result);
+    }
+
+    public void testStringExpressionDoParseEmbedded() throws Exception
+    {
+        String result = muleContext.getExpressionManager().parse(
+            "#[xpath:/xml/*/tag1[@attr1='blahattr1']] foo #[xpath:/xml/*/tag1[@attr1='blahattr2']]", message);
+        assertNotNull(result);
+        assertEquals("BLAH1 foo BLAH2", result);
+    }
 }

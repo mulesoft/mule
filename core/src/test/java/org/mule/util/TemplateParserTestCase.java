@@ -42,7 +42,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
         assertTrue(tp.isValid("[][]"));
-        assertFalse(tp.isValid("[[]]"));
+        assertTrue(tp.isValid("[[]]"));
         assertFalse(tp.isValid("[[][]"));
     }
 
@@ -53,7 +53,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertTrue(tp.isValid("${}${}"));
         assertFalse(tp.isValid("${}&{}"));
         assertFalse(tp.isValid("{}${}"));
-        assertFalse(tp.isValid("${$}${}"));
+        assertTrue(tp.isValid("${$}${}"));
         assertFalse(tp.isValid("${${}}${}"));
         assertFalse(tp.isValid("$ {}"));
 
@@ -66,9 +66,16 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertTrue(tp.isValid("#[]   #[]"));
         assertFalse(tp.isValid("#[]&[]"));
         assertFalse(tp.isValid("[]$[]#"));
-        assertFalse(tp.isValid("#[#]#[]"));
+        assertTrue(tp.isValid("#[#]#[]"));
         assertFalse(tp.isValid("#[#[]]#[]"));
         assertFalse(tp.isValid("# []"));
+
+        assertTrue(tp.isValid("#[foo:blah[4] = 'foo']"));
+        assertTrue(tp.isValid("#[foo:blah[4] = '#foo']"));
+        assertFalse(tp.isValid("#[foo:blah4] = '#foo']"));
+        //Can't have embedded
+        assertFalse(tp.isValid("#[foo:blah = '#[foo]']"));
+
 
     }
 

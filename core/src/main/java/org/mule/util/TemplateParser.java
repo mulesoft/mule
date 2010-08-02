@@ -374,10 +374,12 @@ public final class TemplateParser
 
             int charCount = expression.length();
             int index = 0;
-            char nextChar;
+            char nextChar = ' ';
             char preDelim = 0;
             char open;
             char close;
+            boolean inExpression = false;
+            int expressionCount = 0;
             if (prefix.length() == 2)
             {
                 preDelim = prefix.charAt(0);
@@ -394,7 +396,15 @@ public final class TemplateParser
                 nextChar = expression.charAt(index);
                 if (preDelim != 0 && nextChar == preDelim)
                 {
-                    if (openDelimiterStack.isEmpty())
+                    //escaped
+                    if (inExpression)
+                    {
+                        if (index < charCount && expression.charAt(index + 1) == open)
+                        {
+                            throw new IllegalArgumentException(String.format("Character %s at position %s suggests an expression inside an expression", open, index));
+                        }
+                    }
+                    else if (openDelimiterStack.isEmpty())
                     {
                         openDelimiterStack.push(nextChar);
                         nextChar = expression.charAt(++index);
@@ -402,6 +412,8 @@ public final class TemplateParser
                         {
                             throw new IllegalArgumentException(String.format("Character %s at position %s must appear immediately after %s", open, index, preDelim));
                         }
+                        inExpression = true;
+
                     }
                     else
                     {
@@ -411,7 +423,7 @@ public final class TemplateParser
 
                 if (nextChar == open)
                 {
-                    if (preDelim == 0)
+                    if (preDelim == 0 || inExpression)
                     {
                         openDelimiterStack.push(nextChar);
                     }
@@ -434,18 +446,26 @@ public final class TemplateParser
                     else
                     {
                         openDelimiterStack.pop();
-                        if (preDelim != 0)
+                        if (preDelim != 0 && openDelimiterStack.peek() == preDelim)
                         {
                             openDelimiterStack.pop();
                         }
-                        if (!openDelimiterStack.isEmpty())
-                        {
-                            throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
 
+
+                        if (openDelimiterStack.isEmpty())
+                        {
+                            inExpression = false;
+                            expressionCount++;
+                            //throw new IllegalArgumentException(String.format("Character %s at position %s appears out of sequence", nextChar, index));
                         }
                     }
                 }
             }
+            if (expressionCount == 0)
+            {
+                throw new IllegalArgumentException("Not an expression: " + expression);
+            }
         }
+
     }
 }
