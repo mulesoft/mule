@@ -254,43 +254,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                A message processor that uses a filter to determine whether to process an event.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="messageFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-filter">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Used to filter events.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="abstract-message-processor" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Events that do not pass the filter are sent to this (optional) message processor.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="abstract-message-processor"/>
     <xsd:complexType name="customMessageProcessorType">
         <xsd:complexContent>
@@ -3555,18 +3518,212 @@
         </xsd:complexType>
 
     <!--==============================================================-->
-    <!--  Routers                                                     -->
+    <!--  Routing                                                     -->
     <!--==============================================================-->
 
-    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType">
+    <!--==================================-->
+    <!-- Simple (1-1) Message Processors  -->
+    <!--==================================-->
+    
+    
+    <xsd:element name="abstract-intercepting-router" abstract="true" type="abstractMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
-            <xsd:documentation>Maps the attributes of the current message to known message elements in Mule, namely Message ID and CorrrelationID.
+            <xsd:documentation>
+                A placeholder for intercepting router elements. 
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractMessageInfoMappingType"/>
+    <xsd:complexType name="abstractInterceptingRouterType" />
+    
+    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                A message processor that uses a filter to determine whether to process an event.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="messageFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-filter">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Used to filter events.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-message-processor" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Events that do not pass the filter are sent to this (optional) message processor.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the processor so that other elements can reference it. Required if the processor is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="idempotentMessageFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="idExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines one or more expressions to use when extracting the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. If this property is not set, '#[message:id]' will be used by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="idempotent-message-filter" type="idempotentMessageFilterType"
+                 substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying endpoint must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-    <!-- Inbound Router implementations -->
+    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+	        <xsd:complexContent>
+	            <xsd:extension base="idempotentMessageFilterType">
+                    <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
+	                    <xsd:annotation>
+	                        <xsd:documentation>
+	                            The secure hashing algorithm to use. If not set, the default is SHA-256.
+	                        </xsd:documentation>
+	                    </xsd:annotation>
+	                </xsd:attribute>
+	            </xsd:extension>
+	        </xsd:complexContent>
+	    </xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                The WireTap inbound router allows you to route certain messages to a different endpoint as well as to the component.
+            </xsd:documentation>
+        </xsd:annotation>
+	    <xsd:complexType>
+	        <xsd:complexContent>
+	            <xsd:extension base="abstractInterceptingRouterType">
+	                <xsd:choice>
+	                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="1" maxOccurs="1"/>
+	                    <xsd:element ref="abstract-message-processor" minOccurs="1" maxOccurs="1"/>
+	                </xsd:choice>
+	            </xsd:extension>
+	        </xsd:complexContent>
+	    </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:complexType name="baseAggregatorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingRouterType">
+                <xsd:attribute name="timeout" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines a timeout in Milliseconds to wait for events to be aggregated. By default the router will throw an exeception if the router is waiting for a correlation group and times out before all group enties are received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When false, incomplete aggregation groups will be forwarded to a component on timeout as a java.util.List. When true (default), a CorrelationTimeoutException is thrown and RoutingNotification.CORRELATION_TIMEOUT is fired. The component doesn't receive any messages in this case.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="resequencer" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Holds back a group of messages and resequences them using each message's correlation sequence property.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="collection-aggregator" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages received for a each correlation group.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="message-chunk-aggregator" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Combines two or more messages into a single message by matching messages with a given Correlation ID. Correlation IDs are set on messages when they are dispatched by certain outbound routers, such as the Recipient List and Message Splitter routers. These messages can be aggregated back together again using this router.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="custom-aggregator" 
+                 substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures a custom message aggregator. Mule provides an abstract implementation that has a template method that performs the message aggregation. A common use of the aggregator router is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
+            </xsd:documentation>
+        </xsd:annotation>
+	    <xsd:complexType>
+	        <xsd:complexContent>
+	            <xsd:extension base="baseAggregatorType">
+	                <xsd:sequence>
+	                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+	                        <xsd:annotation>
+	                            <xsd:documentation>
+	                                Spring-style property element for custom configuration.
+	                            </xsd:documentation>
+	                        </xsd:annotation>
+	                    </xsd:element>
+	                </xsd:sequence>
+	                <xsd:attribute name="class" type="substitutableClass" use="required">
+	                    <xsd:annotation>
+	                        <xsd:documentation>
+	                            Fully qualified class name of the custom correlation aggregator router to be used.
+	                        </xsd:documentation>
+	                    </xsd:annotation>
+	                </xsd:attribute>
+	            </xsd:extension>
+	        </xsd:complexContent>
+	    </xsd:complexType>
+	</xsd:element>
+     
+    <!--==================================-->
+    <!-- Routing (1-n) Message Processors  -->
+    <!--==================================-->
+
+
+    <!--=======================-->
+    <!--  2.x Inbound Routers  -->
+    <!--=======================-->
 
     <xsd:complexType name="filteredInboundRouterType">
         <xsd:complexContent>
@@ -4370,6 +4527,14 @@
     </xsd:complexType>
 
     <!-- Message Info Mappers -->
+
+    <xsd:element name="abstract-message-info-mapping" abstract="true" type="abstractMessageInfoMappingType">
+        <xsd:annotation>
+            <xsd:documentation>Maps the attributes of the current message to known message elements in Mule, namely Message ID and CorrrelationID.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractMessageInfoMappingType"/>
 
     <xsd:element name="expression-message-info-mapping" type="expressionMessageInfoMappingType"
                  substitutionGroup="abstract-message-info-mapping">
