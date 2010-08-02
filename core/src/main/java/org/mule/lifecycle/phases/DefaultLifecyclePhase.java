@@ -14,6 +14,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.LifecycleObject;
 
@@ -220,6 +221,11 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         }
         catch (Exception e)
         {
+            e = ExceptionHelper.unwrap(e);
+            if(e instanceof LifecycleException)
+            {
+                throw (LifecycleException)e;
+            }
             throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
         }
     }

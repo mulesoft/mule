@@ -94,6 +94,10 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 {
                     result = tt.execute(cb);
                 }
+                catch (RoutingException e)
+                {
+                    throw e;
+                }
                 catch (Exception e)
                 {
                     throw new RoutingException(outboundRouterMessage, null, e);

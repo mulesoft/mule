@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.RegistryLifecycleHelpers;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.lifecycle.phases.MuleContextInitialisePhase;
@@ -138,9 +139,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
         }
+        catch (LifecycleException e)
+        {
+            throw e;
+        }
         catch (MuleException e)
         {
-            e.printStackTrace();
+            throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(phase, object), e);
         }
         finally
         {

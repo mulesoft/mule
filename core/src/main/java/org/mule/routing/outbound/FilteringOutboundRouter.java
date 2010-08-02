@@ -79,6 +79,10 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         {
             result = sendRequest(event, message, ep, true);
         }
+        catch (RoutingException e)
+        {
+            throw e;
+        }
         catch (MuleException e)
         {
             throw new CouldNotRouteOutboundMessageException(message, ep, e);

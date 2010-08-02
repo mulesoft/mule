@@ -72,6 +72,10 @@ public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleCo
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
         }
+        catch (LifecycleException e)
+        {
+            throw e;
+        }
         catch (MuleException e)
         {
             throw new LifecycleException(e, this);

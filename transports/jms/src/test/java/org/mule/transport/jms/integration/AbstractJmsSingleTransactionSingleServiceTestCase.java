@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.junit.Test;
 
 /**
@@ -143,7 +142,7 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
         {
             public void onException(Throwable t)
             {
-                assertTrue(t.getCause().getCause().getCause() instanceof org.mule.transaction.IllegalTransactionStateException);
+                assertTrue(t.getCause().getCause() instanceof org.mule.transaction.IllegalTransactionStateException);
                 assertEquals(1, exceptionLatch.getCount()); // make sure this
                                                             // exception doesn't
                                                             // happen more than once
