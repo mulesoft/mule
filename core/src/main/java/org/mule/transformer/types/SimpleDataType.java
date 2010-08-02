@@ -9,9 +9,11 @@
  */
 package org.mule.transformer.types;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.transformer.DataType;
 
-import java.io.IOException;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 
 /**
  * A data type that simply wraps a Java type.  This type also allows a mime type to be associated
@@ -28,7 +30,27 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
     public SimpleDataType(Class<?> type, String mimeType)
     {
         this.type = type;
-        this.mimeType = (mimeType == null ? ANY_MIME_TYPE : mimeType);
+        if (mimeType == null)
+        {
+            this.mimeType = ANY_MIME_TYPE;
+        }
+        else
+        {
+            try
+            {
+                MimeType mt = new MimeType(mimeType);
+                this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
+                if (mt.getParameter("charset") != null)
+                {
+                    encoding = mt.getParameter("charset");
+                }
+            }
+            catch (MimeTypeParseException e)
+            {
+                //TODO, this should really get thrown
+                throw new MuleRuntimeException(e);
+            }
+        }
     }
 
     public SimpleDataType(Class type)
@@ -48,7 +70,7 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
 
     public void setMimeType(String mimeType)
     {
-        this.mimeType = (mimeType==null?ANY_MIME_TYPE:mimeType);
+        this.mimeType = (mimeType == null ? ANY_MIME_TYPE : mimeType);
     }
 
     public String getEncoding()
@@ -65,7 +87,7 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
     {
         if (dataType instanceof ImmutableDataType)
         {
-            dataType = ((ImmutableDataType)dataType).getWrappedDataType();
+            dataType = ((ImmutableDataType) dataType).getWrappedDataType();
         }
         if (this == dataType)
         {
