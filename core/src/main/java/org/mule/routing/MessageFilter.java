@@ -31,7 +31,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
 {
     protected Filter filter;
     protected MessageProcessor unacceptedMessageProcessor;
-    protected boolean throwOnNotAccepted;
+    protected boolean throwOnUnaccepted;
 
     public MessageFilter()
     {
@@ -79,17 +79,11 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         {
             unacceptedMessageProcessor.process(event);
         }
-        if (throwOnNotAccepted)
+        if (throwOnUnaccepted)
         {
             throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);   
         }
         return null;
-    }
-
-    @Deprecated
-    public void setMessageProcessor(MessageProcessor unacceptedMessageProcessor)
-    {
-        this.unacceptedMessageProcessor = unacceptedMessageProcessor;
     }
     
     /**
@@ -118,8 +112,8 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         this.filter = filter;
     }
 
-    public void setThrowOnNotAccepted(boolean throwOnNotAccepted)
+    public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
     {
-        this.throwOnNotAccepted = throwOnNotAccepted;
+        this.throwOnUnaccepted = throwOnUnaccepted;
     }
 }

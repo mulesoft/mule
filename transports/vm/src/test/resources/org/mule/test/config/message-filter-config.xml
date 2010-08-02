@@ -20,11 +20,11 @@
     <message-filter name="acceptAll">
         <regex-filter pattern="."/>
     </message-filter>
-    <message-filter name="firstMf" onNotAccepted="reject1">
+    <message-filter name="firstMf" onUnaccepted="reject1">
         <filter ref="globalMf"/>
     </message-filter>
 
-    <message-filter name="secondMf" onNotAccepted="reject2" throwOnNotAccepted="true">
+    <message-filter name="secondMf" onUnaccepted="reject2" throwOnUnaccepted="true">
         <regex-filter pattern=".*DEF.*"/>
     </message-filter>
 

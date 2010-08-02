@@ -33,7 +33,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/config/filter-config.xml";
+        return "org/mule/test/config/message-filter-config.xml";
     }
 
     /** Check that the configuration specifies considers external transactions */

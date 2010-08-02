@@ -19,20 +19,22 @@ import org.w3c.dom.Element;
 
 public class MessageFilterDefinitionParser extends MessageProcessorDefinitionParser implements PostProcessor
 {
+    private static final String ATTRIBUTE_UNACCEPTED = "onUnaccepted";
+
     public MessageFilterDefinitionParser()
     {
         super(MessageFilter.class);
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addIgnored("onNotAccepted");
+        addIgnored(ATTRIBUTE_UNACCEPTED);
         registerPostProcessor(this);
     }
 
     public void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
-        String onNotAccepted = element.getAttribute("onNotAccepted");
-        if (onNotAccepted != null)
+        String onUnaccepted = element.getAttribute(ATTRIBUTE_UNACCEPTED);
+        if (onUnaccepted != null)
         {
-            assembler.extendBean("unacceptedMessageProcessor", onNotAccepted, true);
+            assembler.extendBean("unacceptedMessageProcessor", onUnaccepted, true);
         }
     }
 }

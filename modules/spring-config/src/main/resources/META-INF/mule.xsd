@@ -3568,14 +3568,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="onNotAccepted" type="xsd:string">
+                <xsd:attribute name="onUnaccepted" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Events that are not accepted by the filter are sent to this (optional) named message processor.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="throwOnNotAccepted" type="xsd:boolean">
+                <xsd:attribute name="throwOnUnaccepted" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether to throw an exception if a message is not accepted
