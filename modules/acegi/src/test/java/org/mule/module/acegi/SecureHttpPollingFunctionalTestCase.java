@@ -41,7 +41,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
         //This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
         // can just add a filter
         assertNotNull(result);
-        int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(401, status);
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
 

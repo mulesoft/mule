@@ -32,7 +32,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
 
         //TODO RM: What should really be returned when doing an async request?
         assertNotNull(reply.getPayload());
-        int status = reply.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        int status = reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(status, 200);
         assertEquals(0, reply.getPayloadAsString().length());
     }
@@ -65,8 +65,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8988", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertEquals("chunked", reply.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
-        assertNull(reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
+        assertEquals("chunked", reply.getInboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
+        assertNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
 
     public void testNoChunkingContentLength() throws Exception
@@ -75,8 +75,8 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("http://localhost:8987", new DefaultMuleMessage("test", muleContext));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
-        assertNotSame("chunked", reply.getOutboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
-        assertNotNull(reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
+        assertNotSame("chunked", reply.getInboundProperty(HttpConstants.HEADER_TRANSFER_ENCODING));
+        assertNotNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
     
 }

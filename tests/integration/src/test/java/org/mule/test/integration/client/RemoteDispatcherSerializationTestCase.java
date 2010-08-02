@@ -50,9 +50,9 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
 //        XStreamWireFormat wireFormat = new XStreamWireFormat();
 //        wireFormat.setMuleContext(muleContext);
 //        wireFormat.setTransferObjectClass(RemoteDispatcherNotification.class);
-//        
+//
 //        doTestNotificationSerialization(wireFormat);
-//    }
+//    }            
 
     public void doTestNotificationSerialization(WireFormat wf) throws Exception
     {

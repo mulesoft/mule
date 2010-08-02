@@ -28,7 +28,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage m = client.send("http://localhost:4567/index.html", "", null);
         assertNotNull(m);
-        int status = m.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
@@ -37,7 +37,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient("anonX", "anonX");
         MuleMessage m = client.send("http://localhost:4567/index.html", "", null);
         assertNotNull(m);
-        int status = m.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
@@ -46,7 +46,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient("anon", "anon");
         MuleMessage m = client.send("http://localhost:4567/index.html", "", null);
         assertNotNull(m);
-        int status = m.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
     }
 

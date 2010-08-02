@@ -163,17 +163,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             headers.put(HttpConnector.HTTP_STATUS_PROPERTY, statusCode);
         }
 
-        // this preserves the behaviour of the old code. Ideally, all properties should be on
-        // the INBOUND scope, no matter where they come from.
-        if (transportMessage instanceof HttpRequest)
-        {
-            message.addInboundProperties(headers);
-        }
-        else
-        {
-            message.addProperties(headers);
-        }
-        
+        message.addInboundProperties(headers);
+
         // The encoding is stored as message property. To avoid overriding it from the message
         // properties, it must be initialized last
         initEncoding(message, headers);

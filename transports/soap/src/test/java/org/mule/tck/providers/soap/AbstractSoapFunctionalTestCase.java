@@ -184,7 +184,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
             assertTrue(result.getPayloadAsString().indexOf("location=\"" + location) > -1);
         }
 
-        assertTrue(result.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
+        assertTrue(result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith("text/xml"));
     }
 
 }

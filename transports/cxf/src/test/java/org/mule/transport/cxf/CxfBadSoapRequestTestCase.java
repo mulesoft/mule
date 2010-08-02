@@ -48,7 +48,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
 
-        String ct = reply.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
+        String ct = reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, StringUtils.EMPTY);
         assertEquals("text/xml", ct);
         
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());

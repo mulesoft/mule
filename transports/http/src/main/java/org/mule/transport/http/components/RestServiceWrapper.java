@@ -10,10 +10,11 @@
 
 package org.mule.transport.http.components;
 
+import org.mule.DefaultMuleEventContext;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
-import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -24,8 +25,9 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.routing.filters.MessagePropertyFilter;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
@@ -49,7 +51,6 @@ public class RestServiceWrapper extends AbstractComponent
 
     public static final String DELETE = HttpConstants.METHOD_DELETE;
     public static final String GET = HttpConstants.METHOD_GET;
-    public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
     public static final String HTTP_METHOD = "http.method";
 
@@ -146,7 +147,7 @@ public class RestServiceWrapper extends AbstractComponent
         {
             throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
         }
-        else if (!muleContext.getExpressionManager().isValidExpression(serviceUrl))
+        else if (!muleContext.getExpressionManager().isExpression(serviceUrl))
         {
             try
             {
@@ -161,8 +162,8 @@ public class RestServiceWrapper extends AbstractComponent
         if (errorFilter == null)
         {
             // We'll set a default filter that checks the return code
-            errorFilter = new MessagePropertyFilter("http.status!=200");
-            logger.info("Setting default error filter to MessagePropertyFilter('http.status!=200')");
+            errorFilter = new ExpressionFilter("#[header:INBOUND:http.status!=200]");
+            logger.info("Setting default error filter to ExpressionFilter('#[header:INBOUND:http.status!=200]')");
         }
     }
 
@@ -174,8 +175,9 @@ public class RestServiceWrapper extends AbstractComponent
         Object request = event.getMessage().getPayload();
         String tempUrl = serviceUrl;
         MuleMessage result;
-        if (muleContext.getExpressionManager().isValidExpression(serviceUrl))
+        if (muleContext.getExpressionManager().isExpression(serviceUrl))
         {
+            muleContext.getExpressionManager().validateExpression(serviceUrl);
             tempUrl = muleContext.getExpressionManager().parse(serviceUrl, event.getMessage(), true);
         }
 
@@ -192,7 +194,7 @@ public class RestServiceWrapper extends AbstractComponent
         // if post
         {
             StringBuffer requestBodyBuffer = new StringBuffer();
-            event.getMessage().setOutboundProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
+            event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
             setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();
@@ -201,13 +203,14 @@ public class RestServiceWrapper extends AbstractComponent
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        event.getMessage().setOutboundProperty(HTTP_METHOD, httpMethod);
+        event.getMessage().setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
         endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
         OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
-        result = RequestContext.getEventContext().sendEvent(
+        MuleEventContext eventContext = new DefaultMuleEventContext(event);
+        result = eventContext.sendEvent(
             new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint);
         if (isErrorPayload(result))
         {
@@ -277,8 +280,9 @@ public class RestServiceWrapper extends AbstractComponent
             String exp = (String) entry.getValue();
             Object value = null;
 
-            if (muleContext.getExpressionManager().isValidExpression(exp))
+            if (muleContext.getExpressionManager().isExpression(exp))
             {
+                muleContext.getExpressionManager().validateExpression(exp);
                 try
                 {
                     value = muleContext.getExpressionManager().evaluate(exp, msg);

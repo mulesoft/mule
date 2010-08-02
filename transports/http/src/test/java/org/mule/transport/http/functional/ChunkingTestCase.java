@@ -31,12 +31,12 @@ public class ChunkingTestCase extends FunctionalTestCase
         
         MuleMessage result = client.send("http://localhost:60200/foo", msg, null);
         assertEquals("Hello", result.getPayloadAsString());
-        int status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
         
         result = client.send("http://localhost:60200/foo", msg, null);
         assertEquals("Hello", result.getPayloadAsString());
-        status = result.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+        status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
     }
 

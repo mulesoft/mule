@@ -70,8 +70,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         assertTrue("First callback never fired", hop1made.get());
         assertTrue("Second callback never fired", hop2made.get());
         assertEquals("Hop1 ACK Hop2 ACK", reply.getPayload());
-        assertEquals("hop1", reply.getOutboundProperty("TICKET"));
-        assertEquals("10000", reply.getOutboundProperty("TTL"));
+        assertEquals("hop1", reply.getInboundProperty("TICKET"));
+        assertEquals("10000", reply.getInboundProperty("TTL"));
     }
 
 }

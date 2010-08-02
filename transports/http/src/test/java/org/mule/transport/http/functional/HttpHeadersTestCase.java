@@ -29,11 +29,11 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("clientEndpoint", null, null);
 
-        String contentTypeProperty = result.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String contentTypeProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         assertNotNull(contentTypeProperty); 
         assertEquals("application/x-download", contentTypeProperty);
 
-        String contentDispositionProperty = result.getOutboundProperty(HttpConstants.HEADER_CONTENT_DISPOSITION);
+        String contentDispositionProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_DISPOSITION);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
     }

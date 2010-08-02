@@ -32,6 +32,8 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://invoker.in", TEST_MESSAGE, null);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
+        //TODO MULE-4990 this should really be in the inbound scope 
+        //assertTrue(response.getInboundProperty(PROCESSED, false));
         assertTrue(response.getOutboundProperty(PROCESSED, false));
         String expected = "Hello " + TEST_MESSAGE + " " + MAGIC_NUMBER;
         assertEquals(expected, response.getPayload());
@@ -39,7 +41,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
 
     public static class Component
     {
-        private BindigInterface binding;
+        private BindingInterface binding;
 
         public Object invoke(String s)
         {
@@ -48,18 +50,18 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
             return result;
         }
         
-        public void setBindingInterface(BindigInterface hello)
+        public void setBindingInterface(BindingInterface hello)
         {
             this.binding = hello;
         }
 
-        public BindigInterface getBindingInterface()
+        public BindingInterface getBindingInterface()
         {
             return binding;
         }
     }
     
-    public interface BindigInterface
+    public interface BindingInterface
     {
         MuleMessage process(String s, Integer v);
     }
