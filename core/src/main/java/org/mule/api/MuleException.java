@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -19,7 +20,6 @@ import org.mule.util.SystemUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,15 +50,13 @@ public abstract class MuleException extends Exception
      */
     public MuleException(Message message, Throwable cause)
     {
-        super((cause instanceof InvocationTargetException
-                        ? ((InvocationTargetException) cause).getTargetException() : cause));
+        super(ExceptionHelper.unwrap(cause));
         setMessage(message);
     }
 
     public MuleException(Throwable cause)
     {
-        super((cause instanceof InvocationTargetException
-                        ? ((InvocationTargetException) cause).getTargetException() : cause));
+        super(ExceptionHelper.unwrap(cause));
         if (cause != null)
         {
             setMessage(MessageFactory.createStaticMessage(cause.getMessage() 
@@ -152,6 +150,18 @@ public abstract class MuleException extends Exception
 
     public String getDetailedMessage()
     {
+       if(DefaultMuleConfiguration.verboseExceptions)
+       {
+           return getVerboseMessage();
+       }
+        else
+       {
+           return getSummaryMessage();
+       }
+    }
+
+    public String getVerboseMessage()
+    {
         MuleException e = ExceptionHelper.getRootMuleException(this);
         if (!e.equals(this))
         {
@@ -195,6 +205,38 @@ public abstract class MuleException extends Exception
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
         buf.append(StringUtils.abbreviate(w.toString(), 5000)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
+
+        return buf.toString();
+    }
+
+    public String getSummaryMessage()
+    {
+        MuleException e = ExceptionHelper.getRootMuleException(this);
+        if (!e.equals(this))
+        {
+            return getMessage();
+        }
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append(SystemUtils.LINE_SEPARATOR).append(StringUtils.repeat('*', 80)).append(
+            SystemUtils.LINE_SEPARATOR);
+        buf.append("Message               : ").append(message).append(SystemUtils.LINE_SEPARATOR);
+        buf.append("Code                  : ").append("MULE_ERROR-").append(
+            getExceptionCode() + getMessageCode()).append(SystemUtils.LINE_SEPARATOR);
+        // print exception stack
+        buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(CoreMessages.exceptionStackIs()).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(StringUtils.abbreviate(ExceptionHelper.getExceptionStack(this), 5000));
+
+        buf.append(StringUtils.repeat('-', 80)).append(SystemUtils.LINE_SEPARATOR);
+        buf.append(CoreMessages.rootStackTrace()).append(SystemUtils.LINE_SEPARATOR);
+        Throwable root = ExceptionHelper.getRootException(this);
+        Throwable rootSummary = ExceptionHelper.summarise(root, 3);
+        StringWriter w = new StringWriter();
+        PrintWriter p = new PrintWriter(w);
+        rootSummary.printStackTrace(p);
+        buf.append(StringUtils.abbreviate(w.toString(), 5000));
+        buf.append("    + " + root.getStackTrace().length + " more (set debug level logging or '-Dmule.verbose.exceptions' for everything)").append(SystemUtils.LINE_SEPARATOR);
         buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
 
         return buf.toString();

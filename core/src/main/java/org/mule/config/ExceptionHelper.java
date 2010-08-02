@@ -21,6 +21,7 @@ import org.mule.util.SpiUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
  * useful for dealing with Mule exceptions. This class has 3 core functions - <p/> 1.
  * ErrorCode lookup. A corresponding Mule error code can be found using for a given
- * Mule exception 2. Addtional Error information such as Java doc url for a given
+ * Mule exception 2. Additional Error information such as Java doc url for a given
  * exception can be resolved using this class 3. Error code mappings can be looked up
  * by providing the the protocol to map to and the Mule exception.
  */
@@ -365,6 +366,22 @@ public final class ExceptionHelper
         return t;
     }
 
+
+    /**
+     * Removes some internal Mule entries from the stacktrace. Modifies the
+     * passed-in throwable stacktrace.
+     */
+    public static Throwable summarise(Throwable t, int depth)
+    {
+        t = sanitize(t);
+        StackTraceElement[] trace = t.getStackTrace();
+        StackTraceElement[] newTrace = new StackTraceElement[depth];
+
+        System.arraycopy(trace, 0, newTrace, 0, newTrace.length);
+        t.setStackTrace(newTrace);
+        return t;
+    }
+
     private static boolean isMuleInternalClass(String className)
     {
         /*
@@ -524,5 +541,15 @@ public final class ExceptionHelper
         StringBuffer msg = new StringBuffer();
         msg.append(er.getMessage(t)).append(". Type: ").append(t.getClass());
         return msg.toString();
+    }
+
+    public static <T extends Throwable>T unwrap(T t)
+    {
+        if(t instanceof InvocationTargetException)
+        {
+            return (T)((InvocationTargetException)t).getTargetException();
+        }
+        return t;
+
     }
 }

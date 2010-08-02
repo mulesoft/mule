@@ -52,6 +52,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public static boolean fullStackTraces = false;
 
     /**
+     * When false (default), only a summary of the root exception
+     * and trail is provided. If this flag is false, full exception information is reported.
+     * Switching on DEBUG level logging with automatically set this flag to true.
+     */
+    public static boolean verboseExceptions = false;
+
+    /**
      * A comma-separated list of internal packages/classes which are removed from sanitized stacktraces.
      * Matching is done via string.startsWith().
      * @see #fullStackTraces
@@ -266,6 +273,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             stackTraceFilter = p.split(",");
+        }
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "verbose.exceptions");
+        if (p != null)
+        {
+            verboseExceptions = BooleanUtils.toBoolean(p);
+        }
+        else
+        {
+            verboseExceptions = logger.isDebugEnabled();
         }
     }
 
