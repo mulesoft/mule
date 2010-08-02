@@ -373,11 +373,16 @@ public class MuleServer implements Runnable
      */
     public void shutdown(Throwable e)
     {
+        doShutdown();
+        unregisterShutdownHook();
+
         Message msg = CoreMessages.fatalErrorWhileRunning();
         MuleException muleException = ExceptionHelper.getRootMuleException(e);
+        int exitCode = 1;
         if (muleException != null)
         {
             logger.fatal(muleException.getDetailedMessage());
+            exitCode = muleException.getExceptionCode();
         }
         else
         {
@@ -392,8 +397,9 @@ public class MuleServer implements Runnable
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
 
-        unregisterShutdownHook();
-        doShutdown();
+        System.exit(exitCode);
+
+
     }
 
     /**
@@ -405,6 +411,7 @@ public class MuleServer implements Runnable
 
         unregisterShutdownHook();
         doShutdown();
+        System.exit(0);
     }
 
     protected void doShutdown()
@@ -414,7 +421,6 @@ public class MuleServer implements Runnable
             muleContext.dispose();
             muleContext = null;
         }
-        System.exit(0);
     }
 
     public Log getLogger()
@@ -498,6 +504,7 @@ public class MuleServer implements Runnable
         public void run()
         {
             doShutdown();
+            System.exit(0);
         }
     }
 }
