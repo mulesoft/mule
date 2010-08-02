@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
 
@@ -14,12 +15,12 @@
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
     </composite-processor>
-    
+
     <flow name="flow">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
-        <processor ref="composite1"/>
+        <processor ref="composite1" />
         <composite-processor>
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />
@@ -28,32 +29,43 @@
         <append-string-transformer message="3" />
         <default-service-exception-strategy />
     </flow>
-    
+
     <flow name="flow2">
         <composite-source>
-            <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
-            <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+            <vm:inbound-endpoint path="in2" exchange-pattern="request-response" />
+            <vm:inbound-endpoint path="in3" exchange-pattern="request-response" />
         </composite-source>
         <append-string-transformer message="1" />
-        <processor ref="composite1"/>
-        <vm:outbound-endpoint path="echo" exchange-pattern="request-response"/>
+        <processor ref="composite1" />
+        <vm:outbound-endpoint path="echo" exchange-pattern="request-response" />
     </flow>
 
     <flow name="echo">
-        <vm:inbound-endpoint path="echo" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
     </flow>
-    
+
     <flow name="inout">
-        <vm:inbound-endpoint path="inout-in" exchange-pattern="one-way"/>
-        <vm:outbound-endpoint path="inout-out" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="inout-in" exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="inout-out" exchange-pattern="one-way" />
     </flow>
 
     <flow name="inout-append">
-        <vm:inbound-endpoint path="inout-append-in" exchange-pattern="one-way"/>
-                <append-string-transformer message="inout" />
-        <vm:outbound-endpoint path="inout-append-out" exchange-pattern="one-way"/>
+        <vm:inbound-endpoint path="inout-append-in" exchange-pattern="one-way" />
+        <append-string-transformer message="inout" />
+        <vm:outbound-endpoint path="inout-append-out" exchange-pattern="one-way" />
     </flow>
-    
-    
+
+    <flow name="split-aggregate">
+        <vm:inbound-endpoint path="split-aggregate-in" exchange-pattern="one-way" />
+        <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
+        <script:transformer>
+            <script:script engine="groovy">
+                ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
+                return payload;
+            </script:script>
+        </script:transformer>
+        <collection-aggregator />
+        <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
+    </flow>
 
 </mule>

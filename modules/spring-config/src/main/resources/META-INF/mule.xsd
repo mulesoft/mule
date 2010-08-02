@@ -3525,7 +3525,6 @@
     <!-- Simple (1-1) Message Processors  -->
     <!--==================================-->
     
-    
     <xsd:element name="abstract-intercepting-router" abstract="true" type="abstractMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -3720,6 +3719,22 @@
 	    </xsd:complexType>
 	</xsd:element>
      
+    <xsd:element name="splitter" substitutionGroup="abstract-intercepting-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                The simple splitter splits incoming message into parts passing on each part in turn to the next message processor
+            </xsd:documentation>
+        </xsd:annotation>
+	    <xsd:complexType>
+	        <xsd:complexContent>
+	            <xsd:extension base="abstractInterceptingRouterType">
+	                <xsd:attributeGroup ref="expressionAttributes"/>
+	                <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
+            </xsd:extension>
+	        </xsd:complexContent>
+	    </xsd:complexType>
+    </xsd:element>
+
     <!--==================================-->
     <!-- Routing (1-n) Message Processors  -->
     <!--==================================-->
@@ -4063,7 +4078,7 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:attributeGroup name="defaultOutboundRouterAttributes">
+    <xsd:attributeGroup name="defaultCorrelationAttributes">
         <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
             <xsd:annotation>
                 <xsd:documentation>
@@ -4081,7 +4096,7 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="defaultFilteredOutboundRouterAttributes">
-        <xsd:attributeGroup ref="defaultOutboundRouterAttributes"/>
+        <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
         <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
             <xsd:annotation>
                 <xsd:documentation>
@@ -4106,7 +4121,7 @@
                     <xsd:element ref="abstract-outbound-endpoint"/>
                     <xsd:group ref="defaultOutboundRouterElements"/>
                 </xsd:sequence>
-                <xsd:attributeGroup ref="defaultOutboundRouterAttributes"/>
+                <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -102,6 +102,7 @@ import org.mule.routing.MessageChunkAggregator;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.Resequencer;
 import org.mule.routing.SimpleCollectionAggregator;
+import org.mule.routing.SimpleSplitter;
 import org.mule.routing.WireTap;
 import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.filters.EqualsFilter;
@@ -372,6 +373,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("collection-aggregator", new InboundRouterDefinitionParser(SimpleCollectionAggregator.class));
         registerBeanDefinitionParser("message-chunk-aggregator", new InboundRouterDefinitionParser(MessageChunkAggregator.class));
         registerBeanDefinitionParser("resequencer", new InboundRouterDefinitionParser(Resequencer.class));
+        registerBeanDefinitionParser("splitter", new InboundRouterDefinitionParser(SimpleSplitter.class));
 
         // Routing: Routing Message Processors
         
