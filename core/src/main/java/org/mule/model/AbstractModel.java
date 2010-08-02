@@ -112,6 +112,17 @@ public abstract class AbstractModel implements Model
     /** Destroys any current components */
     public void dispose()
     {
+        if(getLifecycleState().isStarted())
+        {
+            try
+            {
+                stop();
+            }
+            catch (MuleException e)
+            {
+                logger.error("Failed to stop model cleanly as part of a dispoae call: " + getName(), e);
+            }
+        }
         try
         {
             lifecycleManager.fireDisposePhase(new EmptyLifecycleCallback<AbstractModel>());
