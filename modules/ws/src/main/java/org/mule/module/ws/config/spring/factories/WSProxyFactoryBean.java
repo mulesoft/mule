@@ -10,18 +10,18 @@
 
 package org.mule.module.ws.config.spring.factories;
 
-import java.io.File;
-import java.net.URI;
-
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.module.ws.construct.builder.WSProxyBuilder;
+
+import java.io.File;
+import java.net.URI;
 
 public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
 {
@@ -78,22 +78,20 @@ public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
         wsProxyBuilder.wsdlFile(wsdlFile);
     }
 
-    public void setEndpoints(ImmutableEndpoint... endpoints)
+    public void setMessageSource(MessageSource messageSource)
     {
-        for (final ImmutableEndpoint endpoint : endpoints)
+        if (messageSource instanceof InboundEndpoint)
         {
-            if (endpoint instanceof InboundEndpoint)
-            {
-                wsProxyBuilder.inboundEndpoint((InboundEndpoint) endpoint);
-            }
-            else if (endpoint instanceof OutboundEndpoint)
-            {
-                wsProxyBuilder.outboundEndpoint((OutboundEndpoint) endpoint);
-            }
-            else
-            {
-                throw new IllegalArgumentException("unsupported type of endpoint: " + endpoint);
-            }
+            wsProxyBuilder.inboundEndpoint((InboundEndpoint) messageSource);
         }
+        else
+        {
+            throw new IllegalArgumentException("SimpleService requires a InboundEndpoint messagse source");
+        }
+    }
+    
+    public void setEndpoint(OutboundEndpoint endpoint)
+    {
+        wsProxyBuilder.outboundEndpoint((OutboundEndpoint) endpoint);
     }
 }
