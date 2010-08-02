@@ -61,7 +61,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -722,10 +721,6 @@ public class MuleClient implements Disposable
 
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
-        if (!endpoint.getConnector().isStarted() && muleContext.isStarted())
-        {
-            endpoint.getConnector().start();
-        }
         try
         {
             DefaultMuleSession session = new DefaultMuleSession(muleContext);
@@ -735,8 +730,7 @@ public class MuleClient implements Disposable
                 message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
                         user.getUsername(), user.getPassword()));
             }
-            DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
-            return event;
+            return new DefaultMuleEvent(message, endpoint, session);
         }
         catch (Exception e)
         {
