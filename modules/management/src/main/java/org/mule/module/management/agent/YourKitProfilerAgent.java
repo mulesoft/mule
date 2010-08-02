@@ -180,14 +180,4 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
         }
     }
 
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
 }

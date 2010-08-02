@@ -60,16 +60,6 @@ public class TestAgent implements Agent
         // nothing to do
     }
 
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
     public List<Class<? extends Agent>> getDependentAgents()
     {
         return Collections.emptyList();

@@ -45,16 +45,6 @@ public class MockAgent extends Object implements Agent
         return ClassUtils.getSimpleName(this.getClass());
     }
 
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
     public void initialise() throws InitialisationException
     {
         // nothing to do

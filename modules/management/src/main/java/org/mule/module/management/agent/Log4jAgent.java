@@ -18,8 +18,6 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 
-import org.apache.log4j.jmx.HierarchyDynamicMBean;
-
 import java.util.Iterator;
 import java.util.Set;
 
@@ -30,6 +28,8 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
+
+import org.apache.log4j.jmx.HierarchyDynamicMBean;
 
 /**
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running
@@ -108,16 +108,6 @@ public class Log4jAgent extends AbstractAgent
         {
             // ignore
         }
-    }
-
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
     }
 
 }

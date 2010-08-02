@@ -96,15 +96,6 @@ public class ConfigScannerAgent extends AbstractAgent
         // do nothing
     }
 
-    public void registered()
-    {
-        // do nothing
-    }
-
-    public void unregistered()
-    {
-        // do nothing
-    }
 
     public void initialise() throws InitialisationException
     {

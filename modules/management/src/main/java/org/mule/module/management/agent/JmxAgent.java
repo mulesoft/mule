@@ -338,22 +338,6 @@ public class JmxAgent extends AbstractAgent
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
-    /**
      * Register a Java Service Wrapper agent.
      *
      * @throws MuleException if registration failed

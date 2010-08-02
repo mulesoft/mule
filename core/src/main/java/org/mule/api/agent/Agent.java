@@ -23,13 +23,12 @@ import java.util.List;
 public interface Agent extends Lifecycle, NamedObject
 {
     /**
-     * Should be a 1 line description of the agent
+     * A description of the agent that gets displayed in the splash
+     * screen when the Mule Context starts up.
+     * @return a 1 line description of the agent.
      */
     String getDescription();
 
-    void registered();
-
-    void unregistered();
     
     /**
      * @return List of Class objects (agent classes) that this Agent requires to be

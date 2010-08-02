@@ -67,18 +67,9 @@ public class RemoteDispatcherAgent extends AbstractAgent
 
     public void dispose()
     {
-        // nothing to do (yet?)
+        // nothing to do
     }
 
-    public void registered()
-    {
-        // nothing to do (yet?)
-    }
-
-    public void unregistered()
-    {
-        // nothing to do (yet?)
-    }
 
     public void initialise() throws InitialisationException
     {

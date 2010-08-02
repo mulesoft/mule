@@ -45,7 +45,6 @@ import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -277,16 +276,6 @@ public class Mx4jAgent extends AbstractAgent
                              + (adaptorName != null ? adaptorName.getCanonicalName() : "null"), e);
             }
         }
-    }
-
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
     }
 
     // /////////////////////////////////////////////////////////////////////////

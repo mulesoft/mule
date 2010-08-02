@@ -61,18 +61,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     }
 
     /** {@inheritDoc} */
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    /** {@inheritDoc} */
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
-    /** {@inheritDoc} */
     public void start() throws MuleException
     {
         // nothing to do

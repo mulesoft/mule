@@ -129,16 +129,6 @@ public class JdmkAgent extends AbstractAgent
         }
     }
 
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
-        // nothing to do
-    }
-
     public void initialise() throws InitialisationException
     {
         try

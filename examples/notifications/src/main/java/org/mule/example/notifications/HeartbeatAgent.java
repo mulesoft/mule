@@ -47,16 +47,6 @@ public class HeartbeatAgent extends AbstractAgent
         //No Op
     }
 
-    public void registered()
-    {
-        //No Op
-    }
-
-    public void unregistered()
-    {
-        //No Op
-    }
-
     public void start() throws MuleException
     {
         try

@@ -86,16 +86,6 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 
     public void dispose()
     {
-        // nothing to do
-    }
-
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    public void unregistered()
-    {
         for (ServerNotificationListener listener : listeners)
         {
             muleContext.unregisterListener(listener);

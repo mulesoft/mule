@@ -174,17 +174,6 @@ public class WrapperManagerAgent extends AbstractAgent
         }
     }
 
-    /* @see org.mule.api.context.Agent#registered() */
-    public void registered()
-    {
-        // nothing to do
-    }
-
-    /* @see org.mule.api.context.Agent#unregistered() */
-    public void unregistered()
-    {
-        // nothing to do
-    }
 
     // /////////////////////////////////////////////////////////////////////////
     // Getters and setters
