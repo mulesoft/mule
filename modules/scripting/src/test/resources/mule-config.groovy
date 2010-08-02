@@ -5,7 +5,6 @@ import org.mule.api.config.ThreadingProfile
 import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
-import org.mule.api.routing.ResponseRouter
 import org.mule.api.service.Service
 import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
