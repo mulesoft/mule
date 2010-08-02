@@ -114,4 +114,29 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertTrue(results.contains(orange));
     }
 
+    public void testSplitFilterAggregateFlow() throws MuleException, Exception
+    {
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
+
+        muleContext.getClient().send("vm://split-filter-aggregate-in",
+            new DefaultMuleMessage(fruitBowl, muleContext));
+
+        MuleMessage result = muleContext.getClient().request("vm://split-filter-aggregate-out",
+            RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertTrue(result instanceof MuleMessageCollection);
+        MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertEquals(1, coll.size());
+        List<?> results = (List<?>) coll.getPayload();
+
+        assertTrue(results.contains(apple));
+        assertFalse(results.contains(banana));
+        assertFalse(results.contains(orange));
+    }
+
 }

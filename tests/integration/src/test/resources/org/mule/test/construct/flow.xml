@@ -67,5 +67,18 @@
         <collection-aggregator />
         <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
     </flow>
+    
+        <flow name="split-filter-aggregate">
+        <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
+        <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
+        <not-filter>
+            <or-filter>
+                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana"/>
+                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange"/>
+            </or-filter>
+        </not-filter>
+        <collection-aggregator failOnTimeout="false" timeout="1000"/>
+        <vm:outbound-endpoint path="split-filter-aggregate-out" exchange-pattern="one-way" />
+    </flow>
 
 </mule>
