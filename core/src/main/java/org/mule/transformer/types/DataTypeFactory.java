@@ -112,7 +112,11 @@ public class DataTypeFactory
     {
         Class type = o.getClass();
         String mime = null;
-        if (o instanceof MuleMessage)
+        if (o instanceof DataType)
+        {
+            return (DataType)o;
+        }
+        else if (o instanceof MuleMessage)
         {
             MuleMessage mm = (MuleMessage) o;
             type = mm.getPayload().getClass();
