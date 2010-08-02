@@ -29,6 +29,8 @@ import javax.resource.spi.work.WorkException;
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
  * single message.
+ * 
+ * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Aggregator.html}
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor

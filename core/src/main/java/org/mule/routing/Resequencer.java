@@ -27,6 +27,8 @@ import java.util.Comparator;
  * router splits an event it assigns a correlation sequence to the individual message
  * parts so that another router such as the <i>CorrelationEventResequencer</i> can
  * receive the parts and reorder or merge them.
+ * <p>
+ * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Resequencer.html}
  */
 public class Resequencer extends AbstractAggregator
 {

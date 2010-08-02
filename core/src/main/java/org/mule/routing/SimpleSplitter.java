@@ -16,6 +16,11 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.expression.ExpressionConfig;
 
+/**
+ * Splits a message using the expression provided invoking the next message processor one for each split part.
+ * <p>
+ * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
+ */
 public class SimpleSplitter extends AbstractSplittingInterceptingMessageProcessor implements Initialisable
 {
 
