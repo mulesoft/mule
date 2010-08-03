@@ -65,7 +65,7 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
     <xsd:complexType name="simpleServiceType">
         <xsd:complexContent>
             <xsd:extension base="webServiceType">
@@ -73,7 +73,7 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="jaxws-service" type="jaxWsServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="jaxws-service" type="jaxWsServiceType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
     <xsd:complexType name="jaxWsServiceType">
         <xsd:complexContent>
             <xsd:extension base="webServiceType">
@@ -82,7 +82,7 @@
     </xsd:complexType>
     
     
-    <xsd:element name="proxy-service" type="proxyServiceType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="proxy-service" type="proxyServiceType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
     <xsd:complexType name="proxyServiceType">
         <xsd:complexContent>
             <xsd:extension base="webServiceType">
@@ -101,7 +101,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="simple-client" type="simpleClientType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="simple-client" type="simpleClientType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
 
     <xsd:complexType name="simpleClientType">
         <xsd:complexContent>
@@ -110,7 +110,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="jaxws-client" type="jaxwsClientType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="jaxws-client" type="jaxwsClientType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
 
     <xsd:complexType name="jaxwsClientType">
         <xsd:complexContent>
@@ -133,7 +133,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="proxy-client" type="proxyClientType" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:element name="proxy-client" type="proxyClientType" substitutionGroup="mule:abstract-intercepting-message-processor"/>
 
     <xsd:complexType name="proxyClientType">
         <xsd:complexContent>

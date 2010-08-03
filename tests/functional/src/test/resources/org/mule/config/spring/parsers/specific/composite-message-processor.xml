@@ -24,11 +24,7 @@
     </composite-processor>
 
     <endpoint name="endpoint" address="test://test">
-        <composite-processor>
-            <append-string-transformer message="1" />
-            <append-string-transformer message="2" />
-            <append-string-transformer message="3" />
-        </composite-processor>
+        <processor ref="composite1" />
         <processor ref="composite2" />
     </endpoint>
 

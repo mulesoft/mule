@@ -438,8 +438,14 @@
     <xsd:complexType name="inboundCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="abstract-inbound-router"/> <!-- Deprecated -->
+                <xsd:element ref="abstract-transformer" />
+                <xsd:element ref="abstract-filter" />
+                <xsd:element ref="abstract-intercepting-message-processor"/>
+                <xsd:element ref="processor"/>
+                <xsd:element ref="custom-processor"/>
+            </xsd:choice>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
@@ -1200,13 +1206,14 @@
     <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
-            <xsd:choice minOccurs="1" maxOccurs="1">
-                <!-- Deprecated -->
-	            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="1"/>
-	            <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+	            <xsd:element ref="abstract-async-reply-router"/> <!-- Deprecated -->
+                <xsd:element ref="abstract-transformer" />
+                <xsd:element ref="abstract-filter" />
+                <xsd:element ref="abstract-intercepting-message-processor"/>
+                <xsd:element ref="processor"/>
+                <xsd:element ref="custom-processor"/>
             </xsd:choice>
-            <!-- TODO leaving this commented here, but I do not think there should be a transformer here -->
-            <!--<xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:sequence>
         <xsd:attribute name="timeout" type="substitutableInt">
             <xsd:annotation>
@@ -2108,18 +2115,16 @@
     <!-- these include option/repeats - should be embedded once -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:sequence>
+                <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
                 <xsd:element name="response" minOccurs="0">
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded"/>
+                            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
                 </xsd:element>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                <xsd:element ref="abstract-filter" minOccurs="0"/>
-                <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-retry-policy" minOccurs="0"/>
                 <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
                 <xsd:group ref="propertiesGroup"/>
@@ -2128,22 +2133,31 @@
     </xsd:group>
     <xsd:group name="defaultXaEndpointElements">
         <xsd:sequence>
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded" />
-                <xsd:element name="response" minOccurs="0">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:element ref="abstract-message-processor" minOccurs="0" maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                </xsd:element>
-                <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>
-                <xsd:element ref="abstract-filter" minOccurs="0"/>
-                <xsd:element ref="abstract-security-filter" minOccurs="0"/>
-                <xsd:group ref="propertiesGroup"/>
-            </xsd:sequence>
+            <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="response" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:group ref="endpointMessageProcessorElements" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element ref="abstract-transaction" minOccurs="0"/>
+            <xsd:element ref="abstract-xa-transaction" minOccurs="0"/>
+            <xsd:element ref="abstract-filter" minOccurs="0"/>
+            <xsd:element ref="abstract-security-filter" minOccurs="0"/>
+            <xsd:group ref="propertiesGroup"/>
         </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:group name="endpointMessageProcessorElements">
+        <xsd:choice>
+            <xsd:element ref="abstract-transformer" />
+            <xsd:element ref="abstract-filter" />
+            <xsd:element ref="abstract-security-filter"/>
+            <xsd:element ref="abstract-intercepting-message-processor"/>
+            <xsd:element ref="processor"/>
+            <xsd:element ref="custom-processor"/>
+        </xsd:choice>
     </xsd:group>
 
     <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType" substitutionGroup="abstract-message-processor">
@@ -3619,7 +3633,7 @@
     <!-- Simple (1-1) Message Processors  -->
     <!--==================================-->
     
-    <xsd:element name="abstract-intercepting-router" abstract="true" type="abstractMessageProcessorType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="abstract-intercepting-message-processor" abstract="true" type="abstractMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for intercepting router elements. 
@@ -3632,7 +3646,7 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-router">
+    <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A message processor that uses a filter to determine whether to process an event.
@@ -3694,7 +3708,7 @@
     </xsd:complexType>
     
     <xsd:element name="idempotent-message-filter" type="idempotentMessageFilterType"
-                 substitutionGroup="abstract-intercepting-router">
+                 substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying endpoint must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
@@ -3702,7 +3716,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-intercepting-router">
+    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
@@ -3723,7 +3737,7 @@
 	    </xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-router">
+	<xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 The WireTap inbound router allows you to route certain messages to a different endpoint as well as to the component.
@@ -3763,7 +3777,7 @@
     </xsd:complexType>
     
     <xsd:element name="resequencer" type="baseAggregatorType"
-                 substitutionGroup="abstract-intercepting-router">
+                 substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Holds back a group of messages and resequences them using each message's correlation sequence property.
@@ -3772,7 +3786,7 @@
     </xsd:element>
     
     <xsd:element name="collection-aggregator" type="baseAggregatorType"
-                 substitutionGroup="abstract-intercepting-router">
+                 substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages received for a each correlation group.
@@ -3781,7 +3795,7 @@
     </xsd:element>
     
     <xsd:element name="message-chunk-aggregator" type="baseAggregatorType"
-                 substitutionGroup="abstract-intercepting-router">
+                 substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Combines two or more messages into a single message by matching messages with a given Correlation ID. Correlation IDs are set on messages when they are dispatched by certain outbound routers, such as the Recipient List and Message Splitter routers. These messages can be aggregated back together again using this router.
@@ -3790,7 +3804,7 @@
     </xsd:element>
 
     <xsd:element name="custom-aggregator" 
-                 substitutionGroup="abstract-intercepting-router">
+                 substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Configures a custom message aggregator. Mule provides an abstract implementation that has a template method that performs the message aggregation. A common use of the aggregator router is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
@@ -3820,10 +3834,10 @@
 	    </xsd:complexType>
 	</xsd:element>
      
-    <xsd:element name="splitter" substitutionGroup="abstract-intercepting-router">
+    <xsd:element name="splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The simple splitter splits incoming message into parts passing on each part in turn to the next message processor
+                The simple splitter splits incoming message into parts using the configured expressio passing on each part in turn to the next message processor
             </xsd:documentation>
         </xsd:annotation>
 	    <xsd:complexType>
