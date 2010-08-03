@@ -44,7 +44,19 @@ public class DefaultMuleDeployer
 
     public void undeploy(Application app)
     {
-        throw new UnsupportedOperationException("Undeploy not implemented yet");
+        try
+        {
+            app.stop();
+            app.dispose();
+            final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
+            FileUtils.deleteDirectory(appDir);
+        }
+        catch (Throwable t)
+        {
+            // TODO logging
+            t.printStackTrace();
+        }
+
     }
 
     /**
