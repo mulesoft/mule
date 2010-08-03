@@ -55,7 +55,7 @@ public class DefaultMuleDeployer
             throw new IllegalArgumentException("Only Mule application zips are supported: " + url);
         }
 
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         String appName;
         try
         {

@@ -120,7 +120,7 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         {
             this.muleContext.start();
             // save app's state in the marker file
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsFile(), String.format("%s-state.txt", getAppName()));
+            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-state.txt", getAppName()));
             // TODO state enum
             FileUtils.writeStringToFile(marker, "started");
         }
@@ -383,4 +383,3 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         }
     }
 }
->>>>>>> BL-87 Mule application writes a state file ('started' contents atm) in the apps dir. Convention is <app-name>-state.txt

@@ -46,7 +46,7 @@ public final class MuleContainerBootstrapUtils
     /**
      * @return null if running embedded
      */
-    public static File getMuleHomeFile()
+    public static File getMuleHome()
     {
         return isStandalone() ? new File(MULE_HOME) : null;
     }
@@ -54,9 +54,9 @@ public final class MuleContainerBootstrapUtils
     /**
      * @return null if running embedded, otherwise the apps dir as a File ref
      */
-    public static File getMuleAppsFile()
+    public static File getMuleAppsDir()
     {
-        return isStandalone() ? new File(getMuleHomeFile(), MULE_APPS_FILENAME) : null;
+        return isStandalone() ? new File(getMuleHome(), MULE_APPS_FILENAME) : null;
     }
 
     /**

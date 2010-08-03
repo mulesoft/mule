@@ -10,8 +10,6 @@
 
 package org.mule.module.reboot;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +21,11 @@ import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MuleContainerBootstrapUtilsTestCase
 {
@@ -43,22 +46,22 @@ public class MuleContainerBootstrapUtilsTestCase
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleHomeFile()}.
+     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleHome()}.
      */
     @Test
     public void testGetMuleHomeFile()
     {
-        File muleHome = MuleContainerBootstrapUtils.getMuleHomeFile();
+        File muleHome = MuleContainerBootstrapUtils.getMuleHome();
         assertNotNull(muleHome.getAbsolutePath());
     }
 
     /**
-     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleAppsFile()}.
+     * Test method for {@link org.mule.module.reboot.MuleContainerBootstrapUtils#getMuleAppsDir()}.
      */
     @Test
     public void testGetMuleAppsFile()
     {
-        File muleApps = MuleContainerBootstrapUtils.getMuleAppsFile(); 
+        File muleApps = MuleContainerBootstrapUtils.getMuleAppsDir();
         assertNotNull(muleApps.getAbsolutePath());
     }
 

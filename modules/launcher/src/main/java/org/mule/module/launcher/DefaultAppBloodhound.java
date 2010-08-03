@@ -64,7 +64,7 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         File appDir = new File(appsDir, appName);
         if(!appDir.exists())
         {

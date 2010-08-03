@@ -37,7 +37,7 @@ public class DeploymentService
         final Map<String, Object> options = StartupContext.get().getStartupOptions();
         String appString = (String) options.get("app");
 
-        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         String[] apps;
         if (appString == null)
         {

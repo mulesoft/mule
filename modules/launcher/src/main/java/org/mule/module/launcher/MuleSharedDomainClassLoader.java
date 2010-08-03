@@ -38,7 +38,7 @@ public class MuleSharedDomainClassLoader extends URLClassLoader
         super(new URL[0], parent);
         try
         {
-            File domainDir = new File(MuleContainerBootstrapUtils.getMuleHomeFile(), "lib/shared/" + domain);
+            File domainDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "lib/shared/" + domain);
             if (!domainDir.exists())
             {
                 throw new IllegalArgumentException(
