@@ -148,16 +148,26 @@ public class DeploymentService
         return Collections.unmodifiableList(applications);
     }
 
+    /**
+     * Not thread safe. Correctness is guaranteed by a single-threaded executor.
+     */
     protected class AppDirFileWatcher implements Runnable
     {
         protected File appsDir;
 
-        protected String[] deployedApps = new String[0];
+        protected String[] deployedApps;
 
 
         public AppDirFileWatcher(File appsDir)
         {
             this.appsDir = appsDir;
+            // save the list of known apps on startup
+            this.deployedApps = new String[applications.size()];
+            for (int i = 0; i < applications.size(); i++)
+            {
+                deployedApps[i] = applications.get(i).getAppName();
+
+            }
         }
 
         public void run()
@@ -167,10 +177,8 @@ public class DeploymentService
             final String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
 
             // TODO deleting apps not yet implemented
-            final Collection removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
-
-            // new exploded Mule apps
-            final Collection addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
+            @SuppressWarnings("unchecked")
+            final Collection<String> removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
 
             // new packed Mule apps
             for (String zip : zips)
@@ -185,19 +193,51 @@ public class DeploymentService
                 }
             }
 
+            // new exploded Mule apps
+            @SuppressWarnings("unchecked")
+            final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
+            for (String addedApp : addedApps)
+            {
+                try
+                {
+                    onNewExplodedApplication(addedApp);
+                }
+                catch (Throwable t)
+                {
+                    logger.error("Failed to deploy exploded application: " + addedApp, t);
+                }
+            }
+
             deployedApps = apps;
         }
 
-        protected synchronized void onNewApplicationArchive(File file)
+        /**
+         * @param appName application name as it appears in $MULE_HOME/apps
+         */
+        protected void onNewExplodedApplication(String appName)
         {
             if (logger.isInfoEnabled())
             {
-                logger.info("================== New Application " + file);
+                logger.info("================== New Exploded Application: " + appName);
+            }
+
+            Application a = new ApplicationWrapper(new DefaultMuleApplication(appName));
+            // add to the list of known apps first to avoid deployment loop on failure
+            applications.add(a);
+            deployer.deploy(a);
+        }
+
+        protected void onNewApplicationArchive(File file)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("================== New Application Archive: " + file);
             }
 
             try
             {
                 Application app = deployer.installFrom(file.toURL());
+                // add to the list of known apps first to avoid deployment loop on failure
                 applications.add(app);
                 deployer.deploy(app);
             }
