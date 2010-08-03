@@ -167,19 +167,26 @@ public class DeploymentService
             final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
             final String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
 
+            // TODO deleting apps not yet implemented
             final Collection removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
             final Collection addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
-            // list deployed apps to compare with a previous run
-            if (zips.length > 0)
+
+            for (String zip : zips)
             {
-                // TODO only 1st for now
-                onChange(new File(appsDir, zips[0]));
+                try
+                {
+                    onNewApplicationArchive(new File(appsDir, zip));
+                }
+                catch (Throwable t)
+                {
+                    logger.error("Failed to deploy application archive: " + zip, t);
+                }
             }
 
             deployedApps = apps;
         }
 
-        protected synchronized void onChange(File file)
+        protected synchronized void onNewApplicationArchive(File file)
         {
             if (logger.isInfoEnabled())
             {
