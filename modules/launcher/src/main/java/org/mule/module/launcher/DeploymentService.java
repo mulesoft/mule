@@ -174,7 +174,7 @@ public class DeploymentService
         {
             // list new apps
             final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
-            final String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+            String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
 
             // TODO deleting apps not yet implemented
             @SuppressWarnings("unchecked")
@@ -191,6 +191,13 @@ public class DeploymentService
                 {
                     logger.error("Failed to deploy application archive: " + zip, t);
                 }
+            }
+
+            // re-scan exploded apps and update our state, as deploying Mule app archives might have added some
+            if (zips.length > 0)
+            {
+                apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                deployedApps = apps;
             }
 
             // new exploded Mule apps
@@ -214,7 +221,7 @@ public class DeploymentService
         /**
          * @param appName application name as it appears in $MULE_HOME/apps
          */
-        protected void onNewExplodedApplication(String appName)
+        protected void onNewExplodedApplication(String appName) throws Exception
         {
             if (logger.isInfoEnabled())
             {
@@ -227,25 +234,17 @@ public class DeploymentService
             deployer.deploy(a);
         }
 
-        protected void onNewApplicationArchive(File file)
+        protected void onNewApplicationArchive(File file) throws Exception
         {
             if (logger.isInfoEnabled())
             {
                 logger.info("================== New Application Archive: " + file);
             }
 
-            try
-            {
-                Application app = deployer.installFrom(file.toURL());
-                // add to the list of known apps first to avoid deployment loop on failure
-                applications.add(app);
-                deployer.deploy(app);
-            }
-            catch (IOException e)
-            {
-                // TODO better handling of exception
-                e.printStackTrace();
-            }
+            Application app = deployer.installFrom(file.toURL());
+            // add to the list of known apps first to avoid deployment loop on failure
+            applications.add(app);
+            deployer.deploy(app);
         }
     }
 
