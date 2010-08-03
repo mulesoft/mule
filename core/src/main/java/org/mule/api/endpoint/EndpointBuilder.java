@@ -72,8 +72,6 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
     void setTransactionConfig(TransactionConfig transactionConfig);
 
     void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
-
-    void setSecurityFilter(EndpointSecurityFilter securityFilter);
     
     void setExchangePattern(MessageExchangePattern mep);
 

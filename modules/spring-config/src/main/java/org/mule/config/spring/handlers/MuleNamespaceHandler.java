@@ -62,6 +62,7 @@ import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionPars
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
+import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
@@ -422,8 +423,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies")).addAlias("strategy", "encryptionStrategy");
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", PasswordBasedEncryptionStrategy.class));
         registerMuleBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][]{new String[]{"key"}, new String[]{"keyFactory-ref"}}));
-        registerBeanDefinitionParser("encryption-security-filter", new ChildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));
-        registerBeanDefinitionParser("custom-security-filter", new ChildDefinitionParser("securityFilter"));
+        registerBeanDefinitionParser("encryption-security-filter", new SecurityFilterDefinitionParser(MuleEncryptionEndpointSecurityFilter.class));
+        registerBeanDefinitionParser("custom-security-filter", new SecurityFilterDefinitionParser());
         //Interceptors
         registerMuleBeanDefinitionParser("interceptor-stack", new InterceptorStackDefinitionParser());
         registerBeanDefinitionParser("custom-interceptor", new InterceptorDefinitionParser());

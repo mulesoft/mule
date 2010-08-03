@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.DescendentDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.acegi.AcegiProviderAdapter;
 import org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter;
 
@@ -28,7 +29,7 @@ public class AcegiNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
         registerBeanDefinitionParser("delegate-security-provider", new ChildDefinitionParser("provider", AcegiProviderAdapter.class));
-        registerBeanDefinitionParser("http-security-filter", new DescendentDefinitionParser("securityFilter", HttpBasicAuthenticationFilter.class));
+        registerBeanDefinitionParser("http-security-filter", new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class));
         registerBeanDefinitionParser("security-property", new ChildMapEntryDefinitionParser("securityProperty", "name", "value"));
     }
 

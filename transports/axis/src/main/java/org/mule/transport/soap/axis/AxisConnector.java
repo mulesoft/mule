@@ -29,6 +29,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.MessageFilter;
@@ -398,19 +399,21 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         serviceEndpointbuilder.addMessageProcessor(new MessageFilter(receiver.getEndpoint().getFilter()));
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
-        serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        EndpointSecurityFilter securityFilter = receiver.getEndpoint().getSecurityFilter();
+        if (securityFilter != null)
+        {
+            serviceEndpointbuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+        }
 
         // TODO Do we really need to modify the existing receiver endpoint? What happens if we don't security,
         // filters and transformers will get invoked twice?
         AbstractEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint());
         // Remove the Axis filter now
 
-        List<MessageProcessor> procs = receiverEndpointBuilder.getMessageProcessors();
+        List<MessageProcessor> procs = new ArrayList(receiverEndpointBuilder.getMessageProcessors());
         CollectionUtils.removeType(procs, MessageFilter.class);
-        CollectionUtils.removeType(procs, EndpointSecurityFilter.class);
+        CollectionUtils.removeType(procs, SecurityFilterMessageProcessorBuilder.class);
         receiverEndpointBuilder.setMessageProcessors(procs);
-        // Remove the Axis Receiver Security filter now
-        receiverEndpointBuilder.setSecurityFilter(null);
 
         InboundEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()

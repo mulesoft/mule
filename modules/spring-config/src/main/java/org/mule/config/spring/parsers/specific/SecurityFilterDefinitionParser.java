@@ -10,22 +10,18 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.routing.filter.Filter;
+import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.WrappingChildDefinitionParser;
-import org.mule.routing.MessageFilter;
-
-import java.util.List;
-
+import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -33,37 +29,40 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.w3c.dom.Element;
 
+import java.util.List;
+
 /**
- * This allows a filter to be defined globally, or embedded within an endpoint. IF required the filter is
- * wrapped in MessageFilter instance before being injected into the parent.
+ * This allows a security filter to be defined globally, or embedded within an endpoint. The filter is
+ * always wrapped in a SecurityFilterMessageProcessorBuilder instance before being injected into the parent.
  */
-public class FilterDefinitionParser extends ParentContextDefinitionParser implements WrappingChildDefinitionParser.WrappingController
+public class SecurityFilterDefinitionParser extends ParentContextDefinitionParser  implements WrappingChildDefinitionParser.WrappingController
 {
 
-    public static final String FILTER = "filter";
+    public static final String SECURITY_FILTER = "securityFilter";
     public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
 
-    public FilterDefinitionParser(Class filter)
+    public SecurityFilterDefinitionParser(Class filter)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(filter, false));
-        otherwise(new WrappingChildDefinitionParser("messageProcessor", filter, Filter.class, false,MessageFilter.class, FILTER, FILTER, this));
+        otherwise(
+            new WrappingChildDefinitionParser(
+                "messageProcessor", filter, EndpointSecurityFilter.class, false, SecurityFilterMessageProcessorBuilder.class,
+                SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }
 
-    public FilterDefinitionParser()
+    public SecurityFilterDefinitionParser()
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(false));
-        otherwise(new WrappingChildDefinitionParser("messageProcessor", null, Filter.class, true, MessageFilter.class, FILTER, FILTER, this));
+        otherwise(
+            new WrappingChildDefinitionParser(
+                "messageProcessor", null, EndpointSecurityFilter.class, true, SecurityFilterMessageProcessorBuilder.class,
+                SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }
 
-    public boolean shouldWrap(Element e)
+    public boolean shouldWrap(Element elm)
     {
-        String parentName = e.getParentNode().getLocalName().toLowerCase();
-        String grandParentName = e.getParentNode().getParentNode().getLocalName().toLowerCase();
-
-        return !("message-filter".equals(parentName) || "and-filter".equals(parentName)
-            || "or-filter".equals(parentName) || "not-filter".equals(parentName)
-            || "outbound".equals(grandParentName) || "selective-consumer-router".equals(parentName) || "error-filter".equals(parentName));
+        return true;
     }
 }

@@ -31,6 +31,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.mule.routing.MessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
@@ -85,7 +86,10 @@ public abstract class AbstractInboundMessageProcessorTestCase extends AbstractMu
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
         endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        endpointBuilder.setSecurityFilter(securityFilter);
+        if (securityFilter != null)
+        {
+            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+        }
         if (transformer != null)
         {
             endpointBuilder.setTransformers(Collections.singletonList(transformer));

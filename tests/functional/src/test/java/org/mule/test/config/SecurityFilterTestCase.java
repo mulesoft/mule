@@ -1,0 +1,96 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.config;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.security.*;
+import org.mule.api.security.SecurityException;
+import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
+import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
+import org.mule.tck.FunctionalTestCase;
+
+import java.util.List;
+
+/**
+ * Test configuration of security filters
+ */
+public class SecurityFilterTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/config/security-filter-config.xml";
+    }
+
+    public void testConfig() throws Exception
+    {
+        EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint1");
+        assertNotNull(epb);
+        InboundEndpoint iep = epb.buildInboundEndpoint();
+        List<MessageProcessor> mps =iep.getMessageProcessors();
+        int count = 0;
+        InboundSecurityFilterMessageProcessor securityMp = null;
+        for (MessageProcessor mp : mps)
+        {
+            if (mp instanceof InboundSecurityFilterMessageProcessor)
+            {
+                count++;
+                securityMp = (InboundSecurityFilterMessageProcessor) mp;
+            }
+        }
+        assertEquals(1, count);
+        assertEquals(CustomSecurityFilter.class, securityMp.getFilter().getClass());
+
+        epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint2");
+        assertNotNull(epb);
+        iep = epb.buildInboundEndpoint();
+        mps =iep.getMessageProcessors();
+        count = 0;
+        securityMp = null;
+        for (MessageProcessor mp : mps)
+        {
+            if (mp instanceof InboundSecurityFilterMessageProcessor)
+            {
+                count++;
+                securityMp = (InboundSecurityFilterMessageProcessor) mp;
+            }
+        }
+        assertEquals(1, count);
+        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());        
+    }
+
+    /**
+     * Custom security filter class that does nothing at all
+     */
+    public static class CustomSecurityFilter extends AbstractEndpointSecurityFilter
+    {
+        @Override
+        protected void authenticateInbound(MuleEvent event)
+        {
+        }
+
+        @Override
+        protected void authenticateOutbound(MuleEvent event)
+        {
+        }
+
+        @Override
+        protected void doInitialise() throws InitialisationException
+        {
+        }
+    }
+
+}
