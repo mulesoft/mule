@@ -98,7 +98,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private int shutdownTimeout = 5000;
 
-    /** Where Mule stores any runtime files to disk */
+    /**
+     * Where Mule stores any runtime files to disk. Note that in container
+     * mode each app will have its working dir set one level under this dir
+     * (with app's name).
+     *
+     */
     private String workingDirectory = "./.mule";
 
     /**
@@ -147,7 +152,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             id = UUID.getUUID();
         }
-        
+
         if (clusterId == null)
         {
             clusterId = CoreMessages.notClustered().getMessage();
@@ -180,6 +185,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+        if (containerMode)
+        {
+            // in container mode the id is the app name, have each app isolate its work dir
+            this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+        }
     }
 
     /**
