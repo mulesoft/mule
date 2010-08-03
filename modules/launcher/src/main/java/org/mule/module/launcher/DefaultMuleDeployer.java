@@ -48,6 +48,17 @@ public class DefaultMuleDeployer
         throw new UnsupportedOperationException("Undeploy not implemented yet");
     }
 
+    /**
+     * Installs packaged Mule apps from $MULE_HOME/apps directory.
+     * @param packedMuleAppFileName filename of the packed Mule app (only name + ext)
+     */
+    public Application installFromAppDir(String packedMuleAppFileName) throws IOException
+    {
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
+        File appFile = new File(appsDir, packedMuleAppFileName);
+        return installFrom(appFile.toURL());
+    }
+
     public Application installFrom(URL url) throws IOException
     {
         if (!url.toString().endsWith(".zip"))

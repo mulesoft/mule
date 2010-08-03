@@ -29,7 +29,7 @@ public class DeploymentService
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     private List<Application> applications = new ArrayList<Application>();
-    protected DefaultMuleDeployer deployer;
+    protected DefaultMuleDeployer deployer = new DefaultMuleDeployer();
 
     public void start()
     {
@@ -39,8 +39,28 @@ public class DeploymentService
 
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         String[] apps;
-        if (appString == null)
+
+        // mule -app app1:app2:app3 will restrict deployment only to those specified apps
+        final boolean explicitAppSet = appString != null;
+
+        if (!explicitAppSet)
         {
+            // explode any app zips first
+            final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
+            for (String zip : zips)
+            {
+                try
+                {
+                    // we don't care about the returned app object on startup
+                    deployer.installFromAppDir(zip);
+                }
+                catch (IOException e)
+                {
+                    // TODO logging
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+
             // TODO this is a place to put a FQN of the custom sorter (use AND filter)
             // Add string shortcuts for bundled ones
             apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
@@ -57,9 +77,6 @@ public class DeploymentService
             applications.add(a);
         }
 
-        // TODO list exploded, zipped, and merged apps
-
-        deployer = new DefaultMuleDeployer();
 
         for (Application application : applications)
         {
@@ -76,7 +93,7 @@ public class DeploymentService
 
         // only start the monitor thread if we launched in default mode without explicitly
         // stated applications to launch
-        if (appString == null)
+        if (!explicitAppSet)
         {
             scheduleChangeMonitor(appsDir);
         }
