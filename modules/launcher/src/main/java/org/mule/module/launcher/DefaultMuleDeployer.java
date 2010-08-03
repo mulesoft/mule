@@ -10,156 +10,74 @@
 
 package org.mule.module.launcher;
 
-import org.mule.config.StartupContext;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.FilenameUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- *
- */
 public class DefaultMuleDeployer
 {
-    protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
-    private List<Application> applications = new ArrayList<Application>();
-    protected ScheduledExecutorService watchTimer;
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    public void deploy()
+    public void deploy(Application app)
     {
-        // install phase
-        final Map<String, Object> options = StartupContext.get().getStartupOptions();
-        String appString = (String) options.get("app");
+        try
+        {
+            app.install();
+            app.init();
+            app.start();
+        }
+        catch (Throwable t)
+        {
+            // TODO logging
+            t.printStackTrace();
+        }
+    }
+
+    public void undeploy(Application app)
+    {
+        throw new UnsupportedOperationException("Undeploy not implemented yet");
+    }
+
+    public Application installFrom(URL url) throws IOException
+    {
+        if (!url.toString().endsWith(".zip"))
+        {
+            throw new IllegalArgumentException("Only Mule application zips are supported: " + url);
+        }
 
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
-        String[] apps;
-        if (appString == null)
+        String appName;
+        try
         {
-            // TODO this is a place to put a FQN of the custom sorter (use AND filter)
-            // Add string shortcuts for bundled ones
-            apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        }
-        else
-        {
-            apps = appString.split(":");
-        }
-
-        for (String app : apps)
-        {
-            final ApplicationWrapper<Map<String, Object>> a = new ApplicationWrapper<Map<String, Object>>(new DefaultMuleApplication(app));
-            a.setMetaData(options);
-            applications.add(a);
-        }
-
-        for (Application application : applications)
-        {
-            try
+            final String fullPath = url.toURI().toString();
+            appName = FilenameUtils.getBaseName(fullPath);
+            File appDir = new File(appsDir, appName);
+            // normalize the full path + protocol to make unzip happy
+            final File source = new File(url.toURI());
+            FileUtils.unzip(source, appDir);
+            if ("file".equals(url.getProtocol()))
             {
-                application.install();
-                application.init();
-                application.start();
-            }
-            catch (Throwable t)
-            {
-                // TODO logging
-                t.printStackTrace();
+                FileUtils.deleteQuietly(source);
             }
         }
+        catch (URISyntaxException e)
+        {
+            final IOException ex = new IOException(e.getMessage());
+            ex.fillInStackTrace();
+            throw ex;
+        }
 
-        scheduleAppMonitor(new AppDirFileWatcher(appsDir));
-
+        // appname is never null
+        return new ApplicationWrapper<Map<String, Object>>(new DefaultMuleApplication(appName));
     }
-
-    public void undeploy()
-    {
-        if (watchTimer != null)
-        {
-            watchTimer.shutdownNow();
-        }
-        // tear down apps in reverse order
-        Collections.reverse(applications);
-        for (Application application : applications)
-        {
-            try
-            {
-                application.stop();
-                application.dispose();
-            }
-            catch (Throwable t)
-            {
-                // TODO logging
-                t.printStackTrace();
-            }
-        }
-    }
-
-    protected void scheduleAppMonitor(AppDirFileWatcher watcher)
-    {
-        final int reloadIntervalMs = DEFAULT_CHANGES_CHECK_INTERVAL_MS;
-        watchTimer = Executors.newSingleThreadScheduledExecutor(new AppDeployerMonitorThreadFactory());
-
-        // TODO based on the final design, pass in 0 for initial delay for immediate first-time execution
-        watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Application directory check interval: " + reloadIntervalMs);
-        }
-    }
-
-    protected class AppDirFileWatcher implements Runnable
-    {
-        protected File appsDir;
-
-        protected String[] deployedApps = new String[0];
-
-
-        public AppDirFileWatcher(File appsDir)
-        {
-            this.appsDir = appsDir;
-        }
-
-        public void run()
-        {
-            // list new apps
-            final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
-            final String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-
-            final Collection removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
-            final Collection addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
-            // list depoyed apps to compare with a previous run
-            if (zips.length > 0)
-            {
-                // TODO only 1st for now
-                onChange(new File(appsDir, zips[0]));
-            }
-
-            deployedApps = apps;
-        }
-
-        protected synchronized void onChange(File file)
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("================== New Application " + file);
-            }
-        }
-    }
-
 }

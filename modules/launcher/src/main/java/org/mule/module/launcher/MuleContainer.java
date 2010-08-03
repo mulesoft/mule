@@ -19,6 +19,7 @@ import org.mule.config.i18n.Message;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
+import org.mule.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,9 @@ public class MuleContainer
      */
     private static MuleShutdownHook muleShutdownHook;
 
-    protected DefaultMuleDeployer deployer;
+    protected DeploymentService deploymentService;
+
+    private Latch shutdownLatch = new Latch();
 
     /**
      * Application entry point.
@@ -166,8 +169,10 @@ public class MuleContainer
         try
         {
             // TODO pluggable deployer
-            deployer = new DefaultMuleDeployer();
-            deployer.deploy();
+            deploymentService = new DeploymentService();
+            deploymentService.start();
+
+            shutdownLatch.await();
         }
         catch (Throwable e)
         {
@@ -212,16 +217,19 @@ public class MuleContainer
     {
         logger.info("Mule container shutting down due to normal shutdown request");
 
+        shutdownLatch.release();
+
         unregisterShutdownHook();
         doShutdown();
     }
 
     protected void doShutdown()
     {
-        if (deployer != null)
+        if (deploymentService != null)
         {
-            deployer.undeploy();
+            deploymentService.stop();
         }
+
         System.exit(0);
     }
 
