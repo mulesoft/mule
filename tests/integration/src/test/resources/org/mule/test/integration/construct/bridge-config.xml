@@ -44,6 +44,14 @@
           transacted="true"
           inboundAddress="vm://transacted-bridge.in"
           outboundAddress="vm://transacted-maths-service.in" />
+  
+  <bridge name="abstract-parent-bridge"
+          abstract="true"
+          outboundAddress="vm://maths-service.in" />
+
+  <bridge name="concrete-child-bridge"
+          parent="abstract-parent-bridge"
+          inboundAddress="vm://concrete-child-bridge.in" />
 
   <!--
         Test support

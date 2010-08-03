@@ -72,7 +72,10 @@ public class BridgeTestCase extends FunctionalTestCase
         doTestMathsService("vm://transacted-bridge.in");
     }
 
-    // TODO (DDO) add inheritance test
+    public void testInheritance() throws Exception
+    {
+        doTestMathsService("vm://concrete-child-bridge.in");
+    }
 
     private void doTestMathsService(String url) throws MuleException
     {
