@@ -29,7 +29,6 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Meta data is commandline options.
  */
-public class DefaultMuleApplication implements Application<Map<String, Object>>
+public class DefaultMuleApplication implements Application
 {
 
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
@@ -50,7 +49,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
     protected ScheduledExecutorService watchTimer;
 
     private String appName;
-    private Map<String, Object> metaData;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
     protected ApplicationDescriptor descriptor;
@@ -192,16 +190,6 @@ public class DefaultMuleApplication implements Application<Map<String, Object>>
         {
             throw new DeploymentInitException(CoreMessages.failedToLoad(configBuilderClassName), e);
         }
-    }
-
-    public void setMetaData(Map<String, Object> metaData)
-    {
-        this.metaData = metaData;
-    }
-
-    public Map<String, Object> getMetaData()
-    {
-        return this.metaData;
     }
 
     public MuleContext getMuleContext()

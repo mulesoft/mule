@@ -12,11 +12,7 @@ package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
 
-/**
- *
- * @param <M> - meta data class type
- */
-public interface Application<M>
+public interface Application
 {
     void install() throws InstallException;
 
@@ -29,10 +25,6 @@ public interface Application<M>
     void dispose();
 
     void redeploy();
-
-    void setMetaData(M metaData);
-
-    M getMetaData();
 
     MuleContext getMuleContext();
 

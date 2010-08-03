@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -101,7 +100,7 @@ public class DefaultMuleDeployer
             throw ex;
         }
 
-        // appname is never null
-        return new ApplicationWrapper<Map<String, Object>>(new DefaultMuleApplication(appName));
+        // appname is never null by now
+        return new ApplicationWrapper(new DefaultMuleApplication(appName));
     }
 }

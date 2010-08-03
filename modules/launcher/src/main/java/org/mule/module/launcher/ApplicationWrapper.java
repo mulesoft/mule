@@ -18,12 +18,12 @@ import org.mule.api.MuleContext;
  * must be executed with deployment (app) classloader in the context, and not Mule system
  * classloader.
  */
-public class ApplicationWrapper<M> implements Application<M>
+public class ApplicationWrapper implements Application
 {
 
-    private Application<M> delegate;
+    private Application delegate;
 
-    public ApplicationWrapper(Application<M> delegate)
+    public ApplicationWrapper(Application delegate)
     {
         this.delegate = delegate;
     }
@@ -50,11 +50,6 @@ public class ApplicationWrapper<M> implements Application<M>
     public ClassLoader getDeploymentClassLoader()
     {
         return delegate.getDeploymentClassLoader();
-    }
-
-    public M getMetaData()
-    {
-        return delegate.getMetaData();
     }
 
     public MuleContext getMuleContext()
@@ -103,11 +98,6 @@ public class ApplicationWrapper<M> implements Application<M>
     public void redeploy()
     {
         delegate.redeploy();
-    }
-
-    public void setMetaData(M metaData)
-    {
-        delegate.setMetaData(metaData);
     }
 
     public void start() throws DeploymentStartException

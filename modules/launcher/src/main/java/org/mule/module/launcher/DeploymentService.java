@@ -72,8 +72,7 @@ public class DeploymentService
 
         for (String app : apps)
         {
-            final ApplicationWrapper<Map<String, Object>> a = new ApplicationWrapper<Map<String, Object>>(new DefaultMuleApplication(app));
-            a.setMetaData(options);
+            final ApplicationWrapper a = new ApplicationWrapper(new DefaultMuleApplication(app));
             applications.add(a);
         }
 
@@ -169,8 +168,11 @@ public class DeploymentService
 
             // TODO deleting apps not yet implemented
             final Collection removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
+
+            // new exploded Mule apps
             final Collection addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
 
+            // new packed Mule apps
             for (String zip : zips)
             {
                 try
