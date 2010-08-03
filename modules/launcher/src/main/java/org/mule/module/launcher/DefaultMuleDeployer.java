@@ -56,6 +56,12 @@ public class DefaultMuleDeployer
     {
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         File appFile = new File(appsDir, packedMuleAppFileName);
+        // basic security measure: outside apps dir use installFrom(url) and go through any
+        // restrictions applied to it
+        if (!appFile.getParentFile().equals(appsDir))
+        {
+            throw new SecurityException("installFromAppDir() can only deploy from $MULE_HOME/apps. Use installFrom(url) instead.");
+        }
         return installFrom(appFile.toURL());
     }
 
