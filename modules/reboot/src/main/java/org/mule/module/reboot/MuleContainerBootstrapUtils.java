@@ -52,7 +52,7 @@ public final class MuleContainerBootstrapUtils
     }
 
     /**
-     * @return null if running embedded
+     * @return null if running embedded, otherwise the apps dir as a File ref
      */
     public static File getMuleAppsFile()
     {

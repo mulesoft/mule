@@ -148,6 +148,11 @@ public class ApplicationWrapper<M> implements Application<M>
         }
     }
 
+    public String getAppName()
+    {
+        return delegate.getAppName();
+    }
+
     @Override
     public String toString()
     {

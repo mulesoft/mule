@@ -13,10 +13,13 @@ package org.mule.module.launcher;
 import org.mule.config.StartupContext;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
 /**
  *
@@ -31,10 +34,13 @@ public class DefaultMuleDeployer
         final Map<String, Object> options = StartupContext.get().getStartupOptions();
         String appString = (String) options.get("app");
 
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
         String[] apps;
         if (appString == null)
         {
-            apps = MuleContainerBootstrapUtils.getMuleAppsFile().list();
+            // TODO this is a place to put a FQN of the custom sorter (use AND filter)
+            // Add string shortcuts for bundled ones
+            apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
         }
         else
         {
@@ -84,3 +90,4 @@ public class DefaultMuleDeployer
         }
     }
 }
+>>>>>>> BL-87 Mule application writes a state file ('started' contents atm) in the apps dir. Convention is <app-name>-state.txt
