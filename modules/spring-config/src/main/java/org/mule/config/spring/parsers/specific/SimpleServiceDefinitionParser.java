@@ -20,23 +20,19 @@ import org.w3c.dom.Element;
 
 public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefinitionParser
 {
-    private static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
-    private static final String ADDRESS_ATTRIBUTE = "address";
-    private static final String INBOUND_ENDPOINT_CHILD = "inbound-endpoint";
-
-    private static final String RESPONSE_TRANSFORMER_REFS_ATTRIBUTE = "responseTransformer-refs";
-    private static final String TRANSFORMER_REFS_ATTRIBUTE = "transformer-refs";
-
     private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
     private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
 
     public SimpleServiceDefinitionParser()
     {
         super.addAlias("endpoint", "endpointBuilder");
+        
         super.registerPreProcessor(new CheckExclusiveAttributes(new String[][]{
             new String[]{ADDRESS_ATTRIBUTE}, new String[]{ENDPOINT_REF_ATTRIBUTE}}));
+        
         super.registerPreProcessor(new CheckExclusiveAttributes(new String[][]{
             new String[]{COMPONENT_CLASS_ATTRIBUTE}, new String[]{COMPONENT_REF_ATTRIBUTE}}));
+        
         super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
             ENDPOINT_REF_ATTRIBUTE, ADDRESS_ATTRIBUTE, TRANSFORMER_REFS_ATTRIBUTE,
             RESPONSE_TRANSFORMER_REFS_ATTRIBUTE}, new String[]{INBOUND_ENDPOINT_CHILD}));

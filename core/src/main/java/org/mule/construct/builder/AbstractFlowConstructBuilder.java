@@ -19,21 +19,22 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.service.DefaultServiceExceptionStrategy;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
-    protected static final DefaultServiceExceptionStrategy DEFAULT_SERVICE_EXCEPTION_STRATEGY = new DefaultServiceExceptionStrategy();
+    private static final DefaultServiceExceptionStrategy DEFAULT_SERVICE_EXCEPTION_STRATEGY = new DefaultServiceExceptionStrategy();
+
+    private ExceptionListener exceptionListener;
+    private InboundEndpoint inboundEndpoint;
+    private EndpointBuilder inboundEndpointBuilder;
+    private String inboundAddress;
 
     protected String name;
-    protected ExceptionListener exceptionListener;
-    protected InboundEndpoint inboundEndpoint;
-    protected EndpointBuilder inboundEndpointBuilder;
-    protected String inboundAddress;
 
-    // getters should be exposed only for builders where it makes sense
+    // setters should be exposed only for builders where it makes sense
     protected List<MessageProcessor> inboundTransformers;
     protected List<MessageProcessor> inboundResponseTransformers;
 
@@ -88,7 +89,7 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         }
     }
 
-    protected MessageSource buildMessageSource(MuleContext muleContext) throws MuleException
+    protected InboundEndpoint getOrBuildInboundEndpoint(MuleContext muleContext) throws MuleException
     {
         if (inboundEndpoint != null)
         {
@@ -113,8 +114,15 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
             inboundEndpointBuilder.setResponseMessageProcessors(inboundResponseTransformers);
         }
 
+        doConfigureInboundEndpointBuilder(muleContext, inboundEndpointBuilder);
+
         return inboundEndpointBuilder.buildInboundEndpoint();
     }
 
     protected abstract MessageExchangePattern getInboundMessageExchangePattern();
+
+    protected void doConfigureInboundEndpointBuilder(MuleContext muleContext, EndpointBuilder endpointBuilder)
+    {
+        // template method
+    }
 }

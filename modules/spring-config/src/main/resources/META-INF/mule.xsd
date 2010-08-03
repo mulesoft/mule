@@ -1412,18 +1412,17 @@
         </xsd:complexContent>
     </xsd:complexType>    
     
-    
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple in-out service, with no outbound router.
+                A simple request-response service, with no outbound router.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="simpleServiceType">
         <xsd:annotation>
             <xsd:documentation>
-                A simple in-out service, with no outbound router.
+                A simple request-response service, with no outbound router.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
@@ -1484,6 +1483,93 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Specifies a component class. This is a shortcut that is equivalent to providing a 'prototype-object' element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="bridge" type="bridgeType" substitutionGroup="abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A bridge with a single inbound endpoint and a single outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="bridgeType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A bridge with a single inbound endpoint and a single outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="baseFlowConstructType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint on which messages are received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint to which messages are sent.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="inboundAddress" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The address on which this bridge is listening.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="inboundEndpoint-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The endpoint on which this bridge is listening.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outboundAddress" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The address to which messages are sent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outboundEndpoint-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The endpoint to which messages are sent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list of the transformers that will be applied (in order) to the message before it is delivered to the destination endpoint.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list of the transformers that will be applied (in order) to the synchronous response (if any) of the destination endpoint.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attributeGroup ref="allExchangePatterns" />
+                <xsd:attribute name="transacted" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines if the bridge will consume its inbound messages and dispatch its outbound ones within a transaction.
+                            Attempt will be made to automatically select the most appropriate transaction manager (including XA): for more control, use child endpoints.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

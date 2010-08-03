@@ -15,8 +15,10 @@ import java.beans.ExceptionListener;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
@@ -51,8 +53,8 @@ public abstract class AbstractFlowConstructFactoryBean
     protected ApplicationContext applicationContext;
     protected MuleContext muleContext;
 
-    // FIXME (DDO) terrible hack to get around the first call to getObject that
-    // comes too soon (nothing is injected yet)
+    // FIXME terrible hack to get around the first call to getObject that comes too
+    // soon (nothing is injected yet)
     protected AbstractFlowConstruct flowConstruct = NULL_FLOW_CONSTRUCT;
 
     public boolean isSingleton()
@@ -75,6 +77,18 @@ public abstract class AbstractFlowConstructFactoryBean
     public void setName(String name)
     {
         getFlowConstructBuilder().name(name);
+    }
+    
+    public void setMessageSource(MessageSource messageSource)
+    {
+        if (messageSource instanceof InboundEndpoint)
+        {
+            getFlowConstructBuilder().inboundEndpoint((InboundEndpoint) messageSource);
+        }
+        else
+        {
+            throw new IllegalArgumentException("InboundEndpoint is the only supported message source");
+        }
     }
 
     public void setExceptionListener(ExceptionListener exceptionListener)

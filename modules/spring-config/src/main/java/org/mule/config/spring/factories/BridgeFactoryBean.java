@@ -8,76 +8,73 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.ws.config.spring.factories;
+package org.mule.config.spring.factories;
 
-import java.io.File;
-import java.net.URI;
-
+import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
-import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
+import org.mule.construct.Bridge;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
-import org.mule.module.ws.construct.WSProxy;
-import org.mule.module.ws.construct.builder.WSProxyBuilder;
+import org.mule.construct.builder.BridgeBuilder;
 
-public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
+public class BridgeFactoryBean extends AbstractFlowConstructFactoryBean
 {
-    final WSProxyBuilder wsProxyBuilder = new WSProxyBuilder();
+    final BridgeBuilder bridgeBuilder = new BridgeBuilder();
 
     public Class<?> getObjectType()
     {
-        return WSProxy.class;
+        return Bridge.class;
     }
 
     @Override
-    protected AbstractFlowConstructBuilder<WSProxyBuilder, WSProxy> getFlowConstructBuilder()
+    protected AbstractFlowConstructBuilder<BridgeBuilder, Bridge> getFlowConstructBuilder()
     {
-        return wsProxyBuilder;
+        return bridgeBuilder;
     }
-
+    
     public void setEndpoint(OutboundEndpoint endpoint)
     {
-        wsProxyBuilder.outboundEndpoint(endpoint);
+        bridgeBuilder.outboundEndpoint(endpoint);
     }
 
     public void setInboundAddress(String inboundAddress)
     {
-        wsProxyBuilder.inboundAddress(inboundAddress);
+        bridgeBuilder.inboundAddress(inboundAddress);
     }
 
     public void setInboundEndpoint(EndpointBuilder inboundEndpointBuilder)
     {
-        wsProxyBuilder.inboundEndpoint(inboundEndpointBuilder);
+        bridgeBuilder.inboundEndpoint(inboundEndpointBuilder);
     }
 
     public void setOutboundAddress(String outboundAddress)
     {
-        wsProxyBuilder.outboundAddress(outboundAddress);
+        bridgeBuilder.outboundAddress(outboundAddress);
     }
 
     public void setOutboundEndpoint(EndpointBuilder outboundEndpointBuilder)
     {
-        wsProxyBuilder.outboundEndpoint(outboundEndpointBuilder);
+        bridgeBuilder.outboundEndpoint(outboundEndpointBuilder);
     }
 
     public void setTransformers(Transformer... transformers)
     {
-        wsProxyBuilder.outboundTransformers(transformers);
+        bridgeBuilder.inboundTransformers(transformers);
     }
 
     public void setResponseTransformers(Transformer... responseTransformers)
     {
-        wsProxyBuilder.outboundResponseTransformers(responseTransformers);
+        bridgeBuilder.inboundResponseTransformers(responseTransformers);
     }
 
-    public void setWsdlLocation(URI wsldLocation)
+    public void setTransacted(boolean transacted)
     {
-        wsProxyBuilder.wsldLocation(wsldLocation);
+        bridgeBuilder.transacted(transacted);
     }
 
-    public void setWsdlFile(File wsdlFile)
+    public void setExchangePattern(MessageExchangePattern exchangePattern)
     {
-        wsProxyBuilder.wsdlFile(wsdlFile);
+        bridgeBuilder.exchangePattern(exchangePattern);
     }
 }

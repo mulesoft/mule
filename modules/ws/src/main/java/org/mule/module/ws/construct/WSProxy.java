@@ -97,7 +97,8 @@ public class WSProxy extends AbstractFlowConstruct
         if (messageSource == null)
         {
             throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("messageSource can't be null on: " + this.toString()));
+                MessageFactory.createStaticMessage("messageSource can't be null on: " + this.toString()),
+                this);
         }
 
         super.setMessageSource(messageSource);
@@ -105,7 +106,8 @@ public class WSProxy extends AbstractFlowConstruct
         if (outboundEndpoint == null)
         {
             throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("outboundEndpoint can't be null on: " + this.toString()));
+                MessageFactory.createStaticMessage("outboundEndpoint can't be null on: " + this.toString()),
+                this);
         }
 
         this.outboundEndpoint = outboundEndpoint;
@@ -138,13 +140,15 @@ public class WSProxy extends AbstractFlowConstruct
                 MessageExchangePattern.REQUEST_RESPONSE)))
         {
             throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("WSProxy only works with a request-response inbound endpoint."));
+                MessageFactory.createStaticMessage("WSProxy only works with a request-response inbound endpoint."),
+                this);
         }
 
         if (!outboundEndpoint.getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE))
         {
             throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("WSProxy only works with a request-response outbound endpoint."));
+                MessageFactory.createStaticMessage("WSProxy only works with a request-response outbound endpoint."),
+                this);
         }
     }
 

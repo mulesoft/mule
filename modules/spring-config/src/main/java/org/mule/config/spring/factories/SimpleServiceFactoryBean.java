@@ -12,14 +12,11 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.SimpleService;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.SimpleServiceBuilder;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
@@ -51,18 +48,6 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         if (springBeanLookup != null)
         {
             springBeanLookup.setApplicationContext(applicationContext);
-        }
-    }
-
-    public void setMessageSource(MessageSource messageSource)
-    {
-        if (messageSource instanceof InboundEndpoint)
-        {
-            simpleServiceBuilder.inboundEndpoint((InboundEndpoint) messageSource);
-        }
-        else
-        {
-            throw new IllegalArgumentException("SimpleService requires a InboundEndpoint messagse source");
         }
     }
 

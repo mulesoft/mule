@@ -10,6 +10,10 @@
 
 package org.mule.construct;
 
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -32,11 +36,6 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
-
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -190,7 +189,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
      * method but if you wish to use another {@link MessageProcessorBuilder} or just
      * a single {@link MessageProcessor} then this method can be overridden and
      * return a single {@link MessageProcessor} instead.
-     * @throws MuleException 
+     * 
+     * @throws MuleException
      */
     protected void createMessageProcessor() throws MuleException
     {

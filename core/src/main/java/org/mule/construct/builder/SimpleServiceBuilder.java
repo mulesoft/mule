@@ -10,6 +10,8 @@
 
 package org.mule.construct.builder;
 
+import java.util.Arrays;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -17,6 +19,7 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.object.ObjectFactory;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -24,8 +27,6 @@ import org.mule.construct.SimpleService;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Fluent API for the creation of a SimpleService.
@@ -42,17 +43,15 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
         return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    @SuppressWarnings("unchecked")
     public SimpleServiceBuilder inboundTransformers(Transformer... transformers)
     {
-        this.inboundTransformers = Arrays.asList(transformers);
+        this.inboundTransformers = Arrays.asList((MessageProcessor[]) transformers);
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     public SimpleServiceBuilder inboundResponseTransformers(Transformer... responseTransformers)
     {
-        this.inboundResponseTransformers = Arrays.asList(responseTransformers);
+        this.inboundResponseTransformers = Arrays.asList((MessageProcessor[]) responseTransformers);
         return this;
     }
 
@@ -95,6 +94,6 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     @Override
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        return new SimpleService(muleContext, name, buildMessageSource(muleContext), component);
+        return new SimpleService(muleContext, name, getOrBuildInboundEndpoint(muleContext), component);
     }
 }

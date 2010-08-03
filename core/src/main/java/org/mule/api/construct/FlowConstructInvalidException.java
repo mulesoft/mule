@@ -28,6 +28,12 @@ public class FlowConstructInvalidException extends MuleException
         super(message);
     }
 
+    public FlowConstructInvalidException(Message message, FlowConstruct flowConstruct)
+    {
+        super(message);
+        addInfo("FlowConstruct", flowConstruct);
+    }
+
     public FlowConstructInvalidException(Throwable cause)
     {
         super(cause);

@@ -21,6 +21,20 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
 {
     private static final String ABSTRACT_ATTRIBUTE = "abstract";
     private static final String PARENT_ATTRIBUTE = "parent";
+    
+    protected static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
+    protected static final String ADDRESS_ATTRIBUTE = "address";
+    
+    protected static final String INBOUND_ADDRESS_ATTRIBUTE = "inboundAddress";
+    protected static final String INBOUND_ENDPOINT_REF_ATTRIBUTE = "inboundEndpoint-ref";
+    protected static final String INBOUND_ENDPOINT_CHILD = "inbound-endpoint";
+
+    protected static final String OUTBOUND_ADDRESS_ATTRIBUTE = "outboundAddress";
+    protected static final String OUTBOUND_ENDPOINT_REF_ATTRIBUTE = "outboundEndpoint-ref";
+    protected static final String OUTBOUND_ENDPOINT_CHILD = "outboundEndpoint";
+
+    protected static final String TRANSFORMER_REFS_ATTRIBUTE = "transformer-refs";
+    protected static final String RESPONSE_TRANSFORMER_REFS_ATTRIBUTE = "responseTransformer-refs";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -40,7 +54,7 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
 
     private void handleParentAttribute(Element element, BeanDefinitionBuilder builder)
     {
-        String parentAttribute = element.getAttribute(PARENT_ATTRIBUTE);
+        final String parentAttribute = element.getAttribute(PARENT_ATTRIBUTE);
         if (StringUtils.isNotBlank(parentAttribute))
         {
             builder.setParentName(parentAttribute);
@@ -50,7 +64,7 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
 
     private void handleAbstractAttribute(Element element, BeanDefinitionBuilder builder)
     {
-        String abstractAttribute = element.getAttribute(ABSTRACT_ATTRIBUTE);
+        final String abstractAttribute = element.getAttribute(ABSTRACT_ATTRIBUTE);
         if (StringUtils.isNotBlank(abstractAttribute))
         {
             builder.setAbstract(Boolean.parseBoolean(abstractAttribute));

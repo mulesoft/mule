@@ -36,6 +36,7 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
+import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.specific.CompositeMessageProcessorDefinitionParser;
@@ -298,6 +299,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Flow Constructs
         registerBeanDefinitionParser("flow", new FlowDefinitionParser());
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
+        registerBeanDefinitionParser("bridge", new BridgeDefinitionParser());
 
         // Components
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
