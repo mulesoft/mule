@@ -85,7 +85,7 @@ public class MuleContainer
     private static String startupPropertiesFile = null;
 
     /**
-     * The Runtime shutdown thread used to dispose this server
+     * The Runtime shutdown thread used to undeploy this server
      */
     private static MuleShutdownHook muleShutdownHook;
 
@@ -220,7 +220,7 @@ public class MuleContainer
     {
         if (deployer != null)
         {
-            deployer.dispose();
+            deployer.undeploy();
         }
         System.exit(0);
     }

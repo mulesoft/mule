@@ -11,13 +11,13 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.module.launcher.descriptor.Preferred;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
+import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 
@@ -64,9 +64,8 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     public ApplicationDescriptor fetch(String appName) throws IOException
     {
-        final String muleHome = System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
-
-        File appDir = new File(String.format("%s/apps/%s", muleHome, appName));
+        final File appsDir = MuleContainerBootstrapUtils.getMuleAppsFile();
+        File appDir = new File(appsDir, appName);
         if(!appDir.exists())
         {
             throw new MuleRuntimeException(

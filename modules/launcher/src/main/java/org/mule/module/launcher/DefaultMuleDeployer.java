@@ -12,21 +12,34 @@ package org.mule.module.launcher;
 
 import org.mule.config.StartupContext;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.util.CollectionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
  */
 public class DefaultMuleDeployer
 {
+    protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
     private List<Application> applications = new ArrayList<Application>();
+    protected ScheduledExecutorService watchTimer;
+
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     public void deploy()
     {
@@ -69,10 +82,16 @@ public class DefaultMuleDeployer
             }
         }
 
+        scheduleAppMonitor(new AppDirFileWatcher(appsDir));
+
     }
 
-    public void dispose()
+    public void undeploy()
     {
+        if (watchTimer != null)
+        {
+            watchTimer.shutdownNow();
+        }
         // tear down apps in reverse order
         Collections.reverse(applications);
         for (Application application : applications)
@@ -89,5 +108,58 @@ public class DefaultMuleDeployer
             }
         }
     }
+
+    protected void scheduleAppMonitor(AppDirFileWatcher watcher)
+    {
+        final int reloadIntervalMs = DEFAULT_CHANGES_CHECK_INTERVAL_MS;
+        watchTimer = Executors.newSingleThreadScheduledExecutor(new AppDeployerMonitorThreadFactory());
+
+        // TODO based on the final design, pass in 0 for initial delay for immediate first-time execution
+        watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
+
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Application directory check interval: " + reloadIntervalMs);
+        }
+    }
+
+    protected class AppDirFileWatcher implements Runnable
+    {
+        protected File appsDir;
+
+        protected String[] deployedApps = new String[0];
+
+
+        public AppDirFileWatcher(File appsDir)
+        {
+            this.appsDir = appsDir;
+        }
+
+        public void run()
+        {
+            // list new apps
+            final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
+            final String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+
+            final Collection removedApps = CollectionUtils.subtract(Arrays.asList(deployedApps), Arrays.asList(apps));
+            final Collection addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
+            // list depoyed apps to compare with a previous run
+            if (zips.length > 0)
+            {
+                // TODO only 1st for now
+                onChange(new File(appsDir, zips[0]));
+            }
+
+            deployedApps = apps;
+        }
+
+        protected synchronized void onChange(File file)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("================== New Application " + file);
+            }
+        }
+    }
+
 }
->>>>>>> BL-87 Mule application writes a state file ('started' contents atm) in the apps dir. Convention is <app-name>-state.txt
