@@ -118,9 +118,8 @@ public class DefaultMuleApplication implements Application
         {
             this.muleContext.start();
             // save app's state in the marker file
-            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-state.txt", getAppName()));
-            // TODO state enum
-            FileUtils.writeStringToFile(marker, "started");
+            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", getAppName()));
+            FileUtils.writeStringToFile(marker, "Delete this file while Mule is running to undeploy this app in a clean way.");
         }
         catch (MuleException e)
         {
