@@ -25,7 +25,6 @@ import org.mule.construct.builder.AbstractFlowConstructWithSingleOutboundEndpoin
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.util.FileUtils;
 
-// TODO (DDO) unit test
 public class WSProxyBuilder extends
     AbstractFlowConstructWithSingleOutboundEndpointBuilder<WSProxyBuilder, WSProxy>
 {

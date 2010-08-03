@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="WeatherForecaster"
+  targetNamespace="http://tests.mule.org/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://tests.mule.org/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified"
+      elementFormDefault="unqualified" targetNamespace="http://tests.mule.org/"
+      xmlns:tns="http://tests.mule.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="GetWeatherByZipCode" type="tns:GetWeatherByZipCode" />
+      <xs:element name="GetWeatherByZipCodeResponse" type="tns:GetWeatherByZipCodeResponse" />
+      <xs:complexType name="GetWeatherByZipCode">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetWeatherByZipCodeResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="GetWeatherByZipCodeResponse">
+    <wsdl:part element="tns:GetWeatherByZipCodeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetWeatherByZipCode">
+    <wsdl:part element="tns:GetWeatherByZipCode" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WeatherForecaster">
+    <wsdl:operation name="GetWeatherByZipCode">
+      <wsdl:input message="tns:GetWeatherByZipCode" name="GetWeatherByZipCode">
+      </wsdl:input>
+      <wsdl:output message="tns:GetWeatherByZipCodeResponse"
+        name="GetWeatherByZipCodeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WeatherForecasterSoapBinding" type="tns:WeatherForecaster">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetWeatherByZipCode">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetWeatherByZipCode">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetWeatherByZipCodeResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WeatherForecaster">
+    <wsdl:port binding="tns:WeatherForecasterSoapBinding"
+      name="WeatherForecasterPort">
+      <soap:address location="http://localhost:6090/weather-forecast" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
