@@ -38,13 +38,4 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
             return super.getPropertyName(e);
         }
     }
-    
-    protected void preProcess(Element element)
-    {
-        super.preProcess(element);
-        if (isAllowClassAttribute())
-        {
-           clazz = null; // reset for this element
-        }
-    }
 }
