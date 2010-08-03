@@ -40,4 +40,6 @@ public interface Application<M>
      * @return a classloader associated with this deployment 
      */
     ClassLoader getDeploymentClassLoader();
+
+    String getAppName();
 }
