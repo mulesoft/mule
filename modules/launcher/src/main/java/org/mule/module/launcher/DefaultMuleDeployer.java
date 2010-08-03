@@ -67,6 +67,7 @@ public class DefaultMuleDeployer
 
     public Application installFrom(URL url) throws IOException
     {
+        // TODO plug in app-bloodhound/validator here?
         if (!url.toString().endsWith(".zip"))
         {
             throw new IllegalArgumentException("Only Mule application zips are supported: " + url);
@@ -77,6 +78,12 @@ public class DefaultMuleDeployer
         try
         {
             final String fullPath = url.toURI().toString();
+
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Exploding a Mule application archive: " + fullPath);
+            }
+
             appName = FilenameUtils.getBaseName(fullPath);
             File appDir = new File(appsDir, appName);
             // normalize the full path + protocol to make unzip happy
