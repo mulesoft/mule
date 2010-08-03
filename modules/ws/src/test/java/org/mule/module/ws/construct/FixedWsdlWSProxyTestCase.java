@@ -19,7 +19,7 @@ public class FixedWsdlWSProxyTestCase extends AbstractWSProxyTestCase
     @Override
     protected WSProxy newWSProxy(OutboundEndpoint testOutboundEndpoint) throws Exception
     {
-        return new WSProxy(muleContext, "fixed-wsdl-ws-proxy", directInboundMessageSource,
+        return new WSProxy("fixed-wsdl-ws-proxy", muleContext, directInboundMessageSource,
             testOutboundEndpoint, "fake_wsdl " + InetAddress.getLocalHost().getHostName());
     }
 }

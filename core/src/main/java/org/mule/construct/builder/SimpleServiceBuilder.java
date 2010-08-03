@@ -94,6 +94,6 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     @Override
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        return new SimpleService(muleContext, name, getOrBuildInboundEndpoint(muleContext), component);
+        return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), component);
     }
 }

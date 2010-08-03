@@ -25,6 +25,7 @@ import org.mule.construct.builder.AbstractFlowConstructWithSingleOutboundEndpoin
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.util.FileUtils;
 
+// TODO (DDO) unit test
 public class WSProxyBuilder extends
     AbstractFlowConstructWithSingleOutboundEndpointBuilder<WSProxyBuilder, WSProxy>
 {
@@ -85,7 +86,7 @@ public class WSProxyBuilder extends
 
     private WSProxy buildDynamicWsdlUriWSProxy(MuleContext muleContext) throws MuleException
     {
-        return new WSProxy(muleContext, name, getOrBuildInboundEndpoint(muleContext),
+        return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
             getOrBuildOutboundEndpoint(muleContext));
     }
 
@@ -93,7 +94,7 @@ public class WSProxyBuilder extends
     {
         try
         {
-            return new WSProxy(muleContext, name, getOrBuildInboundEndpoint(muleContext),
+            return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
                 getOrBuildOutboundEndpoint(muleContext), FileUtils.readFileToString(wsdlFile));
         }
         catch (final IOException ioe)
@@ -104,7 +105,7 @@ public class WSProxyBuilder extends
 
     private WSProxy buildStaticWsdlUriWSProxy(MuleContext muleContext) throws MuleException
     {
-        return new WSProxy(muleContext, name, getOrBuildInboundEndpoint(muleContext),
+        return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
             getOrBuildOutboundEndpoint(muleContext), wsldLocation);
     }
 }

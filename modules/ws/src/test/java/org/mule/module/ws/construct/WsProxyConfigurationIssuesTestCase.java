@@ -26,7 +26,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testNullMessageSource", null,
+                return new WSProxy("testNullMessageSource", muleContext, null,
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
                         muleContext));
             }
@@ -39,7 +39,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testNullOutboundEndpoint",
+                return new WSProxy("testNullOutboundEndpoint", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null);
             }
         });
@@ -51,7 +51,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testNullOutboundEndpointWithWsdl",
+                return new WSProxy("testNullOutboundEndpointWithWsdl", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null, "fake_wsdl");
             }
         });
@@ -63,7 +63,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testBlankWsdlContents",
+                return new WSProxy("testBlankWsdlContents", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
                         muleContext), "");
@@ -77,7 +77,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testNullWsdlUrl",
+                return new WSProxy("testNullWsdlUrl", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
                         muleContext), (URI) null);
@@ -91,7 +91,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testOneWayInboundEndpoint",
+                return new WSProxy("testOneWayInboundEndpoint", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.ONE_WAY),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
                         muleContext));
@@ -105,7 +105,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         {
             public WSProxy call() throws Exception
             {
-                return new WSProxy(muleContext, "testOneWayOutboundEndpoint",
+                return new WSProxy("testOneWayOutboundEndpoint", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext));
             }

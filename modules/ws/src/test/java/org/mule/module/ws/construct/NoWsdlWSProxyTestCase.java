@@ -18,6 +18,6 @@ public class NoWsdlWSProxyTestCase extends AbstractWSProxyTestCase
     @Override
     protected WSProxy newWSProxy(OutboundEndpoint testOutboundEndpoint) throws Exception
     {
-        return new WSProxy(muleContext, "no-wsdl-ws-proxy", directInboundMessageSource, testOutboundEndpoint);
+        return new WSProxy("no-wsdl-ws-proxy", muleContext, directInboundMessageSource, testOutboundEndpoint);
     }
 }

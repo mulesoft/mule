@@ -28,13 +28,11 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
  * It enforces a consistent exchange pattern across its endpoints. If declared
  * transactional, it ensures that the correct endpoint configuration is in place.
  */
-// TODO (DDO) unit test
 public class Bridge extends AbstractFlowConstruct
 {
     private final OutboundEndpoint outboundEndpoint;
     private final MessageExchangePattern exchangePattern;
     private final boolean transacted;
-    private InboundEndpoint inboundEndpoint;
 
     public Bridge(String name,
                   MuleContext muleContext,
@@ -72,24 +70,16 @@ public class Bridge extends AbstractFlowConstruct
     {
         super.validateConstruct();
 
-        if (!(messageSource instanceof InboundEndpoint))
+        if (messageSource instanceof InboundEndpoint)
         {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("Bridge only works with an inbound endpoint as its message source."),
-                this);
+            validateInboundEndpoint((InboundEndpoint) messageSource);
         }
 
-        inboundEndpoint = (InboundEndpoint) messageSource;
+        validateOutboundEndpoint();
+    }
 
-        if (inboundEndpoint.getExchangePattern() != exchangePattern)
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("Inconsistent bridge inbound endpoint exchange pattern, expected "
-                                                   + exchangePattern
-                                                   + " but was "
-                                                   + inboundEndpoint.getExchangePattern()), this);
-        }
-
+    private void validateOutboundEndpoint() throws FlowConstructInvalidException
+    {
         if (outboundEndpoint.getExchangePattern() != exchangePattern)
         {
             throw new FlowConstructInvalidException(
@@ -97,20 +87,6 @@ public class Bridge extends AbstractFlowConstruct
                                                    + exchangePattern
                                                    + " but was "
                                                    + outboundEndpoint.getExchangePattern()), this);
-        }
-
-        if (transacted && !inboundEndpoint.getTransactionConfig().isConfigured())
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("A transacted bridge requires a transacted inbound endpoint"),
-                this);
-        }
-
-        if (!transacted && inboundEndpoint.getTransactionConfig().isConfigured())
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("A non-transacted bridge requires a non-transacted inbound endpoint"),
-                this);
         }
 
         if (transacted && !outboundEndpoint.getTransactionConfig().isConfigured())
@@ -124,6 +100,33 @@ public class Bridge extends AbstractFlowConstruct
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("A non-transacted bridge requires a non-transacted outbound endpoint"),
+                this);
+        }
+    }
+
+    private void validateInboundEndpoint(InboundEndpoint inboundEndpoint)
+        throws FlowConstructInvalidException
+    {
+        if (inboundEndpoint.getExchangePattern() != exchangePattern)
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("Inconsistent bridge inbound endpoint exchange pattern, expected "
+                                                   + exchangePattern
+                                                   + " but was "
+                                                   + inboundEndpoint.getExchangePattern()), this);
+        }
+
+        if (transacted && !inboundEndpoint.getTransactionConfig().isConfigured())
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("A transacted bridge requires a transacted inbound endpoint"),
+                this);
+        }
+
+        if (!transacted && inboundEndpoint.getTransactionConfig().isConfigured())
+        {
+            throw new FlowConstructInvalidException(
+                MessageFactory.createStaticMessage("A non-transacted bridge requires a non-transacted inbound endpoint"),
                 this);
         }
     }

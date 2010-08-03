@@ -57,37 +57,37 @@ public class WSProxy extends AbstractFlowConstruct
     private final AbstractProxyRequestProcessor proxyMessageProcessor;
     private final OutboundEndpoint outboundEndpoint;
 
-    public WSProxy(MuleContext muleContext,
-                   String name,
+    public WSProxy(String name,
+                   MuleContext muleContext,
                    MessageSource messageSource,
                    OutboundEndpoint outboundEndpoint) throws MuleException
     {
-        this(muleContext, name, messageSource, outboundEndpoint, new DynamicWsdlProxyRequestProcessor(
+        this(name, muleContext, messageSource, outboundEndpoint, new DynamicWsdlProxyRequestProcessor(
             outboundEndpoint));
     }
 
-    public WSProxy(MuleContext muleContext,
-                   String name,
+    public WSProxy(String name,
+                   MuleContext muleContext,
                    MessageSource messageSource,
                    OutboundEndpoint outboundEndpoint,
                    String wsdlContents) throws MuleException
     {
-        this(muleContext, name, messageSource, outboundEndpoint, new StaticWsdlProxyRequestProcessor(
+        this(name, muleContext, messageSource, outboundEndpoint, new StaticWsdlProxyRequestProcessor(
             wsdlContents));
     }
 
-    public WSProxy(MuleContext muleContext,
-                   String name,
+    public WSProxy(String name,
+                   MuleContext muleContext,
                    MessageSource messageSource,
                    OutboundEndpoint outboundEndpoint,
                    URI wsdlUri) throws MuleException
     {
-        this(muleContext, name, messageSource, outboundEndpoint,
+        this(name, muleContext, messageSource, outboundEndpoint,
             new DynamicWsdlProxyRequestProcessor(wsdlUri));
     }
 
-    private WSProxy(MuleContext muleContext,
-                    String name,
+    private WSProxy(String name,
+                    MuleContext muleContext,
                     MessageSource messageSource,
                     OutboundEndpoint outboundEndpoint,
                     AbstractProxyRequestProcessor proxyMessageProcessor) throws MuleException

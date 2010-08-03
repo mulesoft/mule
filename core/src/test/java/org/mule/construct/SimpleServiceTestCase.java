@@ -25,7 +25,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
     {
         super.doSetUp();
 
-        simpleService = new SimpleService(muleContext, "test-simple-service", directInboundMessageSource,
+        simpleService = new SimpleService("test-simple-service", muleContext, directInboundMessageSource,
             COMPONENT);
     }
 

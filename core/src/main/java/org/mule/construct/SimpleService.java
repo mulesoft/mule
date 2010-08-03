@@ -30,8 +30,8 @@ public class SimpleService extends AbstractFlowConstruct
 {
     private final Component component;
 
-    public SimpleService(MuleContext muleContext,
-                         String name,
+    public SimpleService(String name,
+                         MuleContext muleContext,
                          MessageSource messageSource,
                          Component component) throws MuleException
     {
