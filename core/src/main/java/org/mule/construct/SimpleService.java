@@ -66,16 +66,9 @@ public class SimpleService extends AbstractFlowConstruct
     {
         super.validateConstruct();
 
-        if (!(messageSource instanceof InboundEndpoint))
-        {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("SimpleService only works with an inbound endpoint as its message source."),
-                this);
-
-        }
-
-        if (!((InboundEndpoint) messageSource).getExchangePattern().equals(
-            MessageExchangePattern.REQUEST_RESPONSE))
+        if ((messageSource instanceof InboundEndpoint)
+            && (!((InboundEndpoint) messageSource).getExchangePattern().equals(
+                MessageExchangePattern.REQUEST_RESPONSE)))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("SimpleService only works with a request-response inbound endpoint."),
