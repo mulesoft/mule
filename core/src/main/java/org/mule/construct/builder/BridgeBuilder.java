@@ -30,7 +30,6 @@ import org.mule.transaction.XaTransactionFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-//TODO (DDO) unit test
 public class BridgeBuilder extends
     AbstractFlowConstructWithSingleOutboundEndpointBuilder<BridgeBuilder, Bridge>
 {
