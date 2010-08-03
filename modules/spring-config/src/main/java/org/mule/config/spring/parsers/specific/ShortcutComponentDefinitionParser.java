@@ -34,10 +34,6 @@ public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
     @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        Element parent = (Element) element.getParentNode();
-        String serviceName = parent.getAttribute(ATTRIBUTE_NAME);
-        builder.addPropertyReference("flowConstruct", serviceName);
-
         String className = element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS).getValue();
 
         GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();

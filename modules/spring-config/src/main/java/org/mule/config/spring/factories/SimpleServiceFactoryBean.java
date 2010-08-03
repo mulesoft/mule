@@ -12,11 +12,13 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.SimpleService;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.SimpleServiceBuilder;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
@@ -83,8 +85,15 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         simpleServiceBuilder.component(springBeanLookup);
     }
 
-    public void setComponent(Component component)
+    public void setMessageProcessor(MessageProcessor component)
     {
-        simpleServiceBuilder.component(component);
+        if (component instanceof Component)
+        {
+            simpleServiceBuilder.component((Component) component);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Single Component message processor is required");
+        }
     }
 }

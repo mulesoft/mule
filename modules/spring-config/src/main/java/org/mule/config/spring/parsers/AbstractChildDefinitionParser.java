@@ -75,8 +75,8 @@ public abstract class AbstractChildDefinitionParser
             }
             else
             {
-                assembler.getTarget().getPropertyValues().addPropertyValue(propertyName,
-                    new RuntimeBeanReference(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME)));
+                assembler.insertSingletonBeanInTarget(propertyName,
+                    element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME));
             }
         }
     }

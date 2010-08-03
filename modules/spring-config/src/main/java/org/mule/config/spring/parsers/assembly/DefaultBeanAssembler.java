@@ -243,6 +243,12 @@ public class DefaultBeanAssembler implements BeanAssembler
             }
         }
     }
+    
+    public void insertSingletonBeanInTarget(String propertyName, String singletonName)
+    {
+        String newName = bestGuessName(targetConfig, propertyName, target.getBeanClassName());
+        getTarget().getPropertyValues().addPropertyValue(newName, new RuntimeBeanReference(singletonName));
+    }
 
     protected static List retrieveList(Object value)
     {
@@ -456,5 +462,6 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
         return false;
     }
+
 
 }

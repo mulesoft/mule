@@ -2,10 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-    xsi:schemaLocation="
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/scripting/3.0/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
 
@@ -67,18 +69,28 @@
         <collection-aggregator />
         <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
     </flow>
-    
-        <flow name="split-filter-aggregate">
+
+    <flow name="split-filter-aggregate">
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
         <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
         <not-filter>
             <or-filter>
-                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana"/>
-                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange"/>
+                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana" />
+                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange" />
             </or-filter>
         </not-filter>
-        <collection-aggregator failOnTimeout="false" timeout="1000"/>
+        <collection-aggregator failOnTimeout="false" timeout="1000" />
         <vm:outbound-endpoint path="split-filter-aggregate-out" exchange-pattern="one-way" />
     </flow>
+
+    <flow name="component">
+        <vm:inbound-endpoint path="component" exchange-pattern="request-response" />
+        <append-string-transformer message="inout" />
+        <echo-component/>
+        <component>
+            <singleton-object class="java.lang.String"/>
+        </component>
+    </flow>
+
 
 </mule>

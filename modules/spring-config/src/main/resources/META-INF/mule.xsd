@@ -1581,7 +1581,7 @@
     <!-- Components                                              -->
     <!--==============================================================-->
 
-    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType">
+    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for a component element. A component is invoked when inbound messages are received by the service.
@@ -1589,13 +1589,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractComponentType">
-        <xsd:group ref="interceptorGroup" minOccurs="0">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Interceptors that can be used to intercept component invocation.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:group>
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:group ref="interceptorGroup" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Interceptors that can be used to intercept component invocation.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:group>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
@@ -3902,7 +3906,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 
     <xsd:element name="wire-tap-router" type="wireTapRouterType" substitutionGroup="abstract-inbound-router">
         <xsd:annotation>

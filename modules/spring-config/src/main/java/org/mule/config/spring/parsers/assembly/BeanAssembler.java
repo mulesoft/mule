@@ -78,6 +78,8 @@ public interface BeanAssembler
      */
     void insertBeanInTarget(String oldName);
 
+    void insertSingletonBeanInTarget(String propertyName, String singletonName);
+    
     /**
      * Copy the properties from the bean we have been building into the target (typically
      * the parent bean).  In other words, the bean is a facade for the target.
