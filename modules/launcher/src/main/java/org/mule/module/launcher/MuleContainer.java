@@ -19,7 +19,6 @@ import org.mule.config.i18n.Message;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
-import org.mule.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +91,6 @@ public class MuleContainer
 
     protected DeploymentService deploymentService;
 
-    private Latch shutdownLatch = new Latch();
-
     /**
      * Application entry point.
      *
@@ -102,7 +99,7 @@ public class MuleContainer
     public static void main(String[] args) throws Exception
     {
         MuleContainer container = new MuleContainer(args);
-        container.start(false, true);
+        container.start(true);
     }
 
     public MuleContainer()
@@ -149,13 +146,7 @@ public class MuleContainer
         StartupContext.get().setStartupOptions(commandlineOptions);
     }
 
-    /**
-     * Start the mule server
-     *
-     * @param ownThread determines if the server will run in its own daemon thread or
-     *                  the current calling thread
-     */
-    public void start(boolean ownThread, boolean registerShutdownHook)
+    public void start(boolean registerShutdownHook)
     {
         if (registerShutdownHook)
         {
@@ -171,8 +162,6 @@ public class MuleContainer
             // TODO pluggable deployer
             deploymentService = new DeploymentService();
             deploymentService.start();
-
-            shutdownLatch.await();
         }
         catch (Throwable e)
         {
@@ -216,8 +205,6 @@ public class MuleContainer
     public void shutdown()
     {
         logger.info("Mule container shutting down due to normal shutdown request");
-
-        shutdownLatch.release();
 
         unregisterShutdownHook();
         doShutdown();
