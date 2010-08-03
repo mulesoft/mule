@@ -16,9 +16,13 @@ import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
+import java.util.Vector;
+import java.util.jar.JarFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,6 +104,62 @@ public class MuleApplicationClassLoader extends URLClassLoader
     public String getAppName()
     {
         return appName;
+    }
+
+    /**
+     * A workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
+     */
+    public void close()
+    {
+        // jars
+        try
+        {
+            Class clazz = URLClassLoader.class;
+            Field ucp = clazz.getDeclaredField("ucp");
+            ucp.setAccessible(true);
+            Object urlClassPath = ucp.get(this);
+            Field loaders = urlClassPath.getClass().getDeclaredField("loaders");
+            loaders.setAccessible(true);
+            Collection jarLoaders = (Collection) loaders.get(urlClassPath);
+            for (Object jarLoader : jarLoaders)
+            {
+                try
+                {
+                    Field loader = jarLoader.getClass().getDeclaredField("jar");
+                    loader.setAccessible(true);
+                    Object jarFile = loader.get(jarLoader);
+                    ((JarFile) jarFile).close();
+                }
+                catch (Throwable t)
+                {
+                    // if we got this far, this is probably not a JAR loader so skip it
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            // probably not a SUN VM
+        }
+
+        try
+        {
+            // now native libs
+            Class clazz = ClassLoader.class;
+            Field nativeLibraries = clazz.getDeclaredField("nativeLibraries");
+            nativeLibraries.setAccessible(true);
+            Vector nativelib = (Vector) nativeLibraries.get(this);
+            for (Object lib : nativelib)
+            {
+                Method finalize = lib.getClass().getDeclaredMethod("finalize");
+                finalize.setAccessible(true);
+                finalize.invoke(lib);
+            }
+        }
+        catch (Exception ex)
+        {
+            // ignore
+        }
+
     }
 
     @Override

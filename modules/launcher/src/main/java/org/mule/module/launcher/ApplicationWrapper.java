@@ -40,6 +40,15 @@ public class ApplicationWrapper implements Application
                 Thread.currentThread().setContextClassLoader(appCl);
             }
             delegate.dispose();
+            if (appCl != null)
+            {
+                // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
+                if (appCl instanceof MuleApplicationClassLoader)
+                {
+                    MuleApplicationClassLoader classLoader = (MuleApplicationClassLoader) appCl;
+                    classLoader.close();
+                }
+            }
         }
         finally
         {
