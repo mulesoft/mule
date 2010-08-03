@@ -41,7 +41,8 @@ public class AppDeployerMonitorThreadFactory implements ThreadFactory
         Thread t = new Thread(group, r,
                               namePrefix + threadNumber.getAndIncrement(),
                               0);
-        t.setDaemon(true);
+        // make sure it's non-daemon, allows for an 'idle' state of Mule by preventing early termination
+        t.setDaemon(false);
         t.setPriority(Thread.MIN_PRIORITY);
         return t;
     }
