@@ -45,38 +45,9 @@ public class MuleContainer
     };
 
     /**
-     * Don't use a class object so the core doesn't depend on mule-module-spring-config.
-     */
-    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
-
-    /**
-     * This builder sets up the configuration for an idle Mule node - a node that
-     * doesn't do anything initially but is fed configuration during runtime
-     */
-    protected static final String CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER = "org.mule.config.builders.MuleIdleConfigurationBuilder";
-
-    /**
-     * If the annotations module is on the classpath, also enable annotations config builder
-     */
-    public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
-
-    /**
      * logger used by this class
      */
     private static final Log logger = LogFactory.getLog(MuleContainer.class);
-
-    public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
-
-    /**
-     * one or more configuration urls or filenames separated by commas
-     */
-    private String configurationResources = null;
-
-    /**
-     * A FQN of the #configBuilder class, required in case MuleContainer is
-     * reinitialised.
-     */
-    private static String configBuilderClassName = null;
 
     /**
      * A properties file to be read at startup. This can be useful for setting
@@ -105,11 +76,6 @@ public class MuleContainer
     public MuleContainer()
     {
         init(new String[0]);
-    }
-
-    public MuleContainer(String configResources)
-    {
-        init(new String[] {"-config", configResources});
     }
 
     /**
@@ -249,16 +215,6 @@ public class MuleContainer
     // /////////////////////////////////////////////////////////////////
     // Getters and setters
     // /////////////////////////////////////////////////////////////////
-
-    /**
-     * Getter for property messengerURL.
-     *
-     * @return Value of property messengerURL.
-     */
-    public String getConfigurationResources()
-    {
-        return configurationResources;
-    }
 
 
     public static String getStartupPropertiesFile()
