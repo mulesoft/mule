@@ -10,7 +10,7 @@
 package org.mule.config;
 
 import org.mule.api.EndpointAnnotationParser;
-import org.mule.api.RouterAnnotationParser;
+import org.mule.api.MessageProcessorAnnotationParser;
 import org.mule.api.expression.ExpressionAnnotationParser;
 
 import java.lang.annotation.Annotation;
@@ -70,6 +70,6 @@ public interface AnnotationsParserFactory
      * @return the router annotation parser that can parse the supplied annotation or null if a matching parser
      *         not found
      */
-    RouterAnnotationParser getRouterParser(Annotation annotation, Class<?> aClass, Member member);
+    MessageProcessorAnnotationParser getRouterParser(Annotation annotation, Class<?> aClass, Member member);
 
 }

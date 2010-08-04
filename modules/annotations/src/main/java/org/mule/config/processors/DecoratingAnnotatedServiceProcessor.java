@@ -11,10 +11,10 @@ package org.mule.config.processors;
 
 import org.mule.api.AnnotationException;
 import org.mule.api.EndpointAnnotationParser;
+import org.mule.api.MessageProcessorAnnotationParser;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.RouterAnnotationParser;
 import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.meta.Router;
@@ -164,10 +164,10 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
             Router routerAnnotation = annotation.annotationType().getAnnotation(Router.class);
             if (routerAnnotation != null && routerAnnotation.type() == RouterType.Inbound)
             {
-                RouterAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
+                MessageProcessorAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
                 if (parser != null)
                 {
-                    service.getMessageSource().addMessageProcessor(parser.parseRouter(annotation));
+                    service.getMessageSource().addMessageProcessor(parser.parseMessageProcessor(annotation));
                 }
                 else
                 {
@@ -188,10 +188,10 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
             {
 
 
-                RouterAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+                MessageProcessorAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
                 if (parser != null)
                 {
-                    MessageProcessor router = parser.parseRouter(metaData.getAnnotation());
+                    MessageProcessor router = parser.parseMessageProcessor(metaData.getAnnotation());
                     //Todo, wrap lifecycle
                     if (router instanceof MuleContextAware)
                     {
@@ -215,7 +215,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
 
     protected OutboundRouter processOutboundRouter(Class componentFactoryClass) throws MuleException
     {
-        Collection routerParsers = context.getRegistry().lookupObjects(RouterAnnotationParser.class);
+        Collection routerParsers = context.getRegistry().lookupObjects(MessageProcessorAnnotationParser.class);
         OutboundRouter router = null;
 
         List<AnnotationMetaData> annotations = AnnotationUtils.getClassAndMethodAnnotations(componentFactoryClass);
@@ -229,10 +229,10 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
                     //TODO i18n
                     throw new IllegalStateException("You can only configure one outbound router on a service");
                 }
-                RouterAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
+                MessageProcessorAnnotationParser parser = parserFactory.getRouterParser(metaData.getAnnotation(), metaData.getClazz(), metaData.getMember());
                 if (parser != null)
                 {
-                    router = (OutboundRouter) parser.parseRouter(metaData.getAnnotation());
+                    router = (OutboundRouter) parser.parseMessageProcessor(metaData.getAnnotation());
                 }
                 else
                 {

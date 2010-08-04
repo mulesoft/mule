@@ -18,7 +18,7 @@ import java.lang.reflect.Member;
  * An SPI interface used for creating Routers from Annotations. Note that any Router annotations must be themselves
  * annotated with the {@link org.mule.api.routing.Router} annotation.
  */
-public interface RouterAnnotationParser
+public interface MessageProcessorAnnotationParser
 {
     /**
      * Will create a Mule Router according to the annotation. Note that the annotation must
@@ -28,7 +28,7 @@ public interface RouterAnnotationParser
      * @return a new Router configuration based on the current annotation
      * @throws MuleException if the inbound endpoint cannot be created. A Mule-specific error will be thrown.
      */
-    public MessageProcessor parseRouter(Annotation annotation) throws MuleException;
+    public MessageProcessor parseMessageProcessor(Annotation annotation) throws MuleException;
 
     /**
      * Determines whether this parser can process the current annotation. The clazz and member params are passed in

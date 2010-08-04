@@ -10,9 +10,9 @@
 package org.mule.config.endpoint;
 
 import org.mule.api.EndpointAnnotationParser;
+import org.mule.api.MessageProcessorAnnotationParser;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.RouterAnnotationParser;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.api.registry.ObjectProcessor;
@@ -71,10 +71,10 @@ public class RegistryBackedAnnotationsParserFactory implements AnnotationsParser
         return null;
     }
 
-    public RouterAnnotationParser getRouterParser(Annotation annotation, Class aClass, Member member)
+    public MessageProcessorAnnotationParser getRouterParser(Annotation annotation, Class aClass, Member member)
     {
-        Collection<RouterAnnotationParser> parsers = muleContext.getRegistry().lookupObjects(RouterAnnotationParser.class);
-        for (RouterAnnotationParser parser : parsers)
+        Collection<MessageProcessorAnnotationParser> parsers = muleContext.getRegistry().lookupObjects(MessageProcessorAnnotationParser.class);
+        for (MessageProcessorAnnotationParser parser : parsers)
         {
             if (parser.supports(annotation, aClass, member))
             {
