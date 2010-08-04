@@ -15,12 +15,12 @@
     function init()
     {
         setupMap();
-        mule.subscribe("/services/gps", callback);
+        mule.subscribe("/gpswalker", callback);
     }
 
     function dispose()
     {
-        mule.unsubscribe("/services/gps", callback);
+        mule.unsubscribe("/gpswalker", callback);
         GUnload();
     }
 

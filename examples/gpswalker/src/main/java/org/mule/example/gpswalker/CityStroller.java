@@ -9,6 +9,8 @@
  */
 package org.mule.example.gpswalker;
 
+import org.mule.api.annotations.Schedule;
+
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -26,6 +28,7 @@ public class CityStroller
     private AtomicBoolean firstTime = new AtomicBoolean(true);
 
     //could use a better algorithm here or real test data for better results
+    @Schedule(interval = 3000, startDelay = 3000)
     public GpsCoord generateNextCoord()
     {
         if (firstTime.get())

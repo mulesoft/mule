@@ -8,25 +8,30 @@
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
+    <ajax:connector name="ajaxServer" serverUrl="http://localhost:8081/services/gps" resourceBase="./src/main/webapp"/>
+
     <model>
-        <service name="StollerService">
+        <service name="StrollerService">
             <description>
                 A service that generates GPS coordinates in downtown San Francisco. These get mapped on a Google map
                 at the browser. there is no fancy street walking algorithm so the results may vary.
+                Note that this component is triggered by a scheduler configured using the @Schedule annotation
             </description>
+            <!-- The configuration snippet below shows how to configure a scheduling endpoint in XML configuration instead of using
+                 the @Schedule annotation on the component itself. Both methods are valid
+
             <inbound>
-                <quartz:inbound-endpoint repeatInterval="3000" jobName="walkGenerator" exchange-pattern="one-way">
+                <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">
                     <quartz:event-generator-job/>
                 </quartz:inbound-endpoint>
             </inbound>
+            -->
             <component>
                 <singleton-object class="org.mule.example.gpswalker.CityStroller"/>
             </component>
             <outbound>
                 <pass-through-router>
-                    <ajax:servlet-outbound-endpoint path="/services/gps" exchange-pattern="one-way">
-                        <bean-to-map-transformer/>
-                    </ajax:servlet-outbound-endpoint>
+                    <ajax:outbound-endpoint channel="/gpswalker"/>
                 </pass-through-router>
             </outbound>
         </service>
