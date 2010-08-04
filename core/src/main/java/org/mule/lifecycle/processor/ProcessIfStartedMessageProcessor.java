@@ -42,16 +42,16 @@ public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessagePr
         throw new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
     }
 
-    protected String getStartableName(Startable startable)
+    protected String getStartableName(Startable startableObject)
     {
-        if (startable instanceof NamedObject)
+        if (startableObject instanceof NamedObject)
         {
-            return ((NamedObject) startable).getName();
+            return ((NamedObject) startableObject).getName();
         }
         else
         {
-            return startable.toString();
+            return startableObject.toString();
         }
     }
 
-};
+}

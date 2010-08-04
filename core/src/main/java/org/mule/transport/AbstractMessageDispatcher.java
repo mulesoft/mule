@@ -34,8 +34,8 @@ import java.util.List;
 public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
 {
 
-    protected List<Transformer> defaultOutboundTransformers;;       
-    protected List<Transformer> defaultResponseTransformers;;       
+    protected List<Transformer> defaultOutboundTransformers;
+    protected List<Transformer> defaultResponseTransformers;
 
     public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {

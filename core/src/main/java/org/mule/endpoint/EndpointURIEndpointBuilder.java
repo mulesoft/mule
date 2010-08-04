@@ -17,7 +17,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 
 import java.util.Collections;
-import java.util.LinkedList;
 
 public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
 {
@@ -91,6 +90,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors());
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
         setDisableTransportTransformer(source.isDisableTransportTransformer());
-        setMimeType(source.getMimeType());;
+        setMimeType(source.getMimeType());
     }
 }

@@ -10,8 +10,6 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
@@ -21,16 +19,20 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.transaction.XaTransactionFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public abstract class AbstractExternalTransactionTestCase extends FunctionalTestCase
@@ -146,7 +148,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
             }
             catch (Exception ex)
             {
-                ; // return persistent value
+                // return persistent value
             }
             Integer val = transientValue.get(tx);
             return val == null ? persistentValue : val;

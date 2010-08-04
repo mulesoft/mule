@@ -111,7 +111,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
                 }
 
             }
-        }).start();;
+        }).start();
         Thread.sleep(10);
         assertEquals(1, connector.dispatchers.getNumActive());
         try

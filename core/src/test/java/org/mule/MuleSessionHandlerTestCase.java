@@ -45,9 +45,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         Date date = new Date(0);
         session.setProperty("fooDate", date);
         
-        List list = new ArrayList();
-        list.add("bar1");
-        list.add("bar2");
+        List<String> list = createList();
         session.setProperty("fooList", list);
         
         handler.storeSessionInfoToMessage(session, message);
@@ -68,7 +66,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         obj = session.getProperty("fooList");
         assertTrue("Object should be a List but is " + obj.getClass().getName(), obj instanceof List);
         assertEquals(list, obj);
-    }    
+    }
 
     /** @see EE-1774 */
     public void testNonSerializableSessionProperties() throws Exception 
@@ -102,9 +100,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         Date date = new Date(0);
         session.setProperty("fooDate", date);
         
-        List list = new ArrayList();
-        list.add("bar1");
-        list.add("bar2");
+        List<String> list = createList();
         session.setProperty("fooList", list);
         
         legacyHandler.storeSessionInfoToMessage(session, message);
@@ -133,9 +129,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         Date date = new Date(0);
         session.setProperty("fooDate", date);
         
-        List list = new ArrayList();
-        list.add("bar1");
-        list.add("bar2");
+        List<String> list = createList();
         session.setProperty("fooList", list);
 
         handler.storeSessionInfoToMessage(session, message);
@@ -199,19 +193,39 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
             // expected
         }
     }    
-    
+
+    private List<String> createList()
+    {
+        List<String> list = new ArrayList<String>();
+        list.add("bar1");
+        list.add("bar2");
+        return list;
+    }    
+
     private class NotSerializableClass
     {
-        // empty
-    };
+        public NotSerializableClass()
+        {
+            super();
+        }
+    }
     
     private class NotSerializableSecurityContext implements SecurityContext
     {
-        public void setAuthentication(Authentication authentication) { }
+        public NotSerializableSecurityContext()
+        {
+            super();
+        }
+        
+        public void setAuthentication(Authentication authentication)
+        { 
+            // nothing to do
+        }
 
-        public Authentication getAuthentication() { return null; }
+        public Authentication getAuthentication() 
+        { 
+            return null;
+        }
     }
     
 }
-
-

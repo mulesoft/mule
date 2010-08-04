@@ -10,9 +10,6 @@
 
 package org.mule.construct;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -31,6 +28,9 @@ import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 /**
  * In-out SOA-style simple service, with no outbound router. Always fully
  * synchronous.
@@ -46,7 +46,7 @@ public class SimpleService extends AbstractFlowConstruct
             String mepString = string.toUpperCase();
             return Type.valueOf(mepString);
         }
-    };
+    }
 
     private final Component component;
     private final Type type;
