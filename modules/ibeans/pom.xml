@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>3.0.0-RC1-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-module-ibeans</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule IBeans</name>
+    <description>Exposes iBeans over endpoints allowing developers to poll iBean methods and invoke iBean methods as
+        part of an outbound flow
+    </description>
+    <url>http://www.muleforge.org/projects/IBEANS</url>
+
+    <dependencies>
+
+
+        <dependency>
+            <groupId>org.ibeans</groupId>
+            <artifactId>ibeans-core</artifactId>
+            <version>1.0-dev-20100804</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-annotations</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- Mule Transports -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mule Modules -->
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-json</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- for testing -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.0</version>
+            <!-- TODO currently needed in the compile tree, maybe break out test mock support into its own module-->
+            <!--<scope>test</scope>-->
+        </dependency>
+    </dependencies>
+
+</project>
