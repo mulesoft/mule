@@ -18,14 +18,18 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.Collection;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import sun.net.www.protocol.jar.Handler;
 
 public class MuleApplicationClassLoader extends URLClassLoader
 {
@@ -46,7 +50,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
-        super(CLASSPATH_EMPTY, parentCl);
+        super(CLASSPATH_EMPTY, parentCl, new NonCachingURLStreamHandlerFactory());
         this.appName = appName;
         try
         {
@@ -168,5 +172,29 @@ public class MuleApplicationClassLoader extends URLClassLoader
         return String.format("%s[%s]@%s", getClass().getName(),
                              appName,
                              Integer.toHexString(System.identityHashCode(this)));
+    }
+
+    protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory
+    {
+        public URLStreamHandler createURLStreamHandler(String protocol)
+        {
+            return new NonCachingJarResourceURLStreamHandler();
+        }
+    }
+
+    /**
+     * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache
+     * that keeps connections open no matter what.
+     */
+    private static class NonCachingJarResourceURLStreamHandler extends Handler
+    {
+
+        @Override
+        protected java.net.URLConnection openConnection(URL u) throws IOException
+        {
+            JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
+            c.setUseCaches(false);
+            return c;
+        }
     }
 }
