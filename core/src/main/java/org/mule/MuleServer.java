@@ -17,8 +17,10 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
+import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -66,7 +68,7 @@ public class MuleServer implements Runnable
 
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
-     * the core doesn't depend on mule-module-spring. TODO this may not be a problem
+     * the core doesn't depend on mule-module-spring.
      * for Mule 2.x
      */
     protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
@@ -117,6 +119,7 @@ public class MuleServer implements Runnable
      * Application entry point.
      *
      * @param args command-line args
+     * @throws Exception if there is an exception creating the MuleServer
      */
     public static void main(String[] args) throws Exception
     {
@@ -138,6 +141,8 @@ public class MuleServer implements Runnable
 
     /**
      * Configure the server with command-line arguments.
+     * @param args Command line args passed in from the {@link #main(String[])} method
+     * @throws IllegalArgumentException if an argument is passed in that is not recognised by the Mule Server
      */
     public MuleServer(String[] args) throws IllegalArgumentException
     {
@@ -229,6 +234,8 @@ public class MuleServer implements Runnable
      *
      * @param ownThread determines if the server will run in its own daemon thread or
      *                  the current calling thread
+     * @param registerShutdownHook whether to register the default Mule Server shutdown hock.  this will shut down mule cleanly if
+     * the JVM is shutdown.  The only reason not to register this hook is to override it with a custom version
      */
     public void start(boolean ownThread, boolean registerShutdownHook)
     {
@@ -345,10 +352,10 @@ public class MuleServer implements Runnable
         if (!cfgBuilder.isConfigured())
         {
             List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
-            builders.add(cfgBuilder);
-            
+
             // If the annotations module is on the classpath, add the annotations config builder to the list
             // This will enable annotations config for this instance
+            //We need to add this builder before spring so that we can use Mule annotations in Spring
             if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
             {
                 Object configBuilder = ClassUtils.instanciateClass(
@@ -356,13 +363,18 @@ public class MuleServer implements Runnable
                 builders.add((ConfigurationBuilder) configBuilder);
             }
 
+
             Properties startupProperties = null;
             if (getStartupPropertiesFile() != null)
             {
                 startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
             }
+            builders.add(new SimpleConfigurationBuilder(startupProperties));
+
+            builders.add(cfgBuilder);
+
             DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContext = muleContextFactory.createMuleContext(cfgBuilder, startupProperties);
+            muleContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
         }
     }
 
