@@ -8,11 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.routing;
+package org.mule.api;
 
-import org.mule.api.processor.MessageRouter;
-
-public interface MatchableRoutingMessageProcessor extends MatchableMessageProcessor, MessageRouter
+public interface Criteria
 {
 
 }

@@ -16,7 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.RoutingMessageProcessor;
+import org.mule.api.processor.MessageRouter;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * configured statically or can be obtained from the message payload.
  */
 
-public abstract class AbstractRecipientList extends FilteringOutboundRouter implements RoutingMessageProcessor
+public abstract class AbstractRecipientList extends FilteringOutboundRouter implements MessageRouter
 {
     /**
      * logger used by this class

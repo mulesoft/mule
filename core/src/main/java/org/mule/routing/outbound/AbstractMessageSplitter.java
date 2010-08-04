@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.RoutingMessageProcessor;
+import org.mule.api.processor.MessageRouter;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.CorrelationMode;
@@ -30,7 +30,7 @@ import java.util.Map;
  * components. Each Part is fired as a separate event to each endpoint on the router. The
  * targets can have filters on them to receive only certain message parts.
  */
-public abstract class AbstractMessageSplitter extends FilteringOutboundRouter implements RoutingMessageProcessor
+public abstract class AbstractMessageSplitter extends FilteringOutboundRouter implements MessageRouter
 {
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException

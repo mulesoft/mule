@@ -10,20 +10,21 @@
 
 package org.mule.api.processor;
 
+import org.mule.api.Criteria;
+
 /**
- * A {@link MessageProcessor} that routes messages to zero or more destination
- * message processors. Implementations determine exactly how this is done by making
- * decisions about which route(s) should be used and if the message should be copied
- * or not.
+ * A {@link MessageProcessor} that routes messages to zero or more destination message processors using the
+ * specified criteria to determine if a router should be used not not. Implementatios determine the type of
+ * {@link Criteria} and how it is used as well as if the first route is used or if all valid routes are used.
  */
-public interface RoutingMessageProcessor extends MessageProcessor
+public interface CriteriaBasedMessageRouter<T extends Criteria> extends MessageProcessor
 {
     /**
      * Adds a new message processor to the list of routes
      * 
      * @param processor new destination message processor
      */
-    void addRoute(MessageProcessor processor);
+    void addRoute(MessageProcessor processor, T criteria);
 
     /**
      * Removes a message processor from the list of routes
