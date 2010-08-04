@@ -50,7 +50,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
 
     /**
      * The name of the servlet connector to use with this Servlet
+     * @deprecated Use {@link org.mule.transport.servlet.MuleServletContextListener#CONNECTOR_NAME} instead
      */
+    @Deprecated
     public static final String SERVLET_CONNECTOR_NAME_PROPERTY = "org.mule.servlet.connector.name";
 
     public static final String PAYLOAD_PARAMETER_NAME = "org.mule.servlet.payload.param";

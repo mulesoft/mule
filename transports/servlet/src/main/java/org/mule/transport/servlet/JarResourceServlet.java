@@ -1,13 +1,13 @@
 /*
  * $Id$
- * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * -------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.ajax;
+package org.mule.transport.servlet;
 
 import org.mule.util.IOUtils;
 
@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A servlet for loading resources loaded in jar files
  */
-public class MuleJarResourcesServlet extends HttpServlet
+public class JarResourceServlet extends HttpServlet
 {
     public static final String DEFAULT_PATH_SPEC = "/mule-resource/*";
 
