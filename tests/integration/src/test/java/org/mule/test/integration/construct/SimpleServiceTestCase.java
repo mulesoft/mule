@@ -108,6 +108,14 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
 
+    public void testJaxAnnotatedComponentAsDefaultService() throws Exception
+    {
+        final String weatherForecast = muleClient.send("vm://weather-forecaster.in", "74521", null,
+            getTestTimeoutSecs() * 1000).getPayloadAsString();
+
+        assertEquals(new WeatherForecaster().getByZipCode("74521"), weatherForecast);
+    }
+
     private void doTestMathsService(String url) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);

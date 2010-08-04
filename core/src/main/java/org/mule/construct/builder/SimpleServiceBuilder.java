@@ -36,7 +36,7 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
 {
     protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
 
-    protected Type type = SimpleService.Type.DEFAULT;
+    protected Type type = SimpleService.Type.AUTO;
     protected Component component;
 
     @Override
