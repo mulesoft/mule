@@ -16,7 +16,6 @@ import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -25,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  *  Load $MULE_HOME/lib/shared/<domain> libraries.
  */
-public class MuleSharedDomainClassLoader extends URLClassLoader
+public class MuleSharedDomainClassLoader extends GoodCitizenClassLoader
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());

@@ -16,22 +16,13 @@ import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.Collection;
-import java.util.Vector;
-import java.util.jar.JarFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import sun.net.www.protocol.jar.Handler;
 
-public class MuleApplicationClassLoader extends URLClassLoader
+public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 {
 
     /**
@@ -50,7 +41,7 @@ public class MuleApplicationClassLoader extends URLClassLoader
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
-        super(CLASSPATH_EMPTY, parentCl, new NonCachingURLStreamHandlerFactory());
+        super(CLASSPATH_EMPTY, parentCl);
         this.appName = appName;
         try
         {
@@ -110,62 +101,6 @@ public class MuleApplicationClassLoader extends URLClassLoader
         return appName;
     }
 
-    /**
-     * A workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
-     */
-    public void close()
-    {
-        // jars
-        try
-        {
-            Class clazz = URLClassLoader.class;
-            Field ucp = clazz.getDeclaredField("ucp");
-            ucp.setAccessible(true);
-            Object urlClassPath = ucp.get(this);
-            Field loaders = urlClassPath.getClass().getDeclaredField("loaders");
-            loaders.setAccessible(true);
-            Collection jarLoaders = (Collection) loaders.get(urlClassPath);
-            for (Object jarLoader : jarLoaders)
-            {
-                try
-                {
-                    Field loader = jarLoader.getClass().getDeclaredField("jar");
-                    loader.setAccessible(true);
-                    Object jarFile = loader.get(jarLoader);
-                    ((JarFile) jarFile).close();
-                }
-                catch (Throwable t)
-                {
-                    // if we got this far, this is probably not a JAR loader so skip it
-                }
-            }
-        }
-        catch (Throwable t)
-        {
-            // probably not a SUN VM
-        }
-
-        try
-        {
-            // now native libs
-            Class clazz = ClassLoader.class;
-            Field nativeLibraries = clazz.getDeclaredField("nativeLibraries");
-            nativeLibraries.setAccessible(true);
-            Vector nativelib = (Vector) nativeLibraries.get(this);
-            for (Object lib : nativelib)
-            {
-                Method finalize = lib.getClass().getDeclaredMethod("finalize");
-                finalize.setAccessible(true);
-                finalize.invoke(lib);
-            }
-        }
-        catch (Exception ex)
-        {
-            // ignore
-        }
-
-    }
-
     @Override
     public String toString()
     {
@@ -174,27 +109,4 @@ public class MuleApplicationClassLoader extends URLClassLoader
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
-    protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory
-    {
-        public URLStreamHandler createURLStreamHandler(String protocol)
-        {
-            return new NonCachingJarResourceURLStreamHandler();
-        }
-    }
-
-    /**
-     * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache
-     * that keeps connections open no matter what.
-     */
-    private static class NonCachingJarResourceURLStreamHandler extends Handler
-    {
-
-        @Override
-        protected java.net.URLConnection openConnection(URL u) throws IOException
-        {
-            JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
-            c.setUseCaches(false);
-            return c;
-        }
-    }
 }

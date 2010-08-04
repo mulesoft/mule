@@ -43,9 +43,9 @@ public class ApplicationWrapper implements Application
             if (appCl != null)
             {
                 // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
-                if (appCl instanceof MuleApplicationClassLoader)
+                if (appCl instanceof GoodCitizenClassLoader)
                 {
-                    MuleApplicationClassLoader classLoader = (MuleApplicationClassLoader) appCl;
+                    GoodCitizenClassLoader classLoader = (GoodCitizenClassLoader) appCl;
                     classLoader.close();
                 }
             }
