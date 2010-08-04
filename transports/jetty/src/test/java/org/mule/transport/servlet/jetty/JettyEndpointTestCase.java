@@ -22,7 +22,6 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
         assertEquals(8080, endpointUri.getPort());
         assertEquals("localhost", endpointUri.getHost());
         assertEquals("http://localhost:8080", endpointUri.toString());
@@ -36,7 +35,6 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
         assertEquals(8080, endpointUri.getPort());
         assertEquals("localhost", endpointUri.getHost());
         assertEquals("http://localhost:8080", endpointUri.getAddress());
@@ -53,7 +51,6 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
         assertEquals(8080, endpointUri.getPort());
         assertEquals("localhost", endpointUri.getHost());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
@@ -68,28 +65,9 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
         assertEquals(8080, endpointUri.getPort());
         assertEquals("localhost", endpointUri.getHost());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
-        assertEquals(endpointUri.getPath(), "/app/path");
-        assertEquals(0, endpointUri.getParams().size());
-        assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUser());
-        assertEquals("pwd", endpointUri.getPassword());
-        assertEquals("jetty", endpointUri.getSchemeMetaInfo());
-    }
-
-    public void testRestHostPortAndPathUrlAndUserInfo() throws Exception
-    {
-        EndpointURI endpointUri = new MuleEndpointURI("jetty:rest://admin:pwd@localhost:8080/app/path", muleContext);
-        endpointUri.initialise();
-        assertEquals("rest", endpointUri.getScheme());
-        assertEquals("rest://localhost:8080/app/path", endpointUri.getAddress());
-        assertNull(endpointUri.getEndpointName());
-        assertEquals(8080, endpointUri.getPort());
-        assertEquals("localhost", endpointUri.getHost());
-        assertEquals("rest://localhost:8080/app/path", endpointUri.getAddress());
         assertEquals(endpointUri.getPath(), "/app/path");
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());

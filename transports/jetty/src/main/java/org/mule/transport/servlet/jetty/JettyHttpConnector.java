@@ -12,27 +12,36 @@ package org.mule.transport.servlet.jetty;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.servlet.JarResourceServlet;
+import org.mule.transport.servlet.MuleReceiverServlet;
+import org.mule.transport.servlet.MuleServletContextListener;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -45,31 +54,29 @@ import org.mortbay.xml.XmlConfiguration;
  */
 public class JettyHttpConnector extends AbstractConnector
 {
+    public static final String RESOURCE_BASE_PROPERTY = "resourceBase";
+
+    public static final String ROOT = "/";
+
     public static final String JETTY = "jetty";
-    public static final String REST = "rest";
 
     private Server httpServer;
-
-    private List<Integer> serverPorts;
 
     private String configFile;
 
     private JettyReceiverServlet receiverServlet;
 
-    private Class<? extends HttpServlet> servletClass;
-
-    private ServletHolder holder;
-
     private boolean useContinuations = false;
+
+    protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
+
 
     public JettyHttpConnector(MuleContext context)
     {
         super(context);
         registerSupportedProtocol("http");
         registerSupportedProtocol(JETTY);
-        registerSupportedProtocol(REST);
-
-        serverPorts = new ArrayList<Integer>();
+        setInitialStateStopped(true);
     }
 
     public String getProtocol()
@@ -81,23 +88,6 @@ public class JettyHttpConnector extends AbstractConnector
     protected void doInitialise() throws InitialisationException
     {
         httpServer = new Server();
-
-        if (getReceiverServlet() == null)
-        {
-            setServletClass((useContinuations ? JettyContinuationsReceiverServlet.class :
-                    JettyReceiverServlet.class));
-        }
-
-        Context root = new Context(httpServer,"/", Context.SESSIONS);
-        holder = root.addServlet(getServletClass(), "/*");
-        root.addEventListener(new ServletContextListener() {
-            public void contextInitialized(ServletContextEvent sce)
-            {
-                sce.getServletContext().setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
-            }
-
-            public void contextDestroyed(ServletContextEvent sce) { }
-        });
 
         if (configFile != null)
         {
@@ -112,7 +102,36 @@ public class JettyHttpConnector extends AbstractConnector
                 throw new InitialisationException(e, this);
             }
         }
+
+        try
+        {
+            muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
+                public void onNotification(MuleContextNotification notification)
+                {
+
+                    if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                    {
+                        //We delay starting until the context has been started since we need the MuleAjaxServlet to initialise first
+                        setInitialStateStopped(false);
+                        try
+                        {
+                            start();
+                        }
+                        catch (MuleException e)
+                        {
+                            throw new MuleRuntimeException(CoreMessages.failedToStart(getName()), e);
+                        }
+                    }
+                }
+            });
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
+
+
 
     /**
      * Template method to dispose any resources associated with this receiver. There
@@ -120,15 +139,7 @@ public class JettyHttpConnector extends AbstractConnector
      */
     protected void doDispose()
     {
-        try
-        {
-            httpServer.stop();
-        }
-        catch (Exception e)
-        {
-            logger.error("Error disposing Jetty server", e);
-        }
-        serverPorts.clear();
+        holders.clear();
     }
 
     protected void doStart() throws MuleException
@@ -136,13 +147,10 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.start();
-            receiverServlet = (JettyReceiverServlet) holder.getServlet();
-            for (Iterator iter = receivers.values().iterator(); iter.hasNext();)
+            for (ConnectorHolder contextHolder : holders.values())
             {
-                MessageReceiver receiver = (MessageReceiver) iter.next();
-                receiverServlet.addReceiver(receiver);
+                contextHolder.start();
             }
-
         }
         catch (Exception e)
         {
@@ -150,22 +158,24 @@ public class JettyHttpConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         try
         {
-            for (Iterator iter = receivers.values().iterator(); iter.hasNext();)
-            {
-                MessageReceiver receiver = (MessageReceiver) iter.next();
-                receiverServlet.removeReceiver(receiver);
-            }
             httpServer.stop();
+            for (ConnectorHolder connectorRef : holders.values())
+            {
+                connectorRef.stop();
+            }
         }
         catch (Exception e)
         {
             throw new LifecycleException(CoreMessages.failedToStop("Jetty Http Receiver"), e, this);
         }
+
     }
+
 
     /**
      * Template method where any connections should be made for the connector
@@ -188,38 +198,12 @@ public class JettyHttpConnector extends AbstractConnector
         //do nothing
     }
 
-    void registerListener(MessageReceiver receiver) throws Exception
+     @Override
+    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
-        EndpointURI uri = receiver.getEndpointURI();
-        Integer receiverPort = Integer.valueOf(uri.getPort());
-        if (serverPorts.contains(receiverPort))
-        {
-            logger.debug("Http server already listening on: " + uri.getPort());
-            receiverServlet.addReceiver(receiver);
-            return;
-        }
-
-        //TODO
-//        ThreadingProfile tp = getReceiverThreadingProfile();
-//        getHttpServer().addConnector(socketListener);
-//
-//         QueuedThreadPool threadPool = new QueuedThreadPool();
-//          threadPool.setMaxThreads(tp.getMaxThreadsActive());
-//        threadPool.setMinThreads(tp.getMaxThreadsIdle());
-//        threadPool.setMaxIdleTimeMs((int)tp.getThreadTTL());
-//        //TODO exhaust action
-//          httpServer.setThreadPool(threadPool);
-
-        org.mortbay.jetty.AbstractConnector cnn = createJettyConnector();
-
-        cnn.setPort(uri.getPort());
-
-        httpServer.addConnector(cnn);
-
-        serverPorts.add(receiverPort);
-        receiverServlet.addReceiver(receiver);
-
-        cnn.start();
+        MessageReceiver receiver = super.createReceiver(flowConstruct, endpoint);
+        registerJettyEndpoint(receiver, endpoint);
+        return receiver;
     }
 
     protected org.mortbay.jetty.AbstractConnector createJettyConnector()
@@ -227,9 +211,23 @@ public class JettyHttpConnector extends AbstractConnector
         return new SelectChannelConnector();
     }
 
-    public boolean unregisterListener(MessageReceiver receiver)
+    public void unregisterListener(MessageReceiver receiver) throws MuleException
     {
-        return receiverServlet.removeReceiver(receiver);
+        String connectorKey = getHolderKey(receiver.getEndpoint());
+
+        synchronized (this)
+        {
+            ConnectorHolder connectorRef = holders.get(connectorKey);
+            if (connectorRef != null)
+            {
+                if (!connectorRef.isReferenced())
+                {
+                    getHttpServer().removeConnector(connectorRef.getConnector());
+                    holders.remove(connectorKey);
+                    connectorRef.stop();
+                }
+            }
+        }
     }
 
     public Server getHttpServer()
@@ -257,21 +255,6 @@ public class JettyHttpConnector extends AbstractConnector
         this.receiverServlet = receiverServlet;
     }
 
-    protected JettyReceiverServlet createReceiverServlet()
-    {
-        return new JettyReceiverServlet();
-    }
-
-    public Class<? extends HttpServlet> getServletClass()
-    {
-        return servletClass;
-    }
-
-    public void setServletClass(Class<? extends HttpServlet> servletClass)
-    {
-        this.servletClass = servletClass;
-    }
-
     @Override
     public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
@@ -290,5 +273,154 @@ public class JettyHttpConnector extends AbstractConnector
     public void setUseContinuations(boolean useContinuations)
     {
         this.useContinuations = useContinuations;
+    }
+
+    ConnectorHolder<? extends MuleReceiverServlet, ? extends JettyHttpMessageReceiver> registerJettyEndpoint(MessageReceiver receiver, InboundEndpoint endpoint) throws MuleException
+    {
+
+    // Make sure that there is a connector for the requested endpoint.
+        String connectorKey = getHolderKey(endpoint);
+
+        ConnectorHolder holder;
+
+        synchronized (this)
+        {
+            holder = holders.get(connectorKey);
+            if (holder == null)
+            {
+                Connector connector = createJettyConnector();
+
+                connector.setPort(endpoint.getEndpointURI().getPort());
+                connector.setHost(endpoint.getEndpointURI().getHost());
+                if ("localhost".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
+                {
+                    logger.warn("You use localhost interface! It means that no external connections will be available."
+                            + " Don't you want to use 0.0.0.0 instead (all network interfaces)?");
+                }
+                getHttpServer().addConnector(connector);
+
+                holder = createContextHolder(connector, receiver.getEndpoint(), receiver);
+                holders.put(connectorKey, holder);
+                if(isStarted())
+                {
+                    holder.start();
+                }
+            }
+            else
+            {
+                holder.addReceiver(receiver);
+            }
+        }
+        return holder;
+}
+
+    protected ConnectorHolder createContextHolder(Connector connector, InboundEndpoint endpoint, MessageReceiver receiver)
+    {
+        return new MuleReceiverConnectorHolder(connector, (JettyReceiverServlet) createServlet(connector, endpoint), (JettyHttpMessageReceiver)receiver);
+    }
+
+    protected Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
+    {
+        HttpServlet servlet;
+        if (getReceiverServlet() == null)
+        {
+            if(isUseContinuations())
+            {
+                servlet = new JettyContinuationsReceiverServlet();
+            }
+            else
+            {
+                servlet = new JettyReceiverServlet();
+            }
+        }
+        else
+        {
+            servlet = getReceiverServlet();
+        }
+
+
+        String path = endpoint.getEndpointURI().getPath();
+        if(StringUtils.isBlank(path))
+        {
+            path = ROOT;
+        }
+
+        ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
+        Context context = new Context(handlerCollection, ROOT, Context.NO_SECURITY);
+        context.setConnectorNames(new String[]{connector.getName()});
+        context.addEventListener(new MuleServletContextListener(muleContext, getName()));
+
+        String resourceBase = (String)endpoint.getProperty(RESOURCE_BASE_PROPERTY);
+        if(resourceBase!=null)
+        {
+
+            Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
+            resourceContext.setResourceBase(resourceBase);
+        }
+
+        context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
+
+        ServletHolder holder = new ServletHolder();
+        holder.setServlet(servlet);
+        context.addServlet(holder, "/*");
+        getHttpServer().addHandler(handlerCollection);
+        return servlet;
+    }
+
+    protected String getHolderKey(ImmutableEndpoint endpoint)
+    {
+        return endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
+    }
+
+    public class MuleReceiverConnectorHolder extends AbstractConnectorHolder<JettyReceiverServlet, JettyHttpMessageReceiver>
+    {
+        List<MessageReceiver> receivers = new ArrayList<MessageReceiver>();
+
+        public MuleReceiverConnectorHolder(Connector connector, JettyReceiverServlet servlet, JettyHttpMessageReceiver receiver)
+        {
+            super(connector, servlet, receiver);
+            addReceiver(receiver);
+        }
+
+        public boolean isReferenced()
+        {
+            return receivers.size() > 0;
+        }
+
+        public void addReceiver(JettyHttpMessageReceiver receiver)
+        {
+
+            receivers.add(receiver);
+            if(started)
+            {
+                getServlet().addReceiver(receiver);
+            }
+        }
+
+        public void removeReceiver(JettyHttpMessageReceiver receiver)
+        {
+            receivers.remove(receiver);
+            getServlet().removeReceiver(receiver);
+        }
+
+        public void start() throws MuleException
+        {
+            super.start();
+            
+            for (MessageReceiver receiver : receivers)
+            {
+                servlet.addReceiver(receiver);
+            }
+        }
+
+        public void stop() throws MuleException
+        {
+            super.stop();
+
+            for (MessageReceiver receiver : receivers)
+            {
+                servlet.removeReceiver(receiver);
+            }
+        }
     }
 }

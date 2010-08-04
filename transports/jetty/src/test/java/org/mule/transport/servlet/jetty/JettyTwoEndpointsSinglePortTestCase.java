@@ -61,7 +61,8 @@ public class JettyTwoEndpointsSinglePortTestCase extends FunctionalTestCase
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(endpoint, message, null).getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
+            MuleMessage result = client.send(endpoint, message, null);
+            results.add(result.getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
         }
 
         assertEquals(noOfMessages, results.size());

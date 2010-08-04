@@ -11,7 +11,7 @@
 package org.mule.transport.servlet.jetty;
 
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.functional.HttpFunctionalTestCase;
 
@@ -29,11 +29,12 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testNonRootUrls() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        LocalMuleClient client = muleContext.getClient();
         Map props = new HashMap();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("anotherClientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
+
 
 }

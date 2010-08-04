@@ -6,4 +6,4 @@
 org.mule.transport.servlet.jetty.JettyContinuationsTwoEndpointsSinglePortTestCase
 
 # MULE-4586
-org.mule.transport.servlet.jetty.JettyContinuationsHttpFunctionalTestCase
+#org.mule.transport.servlet.jetty.JettyContinuationsHttpFunctionalTestCase

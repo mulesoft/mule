@@ -36,6 +36,10 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         throws EndpointException
     {
         String key = httpServletRequest.getPathInfo();
+        if(StringUtils.EMPTY.equals(key))
+        {
+            key = httpServletRequest.getContextPath();
+        }
 
         MessageReceiver receiver = (MessageReceiver)receivers.get(key);
         if (receiver == null)
@@ -63,7 +67,7 @@ public class JettyReceiverServlet extends MuleReceiverServlet
 
     protected String getReceiverKey(MessageReceiver receiver)
     {
-        String key = receiver.getEndpointURI().getPath();
+        String key = receiver.getEndpoint().getEndpointURI().getPath();
         if(StringUtils.isEmpty(key))
         {
             key = "/";

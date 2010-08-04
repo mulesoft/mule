@@ -54,6 +54,12 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
 
     protected void doInitialise() throws InitialisationException
     {
+        validateSslConfig();
+        super.doInitialise();
+    }
+
+    protected void validateSslConfig() throws InitialisationException
+    {
         try
         {
             tls.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
@@ -62,7 +68,6 @@ public class JettyHttpsConnector extends JettyHttpConnector implements TlsDirect
         {
             throw new InitialisationException(e, this);
         }
-        super.doInitialise();
     }
 
     public String getProtocol()
