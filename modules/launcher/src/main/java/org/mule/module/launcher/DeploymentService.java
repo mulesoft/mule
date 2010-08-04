@@ -106,7 +106,7 @@ public class DeploymentService
         appDirMonitorTimer = Executors.newSingleThreadScheduledExecutor(new AppDeployerMonitorThreadFactory());
 
         // TODO based on the final design, pass in 0 for initial delay for immediate first-time execution
-        appDirMonitorTimer.scheduleWithFixedDelay(new AppDirFileWatcher(appsDir),
+        appDirMonitorTimer.scheduleWithFixedDelay(new AppDirWatcher(appsDir),
                                                   reloadIntervalMs,
                                                   reloadIntervalMs,
                                                   TimeUnit.MILLISECONDS);
@@ -153,7 +153,7 @@ public class DeploymentService
     /**
      * Not thread safe. Correctness is guaranteed by a single-threaded executor.
      */
-    protected class AppDirFileWatcher implements Runnable
+    protected class AppDirWatcher implements Runnable
     {
         protected File appsDir;
 
@@ -162,7 +162,7 @@ public class DeploymentService
         // written on app start, will be used to cleanly undeploy the app without file locking issues
         protected String[] appAnchors = new String[0];
 
-        public AppDirFileWatcher(File appsDir)
+        public AppDirWatcher(File appsDir)
         {
             this.appsDir = appsDir;
             // save the list of known apps on startup
