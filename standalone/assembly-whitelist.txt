@@ -107,6 +107,7 @@ mule-module-boot
 mule-module-builders
 mule-module-client
 mule-module-guice
+mule-module-ibeans
 mule-module-jaas
 mule-module-jbossts
 mule-module-json
