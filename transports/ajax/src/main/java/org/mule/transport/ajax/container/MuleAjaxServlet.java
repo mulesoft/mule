@@ -12,9 +12,12 @@ package org.mule.transport.ajax.container;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.transport.Connector;
 import org.mule.module.json.transformers.ObjectToJson;
+import org.mule.transport.ajax.BayeuxAware;
 import org.mule.transport.ajax.i18n.AjaxMessages;
 import org.mule.transport.service.TransportFactory;
+import org.mule.transport.servlet.MuleServletContextListener;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.io.IOException;
@@ -38,12 +41,7 @@ import org.mortbay.cometd.continuation.ContinuationCometdServlet;
  */
 public class MuleAjaxServlet extends ContinuationCometdServlet
 {
-    /** 
-     * The name of the ajax connector to use with this Servlet 
-     */
-    public static final String AJAX_CONNECTOR_NAME_PROPERTY = "org.mule.ajax.connector.name";
-
-    protected AjaxServletConnector connector = null;
+    protected Connector connector = null;
 
     private ObjectToJson jsonTransformer;
 
@@ -59,15 +57,15 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         {
             throw new ServletException("Attribute " + MuleProperties.MULE_CONTEXT_PROPERTY + " not set on ServletContext");
         }
-        String servletConnectorName = getServletConfig().getInitParameter(AJAX_CONNECTOR_NAME_PROPERTY);
+        String servletConnectorName = getServletConfig().getInitParameter(MuleServletContextListener.CONNECTOR_NAME);
         if (servletConnectorName == null)
         {
-            servletConnectorName = (String)getServletContext().getAttribute(AJAX_CONNECTOR_NAME_PROPERTY);
+            servletConnectorName = (String)getServletContext().getAttribute(MuleServletContextListener.CONNECTOR_NAME);
         }
         
         if (servletConnectorName == null)
         {
-            connector = (AjaxServletConnector) new TransportFactory(muleContext).getConnectorByProtocol(getConnectorProtocol());
+            connector = new TransportFactory(muleContext).getConnectorByProtocol(getConnectorProtocol());
             if (connector == null)
             {
                 connector = new AjaxServletConnector(muleContext);
@@ -84,13 +82,13 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
         }
         else
         {
-            connector = (AjaxServletConnector) muleContext.getRegistry().lookupConnector(servletConnectorName);
+            connector = muleContext.getRegistry().lookupConnector(servletConnectorName);
             if (connector == null)
             {
-                throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, AJAX_CONNECTOR_NAME_PROPERTY).toString());
+                throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, MuleServletContextListener.CONNECTOR_NAME).toString());
             }
         }
-        connector.setBayeux(getBayeux());
+        ((BayeuxAware)connector).setBayeux(getBayeux());
 
         jsonTransformer = new ObjectToJson();
         try
@@ -106,7 +104,7 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        super.service(request, response);    //To change body of overridden methods use File | Settings | File Templates.
+        super.service(request, response);
     }
 
     protected String getConnectorProtocol()

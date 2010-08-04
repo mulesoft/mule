@@ -11,6 +11,7 @@
 package org.mule.transport.ajax;
 
 import org.mule.transport.ajax.container.MuleAjaxServlet;
+import org.mule.transport.servlet.MuleServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -27,7 +28,7 @@ public class AjaxRPCContainerFunctionalTestCase extends AjaxRPCFunctionalTestCas
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
-        c.addEventListener(new AjaxServletContextListener(muleContext, null));
+        c.addEventListener(new MuleServletContextListener(muleContext, null));
 
         httpServer.start();
 

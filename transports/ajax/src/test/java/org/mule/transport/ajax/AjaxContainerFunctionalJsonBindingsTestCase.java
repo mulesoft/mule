@@ -11,6 +11,7 @@
 package org.mule.transport.ajax;
 
 import org.mule.transport.ajax.container.MuleAjaxServlet;
+import org.mule.transport.servlet.MuleServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -18,8 +19,13 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJsonBindingsTestCase
 {
-
     private Server httpServer;
+
+     @Override
+    protected String getConfigResources()
+    {
+        return "ajax-container-functional-json-bindings-test.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -28,7 +34,7 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
-        c.addEventListener(new AjaxServletContextListener(muleContext, null));
+        c.addEventListener(new MuleServletContextListener(muleContext, null));
 
         httpServer.start();
 
@@ -44,11 +50,5 @@ public class AjaxContainerFunctionalJsonBindingsTestCase extends AjaxFunctionalJ
             httpServer.stop();
         }
 
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "ajax-container-functional-json-bindings-test.xml";
     }
 }

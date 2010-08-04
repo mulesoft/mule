@@ -13,6 +13,8 @@ import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
+import java.net.URL;
+
 public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
 {
     @Override
@@ -23,6 +25,7 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
         //By default the connector is not started until the servlet container is up.  We start it here because
         //this test looks at the connector lifecycle
         c.setInitialStateStopped(false);
+        c.setServerUrl(new URL("http://0.0.0.0:12345"));
         return c;
     }
 
@@ -35,6 +38,6 @@ public class AjaxEmbeddedConnectorTestCase extends AbstractConnectorTestCase
     @Override
     public String getTestEndpointURI()
     {
-        return "ajax:http://0.0.0.0:58080/service/request";
+        return "ajax:///request";
     }
 }

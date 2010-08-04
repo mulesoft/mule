@@ -13,8 +13,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.Connector;
 import org.mule.transport.DefaultReplyToHandler;
-import org.mule.transport.ajax.container.AjaxServletConnector;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ import org.mortbay.cometd.AbstractBayeux;
  */
 public class AjaxReplyToHandler extends DefaultReplyToHandler
 {
-    private AjaxServletConnector connector;
+    private Connector connector;
     
-    public AjaxReplyToHandler(List<Transformer> transformers, AjaxServletConnector connector)
+    public AjaxReplyToHandler(List<Transformer> transformers, Connector connector)
     {
         super(transformers, connector.getMuleContext());
         this.connector = connector;
@@ -39,7 +39,7 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
     @Override
     public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
     {
-        AbstractBayeux bayeux = connector.getBayeux();
+        AbstractBayeux bayeux = ((BayeuxAware)connector).getBayeux();
         Channel channel = bayeux.getChannel(replyTo.toString(), false);
         if(channel==null)
         {

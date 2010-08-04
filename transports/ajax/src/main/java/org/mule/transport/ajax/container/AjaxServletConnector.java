@@ -19,6 +19,8 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxReplyToHandler;
+import org.mule.transport.ajax.BayeuxAware;
+import org.mule.transport.ajax.embedded.AjaxConnector;
 import org.mule.transport.servlet.ServletConnector;
 
 import org.cometd.DataFilter;
@@ -28,7 +30,7 @@ import org.mortbay.cometd.AbstractBayeux;
  * A servlet connector that binds to the container and makes a configured 
  * Bayeux available to dispatchers and receivers.
  */
-public class AjaxServletConnector extends ServletConnector
+public class AjaxServletConnector extends ServletConnector implements BayeuxAware
 {
     public static final String PROTOCOL = "ajax-servlet";
 
@@ -80,12 +82,6 @@ public class AjaxServletConnector extends ServletConnector
     private boolean requestAvailable = true;
 
     /**
-     * true if published messages are delivered directly to subscribers (default). 
-     * If false, a message copy is created with only supported fields (default true).
-     */
-    private boolean directDeliver = true;
-
-    /**
      * The number of message refs at which the a single message response will be
      * cached instead of being generated for every client delivered to. Done to optimize
      * a single message being sent to multiple clients.
@@ -95,10 +91,10 @@ public class AjaxServletConnector extends ServletConnector
 
     protected AbstractBayeux bayeux;
 
-    public AjaxServletConnector(MuleContext context)
+    public AjaxServletConnector(MuleContext context) 
     {
         super(context);
-        registerSupportedProtocolWithoutPrefix("ajax");
+        registerSupportedProtocolWithoutPrefix(AjaxConnector.PROTOCOL);
         //Dont start until the servletContainer is up
         setInitialStateStopped(true);
     }
@@ -126,7 +122,7 @@ public class AjaxServletConnector extends ServletConnector
             {
                 ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());
             }
-            start();
+           start();
         }
         catch (MuleException e)
         {
@@ -240,6 +236,7 @@ public class AjaxServletConnector extends ServletConnector
     protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         AjaxMessageReceiver receiver = (AjaxMessageReceiver) super.createReceiver(flowConstruct, endpoint);
+        //The Bayeux object will be null of the connector has not started yet, nothing to worry about
         receiver.setBayeux(getBayeux());
         return receiver;
     }

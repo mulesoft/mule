@@ -7,10 +7,29 @@
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
     <ajax:connector name="connector1" interval="1000" jsonCommented="true" logLevel="1"
-                      maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"/>
+                    maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"
+                    serverUrl="http://0.0.0.0:58080/service" resourceBase="/foo/bar"/>
 
-    <ajax:servlet-connector name="connector2"/>
+    <ajax:connector name="connector2" interval="1000" jsonCommented="true" logLevel="1"
+                    maxInterval="10000" multiFrameInterval="3000" refsThreshold="4000" timeout="50000"
+                    serverUrl="https://0.0.0.0:58081/service" resourceBase="/foo/bar">
+        <ajax:client
+                path="clientKeystore"
+                storePassword="mulepassword"/>
+        <ajax:key-store
+                keyPassword="mulepassword"
+                path="serverKeystore"
+                storePassword="mulepassword"/>
+        <ajax:server
+                path="trustStore"
+                storePassword="mulepassword"
+                explicitOnly="true"
+                requireClientAuthentication="true"/>
+    </ajax:connector>
 
-    <ajax:endpoint name="endpoint1" address="http://0.0.0.0:58080/service/request"/>
-    <ajax:servlet-endpoint name="endpoint2" path="service/response"/>
+    <ajax:servlet-connector name="connector3"/>
+
+    <ajax:endpoint name="endpoint1" channel="/request" connector-ref="connector1"/>
+
+    <ajax:servlet-endpoint name="endpoint2" channel="/response" connector-ref="connector3"/>
 </mule>

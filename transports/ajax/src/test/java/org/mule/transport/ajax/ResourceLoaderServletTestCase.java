@@ -13,6 +13,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
+import org.mule.transport.servlet.JarResourceServlet;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -32,7 +33,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
         httpServer.addConnector(conn);
 
         ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(MuleJarResourcesServlet.class, "/mule-resource/*");
+        handler.addServletWithMapping(JarResourceServlet.class, "/mule-resource/*");
 
         httpServer.addHandler(handler);
 

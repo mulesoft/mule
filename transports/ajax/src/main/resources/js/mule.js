@@ -15,10 +15,8 @@ var mule = {
     _init: function()
     {
         var loc = new String(document.location);
-        console.debug("location is: " + loc);
         loc = loc.replace("localhost", mule.localAdapter);
-        console.debug("after local host replace: " + loc);
-        loc = loc.substring(0, loc.lastIndexOf("/")) + mule.uri;
+        loc = loc.substring(0, loc.indexOf("/", 8)) + mule.uri;
         console.debug("initing now: " + loc);
         dojox.cometd.init(loc);
 
@@ -44,7 +42,6 @@ var mule = {
             dojo.unsubscribe(mule._meta);
         }
         mule._meta = null;
-        //dojox.ajax.unsubscribe("/notification", mule);
         dojox.cometd.disconnect();
     },
 

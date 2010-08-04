@@ -6,7 +6,9 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <ajax:endpoint name="endpoint1" address="http://0.0.0.0:58080/request"/>
+    <ajax:connector name="ajax.server" serverUrl="http://0.0.0.0:58080"/>
+    
+    <ajax:endpoint name="endpoint1" channel="/request"/>
 
     <model name="main">
         <service name="testComponent">

@@ -11,32 +11,34 @@ package org.mule.transport.ajax.embedded;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.notification.MuleContextNotificationListener;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.context.notification.NotificationException;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.transport.ajax.AjaxMessageReceiver;
 import org.mule.transport.ajax.AjaxMuleMessageFactory;
-import org.mule.transport.ajax.AjaxServletContextListener;
-import org.mule.transport.ajax.MuleJarResourcesServlet;
-import org.mule.transport.ajax.container.AjaxServletConnector;
+import org.mule.transport.ajax.AjaxReplyToHandler;
+import org.mule.transport.ajax.BayeuxAware;
 import org.mule.transport.ajax.container.MuleAjaxServlet;
+import org.mule.transport.ajax.i18n.AjaxMessages;
+import org.mule.transport.servlet.JarResourceServlet;
+import org.mule.transport.servlet.MuleServletContextListener;
+import org.mule.transport.servlet.jetty.JettyHttpsConnector;
+import org.mule.util.StringUtils;
 
-import java.util.HashMap;
+import java.net.URL;
 import java.util.Map;
+
+import javax.servlet.Servlet;
 
 import org.mortbay.cometd.AbstractBayeux;
 import org.mortbay.cometd.continuation.ContinuationCometdServlet;
+import org.mortbay.jetty.AbstractConnector;
 import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
@@ -50,15 +52,17 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * Note that a {@link @RESOURCE_BASE_PROPERTY} can be set on the ajax endpoint that provides the location of any web application resources such
  * as html pages
  */
-public class AjaxConnector extends AjaxServletConnector implements MuleContextNotificationListener<MuleContextNotification>
+public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 {
     public static final String PROTOCOL = "ajax";
 
     public static final String RESOURCE_BASE_PROPERTY = "resourceBase";
+    
+    public static final String CHANNEL_PROPERTY = "channel";
 
-    public static final String SERVLET_PATH_SPEC = "/ajax/*";
+    public static final String AJAX_PATH_SPEC = "/ajax/*";
 
-    public static final String COMETD_CIENT = "cometd.client";
+    public static final String COMETD_CLIENT = "cometd.client";
 
     /**
      * This is the key that's used to retrieve the reply to destination from a {@link Map} that's
@@ -66,14 +70,79 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
      */
     public static final String REPLYTO_PARAM = "replyTo";
 
-    private Server httpServer;
+    private URL serverUrl;
 
-    private HashMap<String, BayeuxHolder> connectors = new HashMap<String, BayeuxHolder>();
+    /**
+     * The client side poll timeout in milliseconds (default 0). How long a client
+     * will wait between reconnects
+     */
+    private int interval = INT_VALUE_NOT_SET;
+
+    /**
+     * The max client side poll timeout in milliseconds (default 30000). A client
+     * will be removed if a connection is not received in this time.
+     */
+    private int maxInterval = INT_VALUE_NOT_SET;
+
+    /**
+     * The client side poll timeout if multiple connections are detected from the
+     * same browser (default 1500).
+     */
+    private int multiFrameInterval = INT_VALUE_NOT_SET;
+
+    /**
+     * 0=none, 1=info, 2=debug
+     */
+    private int logLevel = INT_VALUE_NOT_SET;
+
+    /**
+     * The server side poll timeout in milliseconds (default 250000). This is how long
+     * the server will hold a reconnect request before responding.
+     */
+    private int timeout = INT_VALUE_NOT_SET;
+
+    /**
+     * If "true" (default) then the server will accept JSON wrapped in a comment and
+     * will generate JSON wrapped in a comment. This is a defence against Ajax Hijacking.
+     */
+    private boolean jsonCommented = true;
+
+    /**
+     * TODO SUPPORT FILTERS
+     * the location of a JSON file describing {@link org.cometd.DataFilter} instances to be installed
+     */
+    private String filters;
+
+    /**
+     * If true, the current request is made available via the
+     * {@link AbstractBayeux#getCurrentRequest()} method
+     */
+    private boolean requestAvailable = true;
+
+    /**
+     * true if published messages are delivered directly to subscribers (default).
+     * If false, a message copy is created with only supported fields (default true).
+     */
+    private boolean directDeliver = true;
+
+    /**
+     * The number of message refs at which the a single message response will be
+     * cached instead of being generated for every client delivered to. Done to optimize
+     * a single message being sent to multiple clients.
+     */
+    private int refsThreshold = INT_VALUE_NOT_SET;
+
+    private ContinuationCometdServlet servlet;
+
+    private String resourceBase;
 
     public AjaxConnector(MuleContext context)
     {
         super(context);
-        registerSupportedProtocol("ajax");
+        unregisterSupportedProtocol("http");
+        unregisterSupportedProtocol("https");
+        unregisterSupportedProtocol("jetty-ssl");
+        unregisterSupportedProtocol("jetty");
         setInitialStateStopped(true);
     }
 
@@ -83,238 +152,101 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         return PROTOCOL;
     }
 
+    public URL getServerUrl()
+    {
+        return serverUrl;
+    }
+
+    public void setServerUrl(URL serverUrl)
+    {
+        this.serverUrl = serverUrl;
+    }
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        if(serverUrl==null)
+        {
+            throw new InitialisationException(AjaxMessages.serverUrlNotDefined(), this);
+        }
+        super.doInitialise();
         try
         {
-            muleContext.registerListener(this);
-        }
-        catch (NotificationException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
-        httpServer = new Server();
-    }
-
-    public void onNotification(MuleContextNotification notification)
-    {
-
-        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-        {
-            //We delay starting until the context has been started since we need the MuleAjaxServlet to initialise first
-            setInitialStateStopped(false);
-            try
-            {
-                doStart();
-            }
-            catch (MuleException e)
-            {
-                throw new MuleRuntimeException(CoreMessages.failedToStart(getName()), e);
-            }
-        }
-    }
-
-    AbstractBayeux getBayeux(ImmutableEndpoint endpoint)
-    {
-         String connectorKey = endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
-
-        synchronized (this)
-        {
-            BayeuxHolder connectorRef = connectors.get(connectorKey);
-            if(connectorRef!=null)
-            {
-                return connectorRef.servlet.getBayeux();
-            }
-        }
-        throw new IllegalArgumentException("Endpoint not registered: " + connectorKey);
-    }
-
-    /**
-     * Template method to dispose any resources associated with this receiver. There
-     * is not need to dispose the connector as this is already done by the framework
-     */
-    @Override
-    protected void doDispose()
-    {
-        try
-        {
-            httpServer.stop();
+            createEmbeddedServer();
         }
         catch (Exception e)
         {
-            logger.error("Error disposing Jetty server", e);
+            throw new InitialisationException(e, this);
         }
-        connectors.clear();
     }
 
     @Override
     protected void doStart() throws MuleException
     {
-       try
+        super.doStart();
+        for (MessageReceiver receiver : receivers.values())
         {
-            httpServer.start();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(CoreMessages.failedToStart("Jetty Http Receiver").getMessage(), e);
+            ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());
         }
     }
 
     @Override
-    protected void doStop() throws MuleException
+    protected void validateSslConfig() throws InitialisationException
     {
-        try
+        if(serverUrl.getProtocol().equals("https"))
         {
-            for (BayeuxHolder connectorRef : connectors.values())
-            {
-                connectorRef.connector.stop();
-            }
-
-            httpServer.stop();
-
-        }
-        catch (Exception e)
-        {
-            throw new LifecycleException(CoreMessages.failedToStop("Jetty Http Receiver"), e, this);
+            super.validateSslConfig();
         }
     }
 
-
-    /**
-     * Template method where any connections should be made for the connector
-     */
     @Override
-    protected void doConnect() throws Exception
+    public ReplyToHandler getReplyToHandler(ImmutableEndpoint endpoint)
     {
-        //do nothing
+        return new AjaxReplyToHandler(getDefaultResponseTransformers(endpoint), this);
     }
 
-    /**
-     * Template method where any connected resources used by the connector should be
-     * disconnected
-     */
-    @Override
-    protected void doDisconnect() throws Exception
+    void createEmbeddedServer() throws MuleException
     {
-        //do nothing
+        Connector connector = createJettyConnector();
+
+        connector.setPort(serverUrl.getPort());
+        connector.setHost(serverUrl.getHost());
+        
+        getHttpServer().addConnector(connector);
+        EndpointBuilder builder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(serverUrl.toString());
+
+        servlet = (ContinuationCometdServlet)createServlet(connector, builder.buildInboundEndpoint());
     }
 
-    @Override
-    protected MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception
-    {
-        MessageReceiver receiver =  super.createReceiver(flowConstuct, endpoint);
-        BayeuxHolder holder = registerBayeuxEndpoint(receiver.getEndpoint());
-        ((AjaxMessageReceiver) receiver).setBayeux(holder.getBayeux());
-        return receiver;
-    }
-
-    public BayeuxHolder registerBayeuxEndpoint(ImmutableEndpoint endpoint) throws MuleException
-    {
-        // Make sure that there is a connector for the requested endpoint.
-        String connectorKey = endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
-
-        BayeuxHolder holder;
-
-        synchronized (this)
-        {
-            holder = connectors.get(connectorKey);
-            if (holder == null)
-            {
-                Connector connector = createJettyConnector();
-
-                connector.setPort(endpoint.getEndpointURI().getPort());
-                connector.setHost(endpoint.getEndpointURI().getHost());
-                if ("localhost".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
-                {
-                    logger.warn("You use localhost interface! It means that no external connections will be available."
-                            + " Don't you want to use 0.0.0.0 instead (all network interfaces)?");
-                }
-                getHttpServer().addConnector(connector);
-
-                ContinuationCometdServlet servlet = createServletForConnector(connector, endpoint);
-                holder = new BayeuxHolder(connector, servlet);
-                connectors.put(connectorKey, holder);
-            }
-            else
-            {
-                holder.increment();
-            }
-        }
-        return holder;
-    }
-
-
-    @Override
-    public void destroyReceiver(MessageReceiver receiver, ImmutableEndpoint endpoint) throws Exception
-    {
-        unregisterConnectorListener(receiver);
-        super.destroyReceiver(receiver, endpoint);
-    }
-
-    void unregisterConnectorListener(MessageReceiver receiver) throws Exception
-    {
-        InboundEndpoint endpoint = receiver.getEndpoint();
-
-        String connectorKey = endpoint.getProtocol() + ":" + endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort();
-
-        synchronized (this)
-        {
-            BayeuxHolder connectorRef = connectors.get(connectorKey);
-            if (connectorRef != null)
-            {
-                if (connectorRef.decrement() == 0)
-                {
-                    getHttpServer().removeConnector(connectorRef.connector);
-                    connectorRef.connector.stop();
-                    connectors.remove(connectorKey);
-                }
-            }
-        }
-
-    }
-
-    @Override
-    public void setDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
-    {
-        super.setDispatcherFactory(dispatcherFactory);
-    }
-
-    protected org.mortbay.jetty.AbstractConnector createJettyConnector()
-    {
-        return new SelectChannelConnector();
-    }
-
-    public Server getHttpServer()
-    {
-        return httpServer;
-    }
-
-    protected ContinuationCometdServlet createServletForConnector(Connector connector, ImmutableEndpoint endpoint) throws MuleException
+    public Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
     {
         ContinuationCometdServlet servlet = new MuleAjaxServlet();
 
-//        String path = endpoint.getEndpointURI().getPath();
-//        if(StringUtils.isBlank(path))
-//        {
-//            path = "/";
-//        }
-        Context context = new Context(this.getHttpServer(), "/", Context.NO_SECURITY);
-        context.setConnectorNames(new String[]{connector.getName()});
-        context.addEventListener(new AjaxServletContextListener(muleContext, getName()));
-
-        ServletHolder holder = new ServletHolder();
-        holder.setServlet(servlet);
-        String resourceBase = (String)endpoint.getProperty(RESOURCE_BASE_PROPERTY);
-        if(resourceBase!=null)
+        String path = endpoint.getEndpointURI().getPath();
+        if(StringUtils.isBlank(path))
         {
-                context.setResourceBase(resourceBase);
+            path = ROOT;
         }
 
-        context.addServlet(MuleJarResourcesServlet.class, MuleJarResourcesServlet.DEFAULT_PATH_SPEC);
-        context.addServlet(holder, SERVLET_PATH_SPEC);
-        context.addServlet(DefaultServlet.class, "/");
+        ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
+        Context root = new Context(handlerCollection, ROOT, Context.NO_SECURITY);
+        root.setConnectorNames(new String[]{connector.getName()});
+        root.addEventListener(new MuleServletContextListener(muleContext, getName()));
+
+        if(!ROOT.equals(path))
+        {
+            Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
+            populateContext(resourceContext);
+
+        } else
+        {
+            populateContext(root);
+        }
+
+        //Add ajax to root
+        ServletHolder holder = new ServletHolder();
+        holder.setServlet(servlet);
+        root.addServlet(holder, AJAX_PATH_SPEC);
 
 
         if(getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
@@ -326,36 +258,194 @@ public class AjaxConnector extends AjaxServletConnector implements MuleContextNo
         if(getRefsThreshold() != INT_VALUE_NOT_SET) holder.setInitParameter("refsThreshold", Integer.toString(getRefsThreshold()));
         holder.setInitParameter("requestAvailable", Boolean.toString(isRequestAvailable()));
 
+
+        this.getHttpServer().addHandler(handlerCollection);
         return servlet;
     }
 
-    public class BayeuxHolder
+    protected void populateContext(Context context)
     {
-        Connector connector;
-        ContinuationCometdServlet servlet;
-        int refCount;
+        context.addServlet(DefaultServlet.class, ROOT);
+        context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
 
-        public BayeuxHolder(Connector connector,
-                            ContinuationCometdServlet servlet)
+        if(getResourceBase()!=null)
         {
-            this.connector = connector;
-            this.servlet = servlet;
-            increment();
-        }
-
-        public int increment()
-        {
-            return ++refCount;
-        }
-
-        public int decrement()
-        {
-            return --refCount;
-        }
-
-        public AbstractBayeux getBayeux()
-        {
-            return servlet.getBayeux();
+            context.setResourceBase(getResourceBase());
         }
     }
+
+
+    @Override
+    protected AbstractConnector createJettyConnector()
+    {
+        if(serverUrl.getProtocol().equals("https"))
+        {
+            return super.createJettyConnector();
+        }
+        else
+        {
+            return new SelectChannelConnector();
+        }
+    }
+
+
+    public AbstractBayeux getBayeux( )
+    {
+        return servlet.getBayeux();
+    }
+
+    public void setBayeux(AbstractBayeux bayeux)
+    {
+        //Ignore
+    }
+
+    @Override
+    protected MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
+    {
+        MessageReceiver receiver = getServiceDescriptor().createMessageReceiver(this, flowConstruct, endpoint);
+        //If the connector has not started yet, the Bayeux object will still be null
+        ((AjaxMessageReceiver) receiver).setBayeux(getBayeux());
+        return receiver;
+    }
+
+    public String getResourceBase()
+    {
+        return resourceBase;
+    }
+
+    public void setResourceBase(String resourceBase)
+    {
+        this.resourceBase = resourceBase;
+    }
+
+    public int getInterval()
+    {
+        return interval;
+    }
+
+    public void setInterval(int interval)
+    {
+        this.interval = interval;
+    }
+
+    public int getMaxInterval()
+    {
+        return maxInterval;
+    }
+
+    public void setMaxInterval(int maxInterval)
+    {
+        this.maxInterval = maxInterval;
+    }
+
+    public int getMultiFrameInterval()
+    {
+        return multiFrameInterval;
+    }
+
+    public void setMultiFrameInterval(int multiFrameInterval)
+    {
+        this.multiFrameInterval = multiFrameInterval;
+    }
+
+    public int getLogLevel()
+    {
+        return logLevel;
+    }
+
+    public void setLogLevel(int logLevel)
+    {
+        this.logLevel = logLevel;
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
+    }
+
+    public boolean isJsonCommented()
+    {
+        return jsonCommented;
+    }
+
+    public void setJsonCommented(boolean jsonCommented)
+    {
+        this.jsonCommented = jsonCommented;
+    }
+
+    public String getFilters()
+    {
+        return filters;
+    }
+
+    public void setFilters(String filters)
+    {
+        this.filters = filters;
+    }
+
+    public boolean isRequestAvailable()
+    {
+        return requestAvailable;
+    }
+
+    public void setRequestAvailable(boolean requestAvailable)
+    {
+        this.requestAvailable = requestAvailable;
+    }
+
+    public boolean isDirectDeliver()
+    {
+        return directDeliver;
+    }
+
+    public void setDirectDeliver(boolean directDeliver)
+    {
+        this.directDeliver = directDeliver;
+    }
+
+    public int getRefsThreshold()
+    {
+        return refsThreshold;
+    }
+
+    public void setRefsThreshold(int refsThreshold)
+    {
+        this.refsThreshold = refsThreshold;
+    }
+
+//    public class AjaxConnectorHolder extends AbstractConnectorHolder<ContinuationCometdServlet, AjaxMessageReceiver>
+//    {
+//        private int refCount;
+//
+//        public AjaxConnectorHolder(Connector connector, ContinuationCometdServlet servlet, AjaxMessageReceiver receiver)
+//        {
+//            super(connector, servlet, receiver);
+//            addReceiver(receiver);
+//        }
+//
+//        public boolean isReferenced()
+//        {
+//            return refCount == 0;
+//        }
+//
+//
+//        public void addReceiver(AjaxMessageReceiver receiver)
+//        {
+//           refCount++;
+//            if(receiver!=null)
+//            {
+//            receiver.setBayeux(servlet.getBayeux());
+//            }
+//        }
+//
+//        public void removeReceiver(AjaxMessageReceiver receiver)
+//        {
+//            refCount--;
+//        }
+//    }
 }

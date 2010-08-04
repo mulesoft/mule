@@ -9,8 +9,8 @@
  */
 package org.mule.transport.ajax.i18n;
 
-import org.mule.config.i18n.MessageFactory;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * i18n messages for the Ajax transport
@@ -34,5 +34,10 @@ public class AjaxMessages extends MessageFactory
     public static Message noAjaxConnectorWithName(String name, String param)
     {
         return FACTORY.createMessage(BUNDLE_PATH, 3, name, param);
+    }
+
+    public static Message serverUrlNotDefined()
+    {
+        return FACTORY.createMessage(BUNDLE_PATH, 4);
     }
 }

@@ -32,6 +32,12 @@ public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
     private BayeuxClient client;
 
     @Override
+    protected String getConfigResources()
+    {
+        return "ajax-rpc-test.xml";
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
         HttpClient http = new HttpClient();
@@ -48,12 +54,6 @@ public class AjaxRPCFunctionalTestCase extends FunctionalTestCase
     {
         //9 times out of 10 this throws a "ava.lang.IllegalStateException: Not running" exception, it can be ignored
         client.stop();
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "ajax-rpc-test.xml";
     }
 
     public void testDispatchReceiveSimple() throws Exception

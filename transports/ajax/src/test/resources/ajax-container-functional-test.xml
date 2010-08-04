@@ -12,8 +12,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <ajax:servlet-endpoint name="ajax-endpoint1" path="/test1"/>
-    <ajax:servlet-endpoint name="ajax-endpoint2" path="/test2"/>
+    <ajax:servlet-endpoint name="ajax-endpoint1" channel="/test1"/>
+    <ajax:servlet-endpoint name="ajax-endpoint2" channel="/test2"/>
 
     <model name="main">
         <service name="clientSubscribe-test1">

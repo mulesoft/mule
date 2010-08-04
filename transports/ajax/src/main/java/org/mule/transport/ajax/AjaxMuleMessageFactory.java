@@ -116,7 +116,7 @@ public class AjaxMuleMessageFactory extends AbstractMuleMessageFactory
     {
         Object replyTo = map.remove(AjaxConnector.REPLYTO_PARAM);
         muleMessage.setReplyTo(replyTo);
-        
+
         // remove the part of the map we process as payload
         map.remove(Bayeux.DATA_FIELD);
         

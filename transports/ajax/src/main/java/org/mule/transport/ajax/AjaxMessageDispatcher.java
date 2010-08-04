@@ -12,10 +12,13 @@ package org.mule.transport.ajax;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
+import org.mule.transport.ajax.i18n.AjaxMessages;
 import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
@@ -26,7 +29,7 @@ import org.mortbay.cometd.AbstractBayeux;
 /**
  * Will dispatch Mule events to ajax clients available in Bayeux that are listening to this endpoint.
  */
-public class AjaxMessageDispatcher extends AbstractMessageDispatcher
+public class AjaxMessageDispatcher extends AbstractMessageDispatcher implements BayeuxAware
 {
     protected AbstractBayeux bayeux;
 
@@ -40,12 +43,17 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher
 
     protected Client client;
 
-    public AjaxMessageDispatcher(OutboundEndpoint endpoint)
+    public AjaxMessageDispatcher(OutboundEndpoint endpoint) throws CreateException
     {
         super(endpoint);
         cacheMessages = MapUtils.getBoolean(endpoint.getProperties(), "cacheMessages", false);
         messageCacheSize = MapUtils.getInteger(endpoint.getProperties(), "messageCacheSize", 500);
         channel = endpoint.getEndpointURI().getPath();
+        if(StringUtils.isEmpty(channel) || channel.equals("/"))
+        {
+            //TODO i18n
+            throw new CreateException(AjaxMessages.createStaticMessage("The subscription path cannot be empty or equal '/'"), this);
+        }
     }
 
     public AbstractBayeux getBayeux()
@@ -55,7 +63,6 @@ public class AjaxMessageDispatcher extends AbstractMessageDispatcher
 
     public void setBayeux(AbstractBayeux bayeux)
     {
-
         this.bayeux = bayeux;
     }
 

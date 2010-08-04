@@ -33,7 +33,7 @@ import org.mortbay.cometd.BayeuxService;
  * The {@link AjaxMessageReceiver.ReceiverService#route(org.cometd.Client, Object)}
  * is invoked when a message is received on the subscription channel
  */
-public class AjaxMessageReceiver extends AbstractMessageReceiver
+public class AjaxMessageReceiver extends AbstractMessageReceiver implements BayeuxAware
 {
     private AbstractBayeux bayeux;
 
@@ -41,10 +41,11 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
             throws CreateException
     {
         super(connector, flowConstruct, endpoint);
-        String path = endpoint.getEndpointURI().getPath();
-        if(StringUtils.isEmpty(path) || path.equals("/"))
+        String channel = endpoint.getEndpointURI().getPath();
+        if(StringUtils.isEmpty(channel) || channel.equals("/"))
         {
-            throw new CreateException(AjaxMessages.createStaticMessage("The subscription path cannotbe empty or equal '/'"), this);
+            //TODO i18n
+            throw new CreateException(AjaxMessages.createStaticMessage("The subscription path cannot be empty or equal '/'"), this);
         }
     }
 
@@ -64,7 +65,7 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver
         {
             AbstractConnector connector = (AbstractConnector) getConnector();
             MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
-            messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CIENT, client);
+            messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CLIENT, client);
 
             Object replyTo = messageToRoute.getReplyTo();
             MuleMessage message = AjaxMessageReceiver.this.routeMessage(messageToRoute);

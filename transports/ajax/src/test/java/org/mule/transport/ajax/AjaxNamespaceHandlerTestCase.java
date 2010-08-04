@@ -10,9 +10,12 @@
 package org.mule.transport.ajax;
 
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
+
+import java.net.URL;
 
 public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -21,7 +24,7 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         return "ajax-namespace-config.xml";
     }
 
-    public void testElements() throws Exception
+    public void testConnector1Properties() throws Exception
     {
         AjaxConnector connector =
                 (AjaxConnector) muleContext.getRegistry().lookupConnector("connector1");
@@ -35,18 +38,61 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3000, connector.getMultiFrameInterval());
         assertEquals(4000, connector.getRefsThreshold());
         assertEquals(50000, connector.getTimeout());
+        assertEquals(new URL("http://0.0.0.0:58080/service"), connector.getServerUrl());
+        assertEquals("/foo/bar", connector.getResourceBase());
+    }
 
-        AjaxServletConnector connector2 = (AjaxServletConnector) muleContext.getRegistry().lookupConnector("connector2");
+    public void testSecureConnector2Properties() throws Exception
+    {
+        AjaxConnector connector =
+                (AjaxConnector) muleContext.getRegistry().lookupConnector("connector2");
 
-        assertNotNull(connector2);
+        assertNotNull(connector);
+
+        assertTrue(connector.isJsonCommented());
+        assertEquals(1000, connector.getInterval());
+        assertEquals(1, connector.getLogLevel());
+        assertEquals(10000, connector.getMaxInterval());
+        assertEquals(3000, connector.getMultiFrameInterval());
+        assertEquals(4000, connector.getRefsThreshold());
+        assertEquals(50000, connector.getTimeout());
+        assertEquals(new URL("https://0.0.0.0:58081/service"), connector.getServerUrl());
+        assertEquals("/foo/bar", connector.getResourceBase());
+
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("mulepassword", connector.getKeyPassword());
+        assertEquals("mulepassword", connector.getKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
+        assertEquals("mulepassword", connector.getClientKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getTrustStore().endsWith("/trustStore"));
+        assertEquals("mulepassword", connector.getTrustStorePassword());
+        assertTrue(connector.isExplicitTrustStoreOnly());
+        assertTrue(connector.isRequireClientAuthentication());
+    }
+
+    public void testAjaxServletConnector() throws Exception
+    {
+        AjaxServletConnector connector = (AjaxServletConnector) muleContext.getRegistry().lookupConnector("connector3");
+        assertNotNull(connector);
         //No properties
+    }
 
+    public void testEmbeddedEndpoint() throws Exception
+    {
         EndpointBuilder b = muleContext.getRegistry().lookupEndpointBuilder("endpoint1");
         assertNotNull(b);
-        assertEquals("http://0.0.0.0:58080/service/request", b.buildInboundEndpoint().getEndpointURI().getAddress());
+        InboundEndpoint ep = b.buildInboundEndpoint();
+        assertEquals("/request", ep.getEndpointURI().getPath());
+    }
 
-        EndpointBuilder b2 = muleContext.getRegistry().lookupEndpointBuilder("endpoint2");
-        assertNotNull(b2);
-        assertEquals("service/response", b2.buildInboundEndpoint().getEndpointURI().getAddress());
+    public void testServletEndpoint() throws Exception
+    {
+        EndpointBuilder b = muleContext.getRegistry().lookupEndpointBuilder("endpoint2");
+        assertNotNull(b);
+        InboundEndpoint ep = b.buildInboundEndpoint();
+        assertEquals("/response", ep.getEndpointURI().getPath());
     }
 }

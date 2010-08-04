@@ -11,6 +11,7 @@
 package org.mule.transport.ajax;
 
 import org.mule.transport.ajax.container.MuleAjaxServlet;
+import org.mule.transport.servlet.MuleServletContextListener;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -21,13 +22,19 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
     private Server httpServer;
 
     @Override
+    protected String getConfigResources()
+    {
+        return "ajax-container-functional-test.xml";
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
         httpServer = new Server(SERVER_PORT);
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");
-        c.addEventListener(new AjaxServletContextListener(muleContext, null)); 
+        c.addEventListener(new MuleServletContextListener(muleContext, null)); 
 
         httpServer.start();
 
@@ -43,9 +50,5 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
 
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "ajax-container-functional-test.xml";
-    }
+
 }

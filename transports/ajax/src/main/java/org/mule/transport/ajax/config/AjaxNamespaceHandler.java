@@ -10,9 +10,16 @@
 package org.mule.transport.ajax.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.KeyStoreDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
+import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
+import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
@@ -25,20 +32,37 @@ public class AjaxNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerMetaTransportEndpoints(AjaxConnector.PROTOCOL);
+        //Embedded (default) endpoints
+        MuleDefinitionParserConfiguration mdp = registerStandardTransportEndpoints(AjaxConnector.PROTOCOL, new String[]{"channel"});
+        mdp.addAlias(AjaxConnector.CHANNEL_PROPERTY, URIBuilder.PATH);
         registerConnectorDefinitionParser(AjaxConnector.class);
 
-        //registerStandardTransportEndpoints(AjaxServletConnector.PROTOCOL, URIBuilder.SOCKET_ATTRIBUTES);
-        //registerConnectorDefinitionParser(AjaxServletConnector.class);
+        //SSL support (only for embedded)
+        registerBeanDefinitionParser("key-store", new KeyStoreDefinitionParser());
+        registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
+        registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
+        registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
 
-//        registerStandardTransportEndpoints(AjaxServletConnector.PROTOCOL, URIBuilder.SOCKET_ATTRIBUTES);
-//        registerBeanDefinitionParser("servlet-connector", new MuleOrphanDefinitionParser(AjaxServletConnector.class, true));
+        //Servlet endpoints
+        registerBeanDefinitionParser("servlet-connector", new MuleOrphanDefinitionParser(AjaxServletConnector.class, true));
+        registerBeanDefinitionParser("servlet-endpoint", createServletGlobalEndpointParser(getGlobalEndpointBuilderBeanClass()));
+        registerBeanDefinitionParser("servlet-inbound-endpoint", createServletEndpointParser(getInboundEndpointFactoryBeanClass()));
+        registerBeanDefinitionParser("servlet-outbound-endpoint", createServletEndpointParser(getOutboundEndpointFactoryBeanClass()));
+    }
 
-       registerBeanDefinitionParser("servlet-connector", new MuleOrphanDefinitionParser(AjaxServletConnector.class, true));
 
-        registerBeanDefinitionParser("servlet-endpoint", new TransportGlobalEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getGlobalEndpointBuilderBeanClass(), new String[]{"path"}, new String[]{}));
-        registerBeanDefinitionParser("servlet-inbound-endpoint", new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getInboundEndpointFactoryBeanClass(), new String[]{"path"}, new String[]{}));
-        registerBeanDefinitionParser("servlet-outbound-endpoint", new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, getOutboundEndpointFactoryBeanClass(), new String[]{"path"}, new String[]{}));
+    protected AddressedEndpointDefinitionParser createServletEndpointParser(Class factoryBean)
+    {
+        AddressedEndpointDefinitionParser parser = new TransportEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, factoryBean, new String[]{"channel"}, new String[]{});
+        parser.addAlias(AjaxConnector.CHANNEL_PROPERTY, URIBuilder.PATH);
+        return parser;
+    }
+
+    protected AddressedEndpointDefinitionParser createServletGlobalEndpointParser(Class factoryBean)
+    {
+        AddressedEndpointDefinitionParser parser = new TransportGlobalEndpointDefinitionParser(AjaxServletConnector.PROTOCOL, false, factoryBean, new String[]{"channel"}, new String[]{});
+        parser.addAlias(AjaxConnector.CHANNEL_PROPERTY, URIBuilder.PATH);
+        return parser;
     }
 
 }

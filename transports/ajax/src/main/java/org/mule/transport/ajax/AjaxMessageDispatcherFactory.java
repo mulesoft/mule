@@ -31,8 +31,7 @@ public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFacto
         {
             //We're running in embedded mode (i.e. using a Jetty servlet container created by the connector)
             //so we need to register the endpoint
-            AjaxConnector.BayeuxHolder holder = ((AjaxConnector)endpoint.getConnector()).registerBayeuxEndpoint(endpoint);
-            dispatcher.setBayeux(holder.getBayeux());
+            dispatcher.setBayeux(((AjaxConnector)endpoint.getConnector()).getBayeux());
         }
         else
         {
