@@ -10,11 +10,9 @@
 
 package org.mule.api;
 
-public interface Criteria<T extends Object>
+public interface Criteria
 {
 
-    public boolean accept(T object);
-    
 }
 
 
