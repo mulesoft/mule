@@ -34,6 +34,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty("encoding"));
         d.setConfigurationBuilder(p.getProperty("config.builder"));
         d.setDomain(p.getProperty("domain"));
+        d.setAppProperties(p.getProperty("app.properties"));
         // supports true (case insensitive), yes, on as positive values
         d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
 

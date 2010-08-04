@@ -19,9 +19,11 @@ public class ApplicationDescriptor
     private String domain;
     private boolean parentFirstClassLoader = true;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
+    private String appProperties = DEFAULT_APP_PROPERTIES;
     private boolean redeploymentEnabled = true;
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
+    public static final String DEFAULT_APP_PROPERTIES = "mule-app.properties";
     public static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
@@ -49,6 +51,15 @@ public class ApplicationDescriptor
         this.encoding = encoding;
     }
 
+    public String getAppProperties()
+    {
+        return appProperties;
+    }
+
+    public void setAppProperties(String appProperties)
+    {
+        this.appProperties = appProperties;
+    }
 
     /**
      * Config builder name. If the name not found among available builder shortcuts

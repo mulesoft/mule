@@ -10,12 +10,14 @@
 
 package org.mule.module.launcher;
 
+import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.config.builders.AutoConfigurationBuilder;
+import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
@@ -25,10 +27,14 @@ import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -159,22 +165,34 @@ public class DefaultMuleApplication implements Application
 
             ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
                                                                                                  new Object[] {absoluteResourcePaths}, getDeploymentClassLoader());
+
+
+
             if (!cfgBuilder.isConfigured())
             {
-                //List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
-                //builders.add(cfgBuilder);
+                //Load application properties first since they may be needed by other configuration builders
+                List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
+
+                if (descriptor.getAppProperties() != null)
+                {
+                    Properties props = PropertiesUtils.loadProperties(descriptor.getAppProperties(), getClass());
+                    builders.add(new SimpleConfigurationBuilder(props));
+                }
 
                 // If the annotations module is on the classpath, add the annotations config builder to the list
                 // This will enable annotations config for this instance
-                //if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-                //{
-                //    Object configBuilder = ClassUtils.instanciateClass(
-                //            CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-                //    builders.add((ConfigurationBuilder) configBuilder);
-                //}
+                //We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
+                if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
+                {
+                    Object configBuilder = ClassUtils.instanciateClass(
+                        MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
+                    builders.add((ConfigurationBuilder) configBuilder);
+                }
+
+                builders.add(cfgBuilder);
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-                this.muleContext = muleContextFactory.createMuleContext(cfgBuilder, new ApplicationMuleContextBuilder(descriptor));
+                this.muleContext = muleContextFactory.createMuleContext(builders, new ApplicationMuleContextBuilder(descriptor));
 
                 if (descriptor.isRedeploymentEnabled())
                 {
@@ -334,6 +352,7 @@ public class DefaultMuleApplication implements Application
 
     /**
      * Resolve a resource relative to an application root.
+     * @param path the relative path to resolve
      * @return absolute path, may not actually exist (check with File.exists())
      */
     protected File toAbsoluteFile(String path)
