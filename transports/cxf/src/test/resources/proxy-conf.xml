@@ -48,10 +48,10 @@
                                   exchange-pattern="request-response">
                     <!-- we're just ensuring that cxf proxies can handle non XMLStreamReader types here -->
                     <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
+                    <cxf:proxy-service />
                     <response>
                         <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
                     </response>
-                    <cxf:proxy-service />
                 </inbound-endpoint>
             </inbound>
             <outbound>
@@ -214,10 +214,10 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
+                        <cxf:proxy-client />    
                         <response>
                              <transformer ref="TestXslt"/>
                         </response>
-                    	<cxf:proxy-client />    
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -253,10 +253,10 @@
                 <filtering-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
+                         <cxf:proxy-client />    
                          <response>
                              <transformer ref="TestXslt"/>
                          </response>
-                    	<cxf:proxy-client />    
                     </outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/transform" scope="inbound"/>
                 </filtering-router>
