@@ -65,7 +65,7 @@
         <return-argument evaluator="bean" expression="ssn"/>
     </expression-transformer>
 
-    <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" 
+    <endpoint name="CustomerRequestsREST" address="http://localhost:8888/loanbroker" 
         exchange-pattern="one-way"/>
     <vm:endpoint name="CustomerRequests" path="customer.requests" exchange-pattern="request-response"/>
     <jms:endpoint name="CustomerResponses" queue="esb.loan.quotes" exchange-pattern="one-way"/>
