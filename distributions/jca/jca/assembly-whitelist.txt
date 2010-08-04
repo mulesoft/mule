@@ -91,6 +91,7 @@ mule-module-atom
 mule-module-builders
 mule-module-client
 mule-module-guice
+mule-module-ibeans
 mule-module-jaas
 mule-module-jca-core
 mule-module-jca-generic
