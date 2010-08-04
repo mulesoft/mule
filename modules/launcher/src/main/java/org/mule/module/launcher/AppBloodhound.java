@@ -19,5 +19,9 @@ import java.io.IOException;
  */
 public interface AppBloodhound
 {
+
+    /**
+     * Sniff around and get me the app descriptor!
+     */
     ApplicationDescriptor fetch(String appName) throws IOException;
 }
