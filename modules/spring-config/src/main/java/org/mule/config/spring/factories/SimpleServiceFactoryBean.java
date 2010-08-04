@@ -16,9 +16,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.SimpleService;
+import org.mule.construct.SimpleService.Type;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.SimpleServiceBuilder;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
@@ -83,6 +83,10 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
         springBeanLookup = new SpringBeanLookup();
         springBeanLookup.setBean(componentBeanName);
         simpleServiceBuilder.component(springBeanLookup);
+    }
+    
+    public void setType(Type type) {
+        simpleServiceBuilder.type(type);
     }
 
     public void setMessageProcessor(MessageProcessor component)

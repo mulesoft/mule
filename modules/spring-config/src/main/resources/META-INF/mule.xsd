@@ -1426,6 +1426,33 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:attributeGroup name="simpleServiceTypes">
+        <xsd:attribute name="type" default="default">
+            <xsd:annotation>
+                <xsd:documentation>
+                  Defines the type of simple service.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="default">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          The payload is passed to the component without any special processing.  
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ws">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          Exposes the component as a web service (requiring CXF as a dependency), whether it is a JAX-WS annotated class or not.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:attributeGroup>
     <xsd:complexType name="simpleServiceType">
         <xsd:annotation>
             <xsd:documentation>
@@ -1493,6 +1520,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attributeGroup ref="simpleServiceTypes" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

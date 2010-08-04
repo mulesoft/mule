@@ -24,6 +24,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.construct.SimpleService;
+import org.mule.construct.SimpleService.Type;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
@@ -35,6 +36,7 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
 {
     protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
 
+    protected Type type = SimpleService.Type.DEFAULT;
     protected Component component;
 
     @Override
@@ -75,6 +77,12 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
         return component(new SingletonObjectFactory(o));
     }
 
+    public SimpleServiceBuilder type(Type type)
+    {
+        this.type = type;
+        return this;
+    }
+
     public SimpleServiceBuilder component(Component component)
     {
         if (component instanceof JavaComponent)
@@ -94,6 +102,6 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     @Override
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), component);
+        return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), component, type);
     }
 }

@@ -15,6 +15,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.test.components.WeatherForecaster;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
@@ -77,6 +78,34 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     public void testConcreteInheritence() throws Exception
     {
         doTestStringMassager("vm://bam2.in");
+    }
+
+    public void testPojoWebService() throws Exception
+    {
+        final String wsdl = muleClient.request("http://localhost:6099/simple-maths?wsdl",
+            getTestTimeoutSecs() * 1000L).getPayloadAsString();
+
+        assertTrue(wsdl.contains("addTen"));
+
+        final int result = (Integer) muleClient.send(
+            "wsdl-cxf:http://localhost:6099/simple-maths?wsdl&method=addTen", 90, null,
+            getTestTimeoutSecs() * 1000).getPayload();
+
+        assertEquals(100, result);
+    }
+
+    public void testJaxWebService() throws Exception
+    {
+        final String wsdl = muleClient.request("http://localhost:6099/weather-forecast?wsdl",
+            getTestTimeoutSecs() * 1000L).getPayloadAsString();
+
+        assertTrue(wsdl.contains("GetWeatherByZipCode"));
+
+        final String weatherForecast = muleClient.send(
+            "wsdl-cxf:http://localhost:6099/weather-forecast?wsdl&method=GetWeatherByZipCode", "95050", null,
+            getTestTimeoutSecs() * 1000).getPayloadAsString();
+
+        assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
 
     private void doTestMathsService(String url) throws MuleException

@@ -12,6 +12,7 @@ package org.mule.construct;
 
 import org.mule.api.MuleEvent;
 import org.mule.component.AbstractComponent;
+import org.mule.construct.SimpleService.Type;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
 
@@ -26,7 +27,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
         super.doSetUp();
 
         simpleService = new SimpleService("test-simple-service", muleContext, directInboundMessageSource,
-            COMPONENT);
+            COMPONENT, Type.DEFAULT);
     }
 
     @Override

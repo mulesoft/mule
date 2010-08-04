@@ -15,6 +15,7 @@ import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.EchoComponent;
 import org.mule.construct.SimpleService;
+import org.mule.construct.SimpleService.Type;
 import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.SimpleMathsComponent;
@@ -31,6 +32,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
             .inboundTransformers(new StringAppendTransformer("bar"))
             .inboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .component(EchoComponent.class)
+            .type(Type.DEFAULT)
             .exceptionStrategy(new DefaultServiceExceptionStrategy())
             .build(muleContext);
 
