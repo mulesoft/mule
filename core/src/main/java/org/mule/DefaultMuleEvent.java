@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -290,9 +289,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return (T)transformMessage(DataTypeFactory.create(outputType));
+        return (T) transformMessage(DataTypeFactory.create(outputType));
     }
 
     public <T> T transformMessage(DataType<T> outputType) throws TransformerException
