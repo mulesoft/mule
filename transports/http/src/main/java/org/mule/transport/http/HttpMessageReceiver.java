@@ -47,7 +47,6 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.logging.Log;
@@ -385,7 +384,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
-            message.setOutboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
+            message.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
         }
 
         public void release()
