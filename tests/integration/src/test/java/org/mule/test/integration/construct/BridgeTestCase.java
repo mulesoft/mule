@@ -26,6 +26,7 @@ public class BridgeTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }

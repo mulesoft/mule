@@ -27,7 +27,7 @@ public class WSProxyTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true); // true here means false (O_O)
+        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }

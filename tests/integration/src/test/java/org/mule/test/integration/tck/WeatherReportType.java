@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.tck.model;
+package org.mule.test.integration.tck;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;

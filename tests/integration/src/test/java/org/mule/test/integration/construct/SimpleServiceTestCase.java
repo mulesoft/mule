@@ -28,6 +28,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = muleContext.getClient();
     }
