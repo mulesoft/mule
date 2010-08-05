@@ -23,33 +23,37 @@ import org.mortbay.cometd.AbstractBayeux;
  */
 public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
+
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         AjaxMessageDispatcher dispatcher = new AjaxMessageDispatcher(endpoint);
 
-        if(endpoint.getConnector() instanceof AjaxConnector)
+        if (endpoint.getConnector() instanceof AjaxConnector)
         {
             //We're running in embedded mode (i.e. using a Jetty servlet container created by the connector)
             //so we need to register the endpoint
-            dispatcher.setBayeux(((AjaxConnector)endpoint.getConnector()).getBayeux());
+            dispatcher.setBayeux(((AjaxConnector) endpoint.getConnector()).getBayeux());
         }
         else
         {
             //We're bound to an existing servlet container, just grab the Bayeux object from the connector, which  would have been
             //set by the {@link MuleAjaxServlet}
-            AbstractBayeux b = ((AjaxServletConnector)endpoint.getConnector()).getBayeux();
-            if(b==null)
+            AbstractBayeux b = ((AjaxServletConnector) endpoint.getConnector()).getBayeux();
+            if (b == null)
             {
                 long start = System.currentTimeMillis();
                 //Not the correct use for response time out but if fine for this purpose
                 long timeout = start + endpoint.getResponseTimeout();
-                while(start < timeout)
+                while (start < timeout)
                 {
                     try
                     {
                         Thread.sleep(1000);
-                        b = ((AjaxServletConnector)endpoint.getConnector()).getBayeux();
-                        if(b!=null) break;
+                        b = ((AjaxServletConnector) endpoint.getConnector()).getBayeux();
+                        if (b != null)
+                        {
+                            break;
+                        }
                     }
                     catch (InterruptedException e)
                     {
@@ -57,7 +61,7 @@ public class AjaxMessageDispatcherFactory extends AbstractMessageDispatcherFacto
                     }
                 }
                 throw new IllegalArgumentException("Bayeux is null: " + endpoint.getConnector() + ". Waited for " +
-                        endpoint.getResponseTimeout() + " for object to become availble, this usually caused if the servlet container takes a long time to start up");
+                                                   endpoint.getResponseTimeout() + " for object to become availble, this usually caused if the servlet container takes a long time to start up");
             }
             dispatcher.setBayeux(b);
         }
