@@ -167,7 +167,6 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
                                           OutputStream outputStream) throws MuleException
     {
 
-        // TODO MULE-4622
         final Object o = message.getInboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         if (ObjectUtils.getBoolean(o, false) && !endpoint.getExchangePattern().hasResponse())
         {
