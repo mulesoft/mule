@@ -27,14 +27,13 @@ import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -173,10 +172,10 @@ public class DefaultMuleApplication implements Application
                 //Load application properties first since they may be needed by other configuration builders
                 List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
 
-                if (descriptor.getAppProperties() != null)
+                final Map<String,String> appProperties = descriptor.getAppProperties();
+                if (appProperties != null && !appProperties.isEmpty())
                 {
-                    Properties props = PropertiesUtils.loadProperties(descriptor.getAppProperties(), getClass());
-                    builders.add(new SimpleConfigurationBuilder(props));
+                    builders.add(new SimpleConfigurationBuilder(appProperties));
                 }
 
                 // If the annotations module is on the classpath, add the annotations config builder to the list

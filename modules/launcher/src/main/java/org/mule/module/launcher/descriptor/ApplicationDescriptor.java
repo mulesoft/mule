@@ -10,21 +10,24 @@
 
 package org.mule.module.launcher.descriptor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ApplicationDescriptor
 {
+    public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
+    public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
+
     private String appName;
     private String encoding;
     private String configurationBuilder;
     private String domain;
     private boolean parentFirstClassLoader = true;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
-    private String appProperties = DEFAULT_APP_PROPERTIES;
-    private boolean redeploymentEnabled = true;
+    private Map<String, String> appProperties = new HashMap<String, String>();
 
-    public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
-    public static final String DEFAULT_APP_PROPERTIES = "mule-app.properties";
-    public static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
+    private boolean redeploymentEnabled = true;
     /**
      * Required to support the '-config spring' shortcut. Don't use a class object so
      * the core doesn't depend on mule-module-spring.
@@ -51,12 +54,12 @@ public class ApplicationDescriptor
         this.encoding = encoding;
     }
 
-    public String getAppProperties()
+    public Map<String, String> getAppProperties()
     {
         return appProperties;
     }
 
-    public void setAppProperties(String appProperties)
+    public void setAppProperties(Map<String, String> appProperties)
     {
         this.appProperties = appProperties;
     }
