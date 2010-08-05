@@ -11,6 +11,7 @@
 package org.mule.test.integration.tck;
 
 import org.mule.api.annotations.param.Payload;
+import org.mule.test.integration.tck.model.WeatherReportType;
 
 public class WeatherReportConsumer
 {

@@ -74,7 +74,7 @@
                   component-class="org.mule.tck.services.SimpleMathsComponent">
     <default-service-exception-strategy />
   </simple-service>
-
+  
   <simple-service name="weather-forecaster-ws"
                   address="http://localhost:6099/weather-forecast"
                   component-class="org.mule.test.integration.tck.WeatherForecaster"

@@ -10,23 +10,20 @@
 
 package org.mule.test.integration.construct;
 
+import java.io.InputStream;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
+import org.springframework.util.FileCopyUtils;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
     private LocalMuleClient muleClient;
-
-    public SimpleServiceTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -88,8 +85,8 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
     public void testJaxRsService() throws Exception
     {
-        final String wsdl = muleClient.request("http://localhost:6099/weather-forecast?wsdl",
-            getTestTimeoutSecs() * 1000L).getPayloadAsString();
+        final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
+            "http://localhost:6099/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L).getPayload()));
 
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
 
@@ -105,7 +102,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         final String result = muleClient.send(
             "vm://weather-consumer.in",
             Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                "org/mule/test/integration/construct/weather-report.xml"), null).getPayloadAsString();
+                "org/mule/test/integration/construct/weather-report.xml"), null).getPayload().toString();
 
         assertTrue(StringUtils.isNotBlank(result));
     }
@@ -115,7 +112,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         final String result = muleClient.send(
             "vm://weather-xpath-consumer.in",
             Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                "org/mule/test/integration/construct/weather-report.xml"), null).getPayloadAsString();
+                "org/mule/test/integration/construct/weather-report.xml"), null).getPayload().toString();
 
         assertTrue(StringUtils.isNotBlank(result));
     }
@@ -131,7 +128,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     private void doTestStringMassager(String url) throws Exception, MuleException
     {
         final String s = RandomStringUtils.randomAlphabetic(10);
-        final String result = muleClient.send(url, s.getBytes(), null).getPayloadAsString();
+        final String result = new String((byte[]) muleClient.send(url, s.getBytes(), null).getPayload());
         assertEquals(s + "barbaz", result);
     }
 }
