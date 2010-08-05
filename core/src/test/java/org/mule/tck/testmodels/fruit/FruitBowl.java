@@ -78,7 +78,7 @@ public class FruitBowl
 
     }
 
-    public List getFruit()
+    public List<Fruit> getFruit()
     {
         return new ArrayList(bowl.values());
     }

@@ -10,29 +10,37 @@
 
 package org.mule.routing;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.expression.ExpressionConfig;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Splits a message using the expression provided invoking the next message processor one for each split part.
+ * Splits a message using the expression provided invoking the next message processor
+ * one for each split part.
  * <p>
  * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
  */
-public class SimpleSplitter extends AbstractSplittingInterceptingMessageProcessor implements Initialisable
+public class ExpressionSplitter extends AbstractSplitter
+    implements Initialisable
 {
 
     protected ExpressionManager expressionManager;
     protected ExpressionConfig config = new ExpressionConfig();
 
-    public SimpleSplitter()
+    public ExpressionSplitter()
     {
         // Used by spring
     }
 
-    public SimpleSplitter(ExpressionConfig config)
+    public ExpressionSplitter(ExpressionConfig config)
     {
         this.config = config;
         setEvaluator(config.getEvaluator());
@@ -44,10 +52,27 @@ public class SimpleSplitter extends AbstractSplittingInterceptingMessageProcesso
         config.validate(expressionManager);
     }
 
-    protected Object splitMessage(MuleEvent event)
+    protected List<MuleMessage> splitMessage(MuleEvent event)
     {
-        return event.getMuleContext().getExpressionManager().evaluate(
+        Object result = event.getMuleContext().getExpressionManager().evaluate(
             config.getFullExpression(expressionManager), event.getMessage());
+        if (result instanceof List<?>)
+        {
+            List<MuleMessage> messages = new ArrayList<MuleMessage>();
+            for (Object object : (List<?>) result)
+            {
+                messages.add(new DefaultMuleMessage(object, muleContext));
+            }
+            return messages;
+        }
+        else if (result instanceof MuleMessage)
+        {
+            return Collections.singletonList((MuleMessage) result);
+        }
+        else
+        {
+            return Collections.<MuleMessage> singletonList(new DefaultMuleMessage(result, muleContext));
+        }
     }
 
     public String getCustomEvaluator()

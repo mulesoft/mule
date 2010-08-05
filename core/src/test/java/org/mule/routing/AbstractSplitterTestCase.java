@@ -15,6 +15,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
@@ -27,7 +28,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SplittingInterceptingMessageProcessorTestCase extends AbstractMuleTestCase
+public class AbstractSplitterTestCase extends AbstractMuleTestCase
 {
 
     public void testSimpleSplitter() throws Exception
@@ -74,13 +75,18 @@ public class SplittingInterceptingMessageProcessorTestCase extends AbstractMuleT
         }
     }
 
-    private static class TestSplitter extends AbstractSplittingInterceptingMessageProcessor
+    private static class TestSplitter extends AbstractSplitter
     {
         @Override
-        protected Object splitMessage(MuleEvent event)
+        protected List<MuleMessage> splitMessage(MuleEvent event)
         {
             FruitBowl bowl = (FruitBowl) event.getMessage().getPayload();
-            return bowl.getFruit();
+            List<MuleMessage> parts = new ArrayList<MuleMessage>();
+            for (Fruit fruit : bowl.getFruit())
+            {
+                parts.add(new DefaultMuleMessage(fruit, muleContext));
+            }
+            return parts;
         }
     }
 

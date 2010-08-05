@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.outbound.DefaultRouterResultsHandler;
@@ -25,48 +26,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Splits a message invoking the next message processor one for each split part. Implementations most
- * implement {@link #splitMessage(MuleEvent)} and determine how the message is split.
+ * Splits a message invoking the next message processor one for each split part.
+ * Implementations most implement {@link #splitMessage(MuleEvent)} and determine how
+ * the message is split.
  * <p>
  * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
  */
 
-public abstract class AbstractSplittingInterceptingMessageProcessor extends
+public abstract class AbstractSplitter extends
     AbstractInterceptingMessageProcessor implements MuleContextAware
 {
 
     protected MuleContext muleContext;
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;
+    protected MessageInfoMapping messageInfoMapping;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        Object result = splitMessage(event);
-        if (result instanceof List)
+        if (isSplitRequired(event))
         {
-            return resultsHandler.aggregateResults(processParts((List) result, event), event, muleContext);
-        }
-        else
-        {
-            logger.warn("Splitter only returned a single result. If this is not expected, please check your split expression");
-            MuleEvent resultEvent;
-            if (result instanceof MuleMessage)
+            List<MuleMessage> parts = splitMessage(event);
+            if (parts.size() > 0)
             {
-                resultEvent = new DefaultMuleEvent((MuleMessage) result, event);
+                if (parts.size() <= 1)
+                {
+                    logger.warn("Splitter only returned a single result. If this is not expected, please check your split expression");
+                }
+                return resultsHandler.aggregateResults(processParts(parts, event), event, muleContext);
             }
             else
             {
-                resultEvent = new DefaultMuleEvent(new DefaultMuleMessage(result, muleContext), event);
+                logger.warn("Splitter returned no results. If this is not expected, please check your split expression");
+                return null;
             }
+        }
+        else
+        {
             return processNext(event);
         }
     }
 
-    protected abstract Object splitMessage(MuleEvent event);
+    protected boolean isSplitRequired(MuleEvent event)
+    {
+        return true;
+    }
+
+    protected abstract List<MuleMessage> splitMessage(MuleEvent event) throws MuleException;
 
     protected List<MuleEvent> processParts(List parts, MuleEvent event) throws MuleException
     {
-        String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(
+        if (messageInfoMapping == null)
+        {
+            messageInfoMapping = event.getFlowConstruct().getMessageInfoMapping();
+        }
+        String correlationId = messageInfoMapping.getCorrelationId(
             event.getMessage());
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
@@ -92,7 +106,8 @@ public abstract class AbstractSplittingInterceptingMessageProcessor extends
                     message.setCorrelationId(correlationId);
                 }
 
-                // take correlation group size from the message properties, set by concrete
+                // take correlation group size from the message properties, set by
+                // concrete
                 // message splitter implementations
                 message.setCorrelationGroupSize(parts.size());
                 message.setCorrelationSequence(correlationSequence++);
@@ -110,6 +125,11 @@ public abstract class AbstractSplittingInterceptingMessageProcessor extends
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
+    {
+        this.messageInfoMapping = messageInfoMapping;
     }
 
 }

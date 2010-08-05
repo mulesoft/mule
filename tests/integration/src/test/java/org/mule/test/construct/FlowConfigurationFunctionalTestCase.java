@@ -35,6 +35,12 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         return "org/mule/test/construct/flow.xml";
     }
 
+    @Override
+    protected boolean isDisposeManagerPerSuite()
+    {
+        return true;
+    }
+
     public void testFlow() throws MuleException, Exception
     {
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow");
@@ -54,20 +60,13 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow2");
         assertEquals(StartableCompositeMessageSource.class, flow.getMessageSource().getClass());
-        assertEquals(3, flow.getMessageProcessors().size());
+        assertEquals(2, flow.getMessageProcessors().size());
 
         assertEquals("01xyz", muleContext.getClient().send("vm://in2",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
         assertEquals("01xyz", muleContext.getClient().send("vm://in3",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
 
-    }
-
-    public void testEchoFlow() throws MuleException, Exception
-    {
-        assertEquals("0", muleContext.getClient()
-            .send("vm://echo", new DefaultMuleMessage("0", muleContext))
-            .getPayloadAsString());
     }
 
     public void testInOutFlow() throws MuleException, Exception
@@ -114,6 +113,35 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertTrue(results.contains(orange));
     }
 
+    public void testSplitAggregateListFlow() throws MuleException, Exception
+    {
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
+
+        muleContext.getClient().send("vm://split-aggregate-list-in",
+            new DefaultMuleMessage(fruitBowl.getFruit(), muleContext));
+
+        MuleMessage result = muleContext.getClient()
+            .request("vm://split-aggregate-list-out", RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertTrue(result instanceof MuleMessageCollection);
+        MuleMessageCollection coll = (MuleMessageCollection) result;
+        assertEquals(3, coll.size());
+        List<?> results = (List<?>) coll.getPayload();
+
+        assertTrue(apple.isBitten());
+        assertTrue(banana.isBitten());
+        assertTrue(orange.isBitten());
+
+        assertTrue(results.contains(apple));
+        assertTrue(results.contains(banana));
+        assertTrue(results.contains(orange));
+    }
+
     public void testSplitFilterAggregateFlow() throws MuleException, Exception
     {
         Apple apple = new Apple();
@@ -137,6 +165,48 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertTrue(results.contains(apple));
         assertFalse(results.contains(banana));
         assertFalse(results.contains(orange));
+    }
+
+    public void testMessageChunkSplitAggregateFlow() throws MuleException, Exception
+    {
+        String payload = "";
+        for (int i = 0; i < 100; i++)
+        {
+            payload += TEST_MESSAGE;
+        }
+
+        muleContext.getClient().send("vm://message-chunk-split-aggregate-in",
+            new DefaultMuleMessage(payload, muleContext));
+
+        MuleMessage result = muleContext.getClient().request("vm://message-chunk-split-aggregate-out",
+            RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertNotSame(payload, result.getPayload());
+        assertEquals(payload, result.getPayloadAsString());
+    }
+
+    public void testComponentsFlow() throws MuleException, Exception
+    {
+        MuleMessage result = muleContext.getClient().send("vm://components",
+            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        assertNotNull(result);
+        assertNotSame(TEST_MESSAGE + "test", result.getPayload());
+    }
+
+    public void testWireTapFlow() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://wiretap-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        MuleMessage result = muleContext.getClient().request("vm://wiretap-out", RECEIVE_TIMEOUT);
+        MuleMessage tapResult = muleContext.getClient().request("vm://wiretap-tap", RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertNotNull(tapResult);
+        assertNotSame(result, tapResult);
+        assertEquals(TEST_MESSAGE + "inout", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + "intap", tapResult.getPayloadAsString());
     }
 
 }

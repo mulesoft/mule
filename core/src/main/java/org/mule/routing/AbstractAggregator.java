@@ -19,6 +19,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.Aggregator;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
@@ -40,14 +41,20 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     protected EventCorrelator eventCorrelator;
     protected MuleContext muleContext;
     protected FlowConstruct flowConstruct;
+    protected MessageInfoMapping messageInfoMapping;
 
     private long timeout = 0;
     private boolean failOnTimeout = true;
 
     public void initialise() throws InitialisationException
     {
-        eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next,
-            flowConstruct.getMessageInfoMapping(), muleContext);
+        if (messageInfoMapping == null)
+        {
+            messageInfoMapping = flowConstruct.getMessageInfoMapping();
+        }
+
+        eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
+            muleContext);
 
         // Inherit failOnTimeout from async-reply if this aggregator is being used for async-reply
         if (flowConstruct instanceof Service)
@@ -119,5 +126,10 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
+    {
+        this.messageInfoMapping = messageInfoMapping;
     }
 }

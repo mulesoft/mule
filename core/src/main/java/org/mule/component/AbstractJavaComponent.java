@@ -25,6 +25,7 @@ import org.mule.api.routing.BindingCollection;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.binding.DefaultBindingCollection;
 
 import java.util.Collection;
@@ -172,7 +173,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
             }
             else
             {
-                entryPointResolverSet = new DefaultEntryPointResolverSet();
+                entryPointResolverSet = new LegacyEntryPointResolverSet();
             }
         }
     }

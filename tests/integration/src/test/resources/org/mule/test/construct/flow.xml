@@ -7,7 +7,7 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/scripting/3.0/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
 
@@ -39,11 +39,6 @@
         </composite-source>
         <append-string-transformer message="1" />
         <processor ref="composite1" />
-        <vm:outbound-endpoint path="echo" exchange-pattern="request-response" />
-    </flow>
-
-    <flow name="echo">
-        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
     </flow>
 
     <flow name="inout">
@@ -69,6 +64,19 @@
         <collection-aggregator />
         <vm:outbound-endpoint path="split-aggregate-out" exchange-pattern="one-way" />
     </flow>
+    
+    <flow name="split-aggregate-list">
+        <vm:inbound-endpoint path="split-aggregate-list-in" exchange-pattern="one-way" />
+        <collection-splitter enableCorrelation="IF_NOT_SET" />
+        <script:transformer>
+            <script:script engine="groovy">
+                ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
+                return payload;
+            </script:script>
+        </script:transformer>
+        <collection-aggregator />
+        <vm:outbound-endpoint path="split-aggregate-list-out" exchange-pattern="one-way" />
+    </flow>
 
     <flow name="split-filter-aggregate">
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
@@ -82,15 +90,35 @@
         <collection-aggregator failOnTimeout="false" timeout="1000" />
         <vm:outbound-endpoint path="split-filter-aggregate-out" exchange-pattern="one-way" />
     </flow>
+    
+    <flow name="message-chunk-split-aggregate">
+        <vm:inbound-endpoint path="message-chunk-split-aggregate-in" exchange-pattern="one-way" />
+        <message-chunk-splitter messageSize="20" enableCorrelation="ALWAYS"/>
+        <message-chunk-aggregator />
+        <vm:outbound-endpoint path="message-chunk-split-aggregate-out" exchange-pattern="one-way" />
+    </flow>
 
     <flow name="component">
-        <vm:inbound-endpoint path="component" exchange-pattern="request-response" />
-        <append-string-transformer message="inout" />
+        <vm:inbound-endpoint path="components" exchange-pattern="request-response" />
         <echo-component/>
-        <component>
-            <singleton-object class="java.lang.String"/>
-        </component>
+        <test:component appendString="test"/>
+        <log-component/>
     </flow>
+    
+    <flow name="wiretap">
+        <vm:inbound-endpoint path="wiretap-in" exchange-pattern="one-way" />
+        <append-string-transformer message="in" />
+        <wire-tap>
+            <composite-processor>
+                <append-string-transformer message="tap" />
+                <vm:outbound-endpoint path="wiretap-tap" exchange-pattern="one-way" />
+            </composite-processor>
+            <payload-type-filter expectedType="java.lang.String"/>
+        </wire-tap>
+        <append-string-transformer message="out" />
+        <vm:outbound-endpoint path="wiretap-out" exchange-pattern="one-way" />
+    </flow>
+    
 
 
 </mule>
