@@ -10,23 +10,29 @@
 
 package org.mule.test.integration.construct;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
+
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
-    private MuleClient muleClient;
+    private LocalMuleClient muleClient;
+
+    public SimpleServiceTestCase()
+    {
+        setDisposeManagerPerSuite(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        muleClient = new MuleClient(muleContext);
+        muleClient = muleContext.getClient();
     }
 
     @Override

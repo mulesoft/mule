@@ -10,14 +10,13 @@
 
 package org.mule.construct.builder;
 
-import java.util.Arrays;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
@@ -29,13 +28,13 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 
+import java.util.Arrays;
+
 /**
  * Fluent API for the creation of a SimpleService.
  */
 public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService>
 {
-    protected static final LegacyEntryPointResolverSet DEFAULT_ENTRY_POINT_RESOLVER_SET = new LegacyEntryPointResolverSet();
-
     protected Type type = SimpleService.Type.DEFAULT;
     protected Component component;
 
@@ -91,7 +90,7 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
 
             if (javaComponent.getEntryPointResolverSet() == null)
             {
-                javaComponent.setEntryPointResolverSet(DEFAULT_ENTRY_POINT_RESOLVER_SET);
+                javaComponent.setEntryPointResolverSet(createEntryPointResolverSet());
             }
         }
 
@@ -103,5 +102,10 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
         return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), component, type);
+    }
+
+    protected EntryPointResolverSet createEntryPointResolverSet()
+    {
+        return new LegacyEntryPointResolverSet();
     }
 }
