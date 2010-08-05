@@ -233,6 +233,25 @@
     </xsd:element>
     <xsd:complexType name="abstractMessageProcessorType" />
 
+    <xsd:group name="messageProcessorOrOutboundEndpoint">
+        <xsd:choice>
+            <xsd:element ref="abstract-message-processor">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A message processor
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="abstract-outbound-endpoint">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        An outbound endpoint
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:group>
+
     <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -286,10 +305,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <xsd:element ref="abstract-outbound-endpoint"/>
-                        <xsd:element ref="abstract-message-processor"/>
-                    </xsd:choice>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
@@ -1399,20 +1415,7 @@
                         </xsd:element>
                     </xsd:choice> 
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <xsd:element ref="abstract-message-processor">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    A message processor
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="abstract-outbound-endpoint">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    An outbound endpoint
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
                         <xsd:element name="response">
                             <xsd:annotation>
                                 <xsd:documentation>
@@ -1420,22 +1423,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                             <xsd:complexType>
-                                <xsd:choice maxOccurs="unbounded">
-                                    <xsd:element ref="abstract-message-processor">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                A message processor
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:element>
-                                    <xsd:element ref="abstract-outbound-endpoint">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                An outbound endpoint
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:element>                                    
-                                </xsd:choice>
+                                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:choice>
@@ -3799,10 +3787,7 @@
 	        <xsd:complexContent>
 	            <xsd:extension base="abstractInterceptingMessageProcessorType">
 	                <xsd:sequence>
-                        <xsd:choice maxOccurs="1">
-                            <xsd:element ref="abstract-outbound-endpoint"/>
-                            <xsd:element ref="abstract-message-processor"/>
-                        </xsd:choice>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="1"/>
                         <xsd:element ref="abstract-filter" minOccurs="0"/>
                     </xsd:sequence>
 	            </xsd:extension>
