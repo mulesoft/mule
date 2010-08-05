@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor.requestreply;
+package org.mule.routing.requestreply;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;

@@ -11,7 +11,7 @@
 package org.mule.service.processor;
 
 import org.mule.api.source.MessageSource;
-import org.mule.processor.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
 public class ServiceAsyncRequestReplyRequestor extends AbstractAsyncRequestReplyRequester

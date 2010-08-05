@@ -13,7 +13,7 @@ package org.mule.test.usecases.routing.response;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.processor.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 

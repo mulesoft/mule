@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor.requestreply;
+package org.mule.routing.requestreply;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -20,6 +20,7 @@ import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
