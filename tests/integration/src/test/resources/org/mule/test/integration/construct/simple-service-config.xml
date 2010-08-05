@@ -77,6 +77,16 @@
 
   <simple-service name="weather-forecaster-ws"
                   address="http://localhost:6099/weather-forecast"
-                  component-class="org.mule.test.components.WeatherForecaster"
+                  component-class="org.mule.test.integration.tck.WeatherForecaster"
                   type="jax-ws" />
+
+  <!-- JAXB consumer -->
+  <simple-service name="weather-jaxb-consumer"
+                  address="vm://weather-consumer.in"
+                  component-class="org.mule.test.integration.tck.WeatherReportConsumer" />
+
+  <!-- XPath consumer -->
+  <simple-service name="weather-xpath-consumer"
+                  address="vm://weather-xpath-consumer.in"
+                  component-class="org.mule.test.integration.tck.WeatherReportXpathConsumer" />
 </mule>

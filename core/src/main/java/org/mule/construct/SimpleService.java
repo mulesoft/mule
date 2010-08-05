@@ -36,7 +36,7 @@ import org.mule.util.ClassUtils;
  */
 public class SimpleService extends AbstractFlowConstruct
 {
-    // TODO add support for JAX-RS, JAXB
+    // TODO add support for JAX-RS
     public enum Type
     {
         /**

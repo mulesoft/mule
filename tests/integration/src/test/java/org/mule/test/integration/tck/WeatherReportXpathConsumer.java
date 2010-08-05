@@ -8,17 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.components;
+package org.mule.test.integration.tck;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import org.mule.api.annotations.expression.XPath;
 
-@WebService(serviceName = "WeatherForecaster", portName = "WeatherForecasterPort")
-public class WeatherForecaster
+public class WeatherReportXpathConsumer
 {
-    @WebMethod(operationName = "GetWeatherByZipCode")
-    public String getByZipCode(String zipCode)
+    public String consume(@XPath(value = "/weatherReport/report") String report)
     {
-        return zipCode + ": cloudy with chances of meatballs.";
+        return report;
     }
 }

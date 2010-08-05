@@ -15,11 +15,11 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.components.WeatherForecaster;
+import org.mule.test.integration.tck.WeatherForecaster;
+import org.mule.util.StringUtils;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
-
     private MuleClient muleClient;
 
     @Override
@@ -92,6 +92,26 @@ public class SimpleServiceTestCase extends FunctionalTestCase
             getTestTimeoutSecs() * 1000).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
+    }
+
+    public void testJaxbConsumer() throws Exception
+    {
+        final String result = muleClient.send(
+            "vm://weather-consumer.in",
+            Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                "org/mule/test/integration/construct/weather-report.xml"), null).getPayloadAsString();
+
+        assertTrue(StringUtils.isNotBlank(result));
+    }
+
+    public void testXpathConsumer() throws Exception
+    {
+        final String result = muleClient.send(
+            "vm://weather-xpath-consumer.in",
+            Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                "org/mule/test/integration/construct/weather-report.xml"), null).getPayloadAsString();
+
+        assertTrue(StringUtils.isNotBlank(result));
     }
 
     private void doTestMathsService(String url) throws MuleException

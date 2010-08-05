@@ -94,7 +94,7 @@
             <cxf:jaxws-service />  
         </inbound-endpoint>
       </inbound>
-      <component class="org.mule.test.components.WeatherForecaster" />
+      <component class="org.mule.test.integration.tck.WeatherForecaster" />
     </service>
   </model>
 </mule>

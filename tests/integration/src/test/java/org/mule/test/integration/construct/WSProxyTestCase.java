@@ -12,7 +12,7 @@ package org.mule.test.integration.construct;
 
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.components.WeatherForecaster;
+import org.mule.test.integration.tck.WeatherForecaster;
 
 public class WSProxyTestCase extends FunctionalTestCase
 {
