@@ -20,9 +20,11 @@ import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -272,7 +274,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
-        
+        registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
+            AsyncMessageProcessorsFactoryBean.class));
+        registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
+            TransactionalMessageProcessorsFactoryBean.class));
         // Message Sources
         // TODO MULE-4987
         // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));        

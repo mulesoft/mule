@@ -334,6 +334,66 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+    <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Processes the nest list of message processors asychronously using a thread pool 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="asyncType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                    <xsd:element ref="threading-profile" minOccurs="0"/>                    
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Optional name that will be used to name the work managers thread pools
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+     
+    <xsd:element name="seda-stage" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Processes the nest list of message processors asychronously using a seda stage.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="asyncType">
+                    <xsd:sequence>
+                        <xsd:element ref="queue-profile" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Processes the nest list of message processors asychronously using a thread pool 
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                        <xsd:element ref="abstract-transaction"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
     <!-- Message Sources -->
     <xsd:element name="abstract-message-source" abstract="true" type="abstractMessageSourceType">
         <xsd:annotation>

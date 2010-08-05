@@ -138,4 +138,28 @@
         <append-string-transformer message="d" />
     </flow>
 
+    <flow name="async">
+        <vm:inbound-endpoint path="async-in" exchange-pattern="one-way" />
+        <append-string-transformer message="a" />
+        <async>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="async-async-out" exchange-pattern="one-way" />
+            <threading-profile doThreading="true" maxThreadsActive="16"/>
+        </async>    
+        <append-string-transformer message="c" />    
+            <vm:outbound-endpoint path="async-out" exchange-pattern="one-way" />
+    </flow>
+    
+    <flow name="transactional">
+        <vm:inbound-endpoint path="transactional-in" exchange-pattern="request-response" />
+        <append-string-transformer message="a" />
+        <transactional>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="transactional-out" exchange-pattern="one-way" />
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </transactional>    
+        <append-string-transformer message="c" />    
+    </flow>
+
+
 </mule>
