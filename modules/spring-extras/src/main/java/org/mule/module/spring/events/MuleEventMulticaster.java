@@ -249,6 +249,33 @@ public class MuleEventMulticaster
         listeners.remove(listener);
     }
 
+
+    public void addApplicationListenerBean(String s)
+       {
+           Object listener = applicationContext.getBean(s);
+           if(listener instanceof ApplicationListener)
+           {
+               addApplicationListener((ApplicationListener)listener);
+           }
+           else
+           {
+               throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
+           }
+       }
+
+       public void removeApplicationListenerBean(String s)
+       {
+           Object listener = applicationContext.getBean(s);
+           if(listener instanceof ApplicationListener)
+           {
+               removeApplicationListener((ApplicationListener)listener);
+           }
+           else
+           {
+               throw new IllegalArgumentException(SpringMessages.beanNotInstanceOfApplicationListener(s).getMessage());
+           }
+       }
+
     /**
      * Removes all the listeners from the multicaster
      */
@@ -735,8 +762,7 @@ public class MuleEventMulticaster
             {
                 setSubscriptionFilter(WildcardFilter.class);
             }
-            ObjectFilter filter = (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(), pattern);
-            return filter;
+            return (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(), pattern);
         }
         catch (Exception e)
         {

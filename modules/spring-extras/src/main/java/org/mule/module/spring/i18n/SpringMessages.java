@@ -23,6 +23,11 @@ public class SpringMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 1);
     }
+
+    public static Message beanNotInstanceOfApplicationListener(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 12, name);
+    }
 }
 
 

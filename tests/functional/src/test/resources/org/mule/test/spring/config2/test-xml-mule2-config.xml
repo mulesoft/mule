@@ -12,8 +12,7 @@
         <mule:global-property name="doCompression" value="true"/>
         <mule:global-property name="beanProperty1" value="this was set from the manager properties!"/>
         <mule:global-property name="OS_Version" value="${os.version}"/>
-        <mule:global-property name="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
-
+        
         <mule:configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30">
             <mule:default-threading-profile maxBufferSize="42" maxThreadsActive="16"
                 maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
