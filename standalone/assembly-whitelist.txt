@@ -98,6 +98,7 @@ junit-4.8.1
 livetribe-jsr223-2.0.5
 log4j-1.2.14
 mail-1.4.3
+mockito-all-1.8.4
 mule-core
 mule-core-tests
 mule-module-acegi
