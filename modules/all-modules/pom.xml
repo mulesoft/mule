@@ -52,6 +52,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-ibeans</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jaas</artifactId>
             <version>${version}</version>
         </dependency>

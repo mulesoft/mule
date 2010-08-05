@@ -81,13 +81,16 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
+        <!-- TODO currently needed in the compile tree, maybe break out test mock support into its own module-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.8.0</version>
-            <!-- TODO currently needed in the compile tree, maybe break out test mock support into its own module-->
-            <!--<scope>test</scope>-->
         </dependency>
     </dependencies>
 

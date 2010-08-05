@@ -84,6 +84,7 @@ juel-impl-2.1.0
 jug-2.0.0-osgi-asl
 livetribe-jsr223-2.0.5
 mail-1.4.3
+mockito-all-1.8.4
 mule-core
 mule-module-acegi
 mule-module-annotations
