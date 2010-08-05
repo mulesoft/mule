@@ -74,21 +74,9 @@
                   component-class="org.mule.tck.services.SimpleMathsComponent">
     <default-service-exception-strategy />
   </simple-service>
-  
-  <!-- Force type to web-service for non-annotated POJOs -->
-  <simple-service name="maths-ws"
-                  address="http://localhost:6099/simple-maths"
-                  component-class="org.mule.tck.services.SimpleMathsComponent"
-                  type="web-service" />
 
-  <!-- JAX-WS annotated POJOs are automatically exposed as web-services -->
   <simple-service name="weather-forecaster-ws"
                   address="http://localhost:6099/weather-forecast"
-                  component-class="org.mule.test.components.WeatherForecaster" />
-                  
-  <!-- It's possible to expose JAX-WS annotated POJOs as standard payload receivers -->            
-  <simple-service name="weather-forecaster-default"
-                  address="vm://weather-forecaster.in"
                   component-class="org.mule.test.components.WeatherForecaster"
-                  type="default" />
+                  type="jax-ws" />
 </mule>

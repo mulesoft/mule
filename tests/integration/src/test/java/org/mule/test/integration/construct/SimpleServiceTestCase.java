@@ -80,21 +80,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestStringMassager("vm://bam2.in");
     }
 
-    public void testPojoWebService() throws Exception
-    {
-        final String wsdl = muleClient.request("http://localhost:6099/simple-maths?wsdl",
-            getTestTimeoutSecs() * 1000L).getPayloadAsString();
-
-        assertTrue(wsdl.contains("addTen"));
-
-        final int result = (Integer) muleClient.send(
-            "wsdl-cxf:http://localhost:6099/simple-maths?wsdl&method=addTen", 90, null,
-            getTestTimeoutSecs() * 1000).getPayload();
-
-        assertEquals(100, result);
-    }
-
-    public void testJaxWebService() throws Exception
+    public void testJaxRsService() throws Exception
     {
         final String wsdl = muleClient.request("http://localhost:6099/weather-forecast?wsdl",
             getTestTimeoutSecs() * 1000L).getPayloadAsString();
@@ -106,14 +92,6 @@ public class SimpleServiceTestCase extends FunctionalTestCase
             getTestTimeoutSecs() * 1000).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
-    }
-
-    public void testJaxAnnotatedComponentAsDefaultService() throws Exception
-    {
-        final String weatherForecast = muleClient.send("vm://weather-forecaster.in", "74521", null,
-            getTestTimeoutSecs() * 1000).getPayloadAsString();
-
-        assertEquals(new WeatherForecaster().getByZipCode("74521"), weatherForecast);
     }
 
     private void doTestMathsService(String url) throws MuleException

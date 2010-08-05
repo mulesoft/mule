@@ -1427,7 +1427,7 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:attributeGroup name="simpleServiceTypes">
-        <xsd:attribute name="type" default="auto">
+        <xsd:attribute name="type" default="default">
             <xsd:annotation>
                 <xsd:documentation>
                   Defines the type of simple service.
@@ -1435,24 +1435,17 @@
             </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="auto">
-                      <xsd:annotation>
-                        <xsd:documentation>
-                          Use the best strategy to pass messages to the component, based on its annotations.  
-                        </xsd:documentation>
-                      </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="web-service">
-                      <xsd:annotation>
-                        <xsd:documentation>
-                          Expose the component as a SOAP web service (whether it is JAX-WS annotated or not). CXF is required to have this working.
-                        </xsd:documentation>
-                      </xsd:annotation>
-                    </xsd:enumeration>
                     <xsd:enumeration value="default">
                       <xsd:annotation>
                         <xsd:documentation>
                           Pass the inbound messages unaltered to the component.  
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="jax-ws">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          Expose a JAX-WS annoted component as a web service. CXF is required to have this working.
                         </xsd:documentation>
                       </xsd:annotation>
                     </xsd:enumeration>

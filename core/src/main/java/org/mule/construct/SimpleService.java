@@ -10,7 +10,6 @@
 
 package org.mule.construct;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import org.mule.MessageExchangePattern;
@@ -37,19 +36,14 @@ import org.mule.util.ClassUtils;
  */
 public class SimpleService extends AbstractFlowConstruct
 {
-    // TODO add support for Jersey/REST, JAXB
+    // TODO add support for JAX-RS, JAXB
     public enum Type
     {
         /**
-         * Use the best strategy to pass messages to the component, based on its
-         * annotations.
+         * Expose a JAX-WS annoted component as a web service. CXF is required to
+         * have this working.
          */
-        AUTO,
-        /**
-         * Expose the component as a SOAP web service (whether it is JAX-WS annotated
-         * or not). CXF is required to have this working.
-         */
-        WEB_SERVICE,
+        JAX_WS,
         /**
          * Pass the inbound messages unaltered to the component.
          */
@@ -96,6 +90,11 @@ public class SimpleService extends AbstractFlowConstruct
         this.type = type;
     }
 
+    public Component getComponent()
+    {
+        return component;
+    }
+
     @Override
     protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
     {
@@ -124,7 +123,7 @@ public class SimpleService extends AbstractFlowConstruct
                 this);
         }
 
-        if ((type == Type.WEB_SERVICE) && (!(component instanceof JavaComponent)))
+        if ((type == Type.JAX_WS) && (!(component instanceof JavaComponent)))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("SimpleService can only expose instances of JavaComponent as web services."),
@@ -132,49 +131,13 @@ public class SimpleService extends AbstractFlowConstruct
         }
     }
 
-    public Component getComponent()
-    {
-        return component;
-    }
-
     private void configureComponentMessageProcessor(InterceptingChainMessageProcessorBuilder builder)
     {
         Class<?> componentClass = getComponentClass();
-        boolean jaxWSAnnotated = isComponentJaxWSAnnotated(componentClass);
 
-        // add a webservice message processor if the class is JAX-WS annotated or if
-        // the type has been forced to WS (for ex. to serve non-annotated POJOs)
-        if (jaxWSAnnotated || (type == Type.WEB_SERVICE))
+        if (type == Type.JAX_WS)
         {
-            builder.chain(newWebServiceMessageProcessor(componentClass, jaxWSAnnotated));
-        }
-    }
-
-    private MessageProcessor newWebServiceMessageProcessor(Class<?> componentClass, boolean jaxWSAnnotated)
-    {
-        try
-        {
-            MessageProcessorBuilder wsmpb = (MessageProcessorBuilder) ClassUtils.instanciateClass("org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder");
-
-            Method setServiceClassMethod = ClassUtils.getMethod(wsmpb.getClass(), "setServiceClass",
-                new Class<?>[]{Class.class});
-
-            setServiceClassMethod.invoke(wsmpb, new Object[]{componentClass});
-
-            Method setFrontendMethod = ClassUtils.getMethod(wsmpb.getClass(), "setFrontend",
-                new Class<?>[]{String.class});
-
-            setFrontendMethod.invoke(wsmpb, new Object[]{jaxWSAnnotated ? "jaxws" : "simple"});
-
-            ((MuleContextAware) wsmpb).setMuleContext(muleContext);
-
-            return wsmpb.build();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(
-                MessageFactory.createStaticMessage("Failed to configure the required web service infrastructure: are you missing the Mule CXF Module?"),
-                e);
+            builder.chain(newWebServiceMessageProcessor(componentClass));
         }
     }
 
@@ -188,19 +151,32 @@ public class SimpleService extends AbstractFlowConstruct
         return component.getClass();
     }
 
-    @SuppressWarnings("unchecked")
-    private boolean isComponentJaxWSAnnotated(Class<?> componentClass)
+    private MessageProcessor newWebServiceMessageProcessor(Class<?> componentClass)
     {
-        // use reflection because javax.jws.WebService is not in JDK5
         try
         {
-            return componentClass.getAnnotation((Class<Annotation>) Thread.currentThread()
-                .getContextClassLoader()
-                .loadClass("javax.jws.WebService")) != null;
+            MessageProcessorBuilder wsmpb = (MessageProcessorBuilder) ClassUtils.instanciateClass("org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder");
+
+            Method setServiceClassMethod = ClassUtils.getMethod(wsmpb.getClass(), "setServiceClass",
+                new Class<?>[]{Class.class});
+
+            setServiceClassMethod.invoke(wsmpb, new Object[]{componentClass});
+
+            Method setFrontendMethod = ClassUtils.getMethod(wsmpb.getClass(), "setFrontend",
+                new Class<?>[]{String.class});
+
+            setFrontendMethod.invoke(wsmpb, new Object[]{"jaxws"});
+
+            ((MuleContextAware) wsmpb).setMuleContext(muleContext);
+
+            return wsmpb.build();
         }
-        catch (ClassNotFoundException cnfe)
+        catch (Exception e)
         {
-            return false;
+            throw new MuleRuntimeException(
+                MessageFactory.createStaticMessage("Failed to configure the required web service infrastructure: are you missing the Mule CXF Module?"),
+                e);
         }
     }
+
 }
