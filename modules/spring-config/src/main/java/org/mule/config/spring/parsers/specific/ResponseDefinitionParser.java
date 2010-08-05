@@ -22,7 +22,7 @@ public class ResponseDefinitionParser extends ParentContextDefinitionParser
     {
         super("flow", new ChildDefinitionParser("messageProcessor",
             ResponseMessageProcessorsFactoryBean.class));
-        //otherwise(new ParentDefinitionParser());
+        otherwise(new ParentDefinitionParser());
     }
 
 }
