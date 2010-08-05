@@ -209,4 +209,13 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE + "intap", tapResult.getPayloadAsString());
     }
 
+    public void testResponseElement() throws MuleException, Exception
+    {
+        MuleMessage result = muleContext.getClient().send("vm://response",
+            new DefaultMuleMessage("", muleContext));
+
+        assertNotNull(result);
+        assertEquals("abcdefghi", result.getPayloadAsString());
+    }
+
 }

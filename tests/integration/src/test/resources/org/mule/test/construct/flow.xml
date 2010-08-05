@@ -118,7 +118,24 @@
         <append-string-transformer message="out" />
         <vm:outbound-endpoint path="wiretap-out" exchange-pattern="one-way" />
     </flow>
-    
 
+    <flow name="response">
+        <vm:inbound-endpoint path="response" exchange-pattern="request-response" />
+        <append-string-transformer message="a" />
+        <response>
+            <append-string-transformer message="i" />
+        </response>
+        <append-string-transformer message="b" />
+        <response>
+            <append-string-transformer message="f" />
+            <append-string-transformer message="g" />
+            <append-string-transformer message="h" />
+        </response>
+        <response>
+            <append-string-transformer message="e" />
+        </response>
+        <append-string-transformer message="c" />
+        <append-string-transformer message="d" />
+    </flow>
 
 </mule>

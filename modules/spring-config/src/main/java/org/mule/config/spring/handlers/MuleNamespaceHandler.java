@@ -62,6 +62,7 @@ import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
@@ -269,7 +270,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
         registerBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
-        registerBeanDefinitionParser("response", new ParentDefinitionParser());
+        registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         
         // Message Sources
