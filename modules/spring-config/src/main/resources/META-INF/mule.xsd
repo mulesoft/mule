@@ -359,6 +359,7 @@
         </xsd:complexContent>
     </xsd:complexType>
      
+    <!--  TODO 
     <xsd:element name="seda-stage" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -375,6 +376,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+    -->
 
     <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
