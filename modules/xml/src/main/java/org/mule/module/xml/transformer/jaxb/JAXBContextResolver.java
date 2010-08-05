@@ -38,7 +38,7 @@ public class JAXBContextResolver extends AbstractAnnotatedTransformerArgumentRes
     {
        try
         {
-            return JAXBContext.newInstance(annotatedType.getPackage().getName());
+            return JAXBContext.newInstance(annotatedType);
         }
         catch (JAXBException e)
         {
