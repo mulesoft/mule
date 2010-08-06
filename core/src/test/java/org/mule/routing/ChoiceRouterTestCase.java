@@ -24,6 +24,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         choiceRouter = new ChoiceRouter();
     }

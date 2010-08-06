@@ -20,7 +20,7 @@ import org.mule.api.routing.filter.Filter;
  * If the implementation supports the use of a default route then this will be used
  * to route any events that don't match any other routes.
  */
-public interface FilteringRouter extends MessageProcessor
+public interface SelectiveRouter extends MessageProcessor
 {
     void addRoute(MessageProcessor processor, Filter filter);
 

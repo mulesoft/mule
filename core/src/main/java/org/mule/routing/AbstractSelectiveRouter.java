@@ -11,21 +11,25 @@
 package org.mule.routing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.FilteringRouter;
+import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.RoutePathNotFoundException;
+import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.routing.outbound.DefaultRouterResultsHandler;
 
-public abstract class AbstractFilteringRouter extends AbstractRouter implements FilteringRouter
+public abstract class AbstractSelectiveRouter extends AbstractRouter implements SelectiveRouter
 {
     private final List<FilteredRoute> filteredRoutes = new ArrayList<FilteredRoute>();
     private MessageProcessor defaultProcessor;
+    private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
 
     public void addRoute(MessageProcessor processor, Filter filter)
     {
@@ -64,11 +68,11 @@ public abstract class AbstractFilteringRouter extends AbstractRouter implements 
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MessageProcessor selectedProcessor = selectProcessor(event);
+        Collection<MessageProcessor> selectedProcessors = selectProcessors(event);
 
-        if (selectedProcessor != null)
+        if (!selectedProcessors.isEmpty())
         {
-            return routeWithProcessor(selectedProcessor, event);
+            return routeWithProcessors(selectedProcessors, event);
         }
 
         if (defaultProcessor != null)
@@ -83,25 +87,36 @@ public abstract class AbstractFilteringRouter extends AbstractRouter implements 
 
         throw new RoutePathNotFoundException(
             MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-            event.getMessage(), this);
+            event.getMessage(), null);
     }
 
     /**
-     * @return the processor selected according to the specific router strategy or
-     *         null.
+     * @return the processors selected according to the specific router strategy or
+     *         an empty collection (not null).
      */
-    protected abstract MessageProcessor selectProcessor(MuleEvent event);
+    protected abstract Collection<MessageProcessor> selectProcessors(MuleEvent event);
 
     private MuleEvent routeWithProcessor(MessageProcessor processor, MuleEvent event) throws MuleException
     {
-        MuleEvent result = processor.process(event);
+        return routeWithProcessors(Collections.singleton(processor), event);
+    }
 
-        if (getRouterStatistics() != null)
+    private MuleEvent routeWithProcessors(Collection<MessageProcessor> processors, MuleEvent event)
+        throws MuleException
+    {
+        List<MuleEvent> results = new ArrayList<MuleEvent>();
+
+        for (MessageProcessor processor : processors)
         {
-            getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
+            results.add(processor.process(event));
+
+            if (getRouterStatistics() != null)
+            {
+                getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
+            }
         }
 
-        return result;
+        return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
     protected List<FilteredRoute> getFilteredRoutes()
