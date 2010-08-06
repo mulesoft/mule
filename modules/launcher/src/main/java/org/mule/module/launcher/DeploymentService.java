@@ -3,6 +3,8 @@ package org.mule.module.launcher;
 import org.mule.config.StartupContext;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
+import org.mule.util.FilenameUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -219,6 +221,13 @@ public class DeploymentService
             {
                 try
                 {
+                    // check if this app is running first, undeploy it then
+                    final String appName = StringUtils.removeEnd(zip, ".zip");
+                    Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
+                    if (app != null)
+                    {
+                        onApplicationUndeployRequested(appName);
+                    }
                     onNewApplicationArchive(new File(appsDir, zip));
                 }
                 catch (Throwable t)
@@ -286,6 +295,10 @@ public class DeploymentService
             {
                 logger.info("================== New Application Archive: " + file);
             }
+
+            // check if there are any broken leftovers and clean it up before exploded an updated zip
+            final String appName = FilenameUtils.getBaseName(file.getName());
+            FileUtils.deleteTree(new File(appsDir, appName));
 
             Application app = deployer.installFrom(file.toURL());
             // add to the list of known apps first to avoid deployment loop on failure
