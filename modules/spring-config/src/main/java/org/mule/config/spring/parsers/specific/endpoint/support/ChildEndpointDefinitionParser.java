@@ -68,6 +68,10 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         {
             return "messageProcessor";
         }
+        else if ("wire-tap".equals(parent) || "wire-tap-router".equals(parent))
+        {
+            return "tap";
+        }
         else
         {
             return super.getPropertyName(e);
