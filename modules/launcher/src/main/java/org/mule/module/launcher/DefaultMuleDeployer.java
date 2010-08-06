@@ -95,6 +95,7 @@ public class DefaultMuleDeployer implements MuleDeployer
             File appDir = new File(appsDir, appName);
             // normalize the full path + protocol to make unzip happy
             final File source = new File(url.toURI());
+            
             FileUtils.unzip(source, appDir);
             if ("file".equals(url.getProtocol()))
             {
