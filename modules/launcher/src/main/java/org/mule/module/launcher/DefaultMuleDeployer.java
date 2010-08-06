@@ -22,7 +22,7 @@ import java.net.URL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultMuleDeployer
+public class DefaultMuleDeployer implements MuleDeployer
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
@@ -59,10 +59,6 @@ public class DefaultMuleDeployer
 
     }
 
-    /**
-     * Installs packaged Mule apps from $MULE_HOME/apps directory.
-     * @param packedMuleAppFileName filename of the packed Mule app (only name + ext)
-     */
     public Application installFromAppDir(String packedMuleAppFileName) throws IOException
     {
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();

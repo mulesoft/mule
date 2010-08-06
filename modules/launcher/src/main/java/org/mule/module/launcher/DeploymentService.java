@@ -31,7 +31,7 @@ public class DeploymentService
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     private List<Application> applications = new ArrayList<Application>();
-    protected DefaultMuleDeployer deployer = new DefaultMuleDeployer();
+    protected MuleDeployer deployer = new DefaultMuleDeployer();
 
     public void start()
     {
@@ -105,9 +105,8 @@ public class DeploymentService
         final int reloadIntervalMs = DEFAULT_CHANGES_CHECK_INTERVAL_MS;
         appDirMonitorTimer = Executors.newSingleThreadScheduledExecutor(new AppDeployerMonitorThreadFactory());
 
-        // TODO based on the final design, pass in 0 for initial delay for immediate first-time execution
         appDirMonitorTimer.scheduleWithFixedDelay(new AppDirWatcher(appsDir),
-                                                  reloadIntervalMs,
+                                                  0,
                                                   reloadIntervalMs,
                                                   TimeUnit.MILLISECONDS);
 
@@ -148,6 +147,16 @@ public class DeploymentService
     public List<Application> getApplications()
     {
         return Collections.unmodifiableList(applications);
+    }
+
+    public MuleDeployer getDeployer()
+    {
+        return deployer;
+    }
+
+    public void setDeployer(MuleDeployer deployer)
+    {
+        this.deployer = deployer;
     }
 
     /**
