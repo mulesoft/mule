@@ -412,6 +412,7 @@
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-guice</include>
+        <include>org.mule.modules:mule-module-ibeans</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jbossts</include>
         <include>org.mule.modules:mule-module-json</include>
@@ -425,6 +426,7 @@
         <include>org.mule.modules:mule-module-spring-security</include>
         <include>org.mule.modules:mule-module-sxc</include>
         <include>org.mule.modules:mule-module-tomcat</include>
+        <include>org.mule.modules:mule-module-ws</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
@@ -466,23 +468,24 @@
         <exclude>org.mule.transports:mule-transport-vm</exclude>
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
-        <exclude>org.mule.modules:mule-module-launcher</exclude>
-        <exclude>org.mule.modules:mule-module-reboot</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
-        <exclude>org.mule.modules:mule-module-atom</exclude>
-        <exclude>org.mule.modules:mule-module-annotations</exclude>
         <exclude>org.mule.modules:mule-modules-all</exclude>
+        <exclude>org.mule.modules:mule-module-annotations</exclude>
+        <exclude>org.mule.modules:mule-module-atom</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-guice</exclude>
+        <exclude>org.mule.modules:mule-module-ibeans</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jbossts</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-json</exclude>
+        <exclude>org.mule.modules:mule-module-launcher</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
+        <exclude>org.mule.modules:mule-module-reboot</exclude>
         <exclude>org.mule.modules:mule-module-rss</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring-config</exclude>
@@ -490,6 +493,7 @@
         <exclude>org.mule.modules:mule-module-spring-security</exclude>
         <exclude>org.mule.modules:mule-module-sxc</exclude>
         <exclude>org.mule.modules:mule-module-tomcat</exclude>
+        <exclude>org.mule.modules:mule-module-ws</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <exclude>org.mule.examples:mule-examples-all</exclude>
         <exclude>org.mule.examples:mule-example-echo</exclude>
