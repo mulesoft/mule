@@ -24,7 +24,6 @@ public final class MuleContainerBootstrapUtils
 {
     private static final String MULE_APPS_FILENAME = "apps";
     private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
-    private static final String MULE_HOME = System.getProperty("mule.home");
 
     public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
@@ -40,7 +39,7 @@ public final class MuleContainerBootstrapUtils
     public static boolean isStandalone()
     {
         // when embedded, mule.home var is not set
-        return MULE_HOME != null;
+        return getMuleHome() != null;
     }
 
     /**
@@ -48,7 +47,8 @@ public final class MuleContainerBootstrapUtils
      */
     public static File getMuleHome()
     {
-        return isStandalone() ? new File(MULE_HOME) : null;
+        final String muleHome = System.getProperty("mule.home");
+        return muleHome != null ? new File(muleHome) : null;
     }
 
     /**
@@ -64,7 +64,7 @@ public final class MuleContainerBootstrapUtils
      */
     public static File getMuleLibDir()
     {
-        return isStandalone() ? new File(MULE_HOME + File.separator + MULE_LIB_FILENAME) : null;
+        return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
     }
 
     public static File getMuleLocalJarFile()
