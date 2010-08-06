@@ -18,18 +18,17 @@ import org.mule.tck.testmodels.fruit.WaterMelon;
 
 public class CallableEntryPointDiscoveryTestCase extends AbstractMuleTestCase
 {
-
     public void testBadMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();
         InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext(new StringBuffer("foo")));
-        assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+        assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
     public void testGoodMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();
         InvocationResult result = resolver.invoke(new Apple(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 }

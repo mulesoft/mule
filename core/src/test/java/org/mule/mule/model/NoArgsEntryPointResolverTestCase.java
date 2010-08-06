@@ -25,7 +25,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         resolver.addMethod("bite");
         InvocationResult result = resolver.invoke(new InvalidSatsuma(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testExplicitMethodMatch2() throws Exception
@@ -33,7 +33,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         resolver.addMethod("wash");
         InvocationResult result = resolver.invoke(new Apple(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testDynamicMethodMatchFail() throws Exception
@@ -41,14 +41,14 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         InvocationResult result = resolver.invoke(new Apple(), getTestEventContext("blah"));
         assertEquals("Apple service has a number of matching method, so should have failed",
-                result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+                result.getState(), InvocationResult.State.FAILED);
     }
 
     public void testDynamicMethodMatchPass() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         InvocationResult result = resolver.invoke(new InvalidSatsuma(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testDynamicMethodMatchFailOnWildcardMatch() throws Exception
@@ -57,7 +57,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         assertTrue(resolver.removeIgnoredMethod("is*"));
         InvocationResult result = resolver.invoke(new InvalidSatsuma(), getTestEventContext("blah"));
         assertEquals("Satsuma service has a number of matching method, so should have failed",
-                result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+                result.getState(), InvocationResult.State.FAILED);
     }
 
     /** Having a null payload should make no difference */
@@ -66,6 +66,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         resolver.addMethod("wash");
         InvocationResult result = resolver.invoke(new Apple(), getTestEventContext(NullPayload.getInstance()));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 }

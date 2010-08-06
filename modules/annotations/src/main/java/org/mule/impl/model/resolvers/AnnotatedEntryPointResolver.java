@@ -28,10 +28,10 @@ import org.mule.util.annotation.AnnotationUtils;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import net.sf.cglib.proxy.Enhancer;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import net.sf.cglib.proxy.Enhancer;
 
 /**
  * A Mule {@link org.mule.api.model.EntryPointResolver} implementation that will resolve methods on a service class
@@ -75,6 +75,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 
     private AtomicBoolean firstTime = new AtomicBoolean(true);
 
+    @SuppressWarnings("unchecked")
     private Map<Method, Transformer> transformerCache = new ConcurrentHashMap();
 
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
@@ -87,7 +88,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
             }
             catch (Exception e)
             {
-                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
                 result.setErrorMessage(e.toString());
                 return result;
             }
@@ -95,7 +96,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 
         if(methodCache.size()==0)
         {
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
             result.setErrorMessage("Component: " + component + " doesn't have any annotated methods, skipping.");
             return result;
         }
@@ -121,7 +122,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
             method = getMethodByName(methodName, context);
             if (method == null)
             {
-                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
                 result.setErrorMessage("Method not found: " + methodName + " on object: " + component.getClass() + ". If the component is a proxy there needs to be an interface on the proxy that defines this method");
                 return result;
                 //TODO i18n
@@ -139,7 +140,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         }
         else
         {
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
             result.setErrorMessage("Component: " + component + " has more than one method annotated, which means the target method name needs to be set on the event");
             return result;
         }
@@ -195,6 +196,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         }
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
@@ -206,7 +208,6 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 
     protected synchronized void initCache(Object component, MuleEventContext context)
     {
-
         for (int i = 0; i < component.getClass().getMethods().length; i++)
         {
             Method method = component.getClass().getMethods()[i];

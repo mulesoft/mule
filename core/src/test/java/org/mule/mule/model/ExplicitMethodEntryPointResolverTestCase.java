@@ -23,7 +23,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
         resolver.addMethod("someBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testMethodSetMatchFirst() throws Exception
@@ -32,7 +32,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         resolver.addMethod("someBusinessMethod");
         resolver.addMethod("someSetter");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testMethodNotFound() throws Exception
@@ -41,7 +41,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         resolver.addMethod("noMethod");
         resolver.addMethod("noMethod2");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
     public void testNoMethodSet() throws Exception
@@ -71,7 +71,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         resolver.addMethod("wash");
         MuleEventContext ctx = getTestEventContext(new Apple());
         InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public static class TestFruitCleaner

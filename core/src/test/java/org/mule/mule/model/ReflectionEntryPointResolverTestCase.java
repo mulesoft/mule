@@ -12,9 +12,7 @@ package org.mule.mule.model;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.model.InvocationResult;
-import org.mule.api.transport.PropertyScope;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -27,7 +25,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.transport.NullPayload;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import org.mockito.cglib.proxy.Enhancer;
@@ -41,21 +38,21 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         InvocationResult result = resolver.invoke(new WaterMelon(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testExplicitMethodMatchComplexObject() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new FruitLover("Mmmm")));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public void testMethodMatchWithArguments() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Apple(), new Banana()}));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Fruit[]);
         //test that the correct methd was called
         assertTrue(((Fruit[]) result.getResult())[0] instanceof Apple);
@@ -63,7 +60,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals("addAppleAndBanana", result.getMethodCalled());
 
         result = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Banana(), new Apple()}));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Fruit[]);
         assertTrue(((Fruit[]) result.getResult())[0] instanceof Banana);
         assertTrue(((Fruit[]) result.getResult())[1] instanceof Apple);
@@ -75,14 +72,14 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
         assertEquals("Test should have failed because the arguments were not wrapped properly: ",
-                result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+                result.getState(), InvocationResult.State.FAILED);
     }
 
     public void testExplicitMethodMatchSetArrayPass() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Fruit[]{new Apple(), new Orange()}}));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     /**
@@ -94,7 +91,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         RequestContext.setEvent(getTestEvent("Hello"));
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
     public void testMatchOnNoArgs() throws Exception
@@ -103,11 +100,11 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         //This should fail because the Kiwi.bite() method has a void return type, and by default
         //void methods are ignorred
         InvocationResult result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(result.getState(), InvocationResult.State.FAILED);
 
         resolver.setAcceptVoidMethods(true);
         result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertEquals("bite", result.getMethodCalled());
     }
 
@@ -122,11 +119,16 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
 
         MuleEventContext context = getTestEventContext("Blah");
         InvocationResult result = resolver.invoke(proxy, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     private class DummyMethodCallback implements MethodInterceptor
     {
+        public DummyMethodCallback()
+        {
+            super();
+        }
+        
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable
         {
             System.out.println("before: " + method.getName());
@@ -135,21 +137,6 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
 
             //Add handler code here
             return r;
-        }
-    }
-
-    private class DummyComponentProxyHandler implements InvocationHandler
-    {
-        private Object component;
-
-        private DummyComponentProxyHandler(Object component)
-        {
-            this.component = component;
-        }
-
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            return method.invoke(component, args);
         }
     }
 }

@@ -21,12 +21,11 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
 {
-
     public void testArrayMatch() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
         InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
-        assertEquals(ctx.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
 
     }
 
@@ -34,7 +33,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
         InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Apple(), new Orange()}));
-        assertEquals(ctx.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(ctx.getState(), InvocationResult.State.FAILED);
     }
 
 
@@ -42,6 +41,6 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
         InvocationResult ctx = resolver.invoke(new Apple(), getTestEventContext(new Object[]{"blah"}));
-        assertEquals(ctx.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(ctx.getState(), InvocationResult.State.FAILED);
     }
 }

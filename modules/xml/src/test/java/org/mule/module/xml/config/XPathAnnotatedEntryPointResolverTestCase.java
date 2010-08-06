@@ -36,7 +36,7 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doStuff", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result.getResult();
         assertEquals(3, map.size());
@@ -53,7 +53,7 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doStuff2", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result.getResult();
         assertEquals(3, map.size());
@@ -70,7 +70,7 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doStuff3", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result.getResult();
         assertEquals(2, map.size());
@@ -105,7 +105,7 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doStuff5", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result.getResult();
         assertEquals(1, map.size());

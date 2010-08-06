@@ -32,6 +32,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 {
     public static final Fruit[] TEST_PAYLOAD = new Fruit[]{new Apple(), new Banana()};
 
+    @Override
     public void doSetUp() throws Exception
     {
         muleContext.getRegistry().registerObject("trans", new Transformers());
@@ -46,7 +47,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doSomething", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         //We need to parse the xml to normalise it so that the final assert passes
 
         assertEquals(TEST_PAYLOAD.getClass().getName() + ":fooValue:" + FruitBowl.class, result.getResult());
@@ -60,7 +61,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         context.getMessage().setInboundProperty("foo", "fooValue");
         //No need to set the method property if the component only has a single annotated method
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
 
         //We need to parse the xml to normalise it so that the final assert passes
         assertEquals(TEST_PAYLOAD.getClass().getName() + ":fooValue:" + FruitBowl.class, result.getResult());
@@ -73,14 +74,14 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         AnnotatedComponent2 component = new AnnotatedComponent2();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
         InvocationResult result = resolver.invoke(component, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+        assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
     public void testNonAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         InvocationResult result = resolver.invoke(new EchoComponent(), getTestEventContext("blah"));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+        assertEquals(result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
     //Test that we don't toucvh any non-Mule evaluator annotations
@@ -90,7 +91,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         MuleEventContext event = getTestEventContext(new HashMap<Object, Object>());
         event.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "nonExpressionAnnotation", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(new AnnotatedComponent2(), event);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+        assertEquals(result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
     public void testAnnotatedMethodOnProxyWithMethodSet() throws Exception
@@ -105,7 +106,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doSomething", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(proxy, context);
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+        assertEquals(result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
     static class DummyMethodCallback implements MethodInterceptor
