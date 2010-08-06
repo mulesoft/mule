@@ -18,7 +18,6 @@ import org.mule.routing.filters.WildcardFilter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -47,10 +46,9 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
         {
             WildcardFilter filter = new WildcardFilter(expression);
             result = new ArrayList<DataHandler>(message.getAttachmentNames().size());
-            for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
+            for (String name : message.getAttachmentNames())
             {
-                String name = (String) iterator.next();
-                if(filter.accept(name))
+                if (filter.accept(name))
                 {
                     result.add(message.getAttachment(name));
                 }

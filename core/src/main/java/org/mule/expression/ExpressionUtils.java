@@ -31,7 +31,6 @@ import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
  */
 public final class ExpressionUtils
 {
-
     private ExpressionUtils()
     {
         // don't instantiate
@@ -45,6 +44,7 @@ public final class ExpressionUtils
     /**
      * Handler scope-aware expressions like "#[header:INBOUND:foo]
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getPropertyWithScope(String expression, MuleMessage msg, Class<T> type)
     {
         PropertyScope defaultScope = getScope(expression);

@@ -20,7 +20,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
         // For spring
     }
 
-    public InterceptorStack(List interceptors)
+    public InterceptorStack(List<Interceptor> interceptors)
     {
         this.interceptors = interceptors;
     }
@@ -48,12 +47,12 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
         return chain.process(event);
     }
 
-    public List getInterceptors()
+    public List<Interceptor> getInterceptors()
     {
         return interceptors;
     }
 
-    public void setInterceptors(List interceptors)
+    public void setInterceptors(List<Interceptor> interceptors)
     {
         this.interceptors = interceptors;
     }
@@ -85,9 +84,8 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
 
     public void dispose()
     {
-        for (Iterator it = interceptors.iterator(); it.hasNext();)
+        for (Interceptor interceptor : interceptors)
         {
-            Interceptor interceptor = (Interceptor) it.next();
             if (interceptor instanceof Disposable)
             {
                 ((Disposable) interceptor).dispose();

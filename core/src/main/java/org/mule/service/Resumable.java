@@ -10,7 +10,6 @@
 package org.mule.service;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Startable;
 
 /**
  * Adds a resume lifecycle method to an object.  This should only be used with {@link org.mule.service.Pausable}

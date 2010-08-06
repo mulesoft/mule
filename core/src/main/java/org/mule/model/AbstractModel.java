@@ -28,7 +28,6 @@ import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,15 +86,16 @@ public abstract class AbstractModel implements Model
      *
      * @param entryPointResolvers Resolvers to add
      */
-    public void setEntryPointResolvers(Collection entryPointResolvers)
+    public void setEntryPointResolvers(Collection<EntryPointResolver> entryPointResolvers)
     {
         if (null == entryPointResolverSet)
         {
             entryPointResolverSet = new DefaultEntryPointResolverSet();
         }
-        for (Iterator resolvers = entryPointResolvers.iterator(); resolvers.hasNext();)
+        
+        for (EntryPointResolver resolver : entryPointResolvers)
         {
-            entryPointResolverSet.addEntryPointResolver((EntryPointResolver) resolvers.next());
+            entryPointResolverSet.addEntryPointResolver(resolver);
         }
     }
 

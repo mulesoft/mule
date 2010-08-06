@@ -35,7 +35,6 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
      */
     protected transient final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
 
-
     public ServiceLifecycleManager(FlowConstruct service) throws MuleException
     {
         super(service.getName(), service);
@@ -54,9 +53,9 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
     }
 
     @Override
-    protected void notifyTransition(String currentPhase)
+    protected void notifyTransition(String destinationPhase)
     {
-        if(currentPhase.equals(Resumable.PHASE_NAME))
+        if (destinationPhase.equals(Resumable.PHASE_NAME))
         {
             //Revert back to start phase
             completedPhases.remove(Resumable.PHASE_NAME);
@@ -75,7 +74,6 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
         fireNotification(ServiceNotification.SERVICE_INITIALISED);
     }
 
-
     @Override
     public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
@@ -85,7 +83,6 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
         invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(ServiceNotification.SERVICE_STARTED);
     }
-
 
     public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {

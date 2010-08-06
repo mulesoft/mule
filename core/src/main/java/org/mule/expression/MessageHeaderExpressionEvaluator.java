@@ -10,11 +10,8 @@
 
 package org.mule.expression;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.config.i18n.CoreMessages;
 
 /**
  * Looks up the property on the message using the property name given.  If the call on the messgae returns null,

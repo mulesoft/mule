@@ -12,14 +12,8 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.config.i18n.CoreMessages;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Looks up the property on the message using the expression given. The expression can contain a comma-separated list

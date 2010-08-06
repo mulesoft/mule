@@ -13,16 +13,12 @@ package org.mule.expression;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.WildcardFilter;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.activation.DataHandler;
@@ -50,10 +46,9 @@ public class MessageAttachmentsExpressionEvaluator implements ExpressionEvaluato
         {
             WildcardFilter filter = new WildcardFilter(expression);
             result = new HashMap<String, DataHandler>(message.getAttachmentNames().size());
-            for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();)
+            for (String name : message.getAttachmentNames())
             {
-                String name = (String) iterator.next();
-                if(filter.accept(name))
+                if (filter.accept(name))
                 {
                     result.put(name, message.getAttachment(name));
                 }
