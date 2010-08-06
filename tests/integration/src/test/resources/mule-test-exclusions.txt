@@ -102,3 +102,6 @@ org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 
 # BL-38 Need to port for CXF changes
 org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
+
+# MULE-4976 (broken with migration to Spring 3)
+org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
