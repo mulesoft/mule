@@ -30,7 +30,7 @@ public class TooManySatisfiableMethodsException extends MuleException
         super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types));
     }
 
-    public TooManySatisfiableMethodsException(Object component, Class returnType)
+    public TooManySatisfiableMethodsException(Object component, Class<?> returnType)
     {
         super(CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn(component, returnType));
     }

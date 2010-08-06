@@ -17,7 +17,6 @@ import org.mule.util.StringMessageUtils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +57,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
                 "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*")));
     }
 
-    public Set getMethods()
+    public Set<String> getMethods()
     {
         return methods;
     }
@@ -89,6 +88,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         this.enableDiscovery = enableDiscovery;
     }
 
+    @Override
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
         Method method = null;
@@ -96,17 +96,17 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
 
         if (payload == null)
         {
-            return new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            return new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
         }
 
-        for (Iterator iterator = methods.iterator(); iterator.hasNext();)
+        for (String methodName : methods)
         {
-            String methodName = (String) iterator.next();
             method = getMethodByName(methodName, context);
 
             if (method == null)
             {
-                method = ClassUtils.getMethod(component.getClass(), methodName, getMethodArgumentTypes(payload));
+                method = ClassUtils.getMethod(component.getClass(), methodName, 
+                    getMethodArgumentTypes(payload));
             }
             if (method != null)
             {
@@ -125,19 +125,21 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
 
                 if (methods.size() > 1)
                 {
-                    InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                    InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
                     // too many methods match the payload argument
-                    result.setErrorTooManyMatchingMethods(component, argTypes, StringMessageUtils.toString(methods));
+                    result.setErrorTooManyMatchingMethods(component, argTypes, 
+                        StringMessageUtils.toString(methods));
                     return result;
                 }
                 else if (methods.size() == 1)
                 {
                     // found exact match for payload argument
-                    method = this.addMethodByArguments(component, methods.get(0), getPayloadFromMessage(context));
+                    method = this.addMethodByArguments(component, methods.get(0), 
+                        getPayloadFromMessage(context));
                 }
                 else
                 {
-                    InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                    InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
                     // no method for payload argument either - bail out
                     result.setErrorNoMatchingMethods(component, ClassUtils.NO_ARGS_TYPE);
                     return result;
@@ -145,7 +147,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
             }
             else
             {
-                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
                 // no method for the explicit methods either
                 result.setErrorNoMatchingMethodsCalled(component, StringMessageUtils.toString(methods));
                 return result;
@@ -156,6 +158,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
 
     protected abstract Class<?>[] getMethodArgumentTypes(Object[] payload);
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();

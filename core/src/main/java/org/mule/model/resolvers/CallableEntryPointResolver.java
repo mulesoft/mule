@@ -43,7 +43,6 @@ public class CallableEntryPointResolver implements EntryPointResolver
         }
     }
 
-
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
         if (component instanceof Callable)
@@ -53,13 +52,13 @@ public class CallableEntryPointResolver implements EntryPointResolver
         }
         else
         {
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
             result.setErrorMessage(CoreMessages.objectDoesNotImplementInterface(component, Callable.class).toString());
             return result;
         }
     }
 
-
+    @Override
     public String toString()
     {
         return "CallableEntryPointResolver{}";

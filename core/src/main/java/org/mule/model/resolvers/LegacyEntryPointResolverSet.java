@@ -14,19 +14,29 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * An {@link org.mule.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
- * <b>NOTE:</b> Since 3.0 this legacy entry point resolver will always invoked after message transformation 
- * and not before.
+ * <b>NOTE:</b> Since 3.0 this legacy entry point resolver will always invoked after message 
+ * transformation  and not before.
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
-
     private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.impl.model.resolvers.AnnotatedEntryPointResolver";
+ 
     public LegacyEntryPointResolverSet()
+    {
+        addAnnotatedEntryPointResolver();
+        addEntryPointResolver(new MethodHeaderPropertyEntryPointResolver());
+        addEntryPointResolver(new CallableEntryPointResolver());
+
+        ReflectionEntryPointResolver reflectionResolver = new ReflectionEntryPointResolver();
+        //In Mule 1.x you could call setXX methods as service methods by default
+        reflectionResolver.removeIgnoredMethod("set*");
+        addEntryPointResolver(reflectionResolver);
+    }
+
+    private void addAnnotatedEntryPointResolver()
     {
         //Annotations support is not part of Mule core, but we want default handling for annotations we have
         //work-arounds like this to avoid importing annotation classes
@@ -48,12 +58,5 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
         {
             throw new MuleRuntimeException(CoreMessages.cannotLoadFromClasspath(ANNOTATED_ENTRYPOINT_RESOLVER_CLASS));
         }
-        addEntryPointResolver(new MethodHeaderPropertyEntryPointResolver());
-        addEntryPointResolver(new CallableEntryPointResolver());
-
-        ReflectionEntryPointResolver preTransformResolver = new ReflectionEntryPointResolver();
-        //In Mule 1.x you could call setXX methods as service methods by default
-        preTransformResolver.removeIgnoredMethod("set*");
-        addEntryPointResolver(preTransformResolver);
     }
 }

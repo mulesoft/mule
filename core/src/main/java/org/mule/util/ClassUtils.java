@@ -549,11 +549,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
-    public static List getSatisfiableMethods(Class<?> implementation,
+    public static List<Method> getSatisfiableMethods(Class<?> implementation,
                                              Class<?>[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
-                                             Set ignoredMethodNames)
+                                             Set<String> ignoredMethodNames)
     {
         return getSatisfiableMethods(implementation, parameterTypes, voidOk, matchOnObject, ignoredMethodNames, null);
     }
@@ -573,18 +573,18 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
-    public static List<Method> getSatisfiableMethods(Class implementation,
-                                             Class[] parameterTypes,
+    public static List<Method> getSatisfiableMethods(Class<?> implementation,
+                                             Class<?>[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
-                                             Collection ignoredMethodNames,
+                                             Collection<String> ignoredMethodNames,
                                              WildcardFilter filter)
     {
         List<Method> result = new ArrayList<Method>();
 
         if (ignoredMethodNames == null)
         {
-            ignoredMethodNames = Collections.EMPTY_SET;
+            ignoredMethodNames = Collections.emptySet();
         }
 
         Method[] methods = implementation.getMethods();
@@ -596,7 +596,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             {
                 continue;
             }
-            Class[] methodParams = method.getParameterTypes();
+            Class<?>[] methodParams = method.getParameterTypes();
 
             if (compare(methodParams, parameterTypes, matchOnObject))
             {

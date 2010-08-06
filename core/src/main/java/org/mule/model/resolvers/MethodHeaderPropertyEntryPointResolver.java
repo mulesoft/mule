@@ -22,8 +22,9 @@ import java.lang.reflect.Method;
 import org.apache.commons.lang.BooleanUtils;
 
 /**
- * This resolver will look for a {@link org.mule.api.config.MuleProperties#MULE_METHOD_PROPERTY} property on the incoming event to determine which method to invoke
- * Users can customise the name of the property used to look up the method name on the event
+ * This resolver will look for a {@link org.mule.api.config.MuleProperties#MULE_METHOD_PROPERTY} 
+ * property on the incoming event to determine which method to invoke Users can customise the name 
+ * of the property used to look up the method name on the event
  */
 public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointResolver
 {
@@ -48,7 +49,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         if (ignoreMethod)
         {
             //TODO: Removed once we have property scoping
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKE_NOT_SUPPORTED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
             result.setErrorMessage("Property: " + MuleProperties.MULE_IGNORE_METHOD_PROPERTY + " was set so skipping this resolver");
             return result;
         }
@@ -66,7 +67,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         }
         if (methodProp == null)
         {
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
             // no method for the explicit method header
             result.setErrorMessage(CoreMessages.propertyIsNotSetOnEvent(getMethodProperty()).toString());
             return result;
@@ -98,7 +99,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
             
             if (method == null)
             {
-                InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
                 result.setErrorNoMatchingMethods(component, classTypes);
                 return result;
             }
@@ -119,8 +120,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
      * @param method the method to invoke on the component
      * @throws NoSuchMethodException if the method does not exist on the component
      */
-    protected void validateMethod(Object component, Method method)
-            throws NoSuchMethodException
+    protected void validateMethod(Object component, Method method) throws NoSuchMethodException
     {
         boolean fallback = component instanceof Callable;
 

@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -163,6 +164,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
         this.synchronizeCall = synchronizeCall;
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();

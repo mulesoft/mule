@@ -56,9 +56,9 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
         Object[] payload = getPayloadFromMessage(context);
         Class<?>[] classTypes = ClassUtils.getClassTypes(payload);
         Method method = null;
-        for (Iterator iterator = methods.iterator(); iterator.hasNext();)
+        for (Iterator<String> iterator = methods.iterator(); iterator.hasNext();)
         {
-            String methodName = (String) iterator.next();
+            String methodName = iterator.next();
             method = getMethodByName(methodName, context);
 
             if (method == null)
@@ -70,7 +70,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
                 addMethodByName(method, context);
                 
                 // check if the current payload can be handled by this method
-                Class[] parameterTypes = method.getParameterTypes();
+                Class<?>[] parameterTypes = method.getParameterTypes();
                 if (ClassUtils.compare(parameterTypes, classTypes, false))
                 {
                     // we found a matching method, let's invoke it
@@ -86,13 +86,14 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 
         if (method == null)
         {
-            InvocationResult result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);
             result.setErrorNoMatchingMethods(component, classTypes);
             return result;
         }
         return invokeMethod(component, method, payload);
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();

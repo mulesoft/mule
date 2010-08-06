@@ -123,7 +123,7 @@ public class IBeansConnector extends AbstractConnector
                 }
 
                 List<Method> methods = ClassUtils.getSatisfiableMethods(holder.getIbeanClass(), types,
-                    true, false, Collections.<Object>emptyList(), null);
+                    true, false, Collections.<String>emptyList(), null);
                 if(methods.size()==0)
                 {
                     throw new IllegalArgumentException("no matching methods");

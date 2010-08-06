@@ -15,11 +15,11 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.InvocationResult;
 import org.mule.util.CollectionUtils;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,21 +32,21 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 {
-
     protected final Log logger = LogFactory.getLog(getClass());
 
     private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
+    
+    @SuppressWarnings("unchecked")
     private Set<String> exceptions = new CopyOnWriteArraySet/*<String>*/();
 
     public Object invoke(Object component, MuleEventContext context) throws Exception
     {
         try
         {
-            for (Iterator iterator = entryPointResolvers.iterator(); iterator.hasNext();)
+            for (EntryPointResolver resolver : entryPointResolvers)
             {
-                EntryPointResolver resolver = (EntryPointResolver) iterator.next();
                 InvocationResult result = resolver.invoke(component, context);
-                if (result.getState() == InvocationResult.STATE_INVOKED_SUCESSFUL)
+                if (result.getState() == InvocationResult.State.SUCCESSFUL)
                 {
                     return result.getResult();
                 }
@@ -67,7 +67,7 @@ public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 
     }
 
-    public Set getEntryPointResolvers()
+    public Set<EntryPointResolver> getEntryPointResolvers()
     {
         return entryPointResolvers;
     }

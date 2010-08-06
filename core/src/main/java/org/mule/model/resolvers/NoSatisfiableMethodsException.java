@@ -31,12 +31,12 @@ public class NoSatisfiableMethodsException extends MuleException
         super(CoreMessages.noEntryPointFoundForNoArgsMethod(component, methodName));
     }
 
-    public NoSatisfiableMethodsException(Object component, Class[] args)
+    public NoSatisfiableMethodsException(Object component, Class<?>[] args)
     {
         super(CoreMessages.noEntryPointFoundWithArgs(component, args));
     }
 
-    public NoSatisfiableMethodsException(Object component, Class returnType)
+    public NoSatisfiableMethodsException(Object component, Class<?> returnType)
     {
         super(CoreMessages.noMatchingMethodsOnObjectReturning(component, returnType));
     }

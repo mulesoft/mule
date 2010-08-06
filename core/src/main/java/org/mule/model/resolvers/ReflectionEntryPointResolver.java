@@ -52,7 +52,6 @@ import java.util.Set;
  */
 public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 {
-
     // we don't want to match these methods when looking for a service method
     private Set<String> ignoredMethods = new HashSet<String>(Arrays.asList("equals",
             "getInvocationHandler", "set*", "toString",
@@ -125,13 +124,13 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         Class<?>[] types = ClassUtils.getClassTypes(payload);
 
         // do any methods on the service accept a context?
-        List methods = ClassUtils.getSatisfiableMethods(component.getClass(), types,
+        List<Method> methods = ClassUtils.getSatisfiableMethods(component.getClass(), types,
                 isAcceptVoidMethods(), false, ignoredMethods, filter);
 
         int numMethods = methods.size();
         if (numMethods > 1)
         {
-            result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+            result = new InvocationResult(this, InvocationResult.State.FAILED);
             // too many methods match the context argument
             result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
             return result;
@@ -140,18 +139,18 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         else if (numMethods == 1)
         {
             // found exact match for method with context argument
-            method = this.addMethodByArguments(component, (Method) methods.get(0), payload);
+            method = this.addMethodByArguments(component, methods.get(0), payload);
         }
         else
         {
-            methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils
-                    .getClassTypes(payload), true, true, ignoredMethods);
+            methods = ClassUtils.getSatisfiableMethods(component.getClass(), 
+                ClassUtils.getClassTypes(payload), true, true, ignoredMethods);
 
             numMethods = methods.size();
 
             if (numMethods > 1)
             {
-                result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                result = new InvocationResult(this, InvocationResult.State.FAILED);
                 // too many methods match the context argument
                 result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
                 return result;
@@ -159,11 +158,11 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
             else if (numMethods == 1)
             {
                 // found exact match for payload argument
-                method = this.addMethodByArguments(component, (Method) methods.get(0), payload);
+                method = this.addMethodByArguments(component, methods.get(0), payload);
             }
             else
             {
-                result = new InvocationResult(this, InvocationResult.STATE_INVOKED_FAILED);
+                result = new InvocationResult(this, InvocationResult.State.FAILED);
                 // no method for payload argument either - bail out
                 result.setErrorNoMatchingMethods(component, ClassUtils.getClassTypes(payload));
                 return result;
@@ -174,6 +173,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     }
 
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
