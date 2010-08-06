@@ -155,14 +155,8 @@ public abstract class AbstractService implements Service
                         exceptionListener = getModel().getExceptionListener();
                     }
 
-                    if (messageSource instanceof FlowConstructAware)
-                    {
-                        ((FlowConstructAware) messageSource).setFlowConstruct(object);
-                    }
-                    if (asyncReplyMessageSource instanceof FlowConstructAware)
-                    {
-                        ((FlowConstructAware) asyncReplyMessageSource).setFlowConstruct(object);
-                    }
+                    messageSource.setFlowConstruct(object);
+                    asyncReplyMessageSource.setFlowConstruct(object);
                     // Ensure Component has service instance and is initialised. If the component
                     // was configured with spring and is therefore in the registry it will get
                     // started automatically, if it was set on the service directly then it won't
@@ -341,14 +335,8 @@ public abstract class AbstractService implements Service
 
     protected void doStop() throws MuleException
     {
-        if (messageSource instanceof Stoppable)
-        {
-            ((Stoppable) messageSource).stop();
-        }
-        if (asyncReplyMessageSource instanceof Stoppable)
-        {
-            ((Stoppable) asyncReplyMessageSource).stop();
-        }
+        messageSource.stop();
+        asyncReplyMessageSource.stop();
 
         // Component is not in chain
         if (component instanceof Stoppable)
