@@ -54,7 +54,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Override
     protected void doTearDown() throws Exception
     {
-        //FileUtils.deleteTree(muleHome);
+        // comment out the deletion to analyze results after test is done
+        FileUtils.deleteTree(muleHome);
         if (deploymentService != null)
         {
             deploymentService.stop();
