@@ -395,7 +395,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         // Routing: Conditional Routers
         registerBeanDefinitionParser("choice", new ChildDefinitionParser("messageProcessor", ChoiceRouterFactoryBean.class));
-        registerBeanDefinitionParser("when", new ChildDefinitionParser("routes", ConditionalMessageProcessorFactoryBean.class));
+        registerBeanDefinitionParser("when", new ChildDefinitionParser("route", ConditionalMessageProcessorFactoryBean.class));
         registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", ConditionalMessageProcessorFactoryBean.class));
         
         // Routing: Routing Message Processors

@@ -53,6 +53,9 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
 
         result = muleClient.send("vm://with-default-route.in", "apple", null).getPayloadAsString();
         assertEquals("apple:fruit:fruit", result);
+
+        result = muleClient.send("vm://with-default-route.in", "turnip", null).getPayloadAsString();
+        assertEquals("turnip:veggie:veggie", result);
     }
 
     public void testDefaultRoute() throws Exception

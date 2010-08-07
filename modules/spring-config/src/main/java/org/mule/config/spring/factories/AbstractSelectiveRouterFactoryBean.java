@@ -17,7 +17,7 @@ import org.mule.routing.AbstractSelectiveRouter;
 import org.mule.routing.ConditionalMessageProcessor;
 import org.springframework.beans.factory.FactoryBean;
 
-public abstract class AbstractSelectiveRouterFactoryBean  implements FactoryBean
+public abstract class AbstractSelectiveRouterFactoryBean implements FactoryBean
 {
     private MessageProcessor defaultProcessor;
     private Collection<ConditionalMessageProcessor> conditionalMessageProcessors;
@@ -41,14 +41,15 @@ public abstract class AbstractSelectiveRouterFactoryBean  implements FactoryBean
     {
         final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
         router.setDefaultRoute(defaultProcessor);
-        
-        for(final ConditionalMessageProcessor cmp :conditionalMessageProcessors) {
+
+        for (final ConditionalMessageProcessor cmp : conditionalMessageProcessors)
+        {
             router.addRoute(cmp);
         }
-        
+
         return router;
     }
-    
+
     protected abstract AbstractSelectiveRouter newAbstractSelectiveRouter();
 
     public boolean isSingleton()
