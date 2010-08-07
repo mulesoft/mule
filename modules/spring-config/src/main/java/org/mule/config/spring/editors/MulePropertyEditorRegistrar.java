@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring.editors;
 
 import org.mule.MessageExchangePattern;
@@ -19,7 +20,8 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 /**
- * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
+ * The preferred way to configure property editors in Spring 2/3 is to implement a
+ * registrar
  */
 public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware
 {
@@ -34,9 +36,8 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     {
         registry.registerCustomEditor(Connector.class, new ConnectorPropertyEditor(muleContext));
         registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor(muleContext));
-        registry.registerCustomEditor(MessageExchangePattern.class, 
+        registry.registerCustomEditor(MessageExchangePattern.class,
             new MessageExchangePatternPropertyEditor());
-        registry.registerCustomEditor(Type.class, 
-            new SimpleServiceTypePropertyEditor());
+        registry.registerCustomEditor(Type.class, new SimpleServiceTypePropertyEditor());
     }
 }

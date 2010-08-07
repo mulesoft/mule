@@ -21,7 +21,9 @@ import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
+import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
+import org.mule.config.spring.factories.ConditionalMessageProcessorFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
@@ -67,6 +69,7 @@ import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.FactoryBeanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
@@ -391,6 +394,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(CollectionSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
 
+        // Routing: Conditional Routers
+        registerBeanDefinitionParser("choice", new FactoryBeanDefinitionParser(ChoiceRouterFactoryBean.class));
+        registerBeanDefinitionParser("when", new ChildDefinitionParser("routes", ConditionalMessageProcessorFactoryBean.class));
+        registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", ConditionalMessageProcessorFactoryBean.class));
+        
         // Routing: Routing Message Processors
         
         //Message Info Mappings

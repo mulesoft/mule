@@ -18,24 +18,29 @@ import java.util.List;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
+import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.outbound.DefaultRouterResultsHandler;
 
 public abstract class AbstractSelectiveRouter extends AbstractRouter implements SelectiveRouter
 {
-    private final List<FilteredRoute> filteredRoutes = new ArrayList<FilteredRoute>();
-    private MessageProcessor defaultProcessor;
+    private final List<ConditionalMessageProcessor> conditionalMessageProcessors = new ArrayList<ConditionalMessageProcessor>();
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
+    private MessageProcessor defaultProcessor;
 
     public void addRoute(MessageProcessor processor, Filter filter)
     {
-        synchronized (filteredRoutes)
+        addRoute(new ConditionalMessageProcessor(processor, filter));
+    }
+
+    public void addRoute(ConditionalMessageProcessor cmp)
+    {
+        synchronized (conditionalMessageProcessors)
         {
-            filteredRoutes.add(new FilteredRoute(processor, filter));
+            conditionalMessageProcessors.add(cmp);
         }
     }
 
@@ -45,7 +50,7 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
         {
             public void updateAt(int index)
             {
-                filteredRoutes.remove(index);
+                conditionalMessageProcessors.remove(index);
             }
         });
     }
@@ -56,7 +61,7 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
         {
             public void updateAt(int index)
             {
-                filteredRoutes.set(index, new FilteredRoute(processor, filter));
+                conditionalMessageProcessors.set(index, new ConditionalMessageProcessor(processor, filter));
             }
         });
     }
@@ -87,7 +92,7 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
 
         throw new RoutePathNotFoundException(
             MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-            event.getMessage(), null);
+            event.getMessage(), event.getEndpoint());
     }
 
     /**
@@ -119,9 +124,9 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
         return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
-    protected List<FilteredRoute> getFilteredRoutes()
+    protected List<ConditionalMessageProcessor> getConditionalMessageProcessors()
     {
-        return Collections.unmodifiableList(filteredRoutes);
+        return conditionalMessageProcessors;
     }
 
     private interface RoutesUpdater
@@ -131,28 +136,16 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
 
     private void updateRoute(MessageProcessor processor, RoutesUpdater routesUpdater)
     {
-        synchronized (filteredRoutes)
+        synchronized (conditionalMessageProcessors)
         {
 
-            for (int i = 0; i < filteredRoutes.size(); i++)
+            for (int i = 0; i < conditionalMessageProcessors.size(); i++)
             {
-                if (filteredRoutes.get(i).processor.equals(processor))
+                if (conditionalMessageProcessors.get(i).getMessageProcessor().equals(processor))
                 {
                     routesUpdater.updateAt(i);
                 }
             }
-        }
-    }
-
-    protected static class FilteredRoute
-    {
-        final MessageProcessor processor;
-        final Filter filter;
-
-        public FilteredRoute(MessageProcessor processor, Filter filter)
-        {
-            this.processor = processor;
-            this.filter = filter;
         }
     }
 

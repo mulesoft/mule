@@ -30,11 +30,11 @@ public class ChoiceRouter extends AbstractSelectiveRouter
     @Override
     protected Collection<MessageProcessor> selectProcessors(MuleEvent event)
     {
-        for (FilteredRoute filteredRoute : getFilteredRoutes())
+        for (ConditionalMessageProcessor cmp : getConditionalMessageProcessors())
         {
-            if (filteredRoute.filter.accept(event.getMessage()))
+            if (cmp.getFilter().accept(event.getMessage()))
             {
-                return Collections.singleton(filteredRoute.processor);
+                return Collections.singleton(cmp.getMessageProcessor());
             }
         }
 

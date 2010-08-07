@@ -13,7 +13,6 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.construct.SimpleFlowConstruct;
-
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;

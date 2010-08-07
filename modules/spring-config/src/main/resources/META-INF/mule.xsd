@@ -4402,12 +4402,42 @@
         <xsd:attribute name="useTemplates" type="substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
-                    Dertermies if placeholders with expressions can be used with the form [ ] in endpoint uri's.
+                    Determines if placeholders with expressions can be used with the form [ ] in endpoint uri's.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-
+    
+    <!-- Conditional Message Processor Elements -->
+    <xsd:complexType name="abstractConditionalMessageProcessorType" abstract="true">
+        <xsd:sequence>
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
+       </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="whenConditionalMessageProcessorType">
+      <xsd:complexContent>
+        <xsd:extension base="abstractConditionalMessageProcessorType">
+          <xsd:sequence>
+            <xsd:element ref="abstract-filter" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        The condition to use to decide if the message processor can be used.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="otherwiseConditionalMessageProcessorType">
+      <xsd:complexContent>
+        <xsd:extension base="abstractConditionalMessageProcessorType">
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    
     <!-- Default Outbound Router Types -->
     <xsd:complexType name="outboundRouterType">
         <xsd:complexContent>
@@ -4453,6 +4483,17 @@
                     <xsd:group ref="defaultFilteredOutboundRouterElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="selectiveOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="when" type="whenConditionalMessageProcessorType" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="otherwise" type="otherwiseConditionalMessageProcessorType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4535,6 +4576,15 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="choice" type="selectiveOutboundRouterType"
+                 substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the message to the first endpoint whose condition has been satisfied. If no conditions were satisfied, sends to the configured default endpoint if configured, or throws an exception if not configured.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <!-- Splitter routers -->
 
