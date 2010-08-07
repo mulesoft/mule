@@ -17,7 +17,6 @@ import org.mule.tck.FunctionalTestCase;
 
 public class ChoiceRouterTestCase extends FunctionalTestCase
 {
-
     private MuleClient muleClient;
 
     @Override

@@ -105,3 +105,6 @@ org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
 
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
+
+# Need to have core flow working
+org.mule.test.integration.routing.outbound.ChoiceRouterTestCase
