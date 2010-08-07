@@ -15,8 +15,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
@@ -113,15 +117,30 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
 
         for (MessageProcessor processor : processors)
         {
-            results.add(processor.process(event));
-
-            if (getRouterStatistics() != null)
-            {
-                getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
-            }
+            processEventWithProcessor(event, processor, results);
         }
 
         return resultsHandler.aggregateResults(results, event, muleContext);
+    }
+
+    private void processEventWithProcessor(MuleEvent event,
+                                           MessageProcessor processor,
+                                           List<MuleEvent> results) throws MuleException
+    {
+        MuleEvent processedEvent = event;
+
+        if (processor instanceof OutboundEndpoint)
+        {
+            processedEvent = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) processor,
+                event.getSession());
+        }
+
+        results.add(processor.process(processedEvent));
+
+        if (getRouterStatistics() != null)
+        {
+            getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
+        }
     }
 
     protected List<ConditionalMessageProcessor> getConditionalMessageProcessors()
@@ -149,4 +168,9 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 }

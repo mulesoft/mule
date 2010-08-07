@@ -69,7 +69,6 @@ import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.FactoryBeanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
@@ -395,7 +394,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
 
         // Routing: Conditional Routers
-        registerBeanDefinitionParser("choice", new FactoryBeanDefinitionParser(ChoiceRouterFactoryBean.class));
+        registerBeanDefinitionParser("choice", new ChildDefinitionParser("messageProcessor", ChoiceRouterFactoryBean.class));
         registerBeanDefinitionParser("when", new ChildDefinitionParser("routes", ConditionalMessageProcessorFactoryBean.class));
         registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", ConditionalMessageProcessorFactoryBean.class));
         

@@ -37,7 +37,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
     {
         try
         {
-            muleClient.send("vm://no-default-route.in", "invalid", null);
+            muleClient.send("vm://without-default-route.in", "bad", null);
             fail("should have got a MuleException");
         }
         catch (final MuleException me)
@@ -48,8 +48,16 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
 
     public void testRouteFound() throws Exception
     {
-        final String result = muleClient.send("vm://no-default-route.in", "valid", null).getPayloadAsString();
-        assertEquals("valid:echoed", result);
+        String result = muleClient.send("vm://without-default-route.in", "apple", null).getPayloadAsString();
+        assertEquals("apple:fruit:fruit", result);
+
+        result = muleClient.send("vm://with-default-route.in", "apple", null).getPayloadAsString();
+        assertEquals("apple:fruit:fruit", result);
     }
 
+    public void testDefaultRoute() throws Exception
+    {
+        final String result = muleClient.send("vm://with-default-route.in", "car", null).getPayloadAsString();
+        assertEquals("car:default:default", result);
+    }
 }

@@ -7,34 +7,22 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-  <vm:endpoint name="valid-channel" path="valid-channel.in"
-    exchange-pattern="request-response">
-    <append-string-transformer message=":valid" />
-  </vm:endpoint>
-
-  <vm:endpoint name="default-channel" path="default-channel.in"
-    exchange-pattern="request-response">
-    <append-string-transformer message=":default" />
-  </vm:endpoint>
-
-  <flow name="no-default-route">
-    <vm:inbound-endpoint path="no-default-route.in"
-      exchange-pattern="request-response" />
+  <flow name="without-default-route">
+    <vm:inbound-endpoint path="without-default-route.in" exchange-pattern="request-response" />
     <choice>
       <when>
-        <outbound-endpoint ref="valid-channel" />
-        <regex-filter pattern="valid" />
+        <outbound-endpoint ref="fruit-channel" />
+        <regex-filter pattern="apple" />
       </when>
     </choice>
   </flow>
 
-  <flow name="default-route">
-    <vm:inbound-endpoint path="default-route.in"
-      exchange-pattern="request-response" />
+  <flow name="with-default-route">
+    <vm:inbound-endpoint path="with-default-route.in" exchange-pattern="request-response" />
     <choice>
       <when>
-        <outbound-endpoint ref="valid-channel" />
-        <regex-filter pattern="valid" />
+        <outbound-endpoint ref="fruit-channel" />
+        <regex-filter pattern="apple" />
       </when>
       <otherwise>
         <outbound-endpoint ref="default-channel" />
@@ -42,9 +30,24 @@
     </choice>
   </flow>
 
-  <simple-service name="valid-service" endpoint-ref="valid-channel"
+  <vm:endpoint name="fruit-channel" path="fruit-channel.in" exchange-pattern="request-response">
+    <append-string-transformer message=":fruit" />
+  </vm:endpoint>
+
+  <vm:endpoint name="veggie-channel" path="veggie-channel.in" exchange-pattern="request-response">
+    <append-string-transformer message=":veggie" />
+  </vm:endpoint>
+
+  <vm:endpoint name="default-channel" path="default-channel.in" exchange-pattern="request-response">
+    <append-string-transformer message=":default" />
+  </vm:endpoint>
+  
+  <simple-service name="fruit-service" endpoint-ref="fruit-channel"
     component-class="org.mule.component.simple.EchoComponent" />
 
-  <simple-service name="default-service" parent="valid-service"
-    endpoint-ref="default-channel" />
+  <simple-service name="veggie-service" endpoint-ref="veggie-channel"
+    component-class="org.mule.component.simple.EchoComponent" />
+
+  <simple-service name="default-service" endpoint-ref="default-channel"
+    component-class="org.mule.component.simple.EchoComponent"/>
 </mule>
