@@ -14,8 +14,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.work.AbstractMuleEventWork;
@@ -35,11 +38,12 @@ import javax.resource.spi.work.WorkListener;
  * invoked directly in the same thread.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements WorkListener
+    implements WorkListener, Startable, Stoppable
 {
     protected WorkManagerSource workManagerSource;
     protected ExceptionListener exceptionListener;
     protected boolean doThreading;
+    protected WorkManager workManager;
 
     public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading, ExceptionListener exceptionListener)
     {
@@ -47,7 +51,40 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         this.exceptionListener = exceptionListener;
         this.doThreading = doThreading;
     }
+    
+    public AsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
+                                             String name,
+                                             int shutdownTimeout,
+                                             ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
+        this.doThreading = threadingProfile.isDoThreading();
+        workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
+        workManagerSource = new WorkManagerSource()
+        {
+            public WorkManager getWorkManager() throws MuleException
+            {
+                return workManager;
+            }
+        };
+    }
 
+    public void start() throws MuleException
+    {
+        if (workManager != null)
+        {
+            workManager.start();
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        if (workManager != null)
+        {
+            workManager.dispose();
+        }
+    }
+    
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (next == null)
