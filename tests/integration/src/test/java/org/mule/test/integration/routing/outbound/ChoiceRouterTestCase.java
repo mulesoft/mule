@@ -11,6 +11,7 @@
 package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -33,17 +34,13 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/choice-router-test.xml";
     }
 
-    public void testNoRouteFound()
+    public void testNoRouteFound() throws Exception
     {
-        try
-        {
-            muleClient.send("vm://without-default-route.in", "bad", null);
-            fail("should have got a MuleException");
-        }
-        catch (final MuleException me)
-        {
-            assertTrue(me.getCause() instanceof RoutePathNotFoundException);
-        }
+        MuleMessage result = muleClient.send("vm://without-default-route.in", "bad", null);
+        assertNotNull(result);
+        assertNotNull("should have got a MuleException", result.getExceptionPayload());
+        assertNotNull(result.getExceptionPayload().getException() instanceof MuleException);
+        assertNotNull(result.getExceptionPayload().getRootException() instanceof RoutePathNotFoundException);
     }
 
     public void testRouteFound() throws Exception
