@@ -93,7 +93,7 @@
     
     <xsd:complexType name="webServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractMessageProcessorType">
+            <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
                 <xsd:group ref="commonConfiguration"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="commonAttributes"/>
@@ -167,7 +167,7 @@
     
     <xsd:complexType name="outboundType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractMessageProcessorType">
+            <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
                 <xsd:group ref="commonConfiguration"/>
                 <xsd:attributeGroup ref="commonAttributes"/>
             </xsd:extension>
