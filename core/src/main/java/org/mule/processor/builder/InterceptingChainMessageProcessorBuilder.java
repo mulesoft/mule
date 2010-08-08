@@ -11,6 +11,7 @@
 package org.mule.processor.builder;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,6 +28,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 
@@ -185,7 +187,19 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
                 event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) delegate,
                     event.getSession());
             }
-            return processNext(delegate.process(event));
+            MuleEvent delegateResult = delegate.process(event);
+            if (delegateResult != null)
+            {
+                return processNext(delegateResult);
+            }
+            else if (event.getFlowConstruct() instanceof SimpleFlowConstruct)
+            {
+                return processNext(OptimizedRequestContext.criticalSetEvent(event));
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void setNext(MessageProcessor next)
