@@ -64,7 +64,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
             return "messageSource";
         }
         else if ("composite-processor".equals(parent) || "flow".equals(parent) || "async".equals(parent)
-                 || "transactional".equals(parent))
+                 || "transactional".equals(parent) || "when".equals(parent) || "otherwise".equals(parent))
         {
             return "messageProcessor";
         }

@@ -10,11 +10,10 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.ConditionalMessageProcessor;
-import org.mule.routing.MessageFilter;
+
 import org.springframework.beans.factory.FactoryBean;
 
 public class ConditionalMessageProcessorFactoryBean implements FactoryBean
@@ -22,14 +21,14 @@ public class ConditionalMessageProcessorFactoryBean implements FactoryBean
     private MessageProcessor messageProcessor;
     private Filter filter;
 
-    public void setMessageProcessor(MessageFilter messageFilter)
+    public void setFilter(Filter filter)
     {
-        this.filter = messageFilter.getFilter();
+        this.filter = filter;
     }
 
-    public void setEndpoint(OutboundEndpoint endpoint)
+    public void setMessageProcessor(MessageProcessor messageProcessor)
     {
-        this.messageProcessor = endpoint;
+        this.messageProcessor = messageProcessor;
     }
 
     public Object getObject() throws Exception

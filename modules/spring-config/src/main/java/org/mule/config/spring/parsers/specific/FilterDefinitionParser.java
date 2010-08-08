@@ -56,6 +56,7 @@ public class FilterDefinitionParser extends ParentContextDefinitionParser
         return !("message-filter".equals(parentName) || "and-filter".equals(parentName)
                  || "or-filter".equals(parentName) || "not-filter".equals(parentName)
                  || "outbound".equals(grandParentName) || "selective-consumer-router".equals(parentName)
-                 || "error-filter".equals(parentName) || "wire-tap".equals(parentName) || "wire-tap-router".equals(parentName));
+                 || "error-filter".equals(parentName) || "wire-tap".equals(parentName)
+                 || "wire-tap-router".equals(parentName) || "when".equals(parentName));
     }
 }
