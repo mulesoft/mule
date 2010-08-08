@@ -247,7 +247,36 @@ public class DefaultBeanAssembler implements BeanAssembler
     public void insertSingletonBeanInTarget(String propertyName, String singletonName)
     {
         String newName = bestGuessName(targetConfig, propertyName, target.getBeanClassName());
-        getTarget().getPropertyValues().addPropertyValue(newName, new RuntimeBeanReference(singletonName));
+
+        MutablePropertyValues targetProperties = target.getPropertyValues();
+        PropertyValue pv = targetProperties.getPropertyValue(newName);
+        Object oldValue = null == pv ? null : pv.getValue();
+
+        if (!targetConfig.isIgnored(propertyName))
+        {
+            if (targetConfig.isCollection(propertyName))
+            {
+                if (null == oldValue)
+                {
+                    oldValue = new ManagedList();
+                    pv = new PropertyValue(newName, oldValue);
+                    targetProperties.addPropertyValue(pv);
+                }
+
+                List list = retrieveList(oldValue);
+                list.add(new RuntimeBeanReference(singletonName));
+            }
+            else
+            {
+                // not a collection
+                targetProperties.addPropertyValue(newName, new RuntimeBeanReference(singletonName));
+            }
+        }
+        // getTarget().getPropertyValues().addPropertyValue(newName, new RuntimeBeanReference(singletonName));
+    }
+    
+    protected void insertInTarget(String oldName){
+        
     }
 
     protected static List retrieveList(Object value)
