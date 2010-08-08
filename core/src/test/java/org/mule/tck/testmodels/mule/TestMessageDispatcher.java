@@ -18,54 +18,61 @@ import org.mule.transport.AbstractMessageDispatcher;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher
 {
-
     public TestMessageDispatcher(final OutboundEndpoint endpoint)
     {
         super(endpoint);
     }
 
+    @Override
     protected void doInitialise()
     {
         // template method
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {
-            throw new RoutingException(event.getMessage(), event.getEndpoint());
+            throw new RoutingException(event, event.getEndpoint());
         }
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {
-            throw new RoutingException(event.getMessage(), event.getEndpoint());
+            throw new RoutingException(event, event.getEndpoint());
         }
         return event.getMessage();
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // no op
     }
 
+    @Override
     protected void doStart() 
     {
         // no op
     }
 
+    @Override
     protected void doStop() 
     {
         // no op

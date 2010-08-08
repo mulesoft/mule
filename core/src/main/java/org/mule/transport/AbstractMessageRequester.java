@@ -118,17 +118,9 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
     }
 
     @Override
-    protected WorkManager getWorkManager()
+    protected WorkManager getWorkManager() throws MuleException
     {
-        try
-        {
-            return connector.getRequesterWorkManager();
-        }
-        catch (MuleException e)
-        {
-            handleException(e);
-            return null;
-        }
+        return connector.getRequesterWorkManager();
     }
     
     public InboundEndpoint getEndpoint()

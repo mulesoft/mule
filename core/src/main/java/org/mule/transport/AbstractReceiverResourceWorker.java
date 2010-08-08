@@ -49,7 +49,7 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
         }
         catch (Exception e)
         {
-            handleException(e);
+            receiver.getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 

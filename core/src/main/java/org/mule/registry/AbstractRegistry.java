@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
 import org.mule.util.UUID;
 
@@ -159,7 +160,7 @@ public abstract class AbstractRegistry implements Registry
         }
         else if (objects.size() > 1)
         {
-            throw new RegistrationException("More than one object of type " + type + " registered but only one expected.");
+            throw new RegistrationException(MessageFactory.createStaticMessage("More than one object of type " + type + " registered but only one expected."));
         }
         else
         {

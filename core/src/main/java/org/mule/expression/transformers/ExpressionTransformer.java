@@ -61,13 +61,13 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
             }
             catch (ExpressionRuntimeException e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
 
             if (!argument.isOptional() && results[i] == null)
             {
                 throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
+                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), message, this);
 
             }
 

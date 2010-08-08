@@ -23,8 +23,8 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.model.ModelException;
 import org.mule.api.object.ObjectFactory;
+import org.mule.api.registry.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.transformer.TransformerTemplate;
@@ -101,7 +101,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(CoreMessages.failedToStart("Service '" + flowConstruct.getName() + "'"), e);
+                throw new ServiceException(CoreMessages.failedToStart("Service '" + flowConstruct.getName() + "'"), e);
             }
         }
     }
@@ -118,7 +118,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(CoreMessages.failedToStop("Service '" + flowConstruct.getName() + "'"), e);
+                throw new ServiceException(CoreMessages.failedToStop("Service '" + flowConstruct.getName() + "'"), e);
             }
         }
     }

@@ -24,7 +24,6 @@ import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 
-import java.beans.ExceptionListener;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -92,18 +91,6 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * @return true if the protocol is supported by this connector.
      */
     boolean supportsProtocol(String protocol);
-
-    /**
-     * @param listener the exception strategy to use with this endpoint
-     * @see ExceptionListener
-     */
-    void setExceptionListener(ExceptionListener listener);
-
-    /**
-     * @return the Exception stategy used by the endpoint
-     * @see ExceptionListener
-     */
-    ExceptionListener getExceptionListener();
 
     /**
      * @param exception the exception that was caught

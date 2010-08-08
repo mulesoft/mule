@@ -9,7 +9,6 @@
  */
 package org.mule.transport;
 
-import org.mule.MuleSessionHandler;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -19,6 +18,7 @@ import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.session.LegacySessionHandler;
+import org.mule.session.MuleSessionHandler;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 
@@ -75,9 +75,7 @@ public abstract class AbstractReceiverWorker implements Work
         //  MuleContext is used down the line for
         // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
         final MuleContext muleContext = receiver.getConnector().getMuleContext();
-        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                                                         endpoint.getConnector().getExceptionListener(),
-                                                         muleContext);
+        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), muleContext);
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
@@ -152,7 +150,7 @@ public abstract class AbstractReceiverWorker implements Work
         }
         catch (Exception e)
         {
-            handleException(e);
+            receiver.getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
         finally
         {
@@ -179,15 +177,6 @@ public abstract class AbstractReceiverWorker implements Work
      * @throws TransactionException
      */
     protected abstract void bindTransaction(Transaction tx) throws TransactionException;
-
-    /**
-     * A conveniece method that passes the exception to the connector's ExceptionListener
-     * @param e
-     */
-    protected void handleException(Exception e)
-    {
-        endpoint.getConnector().handleException(e);
-    }
 
     /**
      * When Mule has finished processing the current messages, there may be zero or more messages to process

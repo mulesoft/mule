@@ -11,8 +11,7 @@
 package org.mule.transformer;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleEventContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -31,18 +30,24 @@ import org.mule.config.i18n.CoreMessages;
  * @see org.mule.DefaultMuleMessage
  */
 
-public abstract class AbstractMessageAwareTransformer extends AbstractTransformer
+public abstract class AbstractMessageAwareTransformer extends AbstractTransformer implements MessageAwareTransformer
 {
 
     @Override
-    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
+    public boolean isSourceDataTypeSupported(DataType<?> dataType, boolean exactMatch)
     {
         //TODO RM* This is a bit of hack since we could just register MuleMessage as a supportedType, but this has some
         //funny behaviour in certain ObjectToXml transformers
         return (super.isSourceDataTypeSupported(dataType, exactMatch) || MuleMessage.class.isAssignableFrom(dataType.getType()));
     }
 
-    public final Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public final Object doTransform(Object src, String enc) throws TransformerException
+    {
+        return doTransform(src, enc, null);
+    }
+    
+    public final Object doTransform(Object src, String enc, MuleEvent event) throws TransformerException
     {
         MuleMessage message;
         if (src instanceof MuleMessage)
@@ -55,18 +60,18 @@ public abstract class AbstractMessageAwareTransformer extends AbstractTransforme
         }
         else
         {
-            MuleEventContext event = RequestContext.getEventContext();
             if (event == null)
             {
-                throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
+                throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), 
+                    (MuleEvent) null, this);
             }
             message = event.getMessage();
             if (!message.getPayload().equals(src))
             {
-                throw new IllegalStateException("Transform payload does not match current MuleEventContext payload");
+                throw new IllegalStateException("Transform payload does not match current event");
             }
         }
-        return transform(message, encoding);
+        return transform(message, enc);
     }
 
     public abstract Object transform(MuleMessage message, String outputEncoding) throws TransformerException;

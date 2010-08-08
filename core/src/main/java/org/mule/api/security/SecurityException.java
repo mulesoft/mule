@@ -11,6 +11,7 @@
 package org.mule.api.security;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 
@@ -19,13 +20,31 @@ import org.mule.config.i18n.Message;
  */
 public abstract class SecurityException extends MessagingException
 {
+    /**
+     * @deprecated use SecurityException(Message, MuleEvent)
+     */
+    @Deprecated
     protected SecurityException(Message message, MuleMessage muleMessage)
     {
         super(message, muleMessage);
     }
 
+    protected SecurityException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
+
+    /**
+     * @deprecated use SecurityException(Message, MuleEvent, Throwable)
+     */
+    @Deprecated
     protected SecurityException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(message, muleMessage, cause);
+    }
+
+    protected SecurityException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
     }
 }

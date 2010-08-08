@@ -34,7 +34,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
 
         if (routes == null || routes.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
         try
@@ -64,7 +64,7 @@ public class DynamicEndpointRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, routes.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
         }
 
         return result;

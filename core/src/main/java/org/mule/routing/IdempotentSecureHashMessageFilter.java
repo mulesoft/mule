@@ -50,11 +50,11 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter
         }
         catch (NoSuchAlgorithmException nsa)
         {
-            throw new RoutingException(event.getMessage(), event.getEndpoint(), nsa);
+            throw new RoutingException(event, event.getEndpoint(), nsa);
         }
         catch (TransformerException te)
         {
-            throw new RoutingException(event.getMessage(), event.getEndpoint(), te);
+            throw new RoutingException(event, event.getEndpoint(), te);
         }
     }
 

@@ -12,24 +12,13 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.WrappingChildDefinitionParser;
 import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
-import org.w3c.dom.Element;
 
-import java.util.List;
+import org.w3c.dom.Element;
 
 /**
  * This allows a security filter to be defined globally, or embedded within an endpoint. The filter is

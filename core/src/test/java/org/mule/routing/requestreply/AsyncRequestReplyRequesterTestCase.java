@@ -61,7 +61,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, AsyncRequestReplyRequesterTestCase.this);
+            }, true);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -91,7 +91,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, AsyncRequestReplyRequesterTestCase.this);
+            }, true);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -124,7 +124,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true, AsyncRequestReplyRequesterTestCase.this);
+            }, true);
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);

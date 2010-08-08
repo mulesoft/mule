@@ -154,8 +154,7 @@ public class EventCorrelator
         }
         if (groupId == null || groupId.equals("-1"))
         {
-            throw new RoutingException(CoreMessages.noCorrelationId(), event.getMessage(), event
-                    .getEndpoint());
+            throw new RoutingException(CoreMessages.noCorrelationId(), event, event.getEndpoint());
         }
 
         // indicates interleaved EventGroup removal (very rare)
@@ -316,7 +315,7 @@ public class EventCorrelator
                                                              RoutingNotification.CORRELATION_TIMEOUT));
             service.getExceptionListener().exceptionThrown(
                     new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                    messageCollection));
+                                                    group.getMessageCollectionEvent()));
         }
         else
         {

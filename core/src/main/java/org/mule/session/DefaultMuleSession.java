@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.session;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -313,7 +313,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         String serviceName = (String) serializedData.get("serviceName");
         //Can be null if service call originates from MuleClient

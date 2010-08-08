@@ -92,7 +92,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         tc.setAction(action);
         tc.setFactory(new XaTransactionFactory());
         tc.setInteractWithExternal(considerExternal);
-        TransactionTemplate<T> tt = new TransactionTemplate<T>(tc, null, context);
+        TransactionTemplate<T> tt = new TransactionTemplate<T>(tc, context);
         return tt;
     }
 

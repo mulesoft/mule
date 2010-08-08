@@ -34,7 +34,7 @@
                     <mule-ss:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component />
         </service>
     </model>
 

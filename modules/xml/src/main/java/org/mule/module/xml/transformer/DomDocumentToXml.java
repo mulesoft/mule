@@ -45,7 +45,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

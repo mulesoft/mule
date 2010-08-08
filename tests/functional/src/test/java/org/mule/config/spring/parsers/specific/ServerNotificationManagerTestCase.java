@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.SecurityNotificationListener;
@@ -28,6 +29,7 @@ import java.util.Collection;
 public class ServerNotificationManagerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/specific/server-notification-manager-test.xml";
@@ -229,7 +231,8 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         public TestSecurityEvent(MuleContext muleContext)
         {
             super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                new DefaultMuleMessage(NullPayload.getInstance(), muleContext)), 0);
+                new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), 
+                null, null)), 0);
         }
 
     }

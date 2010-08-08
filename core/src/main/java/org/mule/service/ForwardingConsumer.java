@@ -23,6 +23,7 @@ import org.mule.routing.MessageFilter;
  * invoking a service. This can be used to implement a bridge accross different transports.
  * @deprecated
  */
+@Deprecated
 public class ForwardingConsumer extends MessageFilter
 {
     @Override
@@ -60,7 +61,7 @@ public class ForwardingConsumer extends MessageFilter
             }
             catch (MuleException e)
             {
-                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+                throw new RoutingException(event, event.getEndpoint(), e);
             }
         }
     }

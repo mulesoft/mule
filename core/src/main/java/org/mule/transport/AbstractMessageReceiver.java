@@ -11,7 +11,6 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleSession;
 import org.mule.OptimizedRequestContext;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleEvent;
@@ -33,6 +32,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
+import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
@@ -184,12 +184,10 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             applyInboundTransformers(muleEvent);            
         }
-        MuleEvent resultEvent = null;
-        try
-        {
-            resultEvent = listener.process(muleEvent);
-        }
-        catch (FilterUnacceptedException e)
+        MuleEvent resultEvent = listener.process(muleEvent);
+        if (resultEvent != null && resultEvent.getMessage() != null
+            && resultEvent.getMessage().getExceptionPayload() != null 
+            && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
         {
             return handleUnacceptedFilter(muleEvent.getMessage());
         }

@@ -11,6 +11,7 @@
 package org.mule.routing.correlation;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 
@@ -19,13 +20,31 @@ import org.mule.config.i18n.Message;
  */
 public class CorrelationTimeoutException  extends MessagingException
 {
+    /**
+     * @deprecated use CorrelationTimeoutException(Message, MuleEvent)
+     */
+    @Deprecated
     public CorrelationTimeoutException(Message message, MuleMessage muleMessage)
     {
         super(message, muleMessage);
     }
 
+    public CorrelationTimeoutException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
+
+    /**
+     * @deprecated use CorrelationTimeoutException(Message, MuleEvent, Throwable)
+     */
+    @Deprecated
     public CorrelationTimeoutException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(message, muleMessage, cause);
+    }
+
+    public CorrelationTimeoutException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
     }
 }

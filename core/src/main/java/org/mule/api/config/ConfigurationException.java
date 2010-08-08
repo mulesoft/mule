@@ -10,10 +10,10 @@
 
 package org.mule.api.config;
 
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
 
-public class ConfigurationException extends DefaultMuleException
+public class ConfigurationException extends MuleException
 {
     /**
      * Serial version

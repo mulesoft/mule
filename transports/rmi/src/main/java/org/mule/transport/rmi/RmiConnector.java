@@ -88,6 +88,7 @@ public class RmiConnector extends AbstractJndiConnector
         super(context);
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
 
@@ -105,26 +106,31 @@ public class RmiConnector extends AbstractJndiConnector
         initJndiContext();
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
@@ -215,9 +221,8 @@ public class RmiConnector extends AbstractJndiConnector
 
             if (null == methodName)
             {
-                throw new DispatchException(
-                    RmiMessages.messageParamServiceMethodNotSet(), 
-                    event.getMessage(), event.getEndpoint());
+                throw new DispatchException(RmiMessages.messageParamServiceMethodNotSet(), 
+                    event, event.getEndpoint());
             }
         }
 

@@ -10,9 +10,9 @@
 
 package org.mule.tck.functional;
 
-import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingTarget;
+import org.mule.exception.AbstractExceptionListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

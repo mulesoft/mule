@@ -19,8 +19,6 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionTemplate;
 
-import java.beans.ExceptionListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,13 +32,10 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 {
     protected final Log logger = LogFactory.getLog(getClass());
     protected TransactionConfig transactionConfig;
-    protected ExceptionListener exceptionListener;
 
-    public TransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig,
-                                                     ExceptionListener exceptionListener)
+    public TransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
-        this.exceptionListener = exceptionListener;
     }
 
     public MuleEvent process(final MuleEvent event) throws MuleException
@@ -51,8 +46,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(
-                    transactionConfig, exceptionListener, event.getMuleContext());
+            TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(transactionConfig, event.getMuleContext());
             TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
             {
                 public MuleEvent doInTransaction() throws Exception
@@ -72,7 +66,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             catch (Exception e)
             {
                 throw new MessagingException(CoreMessages.errorInvokingMessageProcessorWithinTransaction(
-                    next, transactionConfig), event.getMessage(), e);
+                    next, transactionConfig), event, e);
             }
         }
     }

@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -66,7 +67,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
             }
             else
             {
-                sendMessage = new org.mule.DefaultMuleMessage(part.getPart(), props, muleContext);
+                sendMessage = new DefaultMuleMessage(part.getPart(), props, muleContext);
             }
 
             try
@@ -96,7 +97,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter im
             }
             catch (MuleException e)
             {
-                throw new CouldNotRouteOutboundMessageException(sendMessage, part.getEndpoint(), e);
+                throw new CouldNotRouteOutboundMessageException(event, part.getEndpoint(), e);
             }
         }
 

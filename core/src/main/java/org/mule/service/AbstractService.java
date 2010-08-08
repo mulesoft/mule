@@ -150,7 +150,7 @@ public abstract class AbstractService implements Service
 
                     if (exceptionListener == null)
                     {
-                        // By default us the model Exception Listener
+                        // By default use the model Exception Listener
                         // TODO MULE-2102 This should be configured in the default template.
                         exceptionListener = getModel().getExceptionListener();
                     }
@@ -446,11 +446,6 @@ public abstract class AbstractService implements Service
     //----------------------------------------------------------------------------------------//
     //-                    END LIFECYCLE METHODS
     //----------------------------------------------------------------------------------------//
-
-    protected void handleException(Exception e)
-    {
-        exceptionListener.exceptionThrown(e);
-    }
 
     protected void buildServiceMessageProcessorChain() throws MuleException
     {

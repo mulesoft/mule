@@ -36,14 +36,14 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     public void testMatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        client.dispatch("in", getMatchMessage(), null);
-        MuleMessage message = client.request("vm://match1?connector=queue", RECEIVE_TIMEOUT);
+        client.dispatch("vm://in", getMatchMessage(), null);
+        MuleMessage message = client.request("vm://match1", RECEIVE_TIMEOUT);
 
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
         if(!matchSingle)
         {
-            message = client.request("vm://match2?connector=queue", RECEIVE_TIMEOUT);
+            message = client.request("vm://match2", RECEIVE_TIMEOUT);
             assertNotNull(message);
             assertFalse(message.getPayload() instanceof NullPayload);
         }
@@ -53,8 +53,8 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     public void testError() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        client.dispatch("in", getErrorMessage(), null);
-        MuleMessage message = client.request("vm://error?connector=queue", RECEIVE_TIMEOUT);
+        client.dispatch("vm://in", getErrorMessage(), null);
+        MuleMessage message = client.request("vm://error", RECEIVE_TIMEOUT);
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
     }

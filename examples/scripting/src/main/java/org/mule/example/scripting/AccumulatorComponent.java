@@ -34,7 +34,7 @@ public class AccumulatorComponent implements Callable
         double data = NumberUtils.toDouble(msg);
         if (data == NumberUtils.DOUBLE_ERROR)
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Unable to convert message to double: " + msg));
+            throw new TransformerException(MessageFactory.createStaticMessage("Unable to convert message to double: " + msg), context.getMessage());
         }
         
         if (operation.equalsIgnoreCase("add"))
@@ -55,7 +55,7 @@ public class AccumulatorComponent implements Callable
         }
         else 
         {
-            throw new TransformerException(MessageFactory.createStaticMessage("Operation " + operation + " not recognized"));
+            throw new TransformerException(MessageFactory.createStaticMessage("Operation " + operation + " not recognized"), context.getMessage());
         }
 
         // no auto-boxing

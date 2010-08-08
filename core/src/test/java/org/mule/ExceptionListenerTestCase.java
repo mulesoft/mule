@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.exception.AbstractExceptionListener;
 import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 

@@ -10,6 +10,7 @@
 
 package org.mule.transport.stdio.i18n;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.stdio.StdioConnector;
@@ -20,9 +21,10 @@ public class StdioMessages extends MessageFactory
     
     private static final String BUNDLE_PATH = getBundlePath(StdioConnector.STDIO);
 
-    public static Message couldNotFindStreamWithName(String name)
+    public static Message couldNotFindStreamWithName(ImmutableEndpoint endpoint)
     {
-        return factory.createMessage(BUNDLE_PATH, 1, name);
+        String address = endpoint.getEndpointURI().getAddress();
+        return factory.createMessage(BUNDLE_PATH, 1, address);
     }
 }
 

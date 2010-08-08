@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -167,10 +168,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         // exception to throw
-        MuleException rex = new RoutingException(message, endpoint1);
+        MuleSession session = (MuleSession)mockSession.proxy();
+        MuleEvent eventToThrow = new DefaultMuleEvent(message, endpoint1, session);
+        MuleException rex = new RoutingException(eventToThrow, endpoint1);
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
-        MuleSession session = (MuleSession)mockSession.proxy();
         MuleEvent result = null;
         try
         {
@@ -216,7 +218,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         final MuleSession session = (MuleSession)mockSession.proxy();
         // exception to throw
-        MuleException rex = new RoutingException(message, endpoint1);
+        MuleEvent eventToThrow = new DefaultMuleEvent(message, endpoint1, session);
+        MuleException rex = new RoutingException(eventToThrow, endpoint1);
         // 1st failure
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
@@ -252,12 +255,12 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event", muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(expectedResultMessage, null);
 
-
         assertTrue(router.isMatch(message));
 
         final MuleSession session = (MuleSession)mockSession.proxy();
         // exception to throw
-        MuleException rex = new RoutingException(message, endpoint1);
+        MuleEvent eventToThrow = new DefaultMuleEvent(message, endpoint1, session);
+        MuleException rex = new RoutingException(eventToThrow, endpoint1);
 
         mockendpoint1.expectAndThrow("process", RouterTestUtils.getArgListCheckerMuleEvent(), rex);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
@@ -266,7 +269,6 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         mockendpoint1.verify();
         mockendpoint2.verify();
-
     }
 
     /**

@@ -38,6 +38,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.expression.DefaultExpressionManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
@@ -50,6 +51,7 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.queue.QueueManager;
 
+import java.beans.ExceptionListener;
 import java.util.Collection;
 
 import javax.resource.spi.work.WorkListener;
@@ -104,6 +106,9 @@ public class DefaultMuleContext implements MuleContext
     private ClassLoader executionClassLoader;
     
     protected LocalMuleClient localMuleClient;
+    
+    /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
+    protected ExceptionListener exceptionListener;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -124,6 +129,9 @@ public class DefaultMuleContext implements MuleContext
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
+
+        exceptionListener = new DefaultSystemExceptionStrategy();
+        ((MuleContextAware) exceptionListener).setMuleContext(this);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -625,5 +633,15 @@ public class DefaultMuleContext implements MuleContext
     public LocalMuleClient getClient()
     {
         return localMuleClient;
+    }
+
+    public ExceptionListener getExceptionListener()
+    {
+        return exceptionListener;
+    }
+
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
     }
 }

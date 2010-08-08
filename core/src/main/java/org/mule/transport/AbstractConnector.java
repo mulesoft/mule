@@ -10,7 +10,6 @@
 
 package org.mule.transport;
 
-import org.mule.DefaultExceptionStrategy;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -60,6 +59,7 @@ import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.ExceptionHandlingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
@@ -75,7 +75,6 @@ import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 
-import java.beans.ExceptionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -131,7 +130,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * <li>Dispose Receivers
  * </ol>
  */
-public abstract class AbstractConnector implements Connector, ExceptionListener, WorkListener
+public abstract class AbstractConnector implements Connector, WorkListener
 {
     /**
      * Default number of concurrent transactional receivers.
@@ -149,11 +148,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
      * The name that identifies the endpoint
      */
     protected volatile String name;
-
-    /**
-     * The exception strategy used by this connector
-     */
-    protected volatile ExceptionListener exceptionListener;
 
     /**
      * Factory used to create dispatchers for this connector
@@ -366,16 +360,6 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                     setMaxRequestersActive(getRequesterThreadingProfile().getMaxThreadsActive());
 
                     doInitialise();
-
-                    // We do the management context injection here just in case we're using a
-                    // default ExceptionStrategy
-                    // We always create a default just in case anything goes wrong before
-                    if (exceptionListener == null)
-                    {
-                        exceptionListener = new DefaultExceptionStrategy();
-                        ((DefaultExceptionStrategy) exceptionListener).setMuleContext(muleContext);
-                        ((DefaultExceptionStrategy) exceptionListener).initialise();
-                    }
 
                     try
                     {
@@ -815,7 +799,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
         handleException(exception, null);
     }
 
-    public void handleException(Exception exception, Connectable failed)
+    protected void handleException(Exception exception, Connectable failed)
     {
         // unwrap any exception caused by using reflection apis, but only the top
         // layer
@@ -842,15 +826,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 }
 
                 // Log or otherwise handle exception
-                if (exceptionListener != null)
-                {
-                    exceptionListener.exceptionThrown(exception);
-                }
-                else
-                {
-                    throw new MuleRuntimeException(
-                            CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
-                }
+                muleContext.getExceptionListener().exceptionThrown(exception);
 
                 // Store some info. about the receiver/dispatcher which threw the
                 // ConnectException so
@@ -876,52 +852,18 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
             }
             catch (Exception e)
             {
-                if (exceptionListener == null)
-                {
-                    throw new MuleRuntimeException(
-                            CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), e);
-                }
-                else
-                {
-                    exceptionListener.exceptionThrown(e);
-                }
+                muleContext.getExceptionListener().exceptionThrown(exception);
             }
         }
         else
         {
-            if (exceptionListener != null)
-            {
-                exceptionListener.exceptionThrown(exception);
-            }
-            else
-            {
-                throw new MuleRuntimeException(
-                        CoreMessages.exceptionOnConnectorNoExceptionListener(this.getName()), exception);
-            }
+            muleContext.getExceptionListener().exceptionThrown(exception);
         }
     }
 
     public void exceptionThrown(Exception e)
     {
         handleException(e);
-    }
-
-    /**
-     * @return the ExceptionStrategy for this endpoint
-     * @see ExceptionListener
-     */
-    public ExceptionListener getExceptionListener()
-    {
-        return exceptionListener;
-    }
-
-    /**
-     * @param listener the ExceptionStrategy to use with this endpoint
-     * @see ExceptionListener
-     */
-    public void setExceptionListener(ExceptionListener listener)
-    {
-        exceptionListener = listener;
     }
 
     /**
@@ -2500,13 +2442,14 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new ExceptionHandlingMessageProcessor());
         builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
         {
             public WorkManager getWorkManager() throws MuleException
             {
                 return getDispatcherWorkManager();
             }
-        }, getDispatcherThreadingProfile().isDoThreading(), this));
+        }, getDispatcherThreadingProfile().isDoThreading()));
         builder.chain(new MessageProcessor()
         {
             private MessageProcessor notificationMessageProcessor;
@@ -2535,7 +2478,7 @@ public abstract class AbstractConnector implements Connector, ExceptionListener,
                 }
                 catch (MuleException ex)
                 {
-                    throw new DispatchException(event.getMessage(), endpoint, ex);
+                    throw new DispatchException(event, endpoint, ex);
                 }
                 finally
                 {

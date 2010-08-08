@@ -10,8 +10,8 @@
 
 package org.mule.transport.servlet.jetty.functional;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -49,14 +49,10 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
         Map props = new HashMap();
         props.put("hoo", "noo");
         props.put("har", "nar");
-        try
-        {
-            client.send("clientEndpoint2", null, props);
-            fail("Parameters on the request do not match up");
-        }
-        catch (MuleException e)
-        {
-            //expected
-        }
+
+        MuleMessage result = client.send("clientEndpoint2", null, props);
+        assertNotNull(result);
+        assertNotNull("Parameters on the request do not match up", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
     }
 }

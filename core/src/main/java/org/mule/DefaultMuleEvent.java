@@ -32,6 +32,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.UUID;
@@ -299,7 +300,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         if (outputType == null)
         {
-            throw new TransformerException(CoreMessages.objectIsNull("outputType"));
+            throw new TransformerException(CoreMessages.objectIsNull("outputType"), message);
         }
         return message.getPayload(outputType);
     }

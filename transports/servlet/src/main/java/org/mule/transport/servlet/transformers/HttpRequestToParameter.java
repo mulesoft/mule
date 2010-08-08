@@ -74,7 +74,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerException(this, e);
+                    throw new TransformerException(message, this, e);
                 }
             }
             // HTTP Form
@@ -88,7 +88,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerException(this, e);
+                    throw new TransformerException(message, this, e);
                 }
                 finally
                 {
@@ -98,7 +98,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                     }
                     catch (IOException e2)
                     {
-                        throw new TransformerException(this, e2);
+                        throw new TransformerException(message, this, e2);
                     }
                 }
                 return props.get(payloadParam);

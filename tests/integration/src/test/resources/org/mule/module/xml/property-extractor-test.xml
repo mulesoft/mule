@@ -14,31 +14,23 @@
         <mxml:namespace prefix="foo" uri="http://foo.com"/>
     </mxml:namespace-manager>
 
-    <vm:connector name="default"/>
-    
-    <vm:connector name="queue"/>
-
-    <vm:endpoint name="in" path="in" connector-ref="default" exchange-pattern="one-way"/>
-
     <model name="property extractor test">
 
         <service name="test">
             <inbound>
-                <inbound-endpoint ref="in" exchange-pattern="one-way"/>
-                <forwarding-router/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <vm:outbound-endpoint path="unreliable" connector-ref="default" exchange-pattern="request-response"/>
-                    <vm:outbound-endpoint path="error" connector-ref="queue" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint path="unreliable" exchange-pattern="request-response"/>
+                    <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
                 </exception-based-router>
             </outbound>
         </service>
 
         <service name="unreliable">
             <inbound>
-                <vm:inbound-endpoint path="unreliable" connector-ref="default" exchange-pattern="one-way"/>
-                <forwarding-router/>
+                <vm:inbound-endpoint path="unreliable" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <!-- this property is set from the test case as something like "#[bean:childBean.value]"
@@ -46,8 +38,8 @@
                  -->
                 <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
                     <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" connector-ref="queue" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" connector-ref="queue" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" exchange-pattern="one-way"/>
                 </endpoint-selector-router>
             </outbound>
         </service>

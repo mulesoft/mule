@@ -88,7 +88,7 @@ public class SedaService extends AbstractService
                 {
                     return workManager;
                 }
-            }, getThreadingProfile().isDoThreading(), lifecycleManager.getState(), exceptionListener, stats,
+            }, getThreadingProfile().isDoThreading(), lifecycleManager.getState(), stats,
             muleContext));
         builder.chain(new ServiceInternalMessageProcessor(this));
         if (asyncReplyMessageSource.getEndpoints().size() > 0)

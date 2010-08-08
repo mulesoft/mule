@@ -12,7 +12,6 @@ package org.mule.agent;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -23,6 +22,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.session.DefaultMuleSession;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,10 +10,6 @@
 
 package org.mule.service.processor;
 
-import org.mule.AbstractExceptionListener;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -24,12 +20,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.NullPayload;
-
-import java.beans.ExceptionListener;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -50,7 +42,6 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
      */
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ExceptionListener exceptionListener = service.getExceptionListener();
         MuleEvent resultEvent = null;
         try
         {
@@ -72,45 +63,20 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
                     processReplyTo(event, resultEvent, replyToHandler, replyTo);
                 }
             }
+            return resultEvent;
         }
         catch (Exception e)
         {
             event.getSession().setValid(false);
-
-            if (e instanceof MessagingException)
+            if (e instanceof MuleException)
             {
-                exceptionListener.exceptionThrown(e);
+                throw (MuleException) e;
             }
             else
             {
-                exceptionListener.exceptionThrown(new MessagingException(
-                    CoreMessages.eventProcessingFailedFor(service.getName()), event.getMessage(), e));
-            }
-            if (event.getEndpoint().getExchangePattern().hasResponse())
-            {
-                if (resultEvent == null)
-                {
-                    if (exceptionListener != null && exceptionListener instanceof AbstractExceptionListener
-                        && ((AbstractExceptionListener) exceptionListener).getReturnMessage() != null)
-                    {
-                        resultEvent = new DefaultMuleEvent(
-                            ((AbstractExceptionListener) exceptionListener).getReturnMessage(), event);
-                    }
-                    else
-                    {
-                        resultEvent = new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(),
-                            event.getMessage(), event.getMuleContext()), event);
-                    }
-                }
-                ExceptionPayload exceptionPayload = event.getMessage().getExceptionPayload();
-                if (exceptionPayload == null)
-                {
-                    exceptionPayload = new DefaultExceptionPayload(e);
-                }
-                resultEvent.getMessage().setExceptionPayload(exceptionPayload);
+                throw new MessagingException(event, e);
             }
         }
-        return resultEvent;
     }
 
     protected ReplyToHandler getReplyToHandler(MuleMessage message, ImmutableEndpoint endpoint)

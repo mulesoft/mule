@@ -29,9 +29,6 @@
 
         <mule:custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector" >
             <mule:dispatcher-threading-profile maxBufferSize="2"/>
-            <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
-            <!-- TODO -->
-            <!-- no way to specify connection strategy on a connector? -->
         </mule:custom-connector>
 
         <mule:endpoint name="AppleQueue" address="test://apple.queue" exchange-pattern="one-way"/>
@@ -184,9 +181,9 @@
                     <mule:custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
                 </mule:async-reply>
 
-                <mule:default-connector-exception-strategy>
+                <mule:default-service-exception-strategy>
                     <mule:outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
-                </mule:default-connector-exception-strategy>
+                </mule:default-service-exception-strategy>
             </mule:service>
 
             <!-- MULE-3932 Ensure interceptors can be used with shortcut component config  -->

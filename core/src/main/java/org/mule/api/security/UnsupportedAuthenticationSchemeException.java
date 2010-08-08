@@ -10,6 +10,7 @@
 
 package org.mule.api.security;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 
@@ -23,15 +24,33 @@ public class UnsupportedAuthenticationSchemeException extends SecurityException
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 3281021140543598680L;
+    private static final long serialVersionUID = 3281021140543598681L;
 
+    /**
+     * @deprecated use UnsupportedAuthenticationSchemeException(Message, MuleEvent)
+     */
+    @Deprecated
     public UnsupportedAuthenticationSchemeException(Message message, MuleMessage muleMessage)
     {
         super(message, muleMessage);
     }
 
+    public UnsupportedAuthenticationSchemeException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
+
+    /**
+     * @deprecated use UnsupportedAuthenticationSchemeException(Message, MuleEvent, Throwable)
+     */
+    @Deprecated
     public UnsupportedAuthenticationSchemeException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(message, muleMessage, cause);
+    }
+
+    public UnsupportedAuthenticationSchemeException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
     }
 }

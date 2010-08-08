@@ -10,6 +10,7 @@
 
 package org.mule.api.security;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 
@@ -23,15 +24,33 @@ public class EncryptionNotSupportedException extends SecurityException
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -1661059380853528623L;
-
+    private static final long serialVersionUID = -1661059380853528624L;
+    
+    /**
+     * @deprecated use 
+     */
+    @Deprecated
     public EncryptionNotSupportedException(Message message, MuleMessage muleMessage)
     {
         super(message, muleMessage);
     }
 
+    public EncryptionNotSupportedException(Message message, MuleEvent event)
+    {
+        super(message, event);
+    }
+
+    /**
+     * @deprecated use EncryptionNotSupportedException(Message, MuleEvent, Throwable)
+     */
+    @Deprecated
     public EncryptionNotSupportedException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(message, muleMessage, cause);
+    }
+
+    public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
     }
 }

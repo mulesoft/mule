@@ -636,17 +636,17 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
     public void onNotification(MuleContextNotification notification)
     {
-        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+        try
         {
-            // We need to register the Axis service component once the muleContext
-            // starts because when the model starts listeners on components are started, thus
-            // all listener need to be registered for this connector before the Axis service
-            // component is registered.
-            // The implication of this is that to add a new service and a
-            // different http port the model needs to be restarted before the listener is available
-            if (muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName()) == null)
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
-                try
+                // We need to register the Axis service component once the muleContext
+                // starts because when the model starts listeners on components are started, thus
+                // all listener need to be registered for this connector before the Axis service
+                // component is registered.
+                // The implication of this is that to add a new service and a
+                // different http port the model needs to be restarted before the listener is available
+                if (muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName()) == null)
                 {
                     // Descriptor might be null if no inbound endpoints have been
                     // register for the Axis connector
@@ -655,7 +655,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
                         axisComponent = getOrCreateAxisComponent();
                     }
                     muleContext.getRegistry().registerService(axisComponent);
-
+    
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address
@@ -676,11 +676,11 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
                     }
                     servletServices.clear();
                 }
-                catch (MuleException e)
-                {
-                    handleException(e);
-                }
             }
+        }
+        catch (MuleException e)
+        {
+            handleException(e);
         }
     }
 }

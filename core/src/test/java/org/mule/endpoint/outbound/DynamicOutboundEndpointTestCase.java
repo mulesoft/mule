@@ -25,6 +25,7 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
@@ -40,7 +41,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * {@link org.mule.transport.AbstractMessageDispatcher} and the chain of MessageProcessor's that
  * implement the outbound endpoint processing.
  */
-public class DynamicOutboundEndpointTestCase extends AbstractOutboundMessageProcessorTestCase
+public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
     protected FakeMessageDispatcher dispacher;
     protected MuleEvent testOutboundEvent;
@@ -139,8 +140,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractOutboundMessageProc
 
         assertMessageNotSent();
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE, result.getMessage().getPayloadAsString());
+        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
         assertNotNull(result.getMessage().getExceptionPayload());
+        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
@@ -215,18 +217,14 @@ public class DynamicOutboundEndpointTestCase extends AbstractOutboundMessageProc
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
-        //Force the creation of the real enpoint
+        // Force the creation of the real endpoint
         endpoint.process(testOutboundEvent);
         endpoint.getConnector().stop();
-        try
-        {
-            endpoint.process(testOutboundEvent);
-            fail("exception expected");
-        }
-        catch (Exception e)
-        {
-            assertEquals(LifecycleException.class, e.getClass());
-        }
+
+        MuleEvent resultEvent = endpoint.process(testOutboundEvent);
+        assertNotNull(resultEvent);
+        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof LifecycleException);
     }
 
     public void testTimeoutSetOnEvent() throws Exception

@@ -370,7 +370,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         {
             if (componentObject.get() == null)
             {
-                throw new ComponentException(MessageFactory.createStaticMessage("componentObject SoftReference is null"), RequestContext.getEventContext().getMessage(), component);
+                throw new ComponentException(MessageFactory.createStaticMessage("componentObject SoftReference is null"), RequestContext.getEvent(), component);
             }
             // Use the overriding entrypoint resolver if one is set
             if (component.getEntryPointResolverSet() != null)
@@ -384,7 +384,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new ComponentException(RequestContext.getEventContext().getMessage(), component, e);
+            throw new ComponentException(RequestContext.getEvent(), component, e);
         }
 
         return result;

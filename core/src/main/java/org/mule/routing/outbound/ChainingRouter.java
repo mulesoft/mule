@@ -47,7 +47,7 @@ public class ChainingRouter extends FilteringOutboundRouter implements MessageRo
         MuleEvent resultToReturn = null;
         if (routes == null || routes.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
         final int endpointsCount = routes.size();
@@ -124,7 +124,7 @@ public class ChainingRouter extends FilteringOutboundRouter implements MessageRo
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
+            throw new CouldNotRouteOutboundMessageException(event, endpoint, e);
         }
         return resultToReturn;
     }

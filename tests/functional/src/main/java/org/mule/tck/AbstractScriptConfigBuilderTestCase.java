@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -23,6 +22,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.exception.AbstractExceptionListener;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.MessagePropertyFilter;
@@ -31,12 +31,12 @@ import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
 
+import java.beans.ExceptionListener;
 import java.util.List;
 import java.util.Map;
 
@@ -65,10 +65,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testConnectorConfig() throws Exception
     {
-        TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
-        assertNotNull(c);
-        assertNotNull(c.getExceptionListener());
-        assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
+        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        assertNotNull(es);
+        assertTrue(es.getClass().getName(), es instanceof TestExceptionStrategy);
     }
 
     public void testGlobalEndpointConfig() throws MuleException

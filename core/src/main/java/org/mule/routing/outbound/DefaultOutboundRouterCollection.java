@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.Router;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
@@ -49,7 +50,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         MuleEvent result;
         boolean matchfound = false;
 
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+        for (Iterator<Router> iterator = getRouters().iterator(); iterator.hasNext();)
         {
             OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
 
@@ -61,9 +62,8 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             {
                 if (((DefaultMuleMessage) message).isConsumable())
                 {
-                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload()
-                        .getClass()
-                        .getName()), message);
+                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(
+                        message.getPayload().getClass().getName()), event);
                 }
                 outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             }
@@ -78,10 +78,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 // Manage outbound only transactions here
                 final OutboundRouter router = outboundRouter;
 
-                
-                TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(
-                        outboundRouter.getTransactionConfig(),
-                        event.getFlowConstruct().getExceptionListener(), muleContext);
+                TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(outboundRouter.getTransactionConfig(), muleContext);
                 
                 TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
                 {

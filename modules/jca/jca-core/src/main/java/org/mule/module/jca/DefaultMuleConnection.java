@@ -12,7 +12,6 @@ package org.mule.module.jca;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -29,6 +28,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 
 import java.util.Map;
@@ -80,9 +80,8 @@ public class DefaultMuleConnection implements MuleConnection
         }
         catch (Exception e)
         {
-            throw new DispatchException(
-                ClientMessages.failedToDispatchClientEvent(),
-                event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
+                event.getEndpoint(), e);
         }
     }
 
@@ -123,9 +122,8 @@ public class DefaultMuleConnection implements MuleConnection
         }
         catch (Exception e)
         {
-            throw new DispatchException(
-                ClientMessages.failedToDispatchClientEvent(), 
-                event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
+                event.getEndpoint(), e);
         }
     }
 

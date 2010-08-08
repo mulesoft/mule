@@ -13,12 +13,9 @@ package org.mule.endpoint;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.EndpointSecurityFilter;
-import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSecurityFilterMessageProcessor;
+import org.mule.processor.SecurityFilterMessageProcessor;
 
 /**
  * A holder for security filters.  This will create the correct inbound or outbound
@@ -65,18 +62,7 @@ public class SecurityFilterMessageProcessorBuilder implements EndpointAwareMessa
         {
             securityFilter.setEndpoint(endpoint);
         }
-        if (endpoint instanceof InboundEndpoint)
-        {
-            return new InboundSecurityFilterMessageProcessor((InboundEndpoint) endpoint, securityFilter);
-        }
-        else if (endpoint instanceof OutboundEndpoint)
-        {
-            return new OutboundSecurityFilterMessageProcessor((OutboundEndpoint) endpoint, securityFilter);
-        }
-        else
-        {
-            return null;
-        }
+        return new SecurityFilterMessageProcessor(securityFilter);
     }
 }
 

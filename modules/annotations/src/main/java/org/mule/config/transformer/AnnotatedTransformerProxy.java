@@ -202,7 +202,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
                     }
                     catch (Exception e)
                     {
-                        throw new TransformerException(this, e);
+                        throw new TransformerException(message, this, e);
                     }
 
                 }
@@ -219,7 +219,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         catch (Exception e)
         {
             e.printStackTrace();
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

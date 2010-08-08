@@ -161,7 +161,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
             }
             catch (NoSuchMethodException e)
             {
-                throw new TransformerException(CoreMessages.createStaticMessage(e.getMessage()), e);
+                throw new TransformerException(CoreMessages.createStaticMessage(e.getMessage()), context.getMessage(), e);
             }
         }
 

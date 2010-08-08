@@ -10,14 +10,14 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.DefaultExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 /**
  * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the 
- * {@link org.mule.DefaultExceptionStrategy}. This is used to test that overriding the default 
+ * {@link org.mule.exception.DefaultMessagingExceptionStrategy}. This is used to test that overriding the default 
  * Exception strategy works.
  */
-public class TestExceptionStrategy extends DefaultExceptionStrategy
+public class TestExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     private ExceptionCallback callback;
     

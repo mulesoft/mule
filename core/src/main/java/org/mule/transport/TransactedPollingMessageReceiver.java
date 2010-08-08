@@ -106,8 +106,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     @Override
     public void poll() throws Exception
     {
-        TransactionTemplate<Object> tt = new TransactionTemplate<Object>(endpoint.getTransactionConfig(),
-                connector.getExceptionListener(), connector.getMuleContext());
+        TransactionTemplate<Object> tt = new TransactionTemplate<Object>(endpoint.getTransactionConfig(), connector.getMuleContext());
 
         if (this.isReceiveMessagesInTransaction())
         {
@@ -124,7 +123,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                     {
                         for (Object message : messages)
                         {
-                            TransactedPollingMessageReceiver.this.processMessage(message);
+                            processMessage(message);
                         }
                     }
                     return null;
@@ -183,7 +182,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (Exception e)
             {
-                handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
             finally
             {
@@ -193,7 +192,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
         public Object doInTransaction() throws Exception
         {
-            TransactedPollingMessageReceiver.this.processMessage(message);
+            processMessage(message);
             return null;
         }
 

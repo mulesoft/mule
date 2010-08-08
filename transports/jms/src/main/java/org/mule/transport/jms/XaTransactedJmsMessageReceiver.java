@@ -166,7 +166,6 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         
         TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
                                                 endpoint.getTransactionConfig(),
-                                                connector.getExceptionListener(),
                                                 connector.getMuleContext());
         TransactionCallback<Void> cb = new TransactionCallback<Void>()
         {

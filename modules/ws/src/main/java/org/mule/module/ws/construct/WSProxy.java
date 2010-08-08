@@ -10,11 +10,6 @@
 
 package org.mule.module.ws.construct;
 
-import java.net.InetAddress;
-import java.net.URI;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -36,6 +31,12 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.util.StringUtils;
+
+import java.net.InetAddress;
+import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is implemented to act as a Proxy for a Web Service. It listens for
@@ -206,7 +207,7 @@ public class WSProxy extends AbstractFlowConstruct
             {
                 throw new MessagingException(
                     MessageFactory.createStaticMessage("Impossible to retrieve WSDL for proxied service"),
-                    event.getMessage(), e);
+                    event, e);
             }
         }
 

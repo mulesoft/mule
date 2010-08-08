@@ -66,7 +66,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         if (!muleContext.getExpressionManager().isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionInvalidForProperty("expression", prop), message, null);
+                    CoreMessages.expressionInvalidForProperty("expression", prop), event, null);
         }
 
         Object property = null;
@@ -82,9 +82,10 @@ public class EndpointSelector extends FilteringOutboundRouter
         if (property == null && getDefaultEndpointName() == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionResultWasNull(expressionConfig.getFullExpression(expressionManager)), message, null);
+                    CoreMessages.expressionResultWasNull(
+                        expressionConfig.getFullExpression(expressionManager)), event, null);
         }
-        else if(property==null)
+        else if (property == null)
         {
             logger.info("Expression: " + prop + " returned null, using default endpoint: " + getDefaultEndpointName());
             property = getDefaultEndpointName();
@@ -102,7 +103,8 @@ public class EndpointSelector extends FilteringOutboundRouter
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    expressionConfig.getFullExpression(expressionManager), new Class[]{String.class, List.class}, property.getClass()), message, null);
+                    expressionConfig.getFullExpression(expressionManager), 
+                    new Class[]{String.class, List.class}, property.getClass()), event, null);
         }
 
         List<MuleEvent> results = new ArrayList<MuleEvent>(endpoints.size());
@@ -114,7 +116,7 @@ public class EndpointSelector extends FilteringOutboundRouter
             if (StringUtils.isEmpty(endpointName))
             {
                 throw new CouldNotRouteOutboundMessageException(
-                        CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression(expressionManager)), message, null);
+                        CoreMessages.objectIsNull("Endpoint Name: " + expressionConfig.getFullExpression(expressionManager)), event, null);
             }
             MessageProcessor ep = null;
             try
@@ -123,7 +125,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 if (ep == null)
                 {
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.objectNotFound("Endpoint",
-                            endpointName), message, null);
+                            endpointName), event, null);
                 }
                 MuleEvent result = sendRequest(event, message, ep, true);
                 if (result != null)
@@ -133,7 +135,7 @@ public class EndpointSelector extends FilteringOutboundRouter
             }
             catch (MuleException e)
             {
-                throw new CouldNotRouteOutboundMessageException(message, ep, e);
+                throw new CouldNotRouteOutboundMessageException(event, ep, e);
             }
         }
         return resultsHandler.aggregateResults(results, event, muleContext);

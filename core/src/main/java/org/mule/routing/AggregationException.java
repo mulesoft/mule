@@ -10,11 +10,9 @@
 
 package org.mule.routing;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.Message;
-import org.mule.transport.NullPayload;
 
 /**
  * TODO document
@@ -31,28 +29,26 @@ public class AggregationException extends RoutingException
 
     public AggregationException(EventGroup eventGroup, ImmutableEndpoint endpoint)
     {
-        super(new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getConnector().getMuleContext()), endpoint);
+        super(eventGroup.getMessageCollectionEvent(), endpoint);
         this.eventGroup = eventGroup;
     }
 
     public AggregationException(EventGroup eventGroup, ImmutableEndpoint endpoint, Throwable cause)
     {
-        super(new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getConnector().getMuleContext()), endpoint, cause);
+        super(eventGroup.getMessageCollectionEvent(), endpoint, cause);
         this.eventGroup = eventGroup;
     }
 
     public AggregationException(Message message, EventGroup eventGroup, ImmutableEndpoint endpoint)
     {
-        super(message, new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getConnector().getMuleContext()), endpoint);
+        super(message, eventGroup.getMessageCollectionEvent(), endpoint);
         this.eventGroup = eventGroup;
     }
 
-    public AggregationException(Message message,
-                                EventGroup eventGroup,
-                                ImmutableEndpoint endpoint,
-                                Throwable cause)
+    public AggregationException(Message message, EventGroup eventGroup, ImmutableEndpoint endpoint,
+        Throwable cause)
     {
-        super(message, new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getConnector().getMuleContext()), endpoint, cause);
+        super(message, eventGroup.getMessageCollectionEvent(), endpoint, cause);
         this.eventGroup = eventGroup;
     }
 

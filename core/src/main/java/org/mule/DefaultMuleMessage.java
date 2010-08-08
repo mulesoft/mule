@@ -52,6 +52,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -303,7 +304,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, resultType);
         if (transformer == null)
         {
-            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType), this);
         }
         
         // Pass in the message itself
@@ -312,7 +313,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // Unless we disallow Object.class as a valid return type we need to do this extra check
         if (!resultType.getType().isAssignableFrom(result.getClass()))
         {
-            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
+            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result), this);
         }
         
         // If the payload is a stream and we've consumed it, then we should set the payload on the 
@@ -1348,7 +1349,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * @param muleContext the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
     }

@@ -16,13 +16,13 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * A {@link org.mule.api.MuleMessage} type that manages a collection of MuleMessage Objects.

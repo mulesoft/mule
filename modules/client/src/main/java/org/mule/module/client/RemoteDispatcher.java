@@ -12,7 +12,6 @@ package org.mule.module.client;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.FutureMessageResult;
@@ -36,6 +35,7 @@ import org.mule.module.client.remoting.ServerHandshake;
 import org.mule.module.client.remoting.UnsupportedWireFormatException;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
@@ -48,6 +48,7 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -418,7 +419,7 @@ public class RemoteDispatcher implements Disposable
         }
         catch (Exception e)
         {
-            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(event, event.getEndpoint(), e);
         }
 
         if (logger.isDebugEnabled())

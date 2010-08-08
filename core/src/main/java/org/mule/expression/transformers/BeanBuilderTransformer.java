@@ -93,7 +93,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
 
 
@@ -113,13 +113,13 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             }
             catch (ExpressionRuntimeException e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
 
             if (!argument.isOptional() && value == null)
             {
                 throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
+                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), message, this);
 
             }
             args.put(argument.getName(), value);
@@ -131,11 +131,11 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (IllegalAccessException e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
         catch (InvocationTargetException e)
         {
-            throw new TransformerException(this, e.getTargetException());
+            throw new TransformerException(message, this, e.getTargetException());
         }
 
         return bean;

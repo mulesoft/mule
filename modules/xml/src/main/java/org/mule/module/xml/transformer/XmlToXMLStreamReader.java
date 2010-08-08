@@ -54,7 +54,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
             if (xsr == null)
             {
                 throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."));
+                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), message);
             }
         
             if (reversible && !(xsr instanceof ReversibleXMLStreamReader))
@@ -68,7 +68,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         }
         catch (XMLStreamException e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

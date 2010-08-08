@@ -67,7 +67,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, null, muleContext);
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         tt.execute(new TransactionCallback<Void>()
         {
             public Void doInTransaction() throws Exception
@@ -116,7 +116,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, null, muleContext);
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         try
         {
             tt.execute(new TransactionCallback<Void>()
@@ -172,7 +172,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, null, muleContext);
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         tt.execute(new TransactionCallback<Void>()
         {
             public Void doInTransaction() throws Exception
@@ -200,7 +200,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
-        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, null, muleContext);
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         tt.execute(new TransactionCallback<Void>()
         {
             public Void doInTransaction() throws Exception

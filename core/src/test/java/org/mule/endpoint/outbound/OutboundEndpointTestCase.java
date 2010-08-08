@@ -26,6 +26,7 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -41,7 +42,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * {@link AbstractMessageDispatcher} and the chain of MessageProcessor's that
  * implement the outbound endpoint processing.
  */
-public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTestCase
+public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
     protected FakeMessageDispatcher dispacher;
     protected MuleEvent testOutboundEvent;
@@ -114,8 +115,9 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
 
         assertMessageNotSent();
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE, result.getMessage().getPayloadAsString());
+        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
         assertNotNull(result.getMessage().getExceptionPayload());
+        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
@@ -184,15 +186,11 @@ public class OutboundEndpointTestCase extends AbstractOutboundMessageProcessorTe
             MessageExchangePattern.REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent(endpoint);
         endpoint.getConnector().stop();
-        try
-        {
-            endpoint.process(testOutboundEvent);
-            fail("exception expected");
-        }
-        catch (Exception e)
-        {
-            assertEquals(LifecycleException.class, e.getClass());
-        }
+
+        MuleEvent responseEvent = endpoint.process(testOutboundEvent);
+        assertNotNull(responseEvent);
+        assertNotNull("Exception expected", responseEvent.getMessage().getExceptionPayload());
+        assertTrue(responseEvent.getMessage().getExceptionPayload().getException() instanceof LifecycleException);
     }
 
     public void testTimeoutSetOnEvent() throws Exception

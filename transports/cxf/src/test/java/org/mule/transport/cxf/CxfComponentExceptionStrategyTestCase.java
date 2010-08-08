@@ -10,12 +10,14 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.api.transport.DispatchException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.cxf.testmodels.CustomFault;
 import org.mule.transport.cxf.testmodels.CxfEnabledFaultMessage;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
 
 public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
@@ -24,15 +26,12 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        try
-        {
-            client.send("cxf:http://localhost:63181/services/CxfDefault?method=testCxfException", "TEST",
-                null);
-        }
-        catch (DispatchException e)
-        {
-            assertTrue(e.getCause().getCause() instanceof CxfEnabledFaultMessage);
-        }
+        MuleMessage result = client.send("cxf:http://localhost:63181/services/CxfDefault?method=testCxfException", "TEST", null);
+        assertNotNull(result);
+        assertNotNull("Exception expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
+        assertTrue(result.getExceptionPayload().getRootException().toString(), 
+                   result.getExceptionPayload().getRootException() instanceof SoapFault);
     }
 
     /**
@@ -44,39 +43,26 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        try
-        {
-            client.send(
-                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testCxfException",
-                "TEST", null);
-        }
-        catch (DispatchException ex)
-        {
-            final Throwable t = ex.getCause().getCause();
-            t.printStackTrace();
-            assertNotNull("Cause should've been filled in.", t);
-            assertTrue(t instanceof CxfEnabledFaultMessage);
-            CxfEnabledFaultMessage cxfMsg = (CxfEnabledFaultMessage) t;
-            CustomFault fault = cxfMsg.getFaultInfo();
-            assertNotNull(fault);
-            assertEquals("Custom Exception Message", fault.getDescription());
-        }
+        MuleMessage result = client.send("cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testCxfException", "TEST", null);
+        assertNotNull(result);
+        assertNotNull("Exception expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
+        assertTrue(result.getExceptionPayload().getRootException() instanceof CxfEnabledFaultMessage);
+        CxfEnabledFaultMessage cxfMsg = (CxfEnabledFaultMessage) result.getExceptionPayload().getRootException();
+        CustomFault fault = cxfMsg.getFaultInfo();
+        assertNotNull(fault);
+        assertEquals("Custom Exception Message", fault.getDescription());
     }
 
     public void testUnhandledException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
-        try
-        {
-            client.send(
-                "cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonCxfException",
-                "TEST", null);
-        }
-        catch (DispatchException e)
-        {
-            assertTrue(e.getCause().getCause() instanceof Fault);
-        }
+        MuleMessage result = client.send("cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonCxfException", "TEST", null);
+        assertNotNull(result);
+        assertNotNull("Exception expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
+        assertTrue(result.getExceptionPayload().getRootException() instanceof Fault);
     }
 
     protected String getConfigResources()

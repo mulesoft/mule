@@ -11,7 +11,6 @@
 package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.FailedToQueueEventException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -24,6 +23,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -70,11 +70,10 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                                                  WorkManagerSource workManagerSource,
                                                  boolean doThreading,
                                                  LifecycleState lifecycleState,
-                                                 ExceptionListener exceptionListener,
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(workManagerSource, doThreading, exceptionListener);
+        super(workManagerSource, doThreading);
         this.name = name;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;
@@ -115,9 +114,8 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         }
         catch (Exception e)
         {
-            FailedToQueueEventException e1 = new FailedToQueueEventException(
-                CoreMessages.interruptedQueuingEventFor(getStageDescription()), event.getMessage(), e);
-            exceptionListener.exceptionThrown(e1);
+            throw new FailedToQueueEventException(
+                CoreMessages.interruptedQueuingEventFor(getStageDescription()), event, e);
         }
 
         if (logger.isTraceEnabled())
@@ -181,6 +179,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             catch (Exception e)
             {
                 event.getSession().setValid(false);
+                ExceptionListener exceptionListener = event.getFlowConstruct().getExceptionListener();
                 if (e instanceof MessagingException)
                 {
                     exceptionListener.exceptionThrown(e);
@@ -188,7 +187,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 else
                 {
                     exceptionListener.exceptionThrown(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event.getMessage(), e));
+                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e));
                 }
             }
         }
@@ -266,6 +265,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             }
             catch (Exception e)
             {
+                ExceptionListener exceptionListener = muleContext.getExceptionListener();
                 if (e instanceof InterruptedException)
                 {
                     queueDraining.set(false);
@@ -279,7 +279,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 {
                     exceptionListener.exceptionThrown(new MessagingException(
                         CoreMessages.eventProcessingFailedFor(getStageDescription()),
-                        (event == null ? null : event.getMessage()), e));
+                        event, e));
                 }
             }
         }

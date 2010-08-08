@@ -12,9 +12,9 @@ package org.mule.transport.soap.axis.functional;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;

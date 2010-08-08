@@ -77,7 +77,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
                                         + "/services/mycomponent?method=echo", "test", props);
         
         ExceptionListener exceptionListener = 
-            muleContext.getRegistry().lookupConnector("servletConnector").getExceptionListener();
+            muleContext.getRegistry().lookupService("mycomponent").getExceptionListener();
         assertTrue(exceptionListener instanceof UnitTestExceptionStrategy);
         
         UnitTestExceptionStrategy utExStrat = (UnitTestExceptionStrategy)exceptionListener;

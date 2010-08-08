@@ -13,6 +13,7 @@ package org.mule;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -61,7 +62,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 
     }
 
-    private static class InstrumentedExceptionStrategy extends DefaultExceptionStrategy
+    private static class InstrumentedExceptionStrategy extends DefaultMessagingExceptionStrategy
     {
         private volatile int count = 0;
 

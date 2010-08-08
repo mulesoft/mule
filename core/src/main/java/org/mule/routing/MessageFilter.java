@@ -81,7 +81,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         }
         if (throwOnUnaccepted)
         {
-            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);   
+            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);   
         }
         return null;
     }

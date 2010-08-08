@@ -116,7 +116,7 @@ public class EventGeneratorJob implements Job
         }
         catch (Exception e)
         {
-            receiver.handleException(e);
+            receiver.getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 }

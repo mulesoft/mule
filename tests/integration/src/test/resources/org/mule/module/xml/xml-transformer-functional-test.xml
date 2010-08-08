@@ -10,14 +10,6 @@
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:connector name="default">
-        <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
-    </vm:connector>
-<!--// START SNIPPET: xml-transformers1 -->
-    <vm:connector name="queue">
-        <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
-    </vm:connector>
-
     <mxml:dom-to-xml-transformer name="domToXml"/>
     <mxml:xml-to-dom-transformer name="xmlToDom" returnClass="org.w3c.dom.Document"/>
 
@@ -58,33 +50,35 @@
     </mxml:xslt-transformer>
 <!--// START SNIPPET: xml-transformers2 -->
 
-    <endpoint name="xml-in" address="vm://xml-in" connector-ref="default" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-in" path="object-in" connector-ref="default" exchange-pattern="one-way"/>
-    <endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default" exchange-pattern="one-way"/>
-    <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" exchange-pattern="one-way">
+    <endpoint name="xml-in" address="vm://xml-in" exchange-pattern="one-way"/>
+    <vm:endpoint name="object-in" path="object-in" exchange-pattern="one-way"/>
+    <endpoint name="object-in-2" address="vm://object-in-2" exchange-pattern="one-way"/>
+    <vm:endpoint name="dom-in" address="vm://dom-in" exchange-pattern="one-way">
     	<transformer ref="xmlToDom"/>
     </vm:endpoint>
 
-    <endpoint name="xml-out" address="vm://xml-out" connector-ref="queue" 
+    <endpoint name="xml-out" address="vm://xml-out" 
         exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out" connector-ref="queue"
+    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out"
         exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string" connector-ref="queue"
+    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string"
         exchange-pattern="one-way"/>
-    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"
+    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out"
         exchange-pattern="one-way"/>
-    <endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"
+    <endpoint name="xml-dom-out" address="vm://xml-dom-out"
         exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"
+    <vm:endpoint name="xml-object-out" address="vm://xml-object-out"
         exchange-pattern="one-way"/>
-    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"
+    <endpoint name="object-out" address="vm://object-out"
         exchange-pattern="one-way"/>
-    <vm:endpoint name="object-xml-out" path="object-xml-out" connector-ref="queue"
+    <vm:endpoint name="object-xml-out" path="object-xml-out"
         exchange-pattern="one-way"/>
-    <endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"
+    <endpoint name="dom-xml-out" address="vm://dom-xml-out"
         exchange-pattern="one-way"/>
 
     <model name="xml transformer tests">
+        <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
+
         <service name="xml to ...">
             <inbound>
                 <inbound-endpoint ref="xml-in"/>
@@ -92,7 +86,7 @@
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <outbound-endpoint ref="xml-out" address="vm://xml-out" connector-ref="queue"/>
+                    <outbound-endpoint ref="xml-out" address="vm://xml-out"/>
                     <vm:outbound-endpoint ref="xml-xslt-out">
                     	<transformer ref="xslt"/>
                     </vm:outbound-endpoint>

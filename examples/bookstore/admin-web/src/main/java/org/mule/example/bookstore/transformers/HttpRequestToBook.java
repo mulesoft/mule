@@ -41,15 +41,15 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
 
         if (StringUtils.isBlank(author))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingAuthor());
+            throw new TransformerException(BookstoreAdminMessages.missingAuthor(), message);
         }
         if (StringUtils.isBlank(title))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingTitle());
+            throw new TransformerException(BookstoreAdminMessages.missingTitle(), message);
         }
         if (StringUtils.isBlank(price))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingPrice());
+            throw new TransformerException(BookstoreAdminMessages.missingPrice(), message);
         }
 
         return new Book(author, title, Double.parseDouble(price));

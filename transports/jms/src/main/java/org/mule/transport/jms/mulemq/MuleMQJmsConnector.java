@@ -136,20 +136,12 @@ public class MuleMQJmsConnector extends JmsConnector
     }
 
     @Override
-    protected ConnectionFactory getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory() throws Exception
     {
-        try
-        {
-            ConnectionFactory connectionFactory = (ConnectionFactory) ClassUtils.instanciateClass(
-                getMuleMQFactoryClass(), getRealmURL());
-            applyVendorSpecificConnectionFactoryProperties(connectionFactory);
-            return connectionFactory;
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-        }
-        return null;
+        ConnectionFactory connectionFactory = (ConnectionFactory) ClassUtils.instanciateClass(
+            getMuleMQFactoryClass(), getRealmURL());
+        applyVendorSpecificConnectionFactoryProperties(connectionFactory);
+        return connectionFactory;
     }
 
     private void applyVendorSpecificConnectionFactoryProperties(ConnectionFactory connectionFactory)

@@ -146,7 +146,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            handleException(e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 

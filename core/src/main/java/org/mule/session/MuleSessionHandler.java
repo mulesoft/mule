@@ -8,9 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.session;
 
-import org.mule.session.SerializeAndEncodeSessionHandler;
 
 /**
  * @deprecated Use an explicit SessionHandler such as SerializeAndEncodeSessionHandler or SerializeOnlySessionHandler

@@ -309,8 +309,15 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
                 // do nothing
             }
         });
-        MuleMessage result = testService.sendEvent(testEvent);
-        assertTrue(result.getExceptionPayload() != null);
+        try
+        {
+            testService.sendEvent(testEvent);
+            fail("Exception was expected");
+        }
+        catch (MessagingException e)
+        {
+            // expected 
+        }
     }
 
     private static class TestRequiresNewMessageOutboundRouter extends OutboundPassThroughRouter

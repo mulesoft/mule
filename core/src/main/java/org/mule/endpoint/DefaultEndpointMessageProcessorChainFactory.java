@@ -22,18 +22,16 @@ import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.inbound.InboundExceptionDetailsMessageProcessor;
 import org.mule.endpoint.inbound.InboundLoggingMessageProcessor;
 import org.mule.endpoint.inbound.InboundNotificationMessageProcessor;
-import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEndpointPropertyMessageProcessor;
 import org.mule.endpoint.outbound.OutboundEventTimeoutMessageProcessor;
 import org.mule.endpoint.outbound.OutboundLoggingMessageProcessor;
 import org.mule.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSecurityFilterMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
-import org.mule.endpoint.outbound.OutboundSimpleTryCatchMessageProcessor;
-import org.mule.endpoint.outbound.OutboundTryCatchMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
+import org.mule.processor.ExceptionHandlingMessageProcessor;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.ExceptionThrowingMessageFilter;
@@ -50,6 +48,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     {
         return Arrays.asList(new MessageProcessor[] 
         { 
+            new ExceptionHandlingMessageProcessor(),
             new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint),
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
@@ -78,23 +77,19 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
+        list.add(new ExceptionHandlingMessageProcessor());
+        
         // Log but don't proceed if connector is not started
         list.add(new OutboundLoggingMessageProcessor());
         list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleState()));
 
         // Everything is processed within TransactionTemplate
-        list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig(),
-            connector.getExceptionListener()));
+        list.add(new TransactionalInterceptingMessageProcessor(endpoint.getTransactionConfig()));
 
         list.add(new OutboundEventTimeoutMessageProcessor());
 
-        // Exception handling to preserve previous MuleSession level exception
-        // handling behaviour
-        list.add(new OutboundSimpleTryCatchMessageProcessor());
-
         list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
         list.add(new OutboundEndpointPropertyMessageProcessor());
-        list.add(new OutboundTryCatchMessageProcessor(endpoint));
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
         list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
         return list;

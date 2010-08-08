@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class HttpJmsBridgeTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/sync/http-jms-bridge.xml";
@@ -30,7 +30,7 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         String payload = "payload";
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, Object> headers = new HashMap<String, Object>();
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 

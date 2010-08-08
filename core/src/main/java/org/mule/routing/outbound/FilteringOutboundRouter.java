@@ -61,6 +61,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         expressionManager = muleContext.getExpressionManager();
     }
 
+    @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleEvent result;
@@ -69,8 +70,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
         if (routes == null || routes.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), 
-                message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
         MessageProcessor ep = getRoute(0, message);
@@ -85,7 +85,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, ep, e);
+            throw new CouldNotRouteOutboundMessageException(event, ep, e);
         }
         return result;
     }

@@ -16,10 +16,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.EndpointMessageNotification;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class OutboundNotificationMessageProcessorTestCase extends AbstractOutboundMessageProcessorTestCase
+public class OutboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     public void testDispatch() throws Exception

@@ -12,7 +12,6 @@ package org.mule.module.client.remoting;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
@@ -42,6 +41,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
 import org.mule.object.PrototypeObjectFactory;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;

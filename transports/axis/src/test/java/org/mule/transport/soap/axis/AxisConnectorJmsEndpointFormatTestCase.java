@@ -41,38 +41,24 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     public void testAxisOverJmsWithoutSettingMethodOnEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Exception exception = null;
-        try
-        {
-            client.send("noMethodDefined", new DefaultMuleMessage("test3", muleContext));
-        }
-        catch (Exception e)
-        {
-            exception = e;
-        }
-        assertNotNull(exception);
-        assertTrue(exception instanceof DispatchException);
-        assertTrue(exception.getMessage().startsWith("Cannot invoke WS call without an Operation."));
+
+        MuleMessage result = client.send("noMethodDefined", new DefaultMuleMessage("test3", muleContext));
+        assertNotNull(result);
+        assertNotNull("Exception expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
+        assertTrue(result.getExceptionPayload().getException().getMessage().startsWith("Cannot invoke WS call without an Operation."));
     }
     
     public void testAxisOverJmsWithoutSettingSoapAction() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Exception exception = null;
-        try
-        {
-            MuleMessage msg = client.send("noSoapActionDefined", new DefaultMuleMessage("test4", muleContext));
-            assertEquals(NullPayload.getInstance(), msg.getPayload());
-        }
-        catch (Exception e)
-        {
-            exception = e;
-        }
-        assertNotNull(exception);
-        assertTrue(exception instanceof DispatchException);
-        Throwable rootCause = exception.getCause();
-        assertTrue(rootCause instanceof AxisFault);
-        assertTrue(rootCause.getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
+
+        MuleMessage result = client.send("noSoapActionDefined", new DefaultMuleMessage("test4", muleContext));
+        assertNotNull(result);
+        assertNotNull("Exception expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
+        assertTrue(result.getExceptionPayload().getRootException() instanceof AxisFault);
+        assertTrue(result.getExceptionPayload().getRootException().getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
     }
     
     protected String getConfigResources()

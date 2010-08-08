@@ -32,16 +32,12 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
         if (!canSendWithoutReceiver)
         {
-            try
-            {
-                client.send(endpoint, "Test Client Send message", null);
-                fail("There is no receiver for this endpointUri");
-            }
-            catch (Exception e)
-            {
-                assertTrue(e instanceof DispatchException);
-                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
-            }
+            MuleMessage result = client.send(endpoint, "Test Client Send message", null);
+            assertNotNull(result);
+            assertNotNull("There is no receiver for this endpointUri", result.getExceptionPayload());
+            Throwable e = result.getExceptionPayload().getException();
+            assertTrue(e instanceof DispatchException);
+            assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
         }
         
         Service c = muleContext.getRegistry().lookupService(component);
@@ -57,16 +53,12 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
         if (!canSendWithoutReceiver)
         {
-            try
-            {
-                message = client.send(endpoint, "Test Client Send message", null);
-                fail("There is no receiver for this endpointUri");
-            }
-            catch (Exception e)
-            {
-                assertTrue(e instanceof DispatchException);
-                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
-            }
+            MuleMessage result = client.send(endpoint, "Test Client Send message", null);
+            assertNotNull(result);
+            assertNotNull("There is no receiver for this endpointUri", result.getExceptionPayload());
+            Throwable e = result.getExceptionPayload().getException();
+            assertTrue(e instanceof DispatchException);
+            assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
         }
     }
 

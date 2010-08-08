@@ -45,7 +45,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         if (endpointUri == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event.getMessage(),
+            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event,
                 event.getEndpoint());
         }
         QueueSession session = connector.getQueueSession();
@@ -53,9 +53,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (!queue.offer(event, connector.getQueueTimeout()))
         {
             // queue is full
-            throw new DispatchException(
-                    VMMessages.queueIsFull(queue.getName(), queue.size()),
-                    event.getMessage(), event.getEndpoint());
+            throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),
+                    event, event.getEndpoint());
         }
         if (logger.isDebugEnabled())
         {
@@ -81,7 +80,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
         TransactionTemplate<MuleMessage> tt = new TransactionTemplate<MuleMessage>(
                                                             receiver.getEndpoint().getTransactionConfig(),
-                                                            connector.getExceptionListener(),
                                                             event.getMuleContext());
 
         TransactionCallback<MuleMessage> cb = new TransactionCallback<MuleMessage>()

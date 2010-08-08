@@ -10,7 +10,6 @@
 
 package org.mule.config.i18n;
 
-import org.mule.AbstractExceptionListener;
 import org.mule.MessageExchangePattern;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
@@ -28,6 +27,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.context.notification.ListenerSubscriptionPair;
+import org.mule.exception.AbstractExceptionListener;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;

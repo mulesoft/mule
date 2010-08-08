@@ -136,7 +136,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         {
             throw new TransformerException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
-                            MuleProperties.MULE_ENDPOINT_PROPERTY), this);
+                            MuleProperties.MULE_ENDPOINT_PROPERTY), msg, this);
         }
 
         String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
@@ -252,7 +252,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
             else
             {
-                throw new TransformerException(HttpMessages.unsupportedMethod(method));
+                throw new TransformerException(HttpMessages.unsupportedMethod(method), msg);
             }
 
             // Allow the user to set HttpMethodParams as an object on the message
@@ -281,7 +281,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(msg, this, e);
         }
     }
 
@@ -310,7 +310,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 }
                 catch (Exception e)
                 {
-                    throw new TransformerException(this, e);
+                    throw new TransformerException(msg, this, e);
                 }
             }
             

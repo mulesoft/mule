@@ -289,7 +289,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (Exception e)
             {
-                connector.handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
             finally
             {

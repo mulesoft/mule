@@ -88,7 +88,6 @@ muleContext.transactionManager = new TestTransactionManagerFactory().create()
 //register connector
 TestConnector c = new TestConnector(muleContext);
 c.name = "dummyConnector"
-c.exceptionListener = new TestExceptionStrategy()
 muleContext.registry.registerConnector(c);
 
 //Register transformers

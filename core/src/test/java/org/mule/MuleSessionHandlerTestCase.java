@@ -20,6 +20,7 @@ import org.mule.api.transport.SessionHandler;
 import org.mule.security.DefaultMuleAuthentication;
 import org.mule.security.DefaultSecurityContextFactory;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.tck.AbstractMuleTestCase;

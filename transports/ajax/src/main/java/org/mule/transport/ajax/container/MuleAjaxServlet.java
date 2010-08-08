@@ -88,11 +88,11 @@ public class MuleAjaxServlet extends ContinuationCometdServlet
                 throw new ServletException(AjaxMessages.noAjaxConnectorWithName(servletConnectorName, MuleServletContextListener.CONNECTOR_NAME).toString());
             }
         }
-        ((BayeuxAware)connector).setBayeux(getBayeux());
 
-        jsonTransformer = new ObjectToJson();
         try
         {
+            ((BayeuxAware)connector).setBayeux(getBayeux());
+            jsonTransformer = new ObjectToJson();
             connector.getMuleContext().getRegistry().applyProcessorsAndLifecycle(jsonTransformer);
         }
         catch (MuleException e)

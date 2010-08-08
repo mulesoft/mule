@@ -72,6 +72,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
         client.dispatch(DESTINATION, "test", null);
 
+        Thread.sleep(2000);
         mrexFired.await(timeout, TimeUnit.MILLISECONDS);
         assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
         assertEquals("Wrong number of delivery attempts", 4, callback.getCallbackCount());

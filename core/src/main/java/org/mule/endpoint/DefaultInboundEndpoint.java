@@ -32,6 +32,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 
+import java.beans.ExceptionListener;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     private static final long serialVersionUID = -4752772777414636142L;
     private MessageProcessor listener;
     private FlowConstruct flowConstruct;
+    private ExceptionListener exceptionListener;
 
     public DefaultInboundEndpoint(Connector connector,
                                   EndpointURI endpointUri,
@@ -139,5 +141,15 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    public ExceptionListener getExceptionListener()
+    {
+        return exceptionListener;
+    }
+
+    public void setExceptionListener(ExceptionListener exceptionListener)
+    {
+        this.exceptionListener = exceptionListener;
     }
 }

@@ -80,7 +80,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
 
         return paramMap;

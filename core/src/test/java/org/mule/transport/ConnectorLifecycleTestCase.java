@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -358,15 +359,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         // attempts to send/dispatch/request are made on a stopped/stopping connector
         // This should fail because the connector is not started!
-        try
-        {
-            out.process(getTestEvent("data"));
-            fail("cannot sent on a connector that is not started");
-        }
-        catch (LifecycleException e)
-        {
-            //Expected
-        }
+        MuleEvent resultEvent = out.process(getTestEvent("data"));
+        assertNotNull(resultEvent);
+        assertNotNull("cannot send on a connector that is not started", resultEvent.getMessage().getExceptionPayload());
+        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof LifecycleException);
 
         assertEquals(0, connector.dispatchers.getNumIdle());
 

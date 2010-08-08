@@ -28,6 +28,7 @@ public class TransformerRouter extends AbstractOutboundRouter
 {
     private Transformer transformer;
 
+    @Override
     public MuleEvent route(MuleEvent event) throws MessagingException
     {
         MuleMessage message = event.getMessage();
@@ -42,7 +43,7 @@ public class TransformerRouter extends AbstractOutboundRouter
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
+                throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), event, 
                     routes.get(0), e);
             }
         }

@@ -152,7 +152,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

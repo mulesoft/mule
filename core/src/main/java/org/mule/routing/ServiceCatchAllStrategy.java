@@ -22,6 +22,7 @@ import org.mule.api.service.Service;
  * events to the service as is.
  * @deprecated
  */
+@Deprecated
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
     @Override
@@ -59,7 +60,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
         }
         catch (MuleException e)
         {
-            throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+            throw new RoutingException(event, event.getEndpoint(), e);
         }
     }
 }

@@ -76,7 +76,6 @@ public class RestServiceWrapper extends AbstractComponent
         this.serviceUrl = serviceUrl;
     }
 
-
     public Map getRequiredParams()
     {
         return requiredParams;
@@ -214,8 +213,8 @@ public class RestServiceWrapper extends AbstractComponent
             new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint);
         if (isErrorPayload(result))
         {
-            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result),
-                    result);
+            handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), 
+                event), result);
         }
 
         return result;

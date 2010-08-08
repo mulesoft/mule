@@ -10,7 +10,9 @@
 
 package org.mule.endpoint.outbound;
 
-public class OutboundTransformerMessageProcessorTestCase extends AbstractOutboundMessageProcessorTestCase
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
+
+public class OutboundTransformerMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
     public void testProcess()
     {

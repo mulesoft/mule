@@ -36,13 +36,14 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * <code>DefaultMuleEventContext</code> is the context object for the current
@@ -255,14 +256,15 @@ public class DefaultMuleEventContext implements MuleEventContext
         }
         else if (session.getFlowConstruct() instanceof Service)
         {
-            return ((Service) session.getFlowConstruct()).sendEvent(new DefaultMuleEvent(message,
-                event.getEndpoint(), session));
+            Service service = (Service) session.getFlowConstruct();
+            DefaultMuleEvent eventToSend = new DefaultMuleEvent(message, event.getEndpoint(), session);
+            return service.sendEvent(eventToSend);
         }
         else
         {
             throw new MessagingException(
                 CoreMessages.createStaticMessage("Current event has 'inbound' endpoint and FlowConstuct is not a 'Service', MuleEventContext cannot  this message"),
-                message);
+                event);
         }
     }
 

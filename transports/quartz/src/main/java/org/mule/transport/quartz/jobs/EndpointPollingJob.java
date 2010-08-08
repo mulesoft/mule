@@ -108,14 +108,12 @@ public class EndpointPollingJob implements Job
                 // referencing a global endpoint, fetch configuration from it
                 endpoint = epBuilder.buildInboundEndpoint();
                 tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(),
-                                                   endpoint.getConnector().getExceptionListener(),
                                                    muleContext);
             }
             else
             {
                 // a simple inline endpoint
                 tt = new TransactionTemplate<Void>(new MuleTransactionConfig(),
-                                                   connector.getExceptionListener(),
                                                    muleContext);
             }
 

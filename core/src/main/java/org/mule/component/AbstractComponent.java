@@ -140,7 +140,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         }
         catch (Exception e)
         {
-            throw new ComponentException(CoreMessages.failedToInvoke(this.toString()), event.getMessage(),
+            throw new ComponentException(CoreMessages.failedToInvoke(this.toString()), event,
                 this, e);
         }
     }

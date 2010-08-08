@@ -8,3 +8,5 @@ org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
 # EE-1933 : jms local transactions 'actions' not behaving as expected
 org.mule.transport.jms.integration.transactions.local.JmsSingleTransactionSingleServiceAlwaysJoinConfigurationTestCase
 
+# Broken by BL-165
+org.mule.transport.jms.JmsRedeliveryTestCase

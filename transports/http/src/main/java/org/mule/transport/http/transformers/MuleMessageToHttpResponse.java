@@ -158,7 +158,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(msg, this, e);
         }
 
     }

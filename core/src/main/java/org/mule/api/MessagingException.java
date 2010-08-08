@@ -32,19 +32,70 @@ public class MessagingException extends MuleException
      * The MuleMessage being processed when the error occurred
      */
     protected final transient MuleMessage muleMessage;
+    
+    /**
+     * The MuleEvent being processed when the error occurred
+     */
+    protected final transient MuleEvent event;
 
+    /**
+     * @deprecated use MessagingException(Message, MuleEvent)
+     */
+    @Deprecated
     public MessagingException(Message message, MuleMessage muleMessage)
     {
         super();
         this.muleMessage = muleMessage;
+        this.event = null;
         setMessage(generateMessage(message));
     }
 
+    public MessagingException(Message message, MuleEvent event)
+    {
+        super();
+        this.event = event;
+        this.muleMessage = (event != null ? event.getMessage() : null);
+        setMessage(generateMessage(message));
+    }
+
+    /**
+     * @deprecated use MessagingException(Message, MuleEvent, Throwable)
+     */
+    @Deprecated
     public MessagingException(Message message, MuleMessage muleMessage, Throwable cause)
     {
         super(cause);
         this.muleMessage = muleMessage;
+        this.event = null;
         setMessage(generateMessage(message));
+    }
+
+    public MessagingException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(cause);
+        this.event = event;
+        this.muleMessage = (event != null ? event.getMessage() : null);
+        setMessage(generateMessage(message));
+    }
+
+    /**
+     * @deprecated use MessagingException(MuleEvent, Throwable)
+     */
+    @Deprecated
+    public MessagingException(MuleMessage muleMessage, Throwable cause)
+    {
+        super(cause);
+        this.muleMessage = muleMessage;
+        this.event = null;
+        setMessage(generateMessage(getI18nMessage()));
+    }
+
+    public MessagingException(MuleEvent event, Throwable cause)
+    {
+        super(cause);
+        this.event = event;
+        this.muleMessage = (event != null ? event.getMessage() : null);
+        setMessage(generateMessage(getI18nMessage()));
     }
 
     private String generateMessage(Message message)
@@ -78,7 +129,15 @@ public class MessagingException extends MuleException
 
     public MuleMessage getMuleMessage()
     {
+        if ((event != null) && (muleMessage == null))
+        {
+            return event.getMessage();
+        }
         return muleMessage;
     }
 
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
 }

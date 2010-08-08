@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.service.ServiceException;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.service.AbstractService;
@@ -63,14 +62,14 @@ public class JcaService extends AbstractService
         // therefore cannot be paused by mule
     }
 
-    protected void doPause() throws MuleException
+    protected void doPause() 
     {
-        throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
+        throw new UnsupportedOperationException(JcaMessages.cannotPauseResumeJcaComponent().getMessage());
     }
 
-    protected void doResume() throws MuleException
+    protected void doResume() 
     {
-        throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
+        throw new UnsupportedOperationException(JcaMessages.cannotPauseResumeJcaComponent().getMessage());
     }
 
     @Override

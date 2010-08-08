@@ -192,8 +192,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
      * @throws TransformerException 
      * @deprecated Replaced by convertToText(Object obj, String ouputEncoding)
      */
-    protected String convertToText(Object obj)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
+    protected String convertToText(Object obj) throws Exception
     {
         return convertToText(obj, null);
     }
@@ -214,8 +213,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
      *          On error
      * @throws TransformerException 
      */
-    protected String convertToText(Object obj, String outputEncoding)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
+    protected String convertToText(Object obj, String outputEncoding) throws Exception
     {
         // Catch the direct translations
         if (obj instanceof String)
@@ -227,23 +225,10 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
             return ((Document) obj).asXML();
         }
         // No easy fix, so use the transformer.
-        Source src;
-        try
+        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        if (src == null)
         {
-            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
-            if (src == null)
-            {
-                return null;
-            }
-        }
-        catch (Exception e)
-        {
-            if (e instanceof TransformerException)
-            {
-                throw (TransformerException) e;
-            }
-            
-            throw new TransformerException(this, e);
+            return null;
         }
 
         StringWriter writer = new StringWriter();
@@ -272,27 +257,13 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
      *          On error
      * @throws TransformerException 
      */
-    protected String convertToBytes(Object obj, String outputEncoding)
-            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException, TransformerException
+    protected String convertToBytes(Object obj, String outputEncoding) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src;
-        try
+        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        if (src == null)
         {
-            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
-            if (src == null)
-            {
-                return null;
-            }
-        }
-        catch (Exception e)
-        {
-            if (e instanceof TransformerException)
-            {
-                throw (TransformerException) e;
-            }
-            
-            throw new TransformerException(this, e);
+            return null;
         }
 
         StringWriter writer = new StringWriter();
@@ -304,28 +275,13 @@ public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransfo
         return writer.getBuffer().toString();
     }
     
-    protected void writeToStream(Object obj, String outputEncoding, OutputStream output)
-        throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException,
-        TransformerException
+    protected void writeToStream(Object obj, String outputEncoding, OutputStream output) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
-        Source src;
-        try
+        Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
+        if (src == null)
         {
-            src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
-            if (src == null)
-            {
-                return;
-            }
-        }
-        catch (Exception e)
-        {
-            if (e instanceof TransformerException)
-            {
-                throw (TransformerException) e;
-            }
-            
-            throw new TransformerException(this, e);
+            return;
         }
 
         StreamResult result = new StreamResult(output);

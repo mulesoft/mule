@@ -11,7 +11,7 @@
 package org.mule.api.security;
 
 import org.mule.api.EncryptionStrategy;
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
@@ -23,7 +23,7 @@ import org.mule.config.i18n.Message;
  * that exposes *only* information that maybe useful for debugging not passwords,
  * secret keys, etc.
  */
-public class CryptoFailureException extends DefaultMuleException
+public class CryptoFailureException extends MuleException
 {
     /**
      * Serial version

@@ -59,7 +59,7 @@ public class XmlToObject extends AbstractXStreamTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
         }
         else if (src instanceof InputStream)
@@ -72,7 +72,7 @@ public class XmlToObject extends AbstractXStreamTransformer
             }
             catch (Exception e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
             finally
             {
@@ -102,7 +102,7 @@ public class XmlToObject extends AbstractXStreamTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

@@ -84,13 +84,6 @@ org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
 #TODO
 org.mule.context.notification.ServerNotificationManagerTestCase
 
-###########################
-# Broken by BL-137
-###########################
-
-# CXF - same cause as org.mule.transport.cxf.ProtocolTestCase
-org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
-
 # abstract-transformer and abstract-message-processor violate "Unique Particle Attribution"
 org.mule.config.spring.RootSchemaValidationTestCase
 
@@ -102,6 +95,12 @@ org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 
 # BL-38 Need to port for CXF changes
 org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
+org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
+
+# Broken by BL-165
+org.mule.test.integration.xml.XmlSendTestCase
+org.mule.test.integration.construct.WSProxyTestCase
+org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase
 
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase

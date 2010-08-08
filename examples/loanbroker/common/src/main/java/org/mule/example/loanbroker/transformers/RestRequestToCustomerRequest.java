@@ -44,7 +44,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageAwareTransforme
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
 
         Customer c = new Customer(name, ssn);

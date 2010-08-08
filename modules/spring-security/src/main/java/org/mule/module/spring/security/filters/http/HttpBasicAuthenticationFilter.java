@@ -58,6 +58,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         this.realm = realm;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (realm == null)
@@ -100,6 +101,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * @param event the current message recieved
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
+    @Override
     public void authenticateInbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
@@ -161,15 +163,14 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         else if (header == null)
         {
             setUnauthenticated(event);
-            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+            throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
                 getEndpoint(), this);
         }
         else
         {
             setUnauthenticated(event);
             throw new UnsupportedAuthenticationSchemeException(
-                SpringSecurityMessages.basicFilterCannotHandleHeader(header),
-                event.getMessage());
+                SpringSecurityMessages.basicFilterCannotHandleHeader(header), event);
         }
     }
 
@@ -192,6 +193,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * @param event the current event being dispatched
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
+    @Override
     public void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException
     {
@@ -199,7 +201,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
                     event.getEndpoint(), this);
             }
             else

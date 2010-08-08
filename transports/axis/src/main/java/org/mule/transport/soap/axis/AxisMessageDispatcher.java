@@ -72,6 +72,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (service == null)
@@ -80,6 +81,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         if (service != null)
@@ -88,6 +90,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method
@@ -120,6 +123,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return new Service(config);
     }
 
+    @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
         Object[] args = getArgs(event);
@@ -134,6 +138,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.invoke(args);
     }
 
+    @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         Call call;
@@ -380,9 +385,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
         if (method == null)
         {
-            throw new DispatchException(
-                    SoapMessages.cannotInvokeCallWithoutOperation(), event.getMessage(),
-                    event.getEndpoint());
+            throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(), 
+                event, event.getEndpoint());
         }
         else if (method instanceof SoapMethod)
         {
@@ -392,7 +396,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
                 {
                     callParameters = new HashMap();
                 }
-                callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
+                callParameters.put(((SoapMethod) method).getName().getLocalPart(), method);
             }
         }
         return method;

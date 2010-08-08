@@ -12,7 +12,6 @@ package org.mule.module.spring.events;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -47,6 +46,7 @@ import org.mule.module.spring.i18n.SpringMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.service.ServiceCompositeMessageSource;
+import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;

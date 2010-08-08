@@ -18,4 +18,5 @@ import org.mule.api.transport.MessageRequesting;
 
 public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting, MessageSource, FlowConstructAware, Startable, Stoppable
 {
+    // empty
 }

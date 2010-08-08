@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 /**
  * Unit test for configuring message processors on an inbound endpoint.
  */
-public class InboundEndpointMessageProcessorsTestCase extends AbstractInboundMessageProcessorTestCase
+public class InboundEndpointMessageProcessorsTestCase extends AbstractMessageProcessorTestCase
 {
     private static final String TEST_MESSAGE = "test";
 

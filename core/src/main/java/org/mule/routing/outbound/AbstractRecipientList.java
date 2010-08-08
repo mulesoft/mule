@@ -20,6 +20,7 @@ import org.mule.api.processor.MessageRouter;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             }
             catch (MuleException e)
             {
-                throw new CouldNotRouteOutboundMessageException(request, endpoint, e);
+                throw new CouldNotRouteOutboundMessageException(event, endpoint, e);
             }
         }
 
@@ -125,7 +126,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             }
             if (null == endpoint)
             {
-                throw new RegistrationException("Failed to create endpoint for: " + recipient);
+                throw new RegistrationException(MessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
             }
 
             OutboundEndpoint existingEndpoint = (OutboundEndpoint) recipientCache.putIfAbsent(recipient, endpoint);

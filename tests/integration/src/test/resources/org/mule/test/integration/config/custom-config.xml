@@ -9,10 +9,6 @@
     <!-- Test custom conntector parsing -->
     <custom-connector name="customConnector" class="org.mule.tck.testmodels.mule.TestConnector">
         <spring:property name="someProperty" value="foo"/>
-
-        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <spring:property name="testProperty" value="bar"/>
-        </custom-exception-strategy>
     </custom-connector>
 
     <custom-transformer name="testTransformer" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
@@ -27,4 +23,10 @@
            <spring:property name="bar" value="12"/>
         </custom-filter>
     </endpoint>
+    
+    <model name="main">
+        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="bar"/>
+        </custom-exception-strategy>
+    </model>
 </mule>

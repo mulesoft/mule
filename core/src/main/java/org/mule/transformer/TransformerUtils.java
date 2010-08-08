@@ -48,26 +48,26 @@ public class TransformerUtils
         }
     }
 
-    public static String toString(List transformers)
+    public static String toString(List<Transformer> transformers)
     {
         StringBuffer buffer = new StringBuffer();
-            Iterator transformer = transformers.iterator();
-            while (transformer.hasNext())
+        Iterator<Transformer> transformer = transformers.iterator();
+        while (transformer.hasNext())
+        {
+            buffer.append(transformer.next().toString());
+            if (transformer.hasNext())
             {
-                buffer.append(transformer.next().toString());
-                if (transformer.hasNext())
-                {
-                    buffer.append(" -> ");
-                }
+                buffer.append(" -> ");
             }
+        }
         return buffer.toString();
     }
 
-    public static Transformer firstOrNull(List transformers)
+    public static Transformer firstOrNull(List<Transformer> transformers)
     {
         if (transformers != null && 0 != transformers.size())
         {
-            return (Transformer) transformers.get(0);
+            return transformers.get(0);
         }
         else
         {

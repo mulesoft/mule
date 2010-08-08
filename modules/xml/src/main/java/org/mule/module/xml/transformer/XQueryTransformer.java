@@ -44,7 +44,6 @@ import net.sf.saxon.xqj.SaxonXQDataSource;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.dom4j.DocumentException;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
@@ -186,7 +185,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                         }
                         catch (XQException e)
                         {
-                            throw new TransformerException(XmlMessages.streamNotAvailble(getName()));
+                            throw new TransformerException(XmlMessages.streamNotAvailble(getName()), message);
                         }
                     }
                     else
@@ -198,7 +197,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                         }
                         catch (XQException e)
                         {
-                            throw new TransformerException(XmlMessages.objectNotAvailble(getName()));
+                            throw new TransformerException(XmlMessages.objectNotAvailble(getName()), message);
 
                         }
                     }
@@ -244,7 +243,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 
@@ -309,7 +308,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
      * @throws org.mule.umo.transformer.TransformerException
      *
      */
-    protected void bindDocument(Object src, XQPreparedExpression transformer) throws XQException, TransformerException
+    protected void bindDocument(Object src, XQPreparedExpression transformer) throws Exception
     {
         if (src instanceof byte[])
         {
@@ -338,16 +337,9 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
         else if (src instanceof org.dom4j.Document)
         {
-            try
-            {
-                DOMWriter domWriter = new DOMWriter();
-                Document dom = domWriter.write((org.dom4j.Document) src);
-                transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), dom, null);
-            }
-            catch (DocumentException e)
-            {
-                throw new TransformerException(this, e);
-            }
+            DOMWriter domWriter = new DOMWriter();
+            Document dom = domWriter.write((org.dom4j.Document) src);
+            transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), dom, null);
 
         }
         else if (src instanceof DocumentSource)
@@ -357,7 +349,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
         else
         {
-            throw new TransformerException(CoreMessages.transformUnexpectedType(src.getClass(), null), this);
+            throw new IllegalArgumentException(CoreMessages.transformUnexpectedType(src.getClass(), null).getMessage());
         }
     }
 

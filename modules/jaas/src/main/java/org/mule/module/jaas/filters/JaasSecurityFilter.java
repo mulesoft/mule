@@ -36,6 +36,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
+    @Override
     protected final void authenticateInbound(MuleEvent event)
         throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException,
         UnknownAuthenticationTypeException
@@ -43,7 +44,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         String userHeader = (String) getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
         {
-            throw new CredentialsNotSetException(event.getMessage(), event.getSession().getSecurityContext(),
+            throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(),
                 event.getEndpoint(), this);
         }
 
@@ -72,8 +73,8 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
                 logger.debug("Authentication request for user: " + user.getUsername() 
                     + " failed: " + e.toString());
             }
-            throw new UnauthorisedException(CoreMessages.authFailedForUser(user.getUsername()),
-                event.getMessage(), e);
+            throw new UnauthorisedException(
+                CoreMessages.authFailedForUser(user.getUsername()), event, e);
         }
 
         // Authentication success
@@ -87,6 +88,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         event.getSession().setSecurityContext(context);
     }
 
+    @Override
     protected void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
@@ -94,7 +96,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
+                throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
                     event.getEndpoint(), this);
             }
             else
@@ -117,6 +119,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
 
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         // empty constructor

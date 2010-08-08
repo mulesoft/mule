@@ -15,10 +15,11 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.transaction.Transaction;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
-public class OutboundTxRollbackMessageProcessorTestCase extends AbstractOutboundMessageProcessorTestCase
+public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     public void testNoRollback() throws InitialisationException, EndpointException, Exception

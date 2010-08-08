@@ -10,8 +10,7 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
@@ -19,6 +18,9 @@ import org.mule.module.client.MuleClient;
 import org.mule.transaction.TransactionTemplate;
 
 import javax.transaction.Transaction;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /** Test transaction behavior when "joinExternal" is set to allow joining external transactions
  * There is one test per legal transactional behavior (e.g. ALWAYS_BEGIN).
@@ -308,14 +310,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNull("Response is not null", response);
 
         // This will fail, since there will be no transaction to join
-        try
-        {
-            client.send("vm://entry?connector=vm-normal", "OK", null);
-            fail("Exception expected");
-        }
-        catch (Exception ex)
-        {
-
-        }
+        response = client.send("vm://entry?connector=vm-normal", "OK", null);
+        assertNotNull(response);
+        assertNotNull("Exception expected", response.getExceptionPayload());
+        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
     }
 }

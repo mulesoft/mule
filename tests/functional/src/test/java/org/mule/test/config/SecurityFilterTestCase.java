@@ -15,9 +15,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.security.*;
-import org.mule.api.security.SecurityException;
-import org.mule.endpoint.inbound.InboundSecurityFilterMessageProcessor;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.security.AbstractEndpointSecurityFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.tck.FunctionalTestCase;
@@ -42,13 +40,13 @@ public class SecurityFilterTestCase extends FunctionalTestCase
         InboundEndpoint iep = epb.buildInboundEndpoint();
         List<MessageProcessor> mps =iep.getMessageProcessors();
         int count = 0;
-        InboundSecurityFilterMessageProcessor securityMp = null;
+        SecurityFilterMessageProcessor securityMp = null;
         for (MessageProcessor mp : mps)
         {
-            if (mp instanceof InboundSecurityFilterMessageProcessor)
+            if (mp instanceof SecurityFilterMessageProcessor)
             {
                 count++;
-                securityMp = (InboundSecurityFilterMessageProcessor) mp;
+                securityMp = (SecurityFilterMessageProcessor) mp;
             }
         }
         assertEquals(1, count);
@@ -62,10 +60,10 @@ public class SecurityFilterTestCase extends FunctionalTestCase
         securityMp = null;
         for (MessageProcessor mp : mps)
         {
-            if (mp instanceof InboundSecurityFilterMessageProcessor)
+            if (mp instanceof SecurityFilterMessageProcessor)
             {
                 count++;
-                securityMp = (InboundSecurityFilterMessageProcessor) mp;
+                securityMp = (SecurityFilterMessageProcessor) mp;
             }
         }
         assertEquals(1, count);

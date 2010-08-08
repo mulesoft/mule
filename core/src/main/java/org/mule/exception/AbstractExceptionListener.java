@@ -8,8 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.exception;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -38,9 +41,11 @@ import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.message.ExceptionMessage;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
@@ -82,11 +87,6 @@ public abstract class AbstractExceptionListener
 
     protected boolean enableNotifications = true;
 
-    /**
-     * A message to be returned to the caller as a result of this exception handling.
-     */
-    private MuleMessage returnMessage = null;
-    
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -350,7 +350,7 @@ public abstract class AbstractExceptionListener
         // support everything but rather is an intermediate improvement.
         for (int i = 0; i < endpoints.size(); i++)
         {
-            OutboundEndpoint endpoint = (OutboundEndpoint) endpoints.get(i);
+            OutboundEndpoint endpoint = endpoints.get(i);
             if (((DefaultMuleMessage) exceptionMessage).isConsumable())
             {
                 throw new MessagingException(
@@ -573,24 +573,13 @@ public abstract class AbstractExceptionListener
      */
     public abstract void handleStandardException(Throwable e);
 
-    public MuleMessage getReturnMessage()
-    {
-        return returnMessage;
-    }
-
     /**
-     * Set a message to be returned to the caller as a result of this exception handling.
+     * Get a message to be returned to the caller as a result of this exception handling.
      */
-    public void setReturnMessage(MuleMessage returnMessage)
+    public MuleMessage getReturnMessage(Exception e)
     {
-        this.returnMessage = returnMessage;
-    }
-
-    /**
-     * Set a message to be returned to the caller as a result of this exception handling.
-     */
-    public void setReturnMessage(Object returnMessage)
-    {
-        this.returnMessage = new DefaultMuleMessage(returnMessage, RequestContext.getEvent().getMessage(), muleContext);
+        MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+        message.setExceptionPayload(new DefaultExceptionPayload(e));
+        return message;
     }
 }

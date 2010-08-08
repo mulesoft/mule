@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextException;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -39,7 +40,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("test://outbound");
         assertNotNull(endpoint);
 
-        RoutingException rex = new RoutingException(null, endpoint);
+        RoutingException rex = new RoutingException((MuleEvent) null, endpoint);
         assertSame(endpoint, rex.getRoute());
     }
 

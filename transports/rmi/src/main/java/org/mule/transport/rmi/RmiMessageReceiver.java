@@ -129,7 +129,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            handleException(e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 

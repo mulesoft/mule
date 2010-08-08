@@ -103,7 +103,6 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint
         return true;
     }
 
-
     public boolean isMimeSupported(String mime)
     {
         return acceptedMimeTypes.contains(mime);
@@ -111,11 +110,12 @@ public class RssInboundEndpoint extends DefaultInboundEndpoint
 
     private String getMime(MuleMessage m)
     {
-        String mimeType = m.getOutboundProperty("Content-Type");
         if (m == null)
         {
             return null;
         }
+
+        String mimeType = m.getOutboundProperty("Content-Type");
         int i = mimeType.indexOf(";");
         if (i > -1)
         {

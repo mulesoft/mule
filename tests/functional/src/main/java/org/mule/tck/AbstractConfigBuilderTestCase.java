@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.DefaultExceptionStrategy;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.component.JavaComponent;
@@ -29,6 +28,7 @@ import org.mule.component.AbstractComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.interceptor.InterceptorStack;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.TimerInterceptor;
@@ -43,11 +43,12 @@ import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
+
+import java.beans.ExceptionListener;
 
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -76,10 +77,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testConnectorConfig();
 
-        TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
-        assertNotNull(c);
-        assertNotNull(c.getExceptionListener());
-        assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
+        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        assertNotNull(es);
+        assertTrue(es.getClass().getName(), es instanceof TestExceptionStrategy);
     }
 
     @Override
@@ -114,7 +114,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
         assertNotNull(service.getExceptionListener());
-        assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
+        assertTrue(DefaultMessagingExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
     }
 
     @Override

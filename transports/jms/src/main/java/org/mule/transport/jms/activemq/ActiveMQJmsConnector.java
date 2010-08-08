@@ -44,25 +44,12 @@ public class ActiveMQJmsConnector extends JmsConnector
         // TODO MULE-1409 better support for ActiveMQ 4.x temp destinations
     }
 
-    protected ConnectionFactory getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory() throws Exception
     {
-        try
-        {
-            ConnectionFactory connectionFactory = (ConnectionFactory)
-                    ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, getBrokerURL());
-            applyVendorSpecificConnectionFactoryProperties(connectionFactory);
-            return connectionFactory;
-        }
-        catch (InvocationTargetException itex)
-        {
-            Throwable target = itex.getCause();
-            handleException(target instanceof Exception ? (Exception) target : new Exception(target));
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-        }
-        return null;
+        ConnectionFactory connectionFactory = (ConnectionFactory)
+                ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, getBrokerURL());
+        applyVendorSpecificConnectionFactoryProperties(connectionFactory);
+        return connectionFactory;
     }
 
     protected void applyVendorSpecificConnectionFactoryProperties(ConnectionFactory connectionFactory)

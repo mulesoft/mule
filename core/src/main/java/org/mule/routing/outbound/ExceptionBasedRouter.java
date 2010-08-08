@@ -63,7 +63,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         
         if (recipients == null || recipients.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
         if (enableCorrelation != CorrelationMode.NEVER)
@@ -149,7 +149,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
 
         if (!success)
         {
-            throw new CouldNotRouteOutboundMessageException(request, endpoint);
+            throw new CouldNotRouteOutboundMessageException(event, endpoint);
         }
 
         return result;

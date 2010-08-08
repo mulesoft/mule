@@ -89,7 +89,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         }
         catch (Exception e)
         {
-            handleException(e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 

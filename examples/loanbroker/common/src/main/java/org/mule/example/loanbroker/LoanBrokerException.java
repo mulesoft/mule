@@ -10,18 +10,19 @@
 
 package org.mule.example.loanbroker;
 
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * Exception related to the LoanBroker example app.
  */
-public class LoanBrokerException extends DefaultMuleException
+public class LoanBrokerException extends MuleException
 {
     private static final long serialVersionUID = -1669865702115931005L;
 
     public LoanBrokerException(String message)
     {
-        super(message);
+        super(MessageFactory.createStaticMessage(message));
     }
 
     public LoanBrokerException(Exception e)

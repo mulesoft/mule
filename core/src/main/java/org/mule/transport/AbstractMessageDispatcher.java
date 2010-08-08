@@ -95,7 +95,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            throw new DispatchException(event.getMessage(), endpoint, e);
+            throw new DispatchException(event, endpoint, e);
         }
         return resultEvent;
     }

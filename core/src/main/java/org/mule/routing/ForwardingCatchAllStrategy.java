@@ -39,12 +39,12 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         return endpoint;
     }
 
+    @Override
     public MuleEvent doCatchMessage(MuleEvent event) throws RoutingException
     {
         if (getEndpoint() == null)
         {
-            throw new RoutingException(CoreMessages.noCatchAllEndpointSet(), event.getMessage(),
-                getEndpoint());
+            throw new RoutingException(CoreMessages.noCatchAllEndpointSet(), event, getEndpoint());
         }
         try
         {
@@ -66,7 +66,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         }
         catch (Exception e)
         {
-            throw new RoutingException(event.getMessage(), getEndpoint(), e);
+            throw new RoutingException(event, getEndpoint(), e);
 
         }
     }

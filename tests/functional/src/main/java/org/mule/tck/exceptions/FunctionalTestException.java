@@ -10,15 +10,16 @@
 
 package org.mule.tck.exceptions;
 
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.config.i18n.MessageFactory;
 
-public class FunctionalTestException extends DefaultMuleException
+public class FunctionalTestException extends MuleException
 {
     public static final String EXCEPTION_MESSAGE = "Functional Test Service Exception";
 
     public FunctionalTestException()
     {
-        super(EXCEPTION_MESSAGE);
+        super(MessageFactory.createStaticMessage(EXCEPTION_MESSAGE));
     }
 }
 

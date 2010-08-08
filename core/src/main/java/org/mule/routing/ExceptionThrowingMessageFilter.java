@@ -24,6 +24,7 @@ public class ExceptionThrowingMessageFilter extends MessageFilter
         super(filter);
     }
 
+    @Override
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
     {
         if (unacceptedMessageProcessor != null)
@@ -32,7 +33,7 @@ public class ExceptionThrowingMessageFilter extends MessageFilter
         }
         else
         {
-            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
+            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);
         }
     }
 

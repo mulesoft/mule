@@ -12,7 +12,6 @@ package org.mule.transport.http;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -27,6 +26,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;

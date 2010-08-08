@@ -18,7 +18,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.service.DefaultServiceExceptionStrategy;
 
 import java.util.List;
 
@@ -52,8 +51,7 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(
-            threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout(),
-            new DefaultServiceExceptionStrategy());
+            threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout());
         builder.chain(asyncProcessor);
         for (Object processor : messageProcessors)
         {

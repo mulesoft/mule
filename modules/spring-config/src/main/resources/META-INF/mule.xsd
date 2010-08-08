@@ -3563,14 +3563,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="default-connector-exception-strategy" type="endpointExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Provide default exception handling for a connector via an endpoint.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
     <xsd:complexType name="endpointExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractExceptionStrategyType">
@@ -5506,13 +5498,6 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 The threading profile to use when a connector dispatches messages.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The exception strategy to use when errors occur in the connector.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

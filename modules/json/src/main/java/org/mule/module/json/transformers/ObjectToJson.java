@@ -96,7 +96,7 @@ public class ObjectToJson extends AbstractJsonTransformer
             }
             else
             {
-                throw new TransformerException(JsonMessages.messageStringIsNotJson());
+                throw new TransformerException(JsonMessages.messageStringIsNotJson(), message);
             }
         }
 
@@ -117,7 +117,7 @@ public class ObjectToJson extends AbstractJsonTransformer
         }
         catch (IOException e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
 
         if (returnType.equals(byte[].class))

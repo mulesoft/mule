@@ -75,8 +75,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
-        AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource(), true,  this);
+        AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new TestWorkManagerSource(), true);
         mp.setListener(listener);
         return mp;
     }

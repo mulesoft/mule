@@ -8,11 +8,12 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.0/mule-ftp.xsd">
 
-    <ftp:connector name="ftp" pollingFrequency="500" streaming="true" >
-        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
-    </ftp:connector>
+    <ftp:connector name="ftp" pollingFrequency="500" streaming="true" />
 
     <model name="main">
+        <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+
         <service name="testComponent">
             <inbound>
                 <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60188"/>

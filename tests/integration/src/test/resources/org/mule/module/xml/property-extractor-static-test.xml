@@ -10,40 +10,28 @@
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:connector name="default"/>
-    <vm:connector name="queue"/>
-
-    <vm:endpoint name="in" address="vm://in" connector-ref="default" exchange-pattern="one-way"/>
-
     <model name="property extractor test">
 
         <service name="test">
             <inbound>
-                <inbound-endpoint ref="in"/>
-                <forwarding-router/>
+                <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
             </inbound>
             <outbound>
                 <exception-based-router>
-                    <outbound-endpoint address="vm://unreliable" exchange-pattern="request-response"
-                        connector-ref="default"/>
-                    <vm:outbound-endpoint path="error" exchange-pattern="one-way"
-                        connector-ref="queue"/>
+                    <vm:outbound-endpoint path="unreliable" exchange-pattern="request-response" />
+                    <vm:outbound-endpoint path="error" exchange-pattern="one-way" />
                 </exception-based-router>
             </outbound>
         </service>
 
         <service name="unreliable">
             <inbound>
-                <vm:inbound-endpoint address="vm://unreliable" exchange-pattern="one-way" 
-                    connector-ref="default"/>
-                <forwarding-router/>
+                <vm:inbound-endpoint address="vm://unreliable" exchange-pattern="request-response" />
             </inbound>
             <outbound>
                 <endpoint-selector-router evaluator="xpath" expression="/endpoint">
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" 
-                        exchange-pattern="one-way" connector-ref="queue"/>
-                    <outbound-endpoint name="matchingEndpoint2" address="vm://match2" 
-                        exchange-pattern="one-way" connector-ref="queue"/>
+                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" exchange-pattern="one-way" />
+                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" exchange-pattern="one-way" />
                 </endpoint-selector-router>
             </outbound>
         </service>

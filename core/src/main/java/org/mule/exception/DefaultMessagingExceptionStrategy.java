@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule;
+package org.mule.exception;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingTarget;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
@@ -22,7 +23,7 @@ import org.mule.util.ObjectUtils;
  * strategy.
  */
 
-public class DefaultExceptionStrategy extends AbstractExceptionListener
+public class DefaultMessagingExceptionStrategy extends AbstractExceptionListener
 {
 
     public void handleMessagingException(MuleMessage message, Throwable t)
@@ -47,7 +48,6 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
 
     public void handleStandardException(Throwable t)
     {
-        handleTransaction(t);
         // Attempt to send the exception details to an endpoint if one is set
         if (RequestContext.getEventContext() != null)
         {

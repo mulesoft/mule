@@ -8,15 +8,13 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <vm:connector name="vm">
-        <default-connector-exception-strategy>
-            <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
-        </default-connector-exception-strategy>
-    </vm:connector>
-
     <custom-transformer name="fail" class="org.mule.test.transformers.FailingTransformer"/>
 
     <model name="test">
+        <default-service-exception-strategy>
+            <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
+        </default-service-exception-strategy>
+
         <service name="with-router">
             <inbound>
                 <vm:inbound-endpoint path="with-router-in" exchange-pattern="one-way">
@@ -42,10 +40,6 @@
                     <vm:outbound-endpoint path="without-router-out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
-            <!-- need this instead -->
-            <default-service-exception-strategy>
-                <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
-            </default-service-exception-strategy>
         </service>
     </model>
 </mule>

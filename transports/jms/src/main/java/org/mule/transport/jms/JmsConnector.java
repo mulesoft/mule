@@ -307,21 +307,29 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
             // no spring-configured connection factory. See if there is a default one (e.g. from
             // subclass)
-            ConnectionFactory factory = this.getDefaultConnectionFactory();
-            if (factory != null)
+            ConnectionFactory factory;
+            try
             {
-                return factory;
+                factory = getDefaultConnectionFactory();
             }
-
-            // no connection factory ... give up
-            throw new InitialisationException(JmsMessages.noConnectionFactoryConfigured(), this);
+            catch (Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
+            if (factory == null)
+            {
+                // no connection factory ... give up
+                throw new InitialisationException(JmsMessages.noConnectionFactoryConfigured(), this);
+            }
+            return factory;
         }
     }
 
     /**
      * Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector.
+     * @throws Exception 
      */
-    protected ConnectionFactory getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory() throws Exception
     {
         return null;
     }

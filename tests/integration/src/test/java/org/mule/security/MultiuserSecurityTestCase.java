@@ -10,12 +10,12 @@
 
 package org.mule.security;
 
-import org.mule.MuleSessionHandler;
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
 import org.mule.module.client.MuleClient;
+import org.mule.session.MuleSessionHandler;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;

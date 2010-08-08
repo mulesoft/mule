@@ -55,6 +55,7 @@ public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
         acceptedContentTypes.add("application/rss");
     }
 
+    @Override
     public MuleEvent process(MuleEvent muleEvent) throws MessagingException
     {
         try
@@ -94,11 +95,12 @@ public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), muleEvent.getMessage(), e);
+            throw new MessagingException(e.getI18nMessage(), muleEvent, e);
         }
         return null;
     }
 
+    @Override
     public boolean accept(MuleEvent muleEvent)
     {
         String contentType = muleEvent.getMessage().getOutboundProperty("Content-Type");

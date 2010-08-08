@@ -13,7 +13,6 @@
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>
     <link><item>mule:null-component</item><page>Configuring+Models</page></link>
     <link><item>mule:default-service-exception-strategy</item><page>Configuring+Models</page></link>
-    <link><item>mule:default-connector-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:legacy-entry-point-resolver-set</item><page>Configuring+Models</page></link>
     <link><item>mule:entry-point-resolver-set</item><page>Configuring+Models</page></link>

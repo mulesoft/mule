@@ -10,7 +10,6 @@
 
 package org.mule.tck.providers.soap;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
@@ -137,18 +136,12 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        try
-        {
-            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
-            fail("A nested Fault should have been raised");
-        }
-        catch (MuleException e)
-        {
-            // toplevel
-            assertTrue(e instanceof DispatchException);
-            // the nested Axis fault
-            assertTrue(e.getCause() instanceof Exception);
-        }
+        
+        MuleMessage result = client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
+        assertNotNull(result);
+        assertNotNull("A nested Fault should have been raised", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
+        assertTrue(result.getExceptionPayload().getRootException() instanceof Exception);
     }
 
     public void testLocationUrlInWSDL() throws Exception

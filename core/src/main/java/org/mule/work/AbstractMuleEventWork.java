@@ -48,4 +48,8 @@ public abstract class AbstractMuleEventWork implements Work
         // no-op
     }
 
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
 }

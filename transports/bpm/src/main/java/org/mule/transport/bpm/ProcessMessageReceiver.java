@@ -11,7 +11,6 @@
 package org.mule.transport.bpm;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,11 +24,13 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractMessageReceiver;
 
 import java.util.Map;
 
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
 
 /** Generates an incoming Mule event from an executing workflow process. */
 public class ProcessMessageReceiver extends AbstractMessageReceiver
@@ -56,24 +57,17 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         return response;
     }
 
-    public void generateAsynchronousEvent(String endpoint, Object payload, Map messageProperties) throws MuleException
+    public void generateAsynchronousEvent(String endpoint, Object payload, Map messageProperties) throws MuleException, WorkException
     {
         logger.debug("Executing process is dispatching an event (asynchronously) to Mule endpoint = " + endpoint);
-        try
+        WorkManager workManager = getWorkManager();
+        if (workManager != null)
         {
-            WorkManager workManager = getWorkManager();
-            if (workManager != null)
-            {
-                workManager.scheduleWork(new Worker(endpoint, payload, messageProperties));
-            }
-            else
-            {
-                throw new ConnectorException(MessageFactory.createStaticMessage("WorkManager not available"), getConnector());
-            }
+            workManager.scheduleWork(new Worker(endpoint, payload, messageProperties));
         }
-        catch (Exception e)
+        else
         {
-            handleException(e);
+            throw new ConnectorException(MessageFactory.createStaticMessage("WorkManager not available"), getConnector());
         }
     }
 
@@ -157,7 +151,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             }
             catch (Exception e)
             {
-                getConnector().handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
         }
 

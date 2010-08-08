@@ -13,9 +13,10 @@ package org.mule.endpoint.inbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.message.DefaultExceptionPayload;
 
-public class InboundExceptionDetailsProcessorTestCase extends AbstractInboundMessageProcessorTestCase
+public class InboundExceptionDetailsProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     public void testProcess() throws Exception

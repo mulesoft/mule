@@ -42,6 +42,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -169,7 +170,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw new DispatchException(
                         JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
-                        event.getMessage(), event.getEndpoint());
+                        event, event.getEndpoint());
             }
 
             Message msg = (Message) message;
@@ -551,7 +552,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (Exception e)
         {
-            throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), e);
+            throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), event.getMessage(), e);
         }
         super.applyOutboundTransformers(event);
     }

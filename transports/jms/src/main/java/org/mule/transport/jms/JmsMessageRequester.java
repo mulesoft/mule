@@ -149,36 +149,28 @@ public class JmsMessageRequester extends AbstractMessageRequester
             consumer = support.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
                 topic, endpoint);
 
-            try
+            Message message;
+
+            if (timeout == JmsMessageDispatcher.RECEIVE_NO_WAIT)
             {
-                Message message;
-
-                if (timeout == JmsMessageDispatcher.RECEIVE_NO_WAIT)
-                {
-                    message = consumer.receiveNoWait();
-                }
-                else if (timeout == JmsMessageDispatcher.RECEIVE_WAIT_INDEFINITELY)
-                {
-                    message = consumer.receive();
-                }
-                else
-                {
-                    message = consumer.receive(timeout);
-                }
-
-                if (message == null)
-                {
-                    return null;
-                }
-
-                message = connector.preProcessMessage(message, session);
-                return createMuleMessage(message, endpoint.getEncoding());
+                message = consumer.receiveNoWait();
             }
-            catch (Exception e)
+            else if (timeout == JmsMessageDispatcher.RECEIVE_WAIT_INDEFINITELY)
             {
-                connector.handleException(e);
+                message = consumer.receive();
+            }
+            else
+            {
+                message = consumer.receive(timeout);
+            }
+
+            if (message == null)
+            {
                 return null;
             }
+
+            message = connector.preProcessMessage(message, session);
+            return createMuleMessage(message, endpoint.getEncoding());
         }
         finally
         {

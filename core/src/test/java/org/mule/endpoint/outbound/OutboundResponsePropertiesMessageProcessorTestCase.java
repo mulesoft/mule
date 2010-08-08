@@ -20,9 +20,9 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractEndpointBuilder;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
-public class OutboundResponsePropertiesMessageProcessorTestCase extends
-    AbstractOutboundMessageProcessorTestCase
+public class OutboundResponsePropertiesMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     private static String MY_PROPERTY_KEY = "myProperty";

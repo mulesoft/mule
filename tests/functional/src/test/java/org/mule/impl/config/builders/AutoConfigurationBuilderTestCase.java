@@ -19,8 +19,9 @@ import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+
+import java.beans.ExceptionListener;
 
 public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
 {
@@ -38,10 +39,9 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
         configurationBuilder.configure(muleContext);
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase
-        TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
-        assertNotNull(c);
-        assertNotNull(c.getExceptionListener());
-        assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
+        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        assertNotNull(es);
+        assertTrue(es instanceof TestExceptionStrategy);
     }
 
     // public void testConfigureGroovy()

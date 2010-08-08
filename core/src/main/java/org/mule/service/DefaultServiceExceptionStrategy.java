@@ -10,7 +10,6 @@
 
 package org.mule.service;
 
-import org.mule.DefaultExceptionStrategy;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -18,6 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.CollectionUtils;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * for components. The handler logs errors and will forward the message and exception
  * to an exception endpointUri if one is set on this Exception strategy
  */
-public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
+public class DefaultServiceExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     public DefaultServiceExceptionStrategy()
     {

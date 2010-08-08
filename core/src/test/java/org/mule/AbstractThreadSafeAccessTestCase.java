@@ -13,6 +13,7 @@ package org.mule;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.model.seda.SedaService;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 

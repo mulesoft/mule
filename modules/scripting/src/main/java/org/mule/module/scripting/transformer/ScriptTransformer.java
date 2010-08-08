@@ -35,7 +35,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
         }
         catch (ScriptException e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
     }
 

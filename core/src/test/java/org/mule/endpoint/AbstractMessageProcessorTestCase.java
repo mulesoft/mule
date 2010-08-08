@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.endpoint.outbound;
+package org.mule.endpoint;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -21,29 +21,31 @@ import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.mule.routing.MessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
+import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
-public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractMuleTestCase
+public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestCase
 {
+    protected static final String TEST_URI = "test://myTestUri";
     protected static String RESPONSE_MESSAGE = "response-message";
     protected static MuleMessage responseMessage;
 
@@ -65,7 +67,58 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         notificationManager.addInterfaceToType(EndpointMessageNotificationListener.class,
             EndpointMessageNotification.class);
         notificationManager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+
         builder.setNotificationManager(notificationManager);
+    }
+
+    protected InboundEndpoint createTestInboundEndpoint(Transformer transformer,
+                                                        Transformer responseTransformer)
+        throws EndpointException, InitialisationException
+    {
+        return createTestInboundEndpoint(null, null, transformer, responseTransformer, 
+            MessageExchangePattern.REQUEST_RESPONSE, null);
+    }
+
+    protected InboundEndpoint createTestInboundEndpoint(Filter filter,
+                                                        EndpointSecurityFilter securityFilter,
+                                                        MessageExchangePattern exchangePattern,
+                                                        TransactionConfig txConfig)
+        throws InitialisationException, EndpointException
+    {
+        return createTestInboundEndpoint(filter, securityFilter, null, null, exchangePattern, txConfig);
+    }
+
+    protected InboundEndpoint createTestInboundEndpoint(Filter filter,
+                                                        EndpointSecurityFilter securityFilter,
+                                                        Transformer transformer,
+                                                        Transformer responseTransformer,
+                                                        MessageExchangePattern exchangePattern,
+                                                        TransactionConfig txConfig)
+        throws EndpointException, InitialisationException
+    {
+        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
+        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
+        endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+        if (transformer != null)
+        {
+            endpointBuilder.setTransformers(Collections.singletonList(transformer));
+        }
+        if (responseTransformer != null)
+        {
+            endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
+        }
+        endpointBuilder.setExchangePattern(exchangePattern);
+        endpointBuilder.setTransactionConfig(txConfig);
+        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
+        return endpoint;
+    }
+
+    protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("prop1", "value1");
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
+            getTestSession(getTestService(), muleContext));
     }
 
     protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
@@ -107,10 +160,7 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
             muleContext);
         endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        if (securityFilter != null)
-        {
-            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
-        }
+        endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
         if (transformer != null)
         {
             endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
@@ -132,12 +182,21 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
 
     protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint) throws Exception
     {
+        return createTestOutboundEvent(endpoint, null);
+    }
+    
+    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint, ExceptionListener exceptionListener) throws Exception
+    {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
         props.put("port", new Integer(12345));
 
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint,
-            getTestSession(getTestService(), muleContext));
+        Service svc = getTestService();
+        if (exceptionListener != null)
+        {
+            svc.setExceptionListener(exceptionListener);
+        }
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint, getTestSession(svc, muleContext));
     }
 
     protected MuleMessage createTestResponseMuleMessage()
@@ -145,45 +204,9 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         return new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext);
     }
 
-    static class TestListener implements MessageProcessor
+    public static class TestFilter implements Filter
     {
-        MuleEvent sensedEvent;
-
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            sensedEvent = event;
-            return event;
-        }
-    }
-
-    static class TestSecurityNotificationListener implements SecurityNotificationListener<SecurityNotification>
-    {
-        SecurityNotification securityNotification;
-        Latch latch = new Latch();
-
-        public void onNotification(SecurityNotification notification)
-        {
-            securityNotification = notification;
-            latch.countDown();
-        }
-    }
-
-    static class TestEndpointMessageNotificationListener implements
-        EndpointMessageNotificationListener<EndpointMessageNotification>
-    {
-        EndpointMessageNotification messageNotification;
-        Latch latch = new Latch();
-
-        public void onNotification(EndpointMessageNotification notification)
-        {
-            messageNotification = notification;
-            latch.countDown();
-        }
-    }
-
-    static class TestFilter implements Filter
-    {
-        boolean accept;
+        public boolean accept;
 
         public TestFilter(boolean accept)
         {
@@ -193,6 +216,59 @@ public abstract class AbstractOutboundMessageProcessorTestCase extends AbstractM
         public boolean accept(MuleMessage message)
         {
             return accept;
+        }
+    }
+
+    public static class TestSecurityNotificationListener implements SecurityNotificationListener<SecurityNotification>
+    {
+        public SecurityNotification securityNotification;
+        public Latch latch = new Latch();
+
+        public void onNotification(SecurityNotification notification)
+        {
+            securityNotification = notification;
+            latch.countDown();
+        }
+    }
+
+    public static class TestListener implements MessageProcessor
+    {
+        public MuleEvent sensedEvent;
+
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            sensedEvent = event;
+            return event;
+        }
+    }
+
+    public static class TestEndpointMessageNotificationListener implements EndpointMessageNotificationListener<EndpointMessageNotification>
+    {
+        public EndpointMessageNotification messageNotification;
+        public Latch latch = new Latch();
+
+        public void onNotification(EndpointMessageNotification notification)
+        {
+            messageNotification = notification;
+            latch.countDown();
+        }
+    }
+
+    public static class ExceptionThrowingMessageProcessr implements MessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            throw new IllegalStateException();
+        }
+    }
+
+    public static class TestExceptionListener implements ExceptionListener
+    {
+        public Exception sensedException;
+
+        public void exceptionThrown(Exception e)
+        {
+            sensedException = e;
         }
     }
 

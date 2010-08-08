@@ -10,6 +10,7 @@
 
 package org.mule.api.transport;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.RoutingTarget;
@@ -24,28 +25,61 @@ public class DispatchException extends RoutingException
     /**
      * Serial version
      */
-    private static final long serialVersionUID = -8204621943732496605L;
+    private static final long serialVersionUID = -8204621943732496606L;
 
+    /**
+     * @deprecated use DispatchException(MuleEvent, RoutingTarget)
+     */
+    @Deprecated
     public DispatchException(MuleMessage message, RoutingTarget target)
     {
         super(message, target);
     }
 
+    public DispatchException(MuleEvent event, RoutingTarget target)
+    {
+        super(event, target);
+    }
+
+    /**
+     * @deprecated use DispatchException(MuleEvent, RoutingTarget, Throwable)
+     */
+    @Deprecated
     public DispatchException(MuleMessage message, RoutingTarget target, Throwable cause)
     {
         super(message, target, cause);
     }
 
+    public DispatchException(MuleEvent event, RoutingTarget target, Throwable cause)
+    {
+        super(event, target, cause);
+    }
+
+    /**
+     * @deprecated use DispatchException(Message, MuleEvent, RoutingTarget)
+     */
+    @Deprecated
     public DispatchException(Message message, MuleMessage muleMessage, RoutingTarget target)
     {
         super(message, muleMessage, target);
     }
 
-    public DispatchException(Message message,
-                             MuleMessage muleMessage,
-                             RoutingTarget target,
-                             Throwable cause)
+    public DispatchException(Message message, MuleEvent event, RoutingTarget target)
+    {
+        super(message, event, target);
+    }
+
+    /**
+     * @deprecated use DispatchException(Message, MuleEvent, RoutingTarget, Throwable)
+     */
+    @Deprecated
+    public DispatchException(Message message, MuleMessage muleMessage, RoutingTarget target, Throwable cause)
     {
         super(message, muleMessage, target, cause);
+    }
+
+    public DispatchException(Message message, MuleEvent event, RoutingTarget target, Throwable cause)
+    {
+        super(message, event, target, cause);
     }
 }

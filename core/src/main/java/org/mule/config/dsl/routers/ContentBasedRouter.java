@@ -32,14 +32,14 @@ public class ContentBasedRouter extends AbstractOutboundRouter
         {
             if (isMatch(message))
             {
+                MuleEvent event = RequestContext.cloneAndUpdateEventEndpoint(theEvent, target);
                 try
                 {
-                    MuleEvent event = RequestContext.cloneAndUpdateEventEndpoint(theEvent, target);
                     return target.process(event);
                 }
                 catch (MuleException e)
                 {
-                    throw new MessagingException(e.getI18nMessage(), message, e);
+                    throw new MessagingException(e.getI18nMessage(), event, e);
                 }
             }
         }

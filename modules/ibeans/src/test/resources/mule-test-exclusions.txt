@@ -1,0 +1,2 @@
+# Broken by BL-165
+org.mule.module.ibeans.annotations.ExceptionListenerTestCase

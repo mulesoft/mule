@@ -41,7 +41,6 @@
     <custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
         <spring:property name="someProperty" value="someValue" />
         <dispatcher-threading-profile maxBufferSize="2"/>
-        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         <service-overrides 
             xaTransactedMessageReceiver="org.mule.tck.testmodels.mule.TestMessageReceiver"
             messageFactory="org.mule.test.spring.MockMuleMessageFactory"/>
@@ -239,9 +238,6 @@
                 </filtering-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
             </outbound>
-
-            <!--<custom-exception-strategy class="org.mule.DefaultExceptionStrategy"/>-->
-            <default-connector-exception-strategy/>
         </service>
         
         <service name="anotherComponent">

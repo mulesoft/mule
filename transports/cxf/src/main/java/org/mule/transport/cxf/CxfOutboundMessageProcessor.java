@@ -253,7 +253,7 @@ public class CxfOutboundMessageProcessor
 
         if (method == null)
         {
-            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event.getMessage());
+            throw new MessagingException(CxfMessages.noOperationWasFoundOrSpecified(), event);
         }
         return method;
     }

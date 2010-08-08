@@ -77,7 +77,7 @@ public class IdempotentMessageFilter extends MessageFilter implements FlowConstr
         catch (Exception e)
         {
             throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, assignedComponentName),
-                event.getMessage(), event.getEndpoint(), e);
+                event, event.getEndpoint(), e);
         }
     }
 

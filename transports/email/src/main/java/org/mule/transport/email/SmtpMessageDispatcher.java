@@ -99,7 +99,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new DispatchException(
                 CoreMessages.transformUnexpectedType(data.getClass(), Message.class),
-                event.getMessage(), event.getEndpoint());
+                event, event.getEndpoint());
         }
         else
         {

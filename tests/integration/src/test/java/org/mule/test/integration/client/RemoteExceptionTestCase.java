@@ -11,13 +11,13 @@
 package org.mule.test.integration.client;
 
 import org.mule.api.ExceptionPayload;
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.exceptions.FunctionalTestException;
 
 import java.util.Date;
 
@@ -37,7 +37,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException().getCause() instanceof TransformerException);
+        assertTrue(exceptionPayload.getException() instanceof TransformerException);
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 
@@ -60,7 +60,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getRootException() instanceof DefaultMuleException);
+        assertTrue(exceptionPayload.getRootException().getClass().getName(), 
+                   exceptionPayload.getRootException() instanceof FunctionalTestException);
         assertEquals("Functional Test Service Exception", exceptionPayload.getRootException().getMessage());
     }
 

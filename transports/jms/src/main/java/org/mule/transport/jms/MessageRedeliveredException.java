@@ -11,6 +11,7 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -22,13 +23,31 @@ public class MessageRedeliveredException extends MessagingException
      */
     private static final long serialVersionUID = 9013890402770563931L;
 
+    /**
+     * @deprecated use 
+     */
+    @Deprecated
     public MessageRedeliveredException(MuleMessage muleMessage)
     {
         super(JmsMessages.messageMarkedForRedelivery(muleMessage), muleMessage);
     }
 
+    public MessageRedeliveredException(MuleEvent event)
+    {
+        super(JmsMessages.messageMarkedForRedelivery(event), event);
+    }
+
+    /**
+     * @deprecated use MessageRedeliveredException(Message, MuleEvent)
+     */
+    @Deprecated
     public MessageRedeliveredException(Message message, MuleMessage muleMessage)
     {
         super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery(muleMessage)), muleMessage);
+    }
+    
+    public MessageRedeliveredException(Message message, MuleEvent event)
+    {
+        super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery(event)), event);
     }
 }

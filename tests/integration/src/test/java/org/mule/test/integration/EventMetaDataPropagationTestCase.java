@@ -12,7 +12,6 @@ package org.mule.test.integration;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -22,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;

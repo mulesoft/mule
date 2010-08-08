@@ -175,7 +175,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
             }
             else
             {
-                throw new TransformerException(CoreMessages.propertyHasInvalidValue("entry-property.name", arg.getName()));
+                throw new TransformerException(CoreMessages.propertyHasInvalidValue("entry-property.name", arg.getName()), message);
             }
 
         }

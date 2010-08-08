@@ -12,7 +12,6 @@ package org.mule.transport.http;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
@@ -31,6 +30,7 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.ConnectException;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.i18n.HttpMessages;
@@ -171,7 +171,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             catch (Exception e)
             {
-                handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
             finally
             {

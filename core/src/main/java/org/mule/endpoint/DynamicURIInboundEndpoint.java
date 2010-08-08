@@ -206,7 +206,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         return endpoint.isDisableTransportTransformer();
     }
-    
+
     @Override
     public int hashCode()
     {

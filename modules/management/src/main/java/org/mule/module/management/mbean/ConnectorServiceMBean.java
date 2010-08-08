@@ -13,8 +13,6 @@ package org.mule.module.management.mbean;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Initialisable;
 
-import java.beans.ExceptionListener;
-
 public interface ConnectorServiceMBean extends Initialisable
 {
     String DEFAULT_JMX_NAME_PREFIX = "type=Connector,name=";
@@ -26,8 +24,6 @@ public interface ConnectorServiceMBean extends Initialisable
     String getName();
 
     String getProtocol();
-
-    ExceptionListener getExceptionListener();
 
     void startConnector() throws MuleException;
 

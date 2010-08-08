@@ -10,13 +10,14 @@
 package org.mule.transport.ajax;
 
 import org.mortbay.cometd.AbstractBayeux;
+import org.mule.api.MuleException;
 
 /**
  * Set on objects that have or need access to the Bayeux CometD object
  */
 public interface BayeuxAware
 {
-    void setBayeux(AbstractBayeux bayeux);
+    void setBayeux(AbstractBayeux bayeux) throws MuleException;
 
     AbstractBayeux getBayeux();
 }

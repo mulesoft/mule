@@ -135,7 +135,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
         catch (Exception e)
         {
-            throw new RoutingException(message, null, e);
+            throw new RoutingException(routedEvent, null, e);
         }
         
         if (getRouterStatistics() != null)
@@ -368,13 +368,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     /**
      *  Send message event to destination.
      */
-    protected MuleEvent sendRequestEvent(
-        MuleEvent routedEvent, MuleMessage message, MessageProcessor route, boolean awaitResponse)
-            throws MuleException
+    protected MuleEvent sendRequestEvent(MuleEvent routedEvent, MuleMessage message, 
+        MessageProcessor route, boolean awaitResponse) throws MuleException
     {
         if (route == null)
         {
-            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), message, null);
+            throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), routedEvent, null);
         }
 
         ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint) ? (ImmutableEndpoint)route : routedEvent.getEndpoint();

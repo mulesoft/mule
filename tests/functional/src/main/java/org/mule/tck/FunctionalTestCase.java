@@ -15,6 +15,7 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
@@ -60,7 +61,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         }
         else
         {
-            throw new RegistrationException("Service " + serviceName + " not found in Registry");
+            throw new RegistrationException(MessageFactory.createStaticMessage("Service " + serviceName + " not found in Registry"));
         }
     }
     

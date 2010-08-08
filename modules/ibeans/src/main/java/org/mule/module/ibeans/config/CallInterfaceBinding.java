@@ -10,7 +10,6 @@
 package org.mule.module.ibeans.config;
 
 import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,6 +24,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.binding.BindingInvocationHandler;
+import org.mule.session.DefaultMuleSession;
 
 import java.lang.reflect.Proxy;
 

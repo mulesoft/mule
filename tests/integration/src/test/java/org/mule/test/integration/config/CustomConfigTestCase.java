@@ -16,6 +16,8 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 
+import java.beans.ExceptionListener;
+
 public class CustomConfigTestCase extends FunctionalTestCase
 {
 
@@ -42,9 +44,10 @@ public class CustomConfigTestCase extends FunctionalTestCase
         assertEquals(cnn.getSomeProperty(), "foo");
 
         //Test exception strategy
-        assertNotNull(cnn.getExceptionListener());
-        assertTrue(cnn.getExceptionListener() instanceof TestExceptionStrategy);
-        assertEquals("bar", ((TestExceptionStrategy)cnn.getExceptionListener()).getTestProperty());
+        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        assertNotNull(es);
+        assertTrue(es instanceof TestExceptionStrategy);
+        assertEquals("bar", ((TestExceptionStrategy) es).getTestProperty());
     }
 
     public void testCustomTransformerConfig() throws Exception

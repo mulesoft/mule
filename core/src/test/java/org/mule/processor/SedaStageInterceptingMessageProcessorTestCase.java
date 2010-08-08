@@ -71,9 +71,8 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
-        SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor(null,
-            queueProfile, queueTimeout, new TestWorkManagerSource(), true, lifeCycleState, this, queueStatistics,
-            muleContext);
+        SedaStageInterceptingMessageProcessor mp = 
+            new SedaStageInterceptingMessageProcessor(null, queueProfile, queueTimeout, new TestWorkManagerSource(), true, lifeCycleState, queueStatistics, muleContext);
         mp.setListener(listener);
         return mp;
     }

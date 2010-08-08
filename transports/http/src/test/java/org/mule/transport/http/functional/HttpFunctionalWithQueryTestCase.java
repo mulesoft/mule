@@ -48,14 +48,10 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
         Map props = new HashMap();
         props.put("hoo", "noo");
         props.put("har", "nar");
-        try
-        {
-            client.send("clientEndpoint2", null, props);
-            fail("Parameters on the request do not match up");
-        }
-        catch (MuleException e)
-        {
-            //exprected
-        }
+
+        MuleMessage result = client.send("clientEndpoint2", null, props);
+        assertNotNull(result);
+        assertNotNull("Parameters on the request do not match up", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException() instanceof MuleException);
     }
 }

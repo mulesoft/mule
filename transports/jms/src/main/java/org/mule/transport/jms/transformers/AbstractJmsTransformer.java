@@ -19,11 +19,12 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.JmsMessageUtils;
 import org.mule.util.ClassUtils;
+
+import java.io.IOException;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -71,14 +72,9 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
 
             return result;
         }
-        catch (TransformerException tex)
-        {
-            // rethrow
-            throw tex;
-        }
         catch (Exception e)
         {
-            throw new TransformerException(this, e);
+            throw new TransformerException(message, this, e);
         }
         finally
         {
@@ -122,35 +118,28 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
     }
 
-    protected Object transformFromMessage(Message source, String encoding) throws TransformerException
+    protected Object transformFromMessage(Message source, String encoding) throws IOException, JMSException
     {
-        try
+        if (logger.isDebugEnabled())
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Message type received is: " +
-                        ClassUtils.getSimpleName(source.getClass()));
-            }
-
-            // Try to figure out our endpoint's JMS Specification and fall back to
-            // 1.0.2 if none is set.
-            String jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
-            ImmutableEndpoint endpoint = this.getEndpoint();
-            if (endpoint != null)
-            {
-                Connector connector = endpoint.getConnector();
-                if (connector instanceof JmsConnector)
-                {
-                    jmsSpec = ((JmsConnector) connector).getSpecification();
-                }
-            }
-
-            return JmsMessageUtils.toObject(source, jmsSpec, encoding);
+            logger.debug("Message type received is: " +
+                    ClassUtils.getSimpleName(source.getClass()));
         }
-        catch (Exception e)
+
+        // Try to figure out our endpoint's JMS Specification and fall back to
+        // 1.0.2 if none is set.
+        String jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
+        ImmutableEndpoint endpoint = this.getEndpoint();
+        if (endpoint != null)
         {
-            throw new TransformerException(this, e);
+            Connector connector = endpoint.getConnector();
+            if (connector instanceof JmsConnector)
+            {
+                jmsSpec = ((JmsConnector) connector).getSpecification();
+            }
         }
+
+        return JmsMessageUtils.toObject(source, jmsSpec, encoding);
     }
 
     protected void setJmsProperties(MuleMessage message, Message msg) throws JMSException
@@ -196,7 +185,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
     }
 
-    protected Session getSession() throws TransformerException, ConnectException, JMSException
+    protected Session getSession() throws JMSException
     {
         if (endpoint != null)
         {
@@ -204,8 +193,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
         else
         {
-            throw new TransformerException(this, new IllegalStateException(
-                    "This transformer needs a valid endpoint"));
+            throw new IllegalStateException("This transformer needs a valid endpoint");
         }
     }
 

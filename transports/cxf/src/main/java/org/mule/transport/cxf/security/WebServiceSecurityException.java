@@ -22,7 +22,7 @@ public class WebServiceSecurityException extends org.mule.api.security.SecurityE
             + event.getEndpoint().getEndpointURI() 
             + "\nSecurity provider(s) = " + event.getMuleContext().getSecurityManager().getProviders()
             + "\nEvent = " + event),
-            event.getMessage(), cause);
+            event, cause);
     }
 }
 

@@ -10,8 +10,10 @@
 
 package org.mule.transport.file;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -19,6 +21,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.Message;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
@@ -156,7 +159,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            this.handleException(e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 
@@ -346,9 +349,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             // wrap exception & handle it
-            Exception ex = new RoutingException(FileMessages.exceptionWhileProcessing(sourceFile.getName(),
-                (fileWasRolledBack ? "successful" : "unsuccessful")), new DefaultMuleMessage(message, connector.getMuleContext()), endpoint, e);
-            this.handleException(ex);
+            Message msg = FileMessages.exceptionWhileProcessing(sourceFile.getName(),
+                (fileWasRolledBack ? "successful" : "unsuccessful"));
+            MuleEvent event = new DefaultMuleEvent(message, endpoint, null);
+            Exception ex = new RoutingException(msg, event, endpoint, e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(ex);
         }
     }
 

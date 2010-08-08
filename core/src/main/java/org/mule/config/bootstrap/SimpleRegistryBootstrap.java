@@ -15,10 +15,10 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.ObjectProcessor;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.util.StreamCloser;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
@@ -216,7 +216,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass);
                 if (!(trans instanceof DiscoverableTransformer))
                 {
-                    throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
+                    throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
                 }
                 if (returnClass != null)
                 {

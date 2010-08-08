@@ -24,8 +24,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
-import java.beans.ExceptionListener;
-
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
@@ -41,23 +39,19 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     implements WorkListener, Startable, Stoppable
 {
     protected WorkManagerSource workManagerSource;
-    protected ExceptionListener exceptionListener;
     protected boolean doThreading;
     protected WorkManager workManager;
 
-    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading, ExceptionListener exceptionListener)
+    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading)
     {
         this.workManagerSource = workManagerSource;
-        this.exceptionListener = exceptionListener;
         this.doThreading = doThreading;
     }
     
     public AsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
                                              String name,
-                                             int shutdownTimeout,
-                                             ExceptionListener exceptionListener)
+                                             int shutdownTimeout)
     {
-        this.exceptionListener = exceptionListener;
         this.doThreading = threadingProfile.isDoThreading();
         workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
@@ -107,7 +101,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     {
         try
         {
-            Work work = new AsyncMessageProcessorWoker(event);
+            Work work = new AsyncMessageProcessorWorker(event);
             if (doThreading)
             {
                 workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, this);
@@ -119,8 +113,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
         catch (Exception e)
         {
-            new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
-                event.getMessage(), e);
+            new MessagingException(
+                CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next), event, e);
         }
     }
 
@@ -165,20 +159,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
         logger.error("Work caused exception on '" + type + "'. Work being executed was: "
                      + event.getWork().toString());
-
-        if (e instanceof Exception)
-        {
-            exceptionListener.exceptionThrown((Exception) e);
-        }
-        else
-        {
-            throw new MuleRuntimeException(CoreMessages.errorInvokingMessageProcessorAsynchronously(next), e);
-        }
+        throw new MuleRuntimeException(CoreMessages.errorInvokingMessageProcessorAsynchronously(next), e);
     }
 
-    class AsyncMessageProcessorWoker extends AbstractMuleEventWork
+    class AsyncMessageProcessorWorker extends AbstractMuleEventWork
     {
-        public AsyncMessageProcessorWoker(MuleEvent event)
+        public AsyncMessageProcessorWorker(MuleEvent event)
         {
             super(event);
         }
@@ -192,7 +178,15 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             }
             catch (MuleException e)
             {
-                exceptionListener.exceptionThrown(e);
+                if (event.getFlowConstruct() != null)
+                {
+                    event.getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                }
+                else
+                {
+                    logger.warn("MuleEvent does not have a FlowConstruct, this is probably a bug");
+                    event.getMuleContext().getExceptionListener().exceptionThrown(e);
+                }
             }
         }
     }

@@ -17,8 +17,9 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
-public class OutboundEndpointPropertyMessageProcessorTestCase extends AbstractOutboundMessageProcessorTestCase
+public class OutboundEndpointPropertyMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     public void testProcess() throws InitialisationException, EndpointException, Exception

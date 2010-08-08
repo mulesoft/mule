@@ -18,13 +18,14 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 /**
  * Unit test for configuring message processors on an outbound endpoint.
  */
-public class OutboundEndpointMessageProcessorsTestCase extends AbstractOutboundMessageProcessorTestCase
+public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessageProcessorTestCase
 {
     private MuleEvent testOutboundEvent;
     private OutboundEndpoint endpoint;

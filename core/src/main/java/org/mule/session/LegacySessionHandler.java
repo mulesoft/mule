@@ -10,7 +10,6 @@
 
 package org.mule.session;
 
-import org.mule.DefaultMuleSession;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;

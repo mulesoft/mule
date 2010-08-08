@@ -12,7 +12,6 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -31,6 +30,7 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.AxisConnector;
@@ -74,68 +74,52 @@ public class UniversalSender extends BasicHandler
 
     public void invoke(MessageContext msgContext) throws AxisFault
     {
-        boolean sync = true;
-        Call call = (Call)msgContext.getProperty("call_object");
-
-        if (call == null)
-        {
-            throw new IllegalStateException(
-                "The call_object property must be set on the message context to the client Call object");
-        }
-
-        muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
-        if(muleContext==null)
-        {
-            throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
-        }
-
-        // Get the event stored in call if a request call is made there will be no event
-        MuleEvent event = (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
-
-        if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
-        {
-            sync = false;
-        }
-
-        // Get the dispatch endpoint
-        String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
-        ImmutableEndpoint requestEndpoint = (ImmutableEndpoint)call
-            .getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        
-        OutboundEndpoint endpoint;
-
-        // put username and password in URI if they are set on the current event
-        if (msgContext.getUsername() != null)
-        {
-            String[] tempEndpoint = uri.split("//");
-            String credentialString = msgContext.getUsername() + ":"
-                                      + msgContext.getPassword();
-            uri = tempEndpoint[0] + "//" + credentialString + "@" + tempEndpoint[1];
-            try
-            {
-                endpoint = lookupEndpoint(uri);
-            }
-            catch (MuleException e)
-            {
-                requestEndpoint.getConnector().handleException(e);
-                return;
-            }
-        }
-        else
-        {
-            try
-            {
-                endpoint = lookupEndpoint(uri);
-            }
-            catch (MuleException e)
-            {
-                requestEndpoint.getConnector().handleException(e);
-                return;
-            }
-        }
-
         try
         {
+            boolean sync = true;
+            Call call = (Call)msgContext.getProperty("call_object");
+        
+            if (call == null)
+            {
+                throw new IllegalStateException(
+                    "The call_object property must be set on the message context to the client Call object");
+            }
+        
+            muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
+            if(muleContext==null)
+            {
+                throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
+            }
+        
+            // Get the event stored in call if a request call is made there will be no event
+            MuleEvent event = (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        
+            if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
+            {
+                sync = false;
+            }
+        
+            // Get the dispatch endpoint
+            String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
+            ImmutableEndpoint requestEndpoint = (ImmutableEndpoint)call
+                .getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
+            
+            OutboundEndpoint endpoint;
+        
+            // put username and password in URI if they are set on the current event
+            if (msgContext.getUsername() != null)
+            {
+                String[] tempEndpoint = uri.split("//");
+                String credentialString = msgContext.getUsername() + ":"
+                                          + msgContext.getPassword();
+                uri = tempEndpoint[0] + "//" + credentialString + "@" + tempEndpoint[1];
+                endpoint = lookupEndpoint(uri);
+            }
+            else
+            {
+                endpoint = lookupEndpoint(uri);
+            }
+
             if (requestEndpoint.getConnector() instanceof AxisConnector)
             {
                 msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector())
@@ -272,13 +256,16 @@ public class UniversalSender extends BasicHandler
                 endpoint.process(dispatchEvent);
             }
         }
-        catch (AxisFault axisFault)
-        {
-            throw axisFault;
-        }
         catch (Exception e)
         {
-            throw new AxisFault(e.getMessage(), new Throwable(e));
+            if (e instanceof AxisFault)
+            {
+                throw (AxisFault) e;
+            }
+            else
+            {
+                throw new AxisFault(e.getMessage(), e);
+            }
         }
 
     }

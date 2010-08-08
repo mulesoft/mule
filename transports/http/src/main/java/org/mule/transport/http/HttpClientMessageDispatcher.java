@@ -117,9 +117,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             if (returnException(event, httpMethod))
             {
                 logger.error(httpMethod.getResponseBodyAsString());
-                throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
-                        "Http call returned a status of: " + httpMethod.getStatusCode() + " "
-                                + httpMethod.getStatusText()));
+                
+                Exception cause = new Exception(String.format("Http call returned a status of: %1d %1s",
+                    httpMethod.getStatusCode(), httpMethod.getStatusText()));
+                throw new DispatchException(event, event.getEndpoint(), cause);
             }
             else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
             {
@@ -152,11 +153,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         catch (IOException e)
         {
             // TODO employ dispatcher reconnection strategy at this point
-            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(event, event.getEndpoint(), e);
         }
         catch (Exception e)
         {
-            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(event, event.getEndpoint(), e);
         }
 
     }
@@ -309,7 +310,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
             if (returnException(event, httpMethod))
             {
-                ep = new DefaultExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
+                ep = new DefaultExceptionPayload(new DispatchException(event, event.getEndpoint(),
                         new HttpResponseException(httpMethod.getStatusText(), httpMethod.getStatusCode())));
             }
             else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
@@ -320,7 +321,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 }
                 catch (Exception e)
                 {
-                    ep = new DefaultExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+                    ep = new DefaultExceptionPayload(new DispatchException(event, event.getEndpoint(), e));
                     return getResponseFromMethod(httpMethod, ep);
                 }
             }
@@ -334,7 +335,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw (DispatchException) e;
             }
-            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+            throw new DispatchException(event, event.getEndpoint(), e);
         }
         finally
         {

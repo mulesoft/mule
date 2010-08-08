@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms.i18n;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
@@ -47,6 +48,11 @@ public class JmsMessages extends MessageFactory
     {
         String messageDescription = (message == null) ? "[null message]" : message.getUniqueId();
         return factory.createMessage(BUNDLE_PATH, 7, messageDescription);
+    }
+
+    public static Message messageMarkedForRedelivery(MuleEvent event)
+    {
+        return messageMarkedForRedelivery(event.getMessage());
     }
 
     public static Message failedToCreateAndDispatchResponse(Object object)

@@ -85,19 +85,15 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         Date beforeCall = new Date();
         MuleMessage message;
         Date afterCall;
-        try
-        {
-            message = muleClient.send("http://localhost:60216/DelayService", getPayload(), null, 1000);
-            fail("SocketTimeoutException expected");
-        }
-        catch (Exception e)
-        {
-            // Exception should have been thrown after timeout specified which is
-            // less than default.
-            afterCall = new Date();
-            assertTrue(e.getCause() instanceof SocketTimeoutException);
-            assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
-        }
+
+        MuleMessage result = muleClient.send("http://localhost:60216/DelayService", getPayload(), null, 1000);
+        assertNotNull(result);
+        assertNotNull("SocketTimeoutException expected", result.getExceptionPayload());
+        assertTrue(result.getExceptionPayload().getException().getCause() instanceof SocketTimeoutException);
+        // Exception should have been thrown after timeout specified which is
+        // less than default.
+        afterCall = new Date();
+        assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
     }
 
     public void testIncreaseMuleClientSendResponseTimeout() throws Exception

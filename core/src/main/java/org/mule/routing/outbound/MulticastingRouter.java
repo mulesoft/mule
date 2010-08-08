@@ -40,7 +40,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
 
         if (routes == null || routes.size() == 0)
         {
-            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -63,13 +63,13 @@ public class MulticastingRouter extends FilteringOutboundRouter
             {
                 MessageProcessor mp = routes.get(i);
                 OutboundEndpoint endpoint = mp instanceof OutboundEndpoint ? (OutboundEndpoint)mp : null;
-                if(endpoint == null || endpoint.getFilter()==null || (endpoint.getFilter()!=null && endpoint.getFilter().accept(message)))
+                if (endpoint == null || endpoint.getFilter() == null || (endpoint.getFilter() != null && endpoint.getFilter().accept(message)))
                 {
                     if (((DefaultMuleMessage) message).isConsumable())
                     {
                         throw new MessagingException(
                             CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
-                            message);
+                            event);
                     }
                     
                     MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), 
@@ -84,7 +84,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
         }
         catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, routes.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
         }
         return resultsHandler.aggregateResults(results, event, muleContext);
     }

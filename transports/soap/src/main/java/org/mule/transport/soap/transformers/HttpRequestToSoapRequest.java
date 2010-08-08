@@ -69,7 +69,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
             }
             catch (IOException e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
             
             src = bos.toByteArray();
@@ -83,7 +83,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(this, e);
+                throw new TransformerException(message, this, e);
             }
             // Data is already Xml
             if (data.startsWith("<") || data.startsWith("&lt;"))
@@ -103,7 +103,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
         if (method == null)
         {
             throw new TransformerException(
-                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), this);
+                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), message, this);
         }
 
         if (httpMethod.equals("POST"))

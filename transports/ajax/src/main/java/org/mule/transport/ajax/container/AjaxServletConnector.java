@@ -104,7 +104,7 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
         return bayeux;
     }
 
-    public void setBayeux(AbstractBayeux bayeux)
+    public void setBayeux(AbstractBayeux bayeux) throws MuleException
     {
         this.bayeux = bayeux;
         this.getBayeux().setJSONCommented(isJsonCommented());
@@ -114,20 +114,13 @@ public class AjaxServletConnector extends ServletConnector implements BayeuxAwar
         if(getMultiFrameInterval() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setMultiFrameInterval(getMultiFrameInterval());
         if(getTimeout() != AbstractConnector.INT_VALUE_NOT_SET) this.getBayeux().setTimeout(getMultiFrameInterval());
         //Only start once we have this
-        try
+        this.setInitialStateStopped(false);
+        
+        for (Object receiver : receivers.values())
         {
-            this.setInitialStateStopped(false);
-            
-            for (Object receiver : receivers.values())
-            {
-                ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());
-            }
-           start();
+            ((AjaxMessageReceiver)receiver).setBayeux(getBayeux());
         }
-        catch (MuleException e)
-        {
-            handleException(e);
-        }
+        start();
     }
 
     @Override

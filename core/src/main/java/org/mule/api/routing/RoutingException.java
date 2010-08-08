@@ -11,6 +11,7 @@
 package org.mule.api.routing;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -30,30 +31,67 @@ public class RoutingException extends MessagingException
 
     protected final transient RoutingTarget route;
 
+    /**
+     * @deprecated use RoutingException(MuleEvent, RoutingTarget)
+     */
+    @Deprecated
     public RoutingException(MuleMessage message, RoutingTarget route)
     {
         super(generateMessage(null, route), message);
         this.route = route;
     }
 
+    public RoutingException(MuleEvent event, RoutingTarget route)
+    {
+        super(generateMessage(null, route), event);
+        this.route = route;
+    }
+
+    /**
+     * @deprecated use RoutingException(MuleEvent, RoutingTarget, Throwable)
+     */
+    @Deprecated
     public RoutingException(MuleMessage message, RoutingTarget route, Throwable cause)
     {
         super(generateMessage(null, route), message, cause);
         this.route = route;
     }
 
+    public RoutingException(MuleEvent event, RoutingTarget route, Throwable cause)
+    {
+        super(generateMessage(null, route), event, cause);
+        this.route = route;
+    }
+
+    /**
+     * @deprecated use RoutingException(Message, MuleEvent, RoutingTarget)
+     */
+    @Deprecated
     public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget route)
     {
         super(generateMessage(message, route), muleMessage);
         this.route = route;
     }
 
-    public RoutingException(Message message,
-                            MuleMessage muleMessage,
-                            RoutingTarget route,
-                            Throwable cause)
+    public RoutingException(Message message, MuleEvent event, RoutingTarget route)
+    {
+        super(generateMessage(message, route), event);
+        this.route = route;
+    }
+
+    /**
+     * @deprecated use RoutingException(Message, MuleEvent, RoutingTarget, Throwable)
+     */
+    @Deprecated
+    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget route, Throwable cause)
     {
         super(generateMessage(message, route), muleMessage, cause);
+        this.route = route;
+    }
+
+    public RoutingException(Message message, MuleEvent event, RoutingTarget route, Throwable cause)
+    {
+        super(generateMessage(message, route), event, cause);
         this.route = route;
     }
 

@@ -52,6 +52,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
     private PGPKeyRing keyManager;
 
+    @Override
     protected void authenticateInbound(MuleEvent event)
         throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException
     {
@@ -67,8 +68,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e1)
         {
-            throw new UnauthorisedException(
-                CoreMessages.failedToReadPayload(), event.getMessage(), e1);
+            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
         }
 
         Authentication authentication;
@@ -78,8 +78,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e1)
         {
-            throw new UnauthorisedException(
-                CoreMessages.failedToReadPayload(), event.getMessage(), e1);
+            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
         }
 
         final Authentication authResult;
@@ -95,7 +94,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
                 logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
             }
 
-            throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), event.getMessage(), e);
+            throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), event, e);
         }
 
         // Authentication success
@@ -115,7 +114,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e2)
         {
-            throw new UnauthorisedException(event.getMessage(), context, event.getEndpoint(), this);
+            throw new UnauthorisedException(event, context, event.getEndpoint(), this);
         }
     }
 
@@ -149,6 +148,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
     }
 
+    @Override
     protected void authenticateOutbound(MuleEvent event) throws SecurityException, UnauthorisedException
     {
         logger.debug("authenticateOutbound:" + event.getId());
@@ -171,10 +171,11 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e1)
         {
-            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event.getMessage(), e1);
+            throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
         }
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         if (strategyName != null)

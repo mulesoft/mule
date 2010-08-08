@@ -10,19 +10,18 @@
 
 package org.mule.test.integration.exceptions;
 
-import org.mule.DefaultExceptionStrategy;
-import org.mule.RequestContext;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.message.DefaultExceptionPayload;
 
-public class TestExceptionStrategy extends DefaultExceptionStrategy
+public class TestExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     @Override
-    protected void defaultHandler(Throwable t)
+    public MuleMessage getReturnMessage(Exception e)
     {
-        if (RequestContext.getEvent() != null)
-        {
-            RequestContext.setExceptionPayload(new DefaultExceptionPayload(t));
-            setReturnMessage("Ka-boom!");
-        }
+        MuleMessage message = new DefaultMuleMessage("Ka-boom!", muleContext);
+        message.setExceptionPayload(new DefaultExceptionPayload(e));
+        return message;
     }
 }

@@ -10,8 +10,6 @@
 
 package org.mule.transaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
@@ -21,20 +19,19 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.config.i18n.CoreMessages;
 
-import java.beans.ExceptionListener;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class TransactionTemplate<T>
 {
     private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
 
     private final TransactionConfig config;
-    private final ExceptionListener exceptionListener;
     private final MuleContext context;
 
-    public TransactionTemplate(TransactionConfig config, ExceptionListener listener, MuleContext context)
+    public TransactionTemplate(TransactionConfig config, MuleContext context)
     {
         this.config = config;
-        exceptionListener = listener;
         this.context = context;
     }
 
@@ -130,22 +127,10 @@ public class TransactionTemplate<T>
         catch (Exception e)
         {
             tx = TransactionCoordination.getInstance().getTransaction();
-            if (isExceptionHandledAtThisLevel(tx))
-            {
-                logger.info("Exception Caught in Transaction template.  Handing off to exception handler: "
-                    + exceptionListener);
-                exceptionListener.exceptionThrown(e);
-            }
-            else
-            {
-                logger.info("Exception Caught in Transaction template without any exception listeners defined, exception is rethrown.");
-                if (tx != null)
-                {
-                    tx.setRollbackOnly();
-                }
-            }
             if (tx != null)
             {
+                tx.setRollbackOnly();
+
                 // The exception strategy can choose to route exception
                 // messages as part of the current transaction. So only rollback the
                 // tx if it has been marked for rollback (which is the default
@@ -163,16 +148,7 @@ public class TransactionTemplate<T>
                 // the context delimited by XA's ALWAYS_BEGIN
                 return null;
             }
-            else if (isExceptionHandledAtThisLevel(tx))
-            {
-                // if exception is handled at this level, it has been handled
-                // already, don't loop
-                return null;
-            }
-            else
-            {
-                throw e;
-            }
+            throw e;
         }
         catch (Error e)
         {
@@ -188,18 +164,6 @@ public class TransactionTemplate<T>
             if (joinedExternal != null)
                 TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
         }
-    }
-
-    /**
-     * The exception must be handled at this level if there is an
-     * {@link #exceptionListener} and there is a transaction.
-     * 
-     * @param tx
-     * @return
-     */
-    private boolean isExceptionHandledAtThisLevel(Transaction tx)
-    {
-        return exceptionListener != null && tx != null;
     }
 
     protected void resolveTransaction(Transaction tx) throws TransactionException

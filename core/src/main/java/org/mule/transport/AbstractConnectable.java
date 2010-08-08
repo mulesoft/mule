@@ -36,15 +36,13 @@ import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import java.beans.ExceptionListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
-public abstract class AbstractConnectable<O> implements Connectable, ExceptionListener, LifecycleStateEnabled
+public abstract class AbstractConnectable<O> implements Connectable, LifecycleStateEnabled
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -89,23 +87,6 @@ public abstract class AbstractConnectable<O> implements Connectable, ExceptionLi
         {
             logger.error("Could not dispose of the message dispatcher!", t);
         }
-    }
-
-    public void exceptionThrown(Exception e)
-    {
-        try
-        {
-            handleException(e);
-        }
-        finally
-        {
-            dispose();
-        }
-    }
-
-    public void handleException(Exception exception)
-    {
-        connector.handleException(exception, this);
     }
 
     public boolean validate()
@@ -550,7 +531,7 @@ public abstract class AbstractConnectable<O> implements Connectable, ExceptionLi
         this.endpoint = endpoint;
     }
 
-    abstract protected WorkManager getWorkManager();
+    abstract protected WorkManager getWorkManager() throws MuleException;
 
     public boolean isStarted()
     {

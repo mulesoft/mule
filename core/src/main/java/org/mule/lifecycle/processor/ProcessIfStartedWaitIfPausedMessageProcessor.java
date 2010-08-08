@@ -47,7 +47,7 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
             {
                 throw new MessagingException(
                     CoreMessages.interruptedWaitingForPaused(getStartableName(startable)),
-                    event.getMessage(), e);
+                    event, e);
             }
         }
         return super.processNext(event);

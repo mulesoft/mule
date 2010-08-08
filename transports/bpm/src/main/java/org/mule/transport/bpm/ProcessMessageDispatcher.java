@@ -43,6 +43,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @return an object representing the new state of the process
      */
+    @Override
     public MuleMessage doSend(MuleEvent event) throws Exception
     {
         Object process = processAction(event);
@@ -55,15 +56,16 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            throw new DispatchException(MessageFactory
-                .createStaticMessage("Synchronous process invocation must return the new process state."),
-                event.getMessage(), event.getEndpoint());
+            throw new DispatchException(
+                MessageFactory.createStaticMessage("Synchronous process invocation must return the new process state."),
+                event, event.getEndpoint());
         }
     }
 
     /**
      * Performs an asynchronous action on the BPMS.
      */
+    @Override
     public void doDispatch(MuleEvent event) throws Exception
     {
         processAction(event);

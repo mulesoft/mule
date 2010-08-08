@@ -198,7 +198,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (Exception e)
         {
-            handleException(e);
+            getFlowConstruct().getExceptionListener().exceptionThrown(e);
         }
     }
 
@@ -217,7 +217,6 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             {
                 TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
                                                         endpoint.getTransactionConfig(),
-                                                        connector.getExceptionListener(),
                                                         connector.getMuleContext());
 
                 final String encoding = endpoint.getEncoding();
@@ -283,7 +282,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             }
             catch (Exception e)
             {
-                getConnector().handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
         }
 

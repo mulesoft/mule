@@ -8,26 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.endpoint.inbound;
+package org.mule.processor;
 
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.tck.security.TestSecurityFilter;
 
 import org.junit.Test;
 
-public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInboundMessageProcessorTestCase
+public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
     @Test
     public void testFilterPass() throws Exception
     {
-        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), 
+        TestSecurityFilter securityFilter = new TestSecurityFilter(true);
+        InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter,
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        InterceptingMessageProcessor mp = new InboundSecurityFilterMessageProcessor(endpoint);
+        InterceptingMessageProcessor mp = new SecurityFilterMessageProcessor(securityFilter);
         TestListener listner = new TestListener();
         mp.setListener(listner);
 
@@ -42,9 +44,10 @@ public class InboundSecurityFilterMessageProcessorTestCase extends AbstractInbou
     @Test
     public void testFilterFail() throws Exception
     {
-        InboundEndpoint endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), 
+        TestSecurityFilter securityFilter = new TestSecurityFilter(false);
+        InboundEndpoint endpoint = createTestInboundEndpoint(null, securityFilter,
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        InterceptingMessageProcessor mp = new InboundSecurityFilterMessageProcessor(endpoint);
+        InterceptingMessageProcessor mp = new SecurityFilterMessageProcessor(securityFilter);
         TestListener listner = new TestListener();
         mp.setListener(listner);
 

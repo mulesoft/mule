@@ -152,7 +152,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
             }
             catch (Exception e)
             {
-                handleException(e);
+                getFlowConstruct().getExceptionListener().exceptionThrown(e);
             }
         }
 

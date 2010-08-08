@@ -28,6 +28,8 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.util.queue.QueueManager;
 
+import java.beans.ExceptionListener;
+
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 
@@ -221,4 +223,8 @@ public interface MuleContext extends Lifecycle
     boolean isStarting();
     
     LocalMuleClient getClient();
+    
+    ExceptionListener getExceptionListener();
+
+    void setExceptionListener(ExceptionListener exceptionListener);
 }

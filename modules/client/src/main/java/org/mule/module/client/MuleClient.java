@@ -12,10 +12,8 @@ package org.mule.module.client;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.MessageExchangePattern;
 import org.mule.api.FutureMessageResult;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -34,6 +32,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.ServiceException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
@@ -47,6 +46,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.security.MuleCredentials;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
@@ -278,7 +278,7 @@ public class MuleClient implements Disposable
         }
         catch (Exception e)
         {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event.getMessage(),
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
                 event.getEndpoint(), e);
         }
     }
@@ -320,8 +320,7 @@ public class MuleClient implements Disposable
         Service service = muleContext.getRegistry().lookupService(componentName);
         if (service == null)
         {
-            throw new MessagingException(CoreMessages.objectNotRegistered("Service", componentName),
-                message);
+            throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
         }
         List<Transformer> trans = null;
         if (transformers != null)
@@ -381,8 +380,7 @@ public class MuleClient implements Disposable
         Service service = muleContext.getRegistry().lookupService(componentName);
         if (service == null)
         {
-            throw new MessagingException(CoreMessages.objectNotRegistered("Service", componentName),
-                message);
+            throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
         }
         MuleSession session = new DefaultMuleSession(service, muleContext);
         ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
@@ -637,26 +635,29 @@ public class MuleClient implements Disposable
         MuleEvent event = getEvent(message, endpoint);
         event.setTimeout(timeout);
 
-        try
+        MuleEvent response = endpoint.process(event);
+        if (response != null)
         {
-            MuleEvent response = endpoint.process(event);
-            if (response != null)
-            {
+//            if (response.getMessage().getExceptionPayload() == null)
+//            {
                 return response.getMessage();
-            }
-            else
-            {
-                return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
-            }
+//            }
+//            else
+//            {
+//                Throwable e = response.getMessage().getExceptionPayload().getException();
+//                if (e instanceof MuleException)
+//                {
+//                    throw (MuleException) e;
+//                }
+//                else
+//                {
+//                    throw new MessagingException(message, e);
+//                }
+//            }
         }
-        catch (MuleException e)
+        else
         {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event.getMessage(),
-                event.getEndpoint(), e);
+            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
     }
 
@@ -840,11 +841,11 @@ public class MuleClient implements Disposable
      *            properties.
      * @throws org.mule.api.MuleException
      */
-    public void sendNoReceive(String url, Object payload, Map messageProperties) throws MuleException
+    public void sendNoReceive(String url, Object payload, Map<String, Object> messageProperties) throws MuleException
     {
         if (messageProperties == null)
         {
-            messageProperties = new HashMap();
+            messageProperties = new HashMap<String, Object>();
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
@@ -862,7 +863,7 @@ public class MuleClient implements Disposable
         }
         catch (Exception e)
         {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event.getMessage(),
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
                 event.getEndpoint(), e);
         }
     }

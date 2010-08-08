@@ -15,8 +15,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.util.ObjectNameHelper;
 
-import java.beans.ExceptionListener;
-
 public class ConnectorService implements ConnectorServiceMBean
 {
     private final Connector connector;
@@ -46,11 +44,6 @@ public class ConnectorService implements ConnectorServiceMBean
     public String getProtocol()
     {
         return connector.getProtocol();
-    }
-
-    public ExceptionListener getExceptionListener()
-    {
-        return connector.getExceptionListener();
     }
 
     public void startConnector() throws MuleException

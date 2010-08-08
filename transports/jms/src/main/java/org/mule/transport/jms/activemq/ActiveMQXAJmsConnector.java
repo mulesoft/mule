@@ -12,8 +12,6 @@ package org.mule.transport.jms.activemq;
 import org.mule.api.MuleContext;
 import org.mule.util.ClassUtils;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.jms.ConnectionFactory;
 
 public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
@@ -25,24 +23,11 @@ public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
         super(context);
     }
     
-    protected ConnectionFactory getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory() throws Exception
     {
-        try
-        {
-            ConnectionFactory connectionFactory = (ConnectionFactory)
-                    ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, getBrokerURL());
-            applyVendorSpecificConnectionFactoryProperties(connectionFactory);
-            return connectionFactory;
-        }
-        catch (InvocationTargetException itex)
-        {
-            Throwable target = itex.getCause();
-            handleException(target instanceof Exception ? (Exception) target : new Exception(target));
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-        }
-        return null;
+        ConnectionFactory connectionFactory = (ConnectionFactory)
+                ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, getBrokerURL());
+        applyVendorSpecificConnectionFactoryProperties(connectionFactory);
+        return connectionFactory;
     }
 }

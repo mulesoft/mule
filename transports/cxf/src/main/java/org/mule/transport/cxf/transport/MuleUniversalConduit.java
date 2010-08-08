@@ -15,7 +15,6 @@ import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.DefaultMuleSession;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -25,6 +24,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.cxf.CxfConfiguration;

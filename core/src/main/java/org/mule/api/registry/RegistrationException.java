@@ -10,11 +10,14 @@
 
 package org.mule.api.registry;
 
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.config.i18n.Message;
 
-public class RegistrationException extends DefaultMuleException
+public class RegistrationException extends MuleException
 {
-    public RegistrationException(String message)
+    private static final long serialVersionUID = 9143114426140546637L;
+
+    public RegistrationException(Message message)
     {
         super(message);
     }
@@ -23,5 +26,11 @@ public class RegistrationException extends DefaultMuleException
     {
         super(cause);
     }
+
+    public RegistrationException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
+    
 }
 

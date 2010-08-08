@@ -22,9 +22,7 @@
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
-    <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
-        <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
-    </servlet:connector>
+    <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services" />
 
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
@@ -40,7 +38,8 @@
                     </response>
                 </axis:inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <echo-component />
+	        <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
         </service>
     </model>
 

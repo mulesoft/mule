@@ -12,20 +12,17 @@ package org.mule.module.guice;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.registry.AbstractRegistry;
 
 import com.google.inject.Binding;
-import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +112,7 @@ public class GuiceRegistry extends AbstractRegistry
         }
         else
         {
-            throw new RegistrationException("More than one object of type: " + type + ", was found");
+            throw new RegistrationException(MessageFactory.createStaticMessage("More than one object of type: " + type + ", was found"));
         }
     }
 
