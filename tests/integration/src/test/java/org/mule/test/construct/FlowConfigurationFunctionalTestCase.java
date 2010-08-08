@@ -244,4 +244,48 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     }
 
+    public void testMulticaster() throws MuleException, Exception
+    {
+        muleContext.getClient()
+            .send("vm://multicaster-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        MuleMessage result1 = muleContext.getClient().request("vm://multicaster-out1", RECEIVE_TIMEOUT);
+        MuleMessage result2 = muleContext.getClient().request("vm://multicaster-out2", RECEIVE_TIMEOUT);
+        MuleMessage result3 = muleContext.getClient().request("vm://multicaster-out3", RECEIVE_TIMEOUT);
+
+        assertNotNull(result1);
+        assertNotNull(result2);
+        assertNotNull(result3);
+        assertNotSame(result1, result2);
+        assertNotSame(result1, result3);
+        assertNotSame(result2, result3);
+
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+
+    }
+
+    public void testRecipientList() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://recipient-list-in",
+            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        MuleMessage result1 = muleContext.getClient().request("vm://recipient-list-out1", RECEIVE_TIMEOUT);
+        MuleMessage result2 = muleContext.getClient().request("vm://recipient-list-out2", RECEIVE_TIMEOUT);
+        MuleMessage result3 = muleContext.getClient().request("vm://recipient-list-out3", RECEIVE_TIMEOUT);
+
+        assertNotNull(result1);
+        assertNotNull(result2);
+        assertNotNull(result3);
+        assertNotSame(result1, result2);
+        assertNotSame(result1, result3);
+        assertNotSame(result2, result3);
+
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result1.getPayload());
+
+    }
+
 }

@@ -391,12 +391,16 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(CollectionSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
 
+        // Routing: Routing Message Processors
+        
         // Routing: Conditional Routers
         registerBeanDefinitionParser("choice", new ChildDefinitionParser("messageProcessor", ChoiceRouterFactoryBean.class));
         registerBeanDefinitionParser("when", new ChildDefinitionParser("route", ConditionalMessageProcessorFactoryBean.class));
         registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", ConditionalMessageProcessorFactoryBean.class));
-        
-        // Routing: Routing Message Processors
+
+        registerBeanDefinitionParser("multicaster", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
+        registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
+
         
         //Message Info Mappings
         registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));
