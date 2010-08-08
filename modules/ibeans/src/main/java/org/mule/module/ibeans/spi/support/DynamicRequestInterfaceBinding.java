@@ -9,9 +9,9 @@
  */
 package org.mule.module.ibeans.spi.support;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleEvent;
 import org.mule.config.i18n.CoreMessages;
 
 import org.ibeans.api.channel.CHANNEL;
@@ -24,23 +24,26 @@ import org.ibeans.api.channel.CHANNEL;
 public class DynamicRequestInterfaceBinding extends DefaultRequestInterfaceBinding
 {
     @Override
-    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
+    public MuleEvent process(MuleEvent event) throws MessagingException
     {
         try
         {
-            int timeout = message.getInboundProperty(CHANNEL.TIMEOUT, getMuleContext().getConfiguration().getDefaultResponseTimeout());
+            int timeout = event.getMessage().getInboundProperty(CHANNEL.TIMEOUT, event.getMuleContext().getConfiguration().getDefaultResponseTimeout());
             if (inboundEndpoint instanceof DynamicRequestEndpoint)
             {
-                return ((DynamicRequestEndpoint) inboundEndpoint).request(timeout, message);
+                return new DefaultMuleEvent(((DynamicRequestEndpoint) inboundEndpoint).request(timeout,
+                    event.getMessage()), event);
             }
             else
             {
-                return inboundEndpoint.request(getMuleContext().getConfiguration().getDefaultResponseTimeout());
+                return new DefaultMuleEvent(inboundEndpoint.request(event.getMuleContext()
+                    .getConfiguration()
+                    .getDefaultResponseTimeout()), event);
             }
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), message, e);
+            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), event.getMessage(), e);
         }
     }
 }

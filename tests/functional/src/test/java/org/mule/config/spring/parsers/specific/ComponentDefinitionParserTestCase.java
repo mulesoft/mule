@@ -18,6 +18,7 @@ import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
+import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.simple.PassThroughComponent;
@@ -35,7 +36,6 @@ import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
@@ -56,7 +56,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, service.getComponent().getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
             2,
@@ -77,7 +77,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, service.getComponent().getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -96,7 +96,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, service.getComponent().getClass());
         assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -116,7 +116,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(DefaultJavaComponent.class, service.getComponent().getClass());
         assertEquals(SpringBeanLookup.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
             1,
@@ -149,7 +149,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, service.getComponent().getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         validatePoolingProfile(service);
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
@@ -170,7 +170,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, service.getComponent().getClass());
         assertEquals(PrototypeObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         validatePoolingProfile(service);
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
@@ -191,7 +191,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, service.getComponent().getClass());
         assertEquals(SingletonObjectFactory.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         validatePoolingProfile(service);
         assertNotNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
         assertEquals(
@@ -212,7 +212,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals(PooledJavaComponent.class, service.getComponent().getClass());
         assertEquals(SpringBeanLookup.class, ((AbstractJavaComponent) service.getComponent()).getObjectFactory()
             .getClass());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
         validatePoolingProfile(service);
         assertNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
     }
@@ -243,9 +243,9 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertFalse(service.getComponent() instanceof PassThroughComponent);
         assertTrue(service.getComponent() instanceof JavaComponent);
         assertEquals(DummyComponentWithBinding.class, ((JavaComponent) service.getComponent()).getObjectType());
-        assertNotNull(((JavaComponent) service.getComponent()).getBindingCollection());
-        assertEquals(1, ((JavaComponent) service.getComponent()).getBindingCollection().getRouters().size());
-        assertTrue(((JavaComponent) service.getComponent()).getBindingCollection().getRouters().get(0) instanceof DefaultInterfaceBinding);
+        assertNotNull(((JavaComponent) service.getComponent()).getInterfaceBindings());
+        assertEquals(1, ((JavaComponent) service.getComponent()).getInterfaceBindings().size());
+        assertTrue(((JavaComponent) service.getComponent()).getInterfaceBindings().get(0) instanceof DefaultInterfaceBinding);
         assertTrue(((JavaComponent) service.getComponent()).getLifecycleAdapterFactory() instanceof TestComponentLifecycleAdapterFactory);
 
     }

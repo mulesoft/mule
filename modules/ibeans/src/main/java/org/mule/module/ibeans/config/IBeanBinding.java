@@ -12,22 +12,19 @@ package org.mule.module.ibeans.config;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.EndpointAnnotationParser;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.MuleSession;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.management.stats.RouterStatistics;
 import org.mule.module.ibeans.spi.MuleCallAnnotationHandler;
 import org.mule.module.ibeans.spi.MuleIBeansPlugin;
 import org.mule.module.ibeans.spi.support.DynamicRequestInterfaceBinding;
-import org.mule.routing.AbstractRouter;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
 
@@ -58,7 +55,7 @@ import org.ibeans.impl.TemplateAnnotationHandler;
 /**
  * TODO
  */
-public class IBeanBinding extends AbstractRouter implements InterfaceBinding
+public class IBeanBinding implements InterfaceBinding
 {
 
     private static final Log logger = LogFactory.getLog(IBeanBinding.class);
@@ -71,10 +68,11 @@ public class IBeanBinding extends AbstractRouter implements InterfaceBinding
     protected SimpleFlowConstruct flow;
 
     protected MuleIBeansPlugin plugin;
+    
+    protected MuleContext muleContext;
 
     public IBeanBinding(SimpleFlowConstruct flow, MuleIBeansPlugin plugin)
     {
-        setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_BINDING));
         this.flow = flow;
         this.muleContext = this.flow.getMuleContext();
         this.plugin = plugin;
@@ -90,12 +88,11 @@ public class IBeanBinding extends AbstractRouter implements InterfaceBinding
         throw new UnsupportedOperationException();
     }
 
-    public MuleMessage route(MuleMessage message, MuleSession session) throws MessagingException
+    public MuleEvent process(MuleEvent event) throws MessagingException
     {
         try
         {
-            MuleEvent event = endpoint.process(new DefaultMuleEvent(message, endpoint, session));
-            return event.getMessage();
+            return endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint, event.getSession()));
         }
         catch (MessagingException e)
         {
@@ -103,7 +100,7 @@ public class IBeanBinding extends AbstractRouter implements InterfaceBinding
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), message, e);
+            throw new MessagingException(e.getI18nMessage(), event.getMessage(), e);
         }
     }
 

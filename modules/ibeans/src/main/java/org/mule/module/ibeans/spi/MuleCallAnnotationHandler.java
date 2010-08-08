@@ -9,15 +9,18 @@
  */
 package org.mule.module.ibeans.spi;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 
@@ -118,20 +121,22 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 //        }
        
 
+        MuleEvent replyEvent = null;
         MuleMessage reply;
-        MuleSession session = null; //new DefaultMuleSession(service, muleContext);
+        MuleSession session = new DefaultMuleSession(muleContext);
 
         try
         {
-            reply = router.route(message, session);
+            replyEvent = router.process(new DefaultMuleEvent(message, router.getEndpoint(), session));
         }
         catch (Throwable e)
         {
             //Make all exceptions go through the CallException handler
             reply = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
             reply.setExceptionPayload(new DefaultExceptionPayload(e));
+            e.printStackTrace();
         }
-        return new MuleResponseMessage(reply);
+        return new MuleResponseMessage(replyEvent.getMessage());
     }
 
     public String getScheme(Method method)

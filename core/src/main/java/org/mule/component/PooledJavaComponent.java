@@ -13,16 +13,18 @@ package org.mule.component;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.Component;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.BindingCollection;
 import org.mule.config.PoolingProfile;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
 import org.mule.util.pool.ObjectPool;
+
+import java.util.List;
 
 /**
  * <code>PooledJavaComponent</code> implements pooling.
@@ -52,9 +54,9 @@ public class PooledJavaComponent extends AbstractJavaComponent
     public PooledJavaComponent(ObjectFactory objectFactory,
                                PoolingProfile poolingProfile,
                                EntryPointResolverSet entryPointResolverSet,
-                               BindingCollection bindingCollection)
+                               List<InterfaceBinding> bindings)
     {
-        super(objectFactory, entryPointResolverSet, bindingCollection);
+        super(objectFactory, entryPointResolverSet, bindings);
         this.poolingProfile = poolingProfile;
     }
 

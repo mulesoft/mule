@@ -15,15 +15,15 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InterfaceBinding;
+import org.mule.component.BindingInvocationHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouter;
-import org.mule.routing.binding.BindingInvocationHandler;
 import org.mule.session.DefaultMuleSession;
 
 import java.lang.reflect.Proxy;

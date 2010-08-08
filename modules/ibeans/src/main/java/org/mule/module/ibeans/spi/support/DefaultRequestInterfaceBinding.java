@@ -11,7 +11,7 @@ package org.mule.module.ibeans.spi.support;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.routing.binding.DefaultInterfaceBinding;
+import org.mule.component.DefaultInterfaceBinding;
 
 /**
  * Used for making a request from a message dispatcher

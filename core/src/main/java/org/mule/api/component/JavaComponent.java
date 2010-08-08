@@ -12,10 +12,11 @@ package org.mule.api.component;
 
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.BindingCollection;
 import org.mule.component.PooledJavaComponent;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+
+import java.util.List;
 
 /**
  * <code>JavaComponent</code> is a Java {@link Component} implementation used to
@@ -49,9 +50,9 @@ public interface JavaComponent extends Component
      */
     void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet);
 
-    BindingCollection getBindingCollection();
+    List<InterfaceBinding> getInterfaceBindings();
 
-    void setBindingCollection(BindingCollection bindingCollection);
+    void setInterfaceBindings(List<InterfaceBinding> bindgins);
 
     /**
      * The object factory used to obtain the component object instance. Mule core

@@ -11,16 +11,17 @@
 package org.mule.component;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.registry.ServiceException;
-import org.mule.api.routing.BindingCollection;
-import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+
+import java.util.List;
 
 /**
  * Default implementation of {@link JavaComponent}. Component lifecycle is
@@ -31,13 +32,6 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     protected LifecycleAdapter singletonComponentLifecycleAdapter;
 
-    
-    
-    public void setService(Service service){
-        int i=1;
-        i++;
-    }
-    
     /**
      * For spring only
      */
@@ -53,9 +47,9 @@ public class DefaultJavaComponent extends AbstractJavaComponent
 
     public DefaultJavaComponent(ObjectFactory objectFactory,
                                 EntryPointResolverSet entryPointResolverSet,
-                                BindingCollection bindingCollection)
+                                List<InterfaceBinding> bindings)
     {
-        super(objectFactory, entryPointResolverSet, bindingCollection);
+        super(objectFactory, entryPointResolverSet, bindings);
     }
 
     @Override

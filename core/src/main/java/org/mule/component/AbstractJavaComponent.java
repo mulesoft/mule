@@ -12,6 +12,7 @@ package org.mule.component;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.component.LifecycleAdapterFactory;
@@ -21,14 +22,14 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.object.ObjectFactory;
-import org.mule.api.routing.BindingCollection;
 import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.routing.binding.DefaultBindingCollection;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Abstract implementation of JavaComponent adds JavaComponent specific's:
@@ -42,7 +43,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     protected EntryPointResolverSet entryPointResolverSet;
 
-    protected BindingCollection bindingCollection = new DefaultBindingCollection();
+    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
     protected ObjectFactory objectFactory;
 
@@ -63,14 +64,14 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
 
     public AbstractJavaComponent(ObjectFactory objectFactory,
                                  EntryPointResolverSet entryPointResolverSet,
-                                 BindingCollection bindingCollection)
+                                 List<InterfaceBinding> bindings)
     {
         super();
         this.objectFactory = objectFactory;
         this.entryPointResolverSet = entryPointResolverSet;
-        if (bindingCollection != null)
+        if (bindings != null)
         {
-            this.bindingCollection = bindingCollection;
+            this.bindings = bindings;
         }
     }
 
@@ -192,9 +193,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         return entryPointResolverSet;
     }
 
-    public BindingCollection getBindingCollection()
+    public List<InterfaceBinding> getInterfaceBindings()
     {
-        return bindingCollection;
+        return bindings;
     }
 
     public void setEntryPointResolverSet(EntryPointResolverSet entryPointResolverSet)
@@ -202,9 +203,9 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         this.entryPointResolverSet = entryPointResolverSet;
     }
 
-    public void setBindingCollection(BindingCollection bindingCollection)
+    public void setInterfaceBindings(List<InterfaceBinding> bindings)
     {
-        this.bindingCollection = bindingCollection;
+        this.bindings = bindings;
     }
 
     /**

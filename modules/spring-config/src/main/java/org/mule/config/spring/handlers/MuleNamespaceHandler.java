@@ -11,6 +11,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
@@ -115,7 +116,6 @@ import org.mule.routing.MessageFilter;
 import org.mule.routing.Resequencer;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.WireTap;
-import org.mule.routing.binding.DefaultInterfaceBinding;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
 import org.mule.routing.filters.ExpressionFilter;
@@ -316,7 +316,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
 
-        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("bindingCollection.routers", DefaultInterfaceBinding.class)).addCollection("bindingCollection.routers");
+        registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
 
         // Simple Components
         registerBeanDefinitionParser("pass-through-component", new ComponentDefinitionParser(PassThroughComponent.class));

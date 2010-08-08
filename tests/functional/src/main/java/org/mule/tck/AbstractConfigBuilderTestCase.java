@@ -12,12 +12,12 @@ package org.mule.tck;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
@@ -348,7 +348,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Service orange = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
         assertTrue(orange.getComponent() instanceof JavaComponent);
-        InterfaceBinding r = (InterfaceBinding) ((JavaComponent) orange.getComponent()).getBindingCollection().getRouters().get(0);
+        InterfaceBinding r = (InterfaceBinding) ((JavaComponent) orange.getComponent()).getInterfaceBindings().get(0);
         assertNotNull(r);
 
         //TODO Grab an instance of the service object itself and test that the proxy has been injected

@@ -12,17 +12,17 @@ package org.mule.module.scripting.component;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.BindingCollection;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.component.AbstractComponent;
-import org.mule.routing.binding.BindingInvocationHandler;
-import org.mule.routing.binding.DefaultBindingCollection;
+import org.mule.component.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -33,7 +33,7 @@ import javax.script.Bindings;
  */
 public class ScriptComponent extends AbstractComponent
 {
-    protected BindingCollection bindingCollection = new DefaultBindingCollection();
+    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
     private Scriptable script;
 
@@ -87,14 +87,14 @@ public class ScriptComponent extends AbstractComponent
         this.script = script;
     }
 
-    public BindingCollection getBindingCollection()
+    public List<InterfaceBinding> getInterfaceBindings()
     {
-        return bindingCollection;
+        return bindings;
     }
 
-    public void setBindingCollection(BindingCollection bindingCollection)
+    public void setInterfaceBindings(List<InterfaceBinding> bindingCollection)
     {
-        this.bindingCollection = bindingCollection;
+        this.bindings = bindingCollection;
     }
 
     protected void configureComponentBindings() throws MuleException
@@ -102,9 +102,9 @@ public class ScriptComponent extends AbstractComponent
         proxies = new HashMap<String, Object>();
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy
-        if (bindingCollection != null && bindingCollection.getRouters().size() > 0)
+        if (bindings != null && bindings.size() > 0)
         {
-            for (Iterator<?> it = bindingCollection.getRouters().iterator(); it.hasNext();)
+            for (Iterator<?> it = bindings.iterator(); it.hasNext();)
             {
                 InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
                 String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());

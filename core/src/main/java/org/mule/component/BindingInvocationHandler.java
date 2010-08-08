@@ -8,15 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.binding;
+package org.mule.component;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
@@ -26,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,10 +93,11 @@ public class BindingInvocationHandler implements InvocationHandler
         }
 
         MuleEvent currentEvent = RequestContext.getEvent();
-        MuleMessage reply = router.route(message, currentEvent.getSession());
+        MuleEvent replyEvent = router.process(new DefaultMuleEvent(message,currentEvent));
 
-        if (reply != null)
+        if (replyEvent != null && replyEvent.getMessage()!=null)
         {
+            MuleMessage reply = replyEvent.getMessage();
             if (reply.getExceptionPayload() != null)
             {
                 throw findDeclaredMethodException(method, reply.getExceptionPayload().getException());

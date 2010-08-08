@@ -17,6 +17,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.component.LifecycleAdapter;
 import org.mule.api.construct.FlowConstruct;
@@ -28,14 +29,12 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
 import org.mule.model.resolvers.TooManySatisfiableMethodsException;
 import org.mule.registry.JSR250ValidatorProcessor;
-import org.mule.routing.binding.BindingInvocationHandler;
 import org.mule.util.ClassUtils;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
@@ -45,7 +44,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -394,12 +392,11 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     {
         // Initialise the nested router and bind the endpoints to the methods using a
         // Proxy
-        if (component.getBindingCollection() != null)
+        if (component.getInterfaceBindings() != null)
         {
             Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
-            for (Iterator<?> it = component.getBindingCollection().getRouters().iterator(); it.hasNext();)
+            for (InterfaceBinding interfaceBinding : component.getInterfaceBindings())
             {
-                InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
                 Object proxy = bindings.get(interfaceBinding.getInterface());
 
                 if (proxy == null)

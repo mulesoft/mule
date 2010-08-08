@@ -8,23 +8,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.routing.binding;
+package org.mule.component;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.MuleSession;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.AbstractRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 
 import java.lang.reflect.Proxy;
@@ -32,7 +28,7 @@ import java.lang.reflect.Proxy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultInterfaceBinding extends AbstractRouter implements InterfaceBinding
+public class DefaultInterfaceBinding implements InterfaceBinding
 {
     protected static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
 
@@ -43,23 +39,10 @@ public class DefaultInterfaceBinding extends AbstractRouter implements Interface
     // The router used to actually dispatch the message
     protected OutboundRouter outboundRouter;
 
-    public DefaultInterfaceBinding()
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_BINDING));
-    }
-
-    public MuleMessage route(MuleMessage message, MuleSession session) throws MuleException
-    {
-        OptimizedRequestContext.unsafeRewriteEvent(message);
-        MuleEvent responseEvent = outboundRouter.process(RequestContext.getEvent());
-        if (responseEvent != null)
-        {
-            return responseEvent.getMessage();
-        }
-        else
-        {
-            return null;
-        }
+        OptimizedRequestContext.unsafeRewriteEvent(event.getMessage());
+        return outboundRouter.process(RequestContext.getEvent());
     }
 
     public void setInterface(Class<?> interfaceClass)

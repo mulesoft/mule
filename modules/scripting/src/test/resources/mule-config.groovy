@@ -6,6 +6,7 @@ import org.mule.api.endpoint.InboundEndpoint
 import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
 import org.mule.api.service.Service
+import org.mule.component.DefaultInterfaceBinding
 import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
@@ -17,8 +18,6 @@ import org.mule.object.SingletonObjectFactory
 import org.mule.retry.policies.NoRetryPolicyTemplate
 import org.mule.routing.ForwardingCatchAllStrategy
 import org.mule.routing.MessageFilter
-import org.mule.routing.binding.DefaultBindingCollection
-import org.mule.routing.binding.DefaultInterfaceBinding
 import org.mule.routing.filters.MessagePropertyFilter
 import org.mule.routing.filters.PayloadTypeFilter
 import org.mule.routing.outbound.OutboundPassThroughRouter
@@ -177,18 +176,16 @@ catchAllStrategy.endpoint = createOutboundEndpoint("test://catch.all", null)
 service.messageSource.catchAllStrategy = catchAllStrategy
 
 //Nested Router
-bindingCollection = new DefaultBindingCollection();
 nr = new DefaultInterfaceBinding();
 nr.endpoint = createOutboundEndpoint("test://do.wash", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "wash"
-bindingCollection.addRouter(nr);
+service.component.interfaceBindings.add(nr)
 nr = new DefaultInterfaceBinding();
 nr.endpoint = createOutboundEndpoint("test://do.polish", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "polish"
-bindingCollection.addRouter(nr);
-service.component.bindingCollection = bindingCollection
+service.component.interfaceBindings.add(nr)
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()

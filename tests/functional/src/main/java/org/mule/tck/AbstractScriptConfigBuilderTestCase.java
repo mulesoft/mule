@@ -11,13 +11,12 @@
 package org.mule.tck;
 
 import org.mule.api.MuleException;
+import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.BindingCollection;
-import org.mule.api.routing.InterfaceBinding;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
@@ -205,17 +204,17 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(service.getComponent());
         assertTrue(service.getComponent() instanceof JavaComponent);
-        BindingCollection router = ((JavaComponent) service.getComponent()).getBindingCollection();
-        assertNotNull(router);
+        List<InterfaceBinding> bindings= ((JavaComponent) service.getComponent()).getInterfaceBindings();
+        assertNotNull(bindings);
 
-        assertEquals(2, router.getRouters().size());
+        assertEquals(2, bindings.size());
         // check first Router
-        InterfaceBinding route1 = (InterfaceBinding) router.getRouters().get(0);
+        InterfaceBinding route1 = bindings.get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
         assertNotNull(route1.getEndpoint());
         // check second Router
-        InterfaceBinding route2 = (InterfaceBinding) router.getRouters().get(1);
+        InterfaceBinding route2 = bindings.get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
         assertNotNull(route1.getEndpoint());
