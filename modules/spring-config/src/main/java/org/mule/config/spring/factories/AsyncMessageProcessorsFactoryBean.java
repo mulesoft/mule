@@ -11,12 +11,9 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
@@ -55,15 +52,8 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(
-            new WorkManagerSource()
-            {
-
-                public WorkManager getWorkManager() throws MuleException
-                {
-                    return threadingProfile.createWorkManager(name, muleContext.getConfiguration()
-                        .getShutdownTimeout());
-                }
-            }, threadingProfile.isDoThreading(), new DefaultServiceExceptionStrategy());
+            threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout(),
+            new DefaultServiceExceptionStrategy());
         builder.chain(asyncProcessor);
         for (Object processor : messageProcessors)
         {

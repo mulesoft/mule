@@ -10,7 +10,6 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-
     <composite-processor name="composite1">
         <description>Composite thats appands 'ayz'</description>
         <append-string-transformer message="x" />
@@ -102,9 +101,8 @@
         <vm:inbound-endpoint path="components" exchange-pattern="request-response" />
         <echo-component/>
         <test:component appendString="test"/>
-        <log-component/>
     </flow>
-    
+
     <flow name="wiretap">
         <vm:inbound-endpoint path="wiretap-in" exchange-pattern="one-way" />
         <append-string-transformer message="in" />
@@ -147,19 +145,34 @@
             <threading-profile doThreading="true" maxThreadsActive="16"/>
         </async>    
         <append-string-transformer message="c" />    
-            <vm:outbound-endpoint path="async-out" exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="async-out" exchange-pattern="one-way" />
     </flow>
     
     <flow name="transactional">
-        <vm:inbound-endpoint path="transactional-in" exchange-pattern="request-response" />
+        <vm:inbound-endpoint path="transactional-in" exchange-pattern="one-way">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
         <append-string-transformer message="a" />
         <transactional>
             <append-string-transformer message="b" />
+            <test:component appendString="test"/>
             <vm:outbound-endpoint path="transactional-out" exchange-pattern="one-way" />
-            <vm:transaction action="ALWAYS_BEGIN"/>
+            <vm:transaction action="ALWAYS_JOIN" />
         </transactional>    
-        <append-string-transformer message="c" />    
+        <append-string-transformer message="c" />
+        <default-service-exception-strategy />    
     </flow>
 
+    <flow name="transactionalRollback">
+        <vm:inbound-endpoint path="transactional-rollback-in" exchange-pattern="request-response">
+            <vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <transactional>
+            <test:component appendString="test"/>
+            <test:component throwException="true"/>
+            <vm:outbound-endpoint path="transactional-rollback-out" exchange-pattern="request-response" />
+            <vm:transaction action="JOIN_IF_POSSIBLE" />
+        </transactional>    
+    </flow>
 
 </mule>

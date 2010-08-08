@@ -218,4 +218,30 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("abcdefghi", result.getPayloadAsString());
     }
 
+    public void testAsync() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://async-in", new DefaultMuleMessage("0", muleContext));
+        MuleMessage result = muleContext.getClient().request("vm://async-out", RECEIVE_TIMEOUT);
+        MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-out", RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertNotNull(asyncResult);
+        assertEquals("0ac", result.getPayloadAsString());
+        assertEquals("0ab", asyncResult.getPayloadAsString());
+
+    }
+
+    public void testTransactional() throws MuleException, Exception
+    {
+        muleContext.getClient().dispatch("vm://transactional-in", new DefaultMuleMessage("", muleContext));
+
+    }
+
+    public void testTransactionalRollback() throws MuleException, Exception
+    {
+        muleContext.getClient().dispatch("vm://transactional-rollback-in",
+            new DefaultMuleMessage("", muleContext));
+
+    }
+
 }
