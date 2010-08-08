@@ -12,7 +12,7 @@ package org.mule.module.xml.transformer;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
@@ -38,7 +38,7 @@ import org.dom4j.io.DocumentResult;
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
  * other XML-ish) object.
  */
-public abstract class AbstractXmlTransformer extends AbstractMessageAwareTransformer
+public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
 {
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;

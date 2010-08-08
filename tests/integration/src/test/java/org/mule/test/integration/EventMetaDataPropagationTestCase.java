@@ -20,11 +20,11 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,10 +107,11 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         }
     }
 
-    public static class DummyTransformer extends AbstractMessageAwareTransformer
+    public static class DummyTransformer extends AbstractMessageTransformer
     {
 
-        public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
+        @Override
+        public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
         {
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");

@@ -63,7 +63,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
 
     }
 
-    public void testExecute() throws ExecutionException, InterruptedException, TransformerException
+    public void testExecute() throws ExecutionException, InterruptedException, MuleException
     {
         Callable c = new Callable()
         {
@@ -101,7 +101,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
     }
 
     public void testExecuteWithTimeout()
-        throws ExecutionException, InterruptedException, TransformerException
+        throws ExecutionException, InterruptedException, MuleException
     {
         Callable c = new Callable()
         {

@@ -12,6 +12,7 @@ package org.mule.transport.soap.axis;
 
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
@@ -80,9 +81,10 @@ public class AxisServiceProxy
             // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
             // and also filter out any http related header
             messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
-                                   
-            MuleMessage message = receiver.routeMessage(messageToRoute);
-            
+
+            MuleEvent event = receiver.routeMessage(messageToRoute);
+            MuleMessage message = event == null ? null : event.getMessage();
+
             if (message != null)
             {
                 ExceptionPayload wsException = message.getExceptionPayload();

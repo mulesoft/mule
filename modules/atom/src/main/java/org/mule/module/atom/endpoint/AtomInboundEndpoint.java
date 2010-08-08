@@ -11,6 +11,7 @@
 package org.mule.module.atom.endpoint;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -107,7 +108,7 @@ public class AtomInboundEndpoint extends DefaultInboundEndpoint
             logger.warn("Mime type not set on message, but connector protocol '" + getProtocol()
                         + "' does not explicitly support mimeTypes. Message type will not be validated");
         }
-        message.applyTransformers(inTransform);
+        message.applyTransformers((MuleEvent)null, inTransform);
         return true;
     }
 

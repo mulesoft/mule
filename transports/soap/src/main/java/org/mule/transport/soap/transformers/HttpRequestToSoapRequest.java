@@ -10,11 +10,12 @@
 
 package org.mule.transport.soap.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
@@ -33,7 +34,7 @@ import java.util.Properties;
  * Usually, you would POST a SOAP document, but this Transformer can be useful for
  * making simple SOAP requests
  */
-public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
+public class HttpRequestToSoapRequest extends AbstractMessageTransformer
 {
     public static final String SOAP_HEADER = "<?xml version=\"1.0\" encoding=\"{0}\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body>";
     public static final String SOAP_FOOTER = "</soap:Body></soap:Envelope>";
@@ -47,7 +48,8 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
         setReturnDataType(DataTypeFactory.create(String.class));
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = message.getPayload();
 
@@ -69,7 +71,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
             }
             catch (IOException e)
             {
-                throw new TransformerException(message, this, e);
+                throw new TransformerMessagingException(event, this, e);
             }
             
             src = bos.toByteArray();
@@ -83,7 +85,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(message, this, e);
+                throw new TransformerMessagingException(event, this, e);
             }
             // Data is already Xml
             if (data.startsWith("<") || data.startsWith("&lt;"))
@@ -102,8 +104,8 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
         String method = (String)p.remove(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null)
         {
-            throw new TransformerException(
-                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), message, this);
+            throw new TransformerMessagingException(
+                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), event, this);
         }
 
         if (httpMethod.equals("POST"))

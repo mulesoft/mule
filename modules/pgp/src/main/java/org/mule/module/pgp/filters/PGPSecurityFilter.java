@@ -108,7 +108,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult));
+            updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult), event);
 //            TODO RequestContext.rewriteEvent(new DefaultMuleMessage(
 //                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
         }
@@ -167,7 +167,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            updatePayload(event.getMessage(), strategy.encrypt(message.getPayloadAsBytes(), cryptInfo));
+            updatePayload(event.getMessage(), strategy.encrypt(message.getPayloadAsBytes(), cryptInfo), event);
         }
         catch (Exception e1)
         {

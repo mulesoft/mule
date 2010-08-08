@@ -12,6 +12,7 @@ package org.mule.module.atom.transformers;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.transformers.AbstractExpressionTransformer;
@@ -42,7 +43,8 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
-    public Object transform(MuleMessage message, String encoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
     {
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();
@@ -175,7 +177,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
             }
             else
             {
-                throw new TransformerException(CoreMessages.propertyHasInvalidValue("entry-property.name", arg.getName()), message);
+                throw new TransformerMessagingException(CoreMessages.propertyHasInvalidValue("entry-property.name", arg.getName()), event, this);
             }
 
         }

@@ -157,7 +157,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         }
     }
 
-    protected MuleEvent createResultEvent(MuleEvent event, Object result) throws TransformerException
+    protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException
     {
         if (result instanceof MuleMessage)
         {
@@ -170,7 +170,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         else if (result != null)
         {
             event.getMessage().applyTransformers(
-                    Collections.<Transformer>singletonList(new TransformerTemplate(
+                    event, Collections.<Transformer>singletonList(new TransformerTemplate(
                         new TransformerTemplate.OverwitePayloadCallback(result))));
             return event;
         }

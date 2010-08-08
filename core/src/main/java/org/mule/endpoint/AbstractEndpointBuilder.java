@@ -391,9 +391,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         for (MessageProcessor mp : messageProcessors)
         {
-            if (mp instanceof SecurityFilterMessageProcessor)
+            if (mp instanceof SecurityFilterMessageProcessorBuilder)
             {
-                return ((SecurityFilterMessageProcessor)mp).getFilter();
+                return ((SecurityFilterMessageProcessorBuilder)mp).getSecurityFilter();
             }
         }
 

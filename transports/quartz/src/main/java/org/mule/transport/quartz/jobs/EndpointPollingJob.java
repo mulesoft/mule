@@ -148,7 +148,7 @@ public class EndpointPollingJob implements Job
                         }
                         if (pollGlobalEndpoint)
                         {
-                            result.applyTransformers(finalEndpoint.getTransformers());
+                            result.applyTransformers(null, finalEndpoint.getTransformers());
                         }
 
                         //we need to do this because

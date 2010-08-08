@@ -55,7 +55,7 @@ public class AjaxReplyToHandler extends DefaultReplyToHandler
         }
         else
         {
-            returnMessage.applyTransformers(getTransformers());
+            returnMessage.applyTransformers(event, getTransformers());
             ret = returnMessage.getPayload();
         }
         //Publish to interested clients

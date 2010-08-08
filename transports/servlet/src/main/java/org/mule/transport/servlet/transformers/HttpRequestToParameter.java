@@ -10,9 +10,10 @@
 
 package org.mule.transport.servlet.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.servlet.AbstractReceiverServlet;
 import org.mule.transport.servlet.ServletConnector;
@@ -24,7 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-public class HttpRequestToParameter extends AbstractMessageAwareTransformer
+public class HttpRequestToParameter extends AbstractMessageTransformer
 {
     public HttpRequestToParameter()
     {
@@ -33,7 +34,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         String payloadParam = message.getOutboundProperty(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME,
                                                           AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
@@ -74,7 +75,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerException(message, this, e);
+                    throw new TransformerMessagingException(event, this, e);
                 }
             }
             // HTTP Form
@@ -88,7 +89,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerException(message, this, e);
+                    throw new TransformerMessagingException(event, this, e);
                 }
                 finally
                 {
@@ -98,7 +99,7 @@ public class HttpRequestToParameter extends AbstractMessageAwareTransformer
                     }
                     catch (IOException e2)
                     {
-                        throw new TransformerException(message, this, e2);
+                        throw new TransformerMessagingException(event, this, e2);
                     }
                 }
                 return props.get(payloadParam);

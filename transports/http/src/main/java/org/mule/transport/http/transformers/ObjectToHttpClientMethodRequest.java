@@ -15,9 +15,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -58,7 +59,7 @@ import org.apache.commons.lang.SerializationUtils;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer
+public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 {
     
     public ObjectToHttpClientMethodRequest()
@@ -123,7 +124,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     }
 
     @Override
-    public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = msg.getPayload();
 
@@ -134,9 +135,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         }
         if (endpointString == null)
         {
-            throw new TransformerException(
+            throw new TransformerMessagingException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
-                            MuleProperties.MULE_ENDPOINT_PROPERTY), msg, this);
+                            MuleProperties.MULE_ENDPOINT_PROPERTY), event, this);
         }
 
         String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
@@ -252,7 +253,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
             else
             {
-                throw new TransformerException(HttpMessages.unsupportedMethod(method), msg);
+                throw new TransformerException(HttpMessages.unsupportedMethod(method));
             }
 
             // Allow the user to set HttpMethodParams as an object on the message
@@ -281,7 +282,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         }
         catch (Exception e)
         {
-            throw new TransformerException(msg, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 
@@ -310,7 +311,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 }
                 catch (Exception e)
                 {
-                    throw new TransformerException(msg, this, e);
+                    throw new TransformerException(this, e);
                 }
             }
             

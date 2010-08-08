@@ -10,11 +10,12 @@
 
 package org.mule.example.bookstore.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.BookstoreAdminMessages;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
@@ -23,7 +24,7 @@ import org.mule.util.StringUtils;
  * The request parameters are always strings (they come from the HTML form), 
  * so we need to parse and convert them to their appropriate types.
  */
-public class HttpRequestToBook extends AbstractMessageAwareTransformer
+public class HttpRequestToBook extends AbstractMessageTransformer
 {
     public HttpRequestToBook()
     {
@@ -33,7 +34,7 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         String author = message.getOutboundProperty("author");
         String title = message.getOutboundProperty("title");
@@ -41,15 +42,15 @@ public class HttpRequestToBook extends AbstractMessageAwareTransformer
 
         if (StringUtils.isBlank(author))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingAuthor(), message);
+            throw new TransformerMessagingException(BookstoreAdminMessages.missingAuthor(), event, this);
         }
         if (StringUtils.isBlank(title))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingTitle(), message);
+            throw new TransformerMessagingException(BookstoreAdminMessages.missingTitle(), event, this);
         }
         if (StringUtils.isBlank(price))
         {
-            throw new TransformerException(BookstoreAdminMessages.missingPrice(), message);
+            throw new TransformerMessagingException(BookstoreAdminMessages.missingPrice(), event, this);
         }
 
         return new Book(author, title, Double.parseDouble(price));

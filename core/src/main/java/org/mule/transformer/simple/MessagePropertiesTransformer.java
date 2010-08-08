@@ -12,12 +12,13 @@ package org.mule.transformer.simple;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
@@ -41,7 +42,7 @@ import java.util.Set;
  * <code>null</code>, it will be left intact. The transformer then acts as a more
  * gentle 'enricher'. The default setting is <code>true</code>.
  */
-public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer implements MuleContextAware
+public class MessagePropertiesTransformer extends AbstractMessageTransformer implements MuleContextAware
 {
     private List<String> deleteProperties = null;
     private Map<String, Object> addProperties = null;
@@ -89,7 +90,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
     }
 
     @Override
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         if (deleteProperties != null && deleteProperties.size() > 0)
         {

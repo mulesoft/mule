@@ -9,15 +9,16 @@
  */
 package org.mule.transformer.simple;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import org.apache.commons.lang.SerializationUtils;
 
 /** TODO */
-public class MuleMessageToByteArray extends AbstractMessageAwareTransformer
+public class MuleMessageToByteArray extends AbstractMessageTransformer
 {
     public MuleMessageToByteArray()
     {
@@ -25,7 +26,8 @@ public class MuleMessageToByteArray extends AbstractMessageAwareTransformer
         setReturnDataType(DataTypeFactory.create(byte[].class));
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent e) throws TransformerMessagingException
     {
         return SerializationUtils.serialize(message);
     }

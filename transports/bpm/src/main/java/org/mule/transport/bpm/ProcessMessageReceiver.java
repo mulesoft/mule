@@ -115,7 +115,8 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         else
         {
             message.setOutboundProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
-            response = routeMessage(message);
+            MuleEvent event = routeMessage(message);
+            response = event == null ? null : event.getMessage();
         }
         
         // TODO MULE-4864 Exceptions are not always caught here

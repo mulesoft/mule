@@ -10,11 +10,12 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -31,7 +32,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * transformers. It takes care of creating and configuring the XStream parser.
  */
 
-public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTransformer
+public abstract class AbstractXStreamTransformer extends AbstractMessageTransformer
 {
     private final AtomicReference/* XStream */xstream = new AtomicReference();
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
@@ -76,6 +77,18 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTra
         }
 
         return instance;
+    }
+
+    public final XStream getXStream(MuleEvent event) throws TransformerMessagingException
+    {
+        try
+        {
+            return getXStream();
+        }
+        catch (TransformerException e)
+        {
+            throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+        }
     }
 
     public Object clone() throws CloneNotSupportedException

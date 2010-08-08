@@ -51,7 +51,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
             OutboundEndpoint endpoint = getEndpoint();
             if (sendTransformed && endpoint.getTransformers() != null)
             {
-                event.getMessage().applyTransformers(endpoint.getTransformers());
+                event.getMessage().applyTransformers(event, endpoint.getTransformers());
             }
 
             // Recreate event with outbound endpoint incase anything uses event

@@ -88,7 +88,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                     }
                 }
             }
-            returnMessage.applyTransformers(getTransformers());
+            returnMessage.applyTransformers(event, getTransformers());
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue

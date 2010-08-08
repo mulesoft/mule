@@ -9,6 +9,7 @@
  */
 package org.mule.expression.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -16,6 +17,7 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.transformer.types.DataTypeFactory;
@@ -84,7 +86,8 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object bean;
         try
@@ -93,7 +96,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
 
 
@@ -113,13 +116,13 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             }
             catch (ExpressionRuntimeException e)
             {
-                throw new TransformerException(message, this, e);
+                throw new TransformerMessagingException(event, this, e);
             }
 
             if (!argument.isOptional() && value == null)
             {
-                throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), message, this);
+                throw new TransformerMessagingException(CoreMessages.expressionEvaluatorReturnedNull(
+                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), event, this);
 
             }
             args.put(argument.getName(), value);
@@ -131,11 +134,11 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (IllegalAccessException e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
         catch (InvocationTargetException e)
         {
-            throw new TransformerException(message, this, e.getTargetException());
+            throw new TransformerMessagingException(event, this, e.getTargetException());
         }
 
         return bean;

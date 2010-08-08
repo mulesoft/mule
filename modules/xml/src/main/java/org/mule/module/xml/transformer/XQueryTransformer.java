@@ -9,12 +9,14 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.transformer.types.DataTypeFactory;
@@ -148,7 +150,8 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         try
         {
@@ -185,7 +188,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                         }
                         catch (XQException e)
                         {
-                            throw new TransformerException(XmlMessages.streamNotAvailble(getName()), message);
+                            throw new TransformerException(XmlMessages.streamNotAvailble(getName()));
                         }
                     }
                     else
@@ -197,7 +200,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                         }
                         catch (XQException e)
                         {
-                            throw new TransformerException(XmlMessages.objectNotAvailble(getName()), message);
+                            throw new TransformerException(XmlMessages.objectNotAvailble(getName()));
 
                         }
                     }
@@ -243,7 +246,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

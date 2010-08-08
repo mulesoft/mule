@@ -10,13 +10,14 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
@@ -24,7 +25,7 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.transformer.NoActionTransformer;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
@@ -231,7 +232,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
     }
 
-    private class FileMessageFactoryAssertingTransformer extends AbstractMessageAwareTransformer
+    private class FileMessageFactoryAssertingTransformer extends AbstractMessageTransformer
     {
         private Class<?> expectedPayload;
 
@@ -241,7 +242,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
 
         @Override
-        public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
         {
             assertEquals(expectedPayload, message.getPayload().getClass());
 

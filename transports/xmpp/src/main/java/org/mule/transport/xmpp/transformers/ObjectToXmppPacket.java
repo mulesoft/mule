@@ -10,9 +10,10 @@
 
 package org.mule.transport.xmpp.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
 
@@ -22,7 +23,7 @@ import org.jivesoftware.smack.packet.XMPPError;
 /**
  * Creates an Xmpp message packet from a MuleMessage
  */
-public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
+public class ObjectToXmppPacket extends AbstractMessageTransformer
 {
     public ObjectToXmppPacket()
     {
@@ -32,7 +33,7 @@ public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public Object transform(MuleMessage muleMessage, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage muleMessage, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = muleMessage.getPayload();
         

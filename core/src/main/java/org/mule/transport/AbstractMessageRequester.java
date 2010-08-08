@@ -112,9 +112,9 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         }
     }
 
-    protected void applyInboundTransformers(MuleMessage message) throws TransformerException
+    protected void applyInboundTransformers(MuleMessage message) throws MuleException
     {
-        message.applyTransformers(defaultInboundTransformers);
+        message.applyTransformers(null, defaultInboundTransformers);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
@@ -37,7 +38,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException() instanceof TransformerException);
+        assertTrue(exceptionPayload.getException() instanceof TransformerMessagingException);
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 

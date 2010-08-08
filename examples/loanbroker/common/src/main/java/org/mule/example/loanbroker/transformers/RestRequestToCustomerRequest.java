@@ -10,17 +10,18 @@
 
 package org.mule.example.loanbroker.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Converts parameters on the message into a CustomerQuoteRequest object
  */
-public class RestRequestToCustomerRequest extends AbstractMessageAwareTransformer
+public class RestRequestToCustomerRequest extends AbstractMessageTransformer
 {
 
     public RestRequestToCustomerRequest()
@@ -28,7 +29,8 @@ public class RestRequestToCustomerRequest extends AbstractMessageAwareTransforme
         setReturnDataType(DataTypeFactory.create(CustomerQuoteRequest.class));
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         String name;
         int ssn;
@@ -44,7 +46,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageAwareTransforme
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
 
         Customer c = new Customer(name, ssn);

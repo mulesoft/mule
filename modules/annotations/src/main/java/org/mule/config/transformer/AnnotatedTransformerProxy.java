@@ -9,16 +9,18 @@
  */
 package org.mule.config.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.expression.ExpressionAnnotationsHelper;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.expression.transformers.ExpressionTransformer;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
@@ -36,7 +38,7 @@ import java.util.WeakHashMap;
  * transformer will be given a generated name which is the short name of the class and the method name
  * separated with a '.' i.e. 'MyTransformers.fooToBar'
  */
-public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer implements DiscoverableTransformer
+public class AnnotatedTransformerProxy extends AbstractMessageTransformer implements DiscoverableTransformer
 {
     private int weighting;
 
@@ -118,7 +120,8 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         resolvers = muleContext.getRegistry().lookupObjects(TransformerArgumentResolver.class);
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object firstArg = null;
         Object[] params = new Object[transformMethod.getParameterTypes().length];
@@ -128,7 +131,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         //parameter
         if (paramTransformer != null)
         {
-            Object paramArgs = paramTransformer.transform(message, outputEncoding);
+            Object paramArgs = paramTransformer.transformMessage(message, outputEncoding, null);
 
             if (paramArgs != null && paramArgs.getClass().isArray())
             {
@@ -161,7 +164,14 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         else if (!sourceAnnotated)
         {
             //This will perform any additional transformation from the source type to the method parameter type
-            firstArg = message.getPayload(DataTypeFactory.create(transformMethod.getParameterTypes()[0]));
+            try
+            {
+                firstArg = message.getPayload(DataTypeFactory.create(transformMethod.getParameterTypes()[0]));
+            }
+            catch (TransformerException e)
+            {
+                throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+            }
         }
 
         //if the source is annotated, the paramTransformer will figure out the first parameter
@@ -202,7 +212,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
                     }
                     catch (Exception e)
                     {
-                        throw new TransformerException(message, this, e);
+                        throw new TransformerMessagingException(event, this, e);
                     }
 
                 }
@@ -219,7 +229,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageAwareTransformer i
         catch (Exception e)
         {
             e.printStackTrace();
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

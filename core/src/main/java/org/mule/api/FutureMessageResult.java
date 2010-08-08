@@ -104,18 +104,18 @@ public class FutureMessageResult extends FutureTask
         }
     }
 
-    public MuleMessage getMessage() throws InterruptedException, ExecutionException, TransformerException
+    public MuleMessage getMessage() throws InterruptedException, ExecutionException, MuleException
     {
         return this.getMessage(this.get());
     }
 
     public MuleMessage getMessage(long timeout)
-        throws InterruptedException, ExecutionException, TimeoutException, TransformerException
+        throws InterruptedException, ExecutionException, TimeoutException, MuleException
     {
         return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
     }
 
-    private MuleMessage getMessage(Object obj) throws TransformerException
+    private MuleMessage getMessage(Object obj) throws MuleException
     {
         MuleMessage result = null;
         if (obj != null)
@@ -133,7 +133,7 @@ public class FutureMessageResult extends FutureTask
             {
                 if (transformers != null)
                 {
-                    result.applyTransformers(transformers);
+                    result.applyTransformers(null, transformers, null);
                 }
             }
 

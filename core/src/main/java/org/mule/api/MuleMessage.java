@@ -409,26 +409,29 @@ public interface MuleMessage extends Serializable
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
      * message. This method provides the only way to alter the paylaod of this message without recreating a
      * copy of the message
+     * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    void applyTransformers(List<? extends Transformer> transformers) throws TransformerException;
+    void applyTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException;
 
     /**
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
      * message. This method provides the only way to alter the paylaod of this message without recreating a
      * copy of the message
+     * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    void applyTransformers(Transformer... transformers) throws TransformerException;
+    void applyTransformers(MuleEvent event, Transformer... transformers) throws MuleException;
 
     /**
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
      * message. This method provides the only way to alter the paylaod of this message without recreating a
      * copy of the message
+     * @param event the event being processed
      * @param transformers the transformers to apply to the message payload
      * @param outputType the required output type for this transformation. by adding this parameter some additional
      * transformations will occur on the message payload to ensure that the final payload is of the specified type.
@@ -437,7 +440,7 @@ public interface MuleMessage extends Serializable
      * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a
      * are incompatible with the message payload
      */
-    void applyTransformers(List<? extends Transformer> transformers, Class<?> outputType) throws TransformerException;
+    void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException;
 
     /**
      * Update the message payload. This is typically only called if the
@@ -505,8 +508,9 @@ public interface MuleMessage extends Serializable
     byte[] getPayloadAsBytes() throws Exception;
 
     /**
-     * Returns the original payload used to create this message. The payload of the message can change if {@link #applyTransformers(java.util.List)} or
-     * {@link #applyTransformers(java.util.List, Class)} is called.
+     * Returns the original payload used to create this message. The payload of the message can change
+     * if {@link #applyTransformers(MuleEvent,java.util.List)} or
+     * {@link #applyTransformers(MuleEvent, java.util.List, Class)} is called.
      * @return the original payload used to create this message
      */
     Object getOriginalPayload();

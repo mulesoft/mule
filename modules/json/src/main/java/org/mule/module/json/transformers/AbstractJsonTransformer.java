@@ -11,7 +11,7 @@ package org.mule.module.json.transformers;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 /**
  * TODO
  */
-public abstract class AbstractJsonTransformer extends AbstractMessageAwareTransformer implements DiscoverableTransformer
+public abstract class AbstractJsonTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
 {
     protected int weighting = DiscoverableTransformer.MAX_PRIORITY_WEIGHTING;
 

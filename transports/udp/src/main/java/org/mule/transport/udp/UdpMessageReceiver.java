@@ -10,6 +10,7 @@
 
 package org.mule.transport.udp;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -269,14 +270,15 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 {
                     message.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
                 }
-                returnMessage = routeMessage(message);
+                MuleEvent event = routeMessage(message);
+                returnMessage = event == null ? null : event.getMessage();
 
                 if (returnMessage != null)
                 {
                     byte[] data;
                     if (responseTransformers != null)
                     {
-                        returnMessage.applyTransformers(responseTransformers);
+                        returnMessage.applyTransformers(event, responseTransformers);
                         Object response = returnMessage.getPayload();
                         if (response instanceof byte[])
                         {

@@ -258,7 +258,8 @@ public class DefaultMuleEventContext implements MuleEventContext
         {
             Service service = (Service) session.getFlowConstruct();
             DefaultMuleEvent eventToSend = new DefaultMuleEvent(message, event.getEndpoint(), session);
-            return service.sendEvent(eventToSend);
+            MuleEvent event = service.sendEvent(eventToSend);
+            return event == null ? null : event.getMessage();
         }
         else
         {

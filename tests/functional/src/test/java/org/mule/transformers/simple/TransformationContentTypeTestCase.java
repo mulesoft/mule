@@ -35,7 +35,7 @@ public class TransformationContentTypeTestCase extends FunctionalTestCase
 
         MuleMessage message = new DefaultMuleMessage(inputMessage, muleContext);
         List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
-        message.applyTransformers(transformers);
+        message.applyTransformers(null, transformers);
         assertEquals("text/plain", message.getDataType().getMimeType());
         assertEquals("iso-8859-1", message.getEncoding());
 

@@ -10,9 +10,10 @@
 
 package org.mule.transport.servlet.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.servlet.ServletConnector;
 
@@ -22,7 +23,7 @@ import java.util.Map;
  * Returns a simple Map of the parameters sent with the HTTP Request.  
  * If the same parameter is given more than once, only the first value for it will be in the Map.
  */
-public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
+public class HttpRequestToParameterMap extends AbstractMessageTransformer
 {
     public HttpRequestToParameterMap()
     {
@@ -31,7 +32,7 @@ public class HttpRequestToParameterMap extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         return message.getOutboundProperty(ServletConnector.PARAMETER_MAP_PROPERTY_KEY);
     }

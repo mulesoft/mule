@@ -111,7 +111,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = createMessageCopy(message);
-        return routeMessage(newMessage);
+        MuleEvent event =  routeMessage(newMessage);
+        return event == null ? null : event.getMessage();
     }
     
     protected MuleMessage createMessageCopy(MuleMessage message)

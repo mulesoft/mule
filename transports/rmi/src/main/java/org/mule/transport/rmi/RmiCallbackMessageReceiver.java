@@ -10,6 +10,7 @@
 
 package org.mule.transport.rmi;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -187,7 +188,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
         return (remote);
     }
 
-    public Object routeMessage(Object payload) throws MuleException
+    public MuleEvent routeMessage(Object payload) throws MuleException
     {
         MuleMessage messageToRoute = createMuleMessage(payload, endpoint.getEncoding());
         return routeMessage(messageToRoute);

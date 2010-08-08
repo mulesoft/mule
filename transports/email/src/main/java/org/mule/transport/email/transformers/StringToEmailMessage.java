@@ -10,9 +10,10 @@
 
 package org.mule.transport.email.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.MailUtils;
@@ -37,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * using the String as the contents. This implementation uses properties on the
  * transformer to determine the To: and Subject: fields.
  */
-public class StringToEmailMessage extends AbstractMessageAwareTransformer
+public class StringToEmailMessage extends AbstractMessageTransformer
 {
     /**
      * logger used by this class
@@ -53,7 +54,8 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
     }
 
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector) endpoint.getConnector();
@@ -152,7 +154,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

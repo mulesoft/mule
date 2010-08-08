@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet.jetty;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -62,7 +63,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
     }
 
     @Override
-    protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
+    protected MuleEvent routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
             throws MuleException
     {
         //Force asynchronous processing since we are using continuations

@@ -23,6 +23,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
 

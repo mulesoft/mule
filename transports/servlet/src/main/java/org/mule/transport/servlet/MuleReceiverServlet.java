@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
@@ -214,7 +215,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
             setupRequestMessage(request, requestMessage, receiver);
 
-            MuleMessage result = routeMessage(receiver, requestMessage, request);
+            MuleEvent event = routeMessage(receiver, requestMessage, request);
+            MuleMessage result = event == null ? null : event.getMessage();
             writeResponse(response, result);
         }
         catch (Exception e)
@@ -223,7 +225,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
-    protected MuleMessage routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
+    protected MuleEvent routeMessage(MessageReceiver receiver, MuleMessage requestMessage, HttpServletRequest request)
             throws MuleException
     {
         return receiver.routeMessage(requestMessage);

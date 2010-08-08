@@ -10,9 +10,11 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.types.DataTypeFactory;
 
 /**
@@ -27,7 +29,8 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
         setReturnDataType(DataTypeFactory.XML_STRING);
     }
 
-    public Object transform(MuleMessage message, String encoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = message.getPayload();
         try
@@ -45,7 +48,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

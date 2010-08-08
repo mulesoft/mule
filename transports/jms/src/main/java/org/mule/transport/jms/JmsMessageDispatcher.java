@@ -11,6 +11,7 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -544,7 +545,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     }
     
     @Override
-    protected void applyOutboundTransformers(MuleEvent event) throws TransformerException
+    protected void applyOutboundTransformers(MuleEvent event) throws MuleException
     {
         try
         {
@@ -552,7 +553,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (Exception e)
         {
-            throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), event.getMessage(), e);
+            throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), e);
         }
         super.applyOutboundTransformers(event);
     }

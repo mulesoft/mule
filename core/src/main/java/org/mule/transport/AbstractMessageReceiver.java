@@ -141,19 +141,19 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         return flowConstruct;
     }
 
-    public final MuleMessage routeMessage(MuleMessage message) throws MuleException
+    public final MuleEvent routeMessage(MuleMessage message) throws MuleException
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         return routeMessage(message, tx, null);
     }
 
-    public final MuleMessage routeMessage(MuleMessage message, Transaction trans)
+    public final MuleEvent routeMessage(MuleMessage message, Transaction trans)
         throws MuleException
     {
         return routeMessage(message, trans, null);
     }
 
-    public final MuleMessage routeMessage(MuleMessage message,
+    public final MuleEvent routeMessage(MuleMessage message,
                                           Transaction trans,
                                           OutputStream outputStream) throws MuleException
     {
@@ -161,7 +161,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             outputStream);
     }
 
-    public final MuleMessage routeMessage(MuleMessage message,
+    public final MuleEvent routeMessage(MuleMessage message,
                                           MuleSession session,
                                           Transaction trans,
                                           OutputStream outputStream) throws MuleException
@@ -189,24 +189,25 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             && resultEvent.getMessage().getExceptionPayload() != null 
             && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
         {
-            return handleUnacceptedFilter(muleEvent.getMessage());
+            handleUnacceptedFilter(muleEvent.getMessage());
+            return muleEvent;
         }
 
         if (resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
         {
             applyResponseTransformers(resultEvent);
         }
-        return (resultEvent != null ? resultEvent.getMessage() : null);
+        return resultEvent;
     }
     
-    protected void applyInboundTransformers(MuleEvent event) throws TransformerException
+    protected void applyInboundTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(defaultInboundTransformers);
+        event.getMessage().applyTransformers(event, defaultInboundTransformers);
     }
 
-    protected void applyResponseTransformers(MuleEvent event) throws TransformerException
+    protected void applyResponseTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(defaultResponseTransformers);
+        event.getMessage().applyTransformers(event, defaultResponseTransformers);
     }
 
     protected MuleMessage handleUnacceptedFilter(MuleMessage message)

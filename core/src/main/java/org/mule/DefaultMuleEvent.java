@@ -300,7 +300,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         if (outputType == null)
         {
-            throw new TransformerException(CoreMessages.objectIsNull("outputType"), message);
+            throw new TransformerException(CoreMessages.objectIsNull("outputType"));
         }
         return message.getPayload(outputType);
     }

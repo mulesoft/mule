@@ -10,14 +10,15 @@
 
 package org.mule.module.spring.events;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -359,7 +360,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
      * A simple Transformer that counts down a Latch to indicate that it has been
      * called.
      */
-    public static class TestEventAwareTransformer extends AbstractMessageAwareTransformer
+    public static class TestEventAwareTransformer extends AbstractMessageTransformer
     {
         private CountDownLatch latch;
 
@@ -390,7 +391,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
         {
             assertNotNull(message);
 

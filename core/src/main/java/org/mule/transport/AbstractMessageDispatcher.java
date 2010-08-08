@@ -185,14 +185,14 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         return (OutboundEndpoint) super.getEndpoint();
     }
     
-    protected void applyOutboundTransformers(MuleEvent event) throws TransformerException
+    protected void applyOutboundTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(defaultOutboundTransformers);
+        event.getMessage().applyTransformers(event, defaultOutboundTransformers);
     }
 
-    protected void applyResponseTransformers(MuleEvent event) throws TransformerException
+    protected void applyResponseTransformers(MuleEvent event) throws MuleException
     {
-        event.getMessage().applyTransformers(defaultResponseTransformers);
+        event.getMessage().applyTransformers(event, defaultResponseTransformers);
     }
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;

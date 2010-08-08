@@ -12,6 +12,7 @@ package org.mule.security;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -194,7 +195,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         this.credentialsAccessor = credentialsAccessor;
     }
 
-    protected void updatePayload(MuleMessage message, final Object payload) throws TransformerException
+    protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException
     {
         TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback()
         {
@@ -204,7 +205,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             }
         });
 
-        message.applyTransformers(trans);
+        message.applyTransformers(event, trans);
     }
 
     protected abstract void authenticateInbound(MuleEvent event)

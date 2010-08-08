@@ -10,6 +10,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -120,15 +121,16 @@ public abstract class AbstractReceiverWorker implements Work
                             session = new LegacySessionHandler().retrieveSessionInfoFromMessage(muleMessage);
                         }
                         
-                        MuleMessage result;
+                        MuleEvent resultEvent;
                         if (session != null)
                         {
-                            result = receiver.routeMessage(muleMessage, session, tx, out);
+                            resultEvent = receiver.routeMessage(muleMessage, session, tx, out);
                         }
                         else
                         {
-                            result = receiver.routeMessage(muleMessage, tx, out);
+                            resultEvent = receiver.routeMessage(muleMessage, tx, out);
                         }
+                        MuleMessage result = resultEvent == null ?  null : resultEvent.getMessage();
                         if (result != null)
                         {
                             payload = postProcessMessage(result);

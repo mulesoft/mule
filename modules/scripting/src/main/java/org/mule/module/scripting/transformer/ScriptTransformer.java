@@ -10,10 +10,11 @@
 
 package org.mule.module.scripting.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.scripting.component.Scriptable;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
 import javax.script.ScriptException;
 import javax.script.Bindings;
@@ -21,11 +22,12 @@ import javax.script.Bindings;
 /**
  * Runs a script to perform transformation on an object.
  */
-public class ScriptTransformer extends AbstractMessageAwareTransformer
+public class ScriptTransformer extends AbstractMessageTransformer
 {
     private Scriptable script;
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Bindings bindings = script.getScriptEngine().createBindings();
         script.populateBindings(bindings, message);
@@ -35,7 +37,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
         }
         catch (ScriptException e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

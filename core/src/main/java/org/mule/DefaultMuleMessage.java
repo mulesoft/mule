@@ -12,12 +12,14 @@ package org.mule;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.MessageTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
@@ -304,7 +306,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, resultType);
         if (transformer == null)
         {
-            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType), this);
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
         }
         
         // Pass in the message itself
@@ -313,12 +315,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         // Unless we disallow Object.class as a valid return type we need to do this extra check
         if (!resultType.getType().isAssignableFrom(result.getClass()))
         {
-            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result), this);
+            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
         }
         
         // If the payload is a stream and we've consumed it, then we should set the payload on the 
         // message. This is the only time this method will alter the payload on the message
-        if (isPayloadConsumed(source.getType()))
+        if (isPayloadConsumed(source.getType()))                                                           
         {
             setPayload(result);
         }
@@ -1058,24 +1060,24 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public void applyTransformers(List<? extends Transformer> transformers) throws TransformerException
+    public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException
     {
-        applyTransformers(transformers, null);
+        applyTransformers(event, transformers, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void applyTransformers(Transformer... transformers) throws TransformerException
+    public void applyTransformers(MuleEvent event, Transformer... transformers) throws MuleException
     {
-        applyTransformers(Arrays.asList(transformers), null);
+        applyTransformers(event, Arrays.asList(transformers), null);
     }
 
-    public void applyTransformers(List<? extends Transformer> transformers, Class<?> outputType) throws TransformerException
+    public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException
     {
         if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
         {
-            applyAllTransformers(transformers);
+            applyAllTransformers(event, transformers);
             appliedTransformerHashCodes.add(transformers.hashCode());
         }
 
@@ -1085,7 +1087,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
-    protected void applyAllTransformers(List<? extends Transformer> transformers) throws TransformerException
+    protected void applyAllTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException
     {
         if (!transformers.isEmpty())
         {
@@ -1112,7 +1114,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 Class<?> srcCls = getPayload().getClass();
                 if (transformer.isSourceDataTypeSupported(DataTypeFactory.create(srcCls)))
                 {
-                    Object result = transformer.transform(this);
+                    Object result;
+                    if (transformer instanceof MessageTransformer)
+                    {
+                        result = ((MessageTransformer)transformer).transform(this, event);
+                    }
+                    else
+                    {
+                        result = transformer.transform(this);
+                    }
                     // Update the RequestContext with the result of the transformation.
                     RequestContext.internalRewriteEvent(this, false);
 

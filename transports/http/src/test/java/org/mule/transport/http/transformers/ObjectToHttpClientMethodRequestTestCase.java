@@ -12,6 +12,7 @@ package org.mule.transport.http.transformers;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
@@ -161,10 +162,11 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
             transformer.transform(message);
             fail("Header 'bar' not set on the message");
         }
-        catch (TransformerException e)
+        catch (MuleException e)
         {
             //Expected
-            assertTrue(e.getCause() instanceof RequiredValueException);
+            assertTrue(e.getCause() instanceof RequiredValueException ||
+                       e.getCause().getCause() instanceof RequiredValueException);
         }
     }
     

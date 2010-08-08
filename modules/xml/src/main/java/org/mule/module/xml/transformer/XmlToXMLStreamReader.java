@@ -10,9 +10,11 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
@@ -45,7 +47,8 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         
     }
 
-    public Object transform(MuleMessage message, String encoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = message.getPayload();
         try
@@ -53,8 +56,8 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
             XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
             if (xsr == null)
             {
-                throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), message);
+                throw new TransformerMessagingException(MessageFactory
+                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), event, this);
             }
         
             if (reversible && !(xsr instanceof ReversibleXMLStreamReader))
@@ -68,7 +71,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         }
         catch (XMLStreamException e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

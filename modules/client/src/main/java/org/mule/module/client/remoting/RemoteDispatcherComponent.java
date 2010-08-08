@@ -173,7 +173,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
             if (context.getExchangePattern().hasResponse())
             {
-                result = service.sendEvent(event);
+                MuleEvent resultEvent = service.sendEvent(event);
+                result = resultEvent == null ? null : resultEvent.getMessage();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());
                 return out.toByteArray();
@@ -250,7 +251,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
                 List transformers = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformers(endpoint);
                 if (transformers != null)
                 {
-                    result.applyTransformers(transformers);
+                    result.applyTransformers(null, transformers);
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());

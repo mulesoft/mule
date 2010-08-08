@@ -242,7 +242,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                                            HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
 
                 preRouteMessage(message);
-                MuleMessage returnMessage = receiver.routeMessage(message);
+                MuleEvent returnEvent = receiver.routeMessage(message);
+                MuleMessage returnMessage = returnEvent == null ? null : returnEvent.getMessage();
 
                 Object tempResponse;
                 if (returnMessage != null)
@@ -261,7 +262,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 }
                 else
                 {
-                    response = transformResponse(returnMessage);
+                    response = transformResponse(returnMessage, returnEvent);
                 }
                 
                 response.setupKeepAliveFromRequestVersion(request.getRequestLine().getHttpVersion());
@@ -318,7 +319,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
             response.setBody(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
-            return transformResponse(response);
+            return transformResponse(response, event);
         }
 
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
@@ -329,10 +330,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
             response.setBody(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
-            return transformResponse(response);
+            return transformResponse(response, event);
         }
 
-        private void sendExpect100(HttpRequest request) throws TransformerException, IOException
+        private void sendExpect100(HttpRequest request) throws MuleException, IOException
         {
             RequestLine requestLine = request.getRequestLine();
             
@@ -355,13 +356,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             connector.getMuleContext()), endpoint, new DefaultMuleSession(flowConstruct,
                             connector.getMuleContext()));
                         RequestContext.setEvent(event);
-                        conn.writeResponse(transformResponse(expected));
+                        conn.writeResponse(transformResponse(expected, event));
                     }
                 }
             }
         }
 
-        protected HttpResponse buildFailureResponse(RequestLine requestLine, MuleMessage message) throws TransformerException
+        protected HttpResponse buildFailureResponse(RequestLine requestLine, MuleMessage message) throws MuleException
         {
             EndpointURI uri = endpoint.getEndpointURI();
             String failedPath = String.format("%s://%s:%d%s",
@@ -376,10 +377,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
-            RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
-                    new DefaultMuleSession(flowConstruct, connector.getMuleContext())));
+            DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
+                new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
+            RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers
-            return transformResponse(response);
+            return transformResponse(response, event);
         }
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
@@ -451,7 +453,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return receiver;
     }
 
-    protected HttpResponse transformResponse(Object response) throws TransformerException
+    protected HttpResponse transformResponse(Object response, MuleEvent event) throws MuleException
     {
         MuleMessage message;
         if (response instanceof MuleMessage)
@@ -464,7 +466,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
-        message.applyTransformers(connector.getDefaultResponseTransformers(endpoint), HttpResponse.class);
+        message.applyTransformers(null, connector.getDefaultResponseTransformers(endpoint), HttpResponse.class);
         return (HttpResponse) message.getPayload();
     }
 

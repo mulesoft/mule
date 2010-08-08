@@ -520,13 +520,14 @@ public class MuleEventMulticaster
                 else
                 {
                     MuleSession session = new DefaultMuleSession(service, muleContext);
-                    RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session));
+                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
+                    RequestContext.setEvent(event);
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
                     {
                         message = new DefaultMuleMessage(applicationEvent.getSource(),
                             applicationEvent.getProperties(), muleContext);
-                        message.applyTransformers(endpoint.getTransformers());
+                        message.applyTransformers(event, endpoint.getTransformers());
                     }
                     endpoint.process(new DefaultMuleEvent(message, endpoint, session));
                 }

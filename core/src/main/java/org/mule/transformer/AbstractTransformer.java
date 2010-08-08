@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.notification.MuleContextNotification;
@@ -107,7 +108,14 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     {
         if (event != null && event.getMessage() != null)
         {
-            event.getMessage().applyTransformers(new TransformerWrapper(event));
+            try
+            {
+                event.getMessage().applyTransformers(event, this);
+            }
+            catch (TransformerException e)
+            {
+                throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+            }
         }
         return event;
     }
@@ -334,22 +342,17 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     public final Object transform(Object src) throws TransformerException
     {
-        return transform(src, getEncoding(src), null);
+        return transform(src, getEncoding(src));
     }
 
     public Object transform(Object src, String enc) throws TransformerException
-    {
-        return transform(src, enc, null);
-    }
-
-    protected Object transform(Object src, String enc, MuleEvent event) throws TransformerException
     {
         Object payload = src;
         if (src instanceof MuleMessage)
         {
             MuleMessage message = (MuleMessage) src;
             if ((!isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true) && 
-                 !(this instanceof AbstractMessageAwareTransformer)))
+                 !(this instanceof AbstractMessageTransformer)))
             {
                 src = ((MuleMessage) src).getPayload();
                 payload = message.getPayload();
@@ -376,7 +379,8 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
                     payload.getClass(), endpoint);
-                throw new TransformerException(msg, event, this);
+                /// FIXME
+                throw new TransformerException(msg, this);
             }
         }
 
@@ -386,16 +390,8 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             logger.debug(String.format("Object before transform: %s", StringMessageUtils.toString(payload)));
         }
 
-        Object result;
-        if (this instanceof MessageAwareTransformer)
-        {
-            result = ((MessageAwareTransformer)this).doTransform(payload, enc, event);
-        }
-        else
-        {
-            result = doTransform(payload, enc);
-        }
-        // }
+        Object result = doTransform(payload, enc);
+
         if (result == null)
         {
             result = NullPayload.getInstance();
@@ -548,214 +544,4 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         }
     }
 
-    /**
-     * Wrap a transformer as a way of passing event into and out of the message logic
-     */
-    private class TransformerWrapper implements Transformer
-    {
-        private MuleEvent event;
-
-        TransformerWrapper(MuleEvent event)
-        {
-            this.event = event;
-        }
-
-        public MuleEvent process(MuleEvent evt) throws MuleException
-        {
-            return AbstractTransformer.this.process(evt);
-        }
-
-        public Object checkReturnClass(Object object) throws TransformerException
-        {
-            return AbstractTransformer.this.checkReturnClass(object);
-        }
-
-        public void registerSourceType(Class<?> aClass)
-        {
-            AbstractTransformer.this.registerSourceType(aClass);
-        }
-
-        public void unregisterSourceType(Class<?> aClass)
-        {
-            AbstractTransformer.this.unregisterSourceType(aClass);
-        }
-
-        public void registerSourceType(DataType<?> dataType)
-        {
-            AbstractTransformer.this.registerSourceType(dataType);
-        }
-
-        public void unregisterSourceType(DataType<?> dataType)
-        {
-            AbstractTransformer.this.unregisterSourceType(dataType);
-        }
-
-        public String getName()
-        {
-            return AbstractTransformer.this.getName();
-        }
-
-        public void setName(String string)
-        {
-            AbstractTransformer.this.setName(string);
-        }
-
-        public Class<?> getReturnClass()
-        {
-            return AbstractTransformer.this.getReturnClass();
-        }
-
-        public void setReturnDataType(DataType<?> type)
-        {
-            AbstractTransformer.this.setReturnDataType(type);
-        }
-
-        public DataType<?> getReturnDataType()
-        {
-            return AbstractTransformer.this.getReturnDataType();
-        }
-
-        public void setReturnClass(Class<?> newClass)
-        {
-            AbstractTransformer.this.setReturnClass(newClass);
-        }
-
-        public void setMimeType(String mimeType) throws MimeTypeParseException
-        {
-            AbstractTransformer.this.setMimeType(mimeType);
-        }
-
-        public String getMimeType()
-        {
-            return AbstractTransformer.this.getMimeType();
-        }
-
-        public String getEncoding()
-        {
-            return AbstractTransformer.this.getEncoding();
-        }
-
-        public void setEncoding(String enc)
-        {
-            AbstractTransformer.this.setEncoding(enc);
-        }
-
-        public boolean isSourceTypeSupported(Class<?> aClass)
-        {
-            return AbstractTransformer.this.isSourceTypeSupported(aClass);
-        }
-
-        public boolean isSourceDataTypeSupported(DataType<?> dataType)
-        {
-            return AbstractTransformer.this.isSourceDataTypeSupported(dataType);
-        }
-
-        @Deprecated
-        public boolean isSourceTypeSupported(Class<MuleMessage> aClass, boolean exactMatch)
-        {
-            return AbstractTransformer.this.isSourceTypeSupported(aClass, exactMatch);
-        }
-
-        public boolean isSourceDataTypeSupported(DataType<?> dataType, boolean exactMatch)
-        {
-            return AbstractTransformer.this.isSourceDataTypeSupported(dataType, exactMatch);
-        }
-
-        public Object transform(Object src) throws TransformerException
-        {
-            return AbstractTransformer.this.transform(src, getEncoding(src), event);
-        }
-
-        public Object transform(Object src, String enc) throws TransformerException
-        {
-            return AbstractTransformer.this.transform(src, enc, event);
-        }
-
-        public String getEncoding(Object src)
-        {
-            return AbstractTransformer.this.getEncoding(src);
-        }
-
-        public boolean isConsumed(Class<?> srcCls)
-        {
-            return AbstractTransformer.this.isConsumed(srcCls);
-        }
-
-        public ImmutableEndpoint getEndpoint()
-        {
-            return AbstractTransformer.this.getEndpoint();
-        }
-
-        public void setEndpoint(ImmutableEndpoint endpoint)
-        {
-            AbstractTransformer.this.setEndpoint(endpoint);
-        }
-
-        public Object doTransform(Object src, String encoding) throws TransformerException
-        {
-            return AbstractTransformer.this.doTransform(src, encoding);
-        }
-
-        public void initialise() throws InitialisationException
-        {
-            AbstractTransformer.this.initialise();
-        }
-
-        public void dispose()
-        {
-            AbstractTransformer.this.dispose();
-        }
-
-        public String generateTransformerName()
-        {
-            return AbstractTransformer.this.generateTransformerName();
-        }
-
-        public List<Class<?>> getSourceTypes()
-        {
-            return AbstractTransformer.this.getSourceTypes();
-        }
-
-        public List<DataType<?>> getSourceDataTypes()
-        {
-            return AbstractTransformer.this.getSourceDataTypes();
-        }
-
-        public boolean isIgnoreBadInput()
-        {
-            return AbstractTransformer.this.isIgnoreBadInput();
-        }
-
-        public void setIgnoreBadInput(boolean ignoreBadInput)
-        {
-            AbstractTransformer.this.setIgnoreBadInput(ignoreBadInput);
-        }
-
-        @Override
-        public String toString()
-        {
-            return AbstractTransformer.this.toString();
-        }
-
-        public boolean isAcceptNull()
-        {
-            return AbstractTransformer.this.isAcceptNull();
-        }
-
-        public void setMuleContext(MuleContext context)
-        {
-            AbstractTransformer.this.setMuleContext(context);
-        }
-
-        public void onNotification(MuleContextNotification notification)
-        {
-            AbstractTransformer.this.onNotification(notification);
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return AbstractTransformer.this.hashCode();
-        }
-    }
 }

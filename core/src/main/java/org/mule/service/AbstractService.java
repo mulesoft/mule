@@ -485,17 +485,9 @@ public abstract class AbstractService implements Service
     }
 
     @Deprecated
-    public MuleMessage sendEvent(MuleEvent event) throws MuleException
+    public MuleEvent sendEvent(MuleEvent event) throws MuleException
     {
-        MuleEvent resultEvent = messageProcessorChain.process(event);
-        if (resultEvent != null)
-        {
-            return resultEvent.getMessage();
-        }
-        else
-        {
-            return null;
-        }
+        return messageProcessorChain.process(event);
     }
 
     /**

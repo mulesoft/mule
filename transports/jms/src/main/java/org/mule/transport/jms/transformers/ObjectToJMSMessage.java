@@ -10,8 +10,10 @@
 
 package org.mule.transport.jms.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
@@ -43,8 +45,9 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
     {
         setReturnDataType(DataTypeFactory.create(Message.class));
     }
-        
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         try
         {
@@ -64,7 +67,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

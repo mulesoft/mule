@@ -10,6 +10,7 @@
 
 package org.mule.api.transport;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -59,11 +60,11 @@ public interface MessageReceiver extends Connectable, MessageSource
 
     void setReceiverKey(String key);
 
-    MuleMessage routeMessage(MuleMessage message) throws MuleException;
+    MuleEvent routeMessage(MuleMessage message) throws MuleException;
 
-    MuleMessage routeMessage(MuleMessage message, Transaction trans) throws MuleException;
+    MuleEvent routeMessage(MuleMessage message, Transaction trans) throws MuleException;
 
-    MuleMessage routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
+    MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
         throws MuleException;
     
     MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;

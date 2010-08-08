@@ -10,6 +10,7 @@
 
 package org.mule.transport.xmpp;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
@@ -141,11 +142,12 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
                 }
 
                 MuleMessage message = createMuleMessage(packet, endpoint.getEncoding());
-                MuleMessage returnMessage = routeMessage(message);
+                MuleEvent event = routeMessage(message);
+                MuleMessage returnMessage = event == null ? null : event.getMessage();
 
                 if (returnMessage != null && packet instanceof Message)
                 {
-                    returnMessage.applyTransformers(connector.getDefaultResponseTransformers(endpoint));
+                    returnMessage.applyTransformers(event, connector.getDefaultResponseTransformers(endpoint));
                     Packet result = (Packet) returnMessage.getPayload();
 //                    xmppConnection.sendPacket(result);
                 }

@@ -44,7 +44,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         MuleEventContext ctx = getTestEventContext(msg);
         // context clones message
         msg = ctx.getMessage();
-        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, (String)null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
@@ -65,7 +65,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
         msg.setProperty("addedProperty", "originalValue", PropertyScope.INVOCATION);
-        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, (String)null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
@@ -85,7 +85,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
         msg.setOutboundProperty("public-house", "Bar");
-        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, (String)null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());
@@ -125,7 +125,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         DefaultMuleMessage msg = new DefaultMuleMessage("message", muleContext);
         msg.setOutboundProperty("badProperty", "badValue");
         assertEquals("badValue", msg.<Object>getOutboundProperty("badProperty"));
-        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, null);
+        DefaultMuleMessage transformed = (DefaultMuleMessage) t.transform(msg, (String)null);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());
         assertEquals(msg.getPayload(), transformed.getPayload());

@@ -10,6 +10,7 @@
 
 package org.mule.transport.servlet;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -80,7 +81,8 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
                 
                 MuleMessage message = receiver.createMuleMessage(httpServletRequest);
-                MuleMessage returnMessage = receiver.routeMessage(message);
+                MuleEvent event = receiver.routeMessage(message);
+                MuleMessage returnMessage = event == null ? null : event.getMessage();
                 writeResponse(httpServletResponse, returnMessage);
             }
         }
@@ -103,7 +105,8 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             MuleMessage message = receiver.createMuleMessage(httpServletRequest, 
                 receiver.getEndpoint().getEncoding());
             
-            MuleMessage returnMessage = receiver.routeMessage(message);
+            MuleEvent event = receiver.routeMessage(message);
+            MuleMessage returnMessage = event == null ? null : event.getMessage();
             writeResponse(httpServletResponse, returnMessage);
         }
         catch (Exception e)

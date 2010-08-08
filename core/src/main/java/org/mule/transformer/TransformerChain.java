@@ -10,12 +10,13 @@
 package org.mule.transformer;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.util.StringUtils;
 
 import java.util.Arrays;
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  * A referencable chain of transformers that can be used as a single transformer
  */
-public class TransformerChain extends AbstractMessageAwareTransformer
+public class TransformerChain extends AbstractMessageTransformer
 {
     private List<Transformer> transformers;
 
@@ -57,7 +58,8 @@ public class TransformerChain extends AbstractMessageAwareTransformer
         this(name, Arrays.asList(transformers));
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         MuleMessage result = message;
         Object temp = message;
@@ -65,7 +67,7 @@ public class TransformerChain extends AbstractMessageAwareTransformer
         for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
         {
             lastTransformer = (Transformer) iterator.next();
-            temp = lastTransformer.transform(temp);
+            temp = callTransformer(lastTransformer, temp, event);
             if (temp instanceof MuleMessage)
             {
                 result = (MuleMessage) temp;

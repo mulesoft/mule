@@ -54,7 +54,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      * @throws MuleException if the event fails to be processed
      * @deprecated
      */
-    MuleMessage sendEvent(MuleEvent event) throws MuleException;
+    MuleEvent sendEvent(MuleEvent event) throws MuleException;
 
     /**
      * Determines whether this service has been started

@@ -11,7 +11,7 @@ package org.mule.expression.transformers;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.List;
  * This transformer provides a very powerful way to pull different bits of information from the
  * message and pass them to the service.
  */
-public abstract class AbstractExpressionTransformer extends AbstractMessageAwareTransformer
+public abstract class AbstractExpressionTransformer extends AbstractMessageTransformer
 {
     protected List<ExpressionArgument> arguments;
 

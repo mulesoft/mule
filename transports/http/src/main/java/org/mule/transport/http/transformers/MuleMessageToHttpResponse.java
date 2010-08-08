@@ -10,12 +10,14 @@
 
 package org.mule.transport.http.transformers;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.MuleManifest;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -37,7 +39,7 @@ import org.apache.commons.httpclient.HttpVersion;
 /**
  * Converts a {@link MuleMessage} into an Http response.
  */
-public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
+public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 {
     public static final String CUSTOM_HEADER_PREFIX = "";
 
@@ -64,7 +66,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
     }
 
-    public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         Object src = msg.getPayload();
 
@@ -158,7 +161,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(msg, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
 
     }

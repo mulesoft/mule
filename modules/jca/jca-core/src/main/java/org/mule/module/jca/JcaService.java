@@ -44,7 +44,7 @@ public class JcaService extends AbstractService
      * @param event
      * @throws MuleException
      */
-    public MuleMessage sendEvent(MuleEvent event) throws MuleException
+    public MuleEvent sendEvent(MuleEvent event) throws MuleException
     {
         throw new UnsupportedOperationException("sendEvent()");
     }

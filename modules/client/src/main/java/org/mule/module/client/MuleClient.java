@@ -337,8 +337,8 @@ public class MuleClient implements Disposable
             logger.debug("MuleClient sending event direct to: " + componentName + ". MuleEvent is: " + event);
         }
 
-        MuleMessage result = service.sendEvent(event);
-
+        MuleEvent resultEvent = service.sendEvent(event);
+        MuleMessage result = resultEvent == null ? null : resultEvent.getMessage();
         if (logger.isDebugEnabled())
         {
             logger.debug("Result of MuleClient sendDirect is: "
@@ -347,7 +347,7 @@ public class MuleClient implements Disposable
 
         if (result != null && trans != null)
         {
-            result.applyTransformers(trans);
+            result.applyTransformers(resultEvent, trans);
         }
         return result;
     }

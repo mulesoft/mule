@@ -9,11 +9,13 @@
  */
 package org.mule.transformer;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.TransformerMessagingException;
 
 /** TODO */
-public class TransformerTemplate extends AbstractMessageAwareTransformer
+public class TransformerTemplate extends AbstractMessageTransformer
 {
     private TransformerCallback callback;
 
@@ -22,7 +24,8 @@ public class TransformerTemplate extends AbstractMessageAwareTransformer
         this.callback = callback;
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         try
         {
@@ -30,11 +33,11 @@ public class TransformerTemplate extends AbstractMessageAwareTransformer
         }
         catch (TransformerException e)
         {
-            throw e;
+            throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerMessagingException(event, this, e);
         }
     }
 

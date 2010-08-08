@@ -94,7 +94,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             Transformer trans = this.getTransformer();
             Transformer trans2 = this.getRoundTripTransformer();
             MuleMessage message = new DefaultMuleMessage(getTestData(), muleContext);
-            message.applyTransformers(Arrays.asList(trans, trans2));
+            message.applyTransformers(null, Arrays.asList(trans, trans2));
             Object result = message.getPayload();
             this.compareRoundtripResults(this.getTestData(), result);
         }

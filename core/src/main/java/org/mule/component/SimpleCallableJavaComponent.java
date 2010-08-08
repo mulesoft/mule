@@ -184,7 +184,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent
             else
             {
                 event.getMessage().applyTransformers(
-                    Collections.singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(
+                    event, Collections.singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(
                         result))));
                 return event.getMessage();
             }

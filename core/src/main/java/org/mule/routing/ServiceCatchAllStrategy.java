@@ -41,15 +41,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
             if (event.getEndpoint().getExchangePattern().hasResponse())
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                MuleMessage responseMessage = ((Service) event.getFlowConstruct()).sendEvent(event);
-                if (responseMessage != null)
-                {
-                    return new DefaultMuleEvent(responseMessage, event);
-                }
-                else
-                {
-                    return null;
-                }
+                return ((Service) event.getFlowConstruct()).sendEvent(event);
             }
             else
             {

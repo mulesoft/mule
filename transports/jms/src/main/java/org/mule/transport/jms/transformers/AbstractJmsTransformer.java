@@ -18,7 +18,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.JmsMessageUtils;
@@ -37,7 +37,7 @@ import javax.jms.Session;
  * object. It provides services for compressing and uncompressing messages.
  */
 
-public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransformer implements DiscoverableTransformer
+public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
 {
 
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
@@ -74,7 +74,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
         }
         catch (Exception e)
         {
-            throw new TransformerException(message, this, e);
+            throw new TransformerException(this, e);
         }
         finally
         {

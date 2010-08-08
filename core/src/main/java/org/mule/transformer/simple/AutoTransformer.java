@@ -9,7 +9,9 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.MuleEvent;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
@@ -22,7 +24,7 @@ import org.mule.transformer.types.DataTypeFactory;
  * ambiguity.
  * If an exact match cannot be made an execption will be thrown.
  */
-public class AutoTransformer extends AbstractMessageAwareTransformer
+public class AutoTransformer extends AbstractMessageTransformer
 {
     /**
      * Template method where deriving classes can do any initialisation after the
@@ -41,8 +43,16 @@ public class AutoTransformer extends AbstractMessageAwareTransformer
         }
     }
 
-    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+    @Override
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
-        return message.getPayload(DataTypeFactory.create(getReturnClass()));
+        try
+        {
+            return message.getPayload(DataTypeFactory.create(getReturnClass()));
+        }
+        catch (TransformerException e)
+        {
+            throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+        }
     }
 }

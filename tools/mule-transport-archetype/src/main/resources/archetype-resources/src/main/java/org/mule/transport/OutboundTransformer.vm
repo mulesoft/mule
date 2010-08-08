@@ -11,14 +11,15 @@
 
 package org.mule.transport.${ModuleNameLower}.transformers;
 
-import org.mule.transformer.AbstractMessageAwareTransformer;
-import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 
 /**
  * <code>${outboundTransformer}</code> TODO Document
  */
-public class ${outboundTransformer} extends AbstractMessageAwareTransformer
+public class ${outboundTransformer} extends AbstractMessageTransformer
 {
 
     /* For general guidelines on writing transports see
@@ -42,11 +43,11 @@ public class ${outboundTransformer} extends AbstractMessageAwareTransformer
     }
 
     @Override
-    public Object transform(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
     {
         // TODO Transformer the message here. See comments in {@link AbstractMessageAwareTransformer}
 
-        // Make sure you return a transfromed object that matches the
+        // Make sure you return a transformed object that matches the
         // returnClass type
 
         throw new UnsupportedOperationException("transform");

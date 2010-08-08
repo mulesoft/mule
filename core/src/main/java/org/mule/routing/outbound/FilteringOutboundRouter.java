@@ -109,9 +109,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         
         try
         {
-            message.applyTransformers(transformers);
+            message.applyTransformers(null, transformers);
         }
-        catch (TransformerException e)
+        catch (MuleException e)
         {
             throw new RoutingException(CoreMessages.transformFailedBeforeFilter(), message, 
                 routes.get(0), e);

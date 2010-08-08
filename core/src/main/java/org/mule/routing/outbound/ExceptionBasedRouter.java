@@ -109,7 +109,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
                     }
                     if (resultMessage != null)
                     {
-                        resultMessage.applyTransformers(endpoint.getResponseTransformers());
+                        resultMessage.applyTransformers(result, endpoint.getResponseTransformers());
                     }
                     if (!exceptionPayloadAvailable(resultMessage))
                     {
