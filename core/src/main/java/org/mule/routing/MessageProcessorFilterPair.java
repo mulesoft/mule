@@ -16,19 +16,23 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 
-public class ConditionalMessageProcessor
+/**
+ * A holder for a 2-tuple
+ */
+public class MessageProcessorFilterPair
 {
     private final MessageProcessor messageProcessor;
     private final Filter filter;
 
-    public ConditionalMessageProcessor(MessageProcessor messageProcessor)
+    // FIXME (DDO) try remove
+    public MessageProcessorFilterPair(MessageProcessor messageProcessor)
     {
         Validate.notNull(messageProcessor, "messageProcessor can't be null");
         this.messageProcessor = messageProcessor;
         this.filter = null;
     }
 
-    public ConditionalMessageProcessor(MessageProcessor messageProcessor, Filter filter)
+    public MessageProcessorFilterPair(MessageProcessor messageProcessor, Filter filter)
     {
         Validate.notNull(messageProcessor, "messageProcessor can't be null");
         Validate.notNull(filter, "filter can't be null");

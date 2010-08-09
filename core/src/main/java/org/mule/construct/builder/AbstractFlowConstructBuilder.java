@@ -20,13 +20,10 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
-import org.mule.service.DefaultServiceExceptionStrategy;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
-    private static final DefaultServiceExceptionStrategy DEFAULT_SERVICE_EXCEPTION_STRATEGY = new DefaultServiceExceptionStrategy();
-
     private ExceptionListener exceptionListener;
     private InboundEndpoint inboundEndpoint;
     private EndpointBuilder inboundEndpointBuilder;
@@ -82,10 +79,6 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         if (exceptionListener != null)
         {
             flowConstruct.setExceptionListener(exceptionListener);
-        }
-        else
-        {
-            flowConstruct.setExceptionListener(DEFAULT_SERVICE_EXCEPTION_STRATEGY);
         }
     }
 
