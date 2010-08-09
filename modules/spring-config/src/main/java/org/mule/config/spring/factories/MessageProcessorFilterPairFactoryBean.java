@@ -14,9 +14,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.MessageProcessorFilterPair;
 import org.mule.routing.filters.AcceptAllFilter;
+import org.mule.routing.filters.ExpressionFilter;
 import org.springframework.beans.factory.FactoryBean;
 
-public class ConditionalMessageProcessorFactoryBean implements FactoryBean
+public class MessageProcessorFilterPairFactoryBean implements FactoryBean
 {
     private MessageProcessor messageProcessor;
     private Filter filter;
@@ -29,6 +30,11 @@ public class ConditionalMessageProcessorFactoryBean implements FactoryBean
     public void setMessageProcessor(MessageProcessor messageProcessor)
     {
         this.messageProcessor = messageProcessor;
+    }
+    
+    public void setExpression(String expression)
+    {
+        this.filter = new ExpressionFilter(expression);
     }
 
     public Object getObject() throws Exception

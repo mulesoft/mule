@@ -28,6 +28,9 @@
         <outbound-endpoint ref="veggie-channel" />
         <regex-filter pattern="turnip" />
       </when>
+      <when expression="#[regex:.*berry]">
+        <outbound-endpoint ref="fruit-channel" />
+      </when>
       <otherwise>
         <outbound-endpoint ref="default-channel" />
       </otherwise>

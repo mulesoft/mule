@@ -4024,31 +4024,38 @@
     -->
     
     <!-- Conditional Message Processor Elements -->
-    <xsd:complexType name="abstractConditionalMessageProcessorType" abstract="true">
+    <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true">
         <xsd:sequence>
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
        </xsd:sequence>
     </xsd:complexType>
     
-    <xsd:complexType name="whenConditionalMessageProcessorType">
+    <xsd:complexType name="whenMessageProcessorFilterPairType">
       <xsd:complexContent>
-        <xsd:extension base="abstractConditionalMessageProcessorType">
+        <xsd:extension base="abstractMessageProcessorFilterPairType">
           <xsd:sequence>
-            <xsd:element ref="abstract-filter" minOccurs="1" maxOccurs="1">
+            <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The condition to use to decide if the message processor can be used.
+                        The condition to use to decide if the message processor can be used. Can't be used if an expression attribute has been defined on the when element. 
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
           </xsd:sequence>
+          <xsd:attribute name="expression" type="xsd:string">
+              <xsd:annotation>
+                  <xsd:documentation>
+                    The expression that will be evaluated. This should always be a boolean expression. The syntax of the expression will be determined by the expression language being used.
+                  </xsd:documentation>
+              </xsd:annotation>
+          </xsd:attribute>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:complexType name="otherwiseConditionalMessageProcessorType">
+    <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
       <xsd:complexContent>
-        <xsd:extension base="abstractConditionalMessageProcessorType">
+        <xsd:extension base="abstractMessageProcessorFilterPairType">
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
@@ -4097,8 +4104,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:element name="when" type="whenConditionalMessageProcessorType" minOccurs="1" maxOccurs="unbounded"/>
-                    <xsd:element name="otherwise" type="otherwiseConditionalMessageProcessorType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="when" type="whenMessageProcessorFilterPairType" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="otherwise" type="otherwiseMessageProcessorFilterPairType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

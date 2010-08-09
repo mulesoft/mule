@@ -18,6 +18,9 @@ import org.mule.tck.FunctionalTestCase;
 
 public class ChoiceRouterTestCase extends FunctionalTestCase
 {
+    private static final String WITH_DEFAULT_ROUTE_CHANNEL = "vm://with-default-route.in";
+    private static final String WITHOUT_DEFAULT_ROUTE_CHANNEL = "vm://without-default-route.in";
+
     private MuleClient muleClient;
 
     @Override
@@ -36,28 +39,35 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
 
     public void testNoRouteFound() throws Exception
     {
-        MuleMessage result = muleClient.send("vm://without-default-route.in", "bad", null);
+        final MuleMessage result = muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "bad", null);
         assertNotNull(result);
         assertNotNull("should have got a MuleException", result.getExceptionPayload());
         assertNotNull(result.getExceptionPayload().getException() instanceof MuleException);
         assertNotNull(result.getExceptionPayload().getRootException() instanceof RoutePathNotFoundException);
     }
 
-    public void testRouteFound() throws Exception
+    public void testRoutesFound() throws Exception
     {
-        String result = muleClient.send("vm://without-default-route.in", "apple", null).getPayloadAsString();
+        String result = muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "apple", null).getPayloadAsString();
         assertEquals("apple:fruit:fruit", result);
 
-        result = muleClient.send("vm://with-default-route.in", "apple", null).getPayloadAsString();
+        result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "apple", null).getPayloadAsString();
         assertEquals("apple:fruit:fruit", result);
 
-        result = muleClient.send("vm://with-default-route.in", "turnip", null).getPayloadAsString();
+        result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "turnip", null).getPayloadAsString();
         assertEquals("turnip:veggie:veggie", result);
+    }
+
+    public void testWhenExpressionRouteFound() throws Exception
+    {
+        final String result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "blueberry", null)
+            .getPayloadAsString();
+        assertEquals("blueberry:fruit:fruit", result);
     }
 
     public void testDefaultRoute() throws Exception
     {
-        final String result = muleClient.send("vm://with-default-route.in", "car", null).getPayloadAsString();
+        final String result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "car", null).getPayloadAsString();
         assertEquals("car:default:default", result);
     }
 }

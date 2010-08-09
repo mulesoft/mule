@@ -23,8 +23,8 @@ import org.mule.config.QueueProfile;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
-import org.mule.config.spring.factories.ConditionalMessageProcessorFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
@@ -39,6 +39,7 @@ import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.config.spring.parsers.specific.AggregatorDefinitionParser;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
@@ -395,8 +396,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         
         // Routing: Conditional Routers
         registerBeanDefinitionParser("choice", new ChildDefinitionParser("messageProcessor", ChoiceRouterFactoryBean.class));
-        registerBeanDefinitionParser("when", new ChildDefinitionParser("route", ConditionalMessageProcessorFactoryBean.class));
-        registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", ConditionalMessageProcessorFactoryBean.class));
+        registerBeanDefinitionParser("when", (ChildDefinitionParser)new ChildDefinitionParser("route", MessageProcessorFilterPairFactoryBean.class).registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
+            "expression"}, new String[]{"{http://www.mulesoft.org/schema/mule/core}abstractFilterType"})));
+        registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", MessageProcessorFilterPairFactoryBean.class));
 
         registerBeanDefinitionParser("multicaster", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
         registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
