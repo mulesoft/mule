@@ -27,9 +27,9 @@ import org.mule.util.StringMessageUtils;
 
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference
- * to the current message. This message can be used obtains properties associated
- * with the current message useful to the transform. Note that when part of a
- * transform chain, the Message payload reflects the pre-transform message state,
+ * to the current message. This message can be used to obtain properties associated
+ * with the current message which are useful to the transform. Note that when part of a
+ * transform chain, the MuleMessage payload reflects the pre-transform message state,
  * unless there is no current event for this thread, then the message will be a new
  * DefaultMuleMessage with the src as its payload. Transformers should always work on the
  * src object not the message payload.

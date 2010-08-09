@@ -10,7 +10,6 @@
 
 package org.mule.api.transformer;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 

@@ -42,7 +42,6 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      */
     boolean isSourceDataTypeSupported(DataType<?> dataType);
 
-
     /**
      * Returns an unmodifiable list of Source types registered on this transformer
      *
@@ -120,7 +119,6 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      */
     @Deprecated
     Class<?> getReturnClass();
-
 
     /**
      * Sets the expected return type for the transformed data. If the transformed

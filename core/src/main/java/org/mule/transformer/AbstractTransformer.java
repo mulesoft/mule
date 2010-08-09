@@ -218,6 +218,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         name = string;
     }
 
+    @Deprecated
     public Class<?> getReturnClass()
     {
         return returnType.getType();
@@ -235,6 +236,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         return returnType;
     }
 
+    @Deprecated
     public void setReturnClass(Class<?> newClass)
     {
         returnType = new SimpleDataType<Object>(newClass);
@@ -278,6 +280,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         }
     }
 
+    @Deprecated
     public boolean isSourceTypeSupported(Class<?> aClass)
     {
         return isSourceDataTypeSupported(DataTypeFactory.create(aClass), false);
@@ -478,6 +481,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         return transformerName;
     }
 
+    @Deprecated
     public List<Class<?>> getSourceTypes()
     {
         //A work around to support the legacy API
