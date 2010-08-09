@@ -10,13 +10,6 @@
 
 package org.mule.routing;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -27,13 +20,28 @@ import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.outbound.DefaultRouterResultsHandler;
 
-public abstract class AbstractSelectiveRouter extends AbstractRouter implements SelectiveRouter
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
+public abstract class AbstractSelectiveRouter implements SelectiveRouter
 {
     private final List<ConditionalMessageProcessor> conditionalMessageProcessors = new ArrayList<ConditionalMessageProcessor>();
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     private MessageProcessor defaultProcessor;
+    private RouterStatistics routerStatistics;
+
+    public AbstractSelectiveRouter()
+    {
+        routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+    }
 
     public void addRoute(MessageProcessor processor, Filter filter)
     {
@@ -120,7 +128,7 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
             processEventWithProcessor(event, processor, results);
         }
 
-        return resultsHandler.aggregateResults(results, event, muleContext);
+        return resultsHandler.aggregateResults(results, event, event.getMuleContext());
     }
 
     private void processEventWithProcessor(MuleEvent event,
@@ -168,6 +176,16 @@ public abstract class AbstractSelectiveRouter extends AbstractRouter implements 
         }
     }
 
+    protected RouterStatistics getRouterStatistics()
+    {
+        return routerStatistics;
+    }
+
+    protected void setRouterStatistics(RouterStatistics routerStatistics)
+    {
+        this.routerStatistics = routerStatistics;
+    }
+    
     @Override
     public String toString()
     {

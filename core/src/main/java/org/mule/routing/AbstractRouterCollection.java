@@ -14,9 +14,9 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.routing.Router;
-import org.mule.api.routing.RouterCatchAllStrategy;
-import org.mule.api.routing.RouterCollection;
+import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCatchAllStrategy;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.management.stats.RouterStatistics;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * router collections for in and outbound routers.
  */
 
-public abstract class AbstractRouterCollection implements RouterCollection, MuleContextAware
+public abstract class AbstractRouterCollection implements OutboundRouterCollection, MuleContextAware
 {
     /**
      * logger used by this class
@@ -41,11 +41,11 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
     protected boolean matchAll = false;
 
     @SuppressWarnings("unchecked")
-    protected List<Router> routers = new CopyOnWriteArrayList();
+    protected List<OutboundRouter> routers = new CopyOnWriteArrayList();
 
     protected RouterStatistics statistics;
 
-    private RouterCatchAllStrategy catchAllStrategy;
+    private OutboundRouterCatchAllStrategy catchAllStrategy;
     
     protected MuleContext muleContext;
 
@@ -61,27 +61,27 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
 
     public void dispose()
     {
-        for (Router router : routers)
+        for (OutboundRouter router : routers)
         {
             router.dispose();
         }
     }
 
-    public void setRouters(List<? extends Router> routers)
+    public void setRouters(List<? extends OutboundRouter> routers)
     {
-        for (Router router : routers)
+        for (OutboundRouter router : routers)
         {
             addRouter(router);
         }
     }
 
-    public void addRouter(Router router)
+    public void addRouter(OutboundRouter router)
     {
         router.setRouterStatistics(getStatistics());
         routers.add(router);
     }
 
-    public Router removeRouter(Router router)
+    public OutboundRouter removeRouter(OutboundRouter router)
     {
         if (routers.remove(router))
         {
@@ -93,17 +93,17 @@ public abstract class AbstractRouterCollection implements RouterCollection, Mule
         }
     }
 
-    public List<Router> getRouters()
+    public List<OutboundRouter> getRouters()
     {
         return routers;
     }
 
-    public RouterCatchAllStrategy getCatchAllStrategy()
+    public OutboundRouterCatchAllStrategy getCatchAllStrategy()
     {
         return catchAllStrategy;
     }
 
-    public void setCatchAllStrategy(RouterCatchAllStrategy catchAllStrategy)
+    public void setCatchAllStrategy(OutboundRouterCatchAllStrategy catchAllStrategy)
     {
         this.catchAllStrategy = catchAllStrategy;
         if (this.catchAllStrategy != null && catchAllStrategy instanceof AbstractCatchAllStrategy)

@@ -21,7 +21,7 @@ import org.mule.api.processor.MessageProcessor;
  * do not use conditional routing logic, you will not need a catch all strategy.
  *
  */
-public interface RouterCatchAllStrategy extends MessageProcessor
+public interface OutboundRouterCatchAllStrategy extends MessageProcessor
 {
     /**
      * This method will be invoked when an event is received or being sent where the criteria of the router(s) do not

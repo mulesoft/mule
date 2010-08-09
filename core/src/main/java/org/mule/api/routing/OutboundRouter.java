@@ -14,21 +14,23 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.management.stats.RouterStatistics;
 
 import java.util.List;
 
 /**
- * <code>OutboundRouter</code> is used to control outbound routing behaviour for
- * an event. One or more Outbound routers can be associated with an
+ * <code>OutboundRouter</code> is used to control outbound routing behaviour for an
+ * event. One or more Outbound routers can be associated with an
  * <code>OutboundRouterCollection</code> and will be selected based on the filters
  * set on the individual Outbound Router.
  * 
  * @see OutboundRouterCollection
  */
-
-public interface OutboundRouter extends Router, MessageProcessor
+public interface OutboundRouter extends MessageProcessor, Initialisable, Disposable
 {
     /**
      * Sets a list of MessageProcessor instances associated with this router
@@ -64,10 +66,9 @@ public interface OutboundRouter extends Router, MessageProcessor
      * will change for each type of router depending on expected behaviour. For
      * example, a MulticastingRouter might just iterate through the list of
      * assoaciated routes sending the message. Another type of router such as the
-     * ExceptionBasedRouter will hit the first route, if it fails try the second,
-     * and so on. Most router implementations will extends the
-     * FilteringOutboundRouter which implements all the common logic need for a
-     * router.
+     * ExceptionBasedRouter will hit the first route, if it fails try the second, and
+     * so on. Most router implementations will extends the FilteringOutboundRouter
+     * which implements all the common logic need for a router.
      * 
      * @param event the event to send via one or more routes on this router
      * @throws MessagingException if any errors occur during the sending of messages
@@ -115,9 +116,9 @@ public interface OutboundRouter extends Router, MessageProcessor
     void setReplyTo(String replyTo);
 
     /**
-     * Determines whether this router supports dynamic route. i.e. routes that
-     * are not configured at design time. routes might be pulled from the message
-     * or payload.
+     * Determines whether this router supports dynamic route. i.e. routes that are
+     * not configured at design time. routes might be pulled from the message or
+     * payload.
      */
     boolean isDynamicRoutes();
 
@@ -126,10 +127,13 @@ public interface OutboundRouter extends Router, MessageProcessor
      * @return the route or null if the route is not registered
      */
     MessageProcessor getRoute(String name);
-    
+
     /**
      * Determines is this router requires a new message copy.
      */
     boolean isRequiresNewMessage();
 
+    void setRouterStatistics(RouterStatistics stats);
+
+    RouterStatistics getRouterStatistics();
 }

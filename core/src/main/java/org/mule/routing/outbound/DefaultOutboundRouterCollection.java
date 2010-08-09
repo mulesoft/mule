@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.Router;
+import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
@@ -50,7 +50,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         MuleEvent result;
         boolean matchfound = false;
 
-        for (Iterator<Router> iterator = getRouters().iterator(); iterator.hasNext();)
+        for (Iterator<OutboundRouter> iterator = getRouters().iterator(); iterator.hasNext();)
         {
             OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
 

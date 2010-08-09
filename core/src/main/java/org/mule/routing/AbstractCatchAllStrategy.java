@@ -11,7 +11,7 @@
 package org.mule.routing;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.routing.RouterCatchAllStrategy;
+import org.mule.api.routing.OutboundRouterCatchAllStrategy;
 import org.mule.api.routing.RoutingException;
 import org.mule.management.stats.RouterStatistics;
 
@@ -26,13 +26,13 @@ import org.apache.commons.logging.LogFactory;
  * Think of catch all strategies as a safety net for your events to ensure that all events will get processed.  If you
  * do not use conditional routing logic, you will not need a catch all strategy.
  *
- * Note that it is advised to use this base class over the {@link org.mule.api.routing.RouterCatchAllStrategy} interface
+ * Note that it is advised to use this base class over the {@link org.mule.api.routing.OutboundRouterCatchAllStrategy} interface
  * so that the {@link org.mule.management.stats.RouterStatistics} are available.
  *
  * @see org.mule.routing.LoggingCatchAllStrategy
  * @see org.mule.routing.ForwardingCatchAllStrategy
  */
-public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
+public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAllStrategy
 {
     /**
      * logger used by this class

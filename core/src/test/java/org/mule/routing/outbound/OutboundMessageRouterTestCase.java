@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.Router;
+import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -75,7 +75,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         assertNotNull(messageRouter.removeRouter(router1));
         assertEquals(0, messageRouter.getRouters().size());
         
-        List<Router> list = new ArrayList<Router>();
+        List<OutboundRouter> list = new ArrayList<OutboundRouter>();
         list.add(router1);
         list.add(router2);
         messageRouter.setRouters(list);

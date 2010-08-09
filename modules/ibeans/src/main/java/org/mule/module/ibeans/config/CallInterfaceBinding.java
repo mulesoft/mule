@@ -23,7 +23,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.component.BindingInvocationHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.AbstractRouter;
 import org.mule.session.DefaultMuleSession;
 
 import java.lang.reflect.Proxy;
@@ -37,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * Each method annotated with {@link org.ibeans.annotation.Call} or {@link org.ibeans.annotation.Template} has an associated
  * component binding associated with it.
  */
-public class CallInterfaceBinding extends AbstractRouter implements InterfaceBinding, MessageProcessor
+public class CallInterfaceBinding implements InterfaceBinding, MessageProcessor
 {
     protected static final Log logger = LogFactory.getLog(CallInterfaceBinding.class);
 
@@ -48,10 +47,12 @@ public class CallInterfaceBinding extends AbstractRouter implements InterfaceBin
     // The router used to actually dispatch the message
     protected OutboundEndpoint endpoint;
     private FlowConstruct flow;
+    private RouterStatistics routerStatistics;
+
 
     public CallInterfaceBinding(FlowConstruct flow)
     {
-        setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_BINDING));
+        routerStatistics = new RouterStatistics(RouterStatistics.TYPE_BINDING);
         this.flow = flow;
     }
 
@@ -66,7 +67,7 @@ public class CallInterfaceBinding extends AbstractRouter implements InterfaceBin
         //to know about the flow and create a session
         if(session==null)
         {
-            session = new DefaultMuleSession(flow, muleContext);
+            session = new DefaultMuleSession(flow, message.getMuleContext());
         }
 
         MuleEvent result = process(new DefaultMuleEvent(message, endpoint, session));
