@@ -17,6 +17,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
+import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
@@ -30,7 +31,7 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-public abstract class AbstractSelectiveRouter implements SelectiveRouter
+public abstract class AbstractSelectiveRouter implements SelectiveRouter, RouterStatisticsRecorder
 {
     private final List<ConditionalMessageProcessor> conditionalMessageProcessors = new ArrayList<ConditionalMessageProcessor>();
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
@@ -175,12 +176,12 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter
         }
     }
 
-    protected RouterStatistics getRouterStatistics()
+    public RouterStatistics getRouterStatistics()
     {
         return routerStatistics;
     }
 
-    protected void setRouterStatistics(RouterStatistics routerStatistics)
+    public void setRouterStatistics(RouterStatistics routerStatistics)
     {
         this.routerStatistics = routerStatistics;
     }

@@ -14,7 +14,6 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.management.stats.RouterStatistics;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ import java.util.List;
  * 
  * @see OutboundRouterCollection
  */
-public interface OutboundRouter extends MatchableMessageRouter, Initialisable, Disposable
+public interface OutboundRouter extends MatchableMessageRouter, RouterStatisticsRecorder, Initialisable, Disposable
 {
     /**
      * Sets a list of MessageProcessor instances associated with this router
@@ -74,7 +73,4 @@ public interface OutboundRouter extends MatchableMessageRouter, Initialisable, D
      */
     boolean isDynamicRoutes();
 
-    void setRouterStatistics(RouterStatistics stats);
-
-    RouterStatistics getRouterStatistics();
 }

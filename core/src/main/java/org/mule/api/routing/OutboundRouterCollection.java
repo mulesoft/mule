@@ -13,7 +13,6 @@ package org.mule.api.routing;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.management.stats.RouterStatistics;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ import java.util.List;
  * holding all outbound routers for a service service.
  */
 
-public interface OutboundRouterCollection extends MessageProcessor, Initialisable, Disposable
+public interface OutboundRouterCollection extends MessageProcessor, RouterStatisticsRecorder, Initialisable, Disposable
 {
     void setRouters(List<? extends OutboundRouter> routers);
 
@@ -40,10 +39,6 @@ public interface OutboundRouterCollection extends MessageProcessor, Initialisabl
     void setCatchAllStrategy(OutboundRouterCatchAllStrategy catchAllStrategy);
 
     boolean isMatchAll();
-
-    RouterStatistics getStatistics();
-
-    void setStatistics(RouterStatistics stat);
 
     void setMatchAll(boolean matchAll);
 

@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -38,7 +39,7 @@ import java.util.List;
  * Extension of {@link StartableCompositeMessageSource} which adds message processors between the composite
  * source and the target listener
  */
-public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable
+public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable, RouterStatisticsRecorder
 {
 
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
@@ -101,9 +102,9 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                if (getStatistics().isEnabled())
+                if (getRouterStatistics().isEnabled())
                 {
-                    getStatistics().incrementRoutedMessage(event.getEndpoint());
+                    getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
                 }
                 return processNext(event);
             }
@@ -185,11 +186,17 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         return processors;
     }
 
-    public RouterStatistics getStatistics()
+    public RouterStatistics getRouterStatistics()
     {
         return statistics;
     }
 
+    public void setRouterStatistics(RouterStatistics statistics)
+    {
+        this.statistics = statistics;;
+    }
+
+    
     /**
      * @param name the Endpoint identifier
      * @return the Endpoint or <code>null</code> if the endpointUri is not registered
@@ -226,9 +233,9 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     {
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            if (getStatistics().isEnabled())
+            if (getRouterStatistics().isEnabled())
             {
-                getStatistics().incrementNoRoutedMessage();
+                getRouterStatistics().incrementNoRoutedMessage();
             }
             if (next != null)
             {
@@ -237,9 +244,9 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
                     logger.debug("Message did not match any routers on: "
                                  + event.getFlowConstruct().getName() + " - invoking catch all strategy");
                 }
-                if (getStatistics().isEnabled())
+                if (getRouterStatistics().isEnabled())
                 {
-                    getStatistics().incrementCaughtMessage();
+                    getRouterStatistics().incrementCaughtMessage();
                 }
                 return processNext(event);
             }

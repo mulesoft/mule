@@ -77,7 +77,7 @@ public abstract class AbstractRouterCollection implements OutboundRouterCollecti
 
     public void addRouter(OutboundRouter router)
     {
-        router.setRouterStatistics(getStatistics());
+        router.setRouterStatistics(getRouterStatistics());
         routers.add(router);
     }
 
@@ -122,12 +122,12 @@ public abstract class AbstractRouterCollection implements OutboundRouterCollecti
         this.matchAll = matchAll;
     }
 
-    public RouterStatistics getStatistics()
+    public RouterStatistics getRouterStatistics()
     {
         return statistics;
     }
 
-    public void setStatistics(RouterStatistics stat)
+    public void setRouterStatistics(RouterStatistics stat)
     {
         this.statistics = stat;
     }

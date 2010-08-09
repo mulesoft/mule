@@ -13,7 +13,6 @@ package org.mule.service;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
@@ -390,9 +389,9 @@ public abstract class AbstractService implements Service
         muleContext.getStatistics().add(stats);
         if (outboundRouter != null)
         {
-            stats.setOutboundRouterStat(outboundRouter.getStatistics());
+            stats.setOutboundRouterStat(outboundRouter.getRouterStatistics());
         }
-        stats.setInboundRouterStat(messageSource.getStatistics());
+        stats.setInboundRouterStat(messageSource.getRouterStatistics());
         stats.setComponentStat(component.getStatistics());
 
         try

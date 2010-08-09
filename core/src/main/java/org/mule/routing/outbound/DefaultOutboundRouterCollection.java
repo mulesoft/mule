@@ -130,9 +130,9 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
     protected MuleEvent catchAll(MuleEvent event)
             throws RoutingException
     {
-        if (getStatistics().isEnabled())
+        if (getRouterStatistics().isEnabled())
         {
-            getStatistics().incrementCaughtMessage();
+            getRouterStatistics().incrementCaughtMessage();
         }
 
         return getCatchAllStrategy().process(event);
