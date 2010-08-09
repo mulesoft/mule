@@ -26,9 +26,9 @@ import java.util.List;
 
 public interface OutboundRouterCollection extends MessageProcessor, RouterStatisticsRecorder, Initialisable, Disposable
 {
-    void setRouters(List<? extends OutboundRouter> routers);
+    void setRouters(List<OutboundRouter> routers);
 
-    List<? extends OutboundRouter> getRouters();
+    List<OutboundRouter> getRouters();
 
     void addRouter(OutboundRouter router);
 
