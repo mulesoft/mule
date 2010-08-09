@@ -45,26 +45,24 @@ public class DataTypeFactory
     public static final DataType<String> BYTE_ARRAY = new SimpleDataType<String>(byte[].class);
     public static final DataType<String> INPUT_STREAM = new SimpleDataType<String>(InputStream.class);
 
-
-
-    public static DataType<?> create(Class<?> type)
+    public static <T> DataType<T> create(Class<T> type)
     {
         return create(type, MimeTypes.ANY);
     }
 
-    public static DataType<?> createImmutable(Class<?> type)
+    public static <T> DataType<T> createImmutable(Class<T> type)
     {
-        return new ImmutableDataType(create(type, MimeTypes.ANY));
+        return new ImmutableDataType<T>(create(type, MimeTypes.ANY));
     }
 
-    public static DataType<?> createWithEncoding(Class<?> type, String encoding)
+    public static <T> DataType<T> createWithEncoding(Class<T> type, String encoding)
     {
-        DataType dataType = create(type);
+        DataType<T> dataType = create(type);
         dataType.setEncoding(encoding);
         return dataType;
     }
 
-    public static DataType<?> create(Class<?> type, String mimeType)
+    public static <T> DataType<T> create(Class<T> type, String mimeType)
     {
         if (Collection.class.isAssignableFrom(type))
         {
@@ -79,13 +77,14 @@ public class DataTypeFactory
                 return new CollectionDataType(collectionType, itemType, mimeType);
             }
         }
-        //Special case where proxies are used for testing
+        
+        // Special case where proxies are used for testing
         if (Proxy.isProxyClass(type))
         {
-            return new SimpleDataType(type.getInterfaces()[0], mimeType);
+            return new SimpleDataType<T>(type.getInterfaces()[0], mimeType);
         }
 
-        return new SimpleDataType(type, mimeType);
+        return new SimpleDataType<T>(type, mimeType);
     }
 
     public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType)
@@ -108,13 +107,13 @@ public class DataTypeFactory
      *          object
      * @return a data type that represents the object type.
      */
-    public static DataType createFromObject(Object o)
+    public static DataType<?> createFromObject(Object o)
     {
-        Class type = o.getClass();
+        Class<?> type = o.getClass();
         String mime = null;
         if (o instanceof DataType)
         {
-            return (DataType)o;
+            return (DataType<?>)o;
         }
         else if (o instanceof MuleMessage)
         {
@@ -152,12 +151,12 @@ public class DataTypeFactory
         return create(type, mime);
     }
 
-    public static DataType createFromReturnType(Method m)
+    public static DataType<?> createFromReturnType(Method m)
     {
         return createFromReturnType(m, null);
     }
 
-    public static DataType createFromReturnType(Method m, String mimeType)
+    public static DataType<?> createFromReturnType(Method m, String mimeType)
     {
         if (Collection.class.isAssignableFrom(m.getReturnType()))
         {
@@ -206,12 +205,12 @@ public class DataTypeFactory
         }
     }
 
-    public static DataType createFromField(Field f)
+    public static DataType<?> createFromField(Field f)
     {
         return createFromField(f, null);
     }
 
-    public static DataType createFromField(Field f, String mimeType)
+    public static DataType<?> createFromField(Field f, String mimeType)
     {
         if (Collection.class.isAssignableFrom(f.getType()))
         {
