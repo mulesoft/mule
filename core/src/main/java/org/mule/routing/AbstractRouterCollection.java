@@ -67,7 +67,7 @@ public abstract class AbstractRouterCollection implements OutboundRouterCollecti
         }
     }
 
-    public void setRouters(List<? extends OutboundRouter> routers)
+    public void setRouters(List<OutboundRouter> routers)
     {
         for (OutboundRouter router : routers)
         {
