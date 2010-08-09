@@ -11,8 +11,8 @@ package org.mule.transport.quartz.config;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouter;
 import org.mule.api.service.Service;
+import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.CustomJobConfig;
@@ -110,7 +110,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService3");
         assertNotNull(service);
 
-        OutboundEndpoint ep = (OutboundEndpoint) ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP3");
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractOutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP3");
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof CustomJobFromMessageConfig);
         CustomJobFromMessageConfig config = (CustomJobFromMessageConfig)ep.getProperty("jobConfig");
@@ -127,7 +127,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService4");
         assertNotNull(service);
 
-        OutboundEndpoint ep = (OutboundEndpoint) ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP4");
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractOutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP4");
 
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof CustomJobConfig);
@@ -154,7 +154,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService6");
         assertNotNull(service);
 
-        OutboundEndpoint ep = (OutboundEndpoint) ((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP6");
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractOutboundRouter)service.getOutboundRouter().getRouters().get(0)).getRoute("qEP6");
         
         assertNotNull(ep.getProperty("jobConfig"));
         assertTrue(ep.getProperty("jobConfig") instanceof ScheduledDispatchJobConfig);

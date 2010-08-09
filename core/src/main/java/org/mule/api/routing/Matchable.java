@@ -11,7 +11,7 @@
 package org.mule.api.routing;
 
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 
 /**
  * Enables an artifact to be matched for routing before actually routing to it
@@ -26,6 +26,6 @@ public interface Matchable
      * @return true if the event should be processed by this router
      * @throws MessagingException if the event cannot be evaluated
      */
-    boolean isMatch(MuleEvent event) throws MessagingException;
+    boolean isMatch(MuleMessage message) throws MessagingException;
 
 }

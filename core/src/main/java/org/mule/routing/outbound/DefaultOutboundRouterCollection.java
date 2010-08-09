@@ -17,8 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.TransformingMatchable;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
@@ -58,7 +58,8 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             // Create copy of message for router 1..n-1 if matchAll="true" or if
             // routers require copy because it may mutate payload before match is
             // chosen
-            if (iterator.hasNext() && (isMatchAll() || outboundRouter.isRequiresNewMessage()))
+            if (iterator.hasNext()
+                && (isMatchAll() || ((outboundRouter instanceof TransformingMatchable) && ((TransformingMatchable) outboundRouter).isTransformBeforeMatch())))
             {
                 if (((DefaultMuleMessage) message).isConsumable())
                 {

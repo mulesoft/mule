@@ -12,7 +12,7 @@ package org.mule.api.routing;
 
 import org.mule.api.processor.MessageRouter;
 
-public interface MatchableRoutingMessageProcessor extends MatchableMessageProcessor, MessageRouter
+public interface MatchableMessageRouter extends MatchableMessageProcessor, MessageRouter
 {
 
 }

@@ -411,13 +411,6 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
             latch.countDown();
             return false;
         }
-
-        @Override
-        public boolean isRequiresNewMessage()
-        {
-            return false;
-        }
-
     }
 
     private static class TestOutboundRouterCollection extends DefaultOutboundRouterCollection

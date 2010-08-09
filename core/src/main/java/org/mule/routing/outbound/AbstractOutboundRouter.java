@@ -28,6 +28,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationMode;
+import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -360,11 +361,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         this.resultsHandler = resultsHandler;
     }
     
-    public boolean isRequiresNewMessage()
-    {
-        return false;
-    }
-
     /**
      *  Send message event to destination.
      */

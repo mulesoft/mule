@@ -23,9 +23,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.TransformingMatchable;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -41,7 +41,7 @@ import java.util.Map;
  * set.
  */
 
-public class FilteringOutboundRouter extends AbstractOutboundRouter
+public class FilteringOutboundRouter extends AbstractOutboundRouter implements TransformingMatchable
 {
     protected ExpressionManager expressionManager;
 
@@ -236,8 +236,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         this.useTemplates = useTemplates;
     }
     
-    @Override
-    public boolean isRequiresNewMessage()
+    public boolean isTransformBeforeMatch()
     {
         return !transformers.isEmpty();
     }

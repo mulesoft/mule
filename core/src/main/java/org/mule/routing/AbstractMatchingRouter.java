@@ -95,7 +95,7 @@ public class AbstractMatchingRouter implements MatchingRouter
                 eventToRoute = event;
             }
 
-            if (outboundRouter.isMatch(eventToRoute))
+            if (outboundRouter.isMatch(eventToRoute.getMessage()))
             {
                 matchfound = true;
                 result = outboundRouter.process(event);

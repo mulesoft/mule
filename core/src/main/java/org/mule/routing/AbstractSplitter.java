@@ -20,7 +20,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.routing.outbound.DefaultRouterResultsHandler;
 
 import java.util.ArrayList;
 import java.util.List;

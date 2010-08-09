@@ -21,7 +21,6 @@ import org.mule.api.routing.SelectiveRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.outbound.DefaultRouterResultsHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;

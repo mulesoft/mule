@@ -10,10 +10,6 @@
 
 package org.mule.api.routing;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
@@ -30,7 +26,7 @@ import java.util.List;
  * 
  * @see OutboundRouterCollection
  */
-public interface OutboundRouter extends MessageProcessor, Initialisable, Disposable
+public interface OutboundRouter extends MatchableMessageRouter, Initialisable, Disposable
 {
     /**
      * Sets a list of MessageProcessor instances associated with this router
@@ -46,50 +42,6 @@ public interface OutboundRouter extends MessageProcessor, Initialisable, Disposa
      */
     List<MessageProcessor> getRoutes();
 
-    /**
-     * Adds a route to this router
-     * 
-     * @param route the route to add to the router
-     */
-    void addRoute(MessageProcessor route);
-
-    /**
-     * Removes a specific route from the router
-     * 
-     * @param route the route to remove
-     * @return true if the route was removed
-     */
-    boolean removeRoute(MessageProcessor route);
-
-    /**
-     * This method is responsible for routing the Message. The logic for this method
-     * will change for each type of router depending on expected behaviour. For
-     * example, a MulticastingRouter might just iterate through the list of
-     * assoaciated routes sending the message. Another type of router such as the
-     * ExceptionBasedRouter will hit the first route, if it fails try the second, and
-     * so on. Most router implementations will extends the FilteringOutboundRouter
-     * which implements all the common logic need for a router.
-     * 
-     * @param event the event to send via one or more routes on this router
-     * @throws MessagingException if any errors occur during the sending of messages
-     * @see org.mule.routing.outbound.FilteringOutboundRouter
-     * @see org.mule.routing.outbound.ExceptionBasedRouter
-     * @see org.mule.routing.outbound.MulticastingRouter
-     */
-    public MuleEvent process(MuleEvent event) throws MuleException;
-
-    /**
-     * Determines if the event should be processed by this router. Routers can be
-     * selectively invoked by configuring a filter on them. Usually the filter is
-     * applied to the message when calling this method. All core Mule outbound
-     * routers extend the FilteringOutboundRouter router that handles this method
-     * automatically.
-     * 
-     * @param message the current message to evaluate
-     * @return true if the event should be processed by this router
-     * @throws MessagingException if the event cannot be evaluated
-     */
-    boolean isMatch(MuleMessage message) throws MessagingException;
 
     TransactionConfig getTransactionConfig();
 
@@ -121,17 +73,6 @@ public interface OutboundRouter extends MessageProcessor, Initialisable, Disposa
      * payload.
      */
     boolean isDynamicRoutes();
-
-    /**
-     * @param name the route identifier
-     * @return the route or null if the route is not registered
-     */
-    MessageProcessor getRoute(String name);
-
-    /**
-     * Determines is this router requires a new message copy.
-     */
-    boolean isRequiresNewMessage();
 
     void setRouterStatistics(RouterStatistics stats);
 
