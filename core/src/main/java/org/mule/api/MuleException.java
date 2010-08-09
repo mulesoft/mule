@@ -10,6 +10,12 @@
 
 package org.mule.api;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
@@ -18,19 +24,13 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * <code>MuleException</code> is the base exception type for the Mule server any
  * other exceptions thrown by Mule code will be based on this exception,
  */
 public abstract class MuleException extends Exception
 {
-    private Map info = new HashMap();
+    private final Map info = new HashMap();
     private int errorCode = -1;
     private String message = null;
     private Message i18nMessage;
@@ -59,8 +59,8 @@ public abstract class MuleException extends Exception
         super(ExceptionHelper.unwrap(cause));
         if (cause != null)
         {
-            setMessage(MessageFactory.createStaticMessage(cause.getMessage() 
-                + " (" + cause.getClass().getName() + ")"));
+            setMessage(MessageFactory.createStaticMessage(cause.getMessage() + " ("
+                                                          + cause.getClass().getName() + ")"));
         }
         else
         {
@@ -126,6 +126,7 @@ public abstract class MuleException extends Exception
         errorCode = code;
     }
 
+    @Override
     public final String getMessage()
     {
         return message;
@@ -150,14 +151,14 @@ public abstract class MuleException extends Exception
 
     public String getDetailedMessage()
     {
-       if(DefaultMuleConfiguration.verboseExceptions)
-       {
-           return getVerboseMessage();
-       }
+        if (DefaultMuleConfiguration.verboseExceptions)
+        {
+            return getVerboseMessage();
+        }
         else
-       {
-           return getSummaryMessage();
-       }
+        {
+            return getSummaryMessage();
+        }
     }
 
     public String getVerboseMessage()
@@ -236,12 +237,17 @@ public abstract class MuleException extends Exception
         PrintWriter p = new PrintWriter(w);
         rootSummary.printStackTrace(p);
         buf.append(StringUtils.abbreviate(w.toString(), 5000));
-        buf.append("    + " + root.getStackTrace().length + " more (set debug level logging or '-Dmule.verbose.exceptions' for everything)").append(SystemUtils.LINE_SEPARATOR);
+        buf.append(
+            "    + "
+                            + root.getStackTrace().length
+                            + " more (set debug level logging or '-Dmule.verbose.exceptions=true' for everything)")
+            .append(SystemUtils.LINE_SEPARATOR);
         buf.append(StringUtils.repeat('*', 80)).append(SystemUtils.LINE_SEPARATOR);
 
         return buf.toString();
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -259,8 +265,7 @@ public abstract class MuleException extends Exception
         {
             return false;
         }
-        if (i18nMessage != null
-                        ? !i18nMessage.equals(exception.i18nMessage) : exception.i18nMessage != null)
+        if (i18nMessage != null ? !i18nMessage.equals(exception.i18nMessage) : exception.i18nMessage != null)
         {
             return false;
         }
@@ -272,6 +277,7 @@ public abstract class MuleException extends Exception
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         int result;
