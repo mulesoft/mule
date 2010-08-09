@@ -179,7 +179,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
     {
         if (service != null)
         {        
-            OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
+            OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRoutes().get(0);
             ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getRoutes().get(0);
             this.urlWebservice = endpoint.getEndpointURI().getAddress();
     

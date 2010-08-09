@@ -30,11 +30,13 @@ import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
@@ -387,9 +389,11 @@ public abstract class AbstractService implements Service
         stats = createStatistics();
         stats.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(stats);
-        if (outboundRouter != null)
+        if (outboundRouter != null && outboundRouter instanceof RouterStatisticsRecorder)
         {
-            stats.setOutboundRouterStat(outboundRouter.getRouterStatistics());
+            RouterStatistics routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+            ((RouterStatisticsRecorder)outboundRouter).setRouterStatistics(routerStatistics);
+            stats.setOutboundRouterStat(routerStatistics);
         }
         stats.setInboundRouterStat(messageSource.getRouterStatistics());
         stats.setComponentStat(component.getStatistics());

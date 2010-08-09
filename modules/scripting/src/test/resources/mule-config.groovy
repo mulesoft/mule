@@ -194,7 +194,7 @@ epBuilder = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBu
 epBuilder.muleContext = muleContext
 epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
 outboundRouter.addRoute(epFactory.getOutboundEndpoint(epBuilder))
-service.outboundRouter.addRouter(outboundRouter)
+service.outboundRouter.addRoute(outboundRouter)
 
 //Response Router
 service.asyncReplyMessageSource.addSource(createInboundEndpoint("test://response1", null));

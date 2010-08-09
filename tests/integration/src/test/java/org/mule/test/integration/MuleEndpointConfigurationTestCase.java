@@ -45,9 +45,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(service);
         OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
-        assertEquals(2, outboundRouter.getRouters().size());
+        assertEquals(2, outboundRouter.getRoutes().size());
         // first Router
-        OutboundRouter router1 = (OutboundRouter)outboundRouter.getRouters().get(0);
+        OutboundRouter router1 = (OutboundRouter)outboundRouter.getRoutes().get(0);
         assertEquals(1, router1.getRoutes().size());
         ImmutableEndpoint endpoint = (ImmutableEndpoint) router1.getRoutes().get(0);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
@@ -55,7 +55,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertTrue(endpoint instanceof OutboundEndpoint);
 
         // second Router
-        OutboundRouter router2 = (OutboundRouter)outboundRouter.getRouters().get(1);
+        OutboundRouter router2 = (OutboundRouter)outboundRouter.getRoutes().get(1);
         assertEquals(2, router2.getRoutes().size());
         endpoint = (ImmutableEndpoint) router2.getRoutes().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
@@ -92,9 +92,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(service);
         OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
-        assertEquals(1, outboundRouter.getRouters().size());
+        assertEquals(1, outboundRouter.getRoutes().size());
         // first Router
-        OutboundRouter router = (OutboundRouter)outboundRouter.getRouters().get(0);
+        OutboundRouter router = (OutboundRouter)outboundRouter.getRoutes().get(0);
         assertEquals(1, router.getRoutes().size());
         ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getRoutes().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
@@ -113,9 +113,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertNotNull(service);
         OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
-        assertEquals(1, outboundRouter.getRouters().size());
+        assertEquals(1, outboundRouter.getRoutes().size());
         // first Router
-        OutboundRouter router = (OutboundRouter)outboundRouter.getRouters().get(0);
+        OutboundRouter router = (OutboundRouter)outboundRouter.getRoutes().get(0);
         assertEquals(1, router.getRoutes().size());
         ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getRoutes().get(0);
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());

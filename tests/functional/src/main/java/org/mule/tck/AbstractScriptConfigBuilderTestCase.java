@@ -191,9 +191,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(service.getOutboundRouter());
         OutboundRouterCollection router = service.getOutboundRouter();
         assertNull(router.getCatchAllStrategy());
-        assertEquals(1, router.getRouters().size());
+        assertEquals(1, router.getRoutes().size());
         // check first Router
-        OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
+        OutboundRouter route1 = (OutboundRouter) router.getRoutes().get(0);
         assertTrue(route1 instanceof OutboundPassThroughRouter);
         assertEquals(1, route1.getRoutes().size());
     }
@@ -223,8 +223,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testDescriptorEndpoints()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertEquals(1, service.getOutboundRouter().getRouters().size());
-        OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
+        assertEquals(1, service.getOutboundRouter().getRoutes().size());
+        OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRoutes().get(0);
         assertEquals(1, router.getRoutes().size());
         MessageProcessor mp = router.getRoutes().get(0);
         assertNotNull(mp);

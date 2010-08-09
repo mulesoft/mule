@@ -129,7 +129,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         service.setOutboundRouter(new DefaultOutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addRoute(outProvider);
-        service.getOutboundRouter().addRouter(router);
+        service.getOutboundRouter().addRoute(router);
         service.getMessageSource().addSource(endpoint);
 
         // these tests no longer work - they need replacing with config driven tests

@@ -10,6 +10,7 @@
 
 package org.mule.api.routing;
 
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
@@ -25,36 +26,11 @@ import java.util.List;
  * 
  * @see OutboundRouterCollection
  */
-public interface OutboundRouter extends MatchableMessageRouter, RouterStatisticsRecorder, Initialisable, Disposable
+public interface OutboundRouter
+    extends MatchableMessageRouter, RouterStatisticsRecorder, Initialisable, Disposable, MuleContextAware
 {
-    /**
-     * Sets a list of MessageProcessor instances associated with this router
-     * 
-     * @param routes a list of MessageProcessor instances
-     */
-    void setRoutes(List<MessageProcessor> routes);
-
-    /**
-     * Gets a list of MessageProcessor instances associated with this router
-     * 
-     * @return a list of MessageProcessor instances
-     */
-    List<MessageProcessor> getRoutes();
-
-
-    TransactionConfig getTransactionConfig();
 
     void setTransactionConfig(TransactionConfig transactionConfig);
-
-    /**
-     * Gets the replyTo route for any outgoing messages. This will then be used by
-     * other Mule routers to send replies back for this message. If the underlying
-     * protocol supports replyTo messages, such as Jms, a Jms Destination will be
-     * attached to the outbound message
-     * 
-     * @return the replyTo route or null if one has not been set.
-     */
-    String getReplyTo();
 
     /**
      * Sets the replyTo route for any outgoing messages. This will then be used by
@@ -72,5 +48,12 @@ public interface OutboundRouter extends MatchableMessageRouter, RouterStatistics
      * payload.
      */
     boolean isDynamicRoutes();
+
+    /**
+     * Gets a list of MessageProcessor instances associated with this router
+     * 
+     * @return a list of MessageProcessor instances
+     */
+    List<MessageProcessor> getRoutes();
 
 }

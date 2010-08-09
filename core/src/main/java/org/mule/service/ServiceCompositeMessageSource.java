@@ -218,7 +218,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     {
         if (catchAllStrategy instanceof AbstractCatchAllStrategy)
         {
-            ((AbstractCatchAllStrategy) catchAllStrategy).setStatistics(statistics);
+            ((AbstractCatchAllStrategy) catchAllStrategy).setRouterStatistics(statistics);
         }
         this.catchAllStrategy = catchAllStrategy;
         this.internalCatchAllStrategy.setListener(catchAllStrategy);

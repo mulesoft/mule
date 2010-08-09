@@ -111,7 +111,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
 
         endpoint = (ImmutableEndpoint) 
-            ((OutboundPassThroughRouter) service.getOutboundRouter().getRouters().get(0)).getRoutes().get(0);
+            ((OutboundPassThroughRouter) service.getOutboundRouter().getRoutes().get(0)).getRoutes().get(0);
         
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -165,7 +165,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
 
         endpoint = (ImmutableEndpoint) 
-            ((OutboundPassThroughRouter) service.getOutboundRouter().getRouters().get(0)).getRoutes().get(0);
+            ((OutboundPassThroughRouter) service.getOutboundRouter().getRoutes().get(0)).getRoutes().get(0);
         
         processors = endpoint.getMessageProcessors();
         assertNotNull(processors);

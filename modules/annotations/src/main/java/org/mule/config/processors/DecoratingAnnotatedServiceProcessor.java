@@ -279,7 +279,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
             ((MuleContextAware) router).setMuleContext(context);
         }
         router.initialise();
-        service.getOutboundRouter().addRouter(router);
+        service.getOutboundRouter().addRoute(router);
     }
 
     protected InboundEndpoint tryInboundEndpointAnnotation(AnnotationMetaData metaData, ChannelType channelType) throws MuleException

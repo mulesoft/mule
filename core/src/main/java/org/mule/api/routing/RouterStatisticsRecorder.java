@@ -17,6 +17,4 @@ public interface RouterStatisticsRecorder
 
     void setRouterStatistics(RouterStatistics stats);
 
-    RouterStatistics getRouterStatistics();
-
 }

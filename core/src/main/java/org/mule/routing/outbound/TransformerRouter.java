@@ -23,6 +23,7 @@ import org.mule.config.i18n.CoreMessages;
 /**
  * Simply applies a transformer before continuing on to the next router.
  * This can be useful with the {@link ChainingRouter}.
+ * @deprecated
  */
 public class TransformerRouter extends AbstractOutboundRouter
 {

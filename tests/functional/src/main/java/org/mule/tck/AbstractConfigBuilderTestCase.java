@@ -144,9 +144,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(service.getOutboundRouter());
         OutboundRouterCollection router = service.getOutboundRouter();
         assertNotNull(router.getCatchAllStrategy());
-        assertEquals(2, router.getRouters().size());
+        assertEquals(2, router.getRoutes().size());
         // check first Router
-        OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
+        OutboundRouter route1 = (OutboundRouter) router.getRoutes().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
         assertEquals(1, route1.getRoutes().size());
         ImmutableEndpoint ep = (ImmutableEndpoint) route1.getRoutes().get(0);
@@ -160,7 +160,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
         // check second Router
-        OutboundRouter route2 = (OutboundRouter) router.getRouters().get(1);
+        OutboundRouter route2 = (OutboundRouter) router.getRoutes().get(1);
         assertTrue(route2 instanceof FilteringOutboundRouter);
 
         Filter filter2 = ((FilteringOutboundRouter) route2).getFilter();
@@ -323,13 +323,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Service apple = muleContext.getRegistry().lookupService("appleComponent2");
         InboundEndpoint inEndpoint = apple.getMessageSource().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertEquals(1, apple.getOutboundRouter().getRouters().size());
+        assertEquals(1, apple.getOutboundRouter().getRoutes().size());
         assertNotNull(inEndpoint.getTransactionConfig());
         assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
         assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
-        OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRouters().get(0);
+        OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRoutes().get(0);
         MessageProcessor outEndpoint = outRouter.getRoutes().get(0);
         assertNotNull(outEndpoint);
     }

@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.MatchableMessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -70,15 +70,15 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router2.setRoutes(endpoints);
 
-        messageRouter.addRouter(router1);
-        assertEquals(1, messageRouter.getRouters().size());
-        assertNotNull(messageRouter.removeRouter(router1));
-        assertEquals(0, messageRouter.getRouters().size());
+        messageRouter.addRoute(router1);
+        assertEquals(1, messageRouter.getRoutes().size());
+        messageRouter.removeRoute(router1);
+        assertEquals(0, messageRouter.getRoutes().size());
         
-        List<OutboundRouter> list = new ArrayList<OutboundRouter>();
+        List<MatchableMessageProcessor> list = new ArrayList<MatchableMessageProcessor>();
         list.add(router1);
         list.add(router2);
-        messageRouter.setRouters(list);
+        messageRouter.setRoutes(list);
 
         MuleEvent event = getTestInboundEvent("test event", (MuleSession) session.proxy());
 
@@ -98,7 +98,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         endpoints = new ArrayList<MessageProcessor>();
         endpoints.add((OutboundEndpoint) mockendpoint2.proxy());
         router3.setRoutes(endpoints);
-        messageRouter.addRouter(router3);
+        messageRouter.addRoute(router3);
 
         // now the message should be routed twice to different targets
         event = getTestInboundEvent("testing multiple routing", (MuleSession) session.proxy());
@@ -146,8 +146,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         filterRouter1.setFilter(new PayloadTypeFilter(Exception.class));
         filterRouter2.setFilter(new PayloadTypeFilter(StringBuffer.class));
-        messageRouter.addRouter(filterRouter1);
-        messageRouter.addRouter(filterRouter2);
+        messageRouter.addRoute(filterRouter1);
+        messageRouter.addRoute(filterRouter2);
 
         AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {

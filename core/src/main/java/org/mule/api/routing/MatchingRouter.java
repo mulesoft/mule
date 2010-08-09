@@ -29,6 +29,4 @@ public interface MatchingRouter extends MessageProcessor
 
     void removeRoute(MatchableMessageProcessor matchable);
 
-    void setDefaultRoute(MessageProcessor catchAll);
-
 }

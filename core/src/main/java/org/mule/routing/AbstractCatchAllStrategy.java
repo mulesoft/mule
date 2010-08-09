@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.routing.OutboundRouterCatchAllStrategy;
+import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.routing.RoutingException;
 import org.mule.management.stats.RouterStatistics;
 
@@ -32,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.routing.LoggingCatchAllStrategy
  * @see org.mule.routing.ForwardingCatchAllStrategy
  */
-public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAllStrategy
+public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAllStrategy, RouterStatisticsRecorder
 {
     /**
      * logger used by this class
@@ -45,12 +46,12 @@ public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAll
     protected RouterStatistics statistics;
 
 
-    public RouterStatistics getStatistics()
+    public RouterStatistics getRouterStatistics()
     {
         return statistics;
     }
 
-    public void setStatistics(RouterStatistics statistics)
+    public void setRouterStatistics(RouterStatistics statistics)
     {
         this.statistics = statistics;
     }
@@ -66,9 +67,9 @@ public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAll
      */
     public final MuleEvent process(MuleEvent event) throws RoutingException
     {
-        if(getStatistics()!=null)
+        if(getRouterStatistics()!=null)
         {
-            getStatistics().incrementCaughtMessage();
+            getRouterStatistics().incrementCaughtMessage();
         }
         else
         {

@@ -12,45 +12,63 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.MatchableMessageProcessor;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCatchAllStrategy;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.TransformingMatchable;
-import org.mule.api.transaction.TransactionCallback;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.AbstractRouterCollection;
-import org.mule.transaction.TransactionTemplate;
+import org.mule.routing.AbstractCatchAllStrategy;
 
 import java.util.Iterator;
+import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultOutboundRouterCollection</code> is a container of routers. An
- * DefaultOutboundRouterCollection must have atleast one router. By default the first matching
- * router is used to route an event though it is possible to match on all routers
- * meaning that the message will get sent over all matching routers.
+ * DefaultOutboundRouterCollection must have atleast one router. By default the first
+ * matching router is used to route an event though it is possible to match on all
+ * routers meaning that the message will get sent over all matching routers.
  */
 
-public class DefaultOutboundRouterCollection extends AbstractRouterCollection implements OutboundRouterCollection
+public class DefaultOutboundRouterCollection implements OutboundRouterCollection
 {
 
-    public DefaultOutboundRouterCollection()
-    {
-        super(RouterStatistics.TYPE_OUTBOUND);
-    }
+    /**
+     * logger used by this class
+     */
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
-    public MuleEvent process(final MuleEvent event)
-            throws MessagingException
+    @SuppressWarnings("unchecked")
+    protected List<MatchableMessageProcessor> routers = new CopyOnWriteArrayList();
+    protected boolean matchAll = false;
+    private OutboundRouterCatchAllStrategy catchAllStrategy;
+
+    protected RouterStatistics statistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+    protected MuleContext muleContext;
+
+    public MuleEvent process(final MuleEvent event) throws MessagingException
     {
         MuleMessage message = event.getMessage();
         MuleSession session = event.getSession();
         MuleEvent result;
         boolean matchfound = false;
 
-        for (Iterator<OutboundRouter> iterator = getRouters().iterator(); iterator.hasNext();)
+        for (Iterator<MatchableMessageProcessor> iterator = getRoutes().iterator(); iterator.hasNext();)
         {
             OutboundRouter outboundRouter = (OutboundRouter) iterator.next();
 
@@ -63,8 +81,9 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             {
                 if (((DefaultMuleMessage) message).isConsumable())
                 {
-                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(
-                        message.getPayload().getClass().getName()), event);
+                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload()
+                        .getClass()
+                        .getName()), event);
                 }
                 outboundRouterMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             }
@@ -79,26 +98,17 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 // Manage outbound only transactions here
                 final OutboundRouter router = outboundRouter;
 
-                TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(outboundRouter.getTransactionConfig(), muleContext);
-                
-                TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
-                {
-                    public MuleEvent doInTransaction() throws Exception
-                    {
-                        return router.process(event);
-                    }
-                };
                 try
                 {
-                    result = tt.execute(cb);
+                    result = router.process(event);
                 }
-                catch (RoutingException e)
+                catch (MessagingException e)
                 {
                     throw e;
                 }
                 catch (Exception e)
                 {
-                    throw new RoutingException(outboundRouterMessage, null, e);
+                    throw new RoutingException(event, router, e);
                 }
 
                 if (!isMatchAll())
@@ -112,23 +122,22 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message did not match any routers on: "
-                        + session.getFlowConstruct().getName()
-                        + " invoking catch all strategy");
+                logger.debug("Message did not match any routers on: " + session.getFlowConstruct().getName()
+                             + " invoking catch all strategy");
             }
             return catchAll(event);
         }
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                    + session.getFlowConstruct().getName()
-                    + " and there is no catch all strategy configured on this router.  Disposing message " + message);
+                        + session.getFlowConstruct().getName()
+                        + " and there is no catch all strategy configured on this router.  Disposing message "
+                        + message);
         }
         return event;
     }
 
-    protected MuleEvent catchAll(MuleEvent event)
-            throws RoutingException
+    protected MuleEvent catchAll(MuleEvent event) throws RoutingException
     {
         if (getRouterStatistics().isEnabled())
         {
@@ -136,6 +145,94 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         }
 
         return getCatchAllStrategy().process(event);
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        for (MatchableMessageProcessor router : routers)
+        {
+            if (router instanceof Initialisable)
+            {
+                ((Initialisable) router).initialise();
+            }
+        }
+    }
+
+    public void dispose()
+    {
+        for (MatchableMessageProcessor router : routers)
+        {
+            if (router instanceof Disposable)
+            {
+                ((Disposable) router).dispose();
+            }
+        }
+    }
+
+    public void setRoutes(List<MatchableMessageProcessor> routers)
+    {
+        for (MatchableMessageProcessor router : routers)
+        {
+            addRoute(router);
+        }
+    }
+
+    public void addRoute(MatchableMessageProcessor router)
+    {
+        if (router instanceof RouterStatisticsRecorder)
+        {
+            ((RouterStatisticsRecorder) router).setRouterStatistics(getRouterStatistics());
+        }
+        routers.add(router);
+    }
+
+    public void removeRoute(MatchableMessageProcessor router)
+    {
+        routers.remove(router);
+    }
+
+    public List<MatchableMessageProcessor> getRoutes()
+    {
+        return routers;
+    }
+
+    public OutboundRouterCatchAllStrategy getCatchAllStrategy()
+    {
+        return catchAllStrategy;
+    }
+
+    public void setCatchAllStrategy(OutboundRouterCatchAllStrategy catchAllStrategy)
+    {
+        this.catchAllStrategy = catchAllStrategy;
+        if (this.catchAllStrategy != null && catchAllStrategy instanceof AbstractCatchAllStrategy)
+        {
+            ((AbstractCatchAllStrategy) this.catchAllStrategy).setRouterStatistics(statistics);
+        }
+    }
+
+    public boolean isMatchAll()
+    {
+        return matchAll;
+    }
+
+    public void setMatchAll(boolean matchAll)
+    {
+        this.matchAll = matchAll;
+    }
+
+    public RouterStatistics getRouterStatistics()
+    {
+        return statistics;
+    }
+
+    public void setRouterStatistics(RouterStatistics stat)
+    {
+        this.statistics = stat;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     public boolean hasEndpoints()

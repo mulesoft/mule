@@ -78,7 +78,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         MessageProcessor mp =
             ((OutboundPassThroughRouter) muleContext.getRegistry().lookupService("localEndpoints").
-                getOutboundRouter().getRouters().get(0)).getRoute("ep4");
+                getOutboundRouter().getRoutes().get(0)).getRoute("ep4");
 
         endpoint = (ImmutableEndpoint) mp;
         processors = endpoint.getMessageProcessors();

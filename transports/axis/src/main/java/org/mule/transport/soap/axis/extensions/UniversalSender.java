@@ -315,7 +315,7 @@ public class UniversalSender extends BasicHandler
     private void updateEndpointCache(OutboundRouterCollection router)
     {
         endpointsCache.clear();
-        for (Iterator iterator = router.getRouters().iterator(); iterator.hasNext();)
+        for (Iterator iterator = router.getRoutes().iterator(); iterator.hasNext();)
         {
             OutboundRouter r = (OutboundRouter)iterator.next();
             for (MessageProcessor mp : r.getRoutes())

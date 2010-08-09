@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,16 +20,19 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RouterResultsHandler;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.AbstractRouter;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -44,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
  * statistics about message processing through the router.
  */
-public abstract class AbstractOutboundRouter extends AbstractRouter implements OutboundRouter
+public abstract class AbstractOutboundRouter implements OutboundRouter
 {
     /**
      * These properties are automatically propagated by Mule from inbound to outbound
@@ -75,10 +79,35 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
     protected TransactionConfig transactionConfig;
 
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
+    
+    private RouterStatistics routerStatistics;
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    protected MuleContext muleContext;
+
+    public MuleEvent process(final MuleEvent event) throws MuleException
     {
-        return route(event);
+        TransactionTemplate<MuleEvent> tt = new TransactionTemplate<MuleEvent>(getTransactionConfig(),
+            muleContext);
+
+        TransactionCallback<MuleEvent> cb = new TransactionCallback<MuleEvent>()
+        {
+            public MuleEvent doInTransaction() throws Exception
+            {
+                return route(event);
+            }
+        };
+        try
+        {
+            return tt.execute(cb);
+        }
+        catch (RoutingException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new RoutingException(event, this, e);
+        }
     }
     
     protected abstract MuleEvent route(MuleEvent event) throws MessagingException;
@@ -403,5 +432,36 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
             }
         }
     }
+    
+    public void initialise() throws InitialisationException
+    {
+        // default impl does nothing
+    }
+
+    public void dispose()
+    {
+        // Template
+    }
+    
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
+    public MuleContext getMuleContext()
+    {
+        return muleContext;
+    }
+
+    public void setRouterStatistics(RouterStatistics stats)
+    {
+        this.routerStatistics = stats;
+    }
+
+    public RouterStatistics getRouterStatistics()
+    {
+        return routerStatistics;
+    }
+
 
 }

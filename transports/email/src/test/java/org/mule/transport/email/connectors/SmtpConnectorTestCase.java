@@ -100,7 +100,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         // TODO Simplify this API for adding an outbound endpoint.
         OutboundPassThroughRouter passThroughRouter = new OutboundPassThroughRouter();
         passThroughRouter.addRoute(endpoint);
-        service.getOutboundRouter().addRouter(passThroughRouter);
+        service.getOutboundRouter().addRoute(passThroughRouter);
         //muleContext.getRegistry().registerComponent(service);
 
         MuleMessage message = new DefaultMuleMessage(MESSAGE, muleContext);

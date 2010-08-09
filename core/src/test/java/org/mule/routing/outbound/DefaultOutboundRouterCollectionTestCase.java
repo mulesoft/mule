@@ -80,7 +80,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(false);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(1);
 
         testService.sendEvent(testEvent);
@@ -100,7 +100,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(1);
 
@@ -119,7 +119,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testSingleRequiresCopyRouterMatchAllFalse() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(false);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(1);
 
@@ -138,7 +138,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testSingleRequiresCopyRouterMatchAllTrue() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(1);
 
@@ -159,9 +159,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(false);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
@@ -182,9 +182,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
@@ -203,9 +203,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleRequiresCopyRouterMatchAllFalse() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(false);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
@@ -224,9 +224,9 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleRequiresCopyRouterMatchAllTrue() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
 
@@ -245,11 +245,11 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleMixMatchAllTrue() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(2);
@@ -270,12 +270,12 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleMixMatchAllFalse() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(false);
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(true));
-        testService.getOutboundRouter().addRouter(new TestDoesNotRequireNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(true));
+        testService.getOutboundRouter().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestDoesNotRequireNewMessageOutboundRouter.latch = new CountDownLatch(3);
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(3);
@@ -297,8 +297,8 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testStreamPayload() throws Exception
     {
         testService.getOutboundRouter().setMatchAll(true);
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
-        testService.getOutboundRouter().addRouter(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
+        testService.getOutboundRouter().addRoute(new TestRequiresNewMessageOutboundRouter(false));
 
         TestRequiresNewMessageOutboundRouter.latch = new CountDownLatch(2);
 

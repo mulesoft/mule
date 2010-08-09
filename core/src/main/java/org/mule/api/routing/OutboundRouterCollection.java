@@ -10,29 +10,24 @@
 
 package org.mule.api.routing;
 
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.processor.MessageProcessor;
 
 import java.util.List;
 
 /**
  * <code>RouterCollection</code> defines the interface for a MessageRouter that
- * manages more than one router. A {@link OutboundRouterCatchAllStrategy} can be set on this
- * router to route unwanted or unfiltered events. If a catch strategy is not set, the
- * router just returns null. <code>OutboundRouterCollection</code> is responsible for
- * holding all outbound routers for a service service.
+ * manages more than one router. A {@link OutboundRouterCatchAllStrategy} can be set
+ * on this router to route unwanted or unfiltered events. If a catch strategy is not
+ * set, the router just returns null. <code>OutboundRouterCollection</code> is
+ * responsible for holding all outbound routers for a service service.
  */
 
-public interface OutboundRouterCollection extends MessageProcessor, RouterStatisticsRecorder, Initialisable, Disposable
+public interface OutboundRouterCollection
+    extends MatchingRouter, RouterStatisticsRecorder, Initialisable, Disposable, MuleContextAware
 {
-    void setRouters(List<OutboundRouter> routers);
-
-    List<OutboundRouter> getRouters();
-
-    void addRouter(OutboundRouter router);
-
-    OutboundRouter removeRouter(OutboundRouter router);
+    List<MatchableMessageProcessor> getRoutes();
 
     OutboundRouterCatchAllStrategy getCatchAllStrategy();
 

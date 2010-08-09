@@ -12,7 +12,6 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
@@ -175,8 +174,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         filterRouter1.setFilter(new PayloadTypeFilter(Exception.class));
         filterRouter2.setFilter(new PayloadTypeFilter(StringBuffer.class));
-        messageRouter.addRouter(filterRouter1);
-        messageRouter.addRouter(filterRouter2);
+        messageRouter.addRoute(filterRouter1);
+        messageRouter.addRoute(filterRouter2);
 
         AbstractCatchAllStrategy strategy = new AbstractCatchAllStrategy()
         {

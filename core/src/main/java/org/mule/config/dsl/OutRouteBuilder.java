@@ -31,7 +31,7 @@ public class OutRouteBuilder
     {
         MulticastingRouter mcr = new MulticastingRouter();
         mcr.setMuleContext(muleContext);
-        router.addRouter(mcr);
+        router.addRoute(mcr);
         return this;
     }
 
